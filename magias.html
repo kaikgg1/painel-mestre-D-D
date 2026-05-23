@@ -919,8 +919,7 @@ function abrirModal(m) {
 }
 
 function fecharModal(e) {
-  if (e && e.target !== document.getElementById('modal-overlay') && e.type !== 'click') return;
-  if (e && e.currentTarget === document.getElementById('modal-overlay') && e.target !== e.currentTarget) return;
+  if (e && e.target !== document.getElementById('modal-overlay')) return;
   document.getElementById('modal-overlay').classList.remove('open');
   document.body.style.overflow = '';
 }
