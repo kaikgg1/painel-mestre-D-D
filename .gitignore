@@ -1,1 +1,8 @@
-﻿docs/LivroDoJogador.pdf
+# Conteúdo do PHB — copyright Galápagos Jogos / WotC, não distribuir
+docs/LivroDoJogador.pdf
+docs/LivroDoJogador.txt
+docs/*.txt
+
+# Dependências locais (instaláveis via `npm install`)
+node_modules/
+package-lock.json
