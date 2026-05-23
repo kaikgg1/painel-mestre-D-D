@@ -562,10 +562,46 @@
 
   /* Mobile */
   @media (max-width: 640px) {
-    .header h1 { font-size: 26px; }
-    .grid { grid-template-columns: 1fr; }
-    .toolbar { flex-direction: column; align-items: stretch; }
-    .toolbar button, .toolbar .back-link { padding: 12px 16px; min-height: 44px; width: 100%; text-align: center; }
+    body { padding: 16px 8px; }
+    .header h1 { font-size: 24px; }
+    .grid { grid-template-columns: 1fr; gap: 14px; }
+    .card { padding: 16px 14px; }
+    .toolbar { flex-direction: column; align-items: stretch; gap: 8px; padding: 10px; }
+    .toolbar button, .toolbar .back-link { padding: 12px 16px; min-height: 44px; width: 100%; text-align: center; font-size: 12px; }
+
+    /* Stats: 3 colunas continua, mas com mais respiro */
+    .stats-row { gap: 8px; }
+    .stat-box { padding: 8px 6px; }
+    .stat-value { font-size: 20px; }
+    .stat-value input { font-size: 20px; min-width: 36px; }
+
+    /* Pips de exaustão: maiores pra touch */
+    .exh-pip { width: 32px; height: 32px; font-size: 13px; }
+    /* Pips de salvaguarda de morte: maiores */
+    .death-pip { width: 26px; height: 26px; }
+
+    /* Slots: 2 colunas em vez de 3 + inputs maiores */
+    .spell-slots { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .slot-input { width: 32px; font-size: 14px; padding: 4px 2px; }
+    .slot-inputs { gap: 4px; }
+    .slot-level { padding: 8px 6px; }
+
+    /* Condições: tags maiores */
+    .condition-tag { padding: 6px 12px; font-size: 11px; min-height: 32px; }
+
+    /* Magias preparadas: mais altura mínima */
+    .spell-list { min-height: 70px; font-size: 14px; padding: 10px; }
+
+    /* Ações inferiores */
+    .card-actions { gap: 6px; flex-wrap: wrap; }
+    .card-actions button { padding: 10px 12px; min-height: 40px; font-size: 11px; flex: 1; }
+
+    .hint { padding: 12px 14px; font-size: 12px; }
+  }
+
+  /* Tablet pequeno (entre mobile e 1024) */
+  @media (min-width: 641px) and (max-width: 820px) {
+    .spell-slots { grid-template-columns: 1fr 1fr 1fr; }
   }
 
   /* Foco visível */
@@ -603,6 +639,7 @@
   <button onclick="window.print()" aria-label="Imprimir painel"><span aria-hidden="true">🖨</span> Imprimir</button>
   <button class="danger" onclick="resetarTudo()" aria-label="Resetar todos os dados"><span aria-hidden="true">⚠</span> Resetar Tudo</button>
   <input type="file" id="file-input" accept=".json" onchange="importarSave(event)" aria-label="Selecionar arquivo de save para carregar">
+  <button type="button" id="btn-migrar-local" onclick="migrarLocal()" style="display:none" aria-label="Migrar personagens do navegador para o banco"><span aria-hidden="true">📤</span> Migrar Local</button>
   <span class="auth-slot" id="auth-slot" aria-label="Status de login" style="margin-left:auto;display:flex;gap:8px;align-items:center;font-family:'Cinzel',serif;font-size:11px;color:var(--red-dark)"></span>
 </nav>
 
@@ -620,6 +657,7 @@
 <script src="../assets/js/supabase.js"></script>
 <script src="../assets/js/auth.js"></script>
 <script src="../assets/js/dbsync.js"></script>
+<script src="../assets/js/migrar_local.js"></script>
 <script>
 const CONDICOES = [
   'Agarrado', 'Amedrontado', 'Atordoado', 'Caído', 'Cego', 'Enfeitiçado',
@@ -637,8 +675,18 @@ const PERSONAGENS_INICIAIS = [
 ];
 
 const CAMPANHA = 'mestre';
+const STORAGE_KEY_LEGADO = 'dnd_painel_mestre_v1';
 let estado = { personagens: [] };
 let ehMestre = false;
+
+async function migrarLocal() {
+  const r = await window.MigrarLocal.executar({ storageKey: STORAGE_KEY_LEGADO, campanha: CAMPANHA });
+  if (r.migrados) {
+    toast(`📤 ${r.migrados} migrado(s)`);
+    const btn = document.getElementById('btn-migrar-local');
+    if (btn) btn.style.display = 'none';
+  }
+}
 
 // salvar(p?) — envia campos do personagem p para o banco (debounced).
 // Se sem p, sincroniza todos (legacy, usado em descansoLongo etc.)
@@ -1108,6 +1156,19 @@ async function resetarTudo() {
     document.getElementById('grid').innerHTML = `<div style="padding:30px;text-align:center;color:var(--text-dim,#888)">Erro ao conectar ao banco: ${e.message}</div>`;
     return;
   }
+
+  // Mostra botão "Migrar Local" se Mestre + houver dados antigos
+  if (ehMestre && window.MigrarLocal) {
+    const n = await window.MigrarLocal.detectar(STORAGE_KEY_LEGADO);
+    if (n > 0) {
+      const btn = document.getElementById('btn-migrar-local');
+      if (btn) {
+        btn.style.display = '';
+        btn.innerHTML = `<span aria-hidden="true">📤</span> Migrar Local (${n})`;
+      }
+    }
+  }
+
   render();
 })();
 </script>

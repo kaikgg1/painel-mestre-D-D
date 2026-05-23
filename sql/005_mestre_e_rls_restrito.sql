@@ -53,6 +53,10 @@ drop policy if exists "characters_select_own"   on public.characters;
 drop policy if exists "characters_insert_own"   on public.characters;
 drop policy if exists "characters_update_own"   on public.characters;
 drop policy if exists "characters_delete_own"   on public.characters;
+drop policy if exists "characters_select"       on public.characters;
+drop policy if exists "characters_insert"       on public.characters;
+drop policy if exists "characters_update"       on public.characters;
+drop policy if exists "characters_delete"       on public.characters;
 
 create policy "characters_select" on public.characters
   for select to authenticated
@@ -76,6 +80,10 @@ drop policy if exists "spell_lists_select_own"  on public.spell_lists;
 drop policy if exists "spell_lists_insert_own"  on public.spell_lists;
 drop policy if exists "spell_lists_update_own"  on public.spell_lists;
 drop policy if exists "spell_lists_delete_own"  on public.spell_lists;
+drop policy if exists "spell_lists_select"      on public.spell_lists;
+drop policy if exists "spell_lists_insert"      on public.spell_lists;
+drop policy if exists "spell_lists_update"      on public.spell_lists;
+drop policy if exists "spell_lists_delete"      on public.spell_lists;
 
 create policy "spell_lists_select" on public.spell_lists
   for select to authenticated

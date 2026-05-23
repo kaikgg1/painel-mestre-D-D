@@ -17,6 +17,7 @@ const SCRIPTS = [
   '003_seed_jogadores.sql',
   '004_extras_e_realtime.sql',
   '005_mestre_e_rls_restrito.sql',
+  '006_profiles_seed.sql',
 ];
 
 (async () => {
