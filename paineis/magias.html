@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Grimório completo de magias de D&D 5e em PT-BR (361 magias do Livro do Jogador) com filtros por classe, nível, escola, ritual e concentração.">
+<meta name="theme-color" content="#0a0608">
+<meta property="og:title" content="Grimório de Magias — D&D 5e">
+<meta property="og:description" content="361 magias do PHB em PT-BR com busca e filtros.">
+<meta property="og:type" content="website">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
 <title>Grimório de Magias — D&D 5e</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,700;1,400&display=swap');
@@ -514,13 +520,36 @@
   ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
 
   /* ===== RESPONSIVO ===== */
+  /* Tablet — ajusta densidade dos cards */
+  @media (max-width: 1024px) {
+    .spells-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+    .filters-bar { padding: 0 16px; }
+  }
+
+  /* Mobile — coluna única + targets touch maiores */
   @media (max-width: 600px) {
-    .site-header { padding: 10px 14px; }
+    .site-header { padding: 10px 14px; gap: 12px; }
     .filters-bar { padding: 0 14px; }
     .spells-wrapper { padding: 0 14px; }
     .spells-grid { grid-template-columns: 1fr; }
     .info-grid { grid-template-columns: 1fr; }
     .spell-count { display: none; }
+    .pill, .toggle-pill, .clear-btn { padding: 10px 14px; font-size: 11px; } /* ≥44px alvo */
+    .sort-select, .search-input { padding: 12px 14px; }
+    .back-btn { padding: 10px 14px; }
+    .modal { width: 95%; max-height: 92vh; }
+  }
+
+  /* Foco visível */
+  .pill:focus-visible, .toggle-pill:focus-visible, .clear-btn:focus-visible,
+  .back-btn:focus-visible, .sort-select:focus-visible, .search-input:focus-visible,
+  .spell-card:focus-visible, .modal-close:focus-visible {
+    outline: 2px solid var(--gold-bright);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
   }
 </style>
 </head>
@@ -534,16 +563,16 @@
 
 <div class="filters-bar">
   <!-- Busca + Ordem -->
-  <div class="search-row">
-    <input type="text" class="search-input" id="busca" placeholder="🔍  Buscar magia pelo nome...">
-    <select class="sort-select" id="ordem">
+  <div class="search-row" role="search">
+    <input type="search" class="search-input" id="busca" placeholder="🔍  Buscar magia pelo nome..." aria-label="Buscar magia pelo nome">
+    <select class="sort-select" id="ordem" aria-label="Ordenar magias por">
       <option value="nome-az">Nome A → Z</option>
       <option value="nome-za">Nome Z → A</option>
       <option value="nivel-asc">Nível ↑</option>
       <option value="nivel-desc">Nível ↓</option>
       <option value="escola">Escola</option>
     </select>
-    <button class="clear-btn" onclick="limparFiltros()">✕ Limpar</button>
+    <button class="clear-btn" onclick="limparFiltros()" aria-label="Limpar todos os filtros">✕ Limpar</button>
   </div>
 
   <div class="divider"></div>
@@ -609,21 +638,21 @@
   </div>
 </div>
 
-<div class="spells-wrapper">
-  <div id="grid" class="spells-grid">
+<main class="spells-wrapper">
+  <div id="grid" class="spells-grid" role="list" aria-label="Lista de magias filtradas">
     <div class="state-box" style="grid-column:1/-1">
-      <div class="state-icon">📖</div>
-      <h3>Carregando o grimório<span class="loading-dots"></span></h3>
+      <div class="state-icon" aria-hidden="true">📖</div>
+      <h3>Carregando o grimório<span class="loading-dots" aria-hidden="true"></span></h3>
       <p>Buscando as magias dos planos de existência</p>
     </div>
   </div>
-</div>
+</main>
 
 <!-- Modal -->
-<div class="modal-overlay" id="modal-overlay" onclick="fecharModal(event)">
+<div class="modal-overlay" id="modal-overlay" onclick="fecharModal(event)" role="dialog" aria-modal="true" aria-labelledby="m-nome" aria-hidden="true">
   <div class="modal" id="modal">
     <div class="modal-header">
-      <button class="modal-close" onclick="fecharModal()">✕</button>
+      <button class="modal-close" onclick="fecharModal()" aria-label="Fechar detalhes da magia">✕</button>
       <div class="modal-title" id="m-nome">—</div>
       <div class="modal-meta" id="m-meta"></div>
     </div>
@@ -715,6 +744,9 @@ function criarCard(m) {
   const card = document.createElement('div');
   card.className = 'spell-card';
   card.style.setProperty('--escola-cor', cor);
+  card.setAttribute('role', 'listitem');
+  card.setAttribute('tabindex', '0');
+  card.setAttribute('aria-label', `${m.nome}, ${m.nivel === 0 ? 'truque' : 'nível ' + m.nivel} de ${m.escola}`);
 
   const nivelLabel = m.nivel === 0 ? 'Truque' : `Nível ${m.nivel}`;
   const ritualTag = m.ritual ? `<span class="icon-tag icon-ritual">Ritual</span>` : '';
@@ -732,6 +764,7 @@ function criarCard(m) {
     <div class="classes-row">${classesHtml}</div>`;
 
   card.onclick = () => abrirModal(m);
+  card.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); abrirModal(m); } };
   return card;
 }
 
@@ -767,17 +800,29 @@ function abrirModal(m) {
     : '<span style="color:var(--text-dim);font-style:italic">Não especificado</span>';
 
   document.getElementById('m-fonte').textContent = `Fonte: ${fonte}`;
-  document.getElementById('modal-overlay').classList.add('open');
+  const overlay = document.getElementById('modal-overlay');
+  overlay.classList.add('open');
+  overlay.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
+  ultimoFocado = document.activeElement;
+  setTimeout(() => document.querySelector('.modal-close')?.focus(), 50);
 }
 
+let ultimoFocado = null;
 function fecharModal(e) {
   if (e && e.target !== document.getElementById('modal-overlay')) return;
-  document.getElementById('modal-overlay').classList.remove('open');
+  const overlay = document.getElementById('modal-overlay');
+  overlay.classList.remove('open');
+  overlay.setAttribute('aria-hidden', 'true');
   document.body.style.overflow = '';
+  if (ultimoFocado && document.contains(ultimoFocado)) ultimoFocado.focus();
 }
 
-document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharModal(); });
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && document.getElementById('modal-overlay').classList.contains('open')) {
+    fecharModal();
+  }
+});
 
 /* ===== CONTROLES ===== */
 function atualizarContador(txt) {

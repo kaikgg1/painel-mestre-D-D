@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Painel da campanha Maldição de Strahd — controle de status, HP, slots de magia e condições dos jogadores em Barovia.">
+<meta name="theme-color" content="#0a0608">
+<meta property="og:title" content="Crônicas de Barovia — Painel do Mestre">
+<meta property="og:description" content="Painel da campanha Maldição de Strahd.">
+<meta property="og:type" content="website">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
 <title>Crônicas de Barovia — Painel do Mestre</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,700;1,400&display=swap');
@@ -101,6 +107,26 @@
     gap: 8px;
     justify-content: center;
     flex-wrap: wrap;
+  }
+  .toolbar .back-link {
+    padding: 8px 14px;
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--parchment-dim);
+    border-radius: 2px;
+    text-decoration: none;
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+  }
+  .toolbar .back-link:hover {
+    background: var(--gold);
+    color: var(--bg-deep);
   }
   .toolbar button {
     padding: 8px 16px;
@@ -577,9 +603,28 @@
 
   input[type="file"] { display: none; }
 
+  /* Tablet */
+  @media (max-width: 1024px) {
+    .grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+    .toolbar { gap: 8px; padding: 12px; }
+  }
+
+  /* Mobile */
   @media (max-width: 640px) {
     .header h1 { font-size: 26px; letter-spacing: 2px; }
     .grid { grid-template-columns: 1fr; }
+    .toolbar { flex-direction: column; align-items: stretch; }
+    .toolbar button { padding: 12px 16px; min-height: 44px; width: 100%; }
+  }
+
+  /* Foco visível */
+  button:focus-visible, input:focus-visible, [contenteditable]:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
   }
 </style>
 </head>
@@ -590,15 +635,16 @@
   <div class="subtitle">A Maldição de Strahd · Painel do Mestre</div>
 </header>
 
-<div class="toolbar">
-  <button onclick="adicionarCard()">⚜ Adicionar</button>
-  <button onclick="descansoLongo()">🌙 Descanso Longo</button>
-  <button onclick="exportarSave()">💾 Baixar Save</button>
-  <button onclick="document.getElementById('file-input').click()">📂 Carregar Save</button>
-  <button onclick="window.print()">🖨 Imprimir</button>
-  <button class="danger" onclick="resetarTudo()">☠ Resetar</button>
-  <input type="file" id="file-input" accept=".json" onchange="importarSave(event)">
-</div>
+<nav class="toolbar" aria-label="Ações do painel">
+  <a href="../index.html" class="back-link" aria-label="Voltar à tela inicial">← Voltar</a>
+  <button onclick="adicionarCard()" aria-label="Adicionar novo personagem"><span aria-hidden="true">⚜</span> Adicionar</button>
+  <button onclick="descansoLongo()" aria-label="Aplicar descanso longo a todos"><span aria-hidden="true">🌙</span> Descanso Longo</button>
+  <button onclick="exportarSave()" aria-label="Baixar arquivo de save"><span aria-hidden="true">💾</span> Baixar Save</button>
+  <button onclick="document.getElementById('file-input').click()" aria-label="Carregar arquivo de save"><span aria-hidden="true">📂</span> Carregar Save</button>
+  <button onclick="window.print()" aria-label="Imprimir painel"><span aria-hidden="true">🖨</span> Imprimir</button>
+  <button class="danger" onclick="resetarTudo()" aria-label="Resetar todos os dados"><span aria-hidden="true">☠</span> Resetar</button>
+  <input type="file" id="file-input" accept=".json" onchange="importarSave(event)" aria-label="Selecionar arquivo de save para carregar">
+</nav>
 
 <main class="grid" id="grid"></main>
 
@@ -608,7 +654,7 @@
   <strong>Save</strong> Os dados são salvos no navegador automaticamente · Use <strong>Baixar Save</strong> para guardar em arquivo (recomendado entre sessões)
 </p>
 
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
 <script>
 const CONDICOES = [

@@ -3,6 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Painel do Mestre para D&D 5e — controle de status dos jogadores e grimório completo do Livro do Jogador em português.">
+<meta name="theme-color" content="#0a0608">
+<meta property="og:title" content="Painel do Mestre — D&D 5e">
+<meta property="og:description" content="Painel do Mestre para D&D 5e — controle de status dos jogadores e grimório completo do PHB em português.">
+<meta property="og:type" content="website">
+<link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
 <title>Painel do Mestre — D&D 5e</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,700;1,400&display=swap');
@@ -265,11 +271,31 @@
     letter-spacing: 1px;
   }
 
+  /* Tablet — 2 colunas com 3º quebrando suave */
+  @media (max-width: 1100px) and (min-width: 701px) {
+    .campaigns { gap: 24px; }
+    .campaign-card { width: clamp(240px, 42vw, 360px); padding: 40px 32px 32px; }
+    .campaign-icon { font-size: 60px; }
+  }
+
   @media (max-width: 700px) {
     .title { font-size: 24px; letter-spacing: 2px; }
-    .campaign-card { width: 100%; max-width: 100%; padding: 36px 28px 30px; }
+    .campaign-card { width: 100%; max-width: 100%; padding: 36px 28px 30px; min-height: 220px; }
     .campaigns { gap: 20px; flex-direction: column; align-items: center; }
     .campaign-icon { font-size: 52px; }
+    .campaign-cta { padding: 12px 28px; } /* touch target ≥44px */
+  }
+
+  /* Foco visível para navegação por teclado */
+  .campaign-card:focus-visible {
+    outline: 2px solid var(--gold-bright);
+    outline-offset: 4px;
+  }
+
+  /* Respeita preferência de redução de movimento */
+  @media (prefers-reduced-motion: reduce) {
+    .crest { animation: none; }
+    .campaign-card, .campaign-card * { transition: none !important; }
   }
 </style>
 </head>
@@ -277,7 +303,7 @@
 
 <div class="wrapper">
 
-  <span class="crest">⚔️</span>
+  <span class="crest" aria-hidden="true">⚔️</span>
 
   <h1 class="title">Painel do Mestre</h1>
   <p class="subtitle">Escolha a Campanha</p>
@@ -288,34 +314,34 @@
 
   <div class="campaigns" style="max-width:1200px;margin:0 auto">
 
-    <a href="paineis/painel_barovia_dnd5e.html" class="campaign-card strahd">
-      <span class="corner tl">✠</span>
-      <span class="corner tr">✠</span>
-      <span class="corner bl">✠</span>
-      <span class="corner br">✠</span>
-      <div class="campaign-icon">🧛</div>
+    <a href="paineis/painel_barovia_dnd5e.html" class="campaign-card strahd" aria-label="Abrir painel da campanha Maldição de Strahd">
+      <span class="corner tl" aria-hidden="true">✠</span>
+      <span class="corner tr" aria-hidden="true">✠</span>
+      <span class="corner bl" aria-hidden="true">✠</span>
+      <span class="corner br" aria-hidden="true">✠</span>
+      <div class="campaign-icon" aria-hidden="true">🧛</div>
       <div class="campaign-name">Maldição de Strahd</div>
       <div class="campaign-desc">Crônicas de Barovia<br>O Castelo Ravenloft aguarda</div>
       <div class="campaign-cta">Entrar na Névoa</div>
     </a>
 
-    <a href="paineis/painel_mestre_dnd5e.html" class="campaign-card">
-      <span class="corner tl">✦</span>
-      <span class="corner tr">✦</span>
-      <span class="corner bl">✦</span>
-      <span class="corner br">✦</span>
-      <div class="campaign-icon">🗺️</div>
+    <a href="paineis/painel_mestre_dnd5e.html" class="campaign-card" aria-label="Abrir painel da campanha principal">
+      <span class="corner tl" aria-hidden="true">✦</span>
+      <span class="corner tr" aria-hidden="true">✦</span>
+      <span class="corner bl" aria-hidden="true">✦</span>
+      <span class="corner br" aria-hidden="true">✦</span>
+      <div class="campaign-icon" aria-hidden="true">🗺️</div>
       <div class="campaign-name">Crônica dos Aventureiros</div>
       <div class="campaign-desc">Campanha Principal<br>A jornada continua</div>
       <div class="campaign-cta">Iniciar Sessão</div>
     </a>
 
-    <a href="paineis/magias.html" class="campaign-card">
-      <span class="corner tl">✦</span>
-      <span class="corner tr">✦</span>
-      <span class="corner bl">✦</span>
-      <span class="corner br">✦</span>
-      <div class="campaign-icon">📖</div>
+    <a href="paineis/magias.html" class="campaign-card" aria-label="Abrir grimório de magias">
+      <span class="corner tl" aria-hidden="true">✦</span>
+      <span class="corner tr" aria-hidden="true">✦</span>
+      <span class="corner bl" aria-hidden="true">✦</span>
+      <span class="corner br" aria-hidden="true">✦</span>
+      <div class="campaign-icon" aria-hidden="true">📖</div>
       <div class="campaign-name">Grimório de Magias</div>
       <div class="campaign-desc">D&amp;D 5ª Edição<br>Todas as magias com filtros</div>
       <div class="campaign-cta">Abrir Grimório</div>
