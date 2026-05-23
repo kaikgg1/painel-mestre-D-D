@@ -1,0 +1,1035 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grimório de Magias — D&D 5e</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,700;1,400&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg-deep: #0a0608;
+    --bg-mid: #150a0c;
+    --bg-card: #1a1018;
+    --bg-card-soft: #221520;
+    --gold: #8B6914;
+    --gold-bright: #b88a2c;
+    --blood: #6b1010;
+    --blood-bright: #8b1d1d;
+    --parchment: #d4c5a0;
+    --parchment-dim: #a89878;
+    --shadow: #050304;
+    --text-dim: #8c7d5e;
+
+    --c-abj: #1e3a6e;
+    --c-con: #1e4d2e;
+    --c-div: #3a3a5a;
+    --c-enc: #5a1e3a;
+    --c-evo: #6b3010;
+    --c-ilu: #3a1e6e;
+    --c-nec: #2a1a3a;
+    --c-tra: #1a4a4a;
+  }
+
+  html, body {
+    min-height: 100vh;
+    background-color: var(--bg-deep);
+    background-image: radial-gradient(ellipse at top, #1e1018 0%, #0d0810 50%, #050304 100%);
+    font-family: 'EB Garamond', Georgia, serif;
+    color: var(--parchment);
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.5) 100%);
+    z-index: 0;
+  }
+
+  /* ===== HEADER ===== */
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    background: rgba(10,6,8,0.92);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--gold);
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 2px 16px rgba(0,0,0,0.6);
+  }
+  .back-btn {
+    text-decoration: none;
+    color: var(--parchment-dim);
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border: 1px solid var(--gold);
+    border-radius: 2px;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .back-btn:hover { background: var(--gold); color: var(--shadow); }
+  .header-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(16px, 3vw, 26px);
+    font-weight: 700;
+    color: var(--gold-bright);
+    letter-spacing: 2px;
+    text-shadow: 0 0 20px rgba(184,138,44,0.3);
+    flex: 1;
+    text-align: center;
+  }
+  .spell-count {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    color: var(--text-dim);
+    letter-spacing: 1px;
+    white-space: nowrap;
+    min-width: 80px;
+    text-align: right;
+  }
+
+  /* ===== FILTROS ===== */
+  .filters-bar {
+    position: relative;
+    z-index: 1;
+    max-width: 1400px;
+    margin: 20px auto 0;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .search-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .search-input {
+    flex: 1;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--gold);
+    border-radius: 3px;
+    color: var(--parchment);
+    font-family: 'EB Garamond', serif;
+    font-size: 15px;
+    padding: 9px 14px;
+    outline: none;
+    transition: all 0.2s;
+  }
+  .search-input::placeholder { color: var(--text-dim); font-style: italic; }
+  .search-input:focus { border-color: var(--gold-bright); background: rgba(255,255,255,0.06); }
+
+  .sort-select {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--gold);
+    border-radius: 3px;
+    color: var(--parchment);
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    padding: 9px 12px;
+    outline: none;
+    cursor: pointer;
+    letter-spacing: 0.5px;
+  }
+  .sort-select option { background: #1a1018; }
+
+  .filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+  }
+  .filter-label {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    min-width: 60px;
+  }
+  .pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .pill {
+    padding: 4px 10px;
+    border: 1px solid var(--text-dim);
+    border-radius: 20px;
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+  }
+  .pill:hover { border-color: var(--gold-bright); color: var(--parchment); }
+  .pill.active {
+    background: var(--gold);
+    border-color: var(--gold-bright);
+    color: var(--shadow);
+    font-weight: 700;
+  }
+  .pill.escola-pill.active { color: var(--parchment); }
+
+  .toggle-pill {
+    padding: 4px 12px;
+    border: 1px solid var(--text-dim);
+    border-radius: 20px;
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-dim);
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+    letter-spacing: 0.5px;
+  }
+  .toggle-pill:hover { border-color: var(--gold-bright); color: var(--parchment); }
+  .toggle-pill.active { background: var(--blood); border-color: var(--blood-bright); color: var(--parchment); }
+
+  .clear-btn {
+    padding: 4px 12px;
+    background: transparent;
+    border: 1px solid var(--blood);
+    border-radius: 20px;
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--parchment-dim);
+    cursor: pointer;
+    transition: all 0.15s;
+    letter-spacing: 0.5px;
+  }
+  .clear-btn:hover { background: var(--blood); color: var(--parchment); }
+
+  .divider {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+    margin: 8px 0 4px;
+    opacity: 0.4;
+  }
+
+  /* ===== GRID DE MAGIAS ===== */
+  .spells-wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 1400px;
+    margin: 16px auto 40px;
+    padding: 0 20px;
+  }
+
+  .spells-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    gap: 14px;
+  }
+
+  /* ===== CARD DE MAGIA ===== */
+  .spell-card {
+    background: linear-gradient(160deg, var(--bg-card) 0%, var(--bg-card-soft) 100%);
+    border: 1px solid rgba(139,105,20,0.4);
+    border-radius: 4px;
+    padding: 14px;
+    cursor: pointer;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .spell-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: var(--escola-cor, var(--gold));
+    opacity: 0.7;
+  }
+  .spell-card:hover {
+    border-color: var(--gold-bright);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+  }
+
+  .card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+  }
+  .nivel-badge {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--gold-bright);
+    letter-spacing: 0.5px;
+    background: rgba(139,105,20,0.2);
+    border: 1px solid rgba(139,105,20,0.4);
+    padding: 2px 7px;
+    border-radius: 10px;
+  }
+  .card-icons {
+    display: flex;
+    gap: 4px;
+    font-size: 12px;
+  }
+  .icon-tag {
+    font-size: 10px;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.3px;
+  }
+  .icon-ritual { background: rgba(107,16,16,0.3); color: #c47a5a; border: 1px solid rgba(107,16,16,0.5); }
+  .icon-conc { background: rgba(58,26,90,0.3); color: #9a7aca; border: 1px solid rgba(90,42,120,0.5); }
+
+  .spell-nome {
+    font-family: 'Cinzel', serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--parchment);
+    letter-spacing: 0.5px;
+    line-height: 1.3;
+    margin-bottom: 6px;
+  }
+
+  .escola-badge {
+    display: inline-block;
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 2px;
+    background: var(--escola-cor, rgba(139,105,20,0.3));
+    color: var(--parchment);
+    opacity: 0.85;
+    margin-bottom: 8px;
+  }
+
+  .classes-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 6px;
+  }
+  .class-tag {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    color: var(--text-dim);
+    border: 1px solid rgba(140,125,94,0.3);
+    padding: 1px 6px;
+    border-radius: 2px;
+    letter-spacing: 0.3px;
+  }
+
+  /* ===== LOADING / EMPTY ===== */
+  .state-box {
+    text-align: center;
+    padding: 60px 20px;
+    color: var(--text-dim);
+  }
+  .state-box .state-icon { font-size: 48px; margin-bottom: 16px; }
+  .state-box h3 {
+    font-family: 'Cinzel', serif;
+    font-size: 18px;
+    color: var(--parchment-dim);
+    margin-bottom: 8px;
+  }
+  .state-box p { font-style: italic; font-size: 14px; }
+
+  .loading-dots::after {
+    content: '';
+    animation: dots 1.5s infinite;
+  }
+  @keyframes dots {
+    0%,20% { content: '.'; }
+    40%,60% { content: '..'; }
+    80%,100% { content: '...'; }
+  }
+
+  /* ===== MODAL ===== */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(4px);
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: linear-gradient(160deg, #1f1416 0%, #160c10 100%);
+    border: 2px solid var(--gold);
+    border-radius: 4px;
+    max-width: 640px;
+    width: 100%;
+    max-height: 85vh;
+    overflow-y: auto;
+    box-shadow: 0 0 0 1px var(--blood-bright) inset, 0 20px 60px rgba(0,0,0,0.8);
+    position: relative;
+  }
+
+  .modal-header {
+    padding: 20px 20px 14px;
+    border-bottom: 1px solid var(--blood);
+    position: sticky;
+    top: 0;
+    background: #1f1416;
+    z-index: 1;
+  }
+  .modal-close {
+    position: absolute;
+    top: 14px; right: 14px;
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    font-size: 20px;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.15s;
+    padding: 4px;
+  }
+  .modal-close:hover { color: var(--parchment); }
+  .modal-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--gold-bright);
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+    padding-right: 28px;
+  }
+  .modal-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    margin-top: 8px;
+  }
+  .meta-badge {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 2px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .meta-nivel { background: rgba(139,105,20,0.25); border: 1px solid rgba(184,138,44,0.4); color: var(--gold-bright); }
+  .meta-escola { color: var(--parchment); }
+  .meta-ritual { background: rgba(107,16,16,0.3); border: 1px solid var(--blood); color: #c47a5a; }
+  .meta-conc { background: rgba(58,26,90,0.3); border: 1px solid #5a3a8a; color: #9a7aca; }
+
+  .modal-body { padding: 16px 20px 24px; }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .info-item { font-size: 13px; }
+  .info-key {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 2px;
+  }
+  .info-val { color: var(--parchment); line-height: 1.4; }
+
+  .desc-title {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid var(--blood);
+  }
+  .desc-text {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--parchment);
+    margin-bottom: 14px;
+    white-space: pre-line;
+  }
+
+  .classes-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .class-badge {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    padding: 3px 10px;
+    border: 1px solid rgba(139,105,20,0.4);
+    border-radius: 2px;
+    color: var(--parchment-dim);
+    background: rgba(139,105,20,0.1);
+  }
+
+  .api-source {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    color: var(--text-dim);
+    text-align: right;
+    margin-top: 12px;
+    opacity: 0.5;
+    letter-spacing: 0.5px;
+  }
+
+  /* ===== SCROLLBAR ===== */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg-deep); }
+  ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
+
+  /* ===== RESPONSIVO ===== */
+  @media (max-width: 600px) {
+    .site-header { padding: 10px 14px; }
+    .filters-bar { padding: 0 14px; }
+    .spells-wrapper { padding: 0 14px; }
+    .spells-grid { grid-template-columns: 1fr; }
+    .info-grid { grid-template-columns: 1fr; }
+    .spell-count { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="index.html" class="back-btn">← Voltar</a>
+  <div class="header-title">Grimório de Magias</div>
+  <div class="spell-count" id="count">Carregando...</div>
+</header>
+
+<div class="filters-bar">
+  <!-- Busca + Ordem -->
+  <div class="search-row">
+    <input type="text" class="search-input" id="busca" placeholder="🔍  Buscar magia pelo nome...">
+    <select class="sort-select" id="ordem">
+      <option value="nome-az">Nome A → Z</option>
+      <option value="nome-za">Nome Z → A</option>
+      <option value="nivel-asc">Nível ↑</option>
+      <option value="nivel-desc">Nível ↓</option>
+      <option value="escola">Escola</option>
+    </select>
+    <button class="clear-btn" onclick="limparFiltros()">✕ Limpar</button>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Nível -->
+  <div class="filter-row">
+    <span class="filter-label">Nível</span>
+    <div class="pills" id="pills-nivel">
+      <span class="pill active" data-nivel="all">Todos</span>
+      <span class="pill" data-nivel="0">Truque</span>
+      <span class="pill" data-nivel="1">1</span>
+      <span class="pill" data-nivel="2">2</span>
+      <span class="pill" data-nivel="3">3</span>
+      <span class="pill" data-nivel="4">4</span>
+      <span class="pill" data-nivel="5">5</span>
+      <span class="pill" data-nivel="6">6</span>
+      <span class="pill" data-nivel="7">7</span>
+      <span class="pill" data-nivel="8">8</span>
+      <span class="pill" data-nivel="9">9</span>
+    </div>
+  </div>
+
+  <!-- Escola -->
+  <div class="filter-row">
+    <span class="filter-label">Escola</span>
+    <div class="pills" id="pills-escola">
+      <span class="pill escola-pill active" data-escola="all">Todas</span>
+      <span class="pill escola-pill" data-escola="Abjuração" style="--escola-cor:var(--c-abj)">Abjuração</span>
+      <span class="pill escola-pill" data-escola="Conjuração" style="--escola-cor:var(--c-con)">Conjuração</span>
+      <span class="pill escola-pill" data-escola="Adivinhação" style="--escola-cor:var(--c-div)">Adivinhação</span>
+      <span class="pill escola-pill" data-escola="Encantamento" style="--escola-cor:var(--c-enc)">Encantamento</span>
+      <span class="pill escola-pill" data-escola="Evocação" style="--escola-cor:var(--c-evo)">Evocação</span>
+      <span class="pill escola-pill" data-escola="Ilusão" style="--escola-cor:var(--c-ilu)">Ilusão</span>
+      <span class="pill escola-pill" data-escola="Necromancia" style="--escola-cor:var(--c-nec)">Necromancia</span>
+      <span class="pill escola-pill" data-escola="Transmutação" style="--escola-cor:var(--c-tra)">Transmutação</span>
+    </div>
+  </div>
+
+  <!-- Classe -->
+  <div class="filter-row">
+    <span class="filter-label">Classe</span>
+    <div class="pills" id="pills-classe">
+      <span class="pill active" data-classe="all">Todas</span>
+      <span class="pill" data-classe="Bardo">Bardo</span>
+      <span class="pill" data-classe="Clérigo">Clérigo</span>
+      <span class="pill" data-classe="Druida">Druida</span>
+      <span class="pill" data-classe="Guerreiro">Guerreiro</span>
+      <span class="pill" data-classe="Paladino">Paladino</span>
+      <span class="pill" data-classe="Patrulheiro">Patrulheiro</span>
+      <span class="pill" data-classe="Ladino">Ladino</span>
+      <span class="pill" data-classe="Feiticeiro">Feiticeiro</span>
+      <span class="pill" data-classe="Bruxo">Bruxo</span>
+      <span class="pill" data-classe="Mago">Mago</span>
+      <span class="pill" data-classe="Artífice">Artífice</span>
+    </div>
+  </div>
+
+  <!-- Extras -->
+  <div class="filter-row">
+    <span class="filter-label">Extra</span>
+    <span class="toggle-pill" id="toggle-ritual" onclick="toggleExtra('ritual')">Ritual</span>
+    <span class="toggle-pill" id="toggle-conc" onclick="toggleExtra('conc')">Concentração</span>
+  </div>
+</div>
+
+<div class="spells-wrapper">
+  <div id="grid" class="spells-grid">
+    <div class="state-box" style="grid-column:1/-1">
+      <div class="state-icon">📖</div>
+      <h3>Carregando o grimório<span class="loading-dots"></span></h3>
+      <p>Buscando as magias dos planos de existência</p>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal-overlay" onclick="fecharModal(event)">
+  <div class="modal" id="modal">
+    <div class="modal-header">
+      <button class="modal-close" onclick="fecharModal()">✕</button>
+      <div class="modal-title" id="m-nome">—</div>
+      <div class="modal-meta" id="m-meta"></div>
+    </div>
+    <div class="modal-body">
+      <div class="info-grid" id="m-info"></div>
+      <div class="desc-title">Descrição</div>
+      <div class="desc-text" id="m-desc"></div>
+      <div id="m-maior-nivel-wrap" style="display:none">
+        <div class="desc-title">Em Níveis Superiores</div>
+        <div class="desc-text" id="m-maior-nivel"></div>
+      </div>
+      <div class="desc-title">Classes</div>
+      <div class="classes-list" id="m-classes"></div>
+      <div class="api-source" id="m-fonte"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== TRADUÇÕES ===== */
+const ESCOLA_PT = {
+  'Abjuration':'Abjuração','Conjuration':'Conjuração','Divination':'Adivinhação',
+  'Enchantment':'Encantamento','Evocation':'Evocação','Illusion':'Ilusão',
+  'Necromancy':'Necromancia','Transmutation':'Transmutação',
+  // já em PT (BR API)
+  'Abjuração':'Abjuração','Conjuração':'Conjuração','Adivinhação':'Adivinhação',
+  'Encantamento':'Encantamento','Evocação':'Evocação','Ilusão':'Ilusão',
+  'Necromancia':'Necromancia','Transmutação':'Transmutação'
+};
+
+const CLASSE_PT = {
+  'Bard':'Bardo','Cleric':'Clérigo','Druid':'Druida','Fighter':'Guerreiro',
+  'Paladin':'Paladino','Ranger':'Patrulheiro','Rogue':'Ladino',
+  'Sorcerer':'Feiticeiro','Warlock':'Bruxo','Wizard':'Mago','Artificer':'Artífice',
+  // já em PT
+  'Bardo':'Bardo','Clérigo':'Clérigo','Druida':'Druida','Guerreiro':'Guerreiro',
+  'Paladino':'Paladino','Patrulheiro':'Patrulheiro','Ladino':'Ladino',
+  'Feiticeiro':'Feiticeiro','Bruxo':'Bruxo','Mago':'Mago','Artífice':'Artífice'
+};
+
+const ESCOLA_COR = {
+  'Abjuração':'var(--c-abj)','Conjuração':'var(--c-con)','Adivinhação':'var(--c-div)',
+  'Encantamento':'var(--c-enc)','Evocação':'var(--c-evo)','Ilusão':'var(--c-ilu)',
+  'Necromancia':'var(--c-nec)','Transmutação':'var(--c-tra)'
+};
+
+/* ===== ESTADO ===== */
+let todasMagias = [];
+let fonte = '';
+const filtros = { texto:'', niveis:new Set(), escolas:new Set(), classes:new Set(), ritual:null, conc:null, ordem:'nome-az' };
+
+/* ===== FETCH ===== */
+async function carregarMagias() {
+  // Tenta BR API
+  try {
+    const res = await fetch('https://api-magias-dnd.herokuapp.com/api/br/spells', { signal: AbortSignal.timeout(8000) });
+    if (!res.ok) throw new Error('offline');
+    const data = await res.json();
+    const magias = (Array.isArray(data) ? data : data.spells || data.magias || [])
+      .map(normalizarBR).filter(Boolean);
+    if (magias.length === 0) throw new Error('vazio');
+    todasMagias = magias;
+    fonte = 'API D&D BR (Português)';
+    renderizar();
+    return;
+  } catch(e) { /* tenta próxima */ }
+
+  // Fallback: Open5e (mais completo, inglês + tradução)
+  try {
+    const res = await fetch('https://api.open5e.com/v1/spells/?limit=500&format=json', { signal: AbortSignal.timeout(15000) });
+    if (!res.ok) throw new Error('offline');
+    const data = await res.json();
+    const magias = (data.results || []).map(normalizarOpen5e).filter(Boolean);
+    todasMagias = magias;
+    fonte = 'Open5e (traduzido)';
+    renderizar();
+    return;
+  } catch(e) { /* tenta próxima */ }
+
+  // Fallback final: dnd5eapi.co
+  try {
+    const res = await fetch('https://www.dnd5eapi.co/api/spells', { signal: AbortSignal.timeout(10000) });
+    if (!res.ok) throw new Error('offline');
+    const data = await res.json();
+    // Buscar detalhes em lotes de 30
+    const indices = (data.results || []).map(s => s.index);
+    const magias = await fetchEmLotes(indices);
+    todasMagias = magias;
+    fonte = 'D&D 5e API (traduzido)';
+    renderizar();
+    return;
+  } catch(e) {}
+
+  mostrarErro();
+}
+
+async function fetchEmLotes(indices) {
+  const lote = 30;
+  let todas = [];
+  for (let i = 0; i < indices.length; i += lote) {
+    const batch = indices.slice(i, i + lote);
+    const results = await Promise.all(batch.map(idx =>
+      fetch(`https://www.dnd5eapi.co/api/spells/${idx}`).then(r => r.json()).catch(() => null)
+    ));
+    todas = todas.concat(results.filter(Boolean).map(normalizarDnd5e));
+    atualizarContador(`Carregando: ${Math.min(i+lote, indices.length)}/${indices.length} magias`);
+  }
+  return todas;
+}
+
+/* ===== NORMALIZAÇÃO ===== */
+function normalizarBR(s) {
+  if (!s) return null;
+  const nome = s.nome || s.name || '';
+  if (!nome) return null;
+  return {
+    nome,
+    nivel: s.nivel ?? s.level ?? 0,
+    escola: ESCOLA_PT[s.escola || s.school] || s.escola || s.school || 'Desconhecida',
+    classes: parsearClasses(s.classes || s.classe || ''),
+    tempoCast: s.tempo_conjuracao || s.casting_time || '—',
+    alcance: s.alcance || s.range || '—',
+    componentes: parsearComponentes(s.componentes || s.components || ''),
+    material: s.material || '',
+    duracao: s.duracao || s.duration || '—',
+    ritual: !!(s.ritual),
+    concentracao: !!(s.concentracao || s.concentration),
+    descricao: s.descricao || s.desc || '',
+    maiorNivel: s.em_niveis_superiores || s.higher_level || ''
+  };
+}
+
+function normalizarOpen5e(s) {
+  if (!s || !s.name) return null;
+  const levelRaw = s.level_int ?? parseNivel(s.level);
+  return {
+    nome: s.name,
+    nivel: levelRaw,
+    escola: ESCOLA_PT[s.school] || s.school || 'Desconhecida',
+    classes: parsearClasses(s.dnd_class || ''),
+    tempoCast: s.casting_time || '—',
+    alcance: s.range || '—',
+    componentes: parsearComponentes(s.components || ''),
+    material: s.material || '',
+    duracao: s.duration || '—',
+    ritual: s.ritual === 'yes' || s.ritual === true,
+    concentracao: s.concentration === 'yes' || s.concentration === true,
+    descricao: Array.isArray(s.desc) ? s.desc.join('\n\n') : (s.desc || ''),
+    maiorNivel: Array.isArray(s.higher_level) ? s.higher_level.join('\n') : (s.higher_level || '')
+  };
+}
+
+function normalizarDnd5e(s) {
+  if (!s || !s.name) return null;
+  return {
+    nome: s.name,
+    nivel: s.level ?? 0,
+    escola: ESCOLA_PT[s.school?.name] || s.school?.name || 'Desconhecida',
+    classes: (s.classes || []).map(c => CLASSE_PT[c.name] || c.name),
+    tempoCast: s.casting_time || '—',
+    alcance: s.range || '—',
+    componentes: s.components || [],
+    material: s.material || '',
+    duracao: s.duration || '—',
+    ritual: !!s.ritual,
+    concentracao: !!s.concentration,
+    descricao: Array.isArray(s.desc) ? s.desc.join('\n\n') : (s.desc || ''),
+    maiorNivel: Array.isArray(s.higher_level) ? s.higher_level.join('\n') : (s.higher_level || '')
+  };
+}
+
+function parseNivel(v) {
+  if (typeof v === 'number') return v;
+  if (!v || v === 'cantrip') return 0;
+  const m = String(v).match(/\d+/);
+  return m ? parseInt(m[0]) : 0;
+}
+
+function parsearClasses(raw) {
+  if (Array.isArray(raw)) return raw.map(c => CLASSE_PT[typeof c === 'string' ? c : c.name] || (typeof c === 'string' ? c : c.name));
+  if (typeof raw === 'string') return raw.split(',').map(c => CLASSE_PT[c.trim()] || c.trim()).filter(Boolean);
+  return [];
+}
+
+function parsearComponentes(raw) {
+  if (Array.isArray(raw)) return raw;
+  if (typeof raw === 'string') return raw.split(',').map(c => c.trim()).filter(Boolean);
+  return [];
+}
+
+/* ===== FILTROS E SORT ===== */
+function filtrar() {
+  return todasMagias.filter(m => {
+    if (filtros.texto && !m.nome.toLowerCase().includes(filtros.texto.toLowerCase())) return false;
+    if (filtros.niveis.size && !filtros.niveis.has(m.nivel)) return false;
+    if (filtros.escolas.size && !filtros.escolas.has(m.escola)) return false;
+    if (filtros.classes.size && !m.classes.some(c => filtros.classes.has(c))) return false;
+    if (filtros.ritual !== null && m.ritual !== filtros.ritual) return false;
+    if (filtros.conc !== null && m.concentracao !== filtros.conc) return false;
+    return true;
+  }).sort((a, b) => {
+    switch(filtros.ordem) {
+      case 'nome-za': return b.nome.localeCompare(a.nome, 'pt');
+      case 'nivel-asc': return a.nivel - b.nivel || a.nome.localeCompare(b.nome, 'pt');
+      case 'nivel-desc': return b.nivel - a.nivel || a.nome.localeCompare(b.nome, 'pt');
+      case 'escola': return (a.escola||'').localeCompare(b.escola||'', 'pt') || a.nome.localeCompare(b.nome, 'pt');
+      default: return a.nome.localeCompare(b.nome, 'pt');
+    }
+  });
+}
+
+/* ===== RENDER ===== */
+function renderizar() {
+  const lista = filtrar();
+  const grid = document.getElementById('grid');
+
+  atualizarContador(`${lista.length} de ${todasMagias.length} magias`);
+
+  if (lista.length === 0) {
+    grid.innerHTML = `<div class="state-box" style="grid-column:1/-1">
+      <div class="state-icon">🔮</div>
+      <h3>Nenhuma magia encontrada</h3>
+      <p>Tente outros filtros ou limpe a busca</p>
+    </div>`;
+    return;
+  }
+
+  grid.innerHTML = '';
+  const frag = document.createDocumentFragment();
+  lista.forEach(m => frag.appendChild(criarCard(m)));
+  grid.appendChild(frag);
+}
+
+function criarCard(m) {
+  const cor = ESCOLA_COR[m.escola] || 'var(--gold)';
+  const card = document.createElement('div');
+  card.className = 'spell-card';
+  card.style.setProperty('--escola-cor', cor);
+
+  const nivelLabel = m.nivel === 0 ? 'Truque' : `Nível ${m.nivel}`;
+  const ritualTag = m.ritual ? `<span class="icon-tag icon-ritual">Ritual</span>` : '';
+  const concTag = m.concentracao ? `<span class="icon-tag icon-conc">Conc.</span>` : '';
+  const classesHtml = m.classes.slice(0,5).map(c => `<span class="class-tag">${c}</span>`).join('') +
+    (m.classes.length > 5 ? `<span class="class-tag">+${m.classes.length-5}</span>` : '');
+
+  card.innerHTML = `
+    <div class="card-top">
+      <span class="nivel-badge">${nivelLabel}</span>
+      <div class="card-icons">${ritualTag}${concTag}</div>
+    </div>
+    <div class="spell-nome">${m.nome}</div>
+    <span class="escola-badge" style="background:${cor}">${m.escola}</span>
+    <div class="classes-row">${classesHtml}</div>`;
+
+  card.onclick = () => abrirModal(m);
+  return card;
+}
+
+/* ===== MODAL ===== */
+function abrirModal(m) {
+  const cor = ESCOLA_COR[m.escola] || 'var(--gold)';
+  document.getElementById('m-nome').textContent = m.nome;
+
+  const nivelLabel = m.nivel === 0 ? 'Truque' : `Nível ${m.nivel}`;
+  let metaHtml = `<span class="meta-badge meta-nivel">${nivelLabel}</span>`;
+  metaHtml += `<span class="meta-badge meta-escola" style="background:${cor}">${m.escola}</span>`;
+  if (m.ritual) metaHtml += `<span class="meta-badge meta-ritual">Ritual</span>`;
+  if (m.concentracao) metaHtml += `<span class="meta-badge meta-conc">Concentração</span>`;
+  document.getElementById('m-meta').innerHTML = metaHtml;
+
+  const comps = m.componentes.join(', ') + (m.material ? ` (${m.material})` : '');
+  document.getElementById('m-info').innerHTML = `
+    <div class="info-item"><div class="info-key">Tempo de Conjuração</div><div class="info-val">${m.tempoCast}</div></div>
+    <div class="info-item"><div class="info-key">Alcance</div><div class="info-val">${m.alcance}</div></div>
+    <div class="info-item"><div class="info-key">Componentes</div><div class="info-val">${comps || '—'}</div></div>
+    <div class="info-item"><div class="info-key">Duração</div><div class="info-val">${m.duracao}</div></div>`;
+
+  document.getElementById('m-desc').textContent = m.descricao || '—';
+
+  const maiorWrap = document.getElementById('m-maior-nivel-wrap');
+  if (m.maiorNivel) {
+    document.getElementById('m-maior-nivel').textContent = m.maiorNivel;
+    maiorWrap.style.display = 'block';
+  } else { maiorWrap.style.display = 'none'; }
+
+  document.getElementById('m-classes').innerHTML = m.classes.length
+    ? m.classes.map(c => `<span class="class-badge">${c}</span>`).join('')
+    : '<span style="color:var(--text-dim);font-style:italic">Não especificado</span>';
+
+  document.getElementById('m-fonte').textContent = `Fonte: ${fonte}`;
+  document.getElementById('modal-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function fecharModal(e) {
+  if (e && e.target !== document.getElementById('modal-overlay') && e.type !== 'click') return;
+  if (e && e.currentTarget === document.getElementById('modal-overlay') && e.target !== e.currentTarget) return;
+  document.getElementById('modal-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharModal(); });
+
+/* ===== CONTROLES ===== */
+function atualizarContador(txt) {
+  document.getElementById('count').textContent = txt;
+}
+
+function mostrarErro() {
+  document.getElementById('grid').innerHTML = `<div class="state-box" style="grid-column:1/-1">
+    <div class="state-icon">⚠️</div>
+    <h3>Não foi possível carregar as magias</h3>
+    <p>Verifique sua conexão com a internet e recarregue a página</p>
+  </div>`;
+  document.getElementById('count').textContent = 'Erro';
+}
+
+function limparFiltros() {
+  filtros.texto = ''; filtros.niveis.clear(); filtros.escolas.clear(); filtros.classes.clear();
+  filtros.ritual = null; filtros.conc = null;
+  document.getElementById('busca').value = '';
+  document.getElementById('ordem').value = 'nome-az';
+  filtros.ordem = 'nome-az';
+  document.querySelectorAll('.pill').forEach(p => {
+    p.classList.toggle('active', p.dataset.nivel === 'all' || p.dataset.escola === 'all' || p.dataset.classe === 'all');
+  });
+  document.getElementById('toggle-ritual').classList.remove('active');
+  document.getElementById('toggle-conc').classList.remove('active');
+  renderizar();
+}
+
+function toggleExtra(tipo) {
+  const el = document.getElementById(`toggle-${tipo}`);
+  if (tipo === 'ritual') {
+    filtros.ritual = filtros.ritual === true ? null : true;
+    el.classList.toggle('active', filtros.ritual !== null);
+  } else {
+    filtros.conc = filtros.conc === true ? null : true;
+    el.classList.toggle('active', filtros.conc !== null);
+  }
+  renderizar();
+}
+
+/* ===== EVENT LISTENERS ===== */
+document.getElementById('busca').addEventListener('input', e => {
+  filtros.texto = e.target.value;
+  renderizar();
+});
+
+document.getElementById('ordem').addEventListener('change', e => {
+  filtros.ordem = e.target.value;
+  renderizar();
+});
+
+// Pills de nível (single select)
+document.getElementById('pills-nivel').addEventListener('click', e => {
+  const pill = e.target.closest('.pill');
+  if (!pill) return;
+  document.querySelectorAll('#pills-nivel .pill').forEach(p => p.classList.remove('active'));
+  pill.classList.add('active');
+  const val = pill.dataset.nivel;
+  filtros.niveis.clear();
+  if (val !== 'all') filtros.niveis.add(Number(val));
+  renderizar();
+});
+
+// Pills de escola (multi-select)
+document.getElementById('pills-escola').addEventListener('click', e => {
+  const pill = e.target.closest('.pill');
+  if (!pill) return;
+  const val = pill.dataset.escola;
+  if (val === 'all') {
+    filtros.escolas.clear();
+    document.querySelectorAll('#pills-escola .pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+  } else {
+    document.querySelector('#pills-escola [data-escola="all"]').classList.remove('active');
+    pill.classList.toggle('active');
+    if (pill.classList.contains('active')) filtros.escolas.add(val);
+    else filtros.escolas.delete(val);
+    if (filtros.escolas.size === 0) document.querySelector('#pills-escola [data-escola="all"]').classList.add('active');
+  }
+  renderizar();
+});
+
+// Pills de classe (multi-select)
+document.getElementById('pills-classe').addEventListener('click', e => {
+  const pill = e.target.closest('.pill');
+  if (!pill) return;
+  const val = pill.dataset.classe;
+  if (val === 'all') {
+    filtros.classes.clear();
+    document.querySelectorAll('#pills-classe .pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+  } else {
+    document.querySelector('#pills-classe [data-classe="all"]').classList.remove('active');
+    pill.classList.toggle('active');
+    if (pill.classList.contains('active')) filtros.classes.add(val);
+    else filtros.classes.delete(val);
+    if (filtros.classes.size === 0) document.querySelector('#pills-classe [data-classe="all"]').classList.add('active');
+  }
+  renderizar();
+});
+
+/* ===== INIT ===== */
+carregarMagias();
+</script>
+</body>
+</html>
