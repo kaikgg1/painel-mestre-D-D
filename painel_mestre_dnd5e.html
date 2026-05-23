@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel do Mestre — D&D 5e</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+
+  * { box-sizing: border-box; }
+
+  :root {
+    --bg-page: #2a1810;
+    --bg-parchment: #FDF1DC;
+    --bg-parchment-dark: #E8D5A8;
+    --gold: #C9A24A;
+    --gold-dark: #8B6914;
+    --red: #922610;
+    --red-dark: #5C1809;
+    --brown: #3A1E0C;
+    --brown-soft: #5a3a20;
+  }
+
+  body {
+    margin: 0;
+    padding: 24px 16px;
+    font-family: 'Libre Baskerville', Georgia, serif;
+    background-color: var(--bg-page);
+    background-image:
+      radial-gradient(ellipse at top, #4a2818 0%, #2a1810 60%, #1a0e08 100%);
+    background-attachment: fixed;
+    color: var(--brown);
+    min-height: 100vh;
+  }
+
+  /* ===== CABEÇALHO ===== */
+  .header {
+    max-width: 1280px;
+    margin: 0 auto 24px;
+    text-align: center;
+    color: var(--bg-parchment);
+    position: relative;
+    padding: 8px 0 20px;
+  }
+  .header h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 38px;
+    font-weight: 700;
+    margin: 0;
+    letter-spacing: 3px;
+    color: var(--gold);
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    font-variant: small-caps;
+  }
+  .header .subtitle {
+    font-style: italic;
+    font-size: 14px;
+    color: #d4b88c;
+    margin-top: 6px;
+    letter-spacing: 1px;
+  }
+  .header::after {
+    content: '';
+    display: block;
+    width: 60%;
+    margin: 14px auto 0;
+    height: 2px;
+    background: linear-gradient(to right, transparent, var(--gold), transparent);
+  }
+
+  /* ===== TOOLBAR ===== */
+  .toolbar {
+    max-width: 1280px;
+    margin: 0 auto 20px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .toolbar button {
+    padding: 8px 16px;
+    background: var(--bg-parchment);
+    border: 1.5px solid var(--gold);
+    color: var(--red-dark);
+    border-radius: 4px;
+    cursor: pointer;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    transition: all 0.15s;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+  }
+  .toolbar button:hover {
+    background: var(--gold);
+    color: var(--brown);
+    transform: translateY(-1px);
+  }
+  .toolbar button.danger {
+    border-color: var(--red);
+    color: var(--red-dark);
+  }
+  .toolbar button.danger:hover {
+    background: var(--red);
+    color: var(--bg-parchment);
+  }
+
+  /* ===== GRID DE CARDS ===== */
+  .grid {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+    gap: 20px;
+  }
+
+  /* ===== CARD ===== */
+  .card {
+    background: var(--bg-parchment);
+    background-image:
+      linear-gradient(rgba(253,241,220,0.92), rgba(253,241,220,0.92)),
+      radial-gradient(circle at 30% 20%, rgba(180,150,100,0.2) 0%, transparent 60%),
+      radial-gradient(circle at 70% 80%, rgba(160,130,80,0.15) 0%, transparent 60%);
+    border: 3px double var(--gold);
+    border-radius: 6px;
+    padding: 14px;
+    position: relative;
+    box-shadow:
+      0 0 0 1px var(--red-dark) inset,
+      0 4px 14px rgba(0,0,0,0.4);
+  }
+
+  /* Cantos ornamentais */
+  .card::before, .card::after {
+    content: '✦';
+    position: absolute;
+    color: var(--gold-dark);
+    font-size: 14px;
+    opacity: 0.7;
+  }
+  .card::before { top: 4px; left: 8px; }
+  .card::after { top: 4px; right: 8px; }
+
+  /* ===== CABEÇALHO DO CARD ===== */
+  .char-header {
+    text-align: center;
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1.5px solid var(--red);
+    position: relative;
+  }
+  .char-name {
+    font-family: 'Cinzel', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--red-dark);
+    font-variant: small-caps;
+    letter-spacing: 1.5px;
+    line-height: 1.15;
+    outline: none;
+    min-height: 24px;
+  }
+  .player-name {
+    font-style: italic;
+    font-size: 12px;
+    color: var(--brown-soft);
+    margin-top: 2px;
+    outline: none;
+  }
+  .race-class {
+    font-size: 13px;
+    color: var(--brown);
+    margin-top: 4px;
+    outline: none;
+  }
+  .race-class strong {
+    color: var(--red-dark);
+  }
+
+  /* ===== INSPIRAÇÃO BADGE ===== */
+  .inspiration {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 28px;
+    height: 28px;
+    background: var(--bg-parchment);
+    border: 2px solid var(--gold-dark);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .inspiration.active {
+    background: var(--gold);
+    color: var(--red-dark);
+    box-shadow: 0 0 8px var(--gold);
+  }
+  .inspiration:hover { transform: scale(1.1); }
+
+  /* ===== STATS PRINCIPAIS ===== */
+  .stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  .stat-box {
+    background: rgba(146, 38, 16, 0.08);
+    border: 1px solid var(--red);
+    border-radius: 4px;
+    padding: 6px 4px;
+    text-align: center;
+  }
+  .stat-label {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--red-dark);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin-bottom: 2px;
+  }
+  .stat-value {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--brown);
+    outline: none;
+    line-height: 1.1;
+  }
+  .stat-value.hp {
+    font-size: 15px;
+  }
+  .stat-value.hp .hp-current {
+    color: var(--red-dark);
+  }
+  .stat-value.hp .hp-sep {
+    color: var(--brown-soft);
+    margin: 0 1px;
+  }
+
+  /* ===== SEÇÕES ===== */
+  .section {
+    margin-top: 10px;
+  }
+  .section-title {
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--red-dark);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    padding-bottom: 2px;
+    border-bottom: 1px solid var(--red);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* ===== EXAUSTÃO ===== */
+  .exhaustion {
+    display: flex;
+    gap: 5px;
+    justify-content: center;
+    margin: 4px 0;
+  }
+  .exh-pip {
+    width: 22px;
+    height: 22px;
+    border: 1.5px solid var(--brown-soft);
+    border-radius: 4px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--brown-soft);
+    background: rgba(253, 241, 220, 0.5);
+    transition: all 0.15s;
+    user-select: none;
+  }
+  .exh-pip:hover {
+    border-color: var(--red);
+  }
+  .exh-pip.filled {
+    background: var(--red-dark);
+    border-color: var(--red-dark);
+    color: var(--gold);
+  }
+
+  /* ===== SALVAGUARDAS DE MORTE ===== */
+  .death-saves {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px;
+    margin: 4px 0;
+  }
+  .death-group {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+  .death-group-label {
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .death-group.success .death-group-label { color: #2d6a3e; }
+  .death-group.failure .death-group-label { color: var(--red-dark); }
+  .death-pips {
+    display: flex;
+    gap: 4px;
+  }
+  .death-pip {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 1.5px solid;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .death-group.success .death-pip {
+    border-color: #2d6a3e;
+  }
+  .death-group.success .death-pip.filled {
+    background: #2d6a3e;
+  }
+  .death-group.failure .death-pip {
+    border-color: var(--red-dark);
+  }
+  .death-group.failure .death-pip.filled {
+    background: var(--red-dark);
+  }
+
+  /* ===== SLOTS DE MAGIA ===== */
+  .spell-slots {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 4px;
+    font-size: 11px;
+  }
+  .slot-level {
+    background: rgba(146, 38, 16, 0.05);
+    border: 1px solid rgba(146, 38, 16, 0.3);
+    border-radius: 3px;
+    padding: 3px;
+    text-align: center;
+  }
+  .slot-level-num {
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    color: var(--red-dark);
+    font-size: 10px;
+  }
+  .slot-inputs {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    font-size: 11px;
+  }
+  .slot-input {
+    width: 22px;
+    text-align: center;
+    border: none;
+    background: transparent;
+    font-family: inherit;
+    font-size: 11px;
+    color: var(--brown);
+    outline: none;
+    font-weight: 700;
+  }
+  .slot-input:focus {
+    background: rgba(201, 162, 74, 0.2);
+    border-radius: 2px;
+  }
+  .slot-sep {
+    color: var(--brown-soft);
+  }
+
+  /* ===== MAGIAS PREPARADAS ===== */
+  .spell-list {
+    min-height: 30px;
+    font-size: 12px;
+    line-height: 1.5;
+    outline: none;
+    color: var(--brown);
+    padding: 2px 4px;
+    border-radius: 3px;
+    transition: background 0.12s;
+  }
+  .spell-list:hover { background: rgba(146,38,16,0.04); }
+  .spell-list:focus { background: rgba(146,38,16,0.08); }
+  .spell-list:empty::before {
+    content: 'Truque, Mísseis Mágicos, Escudo...';
+    color: var(--brown-soft);
+    font-style: italic;
+    opacity: 0.6;
+  }
+
+  /* ===== CONDIÇÕES ===== */
+  .conditions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 4px;
+  }
+  .condition-tag {
+    background: var(--bg-parchment-dark);
+    border: 1px solid var(--gold-dark);
+    color: var(--red-dark);
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    user-select: none;
+    font-family: 'Cinzel', serif;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    opacity: 0.45;
+  }
+  .condition-tag.active {
+    background: var(--red);
+    border-color: var(--red-dark);
+    color: var(--bg-parchment);
+    opacity: 1;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .condition-tag:hover {
+    transform: translateY(-1px);
+    opacity: 0.85;
+  }
+  .condition-tag.active:hover {
+    opacity: 1;
+  }
+
+  /* ===== ÁREAS EDITÁVEIS ===== */
+  [contenteditable="true"] {
+    transition: background 0.12s;
+    border-radius: 2px;
+    padding: 0 2px;
+  }
+  [contenteditable="true"]:hover { background: rgba(146,38,16,0.06); cursor: text; }
+  [contenteditable="true"]:focus { background: rgba(146,38,16,0.12); outline: none; }
+
+  /* ===== BOTÃO REMOVER CARD ===== */
+  .remove-card {
+    position: absolute;
+    bottom: 6px;
+    right: 8px;
+    background: transparent;
+    border: none;
+    color: var(--brown-soft);
+    cursor: pointer;
+    font-size: 11px;
+    opacity: 0.4;
+    transition: opacity 0.15s;
+  }
+  .remove-card:hover {
+    opacity: 1;
+    color: var(--red-dark);
+  }
+
+  /* ===== HINT ===== */
+  .hint {
+    max-width: 1280px;
+    margin: 30px auto 0;
+    text-align: center;
+    color: #a8845a;
+    font-size: 11px;
+    font-style: italic;
+    line-height: 1.6;
+  }
+
+  /* Responsivo */
+  @media (max-width: 640px) {
+    .header h1 { font-size: 26px; }
+    .grid { grid-template-columns: 1fr; }
+  }
+
+  /* Impressão */
+  @media print {
+    body { background: white; padding: 0; }
+    .toolbar, .hint, .remove-card { display: none !important; }
+    .card { break-inside: avoid; box-shadow: none; }
+    .header h1 { color: var(--red-dark); text-shadow: none; }
+    .header .subtitle { color: var(--brown); }
+  }
+</style>
+</head>
+<body>
+
+<header class="header">
+  <h1>Painel do Mestre</h1>
+  <div class="subtitle">⚔ Crônica dos Aventureiros ⚔</div>
+</header>
+
+<div class="toolbar">
+  <button onclick="adicionarCard()">+ Adicionar Personagem</button>
+  <button onclick="descansoLongo()">🌙 Descanso Longo</button>
+  <button onclick="window.print()">🖨 Imprimir</button>
+  <button class="danger" onclick="resetarTudo()">⚠ Resetar Tudo</button>
+</div>
+
+<main class="grid" id="grid"></main>
+
+<p class="hint">
+  Clique nos textos para editar • Clique nos círculos de exaustão e salvaguardas para marcar • Clique nas condições para ativar/desativar<br>
+  Os dados são salvos automaticamente no seu navegador
+</p>
+
+<script>
+const CONDICOES = [
+  'Agarrado', 'Amedrontado', 'Atordoado', 'Caído', 'Cego', 'Enfeitiçado',
+  'Envenenado', 'Impedido', 'Incapacitado', 'Inconsciente', 'Invisível',
+  'Paralisado', 'Petrificado', 'Surdo'
+];
+
+const NIVEIS_SLOTS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+const PERSONAGENS_INICIAIS = [
+  { jogador: 'Jogador 1', nome: 'Aragorn', raca: 'Humano', classe: 'Guerreiro', nivel: 5, hpAtual: 42, hpMax: 47, ca: 18 },
+  { jogador: 'Jogador 2', nome: 'Lúthien', raca: 'Elfo', classe: 'Mago', nivel: 5, hpAtual: 25, hpMax: 28, ca: 13 },
+  { jogador: 'Jogador 3', nome: 'Thorin', raca: 'Anão', classe: 'Clérigo', nivel: 5, hpAtual: 38, hpMax: 40, ca: 18 },
+  { jogador: 'Jogador 4', nome: 'Pippin', raca: 'Halfling', classe: 'Ladino', nivel: 5, hpAtual: 30, hpMax: 33, ca: 15 }
+];
+
+const STORAGE_KEY = 'dnd_painel_mestre_v1';
+
+let estado = carregar();
+
+function carregar() {
+  try {
+    const dados = localStorage.getItem(STORAGE_KEY);
+    if (dados) return JSON.parse(dados);
+  } catch (e) {}
+  return { personagens: PERSONAGENS_INICIAIS.map(criarPersonagem) };
+}
+
+function salvar() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(estado));
+  } catch (e) {}
+}
+
+function criarPersonagem(base = {}) {
+  return {
+    id: Date.now() + Math.random(),
+    jogador: base.jogador || 'Nome do Jogador',
+    nome: base.nome || 'Personagem',
+    raca: base.raca || 'Raça',
+    classe: base.classe || 'Classe',
+    nivel: base.nivel || 1,
+    hpAtual: base.hpAtual ?? 10,
+    hpMax: base.hpMax ?? 10,
+    ca: base.ca || 10,
+    inspiracao: false,
+    exaustao: 0,
+    sucessos: 0,
+    falhas: 0,
+    slots: {1:{atual:0,max:0},2:{atual:0,max:0},3:{atual:0,max:0},4:{atual:0,max:0},5:{atual:0,max:0},6:{atual:0,max:0},7:{atual:0,max:0},8:{atual:0,max:0},9:{atual:0,max:0}},
+    magias: '',
+    condicoes: []
+  };
+}
+
+function render() {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  estado.personagens.forEach(p => grid.appendChild(criarCard(p)));
+  salvar();
+}
+
+function criarCard(p) {
+  const card = document.createElement('article');
+  card.className = 'card';
+
+  // === CABEÇALHO ===
+  const header = document.createElement('div');
+  header.className = 'char-header';
+
+  const insp = document.createElement('div');
+  insp.className = 'inspiration' + (p.inspiracao ? ' active' : '');
+  insp.title = 'Inspiração (clique para alternar)';
+  insp.textContent = '★';
+  insp.onclick = () => { p.inspiracao = !p.inspiracao; render(); };
+
+  const nome = document.createElement('div');
+  nome.className = 'char-name';
+  nome.contentEditable = true;
+  nome.textContent = p.nome;
+  nome.onblur = () => { p.nome = nome.textContent.trim() || 'Personagem'; salvar(); };
+
+  const jogador = document.createElement('div');
+  jogador.className = 'player-name';
+  jogador.contentEditable = true;
+  jogador.textContent = p.jogador;
+  jogador.onblur = () => { p.jogador = jogador.textContent.trim() || 'Jogador'; salvar(); };
+
+  const raceClass = document.createElement('div');
+  raceClass.className = 'race-class';
+  raceClass.innerHTML = `<span contenteditable="true" data-field="raca">${p.raca}</span> · <span contenteditable="true" data-field="classe">${p.classe}</span> · <strong>Nv <span contenteditable="true" data-field="nivel">${p.nivel}</span></strong>`;
+  raceClass.querySelectorAll('[contenteditable]').forEach(el => {
+    el.onblur = () => {
+      const field = el.dataset.field;
+      p[field] = field === 'nivel' ? (parseInt(el.textContent) || 1) : (el.textContent.trim() || '?');
+      salvar();
+    };
+  });
+
+  header.appendChild(insp);
+  header.appendChild(nome);
+  header.appendChild(jogador);
+  header.appendChild(raceClass);
+  card.appendChild(header);
+
+  // === STATS PRINCIPAIS ===
+  const stats = document.createElement('div');
+  stats.className = 'stats-row';
+
+  // HP
+  const hpBox = document.createElement('div');
+  hpBox.className = 'stat-box';
+  hpBox.innerHTML = `
+    <div class="stat-label">PV</div>
+    <div class="stat-value hp">
+      <span class="hp-current" contenteditable="true" data-field="hpAtual">${p.hpAtual}</span><span class="hp-sep">/</span><span contenteditable="true" data-field="hpMax">${p.hpMax}</span>
+    </div>`;
+  hpBox.querySelectorAll('[contenteditable]').forEach(el => {
+    el.onblur = () => { p[el.dataset.field] = parseInt(el.textContent) || 0; salvar(); };
+  });
+
+  // CA
+  const caBox = document.createElement('div');
+  caBox.className = 'stat-box';
+  caBox.innerHTML = `<div class="stat-label">CA</div><div class="stat-value" contenteditable="true">${p.ca}</div>`;
+  caBox.querySelector('.stat-value').onblur = (e) => { p.ca = parseInt(e.target.textContent) || 10; salvar(); };
+
+  // Nível (já tá no header, mas adicionamos aqui também como destaque)
+  const nivelBox = document.createElement('div');
+  nivelBox.className = 'stat-box';
+  nivelBox.innerHTML = `<div class="stat-label">Nível</div><div class="stat-value" contenteditable="true">${p.nivel}</div>`;
+  nivelBox.querySelector('.stat-value').onblur = (e) => {
+    p.nivel = parseInt(e.target.textContent) || 1;
+    render();
+  };
+
+  stats.appendChild(hpBox);
+  stats.appendChild(caBox);
+  stats.appendChild(nivelBox);
+  card.appendChild(stats);
+
+  // === EXAUSTÃO ===
+  const exhSection = document.createElement('div');
+  exhSection.className = 'section';
+  exhSection.innerHTML = `<div class="section-title">Exaustão</div><div class="exhaustion"></div>`;
+  const exhContainer = exhSection.querySelector('.exhaustion');
+  for (let i = 1; i <= 6; i++) {
+    const pip = document.createElement('div');
+    pip.className = 'exh-pip' + (i <= p.exaustao ? ' filled' : '');
+    pip.textContent = i;
+    pip.title = `Nível ${i} de exaustão`;
+    pip.onclick = () => {
+      p.exaustao = (p.exaustao === i) ? i - 1 : i;
+      render();
+    };
+    exhContainer.appendChild(pip);
+  }
+  card.appendChild(exhSection);
+
+  // === SALVAGUARDAS DE MORTE ===
+  const deathSection = document.createElement('div');
+  deathSection.className = 'section';
+  deathSection.innerHTML = `
+    <div class="section-title">Salvaguardas de Morte</div>
+    <div class="death-saves">
+      <div class="death-group success">
+        <div class="death-group-label">Sucessos</div>
+        <div class="death-pips" data-type="sucessos"></div>
+      </div>
+      <div class="death-group failure">
+        <div class="death-group-label">Falhas</div>
+        <div class="death-pips" data-type="falhas"></div>
+      </div>
+    </div>`;
+  ['sucessos','falhas'].forEach(tipo => {
+    const cont = deathSection.querySelector(`[data-type="${tipo}"]`);
+    for (let i = 1; i <= 3; i++) {
+      const pip = document.createElement('div');
+      pip.className = 'death-pip' + (i <= p[tipo] ? ' filled' : '');
+      pip.onclick = () => {
+        p[tipo] = (p[tipo] === i) ? i - 1 : i;
+        render();
+      };
+      cont.appendChild(pip);
+    }
+  });
+  card.appendChild(deathSection);
+
+  // === SLOTS DE MAGIA ===
+  const slotsSection = document.createElement('div');
+  slotsSection.className = 'section';
+  slotsSection.innerHTML = `<div class="section-title">Slots de Magia</div><div class="spell-slots"></div>`;
+  const slotsContainer = slotsSection.querySelector('.spell-slots');
+  NIVEIS_SLOTS.forEach(nv => {
+    const slot = document.createElement('div');
+    slot.className = 'slot-level';
+    slot.innerHTML = `
+      <div class="slot-level-num">Nv ${nv}</div>
+      <div class="slot-inputs">
+        <input type="text" class="slot-input" value="${p.slots[nv].atual}" data-slot="${nv}" data-field="atual">
+        <span class="slot-sep">/</span>
+        <input type="text" class="slot-input" value="${p.slots[nv].max}" data-slot="${nv}" data-field="max">
+      </div>`;
+    slot.querySelectorAll('input').forEach(input => {
+      input.onblur = () => {
+        const nivel = input.dataset.slot;
+        const field = input.dataset.field;
+        p.slots[nivel][field] = parseInt(input.value) || 0;
+        salvar();
+      };
+      input.onclick = () => input.select();
+    });
+    slotsContainer.appendChild(slot);
+  });
+  card.appendChild(slotsSection);
+
+  // === MAGIAS PREPARADAS ===
+  const magiasSection = document.createElement('div');
+  magiasSection.className = 'section';
+  magiasSection.innerHTML = `
+    <div class="section-title">Magias Preparadas</div>
+    <div class="spell-list" contenteditable="true">${p.magias}</div>`;
+  const spellList = magiasSection.querySelector('.spell-list');
+  spellList.onblur = () => { p.magias = spellList.innerHTML; salvar(); };
+  card.appendChild(magiasSection);
+
+  // === CONDIÇÕES ===
+  const condSection = document.createElement('div');
+  condSection.className = 'section';
+  condSection.innerHTML = `<div class="section-title">Condições</div><div class="conditions"></div>`;
+  const condContainer = condSection.querySelector('.conditions');
+  CONDICOES.forEach(cond => {
+    const tag = document.createElement('span');
+    tag.className = 'condition-tag' + (p.condicoes.includes(cond) ? ' active' : '');
+    tag.textContent = cond;
+    tag.onclick = () => {
+      if (p.condicoes.includes(cond)) {
+        p.condicoes = p.condicoes.filter(c => c !== cond);
+      } else {
+        p.condicoes.push(cond);
+      }
+      render();
+    };
+    condContainer.appendChild(tag);
+  });
+  card.appendChild(condSection);
+
+  // === REMOVER CARD ===
+  const remover = document.createElement('button');
+  remover.className = 'remove-card';
+  remover.textContent = '✕ remover';
+  remover.title = 'Remover personagem';
+  remover.onclick = () => {
+    if (confirm(`Remover "${p.nome}" do painel?`)) {
+      estado.personagens = estado.personagens.filter(x => x.id !== p.id);
+      render();
+    }
+  };
+  card.appendChild(remover);
+
+  return card;
+}
+
+function adicionarCard() {
+  estado.personagens.push(criarPersonagem());
+  render();
+}
+
+function descansoLongo() {
+  if (!confirm('Restaurar PV ao máximo, zerar exaustão (em -1), salvaguardas de morte e restaurar todos os slots de magia?')) return;
+  estado.personagens.forEach(p => {
+    p.hpAtual = p.hpMax;
+    p.exaustao = Math.max(0, p.exaustao - 1);
+    p.sucessos = 0;
+    p.falhas = 0;
+    Object.keys(p.slots).forEach(nv => {
+      p.slots[nv].atual = p.slots[nv].max;
+    });
+  });
+  render();
+}
+
+function resetarTudo() {
+  if (!confirm('Apagar TODOS os personagens e dados? Esta ação não pode ser desfeita.')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  estado = { personagens: PERSONAGENS_INICIAIS.map(criarPersonagem) };
+  render();
+}
+
+render();
+</script>
+
+</body>
+</html>
