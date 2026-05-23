@@ -1130,6 +1130,11 @@ async function resetarTudo() {
 (async () => {
   const u = await window.Auth.requerLogin('login.html');
   if (!u) return;
+  const mestre = await window.Auth.ehMestre();
+  if (!mestre) {
+    location.replace('../index.html');
+    return;
+  }
   await window.Auth.renderHeader('#auth-slot');
 
   try {

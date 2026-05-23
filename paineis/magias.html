@@ -169,9 +169,16 @@
 
   .filter-row {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 8px;
     align-items: center;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
+    padding-bottom: 4px;
+  }
+  .filter-row .pills {
+    flex-shrink: 0;
   }
   .filter-label {
     font-family: 'Cinzel', serif;
@@ -564,7 +571,9 @@
     line-height: 1.7;
     color: var(--parchment);
     margin-bottom: 14px;
-    white-space: pre-line;
+    white-space: normal;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
 
   .classes-list {
@@ -615,16 +624,22 @@
     .spell-count { display: none; }
     .pill, .toggle-pill, .clear-btn { padding: 10px 14px; font-size: 11px; } /* ≥44px alvo */
     .sort-select, .search-input { padding: 12px 14px; }
+    .filter-row { flex-wrap: nowrap; overflow-x: auto; gap: 6px; }
+    .filter-label { min-width: auto; font-size: 9px; }
+    .pills { flex-wrap: nowrap; gap: 4px; }
     .back-btn { padding: 10px 14px; }
     .modal {
-      width: 95%;
+      width: 98%;
+      max-width: 100vw;
       max-height: 92vh;
       max-height: 92dvh;
       padding-bottom: env(safe-area-inset-bottom);
+      box-sizing: border-box;
     }
-    .modal-body { padding: 14px 16px calc(20px + env(safe-area-inset-bottom)); }
-    .modal-title { font-size: 22px; }
-    .desc-text { font-size: 15px; line-height: 1.65; }
+    .modal-body { padding: 14px 16px calc(20px + env(safe-area-inset-bottom)); overflow-x: hidden; }
+    .modal-title { font-size: 20px; }
+    .desc-text { font-size: 15px; line-height: 1.65; word-wrap: break-word; overflow-wrap: break-word; }
+    .info-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
   }
 
   /* Foco visível */
@@ -815,7 +830,7 @@ function filtrar() {
     if (filtros.classes.size && !m.classes.some(c => filtros.classes.has(c))) return false;
     if (filtros.ritual !== null && m.ritual !== filtros.ritual) return false;
     if (filtros.conc !== null && m.concentracao !== filtros.conc) return false;
-    if (filtros.fav === true && !favoritas.has(m.nome)) return false;
+    if (filtros.fav === true && !ehFavorita(m.nome)) return false;
     return true;
   }).sort((a, b) => {
     switch(filtros.ordem) {

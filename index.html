@@ -124,7 +124,7 @@
   }
 
   .campaign-card {
-    display: flex;
+    display: none; /* hidden until JS reveals based on role */
     flex-direction: column;
     align-items: center;
     text-decoration: none;
@@ -142,6 +142,7 @@
       0 0 0 1px var(--blood) inset;
     overflow: hidden;
   }
+  .campaign-card.visible { display: flex; }
 
   .campaign-card::before {
     content: '';
@@ -338,7 +339,7 @@
 
   <div class="campaigns" style="max-width:1200px;margin:0 auto">
 
-    <a href="paineis/painel_barovia_dnd5e.html" class="campaign-card strahd" aria-label="Abrir painel da campanha Maldição de Strahd">
+    <a href="paineis/painel_barovia_dnd5e.html" class="campaign-card strahd" data-role="mestre" aria-label="Abrir painel da campanha Maldição de Strahd">
       <span class="corner tl" aria-hidden="true">✠</span>
       <span class="corner tr" aria-hidden="true">✠</span>
       <span class="corner bl" aria-hidden="true">✠</span>
@@ -349,7 +350,7 @@
       <div class="campaign-cta">Entrar na Névoa</div>
     </a>
 
-    <a href="paineis/painel_mestre_dnd5e.html" class="campaign-card" aria-label="Abrir painel da campanha principal">
+    <a href="paineis/painel_mestre_dnd5e.html" class="campaign-card" data-role="mestre" aria-label="Abrir painel da campanha principal">
       <span class="corner tl" aria-hidden="true">✦</span>
       <span class="corner tr" aria-hidden="true">✦</span>
       <span class="corner bl" aria-hidden="true">✦</span>
@@ -360,7 +361,7 @@
       <div class="campaign-cta">Iniciar Sessão</div>
     </a>
 
-    <a href="paineis/magias.html" class="campaign-card" aria-label="Abrir grimório de magias">
+    <a href="paineis/magias.html" class="campaign-card" data-role="todos" aria-label="Abrir grimório de magias">
       <span class="corner tl" aria-hidden="true">✦</span>
       <span class="corner tr" aria-hidden="true">✦</span>
       <span class="corner bl" aria-hidden="true">✦</span>
@@ -371,7 +372,7 @@
       <div class="campaign-cta">Abrir Grimório</div>
     </a>
 
-    <a href="paineis/ficha.html" class="campaign-card" aria-label="Minha ficha de personagem">
+    <a href="paineis/ficha.html" class="campaign-card" data-role="jogador" aria-label="Minha ficha de personagem">
       <span class="corner tl" aria-hidden="true">✦</span>
       <span class="corner tr" aria-hidden="true">✦</span>
       <span class="corner bl" aria-hidden="true">✦</span>
@@ -392,10 +393,23 @@
 <script src="assets/js/supabase.js"></script>
 <script src="assets/js/auth.js"></script>
 <script>
-  // Gate: força login antes de ver a home
+  // Gate: força login antes de ver a home + controla visibilidade por role
   (async () => {
     const u = await window.Auth.requerLogin('paineis/login.html');
-    if (u) window.Auth.renderHeader('#auth-slot');
+    if (!u) return;
+    window.Auth.renderHeader('#auth-slot');
+
+    const mestre = await window.Auth.ehMestre();
+    document.querySelectorAll('.campaign-card').forEach(card => {
+      const role = card.dataset.role;
+      if (role === 'todos') {
+        card.classList.add('visible');
+      } else if (role === 'mestre' && mestre) {
+        card.classList.add('visible');
+      } else if (role === 'jogador' && !mestre) {
+        card.classList.add('visible');
+      }
+    });
   })();
 </script>
 
