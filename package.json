@@ -6,7 +6,8 @@
   "scripts": {
     "parse": "node scripts/parse_magias.js",
     "gerar-md": "node scripts/gerar_md.js",
-    "extrair-pdf": "node scripts/extrair_pdf.js"
+    "extrair-pdf": "node scripts/extrair_pdf.js",
+    "formatar-phb": "node scripts/formatar_phb.js"
   },
   "dependencies": {
     "pdf-parse": "^1.1.1"
