@@ -3,140 +3,162 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Painel do Mestre — D&D 5e</title>
+<title>Crônicas de Barovia — Painel do Mestre</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,700;1,400&display=swap');
 
   * { box-sizing: border-box; }
 
   :root {
-    --bg-page: #2a1810;
-    --bg-parchment: #FDF1DC;
-    --bg-parchment-dark: #E8D5A8;
-    --gold: #C9A24A;
-    --gold-dark: #8B6914;
-    --red: #922610;
-    --red-dark: #5C1809;
-    --brown: #3A1E0C;
-    --brown-soft: #5a3a20;
+    --bg-deep: #0a0608;
+    --bg-mid: #1a0e10;
+    --bg-card: #1f1416;
+    --bg-card-soft: #2a1a1c;
+    --parchment: #d4c5a0;
+    --parchment-dim: #a89878;
+    --gold: #8B6914;
+    --gold-bright: #b88a2c;
+    --blood: #6b1010;
+    --blood-bright: #8b1d1d;
+    --blood-dark: #3d0808;
+    --bone: #c4b896;
+    --shadow: #050304;
+    --text: #d4c5a0;
+    --text-dim: #8c7d5e;
   }
 
   body {
     margin: 0;
-    padding: 24px 16px;
-    font-family: 'Libre Baskerville', Georgia, serif;
-    background-color: var(--bg-page);
+    padding: 28px 16px;
+    font-family: 'EB Garamond', Georgia, serif;
+    background-color: var(--bg-deep);
     background-image:
-      radial-gradient(ellipse at top, #4a2818 0%, #2a1810 60%, #1a0e08 100%);
+      radial-gradient(ellipse at top, #2a1518 0%, #150a0c 50%, #050304 100%),
+      repeating-linear-gradient(45deg, transparent 0 2px, rgba(0,0,0,0.15) 2px 4px);
     background-attachment: fixed;
-    color: var(--brown);
+    color: var(--text);
     min-height: 100vh;
   }
+
+  /* Vinheta sutil nas bordas */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.6) 100%);
+    z-index: 1;
+  }
+  body > * { position: relative; z-index: 2; }
 
   /* ===== CABEÇALHO ===== */
   .header {
     max-width: 1280px;
-    margin: 0 auto 24px;
+    margin: 0 auto 28px;
     text-align: center;
-    color: var(--bg-parchment);
+    padding: 12px 0 22px;
     position: relative;
-    padding: 8px 0 20px;
   }
   .header h1 {
-    font-family: 'Cinzel', serif;
-    font-size: 38px;
-    font-weight: 700;
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 42px;
+    font-weight: 900;
     margin: 0;
-    letter-spacing: 3px;
-    color: var(--gold);
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    letter-spacing: 4px;
+    color: var(--blood-bright);
+    text-shadow:
+      0 0 20px rgba(139, 29, 29, 0.5),
+      2px 2px 0 var(--shadow),
+      3px 3px 6px rgba(0,0,0,0.8);
     font-variant: small-caps;
   }
   .header .subtitle {
     font-style: italic;
-    font-size: 14px;
-    color: #d4b88c;
-    margin-top: 6px;
-    letter-spacing: 1px;
+    font-size: 15px;
+    color: var(--parchment-dim);
+    margin-top: 8px;
+    letter-spacing: 2px;
+    font-family: 'EB Garamond', serif;
   }
+  .header .subtitle::before { content: '† '; color: var(--blood); }
+  .header .subtitle::after { content: ' †'; color: var(--blood); }
+
   .header::after {
     content: '';
     display: block;
-    width: 60%;
-    margin: 14px auto 0;
-    height: 2px;
+    width: 70%;
+    margin: 16px auto 0;
+    height: 1px;
     background: linear-gradient(to right, transparent, var(--gold), transparent);
+    box-shadow: 0 1px 0 rgba(0,0,0,0.5);
   }
 
   /* ===== TOOLBAR ===== */
   .toolbar {
     max-width: 1280px;
-    margin: 0 auto 20px;
+    margin: 0 auto 24px;
     display: flex;
-    gap: 10px;
+    gap: 8px;
     justify-content: center;
     flex-wrap: wrap;
   }
   .toolbar button {
     padding: 8px 16px;
-    background: var(--bg-parchment);
-    border: 1.5px solid var(--gold);
-    color: var(--red-dark);
-    border-radius: 4px;
+    background: linear-gradient(to bottom, var(--bg-card-soft), var(--bg-card));
+    border: 1px solid var(--gold);
+    color: var(--parchment);
+    border-radius: 2px;
     cursor: pointer;
     font-family: 'Cinzel', serif;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 600;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
     text-transform: uppercase;
-    transition: all 0.15s;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    transition: all 0.2s;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05);
   }
   .toolbar button:hover {
-    background: var(--gold);
-    color: var(--brown);
+    background: linear-gradient(to bottom, var(--blood), var(--blood-dark));
+    color: var(--bone);
+    border-color: var(--gold-bright);
     transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(139,29,29,0.4);
   }
-  .toolbar button.danger {
-    border-color: var(--red);
-    color: var(--red-dark);
-  }
-  .toolbar button.danger:hover {
-    background: var(--red);
-    color: var(--bg-parchment);
-  }
+  .toolbar button.danger { border-color: var(--blood); }
+  .toolbar button.danger:hover { background: linear-gradient(to bottom, var(--blood-bright), var(--blood)); }
 
   /* ===== GRID DE CARDS ===== */
   .grid {
     max-width: 1280px;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
-    gap: 20px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 22px;
   }
 
   /* ===== CARD ===== */
   .card {
-    background: var(--bg-parchment);
-    background-image:
-      linear-gradient(rgba(253,241,220,0.92), rgba(253,241,220,0.92)),
-      radial-gradient(circle at 30% 20%, rgba(180,150,100,0.2) 0%, transparent 60%),
-      radial-gradient(circle at 70% 80%, rgba(160,130,80,0.15) 0%, transparent 60%);
-    border: 3px double var(--gold);
-    border-radius: 6px;
-    padding: 14px;
+    background:
+      linear-gradient(to bottom, var(--bg-card), var(--bg-card-soft) 50%, var(--bg-card)),
+      var(--bg-card);
+    border: 2px solid var(--gold);
+    border-radius: 3px;
+    padding: 16px 14px 24px;
     position: relative;
     box-shadow:
-      0 0 0 1px var(--red-dark) inset,
-      0 4px 14px rgba(0,0,0,0.4);
+      0 0 0 1px var(--blood-dark) inset,
+      0 6px 20px rgba(0,0,0,0.7),
+      inset 0 0 30px rgba(0,0,0,0.5);
   }
 
+  /* Decoração de cantos góticos */
   .card::before, .card::after {
-    content: '✦';
+    content: '✠';
     position: absolute;
-    color: var(--gold-dark);
-    font-size: 14px;
+    color: var(--blood);
+    font-size: 16px;
     opacity: 0.7;
+    text-shadow: 0 0 4px rgba(0,0,0,0.8);
   }
   .card::before { top: 4px; left: 8px; }
   .card::after { top: 4px; right: 8px; }
@@ -144,59 +166,65 @@
   /* ===== CABEÇALHO DO CARD ===== */
   .char-header {
     text-align: center;
-    margin-bottom: 10px;
+    margin-bottom: 12px;
     padding-bottom: 10px;
-    border-bottom: 1.5px solid var(--red);
+    border-bottom: 1px solid var(--blood);
     position: relative;
   }
   .char-name {
-    font-family: 'Cinzel', serif;
-    font-size: 20px;
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 21px;
     font-weight: 700;
-    color: var(--red-dark);
+    color: var(--gold-bright);
     font-variant: small-caps;
-    letter-spacing: 1.5px;
+    letter-spacing: 2px;
     line-height: 1.15;
     outline: none;
     min-height: 24px;
+    text-shadow: 1px 1px 3px var(--shadow);
   }
   .player-name {
     font-style: italic;
     font-size: 12px;
-    color: var(--brown-soft);
-    margin-top: 2px;
+    color: var(--parchment-dim);
+    margin-top: 3px;
     outline: none;
   }
   .race-class {
-    font-size: 13px;
-    color: var(--brown);
-    margin-top: 4px;
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    color: var(--parchment);
+    margin-top: 5px;
     outline: none;
+    letter-spacing: 0.5px;
   }
-  .race-class strong { color: var(--red-dark); }
+  .race-class strong { color: var(--blood-bright); }
 
   /* ===== INSPIRAÇÃO ===== */
   .inspiration {
     position: absolute;
-    top: -2px;
-    right: -2px;
-    width: 28px;
-    height: 28px;
-    background: var(--bg-parchment);
-    border: 2px solid var(--gold-dark);
+    top: -4px;
+    right: -4px;
+    width: 30px;
+    height: 30px;
+    background: var(--bg-card);
+    border: 2px solid var(--gold);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 18px;
+    color: var(--parchment-dim);
     transition: all 0.2s;
     user-select: none;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.6);
   }
   .inspiration.active {
-    background: var(--gold);
-    color: var(--red-dark);
-    box-shadow: 0 0 8px var(--gold);
+    background: var(--gold-bright);
+    color: var(--shadow);
+    box-shadow: 0 0 12px var(--gold-bright), 0 0 4px var(--gold);
+    border-color: var(--gold-bright);
   }
   .inspiration:hover { transform: scale(1.1); }
 
@@ -205,41 +233,43 @@
     display: grid;
     grid-template-columns: 1.4fr 1fr 1fr;
     gap: 8px;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
   }
   .stat-box {
-    background: rgba(146, 38, 16, 0.08);
-    border: 1px solid var(--red);
-    border-radius: 4px;
+    background: linear-gradient(to bottom, rgba(107, 16, 16, 0.15), rgba(107, 16, 16, 0.05));
+    border: 1px solid var(--blood);
+    border-radius: 2px;
     padding: 6px 4px;
     text-align: center;
+    box-shadow: inset 0 0 8px rgba(0,0,0,0.4);
   }
   .stat-label {
     font-family: 'Cinzel', serif;
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--red-dark);
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--gold);
     text-transform: uppercase;
-    letter-spacing: 0.8px;
-    margin-bottom: 2px;
+    letter-spacing: 1.2px;
+    margin-bottom: 3px;
   }
   .stat-value {
-    font-size: 18px;
+    font-size: 19px;
     font-weight: 700;
-    color: var(--brown);
+    color: var(--parchment);
     outline: none;
     line-height: 1.1;
+    font-family: 'EB Garamond', serif;
+    text-shadow: 1px 1px 2px var(--shadow);
   }
   .stat-value.hp-grouped {
-    font-size: 15px;
+    font-size: 16px;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 2px;
   }
-  .hp-sep { color: var(--brown-soft); margin: 0 1px; }
-
-  /* ===== INPUT NUMÉRICO (math parser) ===== */
+  .hp-current { color: var(--blood-bright); font-weight: 700; }
+  .hp-sep { color: var(--text-dim); }
   .stat-input {
     background: transparent;
     border: none;
@@ -252,26 +282,24 @@
     border-radius: 2px;
     transition: background 0.12s;
   }
-  .stat-input:focus { background: rgba(201, 162, 74, 0.2); }
-  .hp-current-input { color: var(--red-dark); font-weight: 700; max-width: 40px; }
-  .hp-max-input { max-width: 36px; color: var(--brown); }
-  .stat-input::placeholder { color: var(--brown-soft); opacity: 0.5; }
+  .stat-input:focus { background: rgba(184, 138, 44, 0.15); }
+  .hp-current-input { color: var(--blood-bright); font-weight: 700; max-width: 40px; }
+  .hp-max-input { max-width: 36px; color: var(--parchment); }
+  .stat-input::placeholder { color: var(--text-dim); opacity: 0.5; }
 
   /* ===== SEÇÕES ===== */
-  .section { margin-top: 10px; }
+  .section { margin-top: 12px; }
   .section-title {
     font-family: 'Cinzel', serif;
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--red-dark);
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--gold);
     text-transform: uppercase;
-    letter-spacing: 1px;
-    padding-bottom: 2px;
-    border-bottom: 1px solid var(--red);
-    margin-bottom: 6px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
+    letter-spacing: 1.5px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid var(--blood);
+    margin-bottom: 7px;
+    text-shadow: 1px 1px 2px var(--shadow);
   }
 
   /* ===== EXAUSTÃO ===== */
@@ -282,62 +310,75 @@
     margin: 4px 0;
   }
   .exh-pip {
-    width: 22px;
-    height: 22px;
-    border: 1.5px solid var(--brown-soft);
-    border-radius: 4px;
+    width: 24px;
+    height: 24px;
+    border: 1.5px solid var(--text-dim);
+    border-radius: 3px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 11px;
     font-weight: 700;
-    color: var(--brown-soft);
-    background: rgba(253, 241, 220, 0.5);
+    color: var(--text-dim);
+    background: rgba(0,0,0,0.3);
     transition: all 0.15s;
     user-select: none;
+    font-family: 'Cinzel', serif;
   }
-  .exh-pip:hover { border-color: var(--red); }
+  .exh-pip:hover { border-color: var(--blood-bright); }
   .exh-pip.filled {
-    background: var(--red-dark);
-    border-color: var(--red-dark);
-    color: var(--gold);
+    background: linear-gradient(to bottom, var(--blood), var(--blood-dark));
+    border-color: var(--blood-bright);
+    color: var(--gold-bright);
+    box-shadow: 0 0 6px rgba(139,29,29,0.5), inset 0 0 4px rgba(0,0,0,0.5);
   }
 
   /* ===== SALVAGUARDAS DE MORTE ===== */
   .death-saves {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 6px;
+    gap: 8px;
     margin: 4px 0;
   }
   .death-group {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 3px;
+    gap: 4px;
+    padding: 4px;
+    background: rgba(0,0,0,0.2);
+    border-radius: 2px;
   }
   .death-group-label {
     font-size: 10px;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.8px;
+    font-family: 'Cinzel', serif;
   }
-  .death-group.success .death-group-label { color: #2d6a3e; }
-  .death-group.failure .death-group-label { color: var(--red-dark); }
-  .death-pips { display: flex; gap: 4px; }
+  .death-group.success .death-group-label { color: #6b8c5a; }
+  .death-group.failure .death-group-label { color: var(--blood-bright); }
+  .death-pips { display: flex; gap: 5px; }
   .death-pip {
-    width: 14px;
-    height: 14px;
+    width: 15px;
+    height: 15px;
     border-radius: 50%;
     border: 1.5px solid;
     cursor: pointer;
     transition: all 0.15s;
+    background: rgba(0,0,0,0.4);
   }
-  .death-group.success .death-pip { border-color: #2d6a3e; }
-  .death-group.success .death-pip.filled { background: #2d6a3e; }
-  .death-group.failure .death-pip { border-color: var(--red-dark); }
-  .death-group.failure .death-pip.filled { background: var(--red-dark); }
+  .death-group.success .death-pip { border-color: #5a7048; }
+  .death-group.success .death-pip.filled {
+    background: #6b8c5a;
+    box-shadow: 0 0 6px rgba(107,140,90,0.5);
+  }
+  .death-group.failure .death-pip { border-color: var(--blood); }
+  .death-group.failure .death-pip.filled {
+    background: var(--blood-bright);
+    box-shadow: 0 0 6px rgba(139,29,29,0.5);
+  }
 
   /* ===== SLOTS DE MAGIA ===== */
   .spell-slots {
@@ -347,58 +388,61 @@
     font-size: 11px;
   }
   .slot-level {
-    background: rgba(146, 38, 16, 0.05);
-    border: 1px solid rgba(146, 38, 16, 0.3);
-    border-radius: 3px;
-    padding: 3px;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid rgba(139, 105, 20, 0.4);
+    border-radius: 2px;
+    padding: 4px 2px;
     text-align: center;
   }
   .slot-level-num {
     font-family: 'Cinzel', serif;
     font-weight: 700;
-    color: var(--red-dark);
+    color: var(--gold);
     font-size: 10px;
+    letter-spacing: 0.5px;
   }
   .slot-inputs {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 2px;
-    font-size: 11px;
+    margin-top: 2px;
   }
   .slot-input {
-    width: 22px;
+    width: 24px;
     text-align: center;
     border: none;
     background: transparent;
-    font-family: inherit;
-    font-size: 11px;
-    color: var(--brown);
+    font-family: 'EB Garamond', serif;
+    font-size: 12px;
+    color: var(--parchment);
     outline: none;
     font-weight: 700;
     padding: 1px;
     border-radius: 2px;
-    transition: background 0.12s;
   }
-  .slot-input:focus { background: rgba(201, 162, 74, 0.2); }
-  .slot-sep { color: var(--brown-soft); }
+  .slot-input:focus { background: rgba(184, 138, 44, 0.2); }
+  .slot-sep { color: var(--text-dim); }
 
   /* ===== MAGIAS PREPARADAS ===== */
   .spell-list {
-    min-height: 30px;
+    min-height: 32px;
     font-size: 12px;
-    line-height: 1.5;
+    line-height: 1.55;
     outline: none;
-    color: var(--brown);
-    padding: 2px 4px;
-    border-radius: 3px;
-    transition: background 0.12s;
+    color: var(--parchment);
+    padding: 4px 6px;
+    border-radius: 2px;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid rgba(139, 105, 20, 0.3);
+    transition: all 0.15s;
+    font-family: 'EB Garamond', serif;
   }
-  .spell-list:hover { background: rgba(146,38,16,0.04); }
-  .spell-list:focus { background: rgba(146,38,16,0.08); }
+  .spell-list:hover { border-color: rgba(139, 105, 20, 0.6); }
+  .spell-list:focus { border-color: var(--gold); background: rgba(0,0,0,0.35); }
   .spell-list:empty::before {
     content: 'Truque, Mísseis Mágicos, Escudo...';
-    color: var(--brown-soft);
+    color: var(--text-dim);
     font-style: italic;
     opacity: 0.6;
   }
@@ -411,68 +455,67 @@
     margin-top: 4px;
   }
   .condition-tag {
-    background: var(--bg-parchment-dark);
-    border: 1px solid var(--gold-dark);
-    color: var(--red-dark);
-    padding: 2px 8px;
-    border-radius: 10px;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid var(--text-dim);
+    color: var(--text-dim);
+    padding: 3px 9px;
+    border-radius: 2px;
     font-size: 10px;
     cursor: pointer;
     transition: all 0.15s;
     user-select: none;
     font-family: 'Cinzel', serif;
     font-weight: 600;
-    letter-spacing: 0.3px;
-    opacity: 0.45;
+    letter-spacing: 0.5px;
   }
   .condition-tag.active {
-    background: var(--red);
-    border-color: var(--red-dark);
-    color: var(--bg-parchment);
-    opacity: 1;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    background: linear-gradient(to bottom, var(--blood), var(--blood-dark));
+    border-color: var(--gold);
+    color: var(--bone);
+    box-shadow: 0 0 8px rgba(139,29,29,0.4), inset 0 0 4px rgba(0,0,0,0.5);
   }
-  .condition-tag:hover { transform: translateY(-1px); opacity: 0.85; }
-  .condition-tag.active:hover { opacity: 1; }
+  .condition-tag:hover { border-color: var(--blood-bright); transform: translateY(-1px); }
 
   /* ===== ÁREAS EDITÁVEIS ===== */
   [contenteditable="true"] {
     transition: background 0.12s;
     border-radius: 2px;
-    padding: 0 2px;
+    padding: 0 3px;
   }
-  [contenteditable="true"]:hover { background: rgba(146,38,16,0.06); cursor: text; }
-  [contenteditable="true"]:focus { background: rgba(146,38,16,0.12); outline: none; }
+  [contenteditable="true"]:hover { background: rgba(184, 138, 44, 0.08); cursor: text; }
+  [contenteditable="true"]:focus { background: rgba(184, 138, 44, 0.18); outline: none; }
 
-  /* ===== BOTÃO REMOVER CARD ===== */
+  /* ===== BOTÃO REMOVER ===== */
   .remove-card {
     position: absolute;
     bottom: 6px;
-    right: 8px;
+    right: 10px;
     background: transparent;
     border: none;
-    color: var(--brown-soft);
+    color: var(--text-dim);
     cursor: pointer;
-    font-size: 11px;
+    font-size: 10px;
     opacity: 0.4;
     transition: opacity 0.15s;
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.5px;
   }
-  .remove-card:hover { opacity: 1; color: var(--red-dark); }
+  .remove-card:hover { opacity: 1; color: var(--blood-bright); }
 
-  /* ===== TOAST ===== */
+  /* ===== TOAST DE SALVAMENTO ===== */
   .toast {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    background: var(--bg-parchment);
-    border: 1.5px solid var(--gold);
-    color: var(--brown);
+    background: linear-gradient(to bottom, var(--bg-card-soft), var(--bg-card));
+    border: 1px solid var(--gold);
+    color: var(--parchment);
     padding: 10px 18px;
-    border-radius: 4px;
+    border-radius: 2px;
     font-family: 'Cinzel', serif;
     font-size: 12px;
     letter-spacing: 1px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.7);
     opacity: 0;
     transform: translateY(20px);
     transition: all 0.3s;
@@ -484,75 +527,68 @@
   /* ===== HINT ===== */
   .hint {
     max-width: 1280px;
-    margin: 30px auto 0;
+    margin: 32px auto 0;
     text-align: center;
-    color: #a8845a;
-    font-size: 11px;
+    color: var(--text-dim);
+    font-size: 12px;
     font-style: italic;
     line-height: 1.7;
+    font-family: 'EB Garamond', serif;
   }
   .hint strong { color: var(--gold); font-style: normal; font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; }
   .hint code {
-    background: rgba(0,0,0,0.1);
-    border: 1px solid var(--gold-dark);
-    color: var(--red-dark);
-    padding: 1px 5px;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid var(--blood);
+    color: var(--gold-bright);
+    padding: 1px 6px;
     border-radius: 2px;
     font-family: 'Courier New', monospace;
-    font-size: 10px;
+    font-size: 11px;
   }
 
   input[type="file"] { display: none; }
 
   @media (max-width: 640px) {
-    .header h1 { font-size: 26px; }
+    .header h1 { font-size: 26px; letter-spacing: 2px; }
     .grid { grid-template-columns: 1fr; }
-  }
-
-  @media print {
-    body { background: white; padding: 0; }
-    .toolbar, .hint, .remove-card, .toast { display: none !important; }
-    .card { break-inside: avoid; box-shadow: none; }
-    .header h1 { color: var(--red-dark); text-shadow: none; }
-    .header .subtitle { color: var(--brown); }
   }
 </style>
 </head>
 <body>
 
 <header class="header">
-  <h1>Painel do Mestre</h1>
-  <div class="subtitle">⚔ Crônica dos Aventureiros ⚔</div>
+  <h1>Crônicas de Barovia</h1>
+  <div class="subtitle">A Maldição de Strahd · Painel do Mestre</div>
 </header>
 
 <div class="toolbar">
-  <button onclick="adicionarCard()">+ Adicionar Personagem</button>
+  <button onclick="adicionarCard()">⚜ Adicionar</button>
   <button onclick="descansoLongo()">🌙 Descanso Longo</button>
   <button onclick="exportarSave()">💾 Baixar Save</button>
   <button onclick="document.getElementById('file-input').click()">📂 Carregar Save</button>
   <button onclick="window.print()">🖨 Imprimir</button>
-  <button class="danger" onclick="resetarTudo()">⚠ Resetar Tudo</button>
+  <button class="danger" onclick="resetarTudo()">☠ Resetar</button>
   <input type="file" id="file-input" accept=".json" onchange="importarSave(event)">
 </div>
 
 <main class="grid" id="grid"></main>
 
 <p class="hint">
-  <strong>Edição</strong> Clique nos textos para editar · Clique nos círculos para marcar/desmarcar<br>
-  <strong>Matemática nos números</strong> Digite <code>-5</code> em qualquer campo numérico (PV, slots, CA) e pressione Enter para subtrair · <code>+3</code> para somar · <code>=20</code> para definir valor<br>
-  <strong>Save</strong> Dados salvos automaticamente no navegador · Use <strong>Baixar Save</strong> para guardar em arquivo
+  <strong>Edição</strong> Clique nos textos para editar · Clique nos círculos pra marcar/desmarcar<br>
+  <strong>Matemática nos números</strong> Digite <code>-5</code> em qualquer campo numérico (PV, slots, CA) e pressione Enter pra subtrair · <code>+3</code> pra somar · <code>=20</code> pra definir valor<br>
+  <strong>Save</strong> Os dados são salvos no navegador automaticamente · Use <strong>Baixar Save</strong> para guardar em arquivo (recomendado entre sessões)
 </p>
 
 <div class="toast" id="toast"></div>
 
 <script>
 const CONDICOES = [
-  'Agarrado', 'Amedrontado', 'Atordoado', 'Caído', 'Cego', 'Enfeitiçado',
-  'Envenenado', 'Impedido', 'Incapacitado', 'Inconsciente', 'Invisível',
-  'Paralisado', 'Petrificado', 'Surdo'
+  'Agarrado','Amedrontado','Atordoado','Caído','Cego','Enfeitiçado',
+  'Envenenado','Impedido','Incapacitado','Inconsciente','Invisível',
+  'Paralisado','Petrificado','Surdo'
 ];
 
-const NIVEIS_SLOTS = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+const NIVEIS_SLOTS = [1,2,3,4,5,6,7,8,9];
 
 const PERSONAGENS_INICIAIS = [
   { jogador: 'Jogador 1', nome: 'Aragorn', raca: 'Humano', classe: 'Guerreiro', nivel: 5, hpAtual: 42, hpMax: 47, ca: 18 },
@@ -561,7 +597,7 @@ const PERSONAGENS_INICIAIS = [
   { jogador: 'Jogador 4', nome: 'Pippin', raca: 'Halfling', classe: 'Ladino', nivel: 5, hpAtual: 30, hpMax: 33, ca: 15 }
 ];
 
-const STORAGE_KEY = 'dnd_painel_mestre_v1';
+const STORAGE_KEY = 'dnd_barovia_painel_v2';
 
 let estado = carregar();
 
@@ -569,12 +605,12 @@ function carregar() {
   try {
     const dados = localStorage.getItem(STORAGE_KEY);
     if (dados) return JSON.parse(dados);
-  } catch (e) {}
+  } catch(e) {}
   return { personagens: PERSONAGENS_INICIAIS.map(criarPersonagem) };
 }
 
 function salvar() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(estado)); } catch (e) {}
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(estado)); } catch(e) {}
 }
 
 function toast(msg) {
@@ -606,25 +642,33 @@ function criarPersonagem(base = {}) {
   };
 }
 
+/**
+ * Parser de matemática: aceita "+5", "-3", "=20", "10" e calcula com base no valor atual.
+ */
 function aplicarMatematica(valorAtual, entrada) {
   const txt = String(entrada).trim();
   if (txt === '') return valorAtual;
+  // = define valor absoluto
   if (txt.startsWith('=')) {
     const n = parseInt(txt.slice(1));
     return isNaN(n) ? valorAtual : n;
   }
+  // + soma
   if (txt.startsWith('+')) {
     const n = parseInt(txt.slice(1));
     return isNaN(n) ? valorAtual : valorAtual + n;
   }
+  // - subtrai (apenas se tiver dígito depois)
   if (txt.startsWith('-') && txt.length > 1) {
     const n = parseInt(txt.slice(1));
     return isNaN(n) ? valorAtual : valorAtual - n;
   }
+  // Número puro: substitui
   const n = parseInt(txt);
   return isNaN(n) ? valorAtual : n;
 }
 
+/** Cria input numérico com suporte a +/-/= */
 function inputNumerico(valor, callback, classes = '', min = null) {
   const input = document.createElement('input');
   input.type = 'text';
@@ -642,10 +686,15 @@ function inputNumerico(valor, callback, classes = '', min = null) {
   };
 
   input.onkeydown = (e) => {
-    if (e.key === 'Enter') { e.preventDefault(); aplicar(); input.blur(); }
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      aplicar();
+      input.blur();
+    }
   };
   input.onblur = aplicar;
   input.onfocus = () => input.select();
+
   return input;
 }
 
@@ -660,13 +709,13 @@ function criarCard(p) {
   const card = document.createElement('article');
   card.className = 'card';
 
-  // === CABEÇALHO ===
+  // ===== CABEÇALHO =====
   const header = document.createElement('div');
   header.className = 'char-header';
 
   const insp = document.createElement('div');
   insp.className = 'inspiration' + (p.inspiracao ? ' active' : '');
-  insp.title = 'Inspiração (clique para alternar)';
+  insp.title = 'Inspiração';
   insp.textContent = '★';
   insp.onclick = () => { p.inspiracao = !p.inspiracao; render(); };
 
@@ -699,11 +748,11 @@ function criarCard(p) {
   header.appendChild(raceClass);
   card.appendChild(header);
 
-  // === STATS PRINCIPAIS ===
+  // ===== STATS PRINCIPAIS =====
   const stats = document.createElement('div');
   stats.className = 'stats-row';
 
-  // HP
+  // PV
   const hpBox = document.createElement('div');
   hpBox.className = 'stat-box';
   const hpLabel = document.createElement('div');
@@ -752,7 +801,7 @@ function criarCard(p) {
   stats.appendChild(nvBox);
   card.appendChild(stats);
 
-  // === EXAUSTÃO ===
+  // ===== EXAUSTÃO =====
   const exhSection = document.createElement('div');
   exhSection.className = 'section';
   exhSection.innerHTML = `<div class="section-title">Exaustão</div><div class="exhaustion"></div>`;
@@ -761,7 +810,7 @@ function criarCard(p) {
     const pip = document.createElement('div');
     pip.className = 'exh-pip' + (i <= p.exaustao ? ' filled' : '');
     pip.textContent = i;
-    pip.title = `Nível ${i} de exaustão`;
+    pip.title = `Nível ${i}`;
     pip.onclick = () => {
       p.exaustao = (p.exaustao === i) ? i - 1 : i;
       render();
@@ -770,7 +819,7 @@ function criarCard(p) {
   }
   card.appendChild(exhSection);
 
-  // === SALVAGUARDAS DE MORTE ===
+  // ===== SALVAGUARDAS DE MORTE =====
   const deathSection = document.createElement('div');
   deathSection.className = 'section';
   deathSection.innerHTML = `
@@ -799,7 +848,7 @@ function criarCard(p) {
   });
   card.appendChild(deathSection);
 
-  // === SLOTS DE MAGIA ===
+  // ===== SLOTS DE MAGIA =====
   const slotsSection = document.createElement('div');
   slotsSection.className = 'section';
   slotsSection.innerHTML = `<div class="section-title">Slots de Magia</div>`;
@@ -828,7 +877,7 @@ function criarCard(p) {
   slotsSection.appendChild(slotsGrid);
   card.appendChild(slotsSection);
 
-  // === MAGIAS PREPARADAS ===
+  // ===== MAGIAS PREPARADAS =====
   const magiasSection = document.createElement('div');
   magiasSection.className = 'section';
   magiasSection.innerHTML = `<div class="section-title">Magias Preparadas</div>`;
@@ -840,11 +889,12 @@ function criarCard(p) {
   magiasSection.appendChild(spellList);
   card.appendChild(magiasSection);
 
-  // === CONDIÇÕES ===
+  // ===== CONDIÇÕES =====
   const condSection = document.createElement('div');
   condSection.className = 'section';
-  condSection.innerHTML = `<div class="section-title">Condições</div><div class="conditions"></div>`;
-  const condContainer = condSection.querySelector('.conditions');
+  condSection.innerHTML = `<div class="section-title">Condições</div>`;
+  const condContainer = document.createElement('div');
+  condContainer.className = 'conditions';
   CONDICOES.forEach(cond => {
     const tag = document.createElement('span');
     tag.className = 'condition-tag' + (p.condicoes.includes(cond) ? ' active' : '');
@@ -856,15 +906,15 @@ function criarCard(p) {
     };
     condContainer.appendChild(tag);
   });
+  condSection.appendChild(condContainer);
   card.appendChild(condSection);
 
-  // === REMOVER CARD ===
+  // ===== REMOVER =====
   const remover = document.createElement('button');
   remover.className = 'remove-card';
   remover.textContent = '✕ remover';
-  remover.title = 'Remover personagem';
   remover.onclick = () => {
-    if (confirm(`Remover "${p.nome}" do painel?`)) {
+    if (confirm(`Remover "${p.nome}"?`)) {
       estado.personagens = estado.personagens.filter(x => x.id !== p.id);
       render();
     }
@@ -900,7 +950,7 @@ function exportarSave() {
   const a = document.createElement('a');
   const data = new Date().toISOString().slice(0,10);
   a.href = url;
-  a.download = `painel_mestre_save_${data}.json`;
+  a.download = `barovia_save_${data}.json`;
   a.click();
   URL.revokeObjectURL(url);
   toast('💾 Save baixado');
@@ -927,11 +977,11 @@ function importarSave(event) {
 }
 
 function resetarTudo() {
-  if (!confirm('Apagar TODOS os personagens e dados? Esta ação não pode ser desfeita.')) return;
+  if (!confirm('Apagar TODOS os dados? Esta ação não pode ser desfeita.')) return;
   localStorage.removeItem(STORAGE_KEY);
   estado = { personagens: PERSONAGENS_INICIAIS.map(criarPersonagem) };
   render();
-  toast('Resetado');
+  toast('☠ Resetado');
 }
 
 render();
