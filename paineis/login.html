@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Entrar no Painel do Mestre — D&D 5e">
+<meta name="theme-color" content="#0a0608">
+<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<title>Entrar — Painel do Mestre</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,700;1,400&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg-deep: #0a0608;
+    --gold: #8B6914;
+    --gold-bright: #b88a2c;
+    --blood: #6b1010;
+    --blood-bright: #8b1d1d;
+    --parchment: #d4c5a0;
+    --parchment-dim: #a89878;
+    --shadow: #050304;
+  }
+
+  html, body {
+    min-height: 100vh;
+    min-height: 100dvh;
+    background-color: var(--bg-deep);
+    background-image: radial-gradient(ellipse at top, #2a1518 0%, #150a0c 50%, #050304 100%);
+    font-family: 'EB Garamond', Georgia, serif;
+    color: var(--parchment);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .card {
+    width: 100%;
+    max-width: 420px;
+    background: linear-gradient(160deg, #1f1416 0%, #150c0e 60%, #0d0709 100%);
+    border: 2px solid var(--gold);
+    border-radius: 4px;
+    padding: 40px 32px 32px;
+    position: relative;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.8), inset 0 0 30px rgba(0,0,0,0.4),
+                0 0 0 1px var(--blood) inset;
+  }
+  .corner { position: absolute; color: var(--blood); font-size: 14px; opacity: 0.8; }
+  .corner.tl { top: 6px; left: 10px; }
+  .corner.tr { top: 6px; right: 10px; }
+  .corner.bl { bottom: 6px; left: 10px; }
+  .corner.br { bottom: 6px; right: 10px; }
+
+  .crest { display: block; text-align: center; font-size: 44px; margin-bottom: 14px; filter: drop-shadow(0 0 12px rgba(139,105,20,0.5)); }
+  .title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 22px; font-weight: 900;
+    letter-spacing: 2px; text-align: center;
+    color: var(--gold-bright);
+    text-shadow: 0 0 20px rgba(184,138,44,0.4);
+    margin-bottom: 6px;
+  }
+  .subtitle {
+    text-align: center; font-style: italic; font-size: 13px;
+    color: var(--parchment-dim); letter-spacing: 1.5px; margin-bottom: 28px;
+  }
+  .subtitle::before { content: '— '; color: var(--blood-bright); }
+  .subtitle::after  { content: ' —'; color: var(--blood-bright); }
+
+  label {
+    display: block;
+    font-family: 'Cinzel', serif;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 8px;
+  }
+
+  select {
+    width: 100%;
+    padding: 12px 14px;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--gold);
+    border-radius: 3px;
+    color: var(--parchment);
+    font-family: 'EB Garamond', serif; font-size: 16px;
+    outline: none;
+    cursor: pointer;
+  }
+  select:focus { border-color: var(--gold-bright); background: rgba(255,255,255,0.06); }
+  select option { background: #1a1018; color: var(--parchment); }
+
+  .btn {
+    display: block; width: 100%;
+    margin-top: 20px;
+    padding: 14px 18px;
+    background: linear-gradient(to bottom, var(--gold), #6a4f0e);
+    border: 1px solid var(--gold-bright);
+    color: var(--shadow);
+    font-family: 'Cinzel', serif; font-size: 13px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+  .btn:hover  { background: linear-gradient(to bottom, var(--gold-bright), var(--gold)); transform: translateY(-1px); }
+  .btn:disabled { opacity: 0.5; cursor: wait; }
+
+  .erro {
+    margin-top: 14px; padding: 10px 14px;
+    background: rgba(107,16,16,0.25);
+    border: 1px solid var(--blood-bright);
+    color: #f4b8a8;
+    font-size: 13px; border-radius: 3px;
+    display: none;
+  }
+  .erro.show { display: block; }
+
+  .hint {
+    margin-top: 24px;
+    font-size: 12px; text-align: center;
+    color: var(--parchment-dim); font-style: italic;
+  }
+  .hint a { color: var(--gold-bright); text-decoration: none; }
+  .hint a:hover { text-decoration: underline; }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
+</style>
+</head>
+<body>
+
+<main class="card">
+  <span class="corner tl" aria-hidden="true">✠</span>
+  <span class="corner tr" aria-hidden="true">✠</span>
+  <span class="corner bl" aria-hidden="true">✠</span>
+  <span class="corner br" aria-hidden="true">✠</span>
+
+  <span class="crest" aria-hidden="true">⚔️</span>
+  <h1 class="title">Entrar na Mesa</h1>
+  <p class="subtitle">Escolha seu nome</p>
+
+  <form id="login-form" novalidate>
+    <label for="nome">Jogador</label>
+    <select id="nome" required aria-required="true">
+      <option value="">— escolher —</option>
+      <option value="Sabrina123">Sabrina123</option>
+      <option value="Derik123">Derik123</option>
+      <option value="Felipe123">Felipe123</option>
+    </select>
+    <button type="submit" class="btn" id="btn-entrar">Entrar</button>
+    <div class="erro" id="erro" role="alert" aria-live="polite"></div>
+  </form>
+
+  <p class="hint">
+    <a href="../index.html">← Voltar à tela inicial</a>
+  </p>
+</main>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="../assets/js/supabase.js"></script>
+<script src="../assets/js/auth.js"></script>
+<script>
+  const form  = document.getElementById('login-form');
+  const sel   = document.getElementById('nome');
+  const btn   = document.getElementById('btn-entrar');
+  const erro  = document.getElementById('erro');
+
+  // Se já estiver logado, vai direto pro index
+  (async () => {
+    const u = await window.Auth.getUser();
+    if (u) location.replace('../index.html');
+  })();
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    erro.classList.remove('show');
+    const nome = sel.value;
+    if (!nome) { erro.textContent = 'Escolha um jogador.'; erro.classList.add('show'); return; }
+
+    btn.disabled = true; btn.textContent = 'Entrando…';
+    const r = await window.Auth.entrarPorNome(nome);
+    if (!r.ok) {
+      erro.textContent = 'Falha ao entrar: ' + r.erro;
+      erro.classList.add('show');
+      btn.disabled = false; btn.textContent = 'Entrar';
+      return;
+    }
+    // Redirect: se veio com ?from=, volta pra lá
+    const params = new URLSearchParams(location.search);
+    const from   = params.get('from');
+    location.replace(from || '../index.html');
+  });
+</script>
+</body>
+</html>

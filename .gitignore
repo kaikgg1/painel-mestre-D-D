@@ -4,3 +4,8 @@ docs/LivroDoJogador.*
 # Dependências locais (instaláveis via `npm install`)
 node_modules/
 package-lock.json
+
+# Credenciais — nunca commit!
+.env
+.env.local
+.env.*.local

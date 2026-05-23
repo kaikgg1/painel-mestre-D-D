@@ -104,6 +104,22 @@
     min-width: 80px;
     text-align: right;
   }
+  .auth-slot { display: flex; align-items: center; gap: 8px; font-family: 'Cinzel', serif; font-size: 11px; }
+  .auth-slot .auth-nome { color: var(--parchment-dim); letter-spacing: 1px; }
+  .auth-slot .auth-btn {
+    padding: 6px 12px;
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--parchment-dim);
+    border-radius: 2px;
+    font-family: 'Cinzel', serif; font-size: 10px;
+    font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+    text-decoration: none; cursor: pointer; transition: all 0.2s;
+  }
+  .auth-slot .auth-btn:hover { background: var(--gold); color: var(--shadow); }
+  @media (max-width: 600px) {
+    .auth-slot .auth-nome { display: none; }
+  }
 
   /* ===== FILTROS ===== */
   .filters-bar {
@@ -630,6 +646,7 @@
   <a href="../index.html" class="back-btn">← Voltar</a>
   <div class="header-title">Grimório de Magias</div>
   <div class="spell-count" id="count">Carregando...</div>
+  <div class="auth-slot" id="auth-slot" aria-label="Status de login"></div>
 </header>
 
 <div class="filters-bar">
@@ -744,6 +761,10 @@
   </div>
 </div>
 
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="../assets/js/supabase.js"></script>
+<script src="../assets/js/auth.js"></script>
+<script src="../assets/js/favoritas.js"></script>
 <script>
 const ESCOLA_COR = {
   'Abjuração':'var(--c-abj)','Conjuração':'var(--c-con)','Adivinhação':'var(--c-div)',
@@ -756,24 +777,20 @@ let todasMagias = [];
 let fonte = '';
 const filtros = { texto:'', niveis:new Set(), escolas:new Set(), classes:new Set(), ritual:null, conc:null, fav:null, ordem:'nome-az' };
 
-/* ===== FAVORITAS (localStorage) ===== */
-const FAV_KEY = 'grimorio-favoritas-v1';
-const favoritas = new Set(
-  (() => { try { return JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); } catch { return []; } })()
-);
-function salvarFavoritas() {
-  try { localStorage.setItem(FAV_KEY, JSON.stringify([...favoritas])); } catch {}
+/* ===== FAVORITAS (via wrapper Fav: banco se logado, localStorage se não) ===== */
+function ehFavorita(nome)     { return window.Fav ? window.Fav.tem(nome) : false; }
+async function toggleFavorita(nome) {
+  if (!window.Fav) return false;
+  const novo = await window.Fav.alternar(nome);
   atualizarContadorFav();
-}
-function ehFavorita(nome) { return favoritas.has(nome); }
-function toggleFavorita(nome) {
-  if (favoritas.has(nome)) favoritas.delete(nome);
-  else favoritas.add(nome);
-  salvarFavoritas();
+  return novo;
 }
 function atualizarContadorFav() {
   const el = document.getElementById('fav-count');
-  if (el) el.textContent = favoritas.size ? ` (${favoritas.size})` : '';
+  if (el && window.Fav) {
+    const n = window.Fav.tamanho();
+    el.textContent = n ? ` (${n})` : '';
+  }
 }
 
 /* ===== FETCH ===== */
@@ -861,13 +878,14 @@ function criarCard(m) {
 
   // Estrela: alterna favorita sem abrir o modal
   const favBtn = card.querySelector('.fav-btn');
-  favBtn.addEventListener('click', e => {
+  favBtn.addEventListener('click', async e => {
     e.stopPropagation();
-    toggleFavorita(m.nome);
-    const novoEstado = ehFavorita(m.nome);
+    favBtn.disabled = true;
+    const novoEstado = await toggleFavorita(m.nome);
     favBtn.setAttribute('aria-pressed', novoEstado);
     favBtn.setAttribute('aria-label', (novoEstado ? 'Remover ' : 'Marcar ') + m.nome + (novoEstado ? ' das favoritas' : ' como favorita'));
     favBtn.textContent = novoEstado ? '★' : '☆';
+    favBtn.disabled = false;
     // Se o filtro "Só favoritas" estiver ativo e desfavoritou, re-renderiza
     if (filtros.fav === true && !novoEstado) renderizar();
   });
@@ -927,8 +945,9 @@ function abrirModal(m) {
     mFav.setAttribute('aria-pressed', fav);
   }
   atualizarMFav();
-  mFav.onclick = () => {
-    toggleFavorita(m.nome);
+  mFav.onclick = async () => {
+    mFav.disabled = true;
+    await toggleFavorita(m.nome);
     atualizarMFav();
     // Atualiza a estrela do card correspondente, se visível
     const cardFav = document.querySelector(`.spell-card[aria-label^="${m.nome.replace(/"/g, '\\"')},"] .fav-btn`);
@@ -937,6 +956,7 @@ function abrirModal(m) {
       cardFav.setAttribute('aria-pressed', novo);
       cardFav.textContent = novo ? '★' : '☆';
     }
+    mFav.disabled = false;
   };
 
   const overlay = document.getElementById('modal-overlay');
@@ -1066,8 +1086,15 @@ document.getElementById('pills-classe').addEventListener('click', e => {
 });
 
 /* ===== INIT ===== */
-atualizarContadorFav();
-carregarMagias();
+(async () => {
+  // Header de auth
+  if (window.Auth) await window.Auth.renderHeader('#auth-slot');
+  // Carrega favoritas (decide modo banco vs local internamente)
+  if (window.Fav) await window.Fav.carregar();
+  atualizarContadorFav();
+  // Carrega magias
+  carregarMagias();
+})();
 </script>
 </body>
 </html>

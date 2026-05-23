@@ -292,6 +292,28 @@
     outline-offset: 4px;
   }
 
+  /* Barra de auth no topo */
+  .auth-bar {
+    position: fixed;
+    top: 12px; right: 16px;
+    z-index: 10;
+    display: flex; align-items: center; gap: 10px;
+    font-family: 'Cinzel', serif; font-size: 12px;
+  }
+  .auth-bar .auth-nome { color: var(--parchment-dim); letter-spacing: 1px; }
+  .auth-bar .auth-btn {
+    padding: 7px 14px;
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--parchment-dim);
+    border-radius: 2px;
+    font-family: 'Cinzel', serif; font-size: 11px;
+    font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+    text-decoration: none; cursor: pointer; transition: all 0.2s;
+  }
+  .auth-bar .auth-btn:hover { background: var(--gold); color: var(--shadow); }
+  .auth-bar .auth-btn:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 2px; }
+
   /* Respeita preferência de redução de movimento */
   @media (prefers-reduced-motion: reduce) {
     .crest { animation: none; }
@@ -300,6 +322,8 @@
 </style>
 </head>
 <body>
+
+<div class="auth-bar" id="auth-slot" aria-label="Status de login"></div>
 
 <div class="wrapper">
 
@@ -347,11 +371,27 @@
       <div class="campaign-cta">Abrir Grimório</div>
     </a>
 
+    <a href="paineis/ficha.html" class="campaign-card" aria-label="Minha ficha de personagem">
+      <span class="corner tl" aria-hidden="true">✦</span>
+      <span class="corner tr" aria-hidden="true">✦</span>
+      <span class="corner bl" aria-hidden="true">✦</span>
+      <span class="corner br" aria-hidden="true">✦</span>
+      <div class="campaign-icon" aria-hidden="true">📜</div>
+      <div class="campaign-name">Minha Ficha</div>
+      <div class="campaign-desc">Personagem do jogador<br>HP, atributos, slots, favoritas</div>
+      <div class="campaign-cta">Abrir Ficha</div>
+    </a>
+
   </div>
 
   <div class="footer">D&amp;D 5ª Edição · Painel do Mestre</div>
 
 </div>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="assets/js/supabase.js"></script>
+<script src="assets/js/auth.js"></script>
+<script>window.Auth.renderHeader('#auth-slot');</script>
 
 </body>
 </html>
