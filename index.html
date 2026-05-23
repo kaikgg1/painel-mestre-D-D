@@ -24,6 +24,7 @@
 
   html, body {
     min-height: 100vh;
+    width: 100%;
     background-color: var(--bg-deep);
     background-image: radial-gradient(ellipse at top, #2a1518 0%, #150a0c 50%, #050304 100%);
     font-family: 'EB Garamond', Georgia, serif;
@@ -32,7 +33,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 40px 20px;
+    padding: 40px 24px;
   }
 
   body::before {
@@ -47,7 +48,7 @@
   .wrapper {
     position: relative;
     z-index: 1;
-    max-width: 860px;
+    max-width: 1100px;
     width: 100%;
     text-align: center;
   }
@@ -111,7 +112,7 @@
   /* ===== CARDS DE CAMPANHA ===== */
   .campaigns {
     display: flex;
-    gap: 28px;
+    gap: 32px;
     justify-content: center;
     flex-wrap: wrap;
   }
@@ -124,8 +125,8 @@
     background: linear-gradient(160deg, #1f1416 0%, #150c0e 60%, #0d0709 100%);
     border: 2px solid var(--gold);
     border-radius: 4px;
-    padding: 36px 32px 30px;
-    width: 280px;
+    padding: 48px 40px 40px;
+    width: clamp(260px, 38vw, 420px);
     position: relative;
     cursor: pointer;
     transition: all 0.3s ease;
@@ -181,8 +182,8 @@
   .corner.br { bottom: 6px; right: 10px; }
 
   .campaign-icon {
-    font-size: 52px;
-    margin-bottom: 18px;
+    font-size: 68px;
+    margin-bottom: 22px;
     filter: drop-shadow(0 0 8px rgba(139,29,29,0.5));
     transition: transform 0.3s, filter 0.3s;
     line-height: 1;
@@ -194,31 +195,31 @@
 
   .campaign-name {
     font-family: 'Cinzel Decorative', serif;
-    font-size: 17px;
+    font-size: clamp(16px, 2vw, 22px);
     font-weight: 700;
     color: var(--gold-bright);
     letter-spacing: 1px;
     line-height: 1.25;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     text-shadow: 1px 1px 3px var(--shadow);
   }
 
   .campaign-desc {
     font-family: 'EB Garamond', serif;
     font-style: italic;
-    font-size: 13px;
+    font-size: clamp(13px, 1.4vw, 16px);
     color: var(--parchment-dim);
-    line-height: 1.5;
+    line-height: 1.6;
   }
 
   .campaign-cta {
-    margin-top: 20px;
-    padding: 7px 20px;
+    margin-top: 26px;
+    padding: 9px 28px;
     background: transparent;
     border: 1px solid var(--gold);
     color: var(--parchment-dim);
     font-family: 'Cinzel', serif;
-    font-size: 10px;
+    font-size: clamp(10px, 1vw, 12px);
     font-weight: 600;
     letter-spacing: 2px;
     text-transform: uppercase;
@@ -264,10 +265,11 @@
     letter-spacing: 1px;
   }
 
-  @media (max-width: 640px) {
+  @media (max-width: 700px) {
     .title { font-size: 24px; letter-spacing: 2px; }
-    .campaign-card { width: 100%; max-width: 320px; }
-    .campaigns { gap: 20px; }
+    .campaign-card { width: 100%; max-width: 100%; padding: 36px 28px 30px; }
+    .campaigns { gap: 20px; flex-direction: column; align-items: center; }
+    .campaign-icon { font-size: 52px; }
   }
 </style>
 </head>
