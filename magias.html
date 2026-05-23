@@ -644,14 +644,225 @@
 
 <script>
 /* ===== TRADUÇÕES ===== */
-const ESCOLA_PT = {
-  'Abjuration':'Abjuração','Conjuration':'Conjuração','Divination':'Adivinhação',
-  'Enchantment':'Encantamento','Evocation':'Evocação','Illusion':'Ilusão',
-  'Necromancy':'Necromancia','Transmutation':'Transmutação',
-  // já em PT (BR API)
-  'Abjuração':'Abjuração','Conjuração':'Conjuração','Adivinhação':'Adivinhação',
-  'Encantamento':'Encantamento','Evocação':'Evocação','Ilusão':'Ilusão',
-  'Necromancia':'Necromancia','Transmutação':'Transmutação'
+function traduzirEscola(nome) {
+  const mapa = {
+    'abjuration':'Abjuração','conjuration':'Conjuração','divination':'Adivinhação',
+    'enchantment':'Encantamento','evocation':'Evocação','illusion':'Ilusão',
+    'necromancy':'Necromancia','transmutation':'Transmutação',
+    'abjuração':'Abjuração','conjuração':'Conjuração','adivinhação':'Adivinhação',
+    'encantamento':'Encantamento','evocação':'Evocação','ilusão':'Ilusão',
+    'necromancia':'Necromancia','transmutação':'Transmutação'
+  };
+  return nome ? (mapa[nome.toLowerCase()] || nome) : 'Desconhecida';
+}
+
+const ESCOLA_PT = {};  // mantido por compatibilidade
+
+/* ===== NOMES PT-BR (tradução embutida das magias SRD) ===== */
+const NOMES_PT = {
+  // Truques
+  'Acid Splash':'Respingo Ácido','Blade Ward':'Proteção da Lâmina','Chill Touch':'Toque Gélido',
+  'Control Flames':'Controlar Chamas','Create Bonfire':'Criar Fogueira','Dancing Lights':'Luzes Dançantes',
+  'Druidcraft':'Arte Druídica','Eldritch Blast':'Explosão Élfica','Fire Bolt':'Raio de Fogo',
+  'Friends':'Amigos','Frostbite':'Friagem','Guidance':'Orientação','Gust':'Rajada',
+  'Infestation':'Infestação','Light':'Luz','Lightning Lure':'Chamariz Relampejante',
+  'Mage Hand':'Mão do Mago','Magic Stone':'Pedra Mágica','Mending':'Conserto',
+  'Message':'Mensagem','Minor Illusion':'Ilusão Menor','Mold Earth':'Moldar a Terra',
+  'Poison Spray':'Borrifo de Veneno','Prestidigitation':'Prestidigitação',
+  'Primal Savagery':'Selvageria Primordial','Produce Flame':'Produzir Chama',
+  'Ray of Frost':'Raio de Gelo','Resistance':'Resistência','Sacred Flame':'Chama Sagrada',
+  'Shape Water':'Modelar Água','Shillelagh':'Cacetada','Shocking Grasp':'Toque Chocante',
+  'Spare the Dying':'Poupar o Moribundo','Sword Burst':'Estouro de Espada',
+  'Thaumaturgy':'Taumaturgia','Thunderclap':'Estrondo','Toll the Dead':'Dobrar os Sinos da Morte',
+  'True Strike':'Golpe Preciso','Vicious Mockery':'Deboche Cruel','Word of Radiance':'Palavra de Radiosidade',
+  'Green-Flame Blade':'Lâmina de Chama Verde','Sapping Sting':'Picada Enfraquecedora',
+  // Nível 1
+  'Absorb Elements':'Absorver Elementos','Alarm':'Alarme','Animal Friendship':'Amizade com os Animais',
+  'Armor of Agathys':'Armadura de Agátis','Arms of Hadar':'Braços de Hadar','Bane':'Ruína',
+  'Beast Bond':'Vínculo com a Besta','Bless':'Abençoar','Burning Hands':'Mãos Ardentes',
+  'Catapult':'Catapulta','Cause Fear':'Causar Medo','Ceremony':'Cerimônia',
+  'Charm Person':'Encantar Pessoa','Chromatic Orb':'Orbe Cromático','Color Spray':'Borrifo de Cores',
+  'Command':'Ordem','Compelled Duel':'Duelo Compelido','Comprehend Languages':'Compreender Idiomas',
+  'Create or Destroy Water':'Criar ou Destruir Água','Cure Wounds':'Curar Ferimentos',
+  'Detect Evil and Good':'Detectar o Bem e o Mal','Detect Magic':'Detectar Magia',
+  'Detect Poison and Disease':'Detectar Veneno e Doença','Disguise Self':'Disfarçar-se',
+  'Divine Favor':'Favor Divino','Earth Tremor':'Tremor da Terra','Ensnaring Strike':'Golpe Enredante',
+  'Entangle':'Enredar','Expeditious Retreat':'Recuo Expedito','Faerie Fire':'Fogo Feérico',
+  'False Life':'Vida Falsa','Feather Fall':'Queda de Pena','Find Familiar':'Encontrar Familiar',
+  'Fog Cloud':'Nuvem de Névoa','Goodberry':'Frutas Boas','Grease':'Gordura',
+  'Guiding Bolt':'Raio Guia','Hail of Thorns':'Chuva de Espinhos','Healing Word':'Palavra Curativa',
+  'Hellish Rebuke':'Reprimenda Infernal','Heroism':'Heroísmo','Hunter\'s Mark':'Marca do Caçador',
+  'Identify':'Identificar','Illusory Script':'Escrita Ilusória','Inflict Wounds':'Causar Ferimentos',
+  'Jump':'Saltar','Longstrider':'Passada Longa','Mage Armor':'Armadura de Mago',
+  'Magic Missile':'Mísseis Mágicos','Protection from Evil and Good':'Proteção do Bem e do Mal',
+  'Purify Food and Drink':'Purificar Comida e Bebida','Ray of Sickness':'Raio de Enfermidade',
+  'Sanctuary':'Santuário','Shield':'Escudo','Shield of Faith':'Escudo da Fé',
+  'Silent Image':'Imagem Silenciosa','Sleep':'Sono','Snare':'Armadilha',
+  'Speak with Animals':'Falar com os Animais','Tasha\'s Hideous Laughter':'Riso Horrível de Tasha',
+  'Thunderwave':'Onda Trovejante','Unseen Servant':'Servo Invisível','Witch Bolt':'Raio da Feiticeira',
+  'Wrathful Smite':'Golpe Colérico','Zephyr Strike':'Golpe da Brisa',
+  // Nível 2
+  'Acid Arrow':'Flecha Ácida','Aid':'Auxílio','Alter Self':'Alterar-se',
+  'Animal Messenger':'Mensageiro Animal','Arcane Lock':'Trancamento Arcano','Augury':'Augúrio',
+  'Barkskin':'Casca de Árvore','Beast Sense':'Sentidos da Besta','Blindness/Deafness':'Cegueira/Surdez',
+  'Blur':'Borrão','Branding Smite':'Golpe da Marca','Calm Emotions':'Acalmar Emoções',
+  'Cloud of Daggers':'Nuvem de Adagas','Continual Flame':'Chama Contínua',
+  'Crown of Madness':'Coroa da Loucura','Darkness':'Escuridão','Darkvision':'Visão no Escuro',
+  'Detect Thoughts':'Detectar Pensamentos','Dragon\'s Breath':'Sopro do Dragão',
+  'Dust Devil':'Diabo de Pó','Earthbind':'Prender à Terra','Enhance Ability':'Melhorar Habilidade',
+  'Enlarge/Reduce':'Aumentar/Diminuir','Enthrall':'Encantar','Find Steed':'Encontrar Montaria',
+  'Find Traps':'Encontrar Armadilhas','Flame Blade':'Lâmina de Chama',
+  'Flaming Sphere':'Esfera Flamejante','Gentle Repose':'Repouso Suave',
+  'Gust of Wind':'Rajada de Vento','Heat Metal':'Aquecer Metal','Hold Person':'Segurar Pessoa',
+  'Invisibility':'Invisibilidade','Knock':'Abrir','Lesser Restoration':'Restauração Menor',
+  'Levitate':'Levitar','Locate Animals or Plants':'Localizar Animais ou Plantas',
+  'Locate Object':'Localizar Objeto','Magic Mouth':'Boca Mágica','Magic Weapon':'Arma Mágica',
+  'Melf\'s Acid Arrow':'Flecha Ácida de Melf','Mind Spike':'Espinho Mental',
+  'Mirror Image':'Imagem Espelhada','Misty Step':'Passo Enevoado','Moonbeam':'Raio de Lua',
+  'Nystul\'s Magic Aura':'Aura Mágica de Nystul','Pass Without Trace':'Passar sem Rastro',
+  'Prayer of Healing':'Oração de Cura','Protection from Poison':'Proteção contra Veneno',
+  'Pyrotechnics':'Pirotecnia','Ray of Enfeeblement':'Raio de Enfraquecimento',
+  'Rope Trick':'Truque da Corda','Scorching Ray':'Raio Escaldante',
+  'See Invisibility':'Ver Invisibilidade','Shadow Blade':'Lâmina de Sombra','Shatter':'Estilhaçar',
+  'Silence':'Silêncio','Spider Climb':'Escalar como Aranha','Spike Growth':'Crescimento de Espinhos',
+  'Spiritual Weapon':'Arma Espiritual','Suggestion':'Sugestão','Summon Beast':'Convocar Besta',
+  'Warding Bond':'Vínculo de Proteção','Web':'Teia','Zone of Truth':'Zona da Verdade',
+  'Skywrite':'Escrever no Céu','Rime\'s Binding Ice':'Gelo Vinculante de Rime',
+  'Cordon of Arrows':'Cordão de Flechas',
+  // Nível 3
+  'Animate Dead':'Animar Mortos','Aura of Vitality':'Aura de Vitalidade',
+  'Beacon of Hope':'Farol de Esperança','Bestow Curse':'Impor Maldição',
+  'Blinding Smite':'Golpe Cegante','Blink':'Piscar','Call Lightning':'Convocar Relâmpago',
+  'Clairvoyance':'Clarividência','Conjure Animals':'Convocar Animais',
+  'Conjure Barrage':'Convocar Barragem','Counterspell':'Contrafeitiço',
+  'Create Food and Water':'Criar Comida e Água','Crusader\'s Mantle':'Manto do Cruzado',
+  'Daylight':'Luz do Dia','Dispel Magic':'Dissipar Magia','Elemental Weapon':'Arma Elemental',
+  'Erupting Earth':'Terra Eruptiva','Fear':'Medo','Feign Death':'Fingir Morte',
+  'Fireball':'Bola de Fogo','Flame Arrows':'Flechas de Chama','Fly':'Voar',
+  'Gaseous Form':'Forma Gasosa','Glyph of Warding':'Glifo de Proteção','Haste':'Pressa',
+  'Hunger of Hadar':'Fome de Hadar','Hypnotic Pattern':'Padrão Hipnótico',
+  'Leomund\'s Tiny Hut':'Pequena Cabana de Leomund','Life Transference':'Transferência de Vida',
+  'Lightning Arrow':'Flecha de Relâmpago','Lightning Bolt':'Raio','Magic Circle':'Círculo Mágico',
+  'Major Image':'Imagem Maior','Mass Healing Word':'Palavra de Cura em Massa',
+  'Meld Into Stone':'Fundir-se à Pedra','Nondetection':'Não Detecção',
+  'Plant Growth':'Crescimento de Plantas','Protection from Energy':'Proteção contra Energia',
+  'Remove Curse':'Remover Maldição','Revivify':'Revivificar','Sending':'Mensagem',
+  'Sleet Storm':'Tempestade de Granizo','Slow':'Lentidão','Speak with Dead':'Falar com os Mortos',
+  'Speak with Plants':'Falar com as Plantas','Spirit Guardians':'Guardiões Espirituais',
+  'Spirit Shroud':'Mortalha Espiritual','Stinking Cloud':'Nuvem Fedorenta',
+  'Summon Fey':'Convocar Fada','Summon Shadowspawn':'Convocar Gerado pelas Sombras',
+  'Summon Undead':'Convocar Morto-Vivo','Thunder Step':'Passo Trovejante',
+  'Tidal Wave':'Onda de Maré','Tiny Servant':'Servo Diminuto','Tongues':'Línguas',
+  'Vampiric Touch':'Toque Vampírico','Wall of Sand':'Parede de Areia',
+  'Wall of Water':'Parede de Água','Water Breathing':'Respirar na Água',
+  'Water Walk':'Caminhar nas Águas','Wind Wall':'Parede de Vento',
+  'Enemies Abound':'Inimigos em Abundância','Intellect Fortress':'Fortaleza do Intelecto',
+  // Nível 4
+  'Arcane Eye':'Olho Arcano','Aura of Life':'Aura de Vida','Aura of Purity':'Aura de Pureza',
+  'Banishment':'Banimento','Blight':'Praga','Charm Monster':'Encantar Monstro',
+  'Compulsion':'Compulsão','Confusion':'Confusão',
+  'Conjure Minor Elementals':'Convocar Elementais Menores',
+  'Conjure Woodland Beings':'Convocar Seres da Floresta','Control Water':'Controlar Água',
+  'Death Ward':'Guarda contra a Morte','Dimension Door':'Portal Dimensional',
+  'Divination':'Adivinhação','Dominate Beast':'Dominar Besta',
+  'Elemental Bane':'Ruína Elemental','Evard\'s Black Tentacles':'Tentáculos Negros de Evard',
+  'Fabricate':'Fabricar','Fire Shield':'Escudo de Fogo','Freedom of Movement':'Liberdade de Movimento',
+  'Giant Insect':'Inseto Gigante','Grasping Vine':'Videira Agarradora',
+  'Greater Invisibility':'Invisibilidade Superior','Guardian of Faith':'Guardião da Fé',
+  'Guardian of Nature':'Guardião da Natureza','Hallucinatory Terrain':'Terreno Alucinatório',
+  'Ice Storm':'Tempestade de Gelo','Leomund\'s Secret Chest':'Baú Secreto de Leomund',
+  'Locate Creature':'Localizar Criatura','Mordenkainen\'s Faithful Hound':'Cão Fiel de Mordenkainen',
+  'Otiluke\'s Resilient Sphere':'Esfera Resiliente de Otiluke',
+  'Phantasmal Killer':'Assassino Fantasmagórico','Polymorph':'Polimorfismo',
+  'Shadow of Moil':'Sombra de Moil','Sickening Radiance':'Radiância Nauseante',
+  'Staggering Smite':'Golpe Atordoante','Stone Shape':'Moldar Pedra','Stoneskin':'Pele Pétrea',
+  'Storm Sphere':'Esfera da Tempestade','Summon Aberration':'Convocar Aberração',
+  'Summon Construct':'Convocar Constructo','Summon Greater Demon':'Convocar Demônio Superior',
+  'Vitriolic Sphere':'Esfera Vitriólica','Wall of Fire':'Parede de Fogo',
+  'Watery Sphere':'Esfera Aquosa','Black Tentacles':'Tentáculos Negros',
+  // Nível 5
+  'Animate Objects':'Animar Objetos','Antilife Shell':'Concha Anti-Vida',
+  'Awaken':'Despertar','Banishing Smite':'Golpe Banidor','Bigby\'s Hand':'Mão de Bigby',
+  'Circle of Power':'Círculo de Poder','Cloudkill':'Matar com Nuvem','Commune':'Comungar',
+  'Commune with Nature':'Comungar com a Natureza','Cone of Cold':'Cone de Frio',
+  'Conjure Elemental':'Convocar Elemental','Conjure Volley':'Convocar Salva',
+  'Contact Other Plane':'Contatar Outro Plano','Contagion':'Contágio',
+  'Control Winds':'Controlar Ventos','Creation':'Criação','Dawn':'Amanhecer',
+  'Danse Macabre':'Dança Macabra','Destructive Wave':'Onda Destrutiva',
+  'Dispel Evil and Good':'Dissipar o Bem e o Mal','Divine Intervention':'Intervenção Divina',
+  'Dominate Person':'Dominar Pessoa','Dream':'Sonho','Enervation':'Enervação',
+  'Far Step':'Passo Distante','Flame Strike':'Golpe de Chama','Geas':'Geas',
+  'Greater Restoration':'Restauração Superior','Hold Monster':'Segurar Monstro',
+  'Holy Weapon':'Arma Sagrada','Immolation':'Imolação','Infernal Calling':'Chamado Infernal',
+  'Insect Plague':'Praga de Insetos','Legend Lore':'Lore das Lendas','Maelstrom':'Maelstrom',
+  'Mass Cure Wounds':'Curar Ferimentos em Massa','Mislead':'Iludir',
+  'Modify Memory':'Modificar Memória','Negative Energy Flood':'Inundação de Energia Negativa',
+  'Passwall':'Abrir Caminho','Planar Binding':'Ligar ao Plano','Raise Dead':'Ressuscitar',
+  'Rary\'s Telepathic Bond':'Vínculo Telepático de Rary','Reincarnate':'Reencarnar',
+  'Scrying':'Escanear','Seeming':'Parecer','Skill Empowerment':'Potencializar Perícia',
+  'Steel Wind Strike':'Golpe do Vento de Aço','Swift Quiver':'Aljava Veloz',
+  'Summon Celestial':'Convocar Celestial','Synaptic Static':'Estática Sináptica',
+  'Telekinesis':'Telecinesia','Telepathy':'Telepatia',
+  'Teleportation Circle':'Círculo de Teleportação','Transmute Rock':'Transmutar Rocha',
+  'Tree Stride':'Caminhar pelas Árvores','Wall of Force':'Parede de Força',
+  'Wall of Light':'Parede de Luz','Wall of Stone':'Parede de Pedra',
+  'Wrath of Nature':'Ira da Natureza','Arcane Hand':'Mão Arcana',
+  // Nível 6
+  'Arcane Gate':'Portal Arcano','Blade Barrier':'Barreira de Lâminas',
+  'Chain Lightning':'Relâmpago em Cadeia','Circle of Death':'Círculo da Morte',
+  'Conjure Fey':'Convocar Fada','Contingency':'Contingência','Create Undead':'Criar Morto-Vivo',
+  'Disintegrate':'Desintegrar','Eyebite':'Olhar Maligno','Find the Path':'Encontrar o Caminho',
+  'Flesh to Stone':'Carne em Pedra','Forbiddance':'Proibição',
+  'Freezing Sphere':'Esfera de Gelo','Globe of Invulnerability':'Globo de Invulnerabilidade',
+  'Guards and Wards':'Guardas e Proteções','Harm':'Prejudicar','Heal':'Curar',
+  'Heroes\' Feast':'Banquete dos Heróis','Investiture of Flame':'Investidura de Chama',
+  'Investiture of Ice':'Investidura de Gelo','Investiture of Stone':'Investidura de Pedra',
+  'Investiture of Wind':'Investidura de Vento','Magic Jar':'Jarro Mágico',
+  'Mass Suggestion':'Sugestão em Massa','Mental Prison':'Prisão Mental',
+  'Move Earth':'Mover a Terra','Otiluke\'s Freezing Sphere':'Esfera Congelante de Otiluke',
+  'Otto\'s Irresistible Dance':'Dança Irresistível de Otto','Planar Ally':'Aliado Planar',
+  'Programmed Illusion':'Ilusão Programada','Scatter':'Dispersar','Soul Cage':'Gaiola da Alma',
+  'Sunbeam':'Raio de Sol','Tenser\'s Transformation':'Transformação de Tenser',
+  'Transport via Plants':'Transportar pelas Plantas','True Seeing':'Visão Verdadeira',
+  'Wall of Ice':'Parede de Gelo','Wall of Thorns':'Parede de Espinhos',
+  'Wind Walk':'Caminhar pelo Vento','Word of Recall':'Palavra de Retorno',
+  'Drawmij\'s Instant Summons':'Convocação Instantânea de Drawmij',
+  'Primordial Ward':'Proteção Primordial','Tasha\'s Bubbling Cauldron':'Caldeirão Borbulhante de Tasha',
+  // Nível 7
+  'Conjure Celestial':'Convocar Celestial','Crown of Stars':'Coroa de Estrelas',
+  'Delayed Blast Fireball':'Bola de Fogo de Explosão Retardada','Divine Word':'Palavra Divina',
+  'Etherealness':'Etrealidade','Finger of Death':'Dedo da Morte','Fire Storm':'Tempestade de Fogo',
+  'Forcecage':'Gaiola de Força','Magnificent Mansion':'Mansão Magnífica',
+  'Mirage Arcane':'Miragem Arcana',
+  'Mordenkainen\'s Magnificent Mansion':'Mansão Magnífica de Mordenkainen',
+  'Mordenkainen\'s Sword':'Espada de Mordenkainen','Plane Shift':'Mudar de Plano',
+  'Power Word Pain':'Palavra de Poder: Dor','Prismatic Spray':'Borrifo Prismático',
+  'Project Image':'Projetar Imagem','Regenerate':'Regenerar','Resurrection':'Ressurreição',
+  'Reverse Gravity':'Reverter Gravidade','Sequester':'Sequestrar','Simulacrum':'Simulacro',
+  'Symbol':'Símbolo','Teleport':'Teleporte','Temple of the Gods':'Templo dos Deuses',
+  'Whirlwind':'Redemoinho','Tether Essence':'Ancorar Essência',
+  // Nível 8
+  'Abi-Dalzim\'s Horrid Wilting':'Murcha Horrível de Abi-Dalzim',
+  'Animal Shapes':'Formas Animais','Antimagic Field':'Campo Antimágico',
+  'Antipathy/Sympathy':'Antipatia/Simpatia','Clone':'Clonar',
+  'Control Weather':'Controlar o Tempo','Demiplane':'Demiplano',
+  'Dominate Monster':'Dominar Monstro','Earthquake':'Terremoto','Feeblemind':'Enfraquecimento Mental',
+  'Glibness':'Fala Suave','Holy Aura':'Aura Sagrada','Illusory Dragon':'Dragão Ilusório',
+  'Incendiary Cloud':'Nuvem Incendiária','Maddening Darkness':'Escuridão Enlouquecedora',
+  'Maze':'Labirinto','Mighty Fortress':'Fortaleza Poderosa','Mind Blank':'Mente em Branco',
+  'Power Word Stun':'Palavra de Poder: Atordoar','Reality Break':'Quebrar a Realidade',
+  'Sunburst':'Explosão Solar','Tsunami':'Tsunami','Dark Star':'Estrela Negra',
+  // Nível 9
+  'Astral Projection':'Projeção Astral','Blade of Disaster':'Lâmina do Desastre',
+  'Foresight':'Presciência','Gate':'Portal','Imprisonment':'Aprisionamento',
+  'Invulnerability':'Invulnerabilidade','Mass Heal':'Cura em Massa',
+  'Mass Polymorph':'Polimorfismo em Massa','Meteor Swarm':'Chuva de Meteoros',
+  'Power Word Heal':'Palavra de Poder: Curar','Power Word Kill':'Palavra de Poder: Matar',
+  'Prismatic Wall':'Parede Prismática','Psychic Scream':'Grito Psíquico',
+  'Ravenous Void':'Vácuo Voraz','Shapechange':'Metamorfose',
+  'Storm of Vengeance':'Tempestade de Vingança','Time Stop':'Parar o Tempo',
+  'True Polymorph':'Polimorfismo Verdadeiro','True Resurrection':'Ressurreição Verdadeira',
+  'Weird':'Fantasia','Wish':'Desejo','Time Ravage':'Devastação Temporal',
 };
 
 const CLASSE_PT = {
@@ -696,7 +907,7 @@ async function carregarMagias() {
     const res = await fetch('https://api.open5e.com/v1/spells/?limit=500&format=json', { signal: AbortSignal.timeout(15000) });
     if (!res.ok) throw new Error('offline');
     const data = await res.json();
-    const magias = (data.results || []).map(normalizarOpen5e).filter(Boolean);
+    const magias = deduplicar((data.results || []).map(normalizarOpen5e).filter(Boolean));
     todasMagias = magias;
     fonte = 'Open5e (traduzido)';
     renderizar();
@@ -760,9 +971,9 @@ function normalizarOpen5e(s) {
   if (!s || !s.name) return null;
   const levelRaw = s.level_int ?? parseNivel(s.level);
   return {
-    nome: s.name,
+    nome: NOMES_PT[s.name] || s.name,
     nivel: levelRaw,
-    escola: ESCOLA_PT[s.school] || s.school || 'Desconhecida',
+    escola: traduzirEscola(s.school),
     classes: parsearClasses(s.dnd_class || ''),
     tempoCast: s.casting_time || '—',
     alcance: s.range || '—',
@@ -779,9 +990,9 @@ function normalizarOpen5e(s) {
 function normalizarDnd5e(s) {
   if (!s || !s.name) return null;
   return {
-    nome: s.name,
+    nome: NOMES_PT[s.name] || s.name,
     nivel: s.level ?? 0,
-    escola: ESCOLA_PT[s.school?.name] || s.school?.name || 'Desconhecida',
+    escola: traduzirEscola(s.school?.name),
     classes: (s.classes || []).map(c => CLASSE_PT[c.name] || c.name),
     tempoCast: s.casting_time || '—',
     alcance: s.range || '—',
@@ -793,6 +1004,18 @@ function normalizarDnd5e(s) {
     descricao: Array.isArray(s.desc) ? s.desc.join('\n\n') : (s.desc || ''),
     maiorNivel: Array.isArray(s.higher_level) ? s.higher_level.join('\n') : (s.higher_level || '')
   };
+}
+
+function deduplicar(magias) {
+  const vistas = new Map();
+  magias.forEach(m => {
+    const chave = m.nome.toLowerCase().trim();
+    // Prefere a entrada com descrição mais longa (mais completa)
+    if (!vistas.has(chave) || (m.descricao || '').length > (vistas.get(chave).descricao || '').length) {
+      vistas.set(chave, m);
+    }
+  });
+  return Array.from(vistas.values());
 }
 
 function parseNivel(v) {
