@@ -1087,8 +1087,11 @@ document.getElementById('pills-classe').addEventListener('click', e => {
 
 /* ===== INIT ===== */
 (async () => {
+  // Gate: requer login antes de qualquer coisa
+  const u = await window.Auth.requerLogin('login.html');
+  if (!u) return;  // já redirecionou
   // Header de auth
-  if (window.Auth) await window.Auth.renderHeader('#auth-slot');
+  await window.Auth.renderHeader('#auth-slot');
   // Carrega favoritas (decide modo banco vs local internamente)
   if (window.Fav) await window.Fav.carregar();
   atualizarContadorFav();

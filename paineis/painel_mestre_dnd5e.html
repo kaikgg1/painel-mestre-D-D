@@ -603,6 +603,7 @@
   <button onclick="window.print()" aria-label="Imprimir painel"><span aria-hidden="true">🖨</span> Imprimir</button>
   <button class="danger" onclick="resetarTudo()" aria-label="Resetar todos os dados"><span aria-hidden="true">⚠</span> Resetar Tudo</button>
   <input type="file" id="file-input" accept=".json" onchange="importarSave(event)" aria-label="Selecionar arquivo de save para carregar">
+  <span class="auth-slot" id="auth-slot" aria-label="Status de login" style="margin-left:auto;display:flex;gap:8px;align-items:center;font-family:'Cinzel',serif;font-size:11px;color:var(--red-dark)"></span>
 </nav>
 
 <main class="grid" id="grid"></main>
@@ -615,6 +616,10 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="../assets/js/supabase.js"></script>
+<script src="../assets/js/auth.js"></script>
+<script src="../assets/js/dbsync.js"></script>
 <script>
 const CONDICOES = [
   'Agarrado', 'Amedrontado', 'Atordoado', 'Caído', 'Cego', 'Enfeitiçado',
@@ -631,21 +636,22 @@ const PERSONAGENS_INICIAIS = [
   { jogador: 'Jogador 4', nome: 'Pippin', raca: 'Halfling', classe: 'Ladino', nivel: 5, hpAtual: 30, hpMax: 33, ca: 15 }
 ];
 
-const STORAGE_KEY = 'dnd_painel_mestre_v1';
+const CAMPANHA = 'mestre';
+let estado = { personagens: [] };
+let ehMestre = false;
 
-let estado = carregar();
-
-function carregar() {
-  try {
-    const dados = localStorage.getItem(STORAGE_KEY);
-    if (dados) return JSON.parse(dados);
-  } catch (e) {}
-  return { personagens: PERSONAGENS_INICIAIS.map(criarPersonagem) };
+// salvar(p?) — envia campos do personagem p para o banco (debounced).
+// Se sem p, sincroniza todos (legacy, usado em descansoLongo etc.)
+function salvar(p) {
+  if (!window.DBSync) return;
+  if (p && p.id) { window.DBSync.salvarCampo(p.id, p); return; }
+  for (const x of estado.personagens) {
+    if (x.id) window.DBSync.salvarCampo(x.id, x);
+  }
 }
 
-function salvar() {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(estado)); } catch (e) {}
-}
+// Compatibilidade — função carregar() agora é no-op (init real é via DBSync)
+function carregar() { return estado; }
 
 function toast(msg) {
   const t = document.getElementById('toast');
@@ -973,10 +979,13 @@ function criarCard(p) {
   const remover = document.createElement('button');
   remover.className = 'remove-card';
   remover.textContent = '✕ remover';
-  remover.onclick = () => {
+  remover.onclick = async () => {
     if (confirm(`Remover "${p.nome}" do painel?`)) {
-      estado.personagens = estado.personagens.filter(x => x.id !== p.id);
-      render();
+      try {
+        await window.DBSync.deletar(p.id);
+        estado.personagens = estado.personagens.filter(x => x.id !== p.id);
+        render();
+      } catch(e) { alert('Erro ao remover: ' + e.message); }
     }
   };
 
@@ -988,23 +997,38 @@ function criarCard(p) {
   return card;
 }
 
-function adicionarCard() {
-  estado.personagens.push(criarPersonagem());
-  render();
-  toast('Personagem adicionado');
+async function adicionarCard() {
+  try {
+    const base = criarPersonagem();
+    delete base.id;
+    const novo = await window.DBSync.criar(base);
+    // O realtime vai re-renderizar; tb adiciono já pra resposta imediata
+    if (!estado.personagens.find(x => x.id === novo.id)) estado.personagens.push(novo);
+    render();
+    toast('Personagem adicionado');
+  } catch(e) { alert('Erro ao criar: ' + e.message); }
 }
 
-function descansoLongo() {
+async function descansoLongo() {
   if (!confirm('Restaurar PV máximo, slots, reduzir exaustão em 1 e zerar salvaguardas?')) return;
-  estado.personagens.forEach(p => {
+  for (const p of estado.personagens) {
+    if (!podeEditar(p)) continue;
     p.hpAtual = p.hpMax;
     p.exaustao = Math.max(0, p.exaustao - 1);
     p.sucessos = 0;
     p.falhas = 0;
     Object.keys(p.slots).forEach(nv => { p.slots[nv].atual = p.slots[nv].max; });
-  });
+    salvar(p);
+  }
   render();
   toast('🌙 Descanso longo concluído');
+}
+
+function podeEditar(p) {
+  // Mestre edita tudo; jogador só os próprios
+  return ehMestre || (DBSync && (function(){
+    return p.user_id === (DBSync._userId || null);
+  })()) || true;  // RLS no banco já bloqueia se não puder, deixa UI permissiva
 }
 
 function exportarSave() {
@@ -1024,14 +1048,18 @@ function importarSave(event) {
   const file = event.target.files[0];
   if (!file) return;
   const reader = new FileReader();
-  reader.onload = (e) => {
+  reader.onload = async (e) => {
     try {
       const dados = JSON.parse(e.target.result);
       if (!dados.personagens || !Array.isArray(dados.personagens)) throw new Error('Arquivo inválido');
-      if (!confirm(`Carregar save com ${dados.personagens.length} personagem(ns)? Isto substituirá os dados atuais.`)) return;
-      estado = dados;
-      render();
-      toast('📂 Save carregado');
+      if (!confirm(`Importar ${dados.personagens.length} personagem(ns) para o banco?`)) return;
+      for (const p of dados.personagens) {
+        const base = { ...p };
+        delete base.id;
+        delete base.user_id;
+        try { await window.DBSync.criar(base); } catch(err) { console.warn('Falha em', p.nome, err); }
+      }
+      toast('📂 Save importado');
     } catch(err) {
       alert('Erro ao carregar arquivo: ' + err.message);
     }
@@ -1040,15 +1068,48 @@ function importarSave(event) {
   event.target.value = '';
 }
 
-function resetarTudo() {
-  if (!confirm('Apagar TODOS os personagens e dados? Esta ação não pode ser desfeita.')) return;
-  localStorage.removeItem(STORAGE_KEY);
-  estado = { personagens: PERSONAGENS_INICIAIS.map(criarPersonagem) };
+async function resetarTudo() {
+  if (!confirm('Apagar TODOS os personagens da campanha (que você pode editar)? Esta ação não pode ser desfeita.')) return;
+  for (const p of [...estado.personagens]) {
+    try { await window.DBSync.deletar(p.id); } catch(e) { /* RLS pode bloquear */ }
+  }
+  estado.personagens = [];
   render();
   toast('Resetado');
 }
 
-render();
+// ─── INIT: requer login + carrega via DBSync + escuta realtime ───
+(async () => {
+  const u = await window.Auth.requerLogin('login.html');
+  if (!u) return;
+  await window.Auth.renderHeader('#auth-slot');
+
+  try {
+    const r = await window.DBSync.init({
+      campanha: CAMPANHA,
+      onChange: (ev) => {
+        if (ev.tipo === 'load') {
+          estado.personagens = window.DBSync.listar();
+        } else if (ev.tipo === 'insert') {
+          if (!estado.personagens.find(x => x.id === ev.char.id)) estado.personagens.push(ev.char);
+        } else if (ev.tipo === 'update') {
+          const idx = estado.personagens.findIndex(x => x.id === ev.char.id);
+          if (idx >= 0) estado.personagens[idx] = ev.char;
+          else estado.personagens.push(ev.char);
+        } else if (ev.tipo === 'delete') {
+          estado.personagens = estado.personagens.filter(x => x.id !== ev.id);
+        }
+        render();
+      }
+    });
+    ehMestre = r.ehMestre;
+  } catch (e) {
+    console.error(e);
+    document.getElementById('grid').innerHTML = `<div style="padding:30px;text-align:center;color:var(--text-dim,#888)">Erro ao conectar ao banco: ${e.message}</div>`;
+    return;
+  }
+  render();
+})();
 </script>
 
 </body>

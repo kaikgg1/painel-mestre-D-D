@@ -234,12 +234,9 @@ let chars    = [];
 let charAtivo = null;
 
 async function init() {
+  usuario = await window.Auth.requerLogin('login.html');
+  if (!usuario) return;  // redirecionou
   await window.Auth.renderHeader('#auth-slot');
-  usuario = await window.Auth.getUser();
-  if (!usuario) {
-    $('#conteudo').innerHTML = `<div class="estado">Você precisa entrar para gerenciar sua ficha.<br><br><a href="login.html" style="color:var(--gold-bright)">→ Entrar</a></div>`;
-    return;
-  }
   await carregarPersonagens();
 }
 

@@ -36,6 +36,11 @@
     return data || { id: u.id, nome: u.user_metadata?.nome || u.email };
   }
 
+  async function ehMestre() {
+    const u = await getUser();
+    return !!(u && u.email === 'mestre123@mesa.local');
+  }
+
   async function entrarPorNome(nome) {
     const email = emailDoNome(nome);
     const { data, error } = await window.sb.auth.signInWithPassword({ email, password: SENHA_PADRAO });
@@ -48,12 +53,16 @@
     await window.sb.auth.signOut();
   }
 
-  function requerLogin(loginPath) {
-    // chama síncrono: faz redirect se em ~300ms não houver sessão
-    setTimeout(async () => {
-      const u = await getUser();
-      if (!u) window.location.href = loginPath || 'login.html';
-    }, 50);
+  // requerLogin(): redireciona pro login se NÃO autenticado.
+  // Usar SEMPRE no início do <script> da página protegida.
+  // Retorna uma Promise<user|null> — null se redirecionou.
+  async function requerLogin(loginPath) {
+    const u = await getUser();
+    if (u) return u;
+    const from = encodeURIComponent(location.pathname + location.search);
+    const url = (loginPath || 'login.html') + '?from=' + from;
+    location.replace(url);
+    return null;
   }
 
   async function renderHeader(selector) {
@@ -64,8 +73,11 @@
     const loginUrl = ehPainel ? 'login.html' : 'paineis/login.html';
 
     if (profile) {
+      const mestre = await ehMestre();
+      const icon = mestre ? '👑' : '👤';
+      const tag  = mestre ? ' <span style="color:var(--gold-bright);font-size:9px;letter-spacing:1.5px">MESTRE</span>' : '';
       slot.innerHTML = `
-        <span class="auth-nome" aria-label="Logado como ${profile.nome}">👤 ${profile.nome}</span>
+        <span class="auth-nome" aria-label="Logado como ${profile.nome}">${icon} ${profile.nome}${tag}</span>
         <button type="button" class="auth-btn" id="auth-sair-btn">Sair</button>`;
       document.getElementById('auth-sair-btn').addEventListener('click', async () => {
         await sair();
@@ -76,5 +88,5 @@
     }
   }
 
-  window.Auth = { getUser, getProfile, entrarPorNome, sair, requerLogin, renderHeader, JOGADORES };
+  window.Auth = { getUser, getProfile, ehMestre, entrarPorNome, sair, requerLogin, renderHeader, JOGADORES };
 })();

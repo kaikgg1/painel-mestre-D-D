@@ -391,7 +391,13 @@
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script src="assets/js/supabase.js"></script>
 <script src="assets/js/auth.js"></script>
-<script>window.Auth.renderHeader('#auth-slot');</script>
+<script>
+  // Gate: força login antes de ver a home
+  (async () => {
+    const u = await window.Auth.requerLogin('paineis/login.html');
+    if (u) window.Auth.renderHeader('#auth-slot');
+  })();
+</script>
 
 </body>
 </html>

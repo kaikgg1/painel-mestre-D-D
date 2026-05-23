@@ -146,9 +146,14 @@
     <label for="nome">Jogador</label>
     <select id="nome" required aria-required="true">
       <option value="">— escolher —</option>
-      <option value="Sabrina123">Sabrina123</option>
-      <option value="Derik123">Derik123</option>
-      <option value="Felipe123">Felipe123</option>
+      <optgroup label="Jogadores">
+        <option value="Sabrina123">Sabrina123</option>
+        <option value="Derik123">Derik123</option>
+        <option value="Felipe123">Felipe123</option>
+      </optgroup>
+      <optgroup label="Mestre">
+        <option value="Mestre123">Mestre123 (mestre)</option>
+      </optgroup>
     </select>
     <button type="submit" class="btn" id="btn-entrar">Entrar</button>
     <div class="erro" id="erro" role="alert" aria-live="polite"></div>
