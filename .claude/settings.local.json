@@ -27,7 +27,12 @@
       "Bash(git -C \"c:/Users/kaikg/OneDrive/Desktop/Status-Players\" add magias.html index.html)",
       "Bash(git -C \"c:/Users/kaikg/OneDrive/Desktop/Status-Players\" commit -m \"Add spell grimoire page with filters and API integration\")",
       "Bash(git -C \"c:/Users/kaikg/OneDrive/Desktop/Status-Players\" add magias.html)",
-      "Bash(git -C \"c:/Users/kaikg/OneDrive/Desktop/Status-Players\" commit -m \"Fix modal close logic in magias.html\")"
+      "Bash(git -C \"c:/Users/kaikg/OneDrive/Desktop/Status-Players\" commit -m \"Fix modal close logic in magias.html\")",
+      "Bash(curl -s --max-time 8 -o /dev/null -w \"%{http_code}\" \"https://api-magias-dnd.herokuapp.com/api/br/spells\")",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(node -e \"const fs=require\\('fs'\\);const html=fs.readFileSync\\('magias.html','utf8'\\);const m=html.match\\(/const NOMES_PT = \\\\{\\([\\\\s\\\\S]*?\\)\\\\};/\\);if\\(m\\){const block=m[1];const pairs=block.match\\(/'[^']+':'[^']+'/g\\)||[];console.log\\('Total de magias traduzidas:',pairs.length\\);}\")"
     ]
   }
 }
