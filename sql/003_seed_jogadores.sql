@@ -15,7 +15,6 @@ declare
 begin
   -- ── Sabrina123 ──────────────────────────────────────────────────
   if not exists (select 1 from auth.users where email = 'sabrina123@mesa.local') then
-    perform extensions.uuid_generate_v4();  -- garante extensão
     insert into auth.users (
       instance_id, id, aud, role, email, encrypted_password,
       email_confirmed_at, raw_app_meta_data, raw_user_meta_data,

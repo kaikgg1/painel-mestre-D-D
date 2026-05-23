@@ -7,9 +7,12 @@
     "parse": "node scripts/parse_magias.js",
     "gerar-md": "node scripts/gerar_md.js",
     "extrair-pdf": "node scripts/extrair_pdf.js",
-    "formatar-phb": "node scripts/formatar_phb.js"
+    "formatar-phb": "node scripts/formatar_phb.js",
+    "setup-db": "node scripts/setup_db.js"
   },
   "dependencies": {
-    "pdf-parse": "^1.1.1"
+    "pdf-parse": "^1.1.1",
+    "pg": "^8.11.5",
+    "dotenv": "^16.4.5"
   }
 }

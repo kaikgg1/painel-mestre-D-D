@@ -1,8 +1,12 @@
 -- ═══════════════════════════════════════════════════════════════════
 -- Schema MVP1 + MVP2: Painel do Mestre D&D 5e
 -- Auth: "só nome" — 3 jogadores criados em 003_seed.sql
--- Rodar no SQL Editor do Supabase: https://supabase.com/dashboard/project/ehbngkmxwsjxuetjnztz/sql
+-- Rodar no SQL Editor: https://supabase.com/dashboard/project/ehbngkmxwsjxuetjnztz/sql
+-- Ou via: npm run setup-db
 -- ═══════════════════════════════════════════════════════════════════
+
+-- Extensões necessárias
+create extension if not exists pgcrypto;
 
 -- ┌─────────────────────────────────────────────────────────────────┐
 -- │ profiles — extensão de auth.users com nome amigável            │

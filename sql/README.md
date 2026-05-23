@@ -2,7 +2,20 @@
 
 Estes scripts criam o schema do banco para o Painel do Mestre.
 
-## Como rodar
+## Como rodar (escolha um dos dois caminhos)
+
+### Caminho A — Automático (Recomendado)
+
+Requer `.env` na raiz do projeto com `DATABASE_URL` apontando pro Postgres do Supabase.
+
+```bash
+npm install
+npm run setup-db
+```
+
+O script `scripts/setup_db.js` roda os 3 SQLs em ordem e mostra um resumo (tabelas criadas, jogadores cadastrados, policies de RLS).
+
+### Caminho B — Manual via SQL Editor
 
 1. Abra o **SQL Editor** do seu projeto Supabase:
    https://supabase.com/dashboard/project/ehbngkmxwsjxuetjnztz/sql
