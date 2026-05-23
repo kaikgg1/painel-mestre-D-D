@@ -23,7 +23,11 @@
       "Bash(git -C \"c:/Users/kaikg/OneDrive/Desktop/Status-Players\" commit -m \"Make landing page responsive and expand card sizes\")",
       "Bash(git -C \"c:/Users/kaikg/OneDrive/Desktop/Status-Players\" push)",
       "Bash(git -C \"c:/Users/kaikg/OneDrive/Desktop/Status-Players\" add painel_barovia_dnd5e.html painel_mestre_dnd5e.html)",
-      "Bash(git -C \"c:/Users/kaikg/OneDrive/Desktop/Status-Players\" commit -m \"Add per-card save and long rest buttons; auto-save on input\")"
+      "Bash(git -C \"c:/Users/kaikg/OneDrive/Desktop/Status-Players\" commit -m \"Add per-card save and long rest buttons; auto-save on input\")",
+      "Bash(git -C \"c:/Users/kaikg/OneDrive/Desktop/Status-Players\" add magias.html index.html)",
+      "Bash(git -C \"c:/Users/kaikg/OneDrive/Desktop/Status-Players\" commit -m \"Add spell grimoire page with filters and API integration\")",
+      "Bash(git -C \"c:/Users/kaikg/OneDrive/Desktop/Status-Players\" add magias.html)",
+      "Bash(git -C \"c:/Users/kaikg/OneDrive/Desktop/Status-Players\" commit -m \"Fix modal close logic in magias.html\")"
     ]
   }
 }
