@@ -32,7 +32,11 @@
       "Bash(git add *)",
       "Bash(git commit -m ' *)",
       "Bash(git push *)",
-      "Bash(node -e \"const fs=require\\('fs'\\);const html=fs.readFileSync\\('magias.html','utf8'\\);const m=html.match\\(/const NOMES_PT = \\\\{\\([\\\\s\\\\S]*?\\)\\\\};/\\);if\\(m\\){const block=m[1];const pairs=block.match\\(/'[^']+':'[^']+'/g\\)||[];console.log\\('Total de magias traduzidas:',pairs.length\\);}\")"
+      "Bash(node -e \"const fs=require\\('fs'\\);const html=fs.readFileSync\\('magias.html','utf8'\\);const m=html.match\\(/const NOMES_PT = \\\\{\\([\\\\s\\\\S]*?\\)\\\\};/\\);if\\(m\\){const block=m[1];const pairs=block.match\\(/'[^']+':'[^']+'/g\\)||[];console.log\\('Total de magias traduzidas:',pairs.length\\);}\")",
+      "Bash(node -e \"const fs=require\\('fs'\\);const html=fs.readFileSync\\('magias.html','utf8'\\);const m=html.match\\(/const NOMES_PT = \\\\{\\([\\\\s\\\\S]*?\\)\\\\};/\\);if\\(m\\){const pairs=m[1].match\\(/'[^']+':'[^']+'/g\\)||[];console.log\\('Total PHB:',pairs.length\\);}\")",
+      "Bash(node -e ' *)",
+      "Bash(node -e \"const fs=require\\('fs'\\);const lines=fs.readFileSync\\('magias.md','utf8'\\).split\\('\\\\n'\\);console.log\\('Total linhas:',lines.length\\);console.log\\('Linha 950-960:'\\);lines.slice\\(950,960\\).forEach\\(\\(l,i\\)=>console.log\\(950+i+':',l\\)\\);\")",
+      "Bash(node parse_magias.js)"
     ]
   }
 }
