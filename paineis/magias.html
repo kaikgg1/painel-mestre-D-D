@@ -306,6 +306,63 @@
   .icon-ritual { background: rgba(107,16,16,0.3); color: #c47a5a; border: 1px solid rgba(107,16,16,0.5); }
   .icon-conc { background: rgba(58,26,90,0.3); color: #9a7aca; border: 1px solid rgba(90,42,120,0.5); }
 
+  /* Botão de favorita (estrela) — fica no card-icons */
+  .fav-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 2px 6px;
+    font-size: 16px;
+    line-height: 1;
+    color: rgba(168,152,120,0.4);
+    transition: color 0.15s, transform 0.15s;
+    border-radius: 4px;
+    min-width: 28px;
+    min-height: 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .fav-btn:hover { color: var(--gold-bright); transform: scale(1.15); }
+  .fav-btn[aria-pressed="true"] { color: var(--gold-bright); text-shadow: 0 0 8px rgba(212,168,67,0.6); }
+  .fav-btn:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 1px; }
+  @media (max-width: 600px) {
+    .fav-btn { font-size: 20px; padding: 6px 10px; min-width: 44px; min-height: 44px; }
+  }
+
+  /* Botão estrela no modal */
+  .modal-fav {
+    position: absolute;
+    top: 14px;
+    right: 50px;
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--parchment-dim);
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 3px;
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .modal-fav:hover { border-color: var(--gold-bright); color: var(--gold-bright); }
+  .modal-fav[aria-pressed="true"] {
+    background: var(--gold);
+    color: var(--shadow);
+    border-color: var(--gold-bright);
+  }
+
+  /* Filtro "Só Favoritas" */
+  .toggle-pill.fav-toggle[aria-pressed="true"] {
+    background: var(--gold);
+    border-color: var(--gold-bright);
+    color: var(--shadow);
+  }
+
   .spell-nome {
     font-family: 'Cinzel', serif;
     font-size: 15px;
@@ -393,10 +450,16 @@
     max-width: 640px;
     width: 100%;
     max-height: 85vh;
+    max-height: 85dvh; /* respeita barra dinâmica do navegador mobile */
     overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
     box-shadow: 0 0 0 1px var(--blood-bright) inset, 0 20px 60px rgba(0,0,0,0.8);
     position: relative;
   }
+  /* parágrafos da descrição com espaçamento legível */
+  .desc-text p { margin: 0 0 10px; }
+  .desc-text p:last-child { margin-bottom: 0; }
 
   .modal-header {
     padding: 20px 20px 14px;
@@ -537,7 +600,15 @@
     .pill, .toggle-pill, .clear-btn { padding: 10px 14px; font-size: 11px; } /* ≥44px alvo */
     .sort-select, .search-input { padding: 12px 14px; }
     .back-btn { padding: 10px 14px; }
-    .modal { width: 95%; max-height: 92vh; }
+    .modal {
+      width: 95%;
+      max-height: 92vh;
+      max-height: 92dvh;
+      padding-bottom: env(safe-area-inset-bottom);
+    }
+    .modal-body { padding: 14px 16px calc(20px + env(safe-area-inset-bottom)); }
+    .modal-title { font-size: 22px; }
+    .desc-text { font-size: 15px; line-height: 1.65; }
   }
 
   /* Foco visível */
@@ -633,8 +704,9 @@
   <!-- Extras -->
   <div class="filter-row">
     <span class="filter-label">Extra</span>
-    <span class="toggle-pill" id="toggle-ritual" onclick="toggleExtra('ritual')">Ritual</span>
-    <span class="toggle-pill" id="toggle-conc" onclick="toggleExtra('conc')">Concentração</span>
+    <button type="button" class="toggle-pill fav-toggle" id="toggle-fav" onclick="toggleExtra('fav')" aria-pressed="false" aria-label="Mostrar apenas magias favoritas">★ Favoritas <span id="fav-count" aria-hidden="true"></span></button>
+    <button type="button" class="toggle-pill" id="toggle-ritual" onclick="toggleExtra('ritual')" aria-pressed="false">Ritual</button>
+    <button type="button" class="toggle-pill" id="toggle-conc" onclick="toggleExtra('conc')" aria-pressed="false">Concentração</button>
   </div>
 </div>
 
@@ -653,6 +725,7 @@
   <div class="modal" id="modal">
     <div class="modal-header">
       <button class="modal-close" onclick="fecharModal()" aria-label="Fechar detalhes da magia">✕</button>
+      <button class="modal-fav" id="m-fav" type="button" aria-pressed="false">☆ Favoritar</button>
       <div class="modal-title" id="m-nome">—</div>
       <div class="modal-meta" id="m-meta"></div>
     </div>
@@ -681,7 +754,27 @@ const ESCOLA_COR = {
 /* ===== ESTADO ===== */
 let todasMagias = [];
 let fonte = '';
-const filtros = { texto:'', niveis:new Set(), escolas:new Set(), classes:new Set(), ritual:null, conc:null, ordem:'nome-az' };
+const filtros = { texto:'', niveis:new Set(), escolas:new Set(), classes:new Set(), ritual:null, conc:null, fav:null, ordem:'nome-az' };
+
+/* ===== FAVORITAS (localStorage) ===== */
+const FAV_KEY = 'grimorio-favoritas-v1';
+const favoritas = new Set(
+  (() => { try { return JSON.parse(localStorage.getItem(FAV_KEY) || '[]'); } catch { return []; } })()
+);
+function salvarFavoritas() {
+  try { localStorage.setItem(FAV_KEY, JSON.stringify([...favoritas])); } catch {}
+  atualizarContadorFav();
+}
+function ehFavorita(nome) { return favoritas.has(nome); }
+function toggleFavorita(nome) {
+  if (favoritas.has(nome)) favoritas.delete(nome);
+  else favoritas.add(nome);
+  salvarFavoritas();
+}
+function atualizarContadorFav() {
+  const el = document.getElementById('fav-count');
+  if (el) el.textContent = favoritas.size ? ` (${favoritas.size})` : '';
+}
 
 /* ===== FETCH ===== */
 async function carregarMagias() {
@@ -705,6 +798,7 @@ function filtrar() {
     if (filtros.classes.size && !m.classes.some(c => filtros.classes.has(c))) return false;
     if (filtros.ritual !== null && m.ritual !== filtros.ritual) return false;
     if (filtros.conc !== null && m.concentracao !== filtros.conc) return false;
+    if (filtros.fav === true && !favoritas.has(m.nome)) return false;
     return true;
   }).sort((a, b) => {
     switch(filtros.ordem) {
@@ -754,18 +848,42 @@ function criarCard(m) {
   const classesHtml = m.classes.slice(0,5).map(c => `<span class="class-tag">${c}</span>`).join('') +
     (m.classes.length > 5 ? `<span class="class-tag">+${m.classes.length-5}</span>` : '');
 
+  const fav = ehFavorita(m.nome);
+  const favBtnHtml = `<button type="button" class="fav-btn" aria-pressed="${fav}" aria-label="${fav ? 'Remover ' + m.nome + ' das favoritas' : 'Marcar ' + m.nome + ' como favorita'}" title="Favoritar">${fav ? '★' : '☆'}</button>`;
   card.innerHTML = `
     <div class="card-top">
       <span class="nivel-badge">${nivelLabel}</span>
-      <div class="card-icons">${ritualTag}${concTag}</div>
+      <div class="card-icons">${ritualTag}${concTag}${favBtnHtml}</div>
     </div>
     <div class="spell-nome">${m.nome}</div>
     <span class="escola-badge" style="background:${cor}">${m.escola}</span>
     <div class="classes-row">${classesHtml}</div>`;
 
+  // Estrela: alterna favorita sem abrir o modal
+  const favBtn = card.querySelector('.fav-btn');
+  favBtn.addEventListener('click', e => {
+    e.stopPropagation();
+    toggleFavorita(m.nome);
+    const novoEstado = ehFavorita(m.nome);
+    favBtn.setAttribute('aria-pressed', novoEstado);
+    favBtn.setAttribute('aria-label', (novoEstado ? 'Remover ' : 'Marcar ') + m.nome + (novoEstado ? ' das favoritas' : ' como favorita'));
+    favBtn.textContent = novoEstado ? '★' : '☆';
+    // Se o filtro "Só favoritas" estiver ativo e desfavoritou, re-renderiza
+    if (filtros.fav === true && !novoEstado) renderizar();
+  });
+
   card.onclick = () => abrirModal(m);
-  card.onkeydown = e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); abrirModal(m); } };
+  card.onkeydown = e => { if ((e.key === 'Enter' || e.key === ' ') && e.target === card) { e.preventDefault(); abrirModal(m); } };
   return card;
+}
+
+/* ===== HELPERS ===== */
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+function renderizarParagrafos(texto) {
+  if (!texto) return '<p>—</p>';
+  return texto.split(/\n\n+/).map(p => `<p>${escapeHtml(p.trim()).replace(/\n/g, '<br>')}</p>`).join('');
 }
 
 /* ===== MODAL ===== */
@@ -787,11 +905,11 @@ function abrirModal(m) {
     <div class="info-item"><div class="info-key">Componentes</div><div class="info-val">${comps || '—'}</div></div>
     <div class="info-item"><div class="info-key">Duração</div><div class="info-val">${m.duracao}</div></div>`;
 
-  document.getElementById('m-desc').textContent = m.descricao || '—';
+  document.getElementById('m-desc').innerHTML = renderizarParagrafos(m.descricao);
 
   const maiorWrap = document.getElementById('m-maior-nivel-wrap');
   if (m.maiorNivel) {
-    document.getElementById('m-maior-nivel').textContent = m.maiorNivel;
+    document.getElementById('m-maior-nivel').innerHTML = renderizarParagrafos(m.maiorNivel);
     maiorWrap.style.display = 'block';
   } else { maiorWrap.style.display = 'none'; }
 
@@ -800,6 +918,27 @@ function abrirModal(m) {
     : '<span style="color:var(--text-dim);font-style:italic">Não especificado</span>';
 
   document.getElementById('m-fonte').textContent = `Fonte: ${fonte}`;
+
+  // Sincroniza botão de favorita no modal
+  const mFav = document.getElementById('m-fav');
+  function atualizarMFav() {
+    const fav = ehFavorita(m.nome);
+    mFav.textContent = fav ? '★ Favoritada' : '☆ Favoritar';
+    mFav.setAttribute('aria-pressed', fav);
+  }
+  atualizarMFav();
+  mFav.onclick = () => {
+    toggleFavorita(m.nome);
+    atualizarMFav();
+    // Atualiza a estrela do card correspondente, se visível
+    const cardFav = document.querySelector(`.spell-card[aria-label^="${m.nome.replace(/"/g, '\\"')},"] .fav-btn`);
+    if (cardFav) {
+      const novo = ehFavorita(m.nome);
+      cardFav.setAttribute('aria-pressed', novo);
+      cardFav.textContent = novo ? '★' : '☆';
+    }
+  };
+
   const overlay = document.getElementById('modal-overlay');
   overlay.classList.add('open');
   overlay.setAttribute('aria-hidden', 'false');
@@ -840,27 +979,28 @@ function mostrarErro() {
 
 function limparFiltros() {
   filtros.texto = ''; filtros.niveis.clear(); filtros.escolas.clear(); filtros.classes.clear();
-  filtros.ritual = null; filtros.conc = null;
+  filtros.ritual = null; filtros.conc = null; filtros.fav = null;
   document.getElementById('busca').value = '';
   document.getElementById('ordem').value = 'nome-az';
   filtros.ordem = 'nome-az';
   document.querySelectorAll('.pill').forEach(p => {
     p.classList.toggle('active', p.dataset.nivel === 'all' || p.dataset.escola === 'all' || p.dataset.classe === 'all');
   });
-  document.getElementById('toggle-ritual').classList.remove('active');
-  document.getElementById('toggle-conc').classList.remove('active');
+  ['ritual','conc','fav'].forEach(t => {
+    const el = document.getElementById(`toggle-${t}`);
+    el.classList.remove('active');
+    el.setAttribute('aria-pressed', 'false');
+  });
   renderizar();
 }
 
 function toggleExtra(tipo) {
   const el = document.getElementById(`toggle-${tipo}`);
-  if (tipo === 'ritual') {
-    filtros.ritual = filtros.ritual === true ? null : true;
-    el.classList.toggle('active', filtros.ritual !== null);
-  } else {
-    filtros.conc = filtros.conc === true ? null : true;
-    el.classList.toggle('active', filtros.conc !== null);
-  }
+  const chave = tipo === 'conc' ? 'conc' : tipo;
+  filtros[chave] = filtros[chave] === true ? null : true;
+  const ativo = filtros[chave] === true;
+  el.classList.toggle('active', ativo);
+  el.setAttribute('aria-pressed', String(ativo));
   renderizar();
 }
 
@@ -926,6 +1066,7 @@ document.getElementById('pills-classe').addEventListener('click', e => {
 });
 
 /* ===== INIT ===== */
+atualizarContadorFav();
 carregarMagias();
 </script>
 </body>
