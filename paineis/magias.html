@@ -527,7 +527,7 @@
 <body>
 
 <header class="site-header">
-  <a href="index.html" class="back-btn">← Voltar</a>
+  <a href="../index.html" class="back-btn">← Voltar</a>
   <div class="header-title">Grimório de Magias</div>
   <div class="spell-count" id="count">Carregando...</div>
 </header>
@@ -657,7 +657,7 @@ const filtros = { texto:'', niveis:new Set(), escolas:new Set(), classes:new Set
 /* ===== FETCH ===== */
 async function carregarMagias() {
   try {
-    const res = await fetch('magias_data.json');
+    const res = await fetch('../data/magias_data.json');
     if (!res.ok) throw new Error('not found');
     todasMagias = await res.json();
     fonte = 'Grimório PHB (PT-BR)';
