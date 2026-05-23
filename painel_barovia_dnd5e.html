@@ -485,11 +485,40 @@
   [contenteditable="true"]:hover { background: rgba(184, 138, 44, 0.08); cursor: text; }
   [contenteditable="true"]:focus { background: rgba(184, 138, 44, 0.18); outline: none; }
 
-  /* ===== BOTÃO REMOVER ===== */
+  /* ===== BOTÕES DE CARD ===== */
+  .card-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 14px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(107,16,16,0.3);
+  }
+  .save-card {
+    background: linear-gradient(to bottom, rgba(139,105,20,0.2), rgba(139,105,20,0.1));
+    border: 1px solid var(--gold);
+    color: var(--gold-bright);
+    cursor: pointer;
+    font-size: 10px;
+    font-family: 'Cinzel', serif;
+    padding: 5px 14px;
+    border-radius: 2px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .save-card:hover {
+    background: var(--gold);
+    color: var(--shadow);
+    box-shadow: 0 0 8px rgba(184,138,44,0.4);
+  }
+  .save-card.saved {
+    border-color: #6b8c5a;
+    color: #6b8c5a;
+    background: rgba(107,140,90,0.15);
+  }
   .remove-card {
-    position: absolute;
-    bottom: 6px;
-    right: 10px;
     background: transparent;
     border: none;
     color: var(--text-dim);
@@ -723,18 +752,25 @@ function criarCard(p) {
   nome.className = 'char-name';
   nome.contentEditable = true;
   nome.textContent = p.nome;
+  nome.oninput = () => { p.nome = nome.textContent.trim() || 'Personagem'; salvar(); };
   nome.onblur = () => { p.nome = nome.textContent.trim() || 'Personagem'; salvar(); };
 
   const jogador = document.createElement('div');
   jogador.className = 'player-name';
   jogador.contentEditable = true;
   jogador.textContent = p.jogador;
+  jogador.oninput = () => { p.jogador = jogador.textContent.trim() || 'Jogador'; salvar(); };
   jogador.onblur = () => { p.jogador = jogador.textContent.trim() || 'Jogador'; salvar(); };
 
   const raceClass = document.createElement('div');
   raceClass.className = 'race-class';
   raceClass.innerHTML = `<span contenteditable="true" data-field="raca">${p.raca}</span> · <span contenteditable="true" data-field="classe">${p.classe}</span> · <strong>Nv <span contenteditable="true" data-field="nivel">${p.nivel}</span></strong>`;
   raceClass.querySelectorAll('[contenteditable]').forEach(el => {
+    el.oninput = () => {
+      const field = el.dataset.field;
+      p[field] = field === 'nivel' ? (parseInt(el.textContent) || 1) : (el.textContent.trim() || '?');
+      salvar();
+    };
     el.onblur = () => {
       const field = el.dataset.field;
       p[field] = field === 'nivel' ? (parseInt(el.textContent) || 1) : (el.textContent.trim() || '?');
@@ -885,6 +921,7 @@ function criarCard(p) {
   spellList.className = 'spell-list';
   spellList.contentEditable = true;
   spellList.innerHTML = p.magias;
+  spellList.oninput = () => { p.magias = spellList.innerHTML; salvar(); };
   spellList.onblur = () => { p.magias = spellList.innerHTML; salvar(); };
   magiasSection.appendChild(spellList);
   card.appendChild(magiasSection);
@@ -909,7 +946,40 @@ function criarCard(p) {
   condSection.appendChild(condContainer);
   card.appendChild(condSection);
 
-  // ===== REMOVER =====
+  // ===== AÇÕES DO CARD =====
+  const actions = document.createElement('div');
+  actions.className = 'card-actions';
+
+  const salvarBtn = document.createElement('button');
+  salvarBtn.className = 'save-card';
+  salvarBtn.textContent = '💾 Salvar';
+  salvarBtn.onclick = () => {
+    salvar();
+    salvarBtn.textContent = '✓ Salvo';
+    salvarBtn.classList.add('saved');
+    setTimeout(() => {
+      salvarBtn.textContent = '💾 Salvar';
+      salvarBtn.classList.remove('saved');
+    }, 1800);
+    toast(`${p.nome} salvo!`);
+  };
+
+  const descBtn = document.createElement('button');
+  descBtn.className = 'save-card';
+  descBtn.style.borderColor = 'var(--blood)';
+  descBtn.style.color = 'var(--parchment-dim)';
+  descBtn.textContent = '🌙 Desc. Longo';
+  descBtn.onclick = () => {
+    if (!confirm(`Descanso longo para ${p.nome}?`)) return;
+    p.hpAtual = p.hpMax;
+    p.exaustao = Math.max(0, p.exaustao - 1);
+    p.sucessos = 0;
+    p.falhas = 0;
+    Object.keys(p.slots).forEach(nv => { p.slots[nv].atual = p.slots[nv].max; });
+    render();
+    toast(`🌙 ${p.nome} descansou`);
+  };
+
   const remover = document.createElement('button');
   remover.className = 'remove-card';
   remover.textContent = '✕ remover';
@@ -919,7 +989,11 @@ function criarCard(p) {
       render();
     }
   };
-  card.appendChild(remover);
+
+  actions.appendChild(salvarBtn);
+  actions.appendChild(descBtn);
+  actions.appendChild(remover);
+  card.appendChild(actions);
 
   return card;
 }

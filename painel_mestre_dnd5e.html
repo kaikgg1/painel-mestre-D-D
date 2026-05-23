@@ -444,18 +444,42 @@
   [contenteditable="true"]:hover { background: rgba(146,38,16,0.06); cursor: text; }
   [contenteditable="true"]:focus { background: rgba(146,38,16,0.12); outline: none; }
 
-  /* ===== BOTÃO REMOVER CARD ===== */
+  /* ===== BOTÕES DE CARD ===== */
+  .card-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 12px;
+    padding-top: 8px;
+    border-top: 1px solid rgba(146,38,16,0.2);
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .save-card {
+    background: rgba(201,162,74,0.12);
+    border: 1px solid var(--gold);
+    color: var(--gold-dark);
+    cursor: pointer;
+    font-size: 10px;
+    font-family: 'Cinzel', serif;
+    padding: 5px 12px;
+    border-radius: 3px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    font-weight: 600;
+    transition: all 0.2s;
+  }
+  .save-card:hover { background: var(--gold); color: var(--brown); }
+  .save-card.saved { border-color: #2d6a3e; color: #2d6a3e; background: rgba(45,106,62,0.1); }
   .remove-card {
-    position: absolute;
-    bottom: 6px;
-    right: 8px;
     background: transparent;
     border: none;
     color: var(--brown-soft);
     cursor: pointer;
-    font-size: 11px;
+    font-size: 10px;
     opacity: 0.4;
     transition: opacity 0.15s;
+    font-family: 'Cinzel', serif;
   }
   .remove-card:hover { opacity: 1; color: var(--red-dark); }
 
@@ -674,18 +698,25 @@ function criarCard(p) {
   nome.className = 'char-name';
   nome.contentEditable = true;
   nome.textContent = p.nome;
+  nome.oninput = () => { p.nome = nome.textContent.trim() || 'Personagem'; salvar(); };
   nome.onblur = () => { p.nome = nome.textContent.trim() || 'Personagem'; salvar(); };
 
   const jogador = document.createElement('div');
   jogador.className = 'player-name';
   jogador.contentEditable = true;
   jogador.textContent = p.jogador;
+  jogador.oninput = () => { p.jogador = jogador.textContent.trim() || 'Jogador'; salvar(); };
   jogador.onblur = () => { p.jogador = jogador.textContent.trim() || 'Jogador'; salvar(); };
 
   const raceClass = document.createElement('div');
   raceClass.className = 'race-class';
   raceClass.innerHTML = `<span contenteditable="true" data-field="raca">${p.raca}</span> · <span contenteditable="true" data-field="classe">${p.classe}</span> · <strong>Nv <span contenteditable="true" data-field="nivel">${p.nivel}</span></strong>`;
   raceClass.querySelectorAll('[contenteditable]').forEach(el => {
+    el.oninput = () => {
+      const field = el.dataset.field;
+      p[field] = field === 'nivel' ? (parseInt(el.textContent) || 1) : (el.textContent.trim() || '?');
+      salvar();
+    };
     el.onblur = () => {
       const field = el.dataset.field;
       p[field] = field === 'nivel' ? (parseInt(el.textContent) || 1) : (el.textContent.trim() || '?');
@@ -836,6 +867,7 @@ function criarCard(p) {
   spellList.className = 'spell-list';
   spellList.contentEditable = true;
   spellList.innerHTML = p.magias;
+  spellList.oninput = () => { p.magias = spellList.innerHTML; salvar(); };
   spellList.onblur = () => { p.magias = spellList.innerHTML; salvar(); };
   magiasSection.appendChild(spellList);
   card.appendChild(magiasSection);
@@ -858,18 +890,54 @@ function criarCard(p) {
   });
   card.appendChild(condSection);
 
-  // === REMOVER CARD ===
+  // === AÇÕES DO CARD ===
+  const actions = document.createElement('div');
+  actions.className = 'card-actions';
+
+  const salvarBtn = document.createElement('button');
+  salvarBtn.className = 'save-card';
+  salvarBtn.textContent = '💾 Salvar';
+  salvarBtn.onclick = () => {
+    salvar();
+    salvarBtn.textContent = '✓ Salvo';
+    salvarBtn.classList.add('saved');
+    setTimeout(() => {
+      salvarBtn.textContent = '💾 Salvar';
+      salvarBtn.classList.remove('saved');
+    }, 1800);
+    toast(`${p.nome} salvo!`);
+  };
+
+  const descBtn = document.createElement('button');
+  descBtn.className = 'save-card';
+  descBtn.style.borderColor = 'var(--red)';
+  descBtn.style.color = 'var(--red-dark)';
+  descBtn.textContent = '🌙 Desc. Longo';
+  descBtn.onclick = () => {
+    if (!confirm(`Descanso longo para ${p.nome}?`)) return;
+    p.hpAtual = p.hpMax;
+    p.exaustao = Math.max(0, p.exaustao - 1);
+    p.sucessos = 0;
+    p.falhas = 0;
+    Object.keys(p.slots).forEach(nv => { p.slots[nv].atual = p.slots[nv].max; });
+    render();
+    toast(`🌙 ${p.nome} descansou`);
+  };
+
   const remover = document.createElement('button');
   remover.className = 'remove-card';
   remover.textContent = '✕ remover';
-  remover.title = 'Remover personagem';
   remover.onclick = () => {
     if (confirm(`Remover "${p.nome}" do painel?`)) {
       estado.personagens = estado.personagens.filter(x => x.id !== p.id);
       render();
     }
   };
-  card.appendChild(remover);
+
+  actions.appendChild(salvarBtn);
+  actions.appendChild(descBtn);
+  actions.appendChild(remover);
+  card.appendChild(actions);
 
   return card;
 }
