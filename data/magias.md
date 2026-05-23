@@ -1,7 +1,7 @@
 # Grimório de Magias — D&D 5e
 
 > Fonte: *Livro do Jogador* (Edição Brasileira, Galápagos Jogos).
-> Total: **360 magias** organizadas por classe e em ordem alfabética.
+> Total: **361 magias** organizadas por classe e em ordem alfabética.
 
 ## Índice
 
@@ -307,7 +307,7 @@
 - **Detectar o Bem e Mal** — Adivinhação *(Concentração)*
 - **Detectar Veneno e Doença** — Adivinhação *(Ritual, Concentração)*
 - **Escudo da Fé** — Abjuração *(Concentração)*
-- **Infringir Ferimentos** — Necromancia
+- **Infligir Ferimentos** — Necromancia
 - **Palavra Curativa** — Evocação
 - **Perdição** — Encantamento *(Concentração)*
 - **Proteção contra o Bem e Mal** — Abjuração *(Concentração)*
@@ -734,7 +734,7 @@
 
 ### Mago
 
-*213 magias*
+*214 magias*
 
 #### Truques
 
@@ -875,6 +875,7 @@
 - **Metamorfose** — Transmutação *(Concentração)*
 - **Moldar Rochas** — Transmutação
 - **Muralha de Fogo** — Evocação *(Concentração)*
+- **Olho Arcano** — Adivinhação *(Concentração)*
 - **Pele de Pedra** — Abjuração *(Concentração)*
 - **Porta Dimensional** — Conjuração
 - **Santuário Particular de Mordenkainen** — Abjuração
@@ -3798,7 +3799,7 @@ Escolha um humanoide que você possa ver, dentro do alcance. O alvo deve ser bem
 
 ---
 
-### Infringir Ferimentos
+### Infligir Ferimentos
 
 **1º Nível de Necromancia**
 
@@ -4626,11 +4627,27 @@ Você preenche o ar com adagas giratórias num cubo de 1,5 metro quadrado, centr
 
 - **Tempo de Conjuração:** 1 ação
 - **Alcance:** 45 metros
-- **Componentes:** V,
+- **Componentes:** V, S
 - **Duração:** Concentração, até 1 minuto
 - **Classes:** Feiticeiro, Mago
 
-Uma nuvem de fumaça rodopiante que dispara brasas incandescentes aparece numa esfera de 6 metros centrada num ponto, dentro do alcance. A nuvem se espalha, dobrando esquinas, e gera escuridão densa. Ela permanece pela duração ou até que um vento de velocidade moderada ou mais forte (pelo menos 1 quilômetros por hora) a disperse. Quando a nuvem aparece, cada criatura deve realizar um teste de resistência de Destreza. Uma criatura sofre 10d8 de dano de fogo se falhar na resistência ou metade desse dano se passar. Uma criatura deve, também, realizar um teste de resistência quando entrar na área da magia pela primeira vez num turno ou terminar seu turno nela. A nuvem se afasta 3 metros de você numa direção, que você escolheu, no começo de cada um dos seus turnos. OLHO ARCANO 4° nível de adivinhação Tempo de Conjuração: 1 ação Alcance: 9 metros Componentes: V, S, M (um punhado de pelo de morcego) Duração: Concentração, até 1 hora Você cria um olho mágico invisível, dentro do alcance, que flutua no ar pela duração. Você mentalmente recebe informações visuais do olho, que possui visão normal e visão no escuro com alcance de 9 metros. O olho pode ver em todas as direções. Com uma ação, você pode mover o olho até 9 metros em qualquer direção. Não existe limite de quão longe de você o olho pode se mover, mas ele não pode entrar em outro plano de existência. Uma barreira solida bloqueia o movimento do olho, mas o olho pode passar através de aberturas de até 3 centímetros de diâmetro.
+Uma nuvem de fumaça rodopiante que dispara brasas incandescentes aparece numa esfera de 6 metros centrada num ponto, dentro do alcance. A nuvem se espalha, dobrando esquinas, e gera escuridão densa. Ela permanece pela duração ou até que um vento de velocidade moderada ou mais forte (pelo menos 15 quilômetros por hora) a disperse. Quando a nuvem aparece, cada criatura deve realizar um teste de resistência de Destreza. Uma criatura sofre 10d8 de dano de fogo se falhar na resistência ou metade desse dano se passar. Uma criatura deve, também, realizar um teste de resistência quando entrar na área da magia pela primeira vez num turno ou terminar seu turno nela. A nuvem se afasta 3 metros de você numa direção, que você escolheu, no começo de cada um dos seus turnos.
+
+---
+
+### Olho Arcano
+
+**4º Nível de Adivinhação**
+
+- **Tempo de Conjuração:** 1 ação
+- **Alcance:** 9 metros
+- **Componentes:** V, S, M (um punhado de pelo de morcego)
+- **Duração:** Concentração, até 1 hora
+- **Classes:** Mago
+
+Você cria um olho mágico invisível, dentro do alcance, que flutua no ar pela duração. Você mentalmente recebe informações visuais do olho, que possui visão normal e visão no escuro com alcance de 9 metros. O olho pode ver em todas as direções.
+
+Com uma ação, você pode mover o olho até 9 metros em qualquer direção. Não existe limite de quão longe de você o olho pode se mover, mas ele não pode entrar em outro plano de existência. Uma barreira solida bloqueia o movimento do olho, mas o olho pode passar através de aberturas de até 3 centímetros de diâmetro.
 
 ---
 

@@ -35,5 +35,5 @@ node scripts/parse_magias.js
 
 ## Conteúdo
 
-- **360 magias** do Livro do Jogador (edição Galápagos), todas em PT-BR oficial
+- **361 magias** do Livro do Jogador (edição Galápagos), todas em PT-BR oficial
 - Nome, escola, nível, classes, componentes e descrição completa
