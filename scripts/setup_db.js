@@ -19,6 +19,7 @@ const SCRIPTS = [
   '005_mestre_e_rls_restrito.sql',
   '006_profiles_seed.sql',
   '007_personagem_ativo_e_decimais.sql',
+  '008_ficha_completa.sql',
 ];
 
 (async () => {

@@ -294,6 +294,45 @@
   }
   .habilidade-card p { font-size: 13px; line-height: 1.55; color: var(--parchment); }
 
+  /* PERÍCIAS / SALVAGUARDAS */
+  .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; }
+  @media (max-width: 600px) { .check-grid { grid-template-columns: 1fr; } }
+  .check-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 6px 10px; background: rgba(0,0,0,0.15);
+    border: 1px solid rgba(139,105,20,0.2); border-radius: 3px;
+    font-size: 13px;
+  }
+  .check-row label { display: flex; align-items: center; gap: 6px; cursor: pointer; flex: 1; }
+  .check-row .atr-tag { font-size: 9px; color: var(--text-dim); margin-left: 4px; letter-spacing: 1px; }
+  .check-row input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--gold); cursor: pointer; }
+  .check-row .exp-marker {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 10px; color: var(--text-dim); letter-spacing: 1px;
+    margin-left: auto;
+  }
+  .check-row .exp-marker input { accent-color: var(--gold-bright); }
+
+  .lista-tags {
+    display: flex; flex-wrap: wrap; gap: 4px; align-items: flex-start;
+    padding: 8px; background: rgba(0,0,0,0.15);
+    border: 1px solid rgba(139,105,20,0.2); border-radius: 3px;
+    min-height: 38px;
+  }
+  .lista-tags .tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 3px 8px; background: rgba(139,105,20,0.2);
+    border: 1px solid rgba(139,105,20,0.4); border-radius: 12px;
+    font-size: 12px; color: var(--parchment);
+  }
+  .lista-tags .tag .x {
+    cursor: pointer; color: var(--blood-bright); font-weight: 700;
+    padding: 0 2px; border-radius: 50%;
+  }
+  .lista-tags .tag .x:hover { background: var(--blood-bright); color: var(--parchment); }
+  .lista-tags-add { display: flex; gap: 6px; margin-top: 6px; }
+  .lista-tags-add input { flex: 1; }
+
   /* ============ RESPONSIVIDADE ============ */
   @media (max-width: 800px) {
     .grid-2, .grid-3 { grid-template-columns: 1fr; }
@@ -342,6 +381,42 @@ const RACAS = ['','Anão','Elfo','Halfling','Humano','Draconato','Gnomo','Meio-E
 const CLASSES = ['','Bárbaro','Bardo','Bruxo','Clérigo','Druida','Feiticeiro','Guerreiro','Ladino','Mago','Monge','Paladino','Patrulheiro'];
 const ALINHAMENTOS = ['','Leal e Bom','Neutro e Bom','Caótico e Bom','Leal e Neutro','Neutro','Caótico e Neutro','Leal e Mau','Neutro e Mau','Caótico e Mau'];
 const ATRIBUTOS = [['for','Força'],['dex','Destreza'],['con','Constituição'],['int','Inteligência'],['sab','Sabedoria'],['car','Carisma']];
+
+// Perícias do PHB 5e (PT-BR) — mapeadas para o atributo base
+const PERICIAS = [
+  ['acrobacia',         'Acrobacia',         'dex'],
+  ['adestrar_animais',  'Adestrar Animais',  'sab'],
+  ['arcanismo',         'Arcanismo',         'int'],
+  ['atletismo',         'Atletismo',         'for'],
+  ['atuacao',           'Atuação',           'car'],
+  ['enganacao',         'Enganação',         'car'],
+  ['furtividade',       'Furtividade',       'dex'],
+  ['historia',          'História',          'int'],
+  ['intimidacao',       'Intimidação',       'car'],
+  ['intuicao',          'Intuição',          'sab'],
+  ['investigacao',      'Investigação',      'int'],
+  ['medicina',          'Medicina',          'sab'],
+  ['natureza',          'Natureza',          'int'],
+  ['percepcao',         'Percepção',         'sab'],
+  ['persuasao',         'Persuasão',         'car'],
+  ['prestidigitacao',   'Prestidigitação',   'dex'],
+  ['religiao',          'Religião',          'int'],
+  ['sobrevivencia',     'Sobrevivência',     'sab'],
+];
+
+// Habilidades fixas por classe x nível (carregadas async)
+let HABILIDADES_CLASSES = null;
+async function carregarHabilidadesClasses() {
+  if (HABILIDADES_CLASSES) return HABILIDADES_CLASSES;
+  try {
+    const r = await fetch('../data/habilidades_classes.json');
+    HABILIDADES_CLASSES = await r.json();
+    return HABILIDADES_CLASSES;
+  } catch { return {}; }
+}
+function chaveDeClasse(classe) {
+  return (classe || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+}
 
 const mod = v => Math.floor(((+v||10) - 10) / 2);
 const fmtMod = m => (m >= 0 ? '+' : '') + m;
@@ -464,6 +539,7 @@ function render() {
     <div class="tabs" role="tablist">
       <button class="tab ${tabAtiva==='identidade'?'ativa':''}" data-tab="identidade" role="tab">Identidade</button>
       <button class="tab ${tabAtiva==='combate'?'ativa':''}" data-tab="combate" role="tab">Combate</button>
+      <button class="tab ${tabAtiva==='habilidades'?'ativa':''}" data-tab="habilidades" role="tab">Habilidades</button>
       <button class="tab ${tabAtiva==='magias'?'ativa':''}" data-tab="magias" role="tab">Magias</button>
       <button class="tab ${tabAtiva==='equipamento'?'ativa':''}" data-tab="equipamento" role="tab">Equipamento</button>
       <button class="tab ${tabAtiva==='roleplay'?'ativa':''}" data-tab="roleplay" role="tab">Roleplay</button>
@@ -481,10 +557,22 @@ function render() {
   conectarListeners();
 }
 
+function renderListaTags(field, label, valores) {
+  const tags = (valores || []).map((v, i) =>
+    `<span class="tag">${escape(v)}<span class="x" data-rmtag="${field}" data-idx="${i}" role="button" tabindex="0">✕</span></span>`).join('');
+  return `<div class="campo"><label>${label}</label>
+    <div class="lista-tags" id="tags-${field}">${tags || '<span style="color:var(--text-dim);font-style:italic;font-size:12px;padding:4px">Nenhum</span>'}</div>
+    <div class="lista-tags-add">
+      <input type="text" id="add-${field}-input" placeholder="Adicionar...">
+      <button type="button" class="btn" data-addtag="${field}">+</button>
+    </div></div>`;
+}
+
 function renderTab(c, atrs) {
   switch (tabAtiva) {
     case 'identidade':  return renderIdentidade(c, atrs);
     case 'combate':     return renderCombate(c);
+    case 'habilidades': return renderHabilidades(c);
     case 'magias':      return renderMagias(c);
     case 'equipamento': return renderEquipamento(c);
     case 'roleplay':    return renderRoleplay(c);
@@ -511,7 +599,18 @@ function renderIdentidade(c, atrs) {
         <input name="origem" value="${escape(c.origem||'')}"></div>
       <div class="campo"><label>Alinhamento</label>
         <select name="alinhamento">${ALINHAMENTOS.map(a => `<option ${a===c.alinhamento?'selected':''}>${a}</option>`).join('')}</select></div>
+      <div class="campo"><label>XP (Experiência)</label>
+        <input name="xp" type="text" inputmode="numeric" value="${c.xp ?? 0}" data-validar="int" data-min="0">
+        <span class="erro-msg">XP deve ser ≥ 0</span></div>
     </div>
+
+    <h3>Idiomas e Ferramentas</h3>
+    <div class="grid-2">
+      ${renderListaTags('idiomas', 'Idiomas', c.idiomas || ['Comum'])}
+      ${renderListaTags('ferramentas', 'Proficiências em Ferramentas', c.ferramentas || [])}
+    </div>
+    <div class="campo" style="margin-top:14px"><label>Características Raciais</label>
+      <textarea name="tracos_raciais" placeholder="Ex.: Visão no Escuro 18m, Resistência Anã, Proficiência em Machados">${escape(c.tracos_raciais||'')}</textarea></div>
 
     <h3>Atributos</h3>
     <div class="grid-6">
@@ -528,6 +627,8 @@ function renderIdentidade(c, atrs) {
 
 function renderCombate(c) {
   const slots = c.slots_magia || {};
+  const salv = c.salvaguardas || {};
+  const per = c.pericias || {};
   return `
     <h3>Combate</h3>
     <div class="grid-3">
@@ -560,6 +661,42 @@ function renderCombate(c) {
         <span class="erro-msg">Exaustão vai de 0 a 6</span></div>
     </div>
 
+    <h3>Salvaguardas — Proficiente</h3>
+    <p style="color:var(--text-dim);font-style:italic;font-size:12px;margin-bottom:8px">Marque os atributos em que você tem proficiência em testes de resistência.</p>
+    <div class="check-grid">
+      ${ATRIBUTOS.map(([k, nome]) => `
+        <div class="check-row">
+          <label><input type="checkbox" name="salv_${k}" ${salv[k] ? 'checked' : ''}> ${nome}</label>
+        </div>
+      `).join('')}
+    </div>
+
+    <h3>Perícias <span style="font-size:11px;color:var(--text-dim);font-weight:normal;font-style:italic">(P = Proficiente · E = Expertise — dobra o bônus)</span></h3>
+    <div class="check-grid">
+      ${PERICIAS.map(([k, nome, atr]) => {
+        const p = per[k] || {};
+        return `
+          <div class="check-row">
+            <label><input type="checkbox" name="per_${k}_prof" ${p.prof?'checked':''}> ${nome}<span class="atr-tag">${atr.toUpperCase()}</span></label>
+            <span class="exp-marker"><input type="checkbox" name="per_${k}_exp" ${p.exp?'checked':''} ${p.prof?'':'disabled'}> E</span>
+          </div>
+        `;
+      }).join('')}
+    </div>
+
+    <h3>Magia</h3>
+    <div class="grid-3">
+      <div class="campo"><label>Truques Conhecidos</label>
+        <input type="text" inputmode="numeric" name="truques_conhecidos" value="${c.truques_conhecidos ?? 0}" data-validar="int" data-min="0"></div>
+      <div class="campo"><label>Magias Conhecidas</label>
+        <input type="text" inputmode="numeric" name="magias_conhecidas" value="${c.magias_conhecidas ?? 0}" data-validar="int" data-min="0"></div>
+      <div class="campo"><label>CD de Resistência</label>
+        <input type="text" inputmode="numeric" name="cd_resistencia" value="${c.cd_resistencia ?? 8}" data-validar="int" data-min="0">
+        <span class="ajuda">8 + prof + mod do atributo de conjuração</span></div>
+      <div class="campo"><label>Bônus de Ataque de Magia</label>
+        <input type="text" inputmode="numeric" name="bonus_atq_magia" value="${c.bonus_atq_magia ?? 0}" data-validar="int"></div>
+    </div>
+
     <h3>Espaços de Magia</h3>
     <div id="slots-wrap">
       ${[1,2,3,4,5,6,7,8,9].map(n => {
@@ -574,6 +711,50 @@ function renderCombate(c) {
       }).join('')}
     </div>
   `;
+}
+
+function renderHabilidades(c) {
+  const chave = chaveDeClasse(c.classe);
+  return `
+    <h3>Habilidades de Classe</h3>
+    <p style="color:var(--text-dim);font-style:italic;font-size:12px;margin-bottom:14px">
+      Preenchido automaticamente com base na classe e nível.
+      ${c.subclasse ? `Subclasse: <strong>${escape(c.subclasse)}</strong>` : 'Defina sua subclasse na aba <em>Identidade</em>.'}
+    </p>
+    <div id="hab-wrap">Carregando…</div>
+
+    <h3>Características Adicionais</h3>
+    <p style="color:var(--text-dim);font-style:italic;font-size:12px;margin-bottom:8px">
+      Use este espaço para registrar habilidades de subclasse, talentos (feats), ou qualquer outra característica especial.
+    </p>
+    <div class="campo">
+      <textarea name="caracteristicas_adicionais" style="min-height:160px">${escape(c.caracteristicas_adicionais || '')}</textarea>
+    </div>
+  `;
+}
+
+async function popularHabilidades(classe, nivel) {
+  const wrap = document.getElementById('hab-wrap');
+  if (!wrap) return;
+  if (!classe) {
+    wrap.innerHTML = `<div class="item-vazio">Sem classe definida.</div>`;
+    return;
+  }
+  const db = await carregarHabilidadesClasses();
+  const habs = (db[chaveDeClasse(classe)] || []).filter(h => h.nivel <= (nivel||1));
+  if (!habs.length) {
+    wrap.innerHTML = `<div class="item-vazio">Nenhuma habilidade encontrada para ${escape(classe)}.</div>`;
+    return;
+  }
+  // Agrupa por nível
+  const porNivel = {};
+  for (const h of habs) (porNivel[h.nivel] = porNivel[h.nivel] || []).push(h);
+  wrap.innerHTML = Object.entries(porNivel).sort(([a],[b]) => +a - +b).map(([nv, lista]) => `
+    <div class="habilidade-card">
+      <h4>Nível ${nv}</h4>
+      <p>${lista.map(h => escape(h.nome)).join(' · ')}</p>
+    </div>
+  `).join('');
 }
 
 function renderMagias(c) {
@@ -732,6 +913,24 @@ function conectarListeners() {
   // Carregar magias se já estiver na aba
   if (tabAtiva === 'magias') carregarMagiasPreparadas();
 
+  // Habilidades — carrega quando entra
+  if (tabAtiva === 'habilidades') popularHabilidades(charAtivo.classe, charAtivo.nivel);
+
+  // Listeners de tags (idiomas/ferramentas) — só na aba identidade
+  if (tabAtiva === 'identidade') conectarListenersTags();
+
+  // Listeners das checkboxes de perícia (habilita/desabilita E quando P muda)
+  $$('input[name^="per_"][name$="_prof"]').forEach(cb => {
+    cb.addEventListener('change', () => {
+      const k = cb.name.replace('per_', '').replace('_prof', '');
+      const exp = document.querySelector(`input[name="per_${k}_exp"]`);
+      if (exp) {
+        exp.disabled = !cb.checked;
+        if (!cb.checked) exp.checked = false;
+      }
+    });
+  });
+
   // Botões de equipamento
   if (tabAtiva === 'equipamento') conectarListenersEquipamento();
 
@@ -757,6 +956,36 @@ function validarEAtualizarMod(inp) {
     const v = parseNum(inp.value, { inteiro: true, min: 1, max: 30 });
     if (v !== null) document.querySelector(`[data-mod="${k}"]`).textContent = fmtMod(mod(v));
   }
+}
+
+function conectarListenersTags() {
+  // Adicionar tag
+  $$('[data-addtag]').forEach(b => b.addEventListener('click', () => {
+    const f = b.dataset.addtag;
+    const input = document.getElementById(`add-${f}-input`);
+    const v = input.value.trim();
+    if (!v) return;
+    if (!charAtivo[f]) charAtivo[f] = [];
+    if (!charAtivo[f].includes(v)) charAtivo[f].push(v);
+    input.value = '';
+    render();
+  }));
+  // Remover tag
+  $$('[data-rmtag]').forEach(x => x.addEventListener('click', () => {
+    const f = x.dataset.rmtag;
+    const idx = +x.dataset.idx;
+    if (charAtivo[f]) {
+      charAtivo[f].splice(idx, 1);
+      render();
+    }
+  }));
+  // Enter no input adiciona
+  ['idiomas','ferramentas'].forEach(f => {
+    const i = document.getElementById(`add-${f}-input`);
+    if (i) i.addEventListener('keydown', e => {
+      if (e.key === 'Enter') { e.preventDefault(); document.querySelector(`[data-addtag="${f}"]`).click(); }
+    });
+  });
 }
 
 function conectarListenersEquipamento() {
@@ -870,6 +1099,11 @@ async function salvar(e) {
   set('subclasse', txt('subclasse'));
   set('origem', txt('origem'));
   set('alinhamento', txt('alinhamento'));
+  set('xp', num('xp'));
+  set('tracos_raciais', txt('tracos_raciais'));
+  // idiomas e ferramentas (arrays) — pegam direto do estado (mantidos pelos handlers de tag)
+  if (charAtivo.idiomas !== undefined)     payload.idiomas = charAtivo.idiomas;
+  if (charAtivo.ferramentas !== undefined) payload.ferramentas = charAtivo.ferramentas;
 
   // Atributos (só se tab identidade)
   if (fd.has('attr_for')) {
@@ -899,6 +1133,27 @@ async function salvar(e) {
     }
     payload.slots_magia = slots;
   }
+
+  // Salvaguardas + Perícias + Magia (apenas se tab combate ativa)
+  if (fd.has('salv_for')) {
+    const salv = {};
+    for (const [k] of ATRIBUTOS) salv[k] = fd.has('salv_' + k);
+    payload.salvaguardas = salv;
+    const per = {};
+    for (const [k] of PERICIAS) {
+      const prof = fd.has('per_' + k + '_prof');
+      const exp  = fd.has('per_' + k + '_exp');
+      if (prof || exp) per[k] = { prof, exp };
+    }
+    payload.pericias = per;
+    set('truques_conhecidos', num('truques_conhecidos'));
+    set('magias_conhecidas',  num('magias_conhecidas'));
+    set('cd_resistencia',     num('cd_resistencia'));
+    set('bonus_atq_magia',    num('bonus_atq_magia'));
+  }
+
+  // Características adicionais (aba Habilidades)
+  set('caracteristicas_adicionais', txt('caracteristicas_adicionais'));
 
   // Moedas (apenas se tab equipamento ativa)
   if (fd.has('moeda_po')) {
