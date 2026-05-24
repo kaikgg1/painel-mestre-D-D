@@ -496,6 +496,72 @@
     text-shadow: 0 1px 2px rgba(0,0,0,0.8);
   }
 
+  /* ===== Painel aplicar dano/cura ===== */
+  .hp-aplicar {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px dashed rgba(139,29,29,0.4);
+  }
+  .hp-aplicar-titulo {
+    font-family: 'Cinzel', serif; font-size: 9px;
+    color: var(--gold); letter-spacing: 1.5px; text-transform: uppercase;
+    margin-bottom: 8px; text-align: center;
+  }
+  .hp-aplicar-linha {
+    display: flex; gap: 6px; align-items: center; justify-content: center;
+    flex-wrap: wrap;
+  }
+  .hp-aplicar-linha input {
+    width: 56px; padding: 8px 6px;
+    background: rgba(0,0,0,0.5); border: 1px solid var(--gold);
+    color: var(--parchment); font-family: 'Cinzel', serif;
+    font-size: 16px; font-weight: 700; text-align: center;
+    border-radius: 4px; outline: none;
+  }
+  .hp-aplicar-linha input:focus { border-color: var(--gold-bright); background: rgba(0,0,0,0.7); }
+  .hp-btn {
+    padding: 8px 12px;
+    border: 1px solid;
+    border-radius: 4px;
+    font-family: 'Cinzel', serif; font-size: 11px;
+    font-weight: 700; letter-spacing: 1px;
+    cursor: pointer; transition: all 0.15s;
+    background: transparent;
+    min-height: 36px;
+    display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+  }
+  .hp-btn.dano {
+    border-color: var(--blood-bright); color: #f4b8a8;
+  }
+  .hp-btn.dano:hover { background: var(--blood); color: var(--parchment); }
+  .hp-btn.cura {
+    border-color: #2e862e; color: #8fc28f;
+  }
+  .hp-btn.cura:hover { background: #2e5e2e; color: var(--parchment); }
+  .hp-quick {
+    display: grid; grid-template-columns: repeat(8, 1fr); gap: 4px;
+    margin-top: 8px;
+  }
+  .hp-quick button {
+    padding: 6px 4px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(139,105,20,0.35);
+    color: var(--parchment-dim);
+    font-family: 'Cinzel', serif; font-size: 10px;
+    font-weight: 700;
+    border-radius: 3px;
+    cursor: pointer; transition: all 0.15s;
+    min-height: 30px;
+  }
+  .hp-quick button.q-dano { border-color: rgba(139,29,29,0.5); color: #d49890; }
+  .hp-quick button.q-dano:hover { background: rgba(139,29,29,0.3); color: var(--parchment); border-color: var(--blood-bright); }
+  .hp-quick button.q-cura { border-color: rgba(46,134,46,0.5); color: #8fc28f; }
+  .hp-quick button.q-cura:hover { background: rgba(46,134,46,0.25); color: var(--parchment); border-color: #2e862e; }
+  @media (max-width: 480px) {
+    .hp-quick { grid-template-columns: repeat(4, 1fr); }
+    .hp-quick button { font-size: 11px; padding: 8px 4px; min-height: 34px; }
+  }
+
   .stat-hero {
     background: rgba(0,0,0,0.3);
     border: 1px solid rgba(139,105,20,0.4);
@@ -960,6 +1026,26 @@ function renderCombate(c) {
         <div class="hp-temp-label" style="margin-top:8px;text-align:center">
           PV Temporários: <input name="hp_temp" type="text" inputmode="numeric" value="${c.hp_temp ?? 0}" data-validar="int" data-min="0">
         </div>
+
+        <!-- Painel aplicar dano/cura -->
+        <div class="hp-aplicar">
+          <div class="hp-aplicar-titulo">Aplicar Dano ou Cura</div>
+          <div class="hp-aplicar-linha">
+            <button type="button" class="hp-btn dano" data-aplicar="dano" aria-label="Aplicar dano">🩸 Dano</button>
+            <input type="text" inputmode="numeric" id="hp-aplicar-input" value="" placeholder="0" aria-label="Quantidade">
+            <button type="button" class="hp-btn cura" data-aplicar="cura" aria-label="Aplicar cura">✨ Cura</button>
+          </div>
+          <div class="hp-quick" aria-label="Atalhos rápidos">
+            <button type="button" class="q-dano" data-quick="-20">-20</button>
+            <button type="button" class="q-dano" data-quick="-10">-10</button>
+            <button type="button" class="q-dano" data-quick="-5">-5</button>
+            <button type="button" class="q-dano" data-quick="-1">-1</button>
+            <button type="button" class="q-cura" data-quick="1">+1</button>
+            <button type="button" class="q-cura" data-quick="5">+5</button>
+            <button type="button" class="q-cura" data-quick="10">+10</button>
+            <button type="button" class="q-cura" data-quick="20">+20</button>
+          </div>
+        </div>
       </div>
 
       <div class="stat-hero">
@@ -1320,24 +1406,70 @@ function conectarListeners() {
   // Barra de HP ao vivo
   const hpAtual = document.getElementById('hp-atual-input');
   const hpMax = document.getElementById('hp-max-input');
+  const atualizarBarraHP = () => {
+    if (!hpAtual || !hpMax) return;
+    const a = parseNum(hpAtual.value, { inteiro: true }) ?? 0;
+    const m = parseNum(hpMax.value, { inteiro: true }) ?? 0;
+    const pct = m > 0 ? Math.max(0, Math.min(100, Math.round((a / m) * 100))) : 0;
+    const fill = document.getElementById('hp-fill');
+    const pctEl = document.getElementById('hp-percent');
+    const icEl = document.getElementById('hp-icone-atual');
+    if (fill) {
+      fill.style.width = pct + '%';
+      fill.className = 'hp-fill' + (pct <= 15 ? ' critico' : pct <= 35 ? ' baixo' : pct <= 65 ? ' medio' : '');
+    }
+    if (pctEl) pctEl.textContent = pct + '%';
+    if (icEl) icEl.textContent = pct <= 0 ? '💀' : pct <= 25 ? '🩸' : pct <= 50 ? '🧡' : pct <= 75 ? '❤️' : '💖';
+  };
   if (hpAtual && hpMax) {
-    const atualizarBarraHP = () => {
-      const a = parseNum(hpAtual.value, { inteiro: true }) ?? 0;
-      const m = parseNum(hpMax.value, { inteiro: true }) ?? 0;
-      const pct = m > 0 ? Math.max(0, Math.min(100, Math.round((a / m) * 100))) : 0;
-      const fill = document.getElementById('hp-fill');
-      const pctEl = document.getElementById('hp-percent');
-      const icEl = document.getElementById('hp-icone-atual');
-      if (fill) {
-        fill.style.width = pct + '%';
-        fill.className = 'hp-fill' + (pct <= 15 ? ' critico' : pct <= 35 ? ' baixo' : pct <= 65 ? ' medio' : '');
-      }
-      if (pctEl) pctEl.textContent = pct + '%';
-      if (icEl) icEl.textContent = pct <= 0 ? '💀' : pct <= 25 ? '🩸' : pct <= 50 ? '🧡' : pct <= 75 ? '❤️' : '💖';
-    };
     hpAtual.addEventListener('input', atualizarBarraHP);
     hpMax.addEventListener('input', atualizarBarraHP);
   }
+
+  // Aplicar dano/cura — soma/subtrai do hp_atual, clamp [0, hp_max]
+  function aplicarHP(delta) {
+    if (!hpAtual || !hpMax) return;
+    const max = parseNum(hpMax.value, { inteiro: true }) ?? 0;
+    const atual = parseNum(hpAtual.value, { inteiro: true }) ?? 0;
+    let novo = atual + delta;
+    if (novo < 0) novo = 0;
+    if (max > 0 && novo > max) novo = max;
+    hpAtual.value = novo;
+    // Feedback visual no input
+    hpAtual.style.color = delta < 0 ? '#e88a8a' : '#8fc28f';
+    setTimeout(() => { hpAtual.style.color = ''; }, 600);
+    atualizarBarraHP();
+    // Dispara input event para auto-save pegar
+    hpAtual.dispatchEvent(new Event('input', { bubbles: true }));
+  }
+
+  document.querySelectorAll('[data-aplicar]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const input = document.getElementById('hp-aplicar-input');
+      const v = parseNum(input?.value, { inteiro: true });
+      if (v === null || v <= 0) { input?.focus(); return; }
+      aplicarHP(btn.dataset.aplicar === 'dano' ? -v : v);
+      input.value = '';
+    });
+  });
+  document.querySelectorAll('[data-quick]').forEach(btn => {
+    btn.addEventListener('click', () => aplicarHP(+btn.dataset.quick));
+  });
+  // Enter no input aplica baseado no sinal
+  const inputAplicar = document.getElementById('hp-aplicar-input');
+  if (inputAplicar) inputAplicar.addEventListener('keydown', e => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      // Sinal explícito (-5, +10) ou padrão é dano
+      const txt = inputAplicar.value.trim();
+      let n = parseNum(txt, { inteiro: true });
+      if (n === null || n === 0) return;
+      // Se digitou só número positivo sem +, considera dano
+      if (txt[0] !== '+' && txt[0] !== '-' && n > 0) n = -n;
+      aplicarHP(n);
+      inputAplicar.value = '';
+    }
+  });
 
   // Listeners das checkboxes de perícia (habilita/desabilita E quando P muda)
   $$('input[name^="per_"][name$="_prof"]').forEach(cb => {
