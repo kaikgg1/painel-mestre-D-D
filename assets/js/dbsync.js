@@ -38,6 +38,7 @@
   let campanhaAtual = null;
   let usuarioAtual = null;
   let ehMestre = false;
+  let apenasAtivos = false;     // se true, só carrega/exibe is_active=true
   const pendingUpdates = new Map();  // id → {campos: {...}, timer}
 
   // ─── Mapeamento UI ↔ DB ───────────────────────────────────────────
@@ -57,6 +58,7 @@
     slots: 'slots_magia',
     magias: 'magias_preparadas',
     condicoes: 'condicoes',
+    isActive: 'is_active',
   };
 
   function uiToDb(uiObj) {
@@ -87,13 +89,16 @@
       slots: row.slots_magia || {},
       magias: row.magias_preparadas || '',
       condicoes: row.condicoes || [],
+      isActive: !!row.is_active,
     };
   }
 
   // ─── Init ─────────────────────────────────────────────────────────
-  async function init({ campanha, onChange }) {
-    onChangeCb = onChange || (() => {});
-    campanhaAtual = campanha;
+  // opts: { campanha?, onChange, apenasAtivos? }
+  async function init(opts) {
+    onChangeCb = opts.onChange || (() => {});
+    campanhaAtual = opts.campanha || null;
+    apenasAtivos = !!opts.apenasAtivos;
     usuarioAtual = await window.Auth.getUser();
     if (!usuarioAtual) throw new Error('Usuário não autenticado');
     ehMestre = await window.Auth.ehMestre();
@@ -107,6 +112,7 @@
     // RLS já filtra por user_id (ou tudo se mestre)
     let q = window.sb.from('characters').select('*');
     if (campanhaAtual) q = q.eq('campanha', campanhaAtual);
+    if (apenasAtivos)  q = q.eq('is_active', true);
     q = q.order('created_at', { ascending: true });
 
     const { data, error } = await q;
@@ -141,13 +147,31 @@
   async function handleRealtime(payload) {
     const { eventType, new: novo, old } = payload;
     if (eventType === 'INSERT') {
-      // Busca nome do dono
+      if (apenasAtivos && !novo.is_active) return;  // ignora não-ativo
       const { data: prof } = await window.sb.from('profiles').select('nome').eq('id', novo.user_id).maybeSingle();
       novo._jogador_nome = prof?.nome || '';
       cache.set(novo.id, novo);
       onChangeCb({ tipo: 'insert', char: dbToUi(novo) });
     } else if (eventType === 'UPDATE') {
       const antigo = cache.get(novo.id);
+      // Com filtro apenasAtivos: tratar transições
+      if (apenasAtivos) {
+        if (!novo.is_active && antigo) {
+          // virou inativo: remove da lista
+          cache.delete(novo.id);
+          onChangeCb({ tipo: 'delete', id: novo.id });
+          return;
+        }
+        if (novo.is_active && !antigo) {
+          // virou ativo: adiciona à lista
+          const { data: prof } = await window.sb.from('profiles').select('nome').eq('id', novo.user_id).maybeSingle();
+          novo._jogador_nome = prof?.nome || '';
+          cache.set(novo.id, novo);
+          onChangeCb({ tipo: 'insert', char: dbToUi(novo) });
+          return;
+        }
+        if (!novo.is_active) return;  // não tava na lista e não virou ativo
+      }
       novo._jogador_nome = antigo?._jogador_nome || '';
       cache.set(novo.id, novo);
       onChangeCb({ tipo: 'update', char: dbToUi(novo) });
@@ -211,5 +235,12 @@
     listeners = null;
   }
 
-  window.DBSync = { init, listar, criar, salvarCampo, deletar, desconectar };
+  // Marca um PJ como ativo (o trigger no banco desativa os outros do mesmo user)
+  async function setAtivo(id, ativo = true) {
+    const { error } = await window.sb
+      .from('characters').update({ is_active: !!ativo }).eq('id', id);
+    if (error) throw error;
+  }
+
+  window.DBSync = { init, listar, criar, salvarCampo, deletar, desconectar, setAtivo };
 })();

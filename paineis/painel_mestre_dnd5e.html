@@ -1137,9 +1137,13 @@ async function resetarTudo() {
   }
   await window.Auth.renderHeader('#auth-slot');
 
+  // Pré-checa se é mestre antes do init (pra decidir se filtra ativos)
+  const _ehMestreInit = await window.Auth.ehMestre();
+
   try {
     const r = await window.DBSync.init({
       campanha: CAMPANHA,
+      apenasAtivos: _ehMestreInit,  // mestre vê só ativos; jogador vê todos os seus
       onChange: (ev) => {
         if (ev.tipo === 'load') {
           estado.personagens = window.DBSync.listar();

@@ -1174,9 +1174,12 @@ async function resetarTudo() {
   }
   await window.Auth.renderHeader('#auth-slot');
 
+  const _ehMestreInit = await window.Auth.ehMestre();
+
   try {
     const r = await window.DBSync.init({
       campanha: CAMPANHA,
+      apenasAtivos: _ehMestreInit,
       onChange: (ev) => {
         if (ev.tipo === 'load') {
           estado.personagens = window.DBSync.listar();

@@ -9,13 +9,15 @@
 <title>Entrar — Painel do Mestre</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,700;1,400&display=swap');
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
   :root {
     --bg-deep: #0a0608;
+    --bg-card: #1a1018;
+    --bg-card-soft: #221520;
     --gold: #8B6914;
     --gold-bright: #b88a2c;
+    --gold-light: #d4a843;
     --blood: #6b1010;
     --blood-bright: #8b1d1d;
     --parchment: #d4c5a0;
@@ -27,86 +29,171 @@
     min-height: 100vh;
     min-height: 100dvh;
     background-color: var(--bg-deep);
-    background-image: radial-gradient(ellipse at top, #2a1518 0%, #150a0c 50%, #050304 100%);
+    background-image:
+      radial-gradient(ellipse at top, #2a1518 0%, #150a0c 50%, #050304 100%),
+      radial-gradient(circle at 20% 30%, rgba(139,29,29,0.08) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(139,105,20,0.06) 0%, transparent 50%);
     font-family: 'EB Garamond', Georgia, serif;
     color: var(--parchment);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
+    display: grid;
+    place-items: center;
+    padding: 24px 16px;
   }
 
+  body::before {
+    content: ''; position: fixed; inset: 0; pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.6) 100%);
+    z-index: 0;
+  }
+
+  /* ===== CARD PRINCIPAL ===== */
   .card {
+    position: relative; z-index: 1;
     width: 100%;
-    max-width: 420px;
+    max-width: 440px;
     background: linear-gradient(160deg, #1f1416 0%, #150c0e 60%, #0d0709 100%);
     border: 2px solid var(--gold);
-    border-radius: 4px;
-    padding: 40px 32px 32px;
-    position: relative;
-    box-shadow: 0 12px 40px rgba(0,0,0,0.8), inset 0 0 30px rgba(0,0,0,0.4),
-                0 0 0 1px var(--blood) inset;
+    border-radius: 6px;
+    padding: 44px 36px 36px;
+    box-shadow:
+      0 16px 48px rgba(0,0,0,0.8),
+      inset 0 0 32px rgba(0,0,0,0.5),
+      0 0 0 1px var(--blood) inset;
   }
-  .corner { position: absolute; color: var(--blood); font-size: 14px; opacity: 0.8; }
-  .corner.tl { top: 6px; left: 10px; }
-  .corner.tr { top: 6px; right: 10px; }
-  .corner.bl { bottom: 6px; left: 10px; }
-  .corner.br { bottom: 6px; right: 10px; }
 
-  .crest { display: block; text-align: center; font-size: 44px; margin-bottom: 14px; filter: drop-shadow(0 0 12px rgba(139,105,20,0.5)); }
+  /* Cantos decorativos */
+  .corner { position: absolute; color: var(--blood); font-size: 16px; opacity: 0.85; }
+  .corner.tl { top: 8px; left: 12px; }
+  .corner.tr { top: 8px; right: 12px; }
+  .corner.bl { bottom: 8px; left: 12px; }
+  .corner.br { bottom: 8px; right: 12px; }
+
+  /* ===== HEADER ===== */
+  .crest {
+    display: block; text-align: center;
+    font-size: 56px; line-height: 1;
+    margin-bottom: 16px;
+    filter: drop-shadow(0 0 14px rgba(139,105,20,0.5));
+    animation: floatCrest 4s ease-in-out infinite;
+  }
+  @keyframes floatCrest {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+  }
   .title {
     font-family: 'Cinzel Decorative', serif;
-    font-size: 22px; font-weight: 900;
-    letter-spacing: 2px; text-align: center;
+    font-size: clamp(20px, 5vw, 28px); font-weight: 900;
+    letter-spacing: 3px; text-align: center;
     color: var(--gold-bright);
-    text-shadow: 0 0 20px rgba(184,138,44,0.4);
-    margin-bottom: 6px;
+    text-shadow: 0 0 28px rgba(184,138,44,0.45), 1px 1px 0 var(--shadow);
+    margin-bottom: 8px;
   }
   .subtitle {
-    text-align: center; font-style: italic; font-size: 13px;
-    color: var(--parchment-dim); letter-spacing: 1.5px; margin-bottom: 28px;
+    text-align: center; font-style: italic; font-size: 14px;
+    color: var(--parchment-dim); letter-spacing: 2px;
+    margin-bottom: 32px;
   }
   .subtitle::before { content: '— '; color: var(--blood-bright); }
   .subtitle::after  { content: ' —'; color: var(--blood-bright); }
 
-  label {
+  /* ===== ESCOLHA DE JOGADOR (Grid de cards) ===== */
+  .label {
     display: block;
-    font-family: 'Cinzel', serif;
-    font-size: 11px; font-weight: 700;
-    letter-spacing: 1.5px; text-transform: uppercase;
-    color: var(--gold); margin-bottom: 8px;
+    font-family: 'Cinzel', serif; font-size: 11px;
+    font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--gold); margin-bottom: 12px;
+    text-align: center;
   }
 
-  select {
-    width: 100%;
-    padding: 12px 14px;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid var(--gold);
-    border-radius: 3px;
+  .jogadores {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .jogador-btn {
+    position: relative;
+    padding: 18px 8px 12px;
+    background: linear-gradient(160deg, var(--bg-card-soft), var(--bg-card));
+    border: 1.5px solid rgba(139,105,20,0.4);
+    border-radius: 4px;
     color: var(--parchment);
-    font-family: 'EB Garamond', serif; font-size: 16px;
-    outline: none;
     cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Cinzel', serif;
+    text-align: center;
   }
-  select:focus { border-color: var(--gold-bright); background: rgba(255,255,255,0.06); }
-  select option { background: #1a1018; color: var(--parchment); }
+  .jogador-btn:hover {
+    transform: translateY(-2px);
+    border-color: var(--gold-bright);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.6);
+  }
+  .jogador-btn.selecionado {
+    background: linear-gradient(160deg, var(--gold), #6a4f0e);
+    border-color: var(--gold-light);
+    color: var(--shadow);
+    box-shadow: 0 0 18px rgba(212,168,67,0.4);
+  }
+  .jogador-btn .icone {
+    display: block; font-size: 26px; line-height: 1;
+    margin-bottom: 6px;
+  }
+  .jogador-btn .nome {
+    font-size: 12px; font-weight: 700; letter-spacing: 1px;
+  }
 
-  .btn {
+  /* Bloco do Mestre */
+  .mestre-bloco {
+    margin-top: 8px; padding-top: 16px;
+    border-top: 1px solid rgba(139,29,29,0.4);
+    position: relative;
+  }
+  .mestre-bloco::before {
+    content: '♛'; position: absolute; left: 50%; top: -10px;
+    transform: translateX(-50%);
+    background: var(--bg-card); padding: 0 8px;
+    color: var(--blood-bright); font-size: 14px;
+  }
+  .jogador-btn.mestre {
+    border-color: var(--blood);
+    background: linear-gradient(160deg, #2a1014, #1a0608);
+  }
+  .jogador-btn.mestre:hover {
+    border-color: var(--blood-bright);
+    box-shadow: 0 6px 16px rgba(139,29,29,0.4);
+  }
+  .jogador-btn.mestre.selecionado {
+    background: linear-gradient(160deg, var(--blood-bright), var(--blood));
+    color: var(--parchment);
+    border-color: var(--blood-bright);
+    box-shadow: 0 0 18px rgba(139,29,29,0.5);
+  }
+  .jogador-btn.mestre .icone { color: var(--gold-bright); }
+  .jogador-btn.mestre.selecionado .icone { color: var(--parchment); }
+
+  /* ===== BOTÃO ENTRAR ===== */
+  .btn-entrar {
     display: block; width: 100%;
-    margin-top: 20px;
+    margin-top: 24px;
     padding: 14px 18px;
     background: linear-gradient(to bottom, var(--gold), #6a4f0e);
     border: 1px solid var(--gold-bright);
     color: var(--shadow);
-    font-family: 'Cinzel', serif; font-size: 13px; font-weight: 700;
-    letter-spacing: 2px; text-transform: uppercase;
+    font-family: 'Cinzel', serif; font-size: 13px;
+    font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+    border-radius: 3px;
     cursor: pointer;
-    border-radius: 2px;
     transition: all 0.2s;
+    min-height: 48px;
   }
-  .btn:hover  { background: linear-gradient(to bottom, var(--gold-bright), var(--gold)); transform: translateY(-1px); }
-  .btn:disabled { opacity: 0.5; cursor: wait; }
+  .btn-entrar:hover:not(:disabled) {
+    background: linear-gradient(to bottom, var(--gold-bright), var(--gold));
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(184,138,44,0.4);
+  }
+  .btn-entrar:disabled { opacity: 0.4; cursor: not-allowed; }
 
+  /* ===== MENSAGEM DE ERRO ===== */
   .erro {
     margin-top: 14px; padding: 10px 14px;
     background: rgba(107,16,16,0.25);
@@ -117,13 +204,30 @@
   }
   .erro.show { display: block; }
 
-  .hint {
-    margin-top: 24px;
-    font-size: 12px; text-align: center;
-    color: var(--parchment-dim); font-style: italic;
+  .voltar {
+    margin-top: 22px; text-align: center;
+    font-size: 12px; color: var(--parchment-dim);
+    font-style: italic;
   }
-  .hint a { color: var(--gold-bright); text-decoration: none; }
-  .hint a:hover { text-decoration: underline; }
+  .voltar a { color: var(--gold-bright); text-decoration: none; transition: color 0.2s; }
+  .voltar a:hover { color: var(--gold-light); text-decoration: underline; }
+
+  /* ===== RESPONSIVIDADE ===== */
+  @media (max-width: 480px) {
+    body { padding: 12px 8px; }
+    .card { padding: 32px 22px 26px; border-width: 1.5px; }
+    .crest { font-size: 44px; margin-bottom: 12px; }
+    .subtitle { margin-bottom: 24px; font-size: 13px; letter-spacing: 1.5px; }
+    .jogadores { gap: 8px; }
+    .jogador-btn { padding: 14px 6px 10px; }
+    .jogador-btn .icone { font-size: 22px; margin-bottom: 4px; }
+    .jogador-btn .nome { font-size: 11px; }
+  }
+
+  /* Telas muito estreitas (smartphones antigos) */
+  @media (max-width: 340px) {
+    .jogadores { grid-template-columns: 1fr 1fr; }
+  }
 
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
@@ -143,23 +247,36 @@
   <p class="subtitle">Escolha seu nome</p>
 
   <form id="login-form" novalidate>
-    <label for="nome">Jogador</label>
-    <select id="nome" required aria-required="true">
-      <option value="">— escolher —</option>
-      <optgroup label="Jogadores">
-        <option value="Sabrina123">Sabrina123</option>
-        <option value="Derik123">Derik123</option>
-        <option value="Felipe123">Felipe123</option>
-      </optgroup>
-      <optgroup label="Mestre">
-        <option value="Mestre123">Mestre123 (mestre)</option>
-      </optgroup>
-    </select>
-    <button type="submit" class="btn" id="btn-entrar">Entrar</button>
+    <span class="label" id="label-jogador">Jogador</span>
+    <div class="jogadores" id="jogadores-grid" role="radiogroup" aria-labelledby="label-jogador">
+      <button type="button" class="jogador-btn" data-nome="Sabrina123" role="radio" aria-checked="false">
+        <span class="icone" aria-hidden="true">🧝‍♀️</span>
+        <span class="nome">Sabrina</span>
+      </button>
+      <button type="button" class="jogador-btn" data-nome="Derik123" role="radio" aria-checked="false">
+        <span class="icone" aria-hidden="true">⚔️</span>
+        <span class="nome">Derik</span>
+      </button>
+      <button type="button" class="jogador-btn" data-nome="Felipe123" role="radio" aria-checked="false">
+        <span class="icone" aria-hidden="true">🏹</span>
+        <span class="nome">Felipe</span>
+      </button>
+    </div>
+
+    <div class="mestre-bloco">
+      <button type="button" class="jogador-btn mestre" data-nome="Mestre123" role="radio" aria-checked="false" style="grid-column:1/-1;width:100%">
+        <span class="icone" aria-hidden="true">👑</span>
+        <span class="nome">Mestre</span>
+      </button>
+    </div>
+
+    <input type="hidden" id="nome-selecionado" required>
+
+    <button type="submit" class="btn-entrar" id="btn-entrar" disabled>Entrar</button>
     <div class="erro" id="erro" role="alert" aria-live="polite"></div>
   </form>
 
-  <p class="hint">
+  <p class="voltar">
     <a href="../index.html">← Voltar à tela inicial</a>
   </p>
 </main>
@@ -169,9 +286,9 @@
 <script src="../assets/js/auth.js"></script>
 <script>
   const form  = document.getElementById('login-form');
-  const sel   = document.getElementById('nome');
   const btn   = document.getElementById('btn-entrar');
   const erro  = document.getElementById('erro');
+  const hidden = document.getElementById('nome-selecionado');
 
   // Se já estiver logado, vai direto pro index
   (async () => {
@@ -179,10 +296,26 @@
     if (u) location.replace('../index.html');
   })();
 
+  // Seleção via botões
+  document.querySelectorAll('.jogador-btn').forEach(b => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('.jogador-btn').forEach(x => {
+        x.classList.remove('selecionado');
+        x.setAttribute('aria-checked', 'false');
+      });
+      b.classList.add('selecionado');
+      b.setAttribute('aria-checked', 'true');
+      hidden.value = b.dataset.nome;
+      btn.disabled = false;
+      btn.focus({preventScroll: true});
+    });
+  });
+
+  // Submit
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     erro.classList.remove('show');
-    const nome = sel.value;
+    const nome = hidden.value;
     if (!nome) { erro.textContent = 'Escolha um jogador.'; erro.classList.add('show'); return; }
 
     btn.disabled = true; btn.textContent = 'Entrando…';
@@ -193,7 +326,6 @@
       btn.disabled = false; btn.textContent = 'Entrar';
       return;
     }
-    // Redirect: se veio com ?from=, volta pra lá
     const params = new URLSearchParams(location.search);
     const from   = params.get('from');
     location.replace(from || '../index.html');

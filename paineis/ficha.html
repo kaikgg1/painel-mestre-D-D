@@ -15,197 +15,312 @@
     --bg-deep: #0a0608;
     --bg-card: #1a1018;
     --bg-card-soft: #221520;
+    --bg-input: rgba(255,255,255,0.04);
     --gold: #8B6914;
     --gold-bright: #b88a2c;
+    --gold-light: #d4a843;
     --blood: #6b1010;
     --blood-bright: #8b1d1d;
     --parchment: #d4c5a0;
     --parchment-dim: #a89878;
     --shadow: #050304;
     --text-dim: #8c7d5e;
+    --ok: #8fc28f;
+    --erro: #e88a8a;
   }
 
   html, body {
-    min-height: 100vh;
+    min-height: 100vh; min-height: 100dvh;
     background: var(--bg-deep) radial-gradient(ellipse at top, #1e1018 0%, #0d0810 50%, #050304 100%);
     font-family: 'EB Garamond', Georgia, serif;
     color: var(--parchment);
   }
 
+  /* ============ HEADER ============ */
   .site-header {
     position: sticky; top: 0; z-index: 50;
-    background: rgba(10,6,8,0.92); backdrop-filter: blur(8px);
+    background: rgba(10,6,8,0.94); backdrop-filter: blur(8px);
     border-bottom: 1px solid var(--gold);
-    padding: 12px 24px;
-    display: flex; align-items: center; gap: 20px;
+    padding: 12px 20px;
+    display: flex; align-items: center; gap: 16px;
     box-shadow: 0 2px 16px rgba(0,0,0,0.6);
   }
-  .back-btn, .auth-btn {
-    text-decoration: none;
-    color: var(--parchment-dim);
+  .back-btn {
+    text-decoration: none; color: var(--parchment-dim);
     font-family: 'Cinzel', serif; font-size: 11px;
     font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
-    padding: 6px 12px;
-    border: 1px solid var(--gold);
-    border-radius: 2px;
-    transition: all 0.2s;
-    background: transparent; cursor: pointer;
+    padding: 7px 12px; border: 1px solid var(--gold);
+    border-radius: 2px; transition: all 0.2s;
   }
-  .back-btn:hover, .auth-btn:hover { background: var(--gold); color: var(--shadow); }
+  .back-btn:hover { background: var(--gold); color: var(--shadow); }
   .header-title {
-    font-family: 'Cinzel Decorative', serif; font-size: clamp(16px, 3vw, 24px);
+    font-family: 'Cinzel Decorative', serif; font-size: clamp(15px, 3vw, 22px);
     font-weight: 700; color: var(--gold-bright); letter-spacing: 2px;
-    flex: 1; text-align: center;
+    flex: 1; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
   .auth-slot { display: flex; align-items: center; gap: 8px; font-family: 'Cinzel', serif; font-size: 11px; }
   .auth-nome { color: var(--parchment-dim); letter-spacing: 1px; }
+  .auth-btn {
+    padding: 6px 12px; background: transparent;
+    border: 1px solid var(--gold); color: var(--parchment-dim);
+    border-radius: 2px; font-family: 'Cinzel', serif; font-size: 10px;
+    font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+    text-decoration: none; cursor: pointer; transition: all 0.2s;
+  }
+  .auth-btn:hover { background: var(--gold); color: var(--shadow); }
   @media (max-width: 600px) { .auth-nome { display: none; } }
 
-  main {
-    max-width: 980px;
-    margin: 24px auto;
-    padding: 0 16px 48px;
-  }
+  /* ============ MAIN ============ */
+  main { max-width: 1000px; margin: 18px auto; padding: 0 14px 36px; }
+  .estado { padding: 30px; text-align: center; color: var(--text-dim); font-style: italic; }
 
-  .estado {
-    padding: 24px; text-align: center;
-    color: var(--text-dim); font-style: italic;
-  }
-
-  /* Seletor de personagem */
+  /* ============ BARRA DE PERSONAGEM ============ */
   .char-bar {
     display: flex; gap: 10px; align-items: center; flex-wrap: wrap;
-    margin-bottom: 20px;
+    background: linear-gradient(160deg, var(--bg-card) 0%, var(--bg-card-soft) 100%);
+    border: 1px solid rgba(139,105,20,0.4);
+    border-radius: 4px;
+    padding: 12px 14px;
+    margin-bottom: 14px;
   }
-  .char-bar select, .char-bar input {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid var(--gold);
-    color: var(--parchment);
-    font-family: 'EB Garamond', serif; font-size: 15px;
-    padding: 9px 12px; border-radius: 3px; outline: none;
+  .char-bar .pj-label {
+    font-family: 'Cinzel', serif; font-size: 11px;
+    color: var(--gold); letter-spacing: 1.5px; text-transform: uppercase;
   }
-  .char-bar select { min-width: 240px; }
-  .char-bar select:focus, .char-bar input:focus { border-color: var(--gold-bright); }
+  .char-bar select {
+    flex: 1; min-width: 180px;
+    background: var(--bg-input); border: 1px solid var(--gold);
+    color: var(--parchment); font-family: 'EB Garamond', serif;
+    font-size: 15px; padding: 8px 12px; border-radius: 3px; outline: none;
+  }
+  .char-bar select:focus { border-color: var(--gold-bright); }
   .char-bar option { background: #1a1018; }
-  .btn-novo, .btn-deletar {
-    padding: 9px 16px;
-    background: transparent;
-    border: 1px solid var(--gold);
-    color: var(--parchment);
+
+  .btn { padding: 9px 14px; background: transparent;
+    border: 1px solid var(--gold); color: var(--parchment);
     font-family: 'Cinzel', serif; font-size: 11px;
     font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
     border-radius: 3px; cursor: pointer; transition: all 0.2s;
   }
-  .btn-novo:hover { background: var(--gold); color: var(--shadow); }
-  .btn-deletar { border-color: var(--blood); color: #c47a5a; }
-  .btn-deletar:hover { background: var(--blood); color: var(--parchment); }
+  .btn:hover { background: var(--gold); color: var(--shadow); }
+  .btn.danger { border-color: var(--blood); color: #c47a5a; }
+  .btn.danger:hover { background: var(--blood); color: var(--parchment); }
+  .btn.primary {
+    background: linear-gradient(to bottom, var(--gold), #6a4f0e);
+    border-color: var(--gold-bright); color: var(--shadow);
+  }
+  .btn.primary:hover { background: linear-gradient(to bottom, var(--gold-bright), var(--gold)); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-  /* Card ficha */
-  .ficha {
+  /* ESTRELA "ATIVO" */
+  .estrela-ativo {
+    background: transparent; border: 1px solid rgba(139,105,20,0.4);
+    color: var(--parchment-dim); font-size: 18px; line-height: 1;
+    padding: 8px 12px; border-radius: 3px; cursor: pointer;
+    transition: all 0.2s; min-width: 42px; min-height: 42px;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    font-family: 'Cinzel', serif;
+  }
+  .estrela-ativo .lbl { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; }
+  .estrela-ativo:hover { border-color: var(--gold-bright); color: var(--gold-bright); }
+  .estrela-ativo.ativo {
+    background: linear-gradient(to bottom, var(--gold), #6a4f0e);
+    color: var(--shadow); border-color: var(--gold-bright);
+    box-shadow: 0 0 12px rgba(212,168,67,0.4);
+  }
+
+  /* ============ TABS ============ */
+  .tabs {
+    display: flex; gap: 4px; margin-bottom: 0;
+    border-bottom: 1px solid rgba(139,105,20,0.4);
+    overflow-x: auto; scrollbar-width: thin;
+  }
+  .tab {
+    padding: 11px 18px; background: transparent;
+    border: none; border-bottom: 2px solid transparent;
+    color: var(--parchment-dim); font-family: 'Cinzel', serif;
+    font-size: 11px; font-weight: 600; letter-spacing: 1px;
+    text-transform: uppercase; cursor: pointer;
+    transition: all 0.15s; white-space: nowrap;
+  }
+  .tab:hover { color: var(--gold-bright); }
+  .tab.ativa { color: var(--gold-bright); border-bottom-color: var(--gold-bright); }
+  .tab:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: -2px; }
+
+  .tab-content {
     background: linear-gradient(160deg, var(--bg-card) 0%, var(--bg-card-soft) 100%);
-    border: 1px solid rgba(139,105,20,0.5);
-    border-radius: 4px;
+    border: 1px solid rgba(139,105,20,0.4);
+    border-top: none;
+    border-radius: 0 0 4px 4px;
     padding: 22px;
-    box-shadow: 0 6px 24px rgba(0,0,0,0.5);
   }
-  .ficha h2 {
-    font-family: 'Cinzel Decorative', serif;
-    color: var(--gold-bright); font-size: 18px;
-    margin: 22px 0 12px; padding-bottom: 6px;
+
+  /* ============ CAMPOS ============ */
+  h3 {
+    font-family: 'Cinzel Decorative', serif; color: var(--gold-bright);
+    font-size: 16px; letter-spacing: 1px;
+    margin: 18px 0 12px; padding-bottom: 5px;
     border-bottom: 1px solid rgba(139,105,20,0.3);
-    letter-spacing: 1px;
   }
-  .ficha h2:first-of-type { margin-top: 0; }
+  h3:first-of-type { margin-top: 0; }
 
   .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 18px; }
   .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
   .grid-6 { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
-  @media (max-width: 700px) {
-    .grid-2, .grid-3 { grid-template-columns: 1fr; }
-    .grid-6 { grid-template-columns: repeat(3, 1fr); }
-  }
 
   .campo label {
-    display: block;
-    font-family: 'Cinzel', serif; font-size: 10px;
+    display: block; font-family: 'Cinzel', serif; font-size: 10px;
     color: var(--gold); letter-spacing: 1.5px;
     text-transform: uppercase; margin-bottom: 4px;
   }
   .campo input, .campo select, .campo textarea {
-    width: 100%;
-    background: rgba(255,255,255,0.03);
-    border: 1px solid rgba(139,105,20,0.3);
-    color: var(--parchment);
+    width: 100%; background: var(--bg-input);
+    border: 1px solid rgba(139,105,20,0.3); color: var(--parchment);
     font-family: 'EB Garamond', serif; font-size: 14px;
-    padding: 7px 10px; border-radius: 3px; outline: none;
-    transition: border-color 0.15s;
+    padding: 8px 11px; border-radius: 3px; outline: none;
+    transition: border-color 0.15s, background 0.15s;
   }
   .campo input:focus, .campo select:focus, .campo textarea:focus {
-    border-color: var(--gold-bright); background: rgba(255,255,255,0.06);
+    border-color: var(--gold-bright); background: rgba(255,255,255,0.07);
   }
-  .campo textarea { min-height: 60px; resize: vertical; }
-  .campo input[type="number"] { -moz-appearance: textfield; }
+  .campo input.erro, .campo select.erro, .campo textarea.erro {
+    border-color: var(--erro); background: rgba(139,29,29,0.15);
+  }
+  .campo textarea { min-height: 70px; resize: vertical; font-family: 'EB Garamond', serif; line-height: 1.5; }
+  .campo .ajuda { display: block; margin-top: 4px; font-size: 11px; font-style: italic; color: var(--text-dim); }
+  .campo .erro-msg { display: none; margin-top: 4px; font-size: 11px; color: var(--erro); }
+  .campo.tem-erro .erro-msg { display: block; }
+  .campo select option { background: #1a1018; color: var(--parchment); }
 
+  /* ============ ATRIBUTOS (modificador em cima) ============ */
   .atributo {
     text-align: center;
-    background: rgba(0,0,0,0.25);
-    border: 1px solid rgba(139,105,20,0.4);
-    border-radius: 4px;
-    padding: 10px 6px;
+    background: rgba(0,0,0,0.3); border: 1px solid rgba(139,105,20,0.4);
+    border-radius: 6px; padding: 12px 6px;
+    display: flex; flex-direction: column; gap: 6px;
   }
-  .atributo label { font-size: 10px; }
-  .atributo input {
-    width: 100%; text-align: center;
-    background: transparent; border: none;
-    color: var(--gold-bright); font-size: 22px;
-    font-family: 'Cinzel', serif; font-weight: 700;
-    margin: 4px 0;
+  .atributo .nome-atr {
+    font-family: 'Cinzel', serif; font-size: 10px;
+    color: var(--gold); letter-spacing: 1.5px; text-transform: uppercase;
   }
-  .mod {
-    display: block; color: var(--parchment-dim);
-    font-size: 13px; font-family: 'Cinzel', serif;
+  .atributo .modificador {
+    font-family: 'Cinzel Decorative', serif; font-weight: 900;
+    color: var(--gold-bright); font-size: 28px; line-height: 1;
+    background: linear-gradient(180deg, rgba(184,138,44,0.12), transparent);
+    padding: 6px 0; border-radius: 4px;
+    text-shadow: 0 0 12px rgba(184,138,44,0.3);
   }
+  .atributo .valor-base {
+    background: transparent; border: 1px solid rgba(139,105,20,0.3);
+    color: var(--parchment); font-family: 'Cinzel', serif;
+    font-size: 15px; font-weight: 600; text-align: center;
+    padding: 4px 6px; border-radius: 3px; width: 100%;
+  }
+  .atributo .valor-base:focus { outline: 1px solid var(--gold-bright); }
 
-  .slot-linha {
-    display: grid;
-    grid-template-columns: 40px 1fr 1fr;
-    gap: 8px; align-items: center;
-    padding: 4px 0;
-  }
-  .slot-linha .lvl { font-family: 'Cinzel', serif; color: var(--gold); font-size: 12px; }
-
+  /* ============ AÇÕES ============ */
   .acoes {
     display: flex; justify-content: flex-end; gap: 10px;
     margin-top: 24px; padding-top: 18px;
     border-top: 1px solid rgba(139,105,20,0.3);
+    align-items: center; flex-wrap: wrap;
   }
-  .btn-salvar {
-    padding: 11px 28px;
-    background: linear-gradient(to bottom, var(--gold), #6a4f0e);
-    border: 1px solid var(--gold-bright); color: var(--shadow);
-    font-family: 'Cinzel', serif; font-size: 12px;
-    font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
-    border-radius: 2px; cursor: pointer; transition: all 0.2s;
-  }
-  .btn-salvar:hover { background: linear-gradient(to bottom, var(--gold-bright), var(--gold)); }
-  .btn-salvar:disabled { opacity: 0.6; cursor: wait; }
+  .status-msg { margin-right: auto; font-size: 13px; font-style: italic; color: var(--text-dim); }
+  .status-msg.ok    { color: var(--ok); }
+  .status-msg.erro  { color: var(--erro); }
 
-  .status-msg {
-    margin-right: auto;
-    font-size: 13px; font-style: italic;
-    color: var(--text-dim);
+  /* ============ EQUIPAMENTO ============ */
+  .moedas { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 18px; }
+  .moeda-box {
+    background: rgba(0,0,0,0.3); border: 1px solid rgba(139,105,20,0.4);
+    border-radius: 4px; padding: 10px 6px; text-align: center;
   }
-  .status-msg.ok    { color: #8fc28f; }
-  .status-msg.erro  { color: #e88a8a; }
+  .moeda-box label { font-family: 'Cinzel', serif; font-size: 11px; color: var(--gold); letter-spacing: 1px; }
+  .moeda-box input { width: 100%; background: transparent; border: none; color: var(--gold-bright);
+    font-family: 'Cinzel', serif; font-size: 18px; font-weight: 700; text-align: center; margin-top: 4px; outline: none; }
+  .moeda-box input:focus { background: rgba(255,255,255,0.08); border-radius: 3px; }
 
+  .item-tabela {
+    width: 100%; border-collapse: collapse; margin-top: 10px;
+    background: rgba(0,0,0,0.15); border-radius: 4px; overflow: hidden;
+  }
+  .item-tabela th, .item-tabela td {
+    padding: 8px 10px; text-align: left; font-size: 13px;
+    border-bottom: 1px solid rgba(139,105,20,0.2);
+  }
+  .item-tabela th {
+    background: rgba(139,105,20,0.18); color: var(--gold-bright);
+    font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+  }
+  .item-tabela tr:last-child td { border-bottom: none; }
+  .item-tabela .lixo {
+    background: transparent; border: 1px solid rgba(139,29,29,0.4); color: #c47a5a;
+    padding: 3px 8px; border-radius: 2px; cursor: pointer; font-size: 12px;
+    transition: all 0.15s;
+  }
+  .item-tabela .lixo:hover { background: var(--blood); color: var(--parchment); }
+  .item-vazio { padding: 18px; text-align: center; color: var(--text-dim); font-style: italic; }
+
+  .adicionar-bloco { display: flex; gap: 8px; align-items: end; margin-top: 14px; flex-wrap: wrap; }
+  .adicionar-bloco .campo { flex: 1; min-width: 160px; margin: 0; }
+
+  /* ============ MAGIAS PREPARADAS ============ */
+  .magias-lista { display: flex; flex-direction: column; gap: 6px; }
+  .magia-row {
+    display: grid; grid-template-columns: 60px 1fr 100px 100px;
+    gap: 10px; align-items: center;
+    background: rgba(0,0,0,0.2); padding: 8px 12px;
+    border: 1px solid rgba(139,105,20,0.25); border-radius: 3px;
+  }
+  .magia-row:hover { border-color: rgba(139,105,20,0.5); }
+  .magia-nivel { font-family: 'Cinzel', serif; font-weight: 700; color: var(--gold-bright); font-size: 13px; }
+  .magia-nome  { color: var(--parchment); font-size: 14px; }
+  .magia-escola { font-size: 11px; color: var(--text-dim); font-style: italic; }
+  .magia-tags  { display: flex; gap: 4px; flex-wrap: wrap; }
+  .magia-tags span {
+    font-size: 9px; padding: 2px 6px; border-radius: 2px;
+    background: rgba(139,29,29,0.3); color: #c47a5a;
+    font-family: 'Cinzel', serif; letter-spacing: 0.5px;
+  }
+
+  /* ============ HABILIDADES ============ */
+  .habilidade-card {
+    background: rgba(0,0,0,0.2); border: 1px solid rgba(139,105,20,0.3);
+    border-radius: 4px; padding: 12px 14px; margin-bottom: 10px;
+  }
+  .habilidade-card h4 {
+    font-family: 'Cinzel', serif; color: var(--gold-bright);
+    font-size: 13px; margin-bottom: 6px;
+  }
+  .habilidade-card p { font-size: 13px; line-height: 1.55; color: var(--parchment); }
+
+  /* ============ RESPONSIVIDADE ============ */
+  @media (max-width: 800px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    .grid-6 { grid-template-columns: repeat(3, 1fr); }
+    .moedas { grid-template-columns: repeat(2, 1fr); }
+    .magia-row { grid-template-columns: 50px 1fr; row-gap: 4px; }
+    .magia-escola, .magia-tags { grid-column: 2; }
+  }
+  @media (max-width: 480px) {
+    main { padding: 0 8px 30px; }
+    .tab-content { padding: 16px; }
+    .char-bar { padding: 10px; }
+    .char-bar select { font-size: 14px; }
+    .grid-6 { grid-template-columns: repeat(2, 1fr); }
+    .atributo .modificador { font-size: 24px; }
+  }
   *:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 2px; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; }
+  }
 </style>
 </head>
 <body>
 
 <header class="site-header">
   <a href="../index.html" class="back-btn">← Voltar</a>
-  <div class="header-title">Minha Ficha</div>
+  <div class="header-title" id="hdr-titulo">Minha Ficha</div>
   <div class="auth-slot" id="auth-slot" aria-label="Status de login"></div>
 </header>
 
@@ -218,8 +333,10 @@
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script src="../assets/js/supabase.js"></script>
 <script src="../assets/js/auth.js"></script>
+<script src="../assets/js/phb_catalogo.js"></script>
 <script>
 const $ = sel => document.querySelector(sel);
+const $$ = sel => document.querySelectorAll(sel);
 
 const RACAS = ['','Anão','Elfo','Halfling','Humano','Draconato','Gnomo','Meio-Elfo','Meio-Orc','Tiefling'];
 const CLASSES = ['','Bárbaro','Bardo','Bruxo','Clérigo','Druida','Feiticeiro','Guerreiro','Ladino','Mago','Monge','Paladino','Patrulheiro'];
@@ -229,18 +346,31 @@ const ATRIBUTOS = [['for','Força'],['dex','Destreza'],['con','Constituição'],
 const mod = v => Math.floor(((+v||10) - 10) / 2);
 const fmtMod = m => (m >= 0 ? '+' : '') + m;
 
-let usuario  = null;
-let chars    = [];
+let usuario = null;
+let chars = [];
 let charAtivo = null;
+let tabAtiva = 'identidade';
+
+// Cache de favoritas (para a aba Magias Preparadas) — vem do localStorage do grimório
+function carregarFavoritasDoGrimorio() {
+  try { return new Set(JSON.parse(localStorage.getItem('grimorio-favoritas-v1') || '[]')); }
+  catch { return new Set(); }
+}
+
+// Catálogo de magias (carrega só quando necessário)
+let magiasCache = null;
+async function carregarMagiasCache() {
+  if (magiasCache) return magiasCache;
+  try {
+    const r = await fetch('../data/magias_data.json');
+    magiasCache = await r.json();
+    return magiasCache;
+  } catch { return []; }
+}
 
 async function init() {
   usuario = await window.Auth.requerLogin('login.html');
-  if (!usuario) return;  // redirecionou
-  const mestre = await window.Auth.ehMestre();
-  if (mestre) {
-    location.replace('../index.html');
-    return;
-  }
+  if (!usuario) return;
   await window.Auth.renderHeader('#auth-slot');
   await carregarPersonagens();
 }
@@ -256,18 +386,17 @@ async function carregarPersonagens() {
   }
   chars = data || [];
   if (!chars.length) {
-    await criarPersonagem('Meu Personagem');
+    await criarPersonagem('Meu Personagem', true);  // novo PJ já ativo
     return;
   }
   charAtivo = chars[0];
   render();
 }
 
-async function criarPersonagem(nome) {
-  const { data, error } = await window.sb
-    .from('characters')
-    .insert({ user_id: usuario.id, nome: nome || 'Novo Personagem', campanha: 'barovia' })
-    .select('*').single();
+async function criarPersonagem(nome, jaAtivo = false) {
+  const payload = { user_id: usuario.id, nome: nome || 'Novo Personagem' };
+  if (jaAtivo) payload.is_active = true;
+  const { data, error } = await window.sb.from('characters').insert(payload).select('*').single();
   if (error) { alert('Erro ao criar personagem: ' + error.message); return; }
   chars.push(data);
   charAtivo = data;
@@ -280,7 +409,18 @@ async function deletarPersonagem(id) {
   if (error) { alert('Erro ao deletar: ' + error.message); return; }
   chars = chars.filter(c => c.id !== id);
   charAtivo = chars[0] || null;
-  if (!charAtivo) { await criarPersonagem('Meu Personagem'); return; }
+  if (!charAtivo) { await criarPersonagem('Meu Personagem', true); return; }
+  render();
+}
+
+async function alternarAtivo() {
+  const novo = !charAtivo.is_active;
+  const { error } = await window.sb
+    .from('characters').update({ is_active: novo }).eq('id', charAtivo.id);
+  if (error) { alert('Erro: ' + error.message); return; }
+  // Trigger no banco desativa os outros do mesmo user
+  charAtivo.is_active = novo;
+  if (novo) chars = chars.map(c => ({ ...c, is_active: c.id === charAtivo.id }));
   render();
 }
 
@@ -288,168 +428,507 @@ function escape(s) {
   return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 
+// Parser de número com vírgula PT-BR (10,5 → 10.5)
+function parseNum(txt, opts = {}) {
+  if (txt === null || txt === undefined || txt === '') return opts.padrao ?? 0;
+  const s = String(txt).replace(',', '.').trim();
+  if (!/^-?\d+(\.\d+)?$/.test(s)) return null;
+  const n = parseFloat(s);
+  if (opts.min !== undefined && n < opts.min) return null;
+  if (opts.max !== undefined && n > opts.max) return null;
+  if (opts.inteiro && !Number.isInteger(n)) return null;
+  return n;
+}
+
 function render() {
   const c = charAtivo;
   const atrs = c.atributos || {for:10,dex:10,con:10,int:10,sab:10,car:10};
-  const slots = c.slots_magia || {};
+
+  const titulo = `${c.nome || 'Sem nome'}${c.classe ? ' · ' + c.classe : ''}${c.nivel ? ' (Nv ' + c.nivel + ')' : ''}`;
+  $('#hdr-titulo').textContent = titulo;
 
   $('#conteudo').innerHTML = `
     <div class="char-bar">
-      <label for="sel-char" style="font-family:'Cinzel',serif;font-size:11px;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase">Personagem</label>
-      <select id="sel-char">
-        ${chars.map(x => `<option value="${x.id}" ${x.id===c.id?'selected':''}>${escape(x.nome)}${x.classe ? ' — ' + escape(x.classe) + (x.nivel ? ' N' + x.nivel : '') : ''}</option>`).join('')}
+      <span class="pj-label">Personagem</span>
+      <select id="sel-char" aria-label="Selecionar personagem">
+        ${chars.map(x => `<option value="${x.id}" ${x.id===c.id?'selected':''}>${escape(x.nome)}${x.classe ? ' — ' + escape(x.classe) : ''}${x.nivel ? ' N' + x.nivel : ''}${x.is_active?' ★':''}</option>`).join('')}
       </select>
-      <button class="btn-novo" type="button" id="btn-novo">+ Novo</button>
-      <button class="btn-deletar" type="button" id="btn-deletar">Deletar</button>
+      <button class="estrela-ativo ${c.is_active?'ativo':''}" id="btn-ativo" type="button" aria-pressed="${!!c.is_active}" title="Marcar como personagem ativo (visível ao Mestre)">
+        <span aria-hidden="true">${c.is_active?'★':'☆'}</span>
+        <span class="lbl">${c.is_active?'Ativo':'Ativar'}</span>
+      </button>
+      <button class="btn" type="button" id="btn-novo">+ Novo</button>
+      <button class="btn danger" type="button" id="btn-deletar">Deletar</button>
     </div>
 
-    <form class="ficha" id="ficha-form">
-      <h2>Identidade</h2>
-      <div class="grid-2">
-        <div class="campo"><label>Nome do Personagem</label><input name="nome" value="${escape(c.nome)}" required></div>
-        <div class="campo"><label>Nível</label><input name="nivel" type="number" min="1" max="20" value="${c.nivel||1}"></div>
-        <div class="campo"><label>Raça</label><select name="raca">${RACAS.map(r => `<option ${r===c.raca?'selected':''}>${r}</option>`).join('')}</select></div>
-        <div class="campo"><label>Classe</label><select name="classe">${CLASSES.map(cl => `<option ${cl===c.classe?'selected':''}>${cl}</option>`).join('')}</select></div>
-        <div class="campo"><label>Subclasse</label><input name="subclasse" value="${escape(c.subclasse||'')}"></div>
-        <div class="campo"><label>Origem (Background)</label><input name="origem" value="${escape(c.origem||'')}"></div>
-        <div class="campo"><label>Alinhamento</label><select name="alinhamento">${ALINHAMENTOS.map(a => `<option ${a===c.alinhamento?'selected':''}>${a}</option>`).join('')}</select></div>
-      </div>
+    <div class="tabs" role="tablist">
+      <button class="tab ${tabAtiva==='identidade'?'ativa':''}" data-tab="identidade" role="tab">Identidade</button>
+      <button class="tab ${tabAtiva==='combate'?'ativa':''}" data-tab="combate" role="tab">Combate</button>
+      <button class="tab ${tabAtiva==='magias'?'ativa':''}" data-tab="magias" role="tab">Magias</button>
+      <button class="tab ${tabAtiva==='equipamento'?'ativa':''}" data-tab="equipamento" role="tab">Equipamento</button>
+      <button class="tab ${tabAtiva==='roleplay'?'ativa':''}" data-tab="roleplay" role="tab">Roleplay</button>
+    </div>
 
-      <h2>Atributos</h2>
-      <div class="grid-6">
-        ${ATRIBUTOS.map(([k,nome]) => `
-          <div class="atributo">
-            <label>${nome.slice(0,3).toUpperCase()}</label>
-            <input type="number" name="attr_${k}" min="1" max="30" value="${atrs[k] ?? 10}" data-attr="${k}">
-            <span class="mod" data-mod="${k}">${fmtMod(mod(atrs[k]))}</span>
-          </div>
-        `).join('')}
-      </div>
-
-      <h2>Combate</h2>
-      <div class="grid-3">
-        <div class="campo"><label>PV Atual</label><input name="hp_atual" type="number" value="${c.hp_atual ?? 10}"></div>
-        <div class="campo"><label>PV Máximo</label><input name="hp_max" type="number" min="0" value="${c.hp_max ?? 10}"></div>
-        <div class="campo"><label>PV Temporários</label><input name="hp_temp" type="number" min="0" value="${c.hp_temp ?? 0}"></div>
-        <div class="campo"><label>CA</label><input name="ca" type="number" value="${c.ca ?? 10}"></div>
-        <div class="campo"><label>Iniciativa (bônus)</label><input name="iniciativa_bonus" type="number" value="${c.iniciativa_bonus ?? 0}"></div>
-        <div class="campo"><label>Deslocamento (m)</label><input name="deslocamento" type="number" value="${c.deslocamento ?? 9}"></div>
-        <div class="campo"><label>Dado de Vida</label>
-          <select name="dado_vida_tipo">
-            ${[6,8,10,12].map(d => `<option value="${d}" ${d===(c.dado_vida_tipo||8)?'selected':''}>d${d}</option>`).join('')}
-          </select>
-        </div>
-        <div class="campo"><label>Dados de Vida Restantes</label><input name="dado_vida_atual" type="number" min="0" value="${c.dado_vida_atual ?? 1}"></div>
-        <div class="campo"><label>Exaustão (0–6)</label><input name="exaustao" type="number" min="0" max="6" value="${c.exaustao ?? 0}"></div>
-      </div>
-
-      <h2>Espaços de Magia</h2>
-      <div id="slots">
-        ${[1,2,3,4,5,6,7,8,9].map(n => {
-          const s = slots[n] || {max:0,used:0};
-          return `<div class="slot-linha">
-            <span class="lvl">${n}°</span>
-            <div class="campo"><label>Máximo</label><input type="number" min="0" name="slot_${n}_max" value="${s.max}"></div>
-            <div class="campo"><label>Usados</label><input type="number" min="0" name="slot_${n}_used" value="${s.used}"></div>
-          </div>`;
-        }).join('')}
-      </div>
-
-      <h2>Roleplay</h2>
-      <div class="grid-2">
-        <div class="campo"><label>Traços de Personalidade</label><textarea name="tracos_pessoais">${escape(c.tracos_pessoais||'')}</textarea></div>
-        <div class="campo"><label>Ideais</label><textarea name="ideais">${escape(c.ideais||'')}</textarea></div>
-        <div class="campo"><label>Vínculos</label><textarea name="vinculos">${escape(c.vinculos||'')}</textarea></div>
-        <div class="campo"><label>Defeitos</label><textarea name="defeitos">${escape(c.defeitos||'')}</textarea></div>
-      </div>
-
-      <h2>História e Notas</h2>
-      <div class="campo" style="margin-bottom:12px"><label>História</label><textarea name="historia" style="min-height:90px">${escape(c.historia||'')}</textarea></div>
-      <div class="campo"><label>Notas</label><textarea name="notas" style="min-height:60px">${escape(c.notas||'')}</textarea></div>
-
+    <form class="tab-content" id="ficha-form" novalidate>
+      ${renderTab(c, atrs)}
       <div class="acoes">
         <span class="status-msg" id="status"></span>
-        <button class="btn-salvar" type="submit" id="btn-salvar">💾 Salvar</button>
+        <button class="btn primary" type="submit" id="btn-salvar">💾 Salvar</button>
       </div>
     </form>
   `;
 
-  $('#sel-char').addEventListener('change', e => {
-    charAtivo = chars.find(x => x.id === e.target.value);
+  conectarListeners();
+}
+
+function renderTab(c, atrs) {
+  switch (tabAtiva) {
+    case 'identidade':  return renderIdentidade(c, atrs);
+    case 'combate':     return renderCombate(c);
+    case 'magias':      return renderMagias(c);
+    case 'equipamento': return renderEquipamento(c);
+    case 'roleplay':    return renderRoleplay(c);
+  }
+}
+
+function renderIdentidade(c, atrs) {
+  return `
+    <h3>Identidade</h3>
+    <div class="grid-2">
+      <div class="campo"><label>Nome do Personagem</label>
+        <input name="nome" value="${escape(c.nome)}" required></div>
+      <div class="campo"><label>Nível (1–20)</label>
+        <input name="nivel" type="text" inputmode="numeric" value="${c.nivel||1}" data-validar="int" data-min="1" data-max="20">
+        <span class="erro-msg">Nível inválido (1–20)</span></div>
+      <div class="campo"><label>Raça</label>
+        <select name="raca">${RACAS.map(r => `<option ${r===c.raca?'selected':''}>${r}</option>`).join('')}</select></div>
+      <div class="campo"><label>Classe</label>
+        <select name="classe">${CLASSES.map(cl => `<option ${cl===c.classe?'selected':''}>${cl}</option>`).join('')}</select></div>
+      <div class="campo"><label>Subclasse</label>
+        <input name="subclasse" value="${escape(c.subclasse||'')}">
+        <span class="ajuda">Ex.: Domínio da Vida, Caminho do Bárbaro Berserker</span></div>
+      <div class="campo"><label>Origem (Background)</label>
+        <input name="origem" value="${escape(c.origem||'')}"></div>
+      <div class="campo"><label>Alinhamento</label>
+        <select name="alinhamento">${ALINHAMENTOS.map(a => `<option ${a===c.alinhamento?'selected':''}>${a}</option>`).join('')}</select></div>
+    </div>
+
+    <h3>Atributos</h3>
+    <div class="grid-6">
+      ${ATRIBUTOS.map(([k, nome]) => `
+        <div class="atributo">
+          <span class="nome-atr">${nome.slice(0,3).toUpperCase()}</span>
+          <span class="modificador" data-mod="${k}">${fmtMod(mod(atrs[k]))}</span>
+          <input type="text" inputmode="numeric" class="valor-base" name="attr_${k}" value="${atrs[k] ?? 10}" data-attr="${k}" data-validar="int" data-min="1" data-max="30" aria-label="${nome} (valor base 1-30)">
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+
+function renderCombate(c) {
+  const slots = c.slots_magia || {};
+  return `
+    <h3>Combate</h3>
+    <div class="grid-3">
+      <div class="campo"><label>PV Atual</label>
+        <input name="hp_atual" type="text" inputmode="numeric" value="${c.hp_atual ?? 10}" data-validar="int">
+        <span class="erro-msg">Use apenas números inteiros</span></div>
+      <div class="campo"><label>PV Máximo</label>
+        <input name="hp_max" type="text" inputmode="numeric" value="${c.hp_max ?? 10}" data-validar="int" data-min="0">
+        <span class="erro-msg">PV Máximo deve ser ≥ 0</span></div>
+      <div class="campo"><label>PV Temporários</label>
+        <input name="hp_temp" type="text" inputmode="numeric" value="${c.hp_temp ?? 0}" data-validar="int" data-min="0">
+        <span class="erro-msg">Não pode ser negativo</span></div>
+      <div class="campo"><label>CA</label>
+        <input name="ca" type="text" inputmode="numeric" value="${c.ca ?? 10}" data-validar="int">
+        <span class="erro-msg">Use apenas números inteiros</span></div>
+      <div class="campo"><label>Iniciativa (bônus)</label>
+        <input name="iniciativa_bonus" type="text" inputmode="numeric" value="${c.iniciativa_bonus ?? 0}" data-validar="int">
+        <span class="erro-msg">Use apenas números inteiros</span></div>
+      <div class="campo"><label>Deslocamento (metros)</label>
+        <input name="deslocamento" type="text" inputmode="decimal" value="${c.deslocamento ?? 9}" data-validar="num" data-min="0">
+        <span class="ajuda">Aceita decimais (ex.: 10,5)</span>
+        <span class="erro-msg">Use número (ex.: 9 ou 10,5)</span></div>
+      <div class="campo"><label>Dado de Vida</label>
+        <select name="dado_vida_tipo">${[6,8,10,12].map(d => `<option value="${d}" ${d===(c.dado_vida_tipo||8)?'selected':''}>d${d}</option>`).join('')}</select></div>
+      <div class="campo"><label>Dados de Vida Restantes</label>
+        <input name="dado_vida_atual" type="text" inputmode="numeric" value="${c.dado_vida_atual ?? 1}" data-validar="int" data-min="0">
+        <span class="erro-msg">Não pode ser negativo</span></div>
+      <div class="campo"><label>Exaustão (0–6)</label>
+        <input name="exaustao" type="text" inputmode="numeric" value="${c.exaustao ?? 0}" data-validar="int" data-min="0" data-max="6">
+        <span class="erro-msg">Exaustão vai de 0 a 6</span></div>
+    </div>
+
+    <h3>Espaços de Magia</h3>
+    <div id="slots-wrap">
+      ${[1,2,3,4,5,6,7,8,9].map(n => {
+        const s = slots[n] || {max:0,used:0};
+        return `<div style="display:grid;grid-template-columns:40px 1fr 1fr;gap:8px;align-items:center;padding:4px 0">
+          <span style="font-family:'Cinzel',serif;color:var(--gold);font-size:12px">${n}°</span>
+          <div class="campo" style="margin:0"><label>Máximo</label>
+            <input type="text" inputmode="numeric" name="slot_${n}_max" value="${s.max}" data-validar="int" data-min="0"></div>
+          <div class="campo" style="margin:0"><label>Usados</label>
+            <input type="text" inputmode="numeric" name="slot_${n}_used" value="${s.used}" data-validar="int" data-min="0"></div>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+}
+
+function renderMagias(c) {
+  // Aba que carrega assincronamente (cards das favoritas)
+  return `
+    <h3>Magias Preparadas</h3>
+    <p style="color:var(--text-dim);font-style:italic;margin-bottom:14px">
+      Aparecem aqui as magias marcadas como favoritas no <a href="magias.html" style="color:var(--gold-bright)">Grimório</a>.
+    </p>
+    <div id="magias-prep">Carregando…</div>
+  `;
+}
+
+async function carregarMagiasPreparadas() {
+  const wrap = document.getElementById('magias-prep');
+  if (!wrap) return;
+  const favSet = carregarFavoritasDoGrimorio();
+  if (!favSet.size) {
+    wrap.innerHTML = `<div class="item-vazio">Nenhuma magia favoritada. Abra o <a href="magias.html" style="color:var(--gold-bright)">Grimório</a> e clique na estrela ☆ das magias que seu personagem prepara.</div>`;
+    return;
+  }
+  const todas = await carregarMagiasCache();
+  const lista = todas.filter(m => favSet.has(m.nome))
+    .sort((a,b) => a.nivel - b.nivel || a.nome.localeCompare(b.nome, 'pt'));
+  if (!lista.length) { wrap.innerHTML = `<div class="item-vazio">Nenhuma magia encontrada.</div>`; return; }
+  wrap.innerHTML = `<div class="magias-lista">${lista.map(m => {
+    const nv = m.nivel === 0 ? 'Truque' : `${m.nivel}°`;
+    const tags = [m.ritual?'<span>Ritual</span>':'', m.concentracao?'<span>Conc.</span>':''].filter(Boolean).join('');
+    return `<div class="magia-row">
+      <span class="magia-nivel">${nv}</span>
+      <span class="magia-nome">${escape(m.nome)}</span>
+      <span class="magia-escola">${escape(m.escola)}</span>
+      <span class="magia-tags">${tags}</span>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function renderEquipamento(c) {
+  const inv = c.inventario || { moedas:{po:0,pp:0,pe:0,pc:0,pl:0}, armas:[], armaduras:[], itens:[] };
+  const m = inv.moedas || {};
+
+  return `
+    <h3>Moedas</h3>
+    <div class="moedas">
+      ${window.PHB.MOEDAS.map(md => `<div class="moeda-box">
+        <label>${md.abrev}</label>
+        <input type="text" inputmode="numeric" name="moeda_${md.codigo}" value="${m[md.codigo] ?? 0}" data-validar="int" data-min="0" aria-label="${md.nome}">
+      </div>`).join('')}
+    </div>
+    <p style="color:var(--text-dim);font-size:12px;font-style:italic;margin-bottom:18px">
+      Conversão: 10 PC = 1 PP · 5 PP = 1 PE · 2 PE = 1 PO · 10 PO = 1 PL
+    </p>
+
+    <h3>Armas <span style="font-size:12px;color:var(--text-dim);font-weight:normal;font-style:italic">(${inv.armas?.length || 0})</span></h3>
+    ${renderTabelaItens('armas', inv.armas || [], ['Nome', 'Dano', 'Tipo', 'Propriedades'], ['nome','dano','tipo_dano','propriedades'])}
+    <div class="adicionar-bloco">
+      <div class="campo"><label>Adicionar arma do catálogo</label>
+        <select id="add-arma"><option value="">— escolher —</option>${window.PHB.ARMAS.map(a => `<option value='${escape(JSON.stringify(a))}'>${escape(a.nome)} (${a.dano})</option>`).join('')}</select></div>
+      <button class="btn" type="button" id="btn-add-arma">+ Adicionar</button>
+    </div>
+
+    <h3>Armaduras <span style="font-size:12px;color:var(--text-dim);font-weight:normal;font-style:italic">(${inv.armaduras?.length || 0})</span></h3>
+    ${renderTabelaItens('armaduras', inv.armaduras || [], ['Nome', 'CA', 'Tipo', 'Força mín.'], ['nome','ca','tipo','forca'])}
+    <div class="adicionar-bloco">
+      <div class="campo"><label>Adicionar armadura do catálogo</label>
+        <select id="add-armadura"><option value="">— escolher —</option>${window.PHB.ARMADURAS.map(a => `<option value='${escape(JSON.stringify(a))}'>${escape(a.nome)} (CA ${a.ca})</option>`).join('')}</select></div>
+      <button class="btn" type="button" id="btn-add-armadura">+ Adicionar</button>
+    </div>
+
+    <h3>Itens e Equipamento <span style="font-size:12px;color:var(--text-dim);font-weight:normal;font-style:italic">(${inv.itens?.length || 0})</span></h3>
+    ${renderTabelaItens('itens', inv.itens || [], ['Nome', 'Qtd', 'Peso (kg)'], ['nome','qtd','peso'])}
+    <div class="adicionar-bloco">
+      <div class="campo"><label>Item do catálogo</label>
+        <select id="add-item-catalogo"><option value="">— escolher do PHB —</option>${[...window.PHB.ITENS, ...window.PHB.FERRAMENTAS].map(it => `<option value='${escape(JSON.stringify(it))}'>${escape(it.nome)}</option>`).join('')}</select></div>
+      <div class="campo" style="max-width:80px"><label>Qtd</label><input type="text" inputmode="numeric" id="add-item-qtd" value="1"></div>
+      <button class="btn" type="button" id="btn-add-item-cat">+ Adicionar</button>
+    </div>
+    <div class="adicionar-bloco" style="margin-top:6px">
+      <div class="campo"><label>Ou item personalizado</label><input type="text" id="add-item-nome" placeholder="Nome do item"></div>
+      <div class="campo" style="max-width:80px"><label>Qtd</label><input type="text" inputmode="numeric" id="add-item-qtd-custom" value="1"></div>
+      <button class="btn" type="button" id="btn-add-item-custom">+ Adicionar</button>
+    </div>
+  `;
+}
+
+function renderTabelaItens(tipo, itens, colunas, campos) {
+  if (!itens.length) return `<div class="item-vazio">Nenhum ${tipo === 'armas' ? 'arma' : (tipo === 'armaduras' ? 'armadura' : 'item')}. Adicione abaixo.</div>`;
+  return `<table class="item-tabela">
+    <thead><tr>${colunas.map(c => `<th>${c}</th>`).join('')}<th></th></tr></thead>
+    <tbody>${itens.map((it, idx) => `
+      <tr>${campos.map(f => `<td>${escape(it[f] ?? '—')}</td>`).join('')}
+      <td style="text-align:right"><button type="button" class="lixo" data-rm="${tipo}" data-idx="${idx}" aria-label="Remover">✕</button></td></tr>
+    `).join('')}</tbody>
+  </table>`;
+}
+
+function renderRoleplay(c) {
+  return `
+    <h3>Roleplay</h3>
+    <div class="grid-2">
+      <div class="campo"><label>Traços de Personalidade</label>
+        <textarea name="tracos_pessoais">${escape(c.tracos_pessoais||'')}</textarea></div>
+      <div class="campo"><label>Ideais</label>
+        <textarea name="ideais">${escape(c.ideais||'')}</textarea></div>
+      <div class="campo"><label>Vínculos</label>
+        <textarea name="vinculos">${escape(c.vinculos||'')}</textarea></div>
+      <div class="campo"><label>Defeitos</label>
+        <textarea name="defeitos">${escape(c.defeitos||'')}</textarea></div>
+    </div>
+    <h3>História e Notas</h3>
+    <div class="campo" style="margin-bottom:12px"><label>História</label>
+      <textarea name="historia" style="min-height:100px">${escape(c.historia||'')}</textarea></div>
+    <div class="campo"><label>Notas</label>
+      <textarea name="notas" style="min-height:70px">${escape(c.notas||'')}</textarea></div>
+  `;
+}
+
+function conectarListeners() {
+  // Trocar personagem
+  const sel = $('#sel-char');
+  if (sel) sel.addEventListener('change', e => {
+    charAtivo = chars.find(x => x.id === e.target.value) || chars[0];
     render();
   });
-  $('#btn-novo').addEventListener('click', async () => {
+  // Novo
+  const novoBtn = $('#btn-novo');
+  if (novoBtn) novoBtn.addEventListener('click', async () => {
     const nome = prompt('Nome do novo personagem:');
     if (nome) await criarPersonagem(nome);
   });
-  $('#btn-deletar').addEventListener('click', () => deletarPersonagem(charAtivo.id));
+  // Deletar
+  const delBtn = $('#btn-deletar');
+  if (delBtn) delBtn.addEventListener('click', () => deletarPersonagem(charAtivo.id));
+  // Estrela ativo
+  const ativoBtn = $('#btn-ativo');
+  if (ativoBtn) ativoBtn.addEventListener('click', alternarAtivo);
 
-  // Atualiza modificadores ao vivo
-  document.querySelectorAll('[data-attr]').forEach(inp => {
-    inp.addEventListener('input', () => {
-      const k = inp.dataset.attr;
-      document.querySelector(`[data-mod="${k}"]`).textContent = fmtMod(mod(inp.value));
-    });
+  // Tabs
+  $$('.tab').forEach(t => t.addEventListener('click', () => {
+    tabAtiva = t.dataset.tab;
+    render();
+    if (tabAtiva === 'magias') carregarMagiasPreparadas();
+  }));
+
+  // Modificadores ao vivo
+  $$('[data-attr]').forEach(inp => {
+    inp.addEventListener('input', () => validarEAtualizarMod(inp));
   });
 
-  $('#ficha-form').addEventListener('submit', salvar);
+  // Validação inline
+  $$('[data-validar]').forEach(inp => {
+    inp.addEventListener('input', () => validarCampo(inp));
+    inp.addEventListener('blur', () => validarCampo(inp));
+  });
+
+  // Carregar magias se já estiver na aba
+  if (tabAtiva === 'magias') carregarMagiasPreparadas();
+
+  // Botões de equipamento
+  if (tabAtiva === 'equipamento') conectarListenersEquipamento();
+
+  // Submit
+  const form = $('#ficha-form');
+  if (form) form.addEventListener('submit', salvar);
+}
+
+function validarCampo(inp) {
+  const tipo = inp.dataset.validar;
+  const min = inp.dataset.min !== undefined ? +inp.dataset.min : undefined;
+  const max = inp.dataset.max !== undefined ? +inp.dataset.max : undefined;
+  const valor = parseNum(inp.value, { inteiro: tipo === 'int', min, max });
+  const valido = valor !== null;
+  inp.classList.toggle('erro', !valido);
+  inp.closest('.campo')?.classList.toggle('tem-erro', !valido);
+  return valido;
+}
+
+function validarEAtualizarMod(inp) {
+  if (validarCampo(inp)) {
+    const k = inp.dataset.attr;
+    const v = parseNum(inp.value, { inteiro: true, min: 1, max: 30 });
+    if (v !== null) document.querySelector(`[data-mod="${k}"]`).textContent = fmtMod(mod(v));
+  }
+}
+
+function conectarListenersEquipamento() {
+  // Remover item
+  $$('[data-rm]').forEach(b => b.addEventListener('click', e => {
+    const tipo = e.currentTarget.dataset.rm;
+    const idx = +e.currentTarget.dataset.idx;
+    const inv = charAtivo.inventario || {};
+    if (!inv[tipo]) return;
+    inv[tipo].splice(idx, 1);
+    charAtivo.inventario = inv;
+    render();  // re-renderiza apenas a tab
+  }));
+
+  // Adicionar arma do catálogo
+  const btnArma = $('#btn-add-arma');
+  if (btnArma) btnArma.addEventListener('click', () => {
+    const sel = $('#add-arma');
+    if (!sel.value) return;
+    try {
+      const arma = JSON.parse(sel.value);
+      const inv = charAtivo.inventario || {};
+      inv.armas = inv.armas || [];
+      inv.armas.push(arma);
+      charAtivo.inventario = inv;
+      render();
+    } catch (e) { alert('Erro: ' + e.message); }
+  });
+
+  // Adicionar armadura
+  const btnArm = $('#btn-add-armadura');
+  if (btnArm) btnArm.addEventListener('click', () => {
+    const sel = $('#add-armadura');
+    if (!sel.value) return;
+    try {
+      const arm = JSON.parse(sel.value);
+      const inv = charAtivo.inventario || {};
+      inv.armaduras = inv.armaduras || [];
+      inv.armaduras.push(arm);
+      charAtivo.inventario = inv;
+      render();
+    } catch (e) { alert('Erro: ' + e.message); }
+  });
+
+  // Adicionar item do catálogo
+  const btnItemCat = $('#btn-add-item-cat');
+  if (btnItemCat) btnItemCat.addEventListener('click', () => {
+    const sel = $('#add-item-catalogo');
+    const qtd = +($('#add-item-qtd').value || 1);
+    if (!sel.value) return;
+    try {
+      const it = JSON.parse(sel.value);
+      it.qtd = qtd;
+      const inv = charAtivo.inventario || {};
+      inv.itens = inv.itens || [];
+      inv.itens.push(it);
+      charAtivo.inventario = inv;
+      render();
+    } catch (e) { alert('Erro: ' + e.message); }
+  });
+
+  // Item personalizado
+  const btnItemCustom = $('#btn-add-item-custom');
+  if (btnItemCustom) btnItemCustom.addEventListener('click', () => {
+    const nome = $('#add-item-nome').value.trim();
+    const qtd = +($('#add-item-qtd-custom').value || 1);
+    if (!nome) return;
+    const inv = charAtivo.inventario || {};
+    inv.itens = inv.itens || [];
+    inv.itens.push({ nome, qtd, peso: '—' });
+    charAtivo.inventario = inv;
+    render();
+  });
 }
 
 async function salvar(e) {
   e.preventDefault();
   const btn = $('#btn-salvar');
   const status = $('#status');
+
+  // Valida todos os campos com data-validar
+  const invalidos = [];
+  $$('[data-validar]').forEach(inp => { if (!validarCampo(inp)) invalidos.push(inp); });
+  if (invalidos.length) {
+    status.className = 'status-msg erro';
+    status.textContent = `❌ ${invalidos.length} campo(s) com erro — corrija antes de salvar`;
+    invalidos[0].focus();
+    return;
+  }
+
   btn.disabled = true; status.className = 'status-msg'; status.textContent = 'Salvando…';
 
   const f = e.target;
   const fd = new FormData(f);
+  const payload = { ...charAtivo };  // começa com o estado atual (preserva tabs não-renderizadas)
 
-  const atributos = {};
-  for (const [k] of ATRIBUTOS) atributos[k] = +(fd.get('attr_' + k) || 10);
+  // Helpers
+  const num = (k, intt = true) => {
+    if (!fd.has(k)) return undefined;
+    const v = parseNum(fd.get(k), { inteiro: intt });
+    return v === null ? undefined : v;
+  };
+  const txt = (k) => fd.has(k) ? (fd.get(k) || null) : undefined;
 
-  const slots_magia = {};
-  for (let n = 1; n <= 9; n++) {
-    const max  = +(fd.get(`slot_${n}_max`)  || 0);
-    const used = +(fd.get(`slot_${n}_used`) || 0);
-    if (max > 0 || used > 0) slots_magia[n] = { max, used };
+  // Identidade
+  const set = (k, v) => { if (v !== undefined) payload[k] = v; };
+  set('nome', txt('nome'));
+  set('nivel', num('nivel'));
+  set('raca', txt('raca'));
+  set('classe', txt('classe'));
+  set('subclasse', txt('subclasse'));
+  set('origem', txt('origem'));
+  set('alinhamento', txt('alinhamento'));
+
+  // Atributos (só se tab identidade)
+  if (fd.has('attr_for')) {
+    const atrs = {};
+    for (const [k] of ATRIBUTOS) atrs[k] = num('attr_' + k) ?? 10;
+    payload.atributos = atrs;
   }
 
-  const payload = {
-    nome: fd.get('nome'),
-    nivel: +fd.get('nivel') || 1,
-    raca: fd.get('raca') || null,
-    classe: fd.get('classe') || null,
-    subclasse: fd.get('subclasse') || null,
-    origem: fd.get('origem') || null,
-    alinhamento: fd.get('alinhamento') || null,
-    atributos,
-    hp_atual: +fd.get('hp_atual'),
-    hp_max: +fd.get('hp_max'),
-    hp_temp: +fd.get('hp_temp'),
-    ca: +fd.get('ca'),
-    iniciativa_bonus: +fd.get('iniciativa_bonus'),
-    deslocamento: +fd.get('deslocamento'),
-    dado_vida_tipo: +fd.get('dado_vida_tipo'),
-    dado_vida_atual: +fd.get('dado_vida_atual'),
-    exaustao: +fd.get('exaustao'),
-    slots_magia,
-    tracos_pessoais: fd.get('tracos_pessoais') || null,
-    ideais: fd.get('ideais') || null,
-    vinculos: fd.get('vinculos') || null,
-    defeitos: fd.get('defeitos') || null,
-    historia: fd.get('historia') || null,
-    notas: fd.get('notas') || null,
-  };
+  // Combate
+  set('hp_atual', num('hp_atual'));
+  set('hp_max', num('hp_max'));
+  set('hp_temp', num('hp_temp'));
+  set('ca', num('ca'));
+  set('iniciativa_bonus', num('iniciativa_bonus'));
+  set('deslocamento', num('deslocamento', false));  // decimal
+  set('dado_vida_tipo', num('dado_vida_tipo'));
+  set('dado_vida_atual', num('dado_vida_atual'));
+  set('exaustao', num('exaustao'));
+
+  // Slots (apenas se tab combate ativa)
+  if (fd.has('slot_1_max')) {
+    const slots = {};
+    for (let n = 1; n <= 9; n++) {
+      const max  = num(`slot_${n}_max`)  ?? 0;
+      const used = num(`slot_${n}_used`) ?? 0;
+      if (max > 0 || used > 0) slots[n] = { max, used };
+    }
+    payload.slots_magia = slots;
+  }
+
+  // Moedas (apenas se tab equipamento ativa)
+  if (fd.has('moeda_po')) {
+    const inv = payload.inventario || { moedas:{}, armas:[], armaduras:[], itens:[] };
+    inv.moedas = {};
+    for (const md of window.PHB.MOEDAS) inv.moedas[md.codigo] = num('moeda_' + md.codigo) ?? 0;
+    payload.inventario = inv;
+  }
+  // armas/armaduras/itens já foram setados pelo conectarListenersEquipamento (mantidos em payload.inventario)
+
+  // Roleplay
+  set('tracos_pessoais', txt('tracos_pessoais'));
+  set('ideais', txt('ideais'));
+  set('vinculos', txt('vinculos'));
+  set('defeitos', txt('defeitos'));
+  set('historia', txt('historia'));
+  set('notas', txt('notas'));
+
+  // Remove campos que não vão pro UPDATE
+  delete payload.id;
+  delete payload.user_id;
+  delete payload.created_at;
+  delete payload.updated_at;
 
   const { data, error } = await window.sb
-    .from('characters')
-    .update(payload)
-    .eq('id', charAtivo.id)
-    .select('*').single();
+    .from('characters').update(payload).eq('id', charAtivo.id).select('*').single();
 
   if (error) {
     status.className = 'status-msg erro';
-    status.textContent = 'Erro: ' + error.message;
+    status.textContent = '❌ Erro: ' + error.message;
   } else {
     charAtivo = data;
     chars = chars.map(c => c.id === data.id ? data : c);
