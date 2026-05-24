@@ -63,12 +63,18 @@
     { "nivel": 18, "nome": "Canalizar Divindade (3/descanso)", "desc": "Pode usar Canalizar Divindade 3x entre descansos." },
     { "nivel": 20, "nome": "Intervenção Divina Aprimorada", "desc": "Intervenção Divina funciona automaticamente, sem rolagem." },
 
-    { "nivel": 1, "subclasse": "Domínio da Morte", "nome": "Proficiência Adicional", "desc": "Ganha proficiência com armas marciais." },
-    { "nivel": 1, "subclasse": "Domínio da Morte", "nome": "Ceifador", "desc": "Aprende um truque de necromancia de qualquer lista. Truques de necromancia que afetam 1 criatura podem afetar 2 (até 1,5m entre si)." },
-    { "nivel": 2, "subclasse": "Domínio da Morte", "nome": "Canalizar Divindade: Toque da Morte", "desc": "Em um ataque cc bem-sucedido, gasta Canalizar Divindade pra causar 5 + (2× nível) de dano necrótico extra." },
-    { "nivel": 6, "subclasse": "Domínio da Morte", "nome": "Destruição Inevitável", "desc": "Dano necrótico de suas magias e Canalizar Divindade ignora resistência a necrótico." },
-    { "nivel": 8, "subclasse": "Domínio da Morte", "nome": "Golpe Divino", "desc": "1×/turno: ataque com arma causa +1d8 necrótico (vira 2d8 no 14º nível)." },
-    { "nivel": 17, "subclasse": "Domínio da Morte", "nome": "Ceifador Aprimorado", "desc": "Magias de necromancia de 1°–5° nível que afetam 1 criatura podem afetar 2 (até 1,5m entre si). Componentes materiais consumidos pra cada alvo." }
+    { "nivel": 1, "subclasse": "Domínio da Morte", "nome": "Proficiência Adicional",
+      "desc": "Quando o clérigo escolhe esse domínio no 1° nível, ele ganha proficiência com armas marciais." },
+    { "nivel": 1, "subclasse": "Domínio da Morte", "nome": "Ceifador",
+      "desc": "No 1° nível, o clérigo aprende um truque de necromancia de sua escolha de qualquer lista de magia. Quando o clérigo conjura um truque de necromancia que normalmente afete apenas uma criatura, a magia pode, ao invés, afetar duas criaturas a até 1,5 metro uma da outra." },
+    { "nivel": 2, "subclasse": "Domínio da Morte", "nome": "Canalizar Divindade: Toque da Morte",
+      "desc": "A partir do 2° nível, o clérigo pode usar seu Canalizar Divindade para destruir a força vital de outra criatura pelo toque. Quando o clérigo atinge uma criatura com um ataque corpo-a-corpo, ele pode usar Canalizar Divindade para causar dano necrótico extra ao alvo. O dano é igual a 5 + duas vezes o nível do clérigo." },
+    { "nivel": 6, "subclasse": "Domínio da Morte", "nome": "Destruição Inevitável",
+      "desc": "A partir do 6° nível, a habilidade de canalizar energia negativa do clérigo fica mais potente. O dano necrótico causado pelas magias do clérigo e pelas opções de Canalizar Divindade ignoram resistência a dano necrótico." },
+    { "nivel": 8, "subclasse": "Domínio da Morte", "nome": "Golpe Divino",
+      "desc": "No 8º nível, o clérigo ganha a habilidade de infundir os golpes da sua arma com energia necrótica. Uma vez em cada um de seus turnos, quando você acertar uma criatura com um ataque com arma, você causa 1d8 de dano necrótico adicional ao alvo. Quando alcançar o 14º nível, o dano extra aumenta para 2d8." },
+    { "nivel": 17, "subclasse": "Domínio da Morte", "nome": "Ceifador Aprimorado",
+      "desc": "A partir do 17° nível, quando o clérigo conjurar uma magia de necromancia de 1° a 5° nível que afete apenas uma criatura, a magia pode, ao invés, afetar duas criaturas no alcance e que estejam a até 1,5 metro entre si. Se a magia consumir componentes materiais, o clérigo deve fornecê-los para cada alvo." }
   ],
   "druida": [
     { "nivel": 1, "nome": "Druídico (linguagem)", "desc": "Conhece a linguagem secreta dos druidas." },
@@ -169,12 +175,18 @@
     { "nivel": 18, "nome": "Aura Aprimorada (alcance 9m)", "desc": "Auras de Proteção e Coragem têm alcance 9m em vez de 3m." },
     { "nivel": 20, "nome": "Característica do Juramento", "desc": "Característica capstone do juramento escolhido." },
 
-    { "nivel": 3, "subclasse": "Quebrador de Juramento", "nome": "Pré-requisito", "desc": "Paladino mau e ≥ 3º nível que descumpre seu juramento sagrado. Substitui as características de juramento anterior." },
-    { "nivel": 3, "subclasse": "Quebrador de Juramento", "nome": "Canalizar Divindade: Controlar Morto-Vivo", "desc": "Ação: morto-vivo (ND ≤ nv do paladino) a até 9m faz teste de SAB. Falha: obedece comandos por 24h." },
-    { "nivel": 3, "subclasse": "Quebrador de Juramento", "nome": "Canalizar Divindade: Aspecto Apavorante", "desc": "Ação: criaturas escolhidas a 9m fazem teste de SAB. Falha: ficam amedrontadas por 1 min." },
-    { "nivel": 7, "subclasse": "Quebrador de Juramento", "nome": "Aura de Ódio", "desc": "Você, corruptores e mortos-vivos a 3m (9m no 18º nível) ganham +mod CAR nas jogadas de dano cc." },
-    { "nivel": 15, "subclasse": "Quebrador de Juramento", "nome": "Resistência Sobrenatural", "desc": "Resistência a dano de concussão, cortante e perfurante de ataques não-mágicos." },
-    { "nivel": 20, "subclasse": "Quebrador de Juramento", "nome": "Senhor do Pavor", "desc": "Ação: aura de trevas (9m, 1 min). Inimigos amedrontados que iniciam turno na aura sofrem 4d10 psíquico. Você+aliados escolhidos ficam encobertos (desvantagem em ataques contra eles que dependam de visão). Ação bônus: ataque cc mágico (3d10 + CAR necrótico)." }
+    { "nivel": 3, "subclasse": "Quebrador de Juramento", "nome": "Pré-requisito",
+      "desc": "Um Quebrador de Juramento é um paladino que descumpriu seus juramentos sagrados ao perseguir alguma ambição sombria ou servir um poder maligno. Toda a luz que ardia no coração do paladino foi extinta. Apenas as trevas permaneceram. Um paladino deve ser mau e pelo menos 3° nível para se tornar um Quebrador de Juramento. O paladino substitui as características específicas do seu Juramento Sagrado pelas características de Quebrador de Juramento. Também perde as magias de juramento ganhas anteriormente e, no lugar, ganha as magias de Quebrador de Juramento nos níveis de paladino listados." },
+    { "nivel": 3, "subclasse": "Quebrador de Juramento", "nome": "Canalizar Divindade: Controlar Morto-Vivo",
+      "desc": "Com uma ação, o paladino pode afetar uma criatura morta-viva que ele possa ver, a até 9 metros dele. O alvo deve realizar um teste de resistência de Sabedoria. Se fracassar na resistência, o alvo deve obedecer os comandos do paladino pelas próximas 24 horas ou até o paladino usar essa opção de Canalizar Divindade novamente. Um morto-vivo cujo nível de desafio seja igual ou superior ao nível do paladino é imune a esse efeito." },
+    { "nivel": 3, "subclasse": "Quebrador de Juramento", "nome": "Canalizar Divindade: Aspecto Apavorante",
+      "desc": "Com uma ação, o paladino canaliza as emoções mais sombrias e as foca em uma explosão de ameaça mágica. Cada criatura, à escolha do paladino, a até 9 metros dele, deve realizar um teste de resistência de Sabedoria se puder ver o paladino. Se fracassar na resistência, o alvo ficará amedrontado em relação ao paladino por 1 minuto. Se uma criatura amedrontada por esse efeito terminar o turno dela a mais de 9 metros do paladino, ela pode tentar realizar outro teste de resistência de Sabedoria para terminar o efeito sobre si." },
+    { "nivel": 7, "subclasse": "Quebrador de Juramento", "nome": "Aura de Ódio",
+      "desc": "A partir do 7° nível, o paladino, assim como quaisquer corruptores e mortos-vivos a até 3 metros dele, ganham um bônus nas jogadas de dano com armas corpo-a-corpo igual ao modificador de Carisma do paladino (mínimo de +1). Uma criatura pode receber os benefícios dessa característica apenas de um paladino por vez. No 18° nível, o alcance dessa aura aumenta para 9 metros." },
+    { "nivel": 15, "subclasse": "Quebrador de Juramento", "nome": "Resistência Sobrenatural",
+      "desc": "No 15° nível, o paladino ganha resistência a dano de concussão, cortante e perfurante de ataques não-mágicos." },
+    { "nivel": 20, "subclasse": "Quebrador de Juramento", "nome": "Senhor do Pavor",
+      "desc": "No 20° nível, o paladino pode, com uma ação, envolver a si mesmo com uma aura de trevas que dura por 1 minuto. A aura reduz qualquer luz plena num raio de 9 metros em volta do paladino a penumbra. Sempre que um inimigo que esteja amedrontado em relação ao paladino começar seu turno na aura, ele sofre 4d10 de dano psíquico. Além disso, o paladino e criaturas que ele escolher na aura são encobertos por sombras profundas. As criaturas que dependem de visão têm desvantagem nas jogadas de ataque contra as criaturas encobertas pelas sombras. Enquanto a aura durar, o paladino pode usar uma ação bônus, no seu turno, para fazer com que as sombras na aura ataquem uma criatura. O paladino realiza um ataque corpo-a-corpo com magia contra o alvo. Se o ataque atingir, o alvo sofre dano necrótico igual a 3d10 + o modificador de Carisma do paladino. Após ativar a aura, o paladino não poderá fazê-la novamente até terminar um descanso longo." }
   ],
   "patrulheiro": [
     { "nivel": 1, "nome": "Inimigo Predileto", "desc": "Escolha tipo de criatura. Vantagem em testes de Sabedoria pra rastreá-lo e Inteligência pra recordar info." },
