@@ -61,7 +61,14 @@
     { "nivel": 14, "nome": "Destruir Mortos-Vivos (CR 3)", "desc": "Destrói automaticamente mortos-vivos com ND ≤ 3." },
     { "nivel": 17, "nome": "Destruir Mortos-Vivos (CR 4)", "desc": "Destrói automaticamente mortos-vivos com ND ≤ 4." },
     { "nivel": 18, "nome": "Canalizar Divindade (3/descanso)", "desc": "Pode usar Canalizar Divindade 3x entre descansos." },
-    { "nivel": 20, "nome": "Intervenção Divina Aprimorada", "desc": "Intervenção Divina funciona automaticamente, sem rolagem." }
+    { "nivel": 20, "nome": "Intervenção Divina Aprimorada", "desc": "Intervenção Divina funciona automaticamente, sem rolagem." },
+
+    { "nivel": 1, "subclasse": "Domínio da Morte", "nome": "Proficiência Adicional", "desc": "Ganha proficiência com armas marciais." },
+    { "nivel": 1, "subclasse": "Domínio da Morte", "nome": "Ceifador", "desc": "Aprende um truque de necromancia de qualquer lista. Truques de necromancia que afetam 1 criatura podem afetar 2 (até 1,5m entre si)." },
+    { "nivel": 2, "subclasse": "Domínio da Morte", "nome": "Canalizar Divindade: Toque da Morte", "desc": "Em um ataque cc bem-sucedido, gasta Canalizar Divindade pra causar 5 + (2× nível) de dano necrótico extra." },
+    { "nivel": 6, "subclasse": "Domínio da Morte", "nome": "Destruição Inevitável", "desc": "Dano necrótico de suas magias e Canalizar Divindade ignora resistência a necrótico." },
+    { "nivel": 8, "subclasse": "Domínio da Morte", "nome": "Golpe Divino", "desc": "1×/turno: ataque com arma causa +1d8 necrótico (vira 2d8 no 14º nível)." },
+    { "nivel": 17, "subclasse": "Domínio da Morte", "nome": "Ceifador Aprimorado", "desc": "Magias de necromancia de 1°–5° nível que afetam 1 criatura podem afetar 2 (até 1,5m entre si). Componentes materiais consumidos pra cada alvo." }
   ],
   "druida": [
     { "nivel": 1, "nome": "Druídico (linguagem)", "desc": "Conhece a linguagem secreta dos druidas." },
@@ -153,14 +160,21 @@
     { "nivel": 2, "nome": "Conjuração", "desc": "Conjura magias divinas usando Carisma. Símbolo sagrado como foco." },
     { "nivel": 2, "nome": "Castigo Divino", "desc": "Gasta slot ao acertar ataque cc: +2d8 de dano radiante (+1d8 por nível de slot acima do 1°). +1d8 contra mortos-vivos/celestiais." },
     { "nivel": 3, "nome": "Saúde Divina", "desc": "Imune a doenças." },
-    { "nivel": 3, "nome": "Juramento Sagrado", "desc": "Escolha juramento (Devoção, Anciões, Vingança). Habilidades nos níveis 3, 7, 15 e 20." },
+    { "nivel": 3, "nome": "Juramento Sagrado", "desc": "Escolha juramento (Devoção, Anciões, Vingança, Quebrador de Juramento). Habilidades nos níveis 3, 7, 15 e 20." },
     { "nivel": 5, "nome": "Ataque Extra", "desc": "Pode atacar 2x na ação de Ataque." },
     { "nivel": 6, "nome": "Aura de Proteção", "desc": "Você e aliados em 3m somam mod CAR em testes de resistência." },
     { "nivel": 10, "nome": "Aura de Coragem", "desc": "Você e aliados em 3m não podem ficar amedrontados." },
     { "nivel": 11, "nome": "Castigo Divino Aprimorado", "desc": "Acertos cc com armas causam +1d8 de dano radiante (não consome slot)." },
     { "nivel": 14, "nome": "Toque Purificador", "desc": "Ação: termina 1 efeito mágico em si ou aliado. Usos = mod CAR/descanso longo." },
     { "nivel": 18, "nome": "Aura Aprimorada (alcance 9m)", "desc": "Auras de Proteção e Coragem têm alcance 9m em vez de 3m." },
-    { "nivel": 20, "nome": "Característica do Juramento", "desc": "Característica capstone do juramento escolhido." }
+    { "nivel": 20, "nome": "Característica do Juramento", "desc": "Característica capstone do juramento escolhido." },
+
+    { "nivel": 3, "subclasse": "Quebrador de Juramento", "nome": "Pré-requisito", "desc": "Paladino mau e ≥ 3º nível que descumpre seu juramento sagrado. Substitui as características de juramento anterior." },
+    { "nivel": 3, "subclasse": "Quebrador de Juramento", "nome": "Canalizar Divindade: Controlar Morto-Vivo", "desc": "Ação: morto-vivo (ND ≤ nv do paladino) a até 9m faz teste de SAB. Falha: obedece comandos por 24h." },
+    { "nivel": 3, "subclasse": "Quebrador de Juramento", "nome": "Canalizar Divindade: Aspecto Apavorante", "desc": "Ação: criaturas escolhidas a 9m fazem teste de SAB. Falha: ficam amedrontadas por 1 min." },
+    { "nivel": 7, "subclasse": "Quebrador de Juramento", "nome": "Aura de Ódio", "desc": "Você, corruptores e mortos-vivos a 3m (9m no 18º nível) ganham +mod CAR nas jogadas de dano cc." },
+    { "nivel": 15, "subclasse": "Quebrador de Juramento", "nome": "Resistência Sobrenatural", "desc": "Resistência a dano de concussão, cortante e perfurante de ataques não-mágicos." },
+    { "nivel": 20, "subclasse": "Quebrador de Juramento", "nome": "Senhor do Pavor", "desc": "Ação: aura de trevas (9m, 1 min). Inimigos amedrontados que iniciam turno na aura sofrem 4d10 psíquico. Você+aliados escolhidos ficam encobertos (desvantagem em ataques contra eles que dependam de visão). Ação bônus: ataque cc mágico (3d10 + CAR necrótico)." }
   ],
   "patrulheiro": [
     { "nivel": 1, "nome": "Inimigo Predileto", "desc": "Escolha tipo de criatura. Vantagem em testes de Sabedoria pra rastreá-lo e Inteligência pra recordar info." },

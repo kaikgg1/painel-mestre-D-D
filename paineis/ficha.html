@@ -790,14 +790,14 @@ const SUBCLASSES_POR_CLASSE = {
   'barbaro':    ['Caminho do Furioso', 'Caminho do Guerreiro Totêmico'],
   'bardo':      ['Colégio do Conhecimento', 'Colégio do Valor'],
   'bruxo':      ['Patrono Arquifada', 'Patrono Senhor das Trevas', 'Patrono Grande Antigo'],
-  'clerigo':    ['Domínio do Conhecimento', 'Domínio da Vida', 'Domínio da Luz', 'Domínio da Natureza', 'Domínio da Tempestade', 'Domínio Trapaceiro', 'Domínio da Guerra'],
+  'clerigo':    ['Domínio do Conhecimento', 'Domínio da Vida', 'Domínio da Luz', 'Domínio da Natureza', 'Domínio da Tempestade', 'Domínio Trapaceiro', 'Domínio da Guerra', 'Domínio da Morte'],
   'druida':     ['Círculo da Terra', 'Círculo da Lua'],
   'feiticeiro': ['Linhagem Dracônica', 'Magia Selvagem'],
   'guerreiro':  ['Campeão', 'Mestre de Batalha', 'Cavaleiro Místico'],
   'ladino':     ['Ladrão', 'Assassino', 'Trapaceiro Arcano'],
   'mago':       ['Escola de Abjuração', 'Escola de Adivinhação', 'Escola de Conjuração', 'Escola de Encantamento', 'Escola de Evocação', 'Escola de Ilusão', 'Escola de Necromancia', 'Escola de Transmutação'],
   'monge':      ['Caminho da Mão Aberta', 'Caminho da Sombra', 'Caminho dos Quatro Elementos'],
-  'paladino':   ['Juramento de Devoção', 'Juramento dos Anciões', 'Juramento de Vingança'],
+  'paladino':   ['Juramento de Devoção', 'Juramento dos Anciões', 'Juramento de Vingança', 'Quebrador de Juramento'],
   'patrulheiro':['Caçador', 'Mestre das Feras'],
 };
 
@@ -1256,7 +1256,7 @@ function renderHabilidades(c) {
   `;
 }
 
-async function popularHabilidades(classe, nivel) {
+async function popularHabilidades(classe, nivel, subclasse) {
   const wrap = document.getElementById('hab-wrap');
   if (!wrap) return;
   if (!classe) {
@@ -1264,7 +1264,9 @@ async function popularHabilidades(classe, nivel) {
     return;
   }
   const db = await carregarHabilidadesClasses();
-  const habs = (db[chaveDeClasse(classe)] || []).filter(h => h.nivel <= (nivel||1));
+  const todas = db[chaveDeClasse(classe)] || [];
+  // Filtra: nivel <= atual AND (sem subclasse OR subclasse === subclasse do PJ)
+  const habs = todas.filter(h => h.nivel <= (nivel || 1) && (!h.subclasse || h.subclasse === subclasse));
   if (!habs.length) {
     wrap.innerHTML = `<div class="item-vazio">Nenhuma habilidade encontrada para ${escape(classe)}.</div>`;
     return;
@@ -1275,7 +1277,11 @@ async function popularHabilidades(classe, nivel) {
   wrap.innerHTML = Object.entries(porNivel).sort(([a],[b]) => +a - +b).map(([nv, lista]) => `
     <div class="habilidade-card">
       <h4>Nível ${nv}</h4>
-      ${lista.map(h => `<div style="margin-bottom:8px"><strong style="color:var(--gold-bright)">${escape(h.nome)}.</strong> <span style="color:var(--parchment)">${escape(h.desc || '—')}</span></div>`).join('')}
+      ${lista.map(h => `<div style="margin-bottom:8px">
+        ${h.subclasse ? `<span style="display:inline-block;font-size:9px;background:rgba(184,138,44,0.25);color:var(--gold-bright);padding:1px 6px;border-radius:8px;letter-spacing:1px;margin-right:6px;text-transform:uppercase">${escape(h.subclasse)}</span>` : ''}
+        <strong style="color:var(--gold-bright)">${escape(h.nome)}.</strong>
+        <span style="color:var(--parchment)">${escape(h.desc || '—')}</span>
+      </div>`).join('')}
     </div>
   `).join('');
 }
@@ -1487,7 +1493,7 @@ function conectarListeners() {
   if (tabAtiva === 'magias') carregarMagiasPreparadas();
 
   // Habilidades — carrega quando entra
-  if (tabAtiva === 'habilidades') popularHabilidades(charAtivo.classe, charAtivo.nivel);
+  if (tabAtiva === 'habilidades') popularHabilidades(charAtivo.classe, charAtivo.nivel, charAtivo.subclasse);
 
   // Listeners de tags (idiomas/ferramentas) — só na aba identidade
   if (tabAtiva === 'identidade') {
