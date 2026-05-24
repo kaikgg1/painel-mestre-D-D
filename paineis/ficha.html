@@ -674,6 +674,15 @@
   }
   .stat-mini input:focus, .stat-mini select:focus { border-color: var(--gold-bright); }
   .stat-mini .ajuda-mini { display: block; font-size: 9px; color: var(--text-dim); margin-top: 3px; font-style: italic; }
+  .readonly-stat {
+    width: 100%;
+    background: rgba(139,105,20,0.12);
+    border: 1px solid rgba(139,105,20,0.4);
+    color: var(--gold-bright);
+    font-family: 'Cinzel Decorative', serif; font-size: 18px; font-weight: 700;
+    text-align: center; padding: 6px 4px; border-radius: 3px;
+    cursor: help;
+  }
 
   .lista-tags {
     display: flex; flex-wrap: wrap; gap: 4px; align-items: flex-start;
@@ -784,6 +793,16 @@ const CAMPANHAS = [
   ['barovia', 'Maldição de Strahd (Barovia)'],
   ['mestre',  'Crônica dos Aventureiros'],
 ];
+
+// Dado de vida fixo por classe (PHB 5e)
+const DADO_VIDA_POR_CLASSE = {
+  'barbaro': 12, 'bardo': 8, 'bruxo': 8, 'clerigo': 8, 'druida': 8,
+  'feiticeiro': 6, 'guerreiro': 10, 'ladino': 8, 'mago': 6, 'monge': 8,
+  'paladino': 10, 'patrulheiro': 10,
+};
+function dadoVidaDaClasse(classe) {
+  return DADO_VIDA_POR_CLASSE[chaveDeClasse(classe)] || null;
+}
 
 // Subclasses oficiais do PHB 5e por classe (chave normalizada → lista)
 const SUBCLASSES_POR_CLASSE = {
@@ -1159,7 +1178,12 @@ function renderCombate(c) {
       <div class="stat-mini">
         <span class="ic" aria-hidden="true">🎲</span>
         <label>Dado de Vida</label>
-        <select name="dado_vida_tipo">${[6,8,10,12].map(d => `<option value="${d}" ${d===(c.dado_vida_tipo||8)?'selected':''}>d${d}</option>`).join('')}</select>
+        ${(() => {
+          const dv = dadoVidaDaClasse(c.classe) || c.dado_vida_tipo || 8;
+          return `<div class="readonly-stat" id="dv-display" title="Definido pela classe (D&D 5e)">d${dv}</div>
+            <input type="hidden" name="dado_vida_tipo" id="dv-hidden" value="${dv}">
+            <span class="ajuda-mini">${c.classe ? 'classe: ' + c.classe : 'escolha uma classe'}</span>`;
+        })()}
       </div>
       <div class="stat-mini">
         <span class="ic" aria-hidden="true">⏳</span>
@@ -1498,17 +1522,26 @@ function conectarListeners() {
   // Listeners de tags (idiomas/ferramentas) — só na aba identidade
   if (tabAtiva === 'identidade') {
     conectarListenersTags();
-    // Quando a classe muda, atualiza dropdown de subclasse
+    // Quando a classe muda: atualiza dropdown de subclasse + dado de vida
     const selClasse = document.getElementById('sel-classe');
     if (selClasse) selClasse.addEventListener('change', e => {
+      const nova = e.target.value;
+      // Subclasse vira novas opções (e zera)
       const wrap = document.querySelector('[name="subclasse"]')?.closest('.campo');
       if (wrap) {
         const ajuda = wrap.querySelector('.ajuda');
         wrap.querySelector('select,input')?.remove();
         wrap.insertBefore(
-          Object.assign(document.createElement('div'), { innerHTML: renderSubclasseSelect(e.target.value, '') }).firstElementChild,
+          Object.assign(document.createElement('div'), { innerHTML: renderSubclasseSelect(nova, '') }).firstElementChild,
           ajuda
         );
+      }
+      // Dado de vida atualiza com a classe
+      const dv = dadoVidaDaClasse(nova);
+      if (dv) {
+        charAtivo.dado_vida_tipo = dv;
+        const hidden = document.getElementById('dv-hidden');
+        if (hidden) hidden.value = dv;
       }
     });
   }
@@ -1842,7 +1875,10 @@ async function salvar(e) {
   set('ca', num('ca'));
   set('iniciativa_bonus', num('iniciativa_bonus'));
   set('deslocamento', num('deslocamento', false));  // decimal
-  set('dado_vida_tipo', num('dado_vida_tipo'));
+  // Dado de vida sempre derivado da classe (não editável)
+  const dvDaClasse = dadoVidaDaClasse(payload.classe || charAtivo.classe);
+  if (dvDaClasse) payload.dado_vida_tipo = dvDaClasse;
+  else set('dado_vida_tipo', num('dado_vida_tipo'));
   set('dado_vida_atual', num('dado_vida_atual'));
   set('exaustao', num('exaustao'));
 
