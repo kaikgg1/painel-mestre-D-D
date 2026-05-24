@@ -760,6 +760,48 @@
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
   }
+
+  /* ===== TOAST de notificação externa (Mestre editou) ===== */
+  .toast-externo {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 200;
+    max-width: 360px;
+    background: linear-gradient(160deg, #1f1416, #150c0e);
+    border: 1.5px solid var(--gold-bright);
+    border-radius: 6px;
+    padding: 14px 16px;
+    box-shadow: 0 12px 32px rgba(0,0,0,0.7), 0 0 18px rgba(184,138,44,0.3);
+    display: none;
+    animation: slideIn 0.3s ease-out;
+  }
+  .toast-externo.show { display: block; }
+  @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .toast-externo .te-titulo {
+    font-family: 'Cinzel', serif; font-size: 12px;
+    color: var(--gold-bright); letter-spacing: 1.5px;
+    text-transform: uppercase; margin-bottom: 6px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .toast-externo .te-msg { font-size: 13px; color: var(--parchment); line-height: 1.4; margin-bottom: 10px; }
+  .toast-externo .te-acoes { display: flex; gap: 8px; justify-content: flex-end; }
+  .toast-externo button {
+    padding: 6px 12px;
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--parchment-dim);
+    font-family: 'Cinzel', serif; font-size: 10px;
+    font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+    border-radius: 3px; cursor: pointer; transition: all 0.15s;
+  }
+  .toast-externo button.primary {
+    background: var(--gold); color: var(--shadow); border-color: var(--gold-bright);
+  }
+  .toast-externo button:hover { background: var(--gold-bright); color: var(--shadow); }
+  @media (max-width: 600px) {
+    .toast-externo { left: 12px; right: 12px; bottom: 12px; max-width: none; }
+  }
 </style>
 </head>
 <body>
@@ -775,6 +817,16 @@
     <div class="estado">Carregando…</div>
   </div>
 </main>
+
+<!-- Toast de notificação quando a ficha foi editada externamente (Mestre) -->
+<div class="toast-externo" id="toast-externo" role="alert" aria-live="polite">
+  <div class="te-titulo"><span aria-hidden="true">✏</span> Ficha atualizada</div>
+  <div class="te-msg" id="te-msg">O Mestre editou sua ficha. Atualizar pra ver?</div>
+  <div class="te-acoes">
+    <button type="button" id="te-ignorar">Ignorar</button>
+    <button type="button" class="primary" id="te-atualizar">Atualizar</button>
+  </div>
+</div>
 
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script src="../assets/js/supabase.js"></script>
@@ -865,6 +917,9 @@ let usuario = null;
 let chars = [];
 let charAtivo = null;
 let tabAtiva = 'identidade';
+let _ultimoSaveLocal = 0;          // pra ignorar echo do próprio save
+let canalFicha = null;             // canal realtime
+let mudancaPendente = null;        // payload do update externo aguardando
 
 // Favoritas: SOMENTE do banco (spell_lists do PJ ativo)
 async function carregarFavoritasDoBanco() {
@@ -895,6 +950,55 @@ async function init() {
   if (!usuario) return;
   await window.Auth.renderHeader('#auth-slot');
   await carregarPersonagens();
+  escutarMudancasExternas();
+  configurarToastExterno();
+}
+
+// ─── Realtime: detecta quando o Mestre (ou outra aba) edita meu PJ ─
+function escutarMudancasExternas() {
+  if (!window.sb || !usuario) return;
+  if (canalFicha) canalFicha.unsubscribe();
+  canalFicha = window.sb.channel('ficha-' + usuario.id)
+    .on('postgres_changes',
+      { event: 'UPDATE', schema: 'public', table: 'characters', filter: `user_id=eq.${usuario.id}` },
+      payload => onUpdateExterno(payload.new))
+    .subscribe();
+}
+
+function onUpdateExterno(novo) {
+  // Ignora se foi nosso próprio save (echo do realtime — em até 3s)
+  if (Date.now() - _ultimoSaveLocal < 3000) return;
+  // Só notifica se for o PJ ativo (atualizações em outros PJs ficam silenciosas)
+  if (!charAtivo || novo.id !== charAtivo.id) {
+    // Atualiza chars silenciosamente
+    const idx = chars.findIndex(c => c.id === novo.id);
+    if (idx >= 0) chars[idx] = novo;
+    return;
+  }
+  mudancaPendente = novo;
+  const tEl = document.getElementById('toast-externo');
+  const tMsg = document.getElementById('te-msg');
+  if (tMsg) tMsg.textContent = `O Mestre editou "${novo.nome}". Aplicar mudanças agora?`;
+  if (tEl) tEl.classList.add('show');
+}
+
+function configurarToastExterno() {
+  const tEl = document.getElementById('toast-externo');
+  const btnAtualizar = document.getElementById('te-atualizar');
+  const btnIgnorar  = document.getElementById('te-ignorar');
+  if (btnAtualizar) btnAtualizar.addEventListener('click', () => {
+    if (mudancaPendente) {
+      charAtivo = mudancaPendente;
+      chars = chars.map(c => c.id === charAtivo.id ? charAtivo : c);
+      mudancaPendente = null;
+      render();
+    }
+    if (tEl) tEl.classList.remove('show');
+  });
+  if (btnIgnorar) btnIgnorar.addEventListener('click', () => {
+    mudancaPendente = null;
+    if (tEl) tEl.classList.remove('show');
+  });
 }
 
 async function carregarPersonagens() {
@@ -1944,6 +2048,7 @@ async function salvar(e) {
     status.className = 'status-msg erro';
     status.textContent = '❌ Erro: ' + error.message;
   } else {
+    _ultimoSaveLocal = Date.now();   // pra ignorar echo do nosso save no realtime
     // Atualiza CAMPO POR CAMPO em vez de substituir o objeto inteiro
     // (preserva edições em progresso de outros campos não-salvos)
     Object.assign(charAtivo, payload);
