@@ -985,6 +985,9 @@ function criarCard(p) {
   slotsSection.innerHTML = `<div class="section-title">Slots de Magia</div>`;
   const slotsGrid = document.createElement('div');
   slotsGrid.className = 'spell-slots';
+  // Defesa: garante estrutura dos slots se vier de um banco vazio
+  if (!p.slots) p.slots = {};
+  for (let n = 1; n <= 9; n++) if (!p.slots[n]) p.slots[n] = { atual: 0, max: 0 };
   NIVEIS_SLOTS.forEach(nv => {
     const slot = document.createElement('div');
     slot.className = 'slot-level';
@@ -993,11 +996,11 @@ function criarCard(p) {
     numDiv.textContent = `Nv ${nv}`;
     const inputs = document.createElement('div');
     inputs.className = 'slot-inputs';
-    const atualInput = inputNumerico(p.slots[nv].atual, v => { p.slots[nv].atual = Math.max(0, v); atualInput.value = p.slots[nv].atual; salvar(); }, 'slot-input', 0);
+    const atualInput = inputNumerico(p.slots[nv].atual, v => { p.slots[nv].atual = Math.max(0, v); atualInput.value = p.slots[nv].atual; salvar(p); }, 'slot-input', 0);
     const sep = document.createElement('span');
     sep.className = 'slot-sep';
     sep.textContent = '/';
-    const maxInput = inputNumerico(p.slots[nv].max, v => { p.slots[nv].max = Math.max(0, v); maxInput.value = p.slots[nv].max; salvar(); }, 'slot-input', 0);
+    const maxInput = inputNumerico(p.slots[nv].max, v => { p.slots[nv].max = Math.max(0, v); maxInput.value = p.slots[nv].max; salvar(p); }, 'slot-input', 0);
     inputs.appendChild(atualInput);
     inputs.appendChild(sep);
     inputs.appendChild(maxInput);

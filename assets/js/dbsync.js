@@ -70,6 +70,20 @@
     return out;
   }
 
+  // Garante slots completos pros 9 níveis (os painéis assumem essa estrutura)
+  function normalizarSlots(slotsRaw) {
+    const slots = {};
+    const src = slotsRaw || {};
+    for (let n = 1; n <= 9; n++) {
+      const s = src[n] || src[String(n)] || {};
+      slots[n] = {
+        atual: typeof s.atual === 'number' ? s.atual : (typeof s.used === 'number' ? s.used : 0),
+        max: typeof s.max === 'number' ? s.max : 0,
+      };
+    }
+    return slots;
+  }
+
   function dbToUi(row) {
     return {
       id: row.id,
@@ -86,7 +100,7 @@
       exaustao: row.exaustao ?? 0,
       sucessos: row.morte_sucessos ?? 0,
       falhas: row.morte_falhas ?? 0,
-      slots: row.slots_magia || {},
+      slots: normalizarSlots(row.slots_magia),
       magias: row.magias_preparadas || '',
       condicoes: row.condicoes || [],
       isActive: !!row.is_active,
