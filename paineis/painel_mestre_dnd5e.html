@@ -635,8 +635,6 @@
   <button onclick="adicionarCard()" aria-label="Adicionar novo personagem">+ Adicionar Personagem</button>
   <button onclick="descansoLongo()" aria-label="Aplicar descanso longo a todos"><span aria-hidden="true">🌙</span> Descanso Longo</button>
   <button onclick="window.print()" aria-label="Imprimir painel"><span aria-hidden="true">🖨</span> Imprimir</button>
-  <input type="file" id="file-input" accept=".json" onchange="importarSave(event)" style="display:none" aria-hidden="true">
-  <button type="button" id="btn-migrar-local" onclick="migrarLocal()" style="display:none" aria-label="Migrar personagens do navegador para o banco"><span aria-hidden="true">📤</span> Migrar Local</button>
   <span class="auth-slot" id="auth-slot" aria-label="Status de login" style="margin-left:auto;display:flex;gap:8px;align-items:center;font-family:'Cinzel',serif;font-size:11px;color:var(--red-dark)"></span>
 </nav>
 
@@ -654,7 +652,6 @@
 <script src="../assets/js/supabase.js"></script>
 <script src="../assets/js/auth.js"></script>
 <script src="../assets/js/dbsync.js"></script>
-<script src="../assets/js/migrar_local.js"></script>
 <script>
 const CONDICOES = [
   'Agarrado', 'Amedrontado', 'Atordoado', 'Caído', 'Cego', 'Enfeitiçado',
@@ -672,18 +669,8 @@ const PERSONAGENS_INICIAIS = [
 ];
 
 const CAMPANHA = 'mestre';
-const STORAGE_KEY_LEGADO = 'dnd_painel_mestre_v1';
 let estado = { personagens: [] };
 let ehMestre = false;
-
-async function migrarLocal() {
-  const r = await window.MigrarLocal.executar({ storageKey: STORAGE_KEY_LEGADO, campanha: CAMPANHA });
-  if (r.migrados) {
-    toast(`📤 ${r.migrados} migrado(s)`);
-    const btn = document.getElementById('btn-migrar-local');
-    if (btn) btn.style.display = 'none';
-  }
-}
 
 // salvar(p?) — envia campos do personagem p para o banco (debounced).
 // Se sem p, sincroniza todos (legacy, usado em descansoLongo etc.)
@@ -1087,52 +1074,6 @@ function podeEditar(p) {
   })()) || true;  // RLS no banco já bloqueia se não puder, deixa UI permissiva
 }
 
-function exportarSave() {
-  const dados = JSON.stringify(estado, null, 2);
-  const blob = new Blob([dados], { type: 'application/json' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  const data = new Date().toISOString().slice(0,10);
-  a.href = url;
-  a.download = `painel_mestre_save_${data}.json`;
-  a.click();
-  URL.revokeObjectURL(url);
-  toast('💾 Save baixado');
-}
-
-function importarSave(event) {
-  const file = event.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = async (e) => {
-    try {
-      const dados = JSON.parse(e.target.result);
-      if (!dados.personagens || !Array.isArray(dados.personagens)) throw new Error('Arquivo inválido');
-      if (!confirm(`Importar ${dados.personagens.length} personagem(ns) para o banco?`)) return;
-      for (const p of dados.personagens) {
-        const base = { ...p };
-        delete base.id;
-        delete base.user_id;
-        try { await window.DBSync.criar(base); } catch(err) { console.warn('Falha em', p.nome, err); }
-      }
-      toast('📂 Save importado');
-    } catch(err) {
-      alert('Erro ao carregar arquivo: ' + err.message);
-    }
-  };
-  reader.readAsText(file);
-  event.target.value = '';
-}
-
-async function resetarTudo() {
-  if (!confirm('Apagar TODOS os personagens da campanha (que você pode editar)? Esta ação não pode ser desfeita.')) return;
-  for (const p of [...estado.personagens]) {
-    try { await window.DBSync.deletar(p.id); } catch(e) { /* RLS pode bloquear */ }
-  }
-  estado.personagens = [];
-  render();
-  toast('Resetado');
-}
 
 // ─── INIT: requer login + carrega via DBSync + escuta realtime ───
 (async () => {
@@ -1174,17 +1115,6 @@ async function resetarTudo() {
     return;
   }
 
-  // Mostra botão "Migrar Local" se Mestre + houver dados antigos
-  if (ehMestre && window.MigrarLocal) {
-    const n = await window.MigrarLocal.detectar(STORAGE_KEY_LEGADO);
-    if (n > 0) {
-      const btn = document.getElementById('btn-migrar-local');
-      if (btn) {
-        btn.style.display = '';
-        btn.innerHTML = `<span aria-hidden="true">📤</span> Migrar Local (${n})`;
-      }
-    }
-  }
 
   render();
 })();

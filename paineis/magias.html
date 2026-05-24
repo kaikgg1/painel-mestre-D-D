@@ -792,7 +792,7 @@ let todasMagias = [];
 let fonte = '';
 const filtros = { texto:'', niveis:new Set(), escolas:new Set(), classes:new Set(), ritual:null, conc:null, fav:null, ordem:'nome-az' };
 
-/* ===== FAVORITAS (via wrapper Fav: banco se logado, localStorage se não) ===== */
+/* ===== FAVORITAS (via wrapper Fav: 100% Supabase) ===== */
 function ehFavorita(nome)     { return window.Fav ? window.Fav.tem(nome) : false; }
 async function toggleFavorita(nome) {
   if (!window.Fav) return false;

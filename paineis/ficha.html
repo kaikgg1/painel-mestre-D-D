@@ -502,23 +502,17 @@ let chars = [];
 let charAtivo = null;
 let tabAtiva = 'identidade';
 
-// Favoritas: tenta ler do Supabase (spell_lists do PJ ativo); fallback localStorage
-async function carregarFavoritasDoBancoOuLocal() {
-  // Tenta banco primeiro (sincroniza com grimório quando logado)
-  try {
-    if (window.sb && charAtivo?.id) {
-      const { data } = await window.sb
-        .from('spell_lists')
-        .select('spell_names')
-        .eq('character_id', charAtivo.id)
-        .eq('nome', 'Favoritas')
-        .maybeSingle();
-      if (data?.spell_names?.length) return new Set(data.spell_names);
-    }
-  } catch (e) { console.warn('[ficha] sem banco, usando localStorage:', e.message); }
-  // Fallback
-  try { return new Set(JSON.parse(localStorage.getItem('grimorio-favoritas-v1') || '[]')); }
-  catch { return new Set(); }
+// Favoritas: SOMENTE do banco (spell_lists do PJ ativo)
+async function carregarFavoritasDoBanco() {
+  if (!window.sb || !charAtivo?.id) return new Set();
+  const { data, error } = await window.sb
+    .from('spell_lists')
+    .select('spell_names')
+    .eq('character_id', charAtivo.id)
+    .eq('nome', 'Favoritas')
+    .maybeSingle();
+  if (error) { console.warn('[ficha] favoritas:', error.message); return new Set(); }
+  return new Set(data?.spell_names || []);
 }
 
 // Catálogo de magias (carrega só quando necessário)
@@ -657,8 +651,8 @@ function render() {
     <form class="tab-content" id="ficha-form" novalidate>
       ${renderTab(c, atrs)}
       <div class="acoes">
-        <span class="status-msg" id="status"></span>
-        <button class="btn primary" type="submit" id="btn-salvar">💾 Salvar</button>
+        <span class="status-msg" id="status" aria-live="polite">💾 Auto-save ativo · alterações salvam em ~1s</span>
+        <button class="btn primary" type="submit" id="btn-salvar" title="Forçar salvamento imediato">💾 Salvar agora</button>
       </div>
     </form>
   `;
@@ -895,7 +889,7 @@ function renderMagias(c) {
 async function carregarMagiasPreparadas() {
   const wrap = document.getElementById('magias-prep');
   if (!wrap) return;
-  const favSet = await carregarFavoritasDoBancoOuLocal();
+  const favSet = await carregarFavoritasDoBanco();
   if (!favSet.size) {
     wrap.innerHTML = `<div class="item-vazio">Nenhuma magia favoritada. Abra o <a href="magias.html" style="color:var(--gold-bright)">Grimório</a> e clique na estrela ☆ das magias que seu personagem prepara.</div>`;
     return;
@@ -1073,9 +1067,28 @@ function conectarListeners() {
   // Botões de equipamento
   if (tabAtiva === 'equipamento') conectarListenersEquipamento();
 
-  // Submit
+  // Submit manual (botão)
   const form = $('#ficha-form');
-  if (form) form.addEventListener('submit', salvar);
+  if (form) {
+    form.addEventListener('submit', salvar);
+    // ── AUTO-SAVE ── (qualquer mudança dispara salvamento em 800ms)
+    const autoSave = debounce(() => {
+      const ev = new Event('submit', { cancelable: true });
+      form.dispatchEvent(ev);
+    }, 800);
+    form.addEventListener('input', autoSave);
+    form.addEventListener('change', autoSave);
+  }
+}
+
+// Debounce simples
+let _debounceTimers = new Map();
+function debounce(fn, ms) {
+  return function(...args) {
+    const key = fn;
+    if (_debounceTimers.has(key)) clearTimeout(_debounceTimers.get(key));
+    _debounceTimers.set(key, setTimeout(() => fn.apply(this, args), ms));
+  };
 }
 
 function validarCampo(inp) {

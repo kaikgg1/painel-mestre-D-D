@@ -37,8 +37,7 @@ Painel web para o mestre acompanhar status dos jogadores e consultar o grimório
 │       ├── supabase.js         # Cliente Supabase (window.sb)
 │       ├── auth.js             # Login, sessão, header de auth
 │       ├── dbsync.js           # CRUD characters + realtime (window.DBSync)
-│       ├── favoritas.js        # Wrapper banco-ou-localStorage
-│       ├── migrar_local.js     # Importa PJs antigos do localStorage
+│       ├── favoritas.js        # Lista de magias favoritas (100% Supabase)
 │       └── phb_catalogo.js     # Catálogo de armas/armaduras/itens PHB
 │
 ├── data/                       # Dados estáticos (PT-BR)
