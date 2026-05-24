@@ -326,7 +326,41 @@
   }
   .check-row label { display: flex; align-items: center; gap: 6px; cursor: pointer; flex: 1; }
   .check-row .atr-tag { font-size: 9px; color: var(--text-dim); margin-left: 4px; letter-spacing: 1px; }
-  .check-row input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--gold); cursor: pointer; }
+  /* Checkbox medieval custom — substitui o input padrão */
+  .check-row input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 18px; height: 18px;
+    border: 1.5px solid var(--gold);
+    background: var(--shadow);
+    border-radius: 3px;
+    cursor: pointer;
+    position: relative;
+    flex-shrink: 0;
+    transition: all 0.15s;
+  }
+  .check-row input[type="checkbox"]:hover { border-color: var(--gold-bright); box-shadow: 0 0 4px rgba(184,138,44,0.4); }
+  .check-row input[type="checkbox"]:checked {
+    background: linear-gradient(160deg, var(--gold-bright), var(--gold));
+    border-color: var(--gold-bright);
+    box-shadow: 0 0 6px rgba(212,168,67,0.5);
+  }
+  .check-row input[type="checkbox"]:checked::after {
+    content: '✓';
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -52%);
+    color: var(--shadow);
+    font-weight: 900;
+    font-size: 14px;
+    line-height: 1;
+  }
+  .check-row input[type="checkbox"]:disabled {
+    opacity: 0.3; cursor: not-allowed; border-color: var(--text-dim);
+  }
+  .check-row input[type="checkbox"]:focus-visible {
+    outline: 2px solid var(--gold-bright); outline-offset: 2px;
+  }
   .check-row .exp-marker {
     display: inline-flex; align-items: center; gap: 4px;
     font-size: 10px; color: var(--text-dim); letter-spacing: 1px;
@@ -408,6 +442,22 @@ const CAMPANHAS = [
   ['mestre',  'Crônica dos Aventureiros'],
 ];
 
+// Subclasses oficiais do PHB 5e por classe (chave normalizada → lista)
+const SUBCLASSES_POR_CLASSE = {
+  'barbaro':    ['Caminho do Furioso', 'Caminho do Guerreiro Totêmico'],
+  'bardo':      ['Colégio do Conhecimento', 'Colégio do Valor'],
+  'bruxo':      ['Patrono Arquifada', 'Patrono Senhor das Trevas', 'Patrono Grande Antigo'],
+  'clerigo':    ['Domínio do Conhecimento', 'Domínio da Vida', 'Domínio da Luz', 'Domínio da Natureza', 'Domínio da Tempestade', 'Domínio Trapaceiro', 'Domínio da Guerra'],
+  'druida':     ['Círculo da Terra', 'Círculo da Lua'],
+  'feiticeiro': ['Linhagem Dracônica', 'Magia Selvagem'],
+  'guerreiro':  ['Campeão', 'Mestre de Batalha', 'Cavaleiro Místico'],
+  'ladino':     ['Ladrão', 'Assassino', 'Trapaceiro Arcano'],
+  'mago':       ['Escola de Abjuração', 'Escola de Adivinhação', 'Escola de Conjuração', 'Escola de Encantamento', 'Escola de Evocação', 'Escola de Ilusão', 'Escola de Necromancia', 'Escola de Transmutação'],
+  'monge':      ['Caminho da Mão Aberta', 'Caminho da Sombra', 'Caminho dos Quatro Elementos'],
+  'paladino':   ['Juramento de Devoção', 'Juramento dos Anciões', 'Juramento de Vingança'],
+  'patrulheiro':['Caçador', 'Mestre das Feras'],
+};
+
 // Perícias do PHB 5e (PT-BR) — mapeadas para o atributo base
 const PERICIAS = [
   ['acrobacia',         'Acrobacia',         'dex'],
@@ -452,8 +502,21 @@ let chars = [];
 let charAtivo = null;
 let tabAtiva = 'identidade';
 
-// Cache de favoritas (para a aba Magias Preparadas) — vem do localStorage do grimório
-function carregarFavoritasDoGrimorio() {
+// Favoritas: tenta ler do Supabase (spell_lists do PJ ativo); fallback localStorage
+async function carregarFavoritasDoBancoOuLocal() {
+  // Tenta banco primeiro (sincroniza com grimório quando logado)
+  try {
+    if (window.sb && charAtivo?.id) {
+      const { data } = await window.sb
+        .from('spell_lists')
+        .select('spell_names')
+        .eq('character_id', charAtivo.id)
+        .eq('nome', 'Favoritas')
+        .maybeSingle();
+      if (data?.spell_names?.length) return new Set(data.spell_names);
+    }
+  } catch (e) { console.warn('[ficha] sem banco, usando localStorage:', e.message); }
+  // Fallback
   try { return new Set(JSON.parse(localStorage.getItem('grimorio-favoritas-v1') || '[]')); }
   catch { return new Set(); }
 }
@@ -603,6 +666,18 @@ function render() {
   conectarListeners();
 }
 
+function renderSubclasseSelect(classe, atual) {
+  const chave = chaveDeClasse(classe);
+  const opcoes = SUBCLASSES_POR_CLASSE[chave] || [];
+  if (!opcoes.length) {
+    return `<select name="subclasse" disabled style="opacity:.5"><option>${classe ? 'Sem subclasses cadastradas' : 'Escolha uma classe'}</option></select>`;
+  }
+  return `<select name="subclasse" id="sel-subclasse">
+    <option value="">— escolher —</option>
+    ${opcoes.map(o => `<option ${o===atual?'selected':''}>${escape(o)}</option>`).join('')}
+  </select>`;
+}
+
 function renderListaTags(field, label, valores) {
   const tags = (valores || []).map((v, i) =>
     `<span class="tag">${escape(v)}<span class="x" data-rmtag="${field}" data-idx="${i}" role="button" tabindex="0">✕</span></span>`).join('');
@@ -637,10 +712,10 @@ function renderIdentidade(c, atrs) {
       <div class="campo"><label>Raça</label>
         <select name="raca">${RACAS.map(r => `<option ${r===c.raca?'selected':''}>${r}</option>`).join('')}</select></div>
       <div class="campo"><label>Classe</label>
-        <select name="classe">${CLASSES.map(cl => `<option ${cl===c.classe?'selected':''}>${cl}</option>`).join('')}</select></div>
+        <select name="classe" id="sel-classe">${CLASSES.map(cl => `<option ${cl===c.classe?'selected':''}>${cl}</option>`).join('')}</select></div>
       <div class="campo"><label>Subclasse</label>
-        <input name="subclasse" value="${escape(c.subclasse||'')}">
-        <span class="ajuda">Ex.: Domínio da Vida, Caminho do Bárbaro Berserker</span></div>
+        ${renderSubclasseSelect(c.classe, c.subclasse)}
+        <span class="ajuda">Opções automáticas conforme classe (PHB 5e).</span></div>
       <div class="campo"><label>Origem (Background)</label>
         <input name="origem" value="${escape(c.origem||'')}"></div>
       <div class="campo"><label>Alinhamento</label>
@@ -801,7 +876,7 @@ async function popularHabilidades(classe, nivel) {
   wrap.innerHTML = Object.entries(porNivel).sort(([a],[b]) => +a - +b).map(([nv, lista]) => `
     <div class="habilidade-card">
       <h4>Nível ${nv}</h4>
-      <p>${lista.map(h => escape(h.nome)).join(' · ')}</p>
+      ${lista.map(h => `<div style="margin-bottom:8px"><strong style="color:var(--gold-bright)">${escape(h.nome)}.</strong> <span style="color:var(--parchment)">${escape(h.desc || '—')}</span></div>`).join('')}
     </div>
   `).join('');
 }
@@ -820,7 +895,7 @@ function renderMagias(c) {
 async function carregarMagiasPreparadas() {
   const wrap = document.getElementById('magias-prep');
   if (!wrap) return;
-  const favSet = carregarFavoritasDoGrimorio();
+  const favSet = await carregarFavoritasDoBancoOuLocal();
   if (!favSet.size) {
     wrap.innerHTML = `<div class="item-vazio">Nenhuma magia favoritada. Abra o <a href="magias.html" style="color:var(--gold-bright)">Grimório</a> e clique na estrela ☆ das magias que seu personagem prepara.</div>`;
     return;
@@ -966,7 +1041,22 @@ function conectarListeners() {
   if (tabAtiva === 'habilidades') popularHabilidades(charAtivo.classe, charAtivo.nivel);
 
   // Listeners de tags (idiomas/ferramentas) — só na aba identidade
-  if (tabAtiva === 'identidade') conectarListenersTags();
+  if (tabAtiva === 'identidade') {
+    conectarListenersTags();
+    // Quando a classe muda, atualiza dropdown de subclasse
+    const selClasse = document.getElementById('sel-classe');
+    if (selClasse) selClasse.addEventListener('change', e => {
+      const wrap = document.querySelector('[name="subclasse"]')?.closest('.campo');
+      if (wrap) {
+        const ajuda = wrap.querySelector('.ajuda');
+        wrap.querySelector('select,input')?.remove();
+        wrap.insertBefore(
+          Object.assign(document.createElement('div'), { innerHTML: renderSubclasseSelect(e.target.value, '') }).firstElementChild,
+          ajuda
+        );
+      }
+    });
+  }
 
   // Listeners das checkboxes de perícia (habilita/desabilita E quando P muda)
   $$('input[name^="per_"][name$="_prof"]').forEach(cb => {

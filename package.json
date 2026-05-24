@@ -8,9 +8,11 @@
     "gerar-md": "node scripts/gerar_md.js",
     "extrair-pdf": "node scripts/extrair_pdf.js",
     "formatar-phb": "node scripts/formatar_phb.js",
-    "setup-db": "node scripts/setup_db.js"
+    "setup-db": "node scripts/setup_db.js",
+    "auditoria": "node scripts/auditoria.js"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
     "pdf-parse": "^1.1.1",
     "pdf2json": "^3.1.4",
     "pg": "^8.11.5",

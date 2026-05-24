@@ -668,11 +668,8 @@
   <a href="../index.html" class="back-link" aria-label="Voltar à tela inicial">← Voltar</a>
   <button onclick="adicionarCard()" aria-label="Adicionar novo personagem"><span aria-hidden="true">⚜</span> Adicionar</button>
   <button onclick="descansoLongo()" aria-label="Aplicar descanso longo a todos"><span aria-hidden="true">🌙</span> Descanso Longo</button>
-  <button onclick="exportarSave()" aria-label="Baixar arquivo de save"><span aria-hidden="true">💾</span> Baixar Save</button>
-  <button onclick="document.getElementById('file-input').click()" aria-label="Carregar arquivo de save"><span aria-hidden="true">📂</span> Carregar Save</button>
   <button onclick="window.print()" aria-label="Imprimir painel"><span aria-hidden="true">🖨</span> Imprimir</button>
-  <button class="danger" onclick="resetarTudo()" aria-label="Resetar todos os dados"><span aria-hidden="true">☠</span> Resetar</button>
-  <input type="file" id="file-input" accept=".json" onchange="importarSave(event)" aria-label="Selecionar arquivo de save para carregar">
+  <input type="file" id="file-input" accept=".json" onchange="importarSave(event)" style="display:none" aria-hidden="true">
   <button type="button" id="btn-migrar-local" onclick="migrarLocal()" style="display:none" aria-label="Migrar personagens do navegador para o banco"><span aria-hidden="true">📤</span> Migrar Local</button>
   <span class="auth-slot" id="auth-slot" aria-label="Status de login" style="margin-left:auto;display:flex;gap:8px;align-items:center;font-family:'Cinzel',serif;font-size:11px"></span>
 </nav>
@@ -820,7 +817,15 @@ function inputNumerico(valor, callback, classes = '', min = null) {
 function render() {
   const grid = document.getElementById('grid');
   grid.innerHTML = '';
-  estado.personagens.forEach(p => grid.appendChild(criarCard(p)));
+  if (!estado.personagens.length) {
+    grid.innerHTML = `<div style="padding:50px 20px;text-align:center;color:var(--parchment-dim);font-style:italic;grid-column:1/-1;background:rgba(0,0,0,0.25);border:1px dashed var(--blood);border-radius:6px">
+      ${ehMestre
+        ? '🧛 Nenhum personagem ativo em Barovia ainda.<br><br>Os jogadores precisam abrir <strong>Minha Ficha</strong>, vincular à campanha "Maldição de Strahd" e marcar como ★ Ativo.<br><br>Você também pode criar NPCs com o botão <strong>⚜ Adicionar</strong>.'
+        : 'Nenhum personagem na campanha. Clique em <strong>⚜ Adicionar</strong>.'}
+    </div>`;
+  } else {
+    estado.personagens.forEach(p => grid.appendChild(criarCard(p)));
+  }
   salvar();
 }
 

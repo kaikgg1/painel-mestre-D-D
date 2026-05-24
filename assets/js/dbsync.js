@@ -105,6 +105,7 @@
 
     await carregar();
     iniciarRealtime();
+    setupRefetchOnFocus();
     return { ehMestre, usuario: usuarioAtual };
   }
 
@@ -112,7 +113,11 @@
     // RLS já filtra por user_id (ou tudo se mestre)
     let q = window.sb.from('characters').select('*');
     if (campanhaAtual) q = q.eq('campanha', campanhaAtual);
-    if (apenasAtivos)  q = q.eq('is_active', true);
+    // Filtro de ativos: mostra is_active=true OR os próprios do usuário
+    // (assim o Mestre vê ativos dos jogadores + seus próprios NPCs)
+    if (apenasAtivos) {
+      q = q.or(`is_active.eq.true,user_id.eq.${usuarioAtual.id}`);
+    }
     q = q.order('created_at', { ascending: true });
 
     const { data, error } = await q;
@@ -134,6 +139,14 @@
     onChangeCb({ tipo: 'load' });
   }
 
+  // Refetch quando o user volta pra aba (corrige se realtime tiver perdido evento)
+  function setupRefetchOnFocus() {
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') carregar();
+    });
+    window.addEventListener('online', () => carregar());
+  }
+
   // ─── Realtime ────────────────────────────────────────────────────
   function iniciarRealtime() {
     if (listeners) listeners.unsubscribe();
@@ -144,34 +157,38 @@
       .subscribe();
   }
 
+  // Critério "visível": is_active OR é meu (mesmo lógica de carregar)
+  function ehVisivel(row) {
+    if (!apenasAtivos) return true;
+    return row.is_active || row.user_id === usuarioAtual.id;
+  }
+
   async function handleRealtime(payload) {
     const { eventType, new: novo, old } = payload;
     if (eventType === 'INSERT') {
-      if (apenasAtivos && !novo.is_active) return;  // ignora não-ativo
+      if (!ehVisivel(novo)) return;
       const { data: prof } = await window.sb.from('profiles').select('nome').eq('id', novo.user_id).maybeSingle();
       novo._jogador_nome = prof?.nome || '';
       cache.set(novo.id, novo);
       onChangeCb({ tipo: 'insert', char: dbToUi(novo) });
     } else if (eventType === 'UPDATE') {
       const antigo = cache.get(novo.id);
-      // Com filtro apenasAtivos: tratar transições
-      if (apenasAtivos) {
-        if (!novo.is_active && antigo) {
-          // virou inativo: remove da lista
-          cache.delete(novo.id);
-          onChangeCb({ tipo: 'delete', id: novo.id });
-          return;
-        }
-        if (novo.is_active && !antigo) {
-          // virou ativo: adiciona à lista
-          const { data: prof } = await window.sb.from('profiles').select('nome').eq('id', novo.user_id).maybeSingle();
-          novo._jogador_nome = prof?.nome || '';
-          cache.set(novo.id, novo);
-          onChangeCb({ tipo: 'insert', char: dbToUi(novo) });
-          return;
-        }
-        if (!novo.is_active) return;  // não tava na lista e não virou ativo
+      const visAgora = ehVisivel(novo);
+      // Transições de visibilidade
+      if (antigo && !visAgora) {
+        cache.delete(novo.id);
+        onChangeCb({ tipo: 'delete', id: novo.id });
+        return;
       }
+      if (!antigo && visAgora) {
+        const { data: prof } = await window.sb.from('profiles').select('nome').eq('id', novo.user_id).maybeSingle();
+        novo._jogador_nome = prof?.nome || '';
+        cache.set(novo.id, novo);
+        onChangeCb({ tipo: 'insert', char: dbToUi(novo) });
+        return;
+      }
+      if (!visAgora) return;  // continua invisível
+      // Update normal (ambos visíveis)
       novo._jogador_nome = antigo?._jogador_nome || '';
       cache.set(novo.id, novo);
       onChangeCb({ tipo: 'update', char: dbToUi(novo) });
