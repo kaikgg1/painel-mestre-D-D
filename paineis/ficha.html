@@ -95,6 +95,11 @@
   }
   .char-bar select:focus { border-color: var(--gold-bright); }
   .char-bar option { background: #1a1018; }
+  /* Desktop: char-bar-acoes é "transparente" (botões viram filhos diretos) */
+  .char-bar-acoes { display: contents; }
+  @media (max-width: 600px) {
+    .char-bar-acoes { display: grid; grid-template-columns: 1fr auto auto; gap: 6px; }
+  }
 
   .btn { padding: 9px 14px; background: transparent;
     border: 1px solid var(--gold); color: var(--parchment);
@@ -151,11 +156,27 @@
   }
 
   /* ============ TABS ============ */
+  .tabs-wrap {
+    position: relative;
+    /* gradient hint nas bordas para indicar scroll horizontal em mobile */
+  }
+  .tabs-wrap::before, .tabs-wrap::after {
+    content: ''; position: absolute; top: 0; bottom: 1px; width: 24px;
+    pointer-events: none; z-index: 2;
+    opacity: 0; transition: opacity 0.2s;
+  }
+  .tabs-wrap::before { left: 0; background: linear-gradient(to right, var(--bg-card), transparent); }
+  .tabs-wrap::after  { right: 0; background: linear-gradient(to left,  var(--bg-card), transparent); }
+  .tabs-wrap.scroll-left::before  { opacity: 1; }
+  .tabs-wrap.scroll-right::after  { opacity: 1; }
   .tabs {
     display: flex; gap: 4px; margin-bottom: 0;
     border-bottom: 1px solid rgba(139,105,20,0.4);
     overflow-x: auto; scrollbar-width: thin;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
   }
+  .tab { scroll-snap-align: start; }
   .tab {
     padding: 11px 18px; background: transparent;
     border: none; border-bottom: 2px solid transparent;
@@ -278,9 +299,49 @@
     background: transparent; border: 1px solid rgba(139,29,29,0.4); color: #c47a5a;
     padding: 3px 8px; border-radius: 2px; cursor: pointer; font-size: 12px;
     transition: all 0.15s;
+    min-height: 28px; min-width: 28px;
   }
   .item-tabela .lixo:hover { background: var(--blood); color: var(--parchment); }
   .item-vazio { padding: 18px; text-align: center; color: var(--text-dim); font-style: italic; }
+
+  /* MOBILE: tabela vira cards verticais (cada linha = um card) */
+  @media (max-width: 600px) {
+    .item-tabela, .item-tabela thead, .item-tabela tbody, .item-tabela tr, .item-tabela td {
+      display: block;
+    }
+    .item-tabela { background: transparent; border: none; overflow: visible; }
+    .item-tabela thead { display: none; }
+    .item-tabela tr {
+      background: rgba(0,0,0,0.25);
+      border: 1px solid rgba(139,105,20,0.35);
+      border-radius: 6px;
+      padding: 10px 38px 10px 12px;
+      margin-bottom: 8px;
+      position: relative;
+    }
+    .item-tabela td {
+      border: none; padding: 3px 0; font-size: 13px;
+      display: flex; gap: 6px; align-items: baseline;
+    }
+    .item-tabela td::before {
+      content: attr(data-label);
+      font-family: 'Cinzel', serif; color: var(--gold);
+      font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
+      min-width: 70px; flex-shrink: 0;
+    }
+    .item-tabela td:first-child {
+      font-weight: 700; color: var(--gold-bright); font-size: 15px;
+      margin-bottom: 6px; padding-bottom: 6px;
+      border-bottom: 1px dashed rgba(139,105,20,0.25);
+    }
+    .item-tabela td:first-child::before { content: ''; min-width: 0; }
+    .item-tabela td:last-child {
+      position: absolute; top: 8px; right: 8px;
+      padding: 0; margin: 0; border: none;
+    }
+    .item-tabela td:last-child::before { content: ''; min-width: 0; }
+    .item-tabela .lixo { min-height: 36px; min-width: 36px; padding: 4px 10px; font-size: 14px; }
+  }
 
   .adicionar-bloco { display: flex; gap: 8px; align-items: end; margin-top: 14px; flex-wrap: wrap; }
   .adicionar-bloco .campo { flex: 1; min-width: 160px; margin: 0; }
@@ -557,9 +618,11 @@
   .hp-quick button.q-dano:hover { background: rgba(139,29,29,0.3); color: var(--parchment); border-color: var(--blood-bright); }
   .hp-quick button.q-cura { border-color: rgba(46,134,46,0.5); color: #8fc28f; }
   .hp-quick button.q-cura:hover { background: rgba(46,134,46,0.25); color: var(--parchment); border-color: #2e862e; }
-  @media (max-width: 480px) {
-    .hp-quick { grid-template-columns: repeat(4, 1fr); }
-    .hp-quick button { font-size: 11px; padding: 8px 4px; min-height: 34px; }
+  @media (max-width: 600px) {
+    .hp-aplicar-linha input { width: 70px; font-size: 17px; padding: 10px; min-height: 42px; }
+    .hp-btn { padding: 10px 14px; font-size: 12px; min-height: 42px; }
+    .hp-quick { grid-template-columns: repeat(4, 1fr); gap: 6px; }
+    .hp-quick button { font-size: 12px; padding: 10px 4px; min-height: 40px; }
   }
 
   .stat-hero {
@@ -640,6 +703,27 @@
     .magia-row { grid-template-columns: 50px 1fr; row-gap: 4px; }
     .magia-escola, .magia-tags { grid-column: 2; }
   }
+  @media (max-width: 600px) {
+    /* Char-bar reorganizada em mobile: select 100%, depois botões em grid */
+    .char-bar {
+      display: grid;
+      grid-template-areas: "label" "select" "acoes";
+      gap: 8px; padding: 12px;
+    }
+    .char-bar .pj-label { grid-area: label; text-align: center; }
+    .char-bar select { grid-area: select; min-width: 0; }
+    .char-bar #btn-ativo, .char-bar #btn-novo, .char-bar #btn-deletar {
+      /* todos vão pra área acoes via wrapper */
+    }
+    .char-bar-acoes {
+      grid-area: acoes;
+      display: grid; grid-template-columns: 1fr auto auto; gap: 6px;
+    }
+    /* Aviso visibilidade mais compacto */
+    .aviso-visibilidade { padding: 8px 12px; font-size: 12px; line-height: 1.4; gap: 8px; margin-bottom: 12px; }
+    .aviso-visibilidade .icone { font-size: 16px; }
+  }
+
   @media (max-width: 480px) {
     main { padding: 0 8px 30px; }
     .tab-content { padding: 14px 12px; }
@@ -892,21 +976,25 @@ function render() {
       <select id="sel-char" aria-label="Selecionar personagem">
         ${chars.map(x => `<option value="${x.id}" ${x.id===c.id?'selected':''}>${escape(x.nome)}${x.classe ? ' — ' + escape(x.classe) : ''}${x.nivel ? ' N' + x.nivel : ''}${x.is_active?' ★':''}</option>`).join('')}
       </select>
-      <button class="estrela-ativo ${c.is_active?'ativo':''}" id="btn-ativo" type="button" aria-pressed="${!!c.is_active}" title="Marcar como personagem ativo (visível ao Mestre)">
-        <span aria-hidden="true">${c.is_active?'★':'☆'}</span>
-        <span class="lbl">${c.is_active?'Ativo':'Ativar'}</span>
-      </button>
-      <button class="btn" type="button" id="btn-novo">+ Novo</button>
-      <button class="btn danger" type="button" id="btn-deletar">Deletar</button>
+      <div class="char-bar-acoes">
+        <button class="estrela-ativo ${c.is_active?'ativo':''}" id="btn-ativo" type="button" aria-pressed="${!!c.is_active}" title="Marcar como personagem ativo (visível ao Mestre)">
+          <span aria-hidden="true">${c.is_active?'★':'☆'}</span>
+          <span class="lbl">${c.is_active?'Ativo':'Ativar'}</span>
+        </button>
+        <button class="btn" type="button" id="btn-novo">+ Novo</button>
+        <button class="btn danger" type="button" id="btn-deletar">Deletar</button>
+      </div>
     </div>
 
-    <div class="tabs" role="tablist">
-      <button class="tab ${tabAtiva==='identidade'?'ativa':''}" data-tab="identidade" role="tab">Identidade</button>
-      <button class="tab ${tabAtiva==='combate'?'ativa':''}" data-tab="combate" role="tab">Combate</button>
-      <button class="tab ${tabAtiva==='habilidades'?'ativa':''}" data-tab="habilidades" role="tab">Habilidades</button>
-      <button class="tab ${tabAtiva==='magias'?'ativa':''}" data-tab="magias" role="tab">Magias</button>
-      <button class="tab ${tabAtiva==='equipamento'?'ativa':''}" data-tab="equipamento" role="tab">Equipamento</button>
-      <button class="tab ${tabAtiva==='roleplay'?'ativa':''}" data-tab="roleplay" role="tab">Roleplay</button>
+    <div class="tabs-wrap" id="tabs-wrap">
+      <div class="tabs" role="tablist" id="tabs">
+        <button class="tab ${tabAtiva==='identidade'?'ativa':''}" data-tab="identidade" role="tab">Identidade</button>
+        <button class="tab ${tabAtiva==='combate'?'ativa':''}" data-tab="combate" role="tab">Combate</button>
+        <button class="tab ${tabAtiva==='habilidades'?'ativa':''}" data-tab="habilidades" role="tab">Habilidades</button>
+        <button class="tab ${tabAtiva==='magias'?'ativa':''}" data-tab="magias" role="tab">Magias</button>
+        <button class="tab ${tabAtiva==='equipamento'?'ativa':''}" data-tab="equipamento" role="tab">Equipamento</button>
+        <button class="tab ${tabAtiva==='roleplay'?'ativa':''}" data-tab="roleplay" role="tab">Roleplay</button>
+      </div>
     </div>
 
     <form class="tab-content" id="ficha-form" novalidate>
@@ -1307,7 +1395,7 @@ function renderTabelaItens(tipo, itens, colunas, campos) {
   return `<table class="item-tabela">
     <thead><tr>${colunas.map(c => `<th>${c}</th>`).join('')}<th></th></tr></thead>
     <tbody>${itens.map((it, idx) => `
-      <tr>${campos.map(f => `<td>${escape(it[f] ?? '—')}</td>`).join('')}
+      <tr>${campos.map((f, ci) => `<td data-label="${escape(colunas[ci])}">${escape(it[f] ?? '—')}</td>`).join('')}
       <td style="text-align:right"><button type="button" class="lixo" data-rm="${tipo}" data-idx="${idx}" aria-label="Remover">✕</button></td></tr>
     `).join('')}</tbody>
   </table>`;
@@ -1360,6 +1448,22 @@ function conectarListeners() {
     render();
     if (tabAtiva === 'magias') carregarMagiasPreparadas();
   }));
+  // Tabs scroll indicator (gradient hints)
+  const tabs = document.getElementById('tabs');
+  const wrap = document.getElementById('tabs-wrap');
+  if (tabs && wrap) {
+    const upd = () => {
+      const max = tabs.scrollWidth - tabs.clientWidth;
+      wrap.classList.toggle('scroll-left',  tabs.scrollLeft > 4);
+      wrap.classList.toggle('scroll-right', tabs.scrollLeft < max - 4);
+    };
+    upd();
+    tabs.addEventListener('scroll', upd, { passive: true });
+    window.addEventListener('resize', upd);
+    // Scroll a aba ativa pra dentro do viewport
+    const ativa = tabs.querySelector('.tab.ativa');
+    if (ativa) ativa.scrollIntoView({ inline: 'center', block: 'nearest' });
+  }
 
   // Modificadores ao vivo (e recalcula salv/perícias se a tab Combate estiver presente)
   $$('[data-attr]').forEach(inp => {

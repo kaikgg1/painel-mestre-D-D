@@ -637,10 +637,15 @@
       padding-bottom: env(safe-area-inset-bottom);
       box-sizing: border-box;
     }
-    .modal-body { padding: 14px 16px calc(20px + env(safe-area-inset-bottom)); overflow-x: hidden; }
-    .modal-title { font-size: 20px; }
-    .desc-text { font-size: 15px; line-height: 1.65; word-wrap: break-word; overflow-wrap: break-word; }
+    .modal-header { padding: 14px 14px 12px; }
+    .modal-body { padding: 12px 14px calc(20px + env(safe-area-inset-bottom)); overflow-x: hidden; }
+    .modal-title { font-size: 19px; line-height: 1.2; padding-right: 90px; }
+    .modal-meta { gap: 4px; margin-top: 6px; }
+    .meta-badge { font-size: 9px; padding: 3px 7px; }
+    .desc-text { font-size: 14px; line-height: 1.6; word-wrap: break-word; overflow-wrap: break-word; }
+    .desc-text p { margin: 0 0 8px; }
     .info-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
+    .modal-fav { padding: 6px 10px; font-size: 10px; }
   }
 
   /* Foco visível */
