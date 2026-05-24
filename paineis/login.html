@@ -26,107 +26,106 @@
   }
 
   html, body {
-    min-height: 100vh;
-    min-height: 100dvh;
+    min-height: 100vh; min-height: 100dvh;
     background-color: var(--bg-deep);
     background-image:
-      radial-gradient(ellipse at top, #2a1518 0%, #150a0c 50%, #050304 100%),
-      radial-gradient(circle at 20% 30%, rgba(139,29,29,0.08) 0%, transparent 50%),
-      radial-gradient(circle at 80% 70%, rgba(139,105,20,0.06) 0%, transparent 50%);
+      radial-gradient(ellipse at top, #2a1518 0%, #150a0c 40%, #050304 100%),
+      radial-gradient(circle at 25% 80%, rgba(139,29,29,0.06) 0%, transparent 60%),
+      radial-gradient(circle at 75% 20%, rgba(139,105,20,0.05) 0%, transparent 60%);
     font-family: 'EB Garamond', Georgia, serif;
     color: var(--parchment);
-    display: grid;
-    place-items: center;
-    padding: 24px 16px;
+    display: grid; place-items: center;
+    padding: 20px 16px;
   }
-
   body::before {
     content: ''; position: fixed; inset: 0; pointer-events: none;
-    background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.6) 100%);
+    background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.55) 100%);
     z-index: 0;
   }
 
-  /* ===== CARD PRINCIPAL ===== */
   .card {
     position: relative; z-index: 1;
     width: 100%;
-    max-width: 440px;
+    max-width: 460px;
     background: linear-gradient(160deg, #1f1416 0%, #150c0e 60%, #0d0709 100%);
     border: 2px solid var(--gold);
-    border-radius: 6px;
-    padding: 44px 36px 36px;
+    border-radius: 8px;
+    padding: 36px 32px 28px;
     box-shadow:
       0 16px 48px rgba(0,0,0,0.8),
       inset 0 0 32px rgba(0,0,0,0.5),
       0 0 0 1px var(--blood) inset;
   }
-
-  /* Cantos decorativos */
-  .corner { position: absolute; color: var(--blood); font-size: 16px; opacity: 0.85; }
+  .corner { position: absolute; color: var(--blood); font-size: 14px; opacity: 0.7; }
   .corner.tl { top: 8px; left: 12px; }
   .corner.tr { top: 8px; right: 12px; }
   .corner.bl { bottom: 8px; left: 12px; }
   .corner.br { bottom: 8px; right: 12px; }
 
-  /* ===== HEADER ===== */
+  /* ====== HEADER ====== */
   .crest {
     display: block; text-align: center;
-    font-size: 56px; line-height: 1;
-    margin-bottom: 16px;
+    font-size: 52px; line-height: 1; margin-bottom: 14px;
     filter: drop-shadow(0 0 14px rgba(139,105,20,0.5));
-    animation: floatCrest 4s ease-in-out infinite;
+    animation: float 4s ease-in-out infinite;
   }
-  @keyframes floatCrest {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
+  @keyframes float {
+    0%,100% { transform: translateY(0); }
+    50%     { transform: translateY(-4px); }
   }
   .title {
     font-family: 'Cinzel Decorative', serif;
-    font-size: clamp(20px, 5vw, 28px); font-weight: 900;
+    font-size: clamp(20px, 5vw, 26px); font-weight: 900;
     letter-spacing: 3px; text-align: center;
     color: var(--gold-bright);
-    text-shadow: 0 0 28px rgba(184,138,44,0.45), 1px 1px 0 var(--shadow);
-    margin-bottom: 8px;
+    text-shadow: 0 0 24px rgba(184,138,44,0.45), 1px 1px 0 var(--shadow);
+    margin-bottom: 6px;
   }
   .subtitle {
-    text-align: center; font-style: italic; font-size: 14px;
-    color: var(--parchment-dim); letter-spacing: 2px;
-    margin-bottom: 32px;
+    text-align: center; font-style: italic; font-size: 13px;
+    color: var(--parchment-dim); letter-spacing: 1.5px;
+    margin-bottom: 24px;
   }
   .subtitle::before { content: '— '; color: var(--blood-bright); }
   .subtitle::after  { content: ' —'; color: var(--blood-bright); }
 
-  /* ===== ESCOLHA DE JOGADOR (Grid de cards) ===== */
-  .label {
-    display: block;
-    font-family: 'Cinzel', serif; font-size: 11px;
+  /* ====== SEÇÕES ====== */
+  .secao { margin-bottom: 16px; }
+  .secao:last-child { margin-bottom: 0; }
+  .secao-label {
+    display: block; margin-bottom: 10px;
+    font-family: 'Cinzel', serif; font-size: 10px;
     font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
-    color: var(--gold); margin-bottom: 12px;
+    color: var(--gold);
     text-align: center;
   }
 
+  /* ====== JOGADORES ====== */
   .jogadores {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: repeat(3, 1fr);
     gap: 10px;
-    margin-bottom: 16px;
   }
   .jogador-btn {
-    position: relative;
-    padding: 18px 8px 12px;
     background: linear-gradient(160deg, var(--bg-card-soft), var(--bg-card));
-    border: 1.5px solid rgba(139,105,20,0.4);
-    border-radius: 4px;
+    border: 1.5px solid rgba(139,105,20,0.45);
+    border-radius: 6px;
     color: var(--parchment);
     cursor: pointer;
-    transition: all 0.2s;
+    transition: transform 0.15s, border-color 0.15s, box-shadow 0.2s, background 0.2s;
     font-family: 'Cinzel', serif;
     text-align: center;
+    padding: 14px 8px 10px;
+    display: flex; flex-direction: column; align-items: center;
+    gap: 4px;
+    min-height: 80px;
   }
-  .jogador-btn:hover {
+  .jogador-btn .icone { font-size: 24px; line-height: 1; filter: drop-shadow(0 0 4px rgba(0,0,0,0.6)); }
+  .jogador-btn .nome { font-size: 11px; font-weight: 700; letter-spacing: 1px; }
+  .jogador-btn:hover:not(:disabled) {
     transform: translateY(-2px);
     border-color: var(--gold-bright);
-    box-shadow: 0 6px 16px rgba(0,0,0,0.6);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.5);
   }
   .jogador-btn.selecionado {
     background: linear-gradient(160deg, var(--gold), #6a4f0e);
@@ -134,98 +133,98 @@
     color: var(--shadow);
     box-shadow: 0 0 18px rgba(212,168,67,0.4);
   }
-  .jogador-btn .icone {
-    display: block; font-size: 26px; line-height: 1;
-    margin-bottom: 6px;
-  }
-  .jogador-btn .nome {
-    font-size: 12px; font-weight: 700; letter-spacing: 1px;
-  }
 
-  /* Bloco do Mestre */
-  .mestre-bloco {
-    margin-top: 8px; padding-top: 16px;
-    border-top: 1px solid rgba(139,29,29,0.4);
-    position: relative;
-  }
-  .mestre-bloco::before {
-    content: '♛'; position: absolute; left: 50%; top: -10px;
-    transform: translateX(-50%);
-    background: var(--bg-card); padding: 0 8px;
-    color: var(--blood-bright); font-size: 14px;
-  }
-  .jogador-btn.mestre {
-    border-color: var(--blood);
+  /* ====== MESTRE ====== */
+  .mestre-btn {
+    width: 100%;
     background: linear-gradient(160deg, #2a1014, #1a0608);
-  }
-  .jogador-btn.mestre:hover {
-    border-color: var(--blood-bright);
-    box-shadow: 0 6px 16px rgba(139,29,29,0.4);
-  }
-  .jogador-btn.mestre.selecionado {
-    background: linear-gradient(160deg, var(--blood-bright), var(--blood));
+    border: 1.5px solid var(--blood);
+    border-radius: 6px;
     color: var(--parchment);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: 'Cinzel', serif;
+    padding: 12px 18px;
+    display: flex; align-items: center; justify-content: center;
+    gap: 10px;
+    min-height: 52px;
+  }
+  .mestre-btn .ic { font-size: 20px; color: var(--gold-bright); }
+  .mestre-btn .nome { font-size: 13px; font-weight: 700; letter-spacing: 2px; }
+  .mestre-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
     border-color: var(--blood-bright);
+    box-shadow: 0 6px 14px rgba(139,29,29,0.4);
+  }
+  .mestre-btn.selecionado {
+    background: linear-gradient(160deg, var(--blood-bright), var(--blood));
+    border-color: var(--blood-bright);
+    color: var(--parchment);
     box-shadow: 0 0 18px rgba(139,29,29,0.5);
   }
-  .jogador-btn.mestre .icone { color: var(--gold-bright); }
-  .jogador-btn.mestre.selecionado .icone { color: var(--parchment); }
+  .mestre-btn.selecionado .ic { color: var(--parchment); }
 
-  /* ===== BOTÃO ENTRAR ===== */
+  /* ====== ENTRAR ====== */
   .btn-entrar {
     display: block; width: 100%;
-    margin-top: 24px;
     padding: 14px 18px;
+    margin-top: 18px;
     background: linear-gradient(to bottom, var(--gold), #6a4f0e);
     border: 1px solid var(--gold-bright);
     color: var(--shadow);
     font-family: 'Cinzel', serif; font-size: 13px;
-    font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
-    border-radius: 3px;
+    font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase;
+    border-radius: 4px;
     cursor: pointer;
     transition: all 0.2s;
-    min-height: 48px;
+    min-height: 50px;
   }
   .btn-entrar:hover:not(:disabled) {
     background: linear-gradient(to bottom, var(--gold-bright), var(--gold));
     transform: translateY(-1px);
-    box-shadow: 0 4px 14px rgba(184,138,44,0.4);
+    box-shadow: 0 6px 14px rgba(184,138,44,0.4);
   }
-  .btn-entrar:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-entrar:disabled { opacity: 0.35; cursor: not-allowed; }
+  .btn-entrar:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 2px; }
 
-  /* ===== MENSAGEM DE ERRO ===== */
   .erro {
-    margin-top: 14px; padding: 10px 14px;
+    margin-top: 12px; padding: 10px 14px;
     background: rgba(107,16,16,0.25);
     border: 1px solid var(--blood-bright);
     color: #f4b8a8;
-    font-size: 13px; border-radius: 3px;
+    font-size: 13px; border-radius: 4px;
     display: none;
   }
   .erro.show { display: block; }
 
   .voltar {
-    margin-top: 22px; text-align: center;
+    margin-top: 18px; text-align: center;
     font-size: 12px; color: var(--parchment-dim);
     font-style: italic;
   }
   .voltar a { color: var(--gold-bright); text-decoration: none; transition: color 0.2s; }
   .voltar a:hover { color: var(--gold-light); text-decoration: underline; }
 
-  /* ===== RESPONSIVIDADE ===== */
+  /* ====== RESPONSIVO ====== */
   @media (max-width: 480px) {
     body { padding: 12px 8px; }
-    .card { padding: 32px 22px 26px; border-width: 1.5px; }
-    .crest { font-size: 44px; margin-bottom: 12px; }
-    .subtitle { margin-bottom: 24px; font-size: 13px; letter-spacing: 1.5px; }
+    .card { padding: 28px 20px 22px; border-width: 1.5px; border-radius: 6px; }
+    .crest { font-size: 40px; margin-bottom: 10px; }
+    .title { letter-spacing: 2px; margin-bottom: 4px; }
+    .subtitle { font-size: 12px; margin-bottom: 20px; letter-spacing: 1px; }
+    .secao-label { margin-bottom: 8px; font-size: 9px; }
+    .secao { margin-bottom: 14px; }
     .jogadores { gap: 8px; }
-    .jogador-btn { padding: 16px 8px 12px; min-height: 70px; }
-    .jogador-btn .icone { font-size: 22px; margin-bottom: 4px; }
+    .jogador-btn { min-height: 76px; padding: 12px 6px 10px; }
+    .jogador-btn .icone { font-size: 22px; }
     .jogador-btn .nome { font-size: 11px; }
-    .jogador-btn.mestre { min-height: 56px; padding: 14px 12px; }
+    .mestre-btn { padding: 12px 14px; min-height: 48px; }
+    .mestre-btn .ic { font-size: 18px; }
+    .mestre-btn .nome { font-size: 12px; letter-spacing: 1.5px; }
+    .btn-entrar { margin-top: 14px; padding: 14px; font-size: 12px; letter-spacing: 2px; min-height: 48px; }
   }
 
-  /* Telas muito estreitas (smartphones antigos) */
+  /* Telas muito estreitas */
   @media (max-width: 340px) {
     .jogadores { grid-template-columns: 1fr 1fr; }
   }
@@ -248,31 +247,33 @@
   <p class="subtitle">Escolha seu nome</p>
 
   <form id="login-form" novalidate>
-    <span class="label" id="label-jogador">Jogador</span>
-    <div class="jogadores" id="jogadores-grid" role="radiogroup" aria-labelledby="label-jogador">
-      <button type="button" class="jogador-btn" data-nome="Sabrina123" role="radio" aria-checked="false">
-        <span class="icone" aria-hidden="true">🧝‍♀️</span>
-        <span class="nome">Sabrina</span>
-      </button>
-      <button type="button" class="jogador-btn" data-nome="Derik123" role="radio" aria-checked="false">
-        <span class="icone" aria-hidden="true">⚔️</span>
-        <span class="nome">Derik</span>
-      </button>
-      <button type="button" class="jogador-btn" data-nome="Felipe123" role="radio" aria-checked="false">
-        <span class="icone" aria-hidden="true">🏹</span>
-        <span class="nome">Felipe</span>
-      </button>
+    <div class="secao">
+      <span class="secao-label">Jogador</span>
+      <div class="jogadores" role="radiogroup" aria-label="Selecionar jogador">
+        <button type="button" class="jogador-btn" data-nome="Sabrina123" role="radio" aria-checked="false">
+          <span class="icone" aria-hidden="true">🧝‍♀️</span>
+          <span class="nome">Sabrina</span>
+        </button>
+        <button type="button" class="jogador-btn" data-nome="Derik123" role="radio" aria-checked="false">
+          <span class="icone" aria-hidden="true">⚔️</span>
+          <span class="nome">Derik</span>
+        </button>
+        <button type="button" class="jogador-btn" data-nome="Felipe123" role="radio" aria-checked="false">
+          <span class="icone" aria-hidden="true">🏹</span>
+          <span class="nome">Felipe</span>
+        </button>
+      </div>
     </div>
 
-    <div class="mestre-bloco">
-      <button type="button" class="jogador-btn mestre" data-nome="Mestre123" role="radio" aria-checked="false" style="grid-column:1/-1;width:100%">
-        <span class="icone" aria-hidden="true">👑</span>
+    <div class="secao">
+      <span class="secao-label">Mestre</span>
+      <button type="button" class="mestre-btn" data-nome="Mestre123" role="radio" aria-checked="false">
+        <span class="ic" aria-hidden="true">👑</span>
         <span class="nome">Mestre</span>
       </button>
     </div>
 
     <input type="hidden" id="nome-selecionado" required>
-
     <button type="submit" class="btn-entrar" id="btn-entrar" disabled>Entrar</button>
     <div class="erro" id="erro" role="alert" aria-live="polite"></div>
   </form>
@@ -291,16 +292,14 @@
   const erro  = document.getElementById('erro');
   const hidden = document.getElementById('nome-selecionado');
 
-  // Se já estiver logado, vai direto pro index
   (async () => {
     const u = await window.Auth.getUser();
     if (u) location.replace('../index.html');
   })();
 
-  // Seleção via botões
-  document.querySelectorAll('.jogador-btn').forEach(b => {
+  document.querySelectorAll('.jogador-btn, .mestre-btn').forEach(b => {
     b.addEventListener('click', () => {
-      document.querySelectorAll('.jogador-btn').forEach(x => {
+      document.querySelectorAll('.jogador-btn, .mestre-btn').forEach(x => {
         x.classList.remove('selecionado');
         x.setAttribute('aria-checked', 'false');
       });
@@ -308,11 +307,9 @@
       b.setAttribute('aria-checked', 'true');
       hidden.value = b.dataset.nome;
       btn.disabled = false;
-      btn.focus({preventScroll: true});
     });
   });
 
-  // Submit
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
     erro.classList.remove('show');
