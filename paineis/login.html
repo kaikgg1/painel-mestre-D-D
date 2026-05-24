@@ -30,8 +30,8 @@
     background-color: var(--bg-deep);
     background-image:
       radial-gradient(ellipse at top, #2a1518 0%, #150a0c 40%, #050304 100%),
-      radial-gradient(circle at 20% 70%, rgba(139,29,29,0.08) 0%, transparent 55%),
-      radial-gradient(circle at 80% 30%, rgba(139,105,20,0.06) 0%, transparent 55%);
+      radial-gradient(circle at 15% 60%, rgba(139,29,29,0.1) 0%, transparent 45%),
+      radial-gradient(circle at 85% 40%, rgba(139,105,20,0.08) 0%, transparent 45%);
     font-family: 'EB Garamond', Georgia, serif;
     color: var(--parchment);
     display: grid; place-items: center;
@@ -45,12 +45,34 @@
     z-index: 0;
   }
 
+  /* ====== LAYOUT GLOBAL — DESKTOP: 2 COLUNAS ====== */
+  .wrap {
+    position: relative; z-index: 1;
+    width: 100%; max-width: 1100px;
+    display: grid;
+    grid-template-columns: 1fr 520px;
+    gap: 60px;
+    align-items: center;
+    padding: 24px;
+  }
+  @media (max-width: 980px) {
+    .wrap {
+      grid-template-columns: 1fr;
+      gap: 24px;
+      max-width: 720px;
+    }
+  }
+
   /* ====== HEADER FLUTUANTE ====== */
   .topo {
     position: relative; z-index: 1;
     text-align: center;
-    margin-bottom: 28px;
     animation: fadeUp 0.6s ease-out;
+  }
+  @media (min-width: 981px) {
+    .topo { text-align: left; padding-right: 20px; }
+    .topo .subtitulo::before { content: ''; margin: 0; }
+    .topo .subtitulo::after  { content: ''; margin: 0; }
   }
   @keyframes fadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
   .crest {
@@ -58,6 +80,60 @@
     margin-bottom: 12px;
     filter: drop-shadow(0 0 18px rgba(139,105,20,0.55));
     animation: float 4s ease-in-out infinite;
+  }
+  @media (min-width: 981px) { .crest { font-size: 72px; } .titulo { font-size: 40px; } }
+
+  /* ====== INFO BLOCO (desktop) ====== */
+  .info-bloco {
+    display: none;
+  }
+  @media (min-width: 981px) {
+    .info-bloco {
+      display: block;
+      margin-top: 28px;
+      padding-top: 22px;
+      border-top: 1px solid rgba(139,105,20,0.3);
+    }
+    .info-bloco h2 {
+      font-family: 'Cinzel', serif;
+      font-size: 12px; color: var(--gold);
+      letter-spacing: 2px; text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+    .feature-list { display: flex; flex-direction: column; gap: 14px; }
+    .feature {
+      display: flex; gap: 14px; align-items: flex-start;
+    }
+    .feature-ic {
+      font-size: 26px; line-height: 1;
+      width: 44px; height: 44px;
+      display: flex; align-items: center; justify-content: center;
+      background: linear-gradient(160deg, var(--bg-card-soft), var(--bg-card));
+      border: 1px solid var(--gold);
+      border-radius: 50%;
+      flex-shrink: 0;
+      box-shadow: inset 0 0 8px rgba(0,0,0,0.4);
+    }
+    .feature-texto h3 {
+      font-family: 'Cinzel', serif;
+      font-size: 13px; color: var(--gold-bright);
+      letter-spacing: 1px; margin-bottom: 2px;
+    }
+    .feature-texto p {
+      font-size: 13px; color: var(--parchment-dim);
+      line-height: 1.45;
+    }
+
+    .rodape-info {
+      margin-top: 28px;
+      padding: 14px 16px;
+      background: rgba(0,0,0,0.25);
+      border-left: 3px solid var(--blood);
+      border-radius: 0 6px 6px 0;
+      font-size: 12px; font-style: italic;
+      color: var(--parchment-dim); line-height: 1.5;
+    }
+    .rodape-info strong { color: var(--gold-bright); font-style: normal; }
   }
   @keyframes float {
     0%,100% { transform: translateY(0); }
@@ -344,11 +420,41 @@
 </head>
 <body>
 
-<div style="position:relative;z-index:1;width:100%;max-width:720px;display:flex;flex-direction:column;align-items:center">
+<div class="wrap">
   <header class="topo">
     <span class="crest" aria-hidden="true">⚔️</span>
-    <h1 class="titulo">Entrar na Mesa</h1>
-    <p class="subtitulo">Quem está sentando à mesa esta noite?</p>
+    <h1 class="titulo">Painel do Mestre</h1>
+    <p class="subtitulo">D&amp;D 5ª Edição · Crônicas em tempo real</p>
+
+    <div class="info-bloco">
+      <h2>Sua mesa, sempre à mão</h2>
+      <div class="feature-list">
+        <div class="feature">
+          <span class="feature-ic" aria-hidden="true">📜</span>
+          <div class="feature-texto">
+            <h3>Ficha completa</h3>
+            <p>Atributos, perícias, salvaguardas e equipamento — tudo do Livro do Jogador.</p>
+          </div>
+        </div>
+        <div class="feature">
+          <span class="feature-ic" aria-hidden="true">📖</span>
+          <div class="feature-texto">
+            <h3>Grimório com 361 magias</h3>
+            <p>Em PT-BR, com filtros e favoritas vinculadas ao seu personagem.</p>
+          </div>
+        </div>
+        <div class="feature">
+          <span class="feature-ic" aria-hidden="true">⚡</span>
+          <div class="feature-texto">
+            <h3>Tempo real</h3>
+            <p>O Mestre vê as fichas atualizando enquanto você joga — sem refresh.</p>
+          </div>
+        </div>
+      </div>
+      <div class="rodape-info">
+        Cada jogador vê apenas sua própria ficha · O <strong>Mestre</strong> acompanha todos.
+      </div>
+    </div>
   </header>
 
   <main class="selecao">
