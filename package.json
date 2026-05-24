@@ -7,7 +7,9 @@
     "parse": "node scripts/parse_magias.js",
     "gerar-md": "node scripts/gerar_md.js",
     "extrair-pdf": "node scripts/extrair_pdf.js",
+    "extrair-mestre": "node scripts/extrair_pdf.js Mestre.pdf",
     "formatar-phb": "node scripts/formatar_phb.js",
+    "formatar-mestre": "node scripts/formatar_phb.js Mestre.txt",
     "setup-db": "node scripts/setup_db.js",
     "auditoria": "node scripts/auditoria.js"
   },

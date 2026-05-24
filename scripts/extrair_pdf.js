@@ -1,12 +1,15 @@
-// extrair_pdf.js — Extrai texto do docs/LivroDoJogador.pdf para docs/LivroDoJogador.txt
-// Uso: node scripts/extrair_pdf.js
+// extrair_pdf.js — Extrai texto de um PDF em docs/ para .txt no mesmo nome
+// Uso:
+//   node scripts/extrair_pdf.js                    → padrão: LivroDoJogador.pdf
+//   node scripts/extrair_pdf.js Mestre.pdf         → qualquer arquivo em docs/
 // Pré-requisito: npm install
 const fs = require('fs');
 const path = require('path');
 const pdfParse = require('pdf-parse');
 
-const PDF_PATH = path.join(__dirname, '..', 'docs', 'LivroDoJogador.pdf');
-const TXT_PATH = path.join(__dirname, '..', 'docs', 'LivroDoJogador.txt');
+const arg = process.argv[2] || 'LivroDoJogador.pdf';
+const PDF_PATH = path.join(__dirname, '..', 'docs', arg);
+const TXT_PATH = PDF_PATH.replace(/\.pdf$/i, '.txt');
 
 if (!fs.existsSync(PDF_PATH)) {
   console.error(`❌ PDF não encontrado: ${PDF_PATH}`);

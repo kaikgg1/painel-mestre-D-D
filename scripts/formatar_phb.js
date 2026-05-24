@@ -4,8 +4,9 @@
 const fs = require('fs');
 const path = require('path');
 
-const TXT_PATH = path.join(__dirname, '..', 'docs', 'LivroDoJogador.txt');
-const MD_PATH  = path.join(__dirname, '..', 'docs', 'LivroDoJogador.md');
+const arg = process.argv[2] || 'LivroDoJogador.txt';
+const TXT_PATH = path.join(__dirname, '..', 'docs', arg);
+const MD_PATH  = TXT_PATH.replace(/\.txt$/i, '.md');
 
 if (!fs.existsSync(TXT_PATH)) {
   console.error(`❌ Arquivo não encontrado: ${TXT_PATH}`);
@@ -85,10 +86,12 @@ function formatPage(page) {
 
 // ── 3. Monta saída ───────────────────────────────────────────────────────────
 const total = pages.length;
+const nomeBase = path.basename(TXT_PATH, '.txt');
+const titulo = nomeBase.replace(/([A-Z])/g, ' $1').replace(/^\s/, '') + ' — D&D 5e';
 const lines = [
-  '# Livro do Jogador — D&D 5e',
+  `# ${titulo}`,
   '',
-  '> Extração textual de `LivroDoJogador.pdf` (Edição Brasileira, Galápagos Jogos).',
+  `> Extração textual de \`${nomeBase}.pdf\`.`,
   `> ${total} páginas processadas. Cabeçalhos em CAPS no original viram \`## Título\`.`,
   '',
   '> ⚠️ Conteúdo protegido por direitos autorais — uso pessoal, não distribuir.',

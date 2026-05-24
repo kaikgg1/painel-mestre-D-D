@@ -1,6 +1,9 @@
-# Conteúdo do PHB — copyright Galápagos Jogos / WotC, não distribuir
+# Conteúdo do PHB / DMG — copyright Galápagos Jogos / WotC, não distribuir
 docs/LivroDoJogador.*
+docs/Mestre.*
 docs/*.pdf
+docs/*.txt
+docs/*.md
 docs/fichas_txt/
 
 # Dependências locais (instaláveis via `npm install`)
