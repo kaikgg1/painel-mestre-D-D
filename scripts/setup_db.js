@@ -20,6 +20,7 @@ const SCRIPTS = [
   '006_profiles_seed.sql',
   '007_personagem_ativo_e_decimais.sql',
   '008_ficha_completa.sql',
+  '009_ativar_pjs_orfaos.sql',
 ];
 
 (async () => {

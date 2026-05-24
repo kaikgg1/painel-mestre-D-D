@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Minha Ficha — Personagem D&D 5e">
 <meta name="theme-color" content="#0a0608">
-<link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+<link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
 <title>Minha Ficha — D&D 5e</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,700;1,400&display=swap');
@@ -111,6 +111,27 @@
   }
   .btn.primary:hover { background: linear-gradient(to bottom, var(--gold-bright), var(--gold)); }
   .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* AVISO DE FICHA NÃO VISÍVEL PRO MESTRE */
+  .aviso-visibilidade {
+    background: linear-gradient(160deg, rgba(184,138,44,0.18), rgba(107,16,16,0.18));
+    border: 1px solid var(--gold);
+    border-radius: 4px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    line-height: 1.5;
+  }
+  .aviso-visibilidade.ok {
+    background: rgba(46,134,46,0.12);
+    border-color: #2e862e;
+    color: var(--ok);
+  }
+  .aviso-visibilidade .icone { font-size: 18px; flex-shrink: 0; }
+  .aviso-visibilidade strong { color: var(--gold-bright); }
 
   /* ESTRELA "ATIVO" */
   .estrela-ativo {
@@ -381,6 +402,11 @@ const RACAS = ['','Anão','Elfo','Halfling','Humano','Draconato','Gnomo','Meio-E
 const CLASSES = ['','Bárbaro','Bardo','Bruxo','Clérigo','Druida','Feiticeiro','Guerreiro','Ladino','Mago','Monge','Paladino','Patrulheiro'];
 const ALINHAMENTOS = ['','Leal e Bom','Neutro e Bom','Caótico e Bom','Leal e Neutro','Neutro','Caótico e Neutro','Leal e Mau','Neutro e Mau','Caótico e Mau'];
 const ATRIBUTOS = [['for','Força'],['dex','Destreza'],['con','Constituição'],['int','Inteligência'],['sab','Sabedoria'],['car','Carisma']];
+const CAMPANHAS = [
+  ['', '— sem campanha —'],
+  ['barovia', 'Maldição de Strahd (Barovia)'],
+  ['mestre',  'Crônica dos Aventureiros'],
+];
 
 // Perícias do PHB 5e (PT-BR) — mapeadas para o atributo base
 const PERICIAS = [
@@ -522,7 +548,27 @@ function render() {
   const titulo = `${c.nome || 'Sem nome'}${c.classe ? ' · ' + c.classe : ''}${c.nivel ? ' (Nv ' + c.nivel + ')' : ''}`;
   $('#hdr-titulo').textContent = titulo;
 
+  // Aviso de visibilidade pro Mestre
+  const temCampanha = !!c.campanha;
+  const ehAtivo    = !!c.is_active;
+  let aviso = '';
+  if (temCampanha && ehAtivo) {
+    aviso = `<div class="aviso-visibilidade ok">
+      <span class="icone" aria-hidden="true">✓</span>
+      <span>Esta ficha aparece no painel do Mestre — campanha: <strong>${escape(CAMPANHAS.find(([k]) => k === c.campanha)?.[1] || c.campanha)}</strong></span>
+    </div>`;
+  } else {
+    const problemas = [];
+    if (!temCampanha) problemas.push('vincule a uma <strong>Campanha</strong> (aba Identidade)');
+    if (!ehAtivo)     problemas.push('marque como <strong>★ Ativo</strong> (botão no topo)');
+    aviso = `<div class="aviso-visibilidade">
+      <span class="icone" aria-hidden="true">⚠</span>
+      <span>Esta ficha <strong>não aparece pro Mestre</strong>. Para mostrar: ${problemas.join(' e ')}.</span>
+    </div>`;
+  }
+
   $('#conteudo').innerHTML = `
+    ${aviso}
     <div class="char-bar">
       <span class="pj-label">Personagem</span>
       <select id="sel-char" aria-label="Selecionar personagem">
@@ -599,6 +645,9 @@ function renderIdentidade(c, atrs) {
         <input name="origem" value="${escape(c.origem||'')}"></div>
       <div class="campo"><label>Alinhamento</label>
         <select name="alinhamento">${ALINHAMENTOS.map(a => `<option ${a===c.alinhamento?'selected':''}>${a}</option>`).join('')}</select></div>
+      <div class="campo"><label>Campanha (visível pro Mestre)</label>
+        <select name="campanha">${CAMPANHAS.map(([k, lbl]) => `<option value="${k}" ${k===(c.campanha||'')?'selected':''}>${lbl}</option>`).join('')}</select>
+        <span class="ajuda">Salve a ficha para vincular à campanha escolhida.</span></div>
       <div class="campo"><label>XP (Experiência)</label>
         <input name="xp" type="text" inputmode="numeric" value="${c.xp ?? 0}" data-validar="int" data-min="0">
         <span class="erro-msg">XP deve ser ≥ 0</span></div>
@@ -1099,6 +1148,11 @@ async function salvar(e) {
   set('subclasse', txt('subclasse'));
   set('origem', txt('origem'));
   set('alinhamento', txt('alinhamento'));
+  // campanha: '' significa "sem campanha" → null no banco
+  if (fd.has('campanha')) {
+    const v = fd.get('campanha');
+    payload.campanha = v ? v : null;
+  }
   set('xp', num('xp'));
   set('tracos_raciais', txt('tracos_raciais'));
   // idiomas e ferramentas (arrays) — pegam direto do estado (mantidos pelos handlers de tag)
