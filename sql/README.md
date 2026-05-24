@@ -26,7 +26,7 @@ O script `scripts/setup_db.js` roda os 3 SQLs em ordem e mostra um resumo (tabel
    |---|---|---|
    | 1 | [`001_schema.sql`](001_schema.sql) | Cria tabelas `profiles`, `characters`, `spell_lists` + triggers |
    | 2 | [`002_rls.sql`](002_rls.sql) | Habilita Row Level Security e cria policies |
-   | 3 | [`003_seed_jogadores.sql`](003_seed_jogadores.sql) | Cria as 3 contas: Sabrina123, Derik123, Felipe123 |
+   | 3 | [`003_seed_jogadores.sql`](003_seed_jogadores.sql) | Cria as 3 contas: Sabrina, Derick, Felipe |
 
 3. No final do **003**, deve aparecer um resultado mostrando os 3 jogadores criados.
 
@@ -36,9 +36,9 @@ Após rodar o seed, os 3 jogadores podem logar com:
 
 | Nome (no front) | Email (interno) | Senha (compartilhada) |
 |---|---|---|
-| Sabrina123 | sabrina123@mesa.local | mesa-dnd-5e |
-| Derik123 | derik123@mesa.local | mesa-dnd-5e |
-| Felipe123 | felipe123@mesa.local | mesa-dnd-5e |
+| Sabrina | sabrina123@mesa.local | mesa-dnd-5e |
+| Derick  | derik123@mesa.local   | mesa-dnd-5e |
+| Felipe  | felipe123@mesa.local  | mesa-dnd-5e |
 
 O front-end mostra apenas o dropdown de nomes — a senha é preenchida automaticamente pelo JavaScript.
 

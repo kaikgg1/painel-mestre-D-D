@@ -10,7 +10,7 @@ Painel web para o mestre acompanhar status dos jogadores e consultar o grimório
 - 📖 **Grimório com 361 magias** do PHB em PT-BR, com filtros (classe, nível, escola, ritual, concentração) e favoritas por personagem
 - 👑 **Visão do Mestre** em tempo real: vê todas as fichas marcadas como "ativas" pelos jogadores
 - 🗺️ **2 painéis de campanha**: Maldição de Strahd + Crônica dos Aventureiros
-- 🔐 **Login por nome** (Sabrina123, Derik123, Felipe123, Mestre123) — sem digitação de senha
+- 🔐 **Login por nome** (Sabrina, Derick, Felipe, Mestre) — sem digitação de senha
 - 📱 **Responsivo** mobile, tablet e desktop
 
 ## Estrutura

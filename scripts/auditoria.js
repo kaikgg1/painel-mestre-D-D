@@ -78,7 +78,7 @@ async function auditarRealtime(pg) {
 async function auditarUsuariosEProfiles(pg) {
   console.log('\n── 4. USUÁRIOS E PROFILES ──');
   const { rows: u } = await pg.query(`select email, raw_user_meta_data->>'nome' as nome from auth.users where email like '%@mesa.local' order by email`);
-  const esperados = ['Sabrina123','Derik123','Felipe123','Mestre123'];
+  const esperados = ['Sabrina','Derick','Felipe','Mestre123'];
   for (const n of esperados) {
     if (u.find(x => x.nome === n)) ok(`auth.users tem ${n}`);
     else falha(`auth.users SEM ${n}`);

@@ -27,7 +27,7 @@ begin
       crypt(v_senha, gen_salt('bf')),
       now(),
       '{"provider":"email","providers":["email"]}'::jsonb,
-      '{"nome":"Sabrina123"}'::jsonb,
+      '{"nome":"Sabrina"}'::jsonb,
       now(), now(), '', '', '', ''
     );
   end if;
@@ -46,7 +46,7 @@ begin
       crypt(v_senha, gen_salt('bf')),
       now(),
       '{"provider":"email","providers":["email"]}'::jsonb,
-      '{"nome":"Derik123"}'::jsonb,
+      '{"nome":"Derick"}'::jsonb,
       now(), now(), '', '', '', ''
     );
   end if;
@@ -65,7 +65,7 @@ begin
       crypt(v_senha, gen_salt('bf')),
       now(),
       '{"provider":"email","providers":["email"]}'::jsonb,
-      '{"nome":"Felipe123"}'::jsonb,
+      '{"nome":"Felipe"}'::jsonb,
       now(), now(), '', '', '', ''
     );
   end if;

@@ -7,7 +7,7 @@
 //   await Auth.entrarPorNome(nome)        → {ok:true, user} | {ok:false, erro}
 //   await Auth.sair()                     → void
 //   Auth.requerLogin('login.html')        → redirect se não logado
-//   Auth.renderHeader('#auth-slot')       → insere "Olá, Sabrina123 [Sair]" ou "[Entrar]"
+//   Auth.renderHeader('#auth-slot')       → insere "👤 Sabrina [Sair]" ou "[Entrar]"
 
 (function () {
   const SENHA_PADRAO = 'mesa-dnd-5e';   // mesma do seed (003_seed_jogadores.sql)
