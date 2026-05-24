@@ -582,9 +582,9 @@
 
     /* Slots: 2 colunas em vez de 3 + inputs maiores */
     .spell-slots { grid-template-columns: 1fr 1fr; gap: 8px; }
-    .slot-input { width: 32px; font-size: 14px; padding: 4px 2px; }
+    .slot-input { width: 42px; font-size: 16px; padding: 6px 4px; min-height: 32px; }
     .slot-inputs { gap: 4px; }
-    .slot-level { padding: 8px 6px; }
+    .slot-level { padding: 10px 8px; }
 
     /* Condições: tags maiores */
     .condition-tag { padding: 6px 12px; font-size: 11px; min-height: 32px; }
@@ -615,11 +615,31 @@
   }
 
   @media print {
-    body { background: white; padding: 0; }
-    .toolbar, .hint, .remove-card, .toast { display: none !important; }
-    .card { break-inside: avoid; box-shadow: none; }
-    .header h1 { color: var(--red-dark); text-shadow: none; }
-    .header .subtitle { color: var(--brown); }
+    @page { margin: 12mm; size: A4 portrait; }
+    body { background: white !important; padding: 0 !important; color: #222 !important;
+      background-image: none !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    body::before { display: none !important; }
+    .toolbar, .hint, .remove-card, .toast, .auth-slot, .back-link { display: none !important; }
+    .header { margin: 0 0 12px; padding: 0 0 8px; border-bottom: 2px solid #6b1010; }
+    .header h1 { color: #6b1010 !important; text-shadow: none !important; font-size: 24pt; letter-spacing: 2px; }
+    .header .subtitle { color: #6a4f0e !important; font-size: 11pt; }
+    .grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
+    .card {
+      break-inside: avoid; page-break-inside: avoid;
+      box-shadow: none !important;
+      background: #fffdf5 !important; background-image: none !important;
+      border: 1.5px solid #6b1010 !important;
+      color: #222 !important;
+      padding: 10px !important;
+      font-size: 10pt !important;
+    }
+    .card::before, .card::after { display: none !important; }
+    .char-name { color: #6a4f0e !important; text-shadow: none !important; font-size: 14pt !important; }
+    .player-name, .race-class { color: #444 !important; }
+    .stat-label, .section-title { color: #6a4f0e !important; }
+    .stat-value, .stat-value input { color: #6b1010 !important; }
+    input, textarea, [contenteditable] { background: transparent !important; border: none !important; color: #222 !important; }
+    .spell-list { border: 1px solid #ccc !important; min-height: 40px !important; }
   }
 </style>
 </head>

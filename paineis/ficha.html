@@ -367,6 +367,16 @@
     margin-left: auto;
   }
   .check-row .exp-marker input { accent-color: var(--gold-bright); }
+  /* Valor calculado da salvaguarda/perícia (modificador + proficiência) */
+  .check-row .valor-calc {
+    font-family: 'Cinzel', serif; font-weight: 700;
+    font-size: 14px; color: var(--gold-bright);
+    background: rgba(139,105,20,0.18);
+    border: 1px solid rgba(184,138,44,0.4);
+    padding: 3px 9px; border-radius: 12px;
+    min-width: 38px; text-align: center;
+    margin-left: auto;
+  }
 
   .lista-tags {
     display: flex; flex-wrap: wrap; gap: 4px; align-items: flex-start;
@@ -398,11 +408,26 @@
   }
   @media (max-width: 480px) {
     main { padding: 0 8px 30px; }
-    .tab-content { padding: 16px; }
-    .char-bar { padding: 10px; }
-    .char-bar select { font-size: 14px; }
+    .tab-content { padding: 14px 12px; }
+    .char-bar { padding: 10px; gap: 8px; }
+    .char-bar select { font-size: 14px; min-height: 40px; }
+    .btn { min-height: 40px; padding: 10px 12px; }
+    .estrela-ativo { min-height: 44px; min-width: 60px; }
     .grid-6 { grid-template-columns: repeat(2, 1fr); }
+    .atributo { padding: 14px 8px; }
     .atributo .modificador { font-size: 24px; }
+    .atributo .valor-base { padding: 8px 4px; font-size: 16px; min-height: 36px; }
+    /* Tabs: scroll horizontal limpo */
+    .tabs { gap: 0; padding: 0 4px; }
+    .tab { padding: 14px 14px; font-size: 11px; min-height: 44px; }
+    /* Check rows: touch friendly */
+    .check-row { padding: 10px 12px; }
+    .check-row input[type="checkbox"] { width: 22px; height: 22px; }
+    .moedas { grid-template-columns: repeat(3, 1fr); }
+    .moeda-box input { font-size: 16px; min-height: 36px; }
+    /* Inputs ficam +touch */
+    .campo input, .campo select { padding: 12px; min-height: 42px; font-size: 15px; }
+    .campo textarea { font-size: 14px; }
   }
   *:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 2px; }
   @media (prefers-reduced-motion: reduce) {
@@ -496,6 +521,8 @@ function chaveDeClasse(classe) {
 
 const mod = v => Math.floor(((+v||10) - 10) / 2);
 const fmtMod = m => (m >= 0 ? '+' : '') + m;
+// Bônus de proficiência por nível (PHB 5e): 1-4=+2, 5-8=+3, 9-12=+4, 13-16=+5, 17-20=+6
+const bonusProf = nv => Math.floor(((+nv || 1) - 1) / 4) + 2;
 
 let usuario = null;
 let chars = [];
@@ -717,9 +744,6 @@ function renderIdentidade(c, atrs) {
       <div class="campo"><label>Campanha (visível pro Mestre)</label>
         <select name="campanha">${CAMPANHAS.map(([k, lbl]) => `<option value="${k}" ${k===(c.campanha||'')?'selected':''}>${lbl}</option>`).join('')}</select>
         <span class="ajuda">Salve a ficha para vincular à campanha escolhida.</span></div>
-      <div class="campo"><label>XP (Experiência)</label>
-        <input name="xp" type="text" inputmode="numeric" value="${c.xp ?? 0}" data-validar="int" data-min="0">
-        <span class="erro-msg">XP deve ser ≥ 0</span></div>
     </div>
 
     <h3>Idiomas e Ferramentas</h3>
@@ -779,24 +803,32 @@ function renderCombate(c) {
         <span class="erro-msg">Exaustão vai de 0 a 6</span></div>
     </div>
 
-    <h3>Salvaguardas — Proficiente</h3>
-    <p style="color:var(--text-dim);font-style:italic;font-size:12px;margin-bottom:8px">Marque os atributos em que você tem proficiência em testes de resistência.</p>
+    <h3>Salvaguardas <span style="font-size:11px;color:var(--text-dim);font-weight:normal;font-style:italic">(valores calculados auto: modificador + ${bonusProf(c.nivel)} se proficiente)</span></h3>
     <div class="check-grid">
-      ${ATRIBUTOS.map(([k, nome]) => `
-        <div class="check-row">
-          <label><input type="checkbox" name="salv_${k}" ${salv[k] ? 'checked' : ''}> ${nome}</label>
-        </div>
-      `).join('')}
+      ${ATRIBUTOS.map(([k, nome]) => {
+        const m = mod((c.atributos||{})[k] ?? 10);
+        const valor = m + (salv[k] ? bonusProf(c.nivel) : 0);
+        return `
+          <div class="check-row">
+            <label><input type="checkbox" name="salv_${k}" ${salv[k] ? 'checked' : ''} data-salv="${k}"> ${nome}</label>
+            <span class="valor-calc" data-salv-valor="${k}">${fmtMod(valor)}</span>
+          </div>
+        `;
+      }).join('')}
     </div>
 
     <h3>Perícias <span style="font-size:11px;color:var(--text-dim);font-weight:normal;font-style:italic">(P = Proficiente · E = Expertise — dobra o bônus)</span></h3>
     <div class="check-grid">
       ${PERICIAS.map(([k, nome, atr]) => {
         const p = per[k] || {};
+        const m = mod((c.atributos||{})[atr] ?? 10);
+        const bp = bonusProf(c.nivel);
+        const valor = m + (p.prof ? bp : 0) + (p.exp ? bp : 0);
         return `
           <div class="check-row">
-            <label><input type="checkbox" name="per_${k}_prof" ${p.prof?'checked':''}> ${nome}<span class="atr-tag">${atr.toUpperCase()}</span></label>
-            <span class="exp-marker"><input type="checkbox" name="per_${k}_exp" ${p.exp?'checked':''} ${p.prof?'':'disabled'}> E</span>
+            <label><input type="checkbox" name="per_${k}_prof" ${p.prof?'checked':''} data-per="${k}" data-atr="${atr}"> ${nome}<span class="atr-tag">${atr.toUpperCase()}</span></label>
+            <span class="exp-marker"><input type="checkbox" name="per_${k}_exp" ${p.exp?'checked':''} ${p.prof?'':'disabled'} data-per-exp="${k}"> E</span>
+            <span class="valor-calc" data-per-valor="${k}">${fmtMod(valor)}</span>
           </div>
         `;
       }).join('')}
@@ -1017,9 +1049,16 @@ function conectarListeners() {
     if (tabAtiva === 'magias') carregarMagiasPreparadas();
   }));
 
-  // Modificadores ao vivo
+  // Modificadores ao vivo (e recalcula salv/perícias se a tab Combate estiver presente)
   $$('[data-attr]').forEach(inp => {
-    inp.addEventListener('input', () => validarEAtualizarMod(inp));
+    inp.addEventListener('input', () => { validarEAtualizarMod(inp); recalcularValoresPericiasSalv(); });
+  });
+  // Nível também afeta bônus de proficiência
+  const inpNivel = document.querySelector('[name="nivel"]');
+  if (inpNivel) inpNivel.addEventListener('input', () => {
+    const v = parseNum(inpNivel.value, { inteiro: true, min: 1, max: 20 });
+    if (v !== null) charAtivo.nivel = v;
+    recalcularValoresPericiasSalv();
   });
 
   // Validação inline
@@ -1061,8 +1100,11 @@ function conectarListeners() {
         exp.disabled = !cb.checked;
         if (!cb.checked) exp.checked = false;
       }
+      recalcularValoresPericiasSalv();
     });
   });
+  $$('input[name^="per_"][name$="_exp"]').forEach(cb => cb.addEventListener('change', recalcularValoresPericiasSalv));
+  $$('input[name^="salv_"]').forEach(cb => cb.addEventListener('change', recalcularValoresPericiasSalv));
 
   // Botões de equipamento
   if (tabAtiva === 'equipamento') conectarListenersEquipamento();
@@ -1106,8 +1148,43 @@ function validarEAtualizarMod(inp) {
   if (validarCampo(inp)) {
     const k = inp.dataset.attr;
     const v = parseNum(inp.value, { inteiro: true, min: 1, max: 30 });
-    if (v !== null) document.querySelector(`[data-mod="${k}"]`).textContent = fmtMod(mod(v));
+    if (v !== null) {
+      const el = document.querySelector(`[data-mod="${k}"]`);
+      if (el) el.textContent = fmtMod(mod(v));
+      // Atualiza no charAtivo pra recálculo das perícias funcionar
+      if (!charAtivo.atributos) charAtivo.atributos = {};
+      charAtivo.atributos[k] = v;
+    }
   }
+}
+
+// Recalcula valores das salvaguardas e perícias on the fly (sem re-render)
+function recalcularValoresPericiasSalv() {
+  const atrs = charAtivo.atributos || {};
+  const nv = +charAtivo.nivel || 1;
+  const bp = bonusProf(nv);
+  // Coleta inputs atuais (incluindo possíveis edições não-salvas)
+  $$('[data-attr]').forEach(inp => {
+    const v = parseNum(inp.value, { inteiro: true });
+    if (v !== null) atrs[inp.dataset.attr] = v;
+  });
+  // Salvaguardas
+  ATRIBUTOS.forEach(([k]) => {
+    const cb = document.querySelector(`[data-salv="${k}"]`);
+    const out = document.querySelector(`[data-salv-valor="${k}"]`);
+    if (!cb || !out) return;
+    const m = mod(atrs[k] ?? 10);
+    out.textContent = fmtMod(m + (cb.checked ? bp : 0));
+  });
+  // Perícias
+  PERICIAS.forEach(([k, , atr]) => {
+    const prof = document.querySelector(`[data-per="${k}"]`);
+    const exp = document.querySelector(`[data-per-exp="${k}"]`);
+    const out = document.querySelector(`[data-per-valor="${k}"]`);
+    if (!prof || !out) return;
+    const m = mod(atrs[atr] ?? 10);
+    out.textContent = fmtMod(m + (prof.checked ? bp : 0) + (exp?.checked ? bp : 0));
+  });
 }
 
 function conectarListenersTags() {
@@ -1256,7 +1333,6 @@ async function salvar(e) {
     const v = fd.get('campanha');
     payload.campanha = v ? v : null;
   }
-  set('xp', num('xp'));
   set('tracos_raciais', txt('tracos_raciais'));
   // idiomas e ferramentas (arrays) — pegam direto do estado (mantidos pelos handlers de tag)
   if (charAtivo.idiomas !== undefined)     payload.idiomas = charAtivo.idiomas;
