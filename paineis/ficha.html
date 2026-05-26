@@ -761,6 +761,124 @@
     *, *::before, *::after { animation: none !important; transition: none !important; }
   }
 
+  /* ===== ESPAÇOS DE MAGIA (slots) ===== */
+  .slots-info {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 14px;
+    padding: 10px 14px;
+    background: rgba(139,105,20,0.08);
+    border: 1px dashed rgba(139,105,20,0.4);
+    border-radius: 6px;
+    font-size: 13px; color: var(--parchment-dim);
+    font-style: italic;
+  }
+  .slots-info strong { color: var(--gold-bright); font-style: normal; }
+  .slots-info .ic { font-size: 18px; }
+
+  .slots-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 10px;
+  }
+  .slot-card {
+    background: linear-gradient(160deg, var(--bg-card-soft), rgba(0,0,0,0.4));
+    border: 1px solid rgba(139,105,20,0.5);
+    border-radius: 6px;
+    padding: 12px;
+    text-align: center;
+    transition: border-color 0.15s;
+  }
+  .slot-card.indisponivel {
+    opacity: 0.35;
+    border-style: dashed;
+    border-color: rgba(139,105,20,0.25);
+  }
+  .slot-card .slot-titulo {
+    font-family: 'Cinzel', serif; font-size: 10px;
+    color: var(--gold); letter-spacing: 1.5px;
+    text-transform: uppercase; margin-bottom: 8px;
+  }
+  .slot-card .slot-max {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 22px; color: var(--gold-bright); font-weight: 900;
+    line-height: 1; margin-bottom: 8px;
+    text-shadow: 0 0 8px rgba(184,138,44,0.3);
+  }
+  .slot-card.indisponivel .slot-max { color: var(--text-dim); text-shadow: none; }
+
+  .slot-pips {
+    display: flex; flex-wrap: wrap; gap: 4px;
+    justify-content: center; margin-bottom: 8px;
+    min-height: 22px;
+  }
+  .slot-pip {
+    width: 18px; height: 18px;
+    border: 1.5px solid var(--gold);
+    border-radius: 50%;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .slot-pip:hover { transform: scale(1.15); border-color: var(--gold-bright); }
+  .slot-pip.gasto {
+    background: var(--blood);
+    border-color: var(--blood-bright);
+  }
+  .slot-pip:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 2px; }
+
+  .slot-card .slot-status {
+    font-size: 11px; color: var(--parchment-dim);
+    font-family: 'Cinzel', serif; letter-spacing: 0.5px;
+  }
+  .slot-card .slot-status strong { color: var(--gold-bright); }
+
+  .slots-vazio {
+    text-align: center; padding: 24px;
+    color: var(--text-dim); font-style: italic;
+  }
+
+  @media (max-width: 600px) {
+    .slots-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .slot-card { padding: 10px 8px; }
+    .slot-card .slot-max { font-size: 20px; }
+    .slot-pip { width: 22px; height: 22px; }
+  }
+
+  /* ===== Inspiração (Roleplay) ===== */
+  .insp-wrap {
+    display: flex; align-items: center; justify-content: center;
+    gap: 14px; margin-bottom: 8px;
+  }
+  .insp-btn {
+    width: 44px; height: 44px;
+    background: linear-gradient(160deg, var(--bg-card-soft), var(--bg-card));
+    border: 1.5px solid var(--gold);
+    border-radius: 50%;
+    color: var(--gold-bright);
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 22px; font-weight: 900; line-height: 1;
+    cursor: pointer; transition: all 0.15s;
+  }
+  .insp-btn:hover { background: var(--gold); color: var(--shadow); transform: scale(1.08); }
+  .insp-btn:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 3px; }
+  .insp-display {
+    display: flex; align-items: center; gap: 10px;
+    background: linear-gradient(160deg, rgba(184,138,44,0.18), rgba(139,105,20,0.08));
+    border: 2px solid var(--gold);
+    border-radius: 10px;
+    padding: 10px 18px;
+    min-width: 110px;
+    box-shadow: 0 0 18px rgba(184,138,44,0.18);
+  }
+  .insp-icone { font-size: 28px; line-height: 1; filter: drop-shadow(0 0 6px rgba(212,168,67,0.5)); }
+  .insp-display input {
+    background: transparent; border: none;
+    color: var(--gold-bright);
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 28px; font-weight: 900; text-align: center;
+    width: 44px; outline: none;
+  }
+
   /* ===== Retrato do personagem ===== */
   .retrato-wrap {
     display: grid;
@@ -861,6 +979,7 @@
 <script src="../assets/js/supabase.js"></script>
 <script src="../assets/js/auth.js"></script>
 <script src="../assets/js/phb_catalogo.js"></script>
+<script src="../assets/js/phb_slots.js"></script>
 <script>
 const $ = sel => document.querySelector(sel);
 const $$ = sel => document.querySelectorAll(sel);
@@ -1384,21 +1503,54 @@ function renderCombate(c) {
     </div>
 
     <h3>Espaços de Magia</h3>
-    <div id="slots-wrap">
-      ${[1,2,3,4,5,6,7,8,9].map(n => {
-        const s = slots[n] || { atual: 0, max: 0 };
-        const max = s.max ?? 0;
-        const atual = s.atual ?? 0;
-        return `<div style="display:grid;grid-template-columns:40px 1fr 1fr;gap:8px;align-items:center;padding:4px 0">
-          <span style="font-family:'Cinzel',serif;color:var(--gold);font-size:12px">${n}°</span>
-          <div class="campo" style="margin:0"><label>Máximo</label>
-            <input type="text" inputmode="numeric" name="slot_${n}_max" value="${max}" data-validar="int" data-min="0"></div>
-          <div class="campo" style="margin:0"><label>Usados</label>
-            <input type="text" inputmode="numeric" name="slot_${n}_atual" value="${atual}" data-validar="int" data-min="0"></div>
-        </div>`;
-      }).join('')}
-    </div>
+    ${renderSlotsMagia(c, slots)}
   `;
+}
+
+function renderSlotsMagia(c, slots) {
+  const tipo = (window.SlotsPHB && c.classe) ? window.SlotsPHB.tipoDaClasse(c.classe) : null;
+  const slotsClasse = (window.SlotsPHB && c.classe) ? window.SlotsPHB.porClasse(c.classe, c.nivel || 1) : null;
+
+  // Classe sem slots (Bárbaro, Guerreiro, Ladino, Monge sem subclasse mágica)
+  if (!slotsClasse) {
+    return `<div class="slots-vazio">⚔️ ${c.classe || 'Classe'} não recebe espaços de magia pelas regras padrão.<br><span style="font-size:11px">(Subclasses Cavaleiro Místico e Trapaceiro Arcano podem ter — registre em "Características Adicionais".)</span></div>`;
+  }
+
+  const cabecalho = tipo === 'pact'
+    ? `<div class="slots-info"><span class="ic">🔮</span><div>Bruxo usa <strong>Magia do Pacto</strong>: todos os slots são do mesmo nível e recuperam em <strong>descanso curto</strong>.</div></div>`
+    : `<div class="slots-info"><span class="ic">📜</span><div>Espaços calculados automaticamente: <strong>${c.classe}</strong> · Nível <strong>${c.nivel||1}</strong>. Recuperam em <strong>descanso longo</strong>.</div></div>`;
+
+  const niveisComSlots = Object.entries(slotsClasse).filter(([nv, max]) => max > 0);
+  if (!niveisComSlots.length) {
+    return cabecalho + `<div class="slots-vazio">No nível atual, esta classe ainda não tem espaços de magia.</div>`;
+  }
+
+  return cabecalho + `<div class="slots-grid">
+    ${[1,2,3,4,5,6,7,8,9].map(nv => {
+      const max = slotsClasse[nv] || 0;
+      const s = slots[nv] || { atual: 0, max: 0 };
+      const usados = Math.min(s.atual || 0, max);
+      const disponivel = max - usados;
+      if (max === 0) {
+        return `<div class="slot-card indisponivel">
+          <div class="slot-titulo">Nível ${nv}</div>
+          <div class="slot-max">—</div>
+          <div class="slot-status">indisponível</div>
+        </div>`;
+      }
+      const pips = Array.from({length: max}).map((_, i) =>
+        `<button type="button" class="slot-pip ${i < usados ? 'gasto' : ''}" data-slot-nv="${nv}" data-slot-idx="${i}" aria-label="Slot ${nv}° nível, espaço ${i+1}, ${i < usados ? 'gasto' : 'disponível'}"></button>`
+      ).join('');
+      return `<div class="slot-card">
+        <div class="slot-titulo">Nível ${nv}</div>
+        <div class="slot-max" title="Máximo da classe">${max}</div>
+        <div class="slot-pips" data-slot-nv="${nv}">${pips}</div>
+        <div class="slot-status"><strong>${disponivel}</strong> / ${max} disponíveis</div>
+        <input type="hidden" name="slot_${nv}_max" value="${max}">
+        <input type="hidden" name="slot_${nv}_atual" value="${usados}">
+      </div>`;
+    }).join('')}
+  </div>`;
 }
 
 function renderHabilidades(c) {
@@ -1574,7 +1726,21 @@ function renderTabelaItens(tipo, itens, colunas, campos) {
 
 function renderRoleplay(c) {
   const imgUrl = c.imagem_url || '';
+  const insp = +c.inspiracao || 0;
   return `
+    <h3>Inspiração</h3>
+    <div class="insp-wrap">
+      <button type="button" class="insp-btn" id="insp-menos" aria-label="Diminuir inspiração">−</button>
+      <div class="insp-display">
+        <span class="insp-icone" aria-hidden="true">⭐</span>
+        <input type="text" inputmode="numeric" name="inspiracao" id="insp-input" value="${insp}" data-validar="int" data-min="0">
+      </div>
+      <button type="button" class="insp-btn" id="insp-mais" aria-label="Aumentar inspiração">+</button>
+    </div>
+    <p style="color:var(--text-dim);font-style:italic;font-size:12px;text-align:center;margin-bottom:14px">
+      Quantas inspirações você tem disponíveis (gaste 1 antes de uma jogada pra ganhar vantagem).
+    </p>
+
     <h3>Retrato do Personagem</h3>
     <div class="retrato-wrap">
       <div class="retrato-preview" id="retrato-preview">
@@ -1702,6 +1868,55 @@ function conectarListeners() {
       }
     });
   }
+
+  // Pips de slots de magia (clique alterna gasto/disponível)
+  $$('.slot-pip').forEach(p => {
+    p.addEventListener('click', () => {
+      const nv = +p.dataset.slotNv;
+      const grupo = document.querySelector(`.slot-pips[data-slot-nv="${nv}"]`);
+      if (!grupo) return;
+      const pips = [...grupo.querySelectorAll('.slot-pip')];
+      const max = pips.length;
+      const idx = +p.dataset.slotIdx;
+      const eraGasto = p.classList.contains('gasto');
+      // Lógica intuitiva: clicar no primeiro disponível gasta;
+      // clicar no último gasto disponibiliza.
+      let novoGastos;
+      if (eraGasto) {
+        // Quer disponibilizar até esse índice (inclusive este vira disponível)
+        novoGastos = idx;
+      } else {
+        // Quer gastar até esse índice (inclusive este vira gasto)
+        novoGastos = idx + 1;
+      }
+      novoGastos = Math.max(0, Math.min(max, novoGastos));
+      pips.forEach((pip, i) => pip.classList.toggle('gasto', i < novoGastos));
+      // Atualiza o hidden input + status text
+      const wrap = grupo.closest('.slot-card');
+      if (wrap) {
+        const hAtual = wrap.querySelector(`input[name="slot_${nv}_atual"]`);
+        if (hAtual) {
+          hAtual.value = novoGastos;
+          hAtual.dispatchEvent(new Event('input', { bubbles: true }));
+        }
+        const status = wrap.querySelector('.slot-status');
+        if (status) status.innerHTML = `<strong>${max - novoGastos}</strong> / ${max} disponíveis`;
+      }
+    });
+  });
+
+  // Inspiração: + / − buttons
+  const inspMais = document.getElementById('insp-mais');
+  const inspMenos = document.getElementById('insp-menos');
+  const inspIn = document.getElementById('insp-input');
+  if (inspMais && inspIn) inspMais.addEventListener('click', () => {
+    inspIn.value = Math.max(0, (+inspIn.value || 0) + 1);
+    inspIn.dispatchEvent(new Event('input', { bubbles: true }));
+  });
+  if (inspMenos && inspIn) inspMenos.addEventListener('click', () => {
+    inspIn.value = Math.max(0, (+inspIn.value || 0) - 1);
+    inspIn.dispatchEvent(new Event('input', { bubbles: true }));
+  });
 
   // Barra de HP ao vivo
   const hpAtual = document.getElementById('hp-atual-input');
@@ -2104,6 +2319,11 @@ async function salvar(e) {
   set('historia', txt('historia'));
   set('notas', txt('notas'));
   set('imagem_url', txt('imagem_url'));
+  // Inspiração agora é numérica (sempre que aba Roleplay estiver aberta)
+  if (fd.has('inspiracao')) {
+    const v = num('inspiracao');
+    payload.inspiracao = v ?? 0;
+  }
 
   // Remove campos que não vão pro UPDATE
   delete payload.id;

@@ -724,7 +724,7 @@ function criarPersonagem(base = {}) {
     hpAtual: base.hpAtual ?? 10,
     hpMax: base.hpMax ?? 10,
     ca: base.ca || 10,
-    inspiracao: false,
+    inspiracao: 0,
     exaustao: 0,
     sucessos: 0,
     falhas: 0,
@@ -801,10 +801,10 @@ function criarCard(p) {
   header.className = 'char-header';
 
   const insp = document.createElement('div');
-  insp.className = 'inspiration' + (p.inspiracao ? ' active' : '');
+  insp.className = 'inspiration' + (p.inspiracao > 0 ? ' active' : '');
   insp.title = 'Inspiração (clique para alternar)';
   insp.textContent = '★';
-  insp.onclick = () => { p.inspiracao = !p.inspiracao; render(); };
+  insp.onclick = () => { p.inspiracao = p.inspiracao > 0 ? 0 : 1; render(); };
 
   const nome = document.createElement('div');
   nome.className = 'char-name';

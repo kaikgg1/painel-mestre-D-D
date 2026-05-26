@@ -96,7 +96,7 @@
       hpAtual: row.hp_atual ?? 0,
       hpMax: row.hp_max ?? 0,
       ca: row.ca ?? 10,
-      inspiracao: !!row.inspiracao,
+      inspiracao: typeof row.inspiracao === 'number' ? row.inspiracao : (row.inspiracao ? 1 : 0),
       exaustao: row.exaustao ?? 0,
       sucessos: row.morte_sucessos ?? 0,
       falhas: row.morte_falhas ?? 0,
