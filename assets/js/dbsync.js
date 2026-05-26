@@ -59,6 +59,8 @@
     magias: 'magias_preparadas',
     condicoes: 'condicoes',
     isActive: 'is_active',
+    recursosUsados: 'recursos_usados',
+    dadoVidaAtual: 'dado_vida_atual',
   };
 
   function uiToDb(uiObj) {
@@ -104,6 +106,10 @@
       magias: row.magias_preparadas || '',
       condicoes: row.condicoes || [],
       isActive: !!row.is_active,
+      recursosUsados: row.recursos_usados || {},
+      dadoVidaAtual: row.dado_vida_atual ?? 0,
+      // Originais pra exibição (não vão pro UI_TO_DB; só pra leitura)
+      _subclasse: row.subclasse || '',
     };
   }
 

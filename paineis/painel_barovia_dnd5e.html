@@ -694,8 +694,8 @@
 
 <nav class="toolbar" aria-label="Ações do painel">
   <a href="../index.html" class="back-link" aria-label="Voltar à tela inicial">← Voltar</a>
-  <button onclick="adicionarCard()" aria-label="Adicionar novo personagem"><span aria-hidden="true">⚜</span> Adicionar</button>
-  <button onclick="descansoLongo()" aria-label="Aplicar descanso longo a todos"><span aria-hidden="true">🌙</span> Descanso Longo</button>
+  <button onclick="adicionarCard()" id="btn-adicionar" style="display:none" aria-label="Adicionar novo personagem"><span aria-hidden="true">⚜</span> Adicionar</button>
+  <button onclick="descansoLongo()" id="btn-descanso-global" style="display:none" aria-label="Aplicar descanso longo a todos"><span aria-hidden="true">🌙</span> Descanso Longo</button>
   <button onclick="window.print()" aria-label="Imprimir painel"><span aria-hidden="true">🖨</span> Imprimir</button>
   <span class="auth-slot" id="auth-slot" aria-label="Status de login" style="margin-left:auto;display:flex;gap:8px;align-items:center;font-family:'Cinzel',serif;font-size:11px"></span>
 </nav>
@@ -1077,21 +1077,21 @@ function criarCard(p) {
     toast(`${p.nome} salvo!`);
   };
 
-  const descBtn = document.createElement('button');
-  descBtn.className = 'save-card';
-  descBtn.style.borderColor = 'var(--blood)';
-  descBtn.style.color = 'var(--parchment-dim)';
-  descBtn.textContent = '🌙 Desc. Longo';
-  descBtn.onclick = () => {
-    if (!confirm(`Descanso longo para ${p.nome}?`)) return;
-    p.hpAtual = p.hpMax;
-    p.exaustao = Math.max(0, p.exaustao - 1);
-    p.sucessos = 0;
-    p.falhas = 0;
-    Object.keys(p.slots).forEach(nv => { p.slots[nv].atual = p.slots[nv].max; });
-    render();
-    toast(`🌙 ${p.nome} descansou`);
-  };
+  // Botão de descanso longo por card: SÓ Mestre
+  let descBtn = null;
+  if (ehMestre) {
+    descBtn = document.createElement('button');
+    descBtn.className = 'save-card';
+    descBtn.style.borderColor = 'var(--blood)';
+    descBtn.style.color = 'var(--parchment-dim)';
+    descBtn.textContent = '🌙 Desc. Longo';
+    descBtn.onclick = () => {
+      if (!confirm(`Descanso longo para ${p.nome}?`)) return;
+      aplicarDescansoLongo(p);
+      render();
+      toast(`🌙 ${p.nome} descansou`);
+    };
+  }
 
   const remover = document.createElement('button');
   remover.className = 'remove-card';
@@ -1107,7 +1107,7 @@ function criarCard(p) {
   };
 
   actions.appendChild(salvarBtn);
-  actions.appendChild(descBtn);
+  if (descBtn) actions.appendChild(descBtn);
   actions.appendChild(remover);
   card.appendChild(actions);
 
@@ -1125,18 +1125,36 @@ async function adicionarCard() {
   } catch(e) { alert('Erro ao criar: ' + e.message); }
 }
 
-async function descansoLongo() {
-  if (!confirm('Restaurar PV máximo, slots, reduzir exaustão em 1 e zerar salvaguardas?')) return;
-  for (const p of estado.personagens) {
-    p.hpAtual = p.hpMax;
-    p.exaustao = Math.max(0, p.exaustao - 1);
-    p.sucessos = 0;
-    p.falhas = 0;
-    Object.keys(p.slots).forEach(nv => { p.slots[nv].atual = p.slots[nv].max; });
-    salvar(p);
+// Aplica regras de descanso longo do PHB num personagem:
+// HP → max; slots → max; exaustão −1; saves de morte → 0;
+// recursos por dia → atual=0; dado de vida → recupera metade do nível (mín 1).
+function aplicarDescansoLongo(p) {
+  p.hpAtual = p.hpMax;
+  p.exaustao = Math.max(0, (p.exaustao || 0) - 1);
+  p.sucessos = 0;
+  p.falhas = 0;
+  // Slots: zera os "atual" (recuperam todos no longo)
+  if (p.slots) Object.keys(p.slots).forEach(nv => { p.slots[nv].atual = 0; });
+  // Recursos de classe (Canalizar Divindade, Surto de Ação, etc.)
+  if (p.recursosUsados && typeof p.recursosUsados === 'object') {
+    Object.keys(p.recursosUsados).forEach(k => {
+      if (p.recursosUsados[k] && typeof p.recursosUsados[k].atual === 'number') {
+        p.recursosUsados[k].atual = 0;
+      }
+    });
   }
+  // Dado de vida: recupera metade do nível (PHB), mínimo 1
+  const recupera = Math.max(1, Math.floor((p.nivel || 1) / 2));
+  p.dadoVidaAtual = Math.min((p.nivel || 1), (p.dadoVidaAtual || 0) + recupera);
+  salvar(p);
+}
+
+async function descansoLongo() {
+  if (!ehMestre) { toast('⚠ Apenas o Mestre pode aplicar descanso longo'); return; }
+  if (!confirm('Aplicar descanso longo a TODOS: PV máximo, slots cheios, recursos resetados, exaustão −1, dado de vida recupera metade do nível. Confirma?')) return;
+  for (const p of estado.personagens) aplicarDescansoLongo(p);
   render();
-  toast('🌙 Descanso longo concluído');
+  toast('🌙 Descanso longo concluído pra todos');
 }
 
 
@@ -1168,6 +1186,13 @@ async function descansoLongo() {
       }
     });
     ehMestre = r.ehMestre;
+    // Botões exclusivos do Mestre na toolbar
+    if (ehMestre) {
+      const ba = document.getElementById('btn-adicionar');
+      const bd = document.getElementById('btn-descanso-global');
+      if (ba) ba.style.display = '';
+      if (bd) bd.style.display = '';
+    }
   } catch (e) {
     console.error(e);
     document.getElementById('grid').innerHTML = `<div style="padding:30px;text-align:center;color:var(--parchment-dim,#888)">Erro ao conectar: ${e.message}</div>`;

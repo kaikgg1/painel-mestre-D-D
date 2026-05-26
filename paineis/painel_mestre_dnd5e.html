@@ -1030,11 +1030,7 @@ function criarCard(p) {
   descBtn.textContent = '🌙 Desc. Longo';
   descBtn.onclick = () => {
     if (!confirm(`Descanso longo para ${p.nome}?`)) return;
-    p.hpAtual = p.hpMax;
-    p.exaustao = Math.max(0, p.exaustao - 1);
-    p.sucessos = 0;
-    p.falhas = 0;
-    Object.keys(p.slots).forEach(nv => { p.slots[nv].atual = p.slots[nv].max; });
+    aplicarDescansoLongo(p);
     render();
     toast(`🌙 ${p.nome} descansou`);
   };
@@ -1072,16 +1068,29 @@ async function adicionarCard() {
   } catch(e) { alert('Erro ao criar: ' + e.message); }
 }
 
+function aplicarDescansoLongo(p) {
+  p.hpAtual = p.hpMax;
+  p.exaustao = Math.max(0, (p.exaustao || 0) - 1);
+  p.sucessos = 0;
+  p.falhas = 0;
+  if (p.slots) Object.keys(p.slots).forEach(nv => { p.slots[nv].atual = 0; });
+  if (p.recursosUsados && typeof p.recursosUsados === 'object') {
+    Object.keys(p.recursosUsados).forEach(k => {
+      if (p.recursosUsados[k] && typeof p.recursosUsados[k].atual === 'number') {
+        p.recursosUsados[k].atual = 0;
+      }
+    });
+  }
+  const recupera = Math.max(1, Math.floor((p.nivel || 1) / 2));
+  p.dadoVidaAtual = Math.min((p.nivel || 1), (p.dadoVidaAtual || 0) + recupera);
+  salvar(p);
+}
+
 async function descansoLongo() {
-  if (!confirm('Restaurar PV máximo, slots, reduzir exaustão em 1 e zerar salvaguardas?')) return;
+  if (!confirm('Aplicar descanso longo: PV máximo, slots cheios, recursos resetados, exaustão −1, dado de vida recupera metade do nível. Confirma pra TODOS?')) return;
   for (const p of estado.personagens) {
     if (!podeEditar(p)) continue;
-    p.hpAtual = p.hpMax;
-    p.exaustao = Math.max(0, p.exaustao - 1);
-    p.sucessos = 0;
-    p.falhas = 0;
-    Object.keys(p.slots).forEach(nv => { p.slots[nv].atual = p.slots[nv].max; });
-    salvar(p);
+    aplicarDescansoLongo(p);
   }
   render();
   toast('🌙 Descanso longo concluído');
