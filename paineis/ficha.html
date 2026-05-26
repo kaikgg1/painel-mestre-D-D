@@ -560,6 +560,7 @@
     padding: 10px 0; border-bottom: 1px dashed rgba(139,105,20,0.18);
   }
   .hab-feature:last-child { border-bottom: none; }
+  .hab-feature.ativa { border-left: 2px solid var(--gold); padding-left: 10px; }
   .hab-feature-head {
     display: grid; grid-template-columns: 1fr auto; gap: 14px; align-items: start;
   }
@@ -1841,6 +1842,55 @@ function slugFeature(nome) {
     .toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '').slice(0, 80);
 }
 
+// Detecta se uma feature tem usos limitados por descanso/dia analisando
+// nome + descrição. Retorna {max, periodo, tipo} ou null para passivas.
+// max=0 quando a fórmula é variável (ex.: "1 + mod CAR") — usuário ajusta.
+function detectarUsosLimitados(h) {
+  const txt = (h.nome || '') + ' ' + (h.desc || '');
+
+  // 1) (N/descanso|dia|longo|curto) — padrão explícito no nome
+  let m = txt.match(/\(\s*(\d+)\s*\/\s*(descanso(?:\s+(?:curto|longo))?|dia|longo|curto|long\.?|curt\.?)\s*\)/i);
+  if (m) return { max: +m[1], periodo: m[2].toLowerCase() };
+
+  // 2) (N uso/usos) no nome
+  m = txt.match(/\(\s*(\d+)\s+usos?\s*\)/i);
+  if (m) return { max: +m[1], periodo: 'descanso' };
+
+  // 3) "Nx/descanso" ou "Nx/dia" (sem parênteses)
+  m = txt.match(/(\d+)\s*x\s*\/\s*(descanso(?:\s+(?:curto|longo))?|dia|longo|curto)/i);
+  if (m) return { max: +m[1], periodo: m[2].toLowerCase() };
+
+  // 4) "N vezes por (descanso|dia)" ou "N vezes entre descansos"
+  m = txt.match(/(\d+)\s+vezes?\s+(?:por|a\s+cada|entre)\s+(descanso[s]?(?:\s+(?:curto|longo))?|dia)/i);
+  if (m) return { max: +m[1], periodo: m[2].toLowerCase() };
+
+  // 5) "uma vez por (descanso|dia|turno)"
+  if (/uma\s+vez\s+(?:por|a\s+cada|entre)\s+(descanso|dia|turno)/i.test(txt)) {
+    return { max: 1, periodo: RegExp.$1.toLowerCase() };
+  }
+
+  // 6) "1x cada/descanso" / "1x/dia"
+  m = txt.match(/(\d+)\s*x\s+cada\s+(descanso|dia)/i);
+  if (m) return { max: +m[1], periodo: m[2].toLowerCase() };
+
+  // 7) Fórmula "Usos = X" ou "X usos = ..." (ex.: Sentido Divino do Paladino)
+  if (/usos?\s*=/i.test(txt) || /usos?\s*por\s+descanso/i.test(txt)) {
+    return { max: 0, periodo: 'descanso' };  // editável manualmente
+  }
+
+  // 8) "/descanso longo" ou "/descanso curto" no fim de uma cláusula com número
+  m = txt.match(/(\d+)\s*\/\s*(descanso\s+(?:curto|longo)|dia|longo|curto)/i);
+  if (m) return { max: +m[1], periodo: m[2].toLowerCase() };
+
+  // 9) "recupera em descanso" + número de cargas/pontos no início (ex.: pontos de feitiçaria)
+  if (/recupera\s+em\s+descanso\s+(curto|longo)/i.test(txt) &&
+      /(\d+)\s+(?:pontos?|cargas?|usos?)/i.test(txt)) {
+    return { max: 0, periodo: 'descanso ' + RegExp.$1.toLowerCase() };  // editável
+  }
+
+  return null;  // passiva — sem tracker
+}
+
 async function popularHabilidades(classe, nivel, subclasse) {
   const wrap = document.getElementById('hab-wrap');
   if (!wrap) return;
@@ -1866,27 +1916,45 @@ async function popularHabilidades(classe, nivel, subclasse) {
       <h4>Nível ${nv}</h4>
       ${lista.map(h => {
         const slug = slugFeature(h.nome);
-        const r = recursos[slug] || { atual: 0, max: 0 };
-        const usos = +r.atual || 0;
-        const max  = +r.max || 0;
+        const detectado = detectarUsosLimitados(h);
+        const r = recursos[slug] || {};
+        // max efetivo: o que está salvo > o detectado pelo regex
+        const maxSalvo = +r.max || 0;
+        const maxDetectado = detectado ? +detectado.max : 0;
+        const max = maxSalvo > 0 ? maxSalvo : maxDetectado;
+        const usos = Math.min(+r.atual || 0, max);
         const disp = Math.max(0, max - usos);
+
+        // SEM tracker: feature passiva (nenhum padrão de uso detectado)
+        if (!detectado && maxSalvo === 0) {
+          return `<div class="hab-feature passiva" data-hab-slug="${slug}">
+            ${h.subclasse ? `<span class="hab-sub-tag">${escape(h.subclasse)}</span>` : ''}
+            <div class="hab-feature-titulo">
+              <strong>${escape(h.nome)}.</strong>
+              <span class="hab-desc">${escape(h.desc || '—')}</span>
+            </div>
+          </div>`;
+        }
+
+        // COM tracker: feature usável (limite detectado ou já configurado)
+        const periodo = detectado?.periodo || 'descanso';
         const pips = max > 0 ? Array.from({length: max}).map((_, i) =>
           `<button type="button" class="hab-pip ${i < usos ? 'gasto' : ''}" data-hab-slug="${slug}" data-hab-idx="${i}" aria-label="Uso ${i+1} ${i < usos ? 'gasto' : 'disponível'}"></button>`
         ).join('') : '';
-        return `<div class="hab-feature" data-hab-slug="${slug}">
+        return `<div class="hab-feature ativa" data-hab-slug="${slug}">
           ${h.subclasse ? `<span class="hab-sub-tag">${escape(h.subclasse)}</span>` : ''}
           <div class="hab-feature-head">
             <div class="hab-feature-titulo">
               <strong>${escape(h.nome)}.</strong>
               <span class="hab-desc">${escape(h.desc || '—')}</span>
             </div>
-            <div class="hab-tracker">
-              <label class="hab-tracker-lbl">Usos / ${max > 0 ? 'rest.' : 'def.'}:</label>
-              <input type="text" inputmode="numeric" class="hab-tracker-max" value="${max}" data-hab-max="${slug}" aria-label="Máximo de usos por descanso longo" title="Máximo de usos por descanso longo (0 = sem limite)">
+            <div class="hab-tracker" title="Recupera em ${escape(periodo)}">
+              <label class="hab-tracker-lbl">Usos:</label>
               ${max > 0 ? `
                 <span class="hab-pips">${pips}</span>
                 <span class="hab-disp"><strong>${disp}</strong>/${max}</span>
-              ` : `<span class="hab-disp" style="color:var(--text-dim)">— sem limite —</span>`}
+              ` : ''}
+              <input type="text" inputmode="numeric" class="hab-tracker-max" value="${max}" data-hab-max="${slug}" aria-label="Máximo de usos" title="Ajuste o máximo (a regra padrão é ${detectado?.max || '?'})">
             </div>
           </div>
         </div>`;
