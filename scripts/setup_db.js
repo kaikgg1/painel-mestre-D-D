@@ -22,6 +22,7 @@ const SCRIPTS = [
   '008_ficha_completa.sql',
   '009_ativar_pjs_orfaos.sql',
   '010_inspiracao_numerica.sql',
+  '011_storage_retratos.sql',
 ];
 
 (async () => {
