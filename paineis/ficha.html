@@ -1620,8 +1620,18 @@ function renderIdentidade(c, atrs) {
       ${renderListaTags('idiomas', 'Idiomas', c.idiomas || ['Comum'])}
       ${renderListaTags('ferramentas', 'Proficiências em Ferramentas', c.ferramentas || [])}
     </div>
-    <div class="campo" style="margin-top:14px"><label>Características Raciais</label>
-      <textarea name="tracos_raciais" placeholder="Ex.: Visão no Escuro 18m, Resistência Anã, Proficiência em Machados">${escape(c.tracos_raciais||'')}</textarea></div>
+    <div class="rp-lock-bar" style="margin-top:14px">
+      <h4 style="margin:0;font-family:'Cinzel',serif;font-size:13px;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase">Características Raciais</h4>
+      <button type="button" class="btn-rp-edit" id="btn-rac-toggle" aria-pressed="false">
+        <span aria-hidden="true">✏</span> <span id="btn-rac-label">Editar</span>
+      </button>
+    </div>
+    <p class="rp-lock-hint" id="rac-lock-hint">Bloqueado pra evitar edição acidental. Clique em <strong>Editar</strong> pra alterar.</p>
+    <div class="rp-bloqueavel" data-rac-lock="1">
+      <div class="campo">
+        <textarea name="tracos_raciais" placeholder="Ex.: Visão no Escuro 18m, Resistência Anã, Proficiência em Machados">${escape(c.tracos_raciais||'')}</textarea>
+      </div>
+    </div>
 
     <h3>Atributos</h3>
     <div class="grid-6">
@@ -2385,10 +2395,31 @@ function aplicarBloqueioRoleplay(bloqueado) {
   if (hint) hint.style.display = bloqueado ? '' : 'none';
 }
 
+// Lock genérico para qualquer bloco [data-X-lock]
+function aplicarBloqueioGenerico(blocos, btnId, lblId, hintId, bloqueado) {
+  blocos.forEach(b => {
+    b.classList.toggle('rp-locked', bloqueado);
+    b.querySelectorAll('input, textarea').forEach(el => {
+      if (bloqueado) el.setAttribute('readonly', '');
+      else el.removeAttribute('readonly');
+    });
+  });
+  const btn = document.getElementById(btnId);
+  const lbl = document.getElementById(lblId);
+  const hint = document.getElementById(hintId);
+  if (btn) btn.setAttribute('aria-pressed', String(!bloqueado));
+  if (lbl) lbl.textContent = bloqueado ? 'Editar' : 'Salvar e travar';
+  if (btn) btn.classList.toggle('editando', !bloqueado);
+  if (hint) hint.style.display = bloqueado ? '' : 'none';
+}
+
 function conectarListeners() {
   // Trocar personagem
   const sel = $('#sel-char');
   if (sel) sel.addEventListener('change', e => {
+    // Salva edições pendentes do PJ atual antes de trocar
+    const form = document.getElementById('ficha-form');
+    if (form) form.dispatchEvent(new Event('submit', { cancelable: true }));
     charAtivo = chars.find(x => x.id === e.target.value) || chars[0];
     render();
   });
@@ -2407,6 +2438,10 @@ function conectarListeners() {
 
   // Tabs
   $$('.tab').forEach(t => t.addEventListener('click', () => {
+    // Flush qualquer edição pendente antes de re-renderizar (textarea da aba
+    // some do DOM e o auto-save debounce ainda não disparou).
+    const form = document.getElementById('ficha-form');
+    if (form) form.dispatchEvent(new Event('submit', { cancelable: true }));
     tabAtiva = t.dataset.tab;
     render();
     if (tabAtiva === 'magias') carregarMagiasPreparadas();
@@ -2477,6 +2512,23 @@ function conectarListeners() {
         if (hidden) hidden.value = dv;
       }
     });
+
+    // Lock de Características Raciais
+    const blocosRac = document.querySelectorAll('[data-rac-lock]');
+    if (blocosRac.length) {
+      aplicarBloqueioGenerico(blocosRac, 'btn-rac-toggle', 'btn-rac-label', 'rac-lock-hint', true);
+      const btnRac = document.getElementById('btn-rac-toggle');
+      if (btnRac) btnRac.addEventListener('click', () => {
+        const editando = btnRac.classList.contains('editando');
+        if (editando) {
+          const form = document.getElementById('ficha-form');
+          if (form) form.dispatchEvent(new Event('submit', { cancelable: true }));
+          aplicarBloqueioGenerico(blocosRac, 'btn-rac-toggle', 'btn-rac-label', 'rac-lock-hint', true);
+        } else {
+          aplicarBloqueioGenerico(blocosRac, 'btn-rac-toggle', 'btn-rac-label', 'rac-lock-hint', false);
+        }
+      });
+    }
   }
 
   // Pips de slots de magia (clique alterna gasto/disponível)

@@ -733,13 +733,32 @@ const CAMPANHA = 'mestre';
 let estado = { personagens: [] };
 let ehMestre = false;
 
+// ─── Anti-eco: marca saves locais pra ignorar o próprio realtime echo ───
+const _ecoLocal = new Map();
+function marcarEcoLocal(id) {
+  if (!id) return;
+  _ecoLocal.set(id, Date.now());
+  setTimeout(() => _ecoLocal.delete(id), 3000);
+}
+function ehEcoLocal(id) {
+  const t = _ecoLocal.get(id);
+  return t && (Date.now() - t < 2500);
+}
+
 // salvar(p?) — envia campos do personagem p para o banco (debounced).
 // Se sem p, sincroniza todos (legacy, usado em descansoLongo etc.)
 function salvar(p) {
   if (!window.DBSync) return;
-  if (p && p.id) { window.DBSync.salvarCampo(p.id, p); return; }
+  if (p && p.id) {
+    marcarEcoLocal(p.id);
+    window.DBSync.salvarCampo(p.id, p);
+    return;
+  }
   for (const x of estado.personagens) {
-    if (x.id) window.DBSync.salvarCampo(x.id, x);
+    if (x.id) {
+      marcarEcoLocal(x.id);
+      window.DBSync.salvarCampo(x.id, x);
+    }
   }
 }
 
@@ -867,12 +886,20 @@ function render() {
   } else {
     estado.personagens.forEach(p => grid.appendChild(criarCard(p)));
   }
-  salvar();
+}
+
+function rerenderCard(p) {
+  const grid = document.getElementById('grid');
+  if (!grid || !p?.id) return;
+  const antigo = grid.querySelector(`[data-card-id="${p.id}"]`);
+  if (!antigo) { render(); return; }
+  antigo.replaceWith(criarCard(p));
 }
 
 function criarCard(p) {
   const card = document.createElement('article');
   card.className = 'card';
+  if (p.id) card.dataset.cardId = p.id;
 
   // === CABEÇALHO ===
   const header = document.createElement('div');
@@ -884,40 +911,39 @@ function criarCard(p) {
   insp.title = `Inspiração: ${inspNum} (clique para +1 · Shift+clique para −1)`;
   insp.innerHTML = `<span class="ic">★</span><span class="qty">${inspNum}</span>`;
   insp.onclick = (e) => {
-    if (e.shiftKey) p.inspiracao = Math.max(0, inspNum - 1);
-    else p.inspiracao = inspNum + 1;
+    if (e.shiftKey) p.inspiracao = Math.max(0, (+p.inspiracao || 0) - 1);
+    else p.inspiracao = (+p.inspiracao || 0) + 1;
     salvar(p);
-    render();
+    const n = +p.inspiracao || 0;
+    insp.classList.toggle('active', n > 0);
+    insp.querySelector('.qty').textContent = n;
   };
 
   const nome = document.createElement('div');
   nome.className = 'char-name';
   nome.contentEditable = true;
   nome.textContent = p.nome;
-  nome.oninput = () => { p.nome = nome.textContent.trim() || 'Personagem'; salvar(); };
-  nome.onblur = () => { p.nome = nome.textContent.trim() || 'Personagem'; salvar(); };
+  nome.oninput = () => { p.nome = nome.textContent.trim() || 'Personagem'; salvar(p); };
+  nome.onblur = () => { p.nome = nome.textContent.trim() || 'Personagem'; salvar(p); };
 
   const jogador = document.createElement('div');
   jogador.className = 'player-name';
   jogador.contentEditable = true;
   jogador.textContent = p.jogador;
-  jogador.oninput = () => { p.jogador = jogador.textContent.trim() || 'Jogador'; salvar(); };
-  jogador.onblur = () => { p.jogador = jogador.textContent.trim() || 'Jogador'; salvar(); };
+  jogador.oninput = () => { p.jogador = jogador.textContent.trim() || 'Jogador'; salvar(p); };
+  jogador.onblur = () => { p.jogador = jogador.textContent.trim() || 'Jogador'; salvar(p); };
 
   const raceClass = document.createElement('div');
   raceClass.className = 'race-class';
   raceClass.innerHTML = `<span contenteditable="true" data-field="raca">${p.raca}</span> · <span contenteditable="true" data-field="classe">${p.classe}</span> · <strong>Nv <span contenteditable="true" data-field="nivel">${p.nivel}</span></strong>`;
   raceClass.querySelectorAll('[contenteditable]').forEach(el => {
-    el.oninput = () => {
+    const aplicar = () => {
       const field = el.dataset.field;
       p[field] = field === 'nivel' ? (parseInt(el.textContent) || 1) : (el.textContent.trim() || '?');
-      salvar();
+      salvar(p);
     };
-    el.onblur = () => {
-      const field = el.dataset.field;
-      p[field] = field === 'nivel' ? (parseInt(el.textContent) || 1) : (el.textContent.trim() || '?');
-      salvar();
-    };
+    el.oninput = aplicar;
+    el.onblur = aplicar;
   });
 
   header.appendChild(insp);
@@ -942,7 +968,7 @@ function criarCard(p) {
   const hpSep = document.createElement('span');
   hpSep.className = 'hp-sep';
   hpSep.textContent = '/';
-  const hpMax = inputNumerico(p.hpMax, v => { p.hpMax = v; salvar(); }, 'hp-max-input', 1);
+  const hpMax = inputNumerico(p.hpMax, v => { p.hpMax = v; salvar(p); }, 'hp-max-input', 1);
   hpVal.appendChild(hpCur);
   hpVal.appendChild(hpSep);
   hpVal.appendChild(hpMax);
@@ -955,7 +981,7 @@ function criarCard(p) {
   caBox.innerHTML = `<div class="stat-label">CA</div>`;
   const caVal = document.createElement('div');
   caVal.className = 'stat-value';
-  const caInput = inputNumerico(p.ca, v => { p.ca = v; salvar(); }, '', 0);
+  const caInput = inputNumerico(p.ca, v => { p.ca = v; salvar(p); }, '', 0);
   caVal.appendChild(caInput);
   caBox.appendChild(caVal);
 
@@ -968,8 +994,8 @@ function criarCard(p) {
   const nvInput = inputNumerico(p.nivel, v => {
     p.nivel = Math.max(1, Math.min(20, v));
     nvInput.value = p.nivel;
-    salvar();
-    render();
+    salvar(p);
+    rerenderCard(p);  // slots dependem do nível
   }, '', 1);
   nvVal.appendChild(nvInput);
   nvBox.appendChild(nvVal);
@@ -991,7 +1017,10 @@ function criarCard(p) {
     pip.title = `Nível ${i} de exaustão`;
     pip.onclick = () => {
       p.exaustao = (p.exaustao === i) ? i - 1 : i;
-      render();
+      salvar(p);
+      exhContainer.querySelectorAll('.exh-pip').forEach((el, idx) => {
+        el.classList.toggle('filled', (idx + 1) <= p.exaustao);
+      });
     };
     exhContainer.appendChild(pip);
   }
@@ -1019,7 +1048,10 @@ function criarCard(p) {
       pip.className = 'death-pip' + (i <= p[tipo] ? ' filled' : '');
       pip.onclick = () => {
         p[tipo] = (p[tipo] === i) ? i - 1 : i;
-        render();
+        salvar(p);
+        cont.querySelectorAll('.death-pip').forEach((el, idx) => {
+          el.classList.toggle('filled', (idx + 1) <= p[tipo]);
+        });
       };
       cont.appendChild(pip);
     }
@@ -1066,24 +1098,33 @@ function criarCard(p) {
       } else {
         const pipsBox = document.createElement('div');
         pipsBox.className = 'slot-pips-mestre';
+        const stat = document.createElement('div');
+        stat.className = 'slot-status-m';
+
+        const atualizarStatus = () => {
+          const u = Math.min(p.slots[nv].atual || 0, maxClasse);
+          const d = maxClasse - u;
+          stat.innerHTML = `<strong>${d}</strong>/${maxClasse}`;
+          pipsBox.querySelectorAll('.slot-pip-m').forEach((el, idx) => {
+            el.classList.toggle('gasto', idx < u);
+          });
+        };
+
         for (let i = 0; i < maxClasse; i++) {
           const pip = document.createElement('button');
           pip.type = 'button';
           pip.className = 'slot-pip-m' + (i < usados ? ' gasto' : '');
           pip.setAttribute('aria-label', `Slot ${nv}° espaço ${i+1} — ${i < usados ? 'gasto' : 'disponível'}`);
           pip.onclick = () => {
-            // Click no gasto → recupera; no disponível → gasta
             const novoUsados = pip.classList.contains('gasto') ? i : (i + 1);
             p.slots[nv].atual = Math.max(0, Math.min(maxClasse, novoUsados));
             salvar(p);
-            render();
+            atualizarStatus();
           };
           pipsBox.appendChild(pip);
         }
+        atualizarStatus();
         slot.appendChild(pipsBox);
-        const stat = document.createElement('div');
-        stat.className = 'slot-status-m';
-        stat.innerHTML = `<strong>${disp}</strong>/${maxClasse}`;
         slot.appendChild(stat);
       }
       slotsGrid.appendChild(slot);
@@ -1127,7 +1168,8 @@ function criarCard(p) {
     tag.onclick = () => {
       if (p.condicoes.includes(cond)) p.condicoes = p.condicoes.filter(c => c !== cond);
       else p.condicoes.push(cond);
-      render();
+      salvar(p);
+      tag.classList.toggle('active', p.condicoes.includes(cond));
     };
     condContainer.appendChild(tag);
   });
@@ -1159,7 +1201,7 @@ function criarCard(p) {
   descBtn.onclick = () => {
     if (!confirm(`Descanso longo para ${p.nome}?`)) return;
     aplicarDescansoLongo(p);
-    render();
+    rerenderCard(p);
     toast(`🌙 ${p.nome} descansou`);
   };
 
@@ -1253,16 +1295,23 @@ function podeEditar(p) {
       onChange: (ev) => {
         if (ev.tipo === 'load') {
           estado.personagens = window.DBSync.listar();
+          render();
         } else if (ev.tipo === 'insert') {
-          if (!estado.personagens.find(x => x.id === ev.char.id)) estado.personagens.push(ev.char);
+          if (!estado.personagens.find(x => x.id === ev.char.id)) {
+            estado.personagens.push(ev.char);
+            render();
+          }
         } else if (ev.tipo === 'update') {
           const idx = estado.personagens.findIndex(x => x.id === ev.char.id);
           if (idx >= 0) estado.personagens[idx] = ev.char;
-          else estado.personagens.push(ev.char);
+          else { estado.personagens.push(ev.char); render(); return; }
+          // Anti-eco: nossa própria edição já foi aplicada no DOM
+          if (ehEcoLocal(ev.char.id)) return;
+          rerenderCard(ev.char);
         } else if (ev.tipo === 'delete') {
           estado.personagens = estado.personagens.filter(x => x.id !== ev.id);
+          render();
         }
-        render();
       }
     });
     ehMestre = r.ehMestre;
