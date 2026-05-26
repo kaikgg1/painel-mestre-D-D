@@ -2123,8 +2123,11 @@ function renderEquipamento(c) {
       </div>
       ${renderTabelaItens('armas', inv.armas || [], ['Nome', 'Dano', 'Tipo', 'Propriedades'], ['nome','dano','tipo_dano','propriedades'])}
       <div class="adicionar-bloco">
-        <div class="campo"><label>Adicionar arma do catálogo</label>
-          <select id="add-arma"><option value="">— escolher —</option>${window.PHB.ARMAS.map(a => `<option value='${escape(JSON.stringify(a))}'>${escape(a.nome)} (${a.dano})</option>`).join('')}</select></div>
+        <div class="campo"><label>Adicionar arma do catálogo (${window.PHB.ARMAS.length} do PHB)</label>
+          <select id="add-arma">
+            <option value="">— escolher —</option>
+            ${optgroupsPorCategoria(window.PHB.ARMAS, a => `${escape(a.nome)} (${a.dano} ${escape(a.tipo_dano)})`)}
+          </select></div>
         <button class="btn" type="button" id="btn-add-arma">+ Adicionar</button>
       </div>
     </div>
@@ -2137,8 +2140,11 @@ function renderEquipamento(c) {
       </div>
       ${renderTabelaItens('armaduras', inv.armaduras || [], ['Nome', 'CA', 'Tipo', 'Força mín.'], ['nome','ca','tipo','forca'])}
       <div class="adicionar-bloco">
-        <div class="campo"><label>Adicionar armadura do catálogo</label>
-          <select id="add-armadura"><option value="">— escolher —</option>${window.PHB.ARMADURAS.map(a => `<option value='${escape(JSON.stringify(a))}'>${escape(a.nome)} (CA ${a.ca})</option>`).join('')}</select></div>
+        <div class="campo"><label>Adicionar armadura do catálogo (${window.PHB.ARMADURAS.length} do PHB)</label>
+          <select id="add-armadura">
+            <option value="">— escolher —</option>
+            ${optgroupsPorTipo(window.PHB.ARMADURAS, a => `${escape(a.nome)} (CA ${escape(a.ca)})`)}
+          </select></div>
         <button class="btn" type="button" id="btn-add-armadura">+ Adicionar</button>
       </div>
     </div>
@@ -2151,8 +2157,12 @@ function renderEquipamento(c) {
       </div>
       ${renderTabelaItens('itens', inv.itens || [], ['Nome', 'Qtd', 'Peso (kg)'], ['nome','qtd','peso'])}
       <div class="adicionar-bloco">
-        <div class="campo"><label>Item do catálogo</label>
-          <select id="add-item-catalogo"><option value="">— escolher do PHB —</option>${[...window.PHB.ITENS, ...window.PHB.FERRAMENTAS].map(it => `<option value='${escape(JSON.stringify(it))}'>${escape(it.nome)}</option>`).join('')}</select></div>
+        <div class="campo"><label>Item do catálogo (${window.PHB.ITENS.length + window.PHB.FERRAMENTAS.length} do PHB)</label>
+          <select id="add-item-catalogo">
+            <option value="">— escolher do PHB —</option>
+            ${optgroupsPorCategoria(window.PHB.ITENS, it => escape(it.nome))}
+            ${optgroupsPorCategoria(window.PHB.FERRAMENTAS, it => escape(it.nome))}
+          </select></div>
         <div class="campo" style="max-width:80px"><label>Qtd</label><input type="text" inputmode="numeric" id="add-item-qtd" value="1"></div>
         <button class="btn" type="button" id="btn-add-item-cat">+ Adicionar</button>
       </div>
@@ -2163,6 +2173,36 @@ function renderEquipamento(c) {
       </div>
     </div>
   `;
+}
+
+// Gera <optgroup> agrupando pela propriedade `categoria` (alfabético dentro do grupo).
+function optgroupsPorCategoria(lista, formatarRotulo) {
+  const grupos = {};
+  for (const it of lista) {
+    const cat = it.categoria || 'Outros';
+    (grupos[cat] = grupos[cat] || []).push(it);
+  }
+  // Lista já vem ordenada alfabeticamente; só agrupa
+  return Object.keys(grupos).sort((a,b) => a.localeCompare(b, 'pt'))
+    .map(cat => `<optgroup label="${escape(cat)}">
+      ${grupos[cat].map(it => `<option value='${escape(JSON.stringify(it))}'>${formatarRotulo(it)}</option>`).join('')}
+    </optgroup>`).join('');
+}
+
+// Para armaduras: agrupa pelo campo `tipo` (Leve / Média / Pesada / Escudo)
+function optgroupsPorTipo(lista, formatarRotulo) {
+  const grupos = {};
+  for (const it of lista) {
+    const cat = it.tipo || 'Outros';
+    (grupos[cat] = grupos[cat] || []).push(it);
+  }
+  const ordem = ['Leve', 'Média', 'Pesada', 'Escudo'];
+  return Object.keys(grupos).sort((a,b) => {
+    const ia = ordem.indexOf(a), ib = ordem.indexOf(b);
+    return (ia === -1 ? 99 : ia) - (ib === -1 ? 99 : ib);
+  }).map(cat => `<optgroup label="${escape(cat)}">
+    ${grupos[cat].map(it => `<option value='${escape(JSON.stringify(it))}'>${formatarRotulo(it)}</option>`).join('')}
+  </optgroup>`).join('');
 }
 
 function renderTabelaItens(tipo, itens, colunas, campos) {
