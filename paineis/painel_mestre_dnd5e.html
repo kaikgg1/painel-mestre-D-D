@@ -206,25 +206,32 @@
     position: absolute;
     top: -2px;
     right: -2px;
-    width: 28px;
+    min-width: 32px;
     height: 28px;
+    padding: 0 6px;
     background: var(--bg-parchment);
     border: 2px solid var(--gold-dark);
-    border-radius: 50%;
+    border-radius: 14px;
     display: flex;
     align-items: center;
     justify-content: center;
+    gap: 3px;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 14px;
+    font-family: 'Cinzel', serif;
+    font-weight: 700;
+    color: var(--brown);
     transition: all 0.2s;
     user-select: none;
   }
+  .inspiration .ic { font-size: 14px; }
+  .inspiration .qty { font-size: 13px; }
   .inspiration.active {
     background: var(--gold);
     color: var(--red-dark);
     box-shadow: 0 0 8px var(--gold);
   }
-  .inspiration:hover { transform: scale(1.1); }
+  .inspiration:hover { transform: scale(1.08); }
 
   /* ===== STATS PRINCIPAIS ===== */
   .stats-row {
@@ -373,41 +380,74 @@
     font-size: 11px;
   }
   .slot-level {
-    background: rgba(146, 38, 16, 0.05);
+    background: linear-gradient(180deg, rgba(146, 38, 16, 0.08), rgba(146, 38, 16, 0.02));
     border: 1px solid rgba(146, 38, 16, 0.3);
-    border-radius: 3px;
-    padding: 3px;
+    border-radius: 5px;
+    padding: 6px 4px;
     text-align: center;
+    transition: opacity 0.2s, filter 0.2s;
   }
+  .slot-level.indisponivel { opacity: 0.35; filter: grayscale(0.6); }
   .slot-level-num {
     font-family: 'Cinzel', serif;
     font-weight: 700;
     color: var(--red-dark);
     font-size: 10px;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
   }
-  .slot-inputs {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 2px;
-    font-size: 11px;
+  .slot-pips-mestre {
+    display: flex; flex-wrap: wrap; gap: 3px;
+    justify-content: center; min-height: 16px; margin-bottom: 3px;
   }
-  .slot-input {
-    width: 22px;
-    text-align: center;
-    border: none;
-    background: transparent;
-    font-family: inherit;
+  .slot-pip-m {
+    width: 14px; height: 14px;
+    border: 1.5px solid var(--red-dark);
+    border-radius: 50%;
+    background: var(--bg-parchment);
+    cursor: pointer; padding: 0;
+    transition: transform 0.12s, background 0.12s;
+  }
+  .slot-pip-m:hover { transform: scale(1.2); }
+  .slot-pip-m.gasto {
+    background: radial-gradient(circle, var(--red), var(--red-dark));
+    border-color: var(--red);
+  }
+  .slot-status-m {
+    font-size: 10px; font-family: 'Cinzel', serif;
+    color: var(--brown-soft); letter-spacing: 0.5px;
+  }
+  .slot-status-m strong { color: var(--red-dark); font-size: 11px; }
+  .slot-level.indisponivel .slot-status-m { color: var(--brown-soft); }
+
+  /* ===== MAGIAS PREPARADAS (Mestre — vem do spell_lists) ===== */
+  .magias-prep-mestre {
+    display: flex; flex-wrap: wrap; gap: 4px;
+    min-height: 24px;
+    padding: 4px 0;
+  }
+  .magia-prep-tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    background: rgba(184, 138, 44, 0.15);
+    border: 1px solid rgba(146, 38, 16, 0.3);
+    border-radius: 10px;
+    padding: 2px 8px;
     font-size: 11px;
     color: var(--brown);
-    outline: none;
-    font-weight: 700;
-    padding: 1px;
-    border-radius: 2px;
-    transition: background 0.12s;
   }
-  .slot-input:focus { background: rgba(201, 162, 74, 0.2); }
-  .slot-sep { color: var(--brown-soft); }
+  .magia-prep-tag .nv {
+    font-family: 'Cinzel', serif;
+    font-size: 9px; font-weight: 700;
+    color: var(--red-dark);
+    background: var(--bg-parchment);
+    border-radius: 8px;
+    padding: 1px 5px;
+    letter-spacing: 0.5px;
+  }
+  .magia-prep-vazio {
+    font-size: 11px; color: var(--brown-soft);
+    font-style: italic; padding: 4px 0;
+  }
 
   /* ===== MAGIAS PREPARADAS ===== */
   .spell-list {
@@ -672,6 +712,7 @@
 <script src="../assets/js/supabase.js"></script>
 <script src="../assets/js/auth.js"></script>
 <script src="../assets/js/dbsync.js"></script>
+<script src="../assets/js/phb_slots.js"></script>
 <script>
 const CONDICOES = [
   'Agarrado', 'Amedrontado', 'Atordoado', 'Caído', 'Cego', 'Enfeitiçado',
@@ -753,6 +794,43 @@ function aplicarMatematica(valorAtual, entrada) {
   return isNaN(n) ? valorAtual : n;
 }
 
+// Escape HTML básico
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({
+    '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+  }[c]));
+}
+
+// Carrega magias preparadas (favoritas) de um personagem específico
+// Junta spell_lists com o catálogo de magias pra ter nível/escola.
+let _magiasCacheMestre = null;
+async function carregarCatalogoMagias() {
+  if (_magiasCacheMestre) return _magiasCacheMestre;
+  try {
+    const r = await fetch('../data/magias_data.json');
+    _magiasCacheMestre = await r.json();
+    return _magiasCacheMestre;
+  } catch { return []; }
+}
+async function carregarMagiasPreparadasMestre(characterId) {
+  if (!window.sb || !characterId) return [];
+  try {
+    const { data } = await window.sb.from('spell_lists')
+      .select('spell_names')
+      .eq('character_id', characterId)
+      .eq('nome', 'Favoritas')
+      .maybeSingle();
+    const nomes = new Set(data?.spell_names || []);
+    if (!nomes.size) return [];
+    const todas = await carregarCatalogoMagias();
+    return todas.filter(m => nomes.has(m.nome))
+      .sort((a,b) => a.nivel - b.nivel || a.nome.localeCompare(b.nome, 'pt'));
+  } catch (e) {
+    console.warn('[mestre] preparadas:', e);
+    return [];
+  }
+}
+
 function inputNumerico(valor, callback, classes = '', min = null) {
   const input = document.createElement('input');
   input.type = 'text';
@@ -801,10 +879,16 @@ function criarCard(p) {
   header.className = 'char-header';
 
   const insp = document.createElement('div');
-  insp.className = 'inspiration' + (p.inspiracao > 0 ? ' active' : '');
-  insp.title = 'Inspiração (clique para alternar)';
-  insp.textContent = '★';
-  insp.onclick = () => { p.inspiracao = p.inspiracao > 0 ? 0 : 1; render(); };
+  const inspNum = +p.inspiracao || 0;
+  insp.className = 'inspiration' + (inspNum > 0 ? ' active' : '');
+  insp.title = `Inspiração: ${inspNum} (clique para +1 · Shift+clique para −1)`;
+  insp.innerHTML = `<span class="ic">★</span><span class="qty">${inspNum}</span>`;
+  insp.onclick = (e) => {
+    if (e.shiftKey) p.inspiracao = Math.max(0, inspNum - 1);
+    else p.inspiracao = inspNum + 1;
+    salvar(p);
+    render();
+  };
 
   const nome = document.createElement('div');
   nome.className = 'char-name';
@@ -943,49 +1027,93 @@ function criarCard(p) {
   card.appendChild(deathSection);
 
   // === SLOTS DE MAGIA ===
-  const slotsSection = document.createElement('div');
-  slotsSection.className = 'section';
-  slotsSection.innerHTML = `<div class="section-title">Slots de Magia</div>`;
-  const slotsGrid = document.createElement('div');
-  slotsGrid.className = 'spell-slots';
-  // Defesa: garante estrutura dos slots se vier de um banco vazio
-  if (!p.slots) p.slots = {};
-  for (let n = 1; n <= 9; n++) if (!p.slots[n]) p.slots[n] = { atual: 0, max: 0 };
-  NIVEIS_SLOTS.forEach(nv => {
-    const slot = document.createElement('div');
-    slot.className = 'slot-level';
-    const numDiv = document.createElement('div');
-    numDiv.className = 'slot-level-num';
-    numDiv.textContent = `Nv ${nv}`;
-    const inputs = document.createElement('div');
-    inputs.className = 'slot-inputs';
-    const atualInput = inputNumerico(p.slots[nv].atual, v => { p.slots[nv].atual = Math.max(0, v); atualInput.value = p.slots[nv].atual; salvar(p); }, 'slot-input', 0);
-    const sep = document.createElement('span');
-    sep.className = 'slot-sep';
-    sep.textContent = '/';
-    const maxInput = inputNumerico(p.slots[nv].max, v => { p.slots[nv].max = Math.max(0, v); maxInput.value = p.slots[nv].max; salvar(p); }, 'slot-input', 0);
-    inputs.appendChild(atualInput);
-    inputs.appendChild(sep);
-    inputs.appendChild(maxInput);
-    slot.appendChild(numDiv);
-    slot.appendChild(inputs);
-    slotsGrid.appendChild(slot);
-  });
-  slotsSection.appendChild(slotsGrid);
-  card.appendChild(slotsSection);
+  // Semântica: p.slots[nv].atual = USADOS (gastos), p.slots[nv].max = total.
+  // Max calculado pela classe/nível via SlotsPHB; fallback pro valor salvo.
+  const slotsClasse = (window.SlotsPHB && p.classe)
+    ? window.SlotsPHB.porClasse(p.classe, p.nivel, p._subclasse)
+    : null;
 
-  // === MAGIAS PREPARADAS ===
-  const magiasSection = document.createElement('div');
-  magiasSection.className = 'section';
-  magiasSection.innerHTML = `<div class="section-title">Magias Preparadas</div>`;
-  const spellList = document.createElement('div');
-  spellList.className = 'spell-list';
-  spellList.contentEditable = true;
-  spellList.innerHTML = p.magias;
-  spellList.oninput = () => { p.magias = spellList.innerHTML; salvar(); };
-  spellList.onblur = () => { p.magias = spellList.innerHTML; salvar(); };
-  magiasSection.appendChild(spellList);
-  card.appendChild(magiasSection);
+  if (slotsClasse) {
+    const slotsSection = document.createElement('div');
+    slotsSection.className = 'section';
+    slotsSection.innerHTML = `<div class="section-title">Slots de Magia</div>`;
+    const slotsGrid = document.createElement('div');
+    slotsGrid.className = 'spell-slots';
+
+    if (!p.slots) p.slots = {};
+    for (let n = 1; n <= 9; n++) if (!p.slots[n]) p.slots[n] = { atual: 0, max: 0 };
+
+    NIVEIS_SLOTS.forEach(nv => {
+      const maxClasse = slotsClasse[nv] || 0;
+      // Sincroniza max do banco com a tabela da classe
+      p.slots[nv].max = maxClasse;
+      const usados = Math.min(p.slots[nv].atual || 0, maxClasse);
+      const disp = maxClasse - usados;
+
+      const slot = document.createElement('div');
+      slot.className = 'slot-level' + (maxClasse === 0 ? ' indisponivel' : '');
+
+      const numDiv = document.createElement('div');
+      numDiv.className = 'slot-level-num';
+      numDiv.textContent = `Nv ${nv}`;
+      slot.appendChild(numDiv);
+
+      if (maxClasse === 0) {
+        const stat = document.createElement('div');
+        stat.className = 'slot-status-m';
+        stat.textContent = '—';
+        slot.appendChild(stat);
+      } else {
+        const pipsBox = document.createElement('div');
+        pipsBox.className = 'slot-pips-mestre';
+        for (let i = 0; i < maxClasse; i++) {
+          const pip = document.createElement('button');
+          pip.type = 'button';
+          pip.className = 'slot-pip-m' + (i < usados ? ' gasto' : '');
+          pip.setAttribute('aria-label', `Slot ${nv}° espaço ${i+1} — ${i < usados ? 'gasto' : 'disponível'}`);
+          pip.onclick = () => {
+            // Click no gasto → recupera; no disponível → gasta
+            const novoUsados = pip.classList.contains('gasto') ? i : (i + 1);
+            p.slots[nv].atual = Math.max(0, Math.min(maxClasse, novoUsados));
+            salvar(p);
+            render();
+          };
+          pipsBox.appendChild(pip);
+        }
+        slot.appendChild(pipsBox);
+        const stat = document.createElement('div');
+        stat.className = 'slot-status-m';
+        stat.innerHTML = `<strong>${disp}</strong>/${maxClasse}`;
+        slot.appendChild(stat);
+      }
+      slotsGrid.appendChild(slot);
+    });
+    slotsSection.appendChild(slotsGrid);
+    card.appendChild(slotsSection);
+
+    // === MAGIAS PREPARADAS (do spell_lists do jogador) ===
+    const magiasSection = document.createElement('div');
+    magiasSection.className = 'section';
+    magiasSection.innerHTML = `<div class="section-title">Magias Preparadas</div>`;
+    const wrap = document.createElement('div');
+    wrap.className = 'magias-prep-mestre';
+    wrap.innerHTML = `<span class="magia-prep-vazio">Carregando…</span>`;
+    magiasSection.appendChild(wrap);
+    card.appendChild(magiasSection);
+    // Fetch async
+    carregarMagiasPreparadasMestre(p.id).then(magias => {
+      if (!magias.length) {
+        wrap.innerHTML = `<span class="magia-prep-vazio">Nenhuma magia favoritada pelo jogador.</span>`;
+        return;
+      }
+      wrap.innerHTML = magias.map(m => {
+        const nv = m.nivel === 0 ? 'TRU' : `${m.nivel}°`;
+        return `<span class="magia-prep-tag" title="${escapeHtml(m.escola || '')}">
+          <span class="nv">${nv}</span>${escapeHtml(m.nome)}
+        </span>`;
+      }).join('');
+    });
+  }
 
   // === CONDIÇÕES ===
   const condSection = document.createElement('div');
