@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a0608">
+<link rel="icon" type="image/svg+xml" href="../../assets/img/favicon.svg">
+<title>Fichas de Vilão — Painel do Mestre</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,700;1,400&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg-deep:#0a0608; --bg-card:#1a1018; --bg-card-soft:#221520;
+    --gold:#8B6914; --gold-bright:#b88a2c; --gold-light:#d4a843;
+    --blood:#6b1010; --blood-bright:#8b1d1d;
+    --parchment:#d4c5a0; --parchment-dim:#a89878;
+    --shadow:#050304; --text-dim:#8c7d5e;
+  }
+  html, body {
+    min-height: 100vh; min-height: 100dvh;
+    background: var(--bg-deep);
+    background-image: radial-gradient(ellipse at top, #2a1518 0%, #150a0c 40%, #050304 100%);
+    font-family: 'EB Garamond', Georgia, serif;
+    color: var(--parchment);
+  }
+  body::before {
+    content: ''; position: fixed; inset: 0;
+    pointer-events: none; z-index: 0;
+    background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.55) 100%);
+  }
+  .site-header {
+    position: sticky; top: 0; z-index: 30;
+    background: linear-gradient(180deg, rgba(15,8,10,0.96), rgba(10,6,8,0.92));
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--gold);
+    padding: 12px 24px;
+    display: flex; align-items: center; gap: 16px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.7);
+  }
+  .back-btn {
+    text-decoration: none; color: var(--parchment-dim);
+    font-family: 'Cinzel', serif; font-size: 11px;
+    font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 8px 14px; border: 1px solid var(--gold);
+    border-radius: 3px; transition: all 0.2s; white-space: nowrap;
+  }
+  .back-btn:hover { background: var(--gold); color: var(--shadow); }
+  .header-title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(16px, 2.8vw, 24px); font-weight: 700;
+    color: var(--gold-bright); letter-spacing: 2px;
+    text-shadow: 0 0 24px rgba(184,138,44,0.35);
+    flex: 1; text-align: center;
+  }
+  .auth-slot { display: flex; align-items: center; gap: 8px; font-family: 'Cinzel', serif; font-size: 11px; }
+  .auth-slot .auth-nome { color: var(--parchment-dim); letter-spacing: 1px; }
+  .auth-slot .auth-btn {
+    padding: 6px 12px; background: transparent; border: 1px solid var(--gold);
+    color: var(--parchment-dim); border-radius: 2px;
+    font-family: 'Cinzel', serif; font-size: 10px; font-weight: 600;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    text-decoration: none; cursor: pointer; transition: all 0.2s;
+  }
+  .auth-slot .auth-btn:hover { background: var(--gold); color: var(--shadow); }
+
+  main {
+    position: relative; z-index: 1;
+    max-width: 1100px; margin: 40px auto; padding: 0 24px 60px;
+  }
+  .intro {
+    text-align: center; margin-bottom: 36px;
+  }
+  .intro h1 {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(22px, 4vw, 34px);
+    color: var(--gold-bright);
+    letter-spacing: 3px; margin-bottom: 10px;
+    text-shadow: 0 0 28px rgba(184,138,44,0.3);
+  }
+  .intro p {
+    font-style: italic; color: var(--parchment-dim);
+    font-size: 15px; max-width: 580px; margin: 0 auto;
+  }
+  .intro hr {
+    width: 60%; max-width: 400px; margin: 18px auto 0; border: 0;
+    height: 1px; background: linear-gradient(to right, transparent, var(--gold-bright), transparent);
+    opacity: 0.5;
+  }
+
+  .villain-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+  }
+  .villain-card {
+    position: relative;
+    display: flex; flex-direction: column;
+    text-decoration: none;
+    background: linear-gradient(160deg, var(--bg-card-soft), var(--bg-card) 60%, #0d0709);
+    border: 2px solid var(--gold);
+    border-radius: 8px;
+    padding: 32px 24px 24px;
+    overflow: hidden;
+    transition: transform 0.3s, border-color 0.3s, box-shadow 0.3s;
+    min-height: 280px;
+  }
+  .villain-card::before {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(139,29,29,0.15), transparent 60%);
+    pointer-events: none; opacity: 0; transition: opacity 0.3s;
+  }
+  .villain-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--gold-bright);
+    box-shadow: 0 14px 36px rgba(0,0,0,0.7), 0 0 24px rgba(139,29,29,0.2);
+  }
+  .villain-card:hover::before { opacity: 1; }
+  .villain-card.locked { opacity: 0.55; cursor: not-allowed; }
+  .villain-card.locked:hover { transform: none; box-shadow: none; border-color: var(--gold); }
+
+  .villain-card.strahd {
+    background: linear-gradient(160deg, #200e10 0%, #160a0c 60%, #0d0608 100%);
+    border-color: var(--blood-bright);
+  }
+  .villain-card.strahd:hover {
+    border-color: var(--blood-bright);
+    box-shadow: 0 14px 36px rgba(0,0,0,0.7), 0 0 28px rgba(139,29,29,0.4);
+  }
+  .villain-card .corner {
+    position: absolute; color: var(--blood); font-size: 14px;
+    opacity: 0.5; transition: all 0.3s;
+  }
+  .villain-card:hover .corner { opacity: 0.9; color: var(--gold-bright); }
+  .corner.tl { top: 8px; left: 12px; }
+  .corner.tr { top: 8px; right: 12px; }
+  .corner.bl { bottom: 8px; left: 12px; }
+  .corner.br { bottom: 8px; right: 12px; }
+
+  .vil-icon {
+    font-size: 60px;
+    margin-bottom: 18px;
+    filter: drop-shadow(0 0 12px rgba(139,29,29,0.4));
+    align-self: center;
+    line-height: 1;
+  }
+  .vil-nome {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 22px; font-weight: 700;
+    color: var(--gold-bright);
+    letter-spacing: 1.5px; text-align: center;
+    margin-bottom: 8px;
+    text-shadow: 1px 1px 3px var(--shadow);
+  }
+  .vil-titulo {
+    font-style: italic; color: var(--parchment-dim);
+    text-align: center; font-size: 13px; margin-bottom: 14px;
+  }
+  .vil-meta {
+    display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;
+    margin-bottom: 14px;
+  }
+  .meta-tag {
+    font-family: 'Cinzel', serif;
+    font-size: 9px; font-weight: 700;
+    padding: 3px 8px; border-radius: 3px;
+    letter-spacing: 0.5px; text-transform: uppercase;
+    background: rgba(139,105,20,0.18);
+    border: 1px solid rgba(184,138,44,0.4);
+    color: var(--gold-bright);
+  }
+  .vil-resumo {
+    font-size: 13px; line-height: 1.6;
+    color: var(--parchment-dim); text-align: center;
+    margin-bottom: auto; padding-bottom: 14px;
+  }
+  .vil-cta {
+    margin-top: auto;
+    padding: 10px 18px;
+    background: transparent;
+    border: 1px solid var(--blood-bright);
+    color: var(--parchment);
+    font-family: 'Cinzel', serif;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 2px; text-transform: uppercase;
+    border-radius: 3px;
+    text-align: center;
+    transition: all 0.2s;
+  }
+  .villain-card:hover .vil-cta {
+    background: var(--blood-bright);
+    color: var(--parchment);
+  }
+
+  .add-card {
+    border: 2px dashed rgba(139,105,20,0.4);
+    background: transparent;
+    color: var(--text-dim);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 40px 24px;
+    font-family: 'Cinzel', serif;
+    font-style: italic;
+    text-align: center;
+    border-radius: 8px;
+    min-height: 280px;
+    cursor: default;
+  }
+  .add-card .add-icon { font-size: 40px; margin-bottom: 12px; opacity: 0.5; }
+  .add-card p { font-size: 13px; line-height: 1.5; max-width: 240px; }
+
+  .acesso-restrito {
+    display: none;
+    padding: 60px 24px; text-align: center;
+    color: var(--parchment-dim);
+  }
+  .acesso-restrito h2 {
+    font-family: 'Cinzel Decorative', serif;
+    color: var(--gold-bright); font-size: 22px; margin-bottom: 12px;
+    letter-spacing: 2px;
+  }
+  .acesso-restrito.show { display: block; }
+  .villain-grid.hidden { display: none; }
+
+  @media (max-width: 600px) {
+    .site-header { padding: 10px 14px; gap: 12px; }
+    main { padding: 0 14px 40px; margin-top: 24px; }
+    .villain-grid { grid-template-columns: 1fr; gap: 16px; }
+    .villain-card { padding: 28px 20px 20px; min-height: 0; }
+    .add-card { min-height: 0; padding: 28px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <a href="../../index.html" class="back-btn">← Início</a>
+  <div class="header-title">Fichas de Vilão</div>
+  <div class="auth-slot" id="auth-slot"></div>
+</header>
+
+<div class="acesso-restrito" id="restrito">
+  <h2>🔒 Acesso restrito ao Mestre</h2>
+  <p>Esta página é só para quem conduz a aventura.</p>
+  <p style="margin-top:16px"><a href="../login.html" class="back-btn" style="display:inline-block">Entrar como Mestre</a></p>
+</div>
+
+<main id="main-content" style="display:none">
+  <div class="intro">
+    <h1>Fichas de Vilão</h1>
+    <p>Selecione o vilão principal da campanha. Cada ficha mantém HP, slots, condições e notas <strong style="color:var(--gold-bright)">sincronizados em tempo real</strong> entre os seus dispositivos.</p>
+    <hr>
+  </div>
+
+  <div class="villain-grid">
+
+    <!-- Strahd -->
+    <a href="strahd.html" class="villain-card strahd" aria-label="Abrir ficha de Strahd von Zarovich">
+      <span class="corner tl" aria-hidden="true">✠</span>
+      <span class="corner tr" aria-hidden="true">✠</span>
+      <span class="corner bl" aria-hidden="true">✠</span>
+      <span class="corner br" aria-hidden="true">✠</span>
+      <div class="vil-icon" aria-hidden="true">🧛</div>
+      <div class="vil-nome">Strahd von Zarovich</div>
+      <div class="vil-titulo">Conde de Barovia · O Vampiro</div>
+      <div class="vil-meta">
+        <span class="meta-tag">ND 21</span>
+        <span class="meta-tag">3 Fases</span>
+        <span class="meta-tag">PV 331</span>
+      </div>
+      <div class="vil-resumo">Ficha de combate completa com transições entre Mago, Soldado e Vampiro. Inclui grimório de magias e ações de covil.</div>
+      <div class="vil-cta">Abrir Ficha</div>
+    </a>
+
+    <!-- Placeholder para novos vilões -->
+    <div class="add-card">
+      <div class="add-icon" aria-hidden="true">＋</div>
+      <p>Novos vilões serão adicionados aqui conforme as campanhas avançarem.</p>
+    </div>
+
+  </div>
+</main>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="../../assets/js/supabase.js"></script>
+<script src="../../assets/js/auth.js"></script>
+<script>
+  (async () => {
+    const u = await window.Auth.requerLogin('../login.html');
+    if (!u) return;
+    await window.Auth.renderHeader('#auth-slot');
+    const ehMestre = await window.Auth.ehMestre();
+    if (!ehMestre) {
+      document.getElementById('restrito').classList.add('show');
+      return;
+    }
+    document.getElementById('main-content').style.display = 'block';
+  })();
+</script>
+
+</body>
+</html>

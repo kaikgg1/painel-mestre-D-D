@@ -734,6 +734,8 @@
   <a href="../index.html" class="back-link" aria-label="Voltar à tela inicial">← Voltar</a>
   <button onclick="adicionarCard()" id="btn-adicionar" style="display:none" aria-label="Adicionar novo personagem"><span aria-hidden="true">⚜</span> Adicionar</button>
   <button onclick="descansoLongo()" id="btn-descanso-global" style="display:none" aria-label="Aplicar descanso longo a todos"><span aria-hidden="true">🌙</span> Descanso Longo</button>
+  <button type="button" onclick="abrirNotasMestre()" id="btn-notas-mestre" style="display:none" aria-label="Abrir anotações do mestre"><span aria-hidden="true">📒</span> Anotações</button>
+  <a href="vilao/index.html" id="link-vilao" class="back-link" style="display:none;text-decoration:none" aria-label="Abrir fichas de vilão"><span aria-hidden="true">🧛</span> Vilões</a>
   <button onclick="window.print()" aria-label="Imprimir painel"><span aria-hidden="true">🖨</span> Imprimir</button>
   <span class="auth-slot" id="auth-slot" aria-label="Status de login" style="margin-left:auto;display:flex;gap:8px;align-items:center;font-family:'Cinzel',serif;font-size:11px"></span>
 </nav>
@@ -753,6 +755,7 @@
 <script src="../assets/js/auth.js"></script>
 <script src="../assets/js/dbsync.js"></script>
 <script src="../assets/js/phb_slots.js"></script>
+<script src="../assets/js/master_notes.js"></script>
 <script>
 const CONDICOES = [
   'Agarrado','Amedrontado','Atordoado','Caído','Cego','Enfeitiçado',
@@ -938,13 +941,43 @@ function render() {
 }
 
 // Patch cirúrgico: re-renderiza apenas o card de um personagem específico
+// Anti-flicker: debounce por card + skip se o usuário está editando dentro dele.
+const _rerenderTimers = new Map();
+const _rerenderPending = new Map();
+
 function rerenderCard(p) {
+  if (!p?.id) return;
+  _rerenderPending.set(p.id, p);
+  if (_rerenderTimers.has(p.id)) clearTimeout(_rerenderTimers.get(p.id));
+  _rerenderTimers.set(p.id, setTimeout(() => {
+    _rerenderTimers.delete(p.id);
+    _aplicarRerender(p.id);
+  }, 280));
+}
+
+function _aplicarRerender(id) {
   const grid = document.getElementById('grid');
-  if (!grid || !p?.id) return;
-  const antigo = grid.querySelector(`[data-card-id="${p.id}"]`);
-  if (!antigo) { render(); return; }
-  const novo = criarCard(p);
+  if (!grid) return;
+  const antigo = grid.querySelector(`[data-card-id="${id}"]`);
+  if (!antigo) { _rerenderPending.delete(id); render(); return; }
+  if (antigo.contains(document.activeElement)) {
+    const handler = () => {
+      antigo.removeEventListener('focusout', handler);
+      setTimeout(() => {
+        if (!antigo.contains(document.activeElement)) _aplicarRerender(id);
+      }, 250);
+    };
+    antigo.addEventListener('focusout', handler, { once: true });
+    return;
+  }
+  const dados = _rerenderPending.get(id);
+  _rerenderPending.delete(id);
+  if (!dados) return;
+  const h = antigo.offsetHeight;
+  const novo = criarCard(dados);
+  novo.style.minHeight = h + 'px';
   antigo.replaceWith(novo);
+  requestAnimationFrame(() => requestAnimationFrame(() => { novo.style.minHeight = ''; }));
 }
 
 function criarCard(p) {
@@ -975,15 +1008,15 @@ function criarCard(p) {
   nome.className = 'char-name';
   nome.contentEditable = true;
   nome.textContent = p.nome;
-  nome.oninput = () => { p.nome = nome.textContent.trim() || 'Personagem'; salvar(); };
-  nome.onblur = () => { p.nome = nome.textContent.trim() || 'Personagem'; salvar(); };
+  nome.oninput = () => { p.nome = nome.textContent.trim() || 'Personagem'; salvar(p); };
+  nome.onblur = () => { p.nome = nome.textContent.trim() || 'Personagem'; salvar(p); };
 
   const jogador = document.createElement('div');
   jogador.className = 'player-name';
   jogador.contentEditable = true;
   jogador.textContent = p.jogador;
-  jogador.oninput = () => { p.jogador = jogador.textContent.trim() || 'Jogador'; salvar(); };
-  jogador.onblur = () => { p.jogador = jogador.textContent.trim() || 'Jogador'; salvar(); };
+  jogador.oninput = () => { p.jogador = jogador.textContent.trim() || 'Jogador'; salvar(p); };
+  jogador.onblur = () => { p.jogador = jogador.textContent.trim() || 'Jogador'; salvar(p); };
 
   const raceClass = document.createElement('div');
   raceClass.className = 'race-class';
@@ -992,12 +1025,12 @@ function criarCard(p) {
     el.oninput = () => {
       const field = el.dataset.field;
       p[field] = field === 'nivel' ? (parseInt(el.textContent) || 1) : (el.textContent.trim() || '?');
-      salvar();
+      salvar(p);
     };
     el.onblur = () => {
       const field = el.dataset.field;
       p[field] = field === 'nivel' ? (parseInt(el.textContent) || 1) : (el.textContent.trim() || '?');
-      salvar();
+      salvar(p);
     };
   });
 
@@ -1019,11 +1052,11 @@ function criarCard(p) {
   hpLabel.textContent = 'Pontos de Vida';
   const hpVal = document.createElement('div');
   hpVal.className = 'stat-value hp-grouped';
-  const hpCur = inputNumerico(p.hpAtual, v => { p.hpAtual = v; salvar(); toast(`PV atualizado: ${v}`); }, 'hp-current-input', 0);
+  const hpCur = inputNumerico(p.hpAtual, v => { p.hpAtual = v; salvar(p); toast(`PV atualizado: ${v}`); }, 'hp-current-input', 0);
   const hpSep = document.createElement('span');
   hpSep.className = 'hp-sep';
   hpSep.textContent = '/';
-  const hpMax = inputNumerico(p.hpMax, v => { p.hpMax = v; salvar(); }, 'hp-max-input', 1);
+  const hpMax = inputNumerico(p.hpMax, v => { p.hpMax = v; salvar(p); }, 'hp-max-input', 1);
   hpVal.appendChild(hpCur);
   hpVal.appendChild(hpSep);
   hpVal.appendChild(hpMax);
@@ -1036,7 +1069,7 @@ function criarCard(p) {
   caBox.innerHTML = `<div class="stat-label">CA</div>`;
   const caVal = document.createElement('div');
   caVal.className = 'stat-value';
-  const caInput = inputNumerico(p.ca, v => { p.ca = v; salvar(); }, '', 0);
+  const caInput = inputNumerico(p.ca, v => { p.ca = v; salvar(p); }, '', 0);
   caVal.appendChild(caInput);
   caBox.appendChild(caVal);
 
@@ -1238,7 +1271,7 @@ function criarCard(p) {
   salvarBtn.className = 'save-card';
   salvarBtn.textContent = '💾 Salvar';
   salvarBtn.onclick = () => {
-    salvar();
+    salvar(p);
     salvarBtn.textContent = '✓ Salvo';
     salvarBtn.classList.add('saved');
     setTimeout(() => {
@@ -1367,10 +1400,10 @@ async function descansoLongo() {
     ehMestre = r.ehMestre;
     // Botões exclusivos do Mestre na toolbar
     if (ehMestre) {
-      const ba = document.getElementById('btn-adicionar');
-      const bd = document.getElementById('btn-descanso-global');
-      if (ba) ba.style.display = '';
-      if (bd) bd.style.display = '';
+      ['btn-adicionar','btn-descanso-global','btn-notas-mestre','link-vilao'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = '';
+      });
     }
   } catch (e) {
     console.error(e);

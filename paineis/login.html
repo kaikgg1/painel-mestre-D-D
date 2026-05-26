@@ -336,6 +336,48 @@
     font-style: italic;
   }
 
+  /* ====== SENHA DO MESTRE ====== */
+  .senha-bloco {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 14px 16px;
+    background: linear-gradient(160deg, rgba(107,16,16,0.25), rgba(26,8,10,0.7));
+    border: 1px solid var(--blood);
+    border-left: 4px solid var(--blood-bright);
+    border-radius: 8px;
+    animation: fadeUp 0.3s ease-out;
+  }
+  .senha-bloco[hidden] { display: none; }
+  .senha-label {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gold-bright);
+  }
+  .senha-input {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid var(--blood-bright);
+    border-radius: 6px;
+    color: var(--parchment);
+    font-family: 'EB Garamond', serif;
+    font-size: 16px;
+    letter-spacing: 4px;
+    outline: none;
+    transition: all 0.2s;
+    min-height: 48px;
+  }
+  .senha-input::placeholder { color: var(--text-dim, #8c7d5e); letter-spacing: 1px; font-style: italic; }
+  .senha-input:focus {
+    border-color: var(--gold-bright);
+    background: rgba(0,0,0,0.55);
+    box-shadow: 0 0 0 3px rgba(184,138,44,0.15);
+  }
+
   /* ====== ÁREA DE AÇÃO ====== */
   .acoes {
     margin-top: 12px;
@@ -493,6 +535,12 @@
 
       <input type="hidden" id="nome-selecionado" required>
 
+      <!-- Campo de senha (só aparece para Mestre) -->
+      <div class="senha-bloco" id="senha-bloco" hidden>
+        <label for="senha-mestre" class="senha-label">🔒 Senha do Mestre</label>
+        <input type="password" id="senha-mestre" class="senha-input" placeholder="Digite a senha" autocomplete="off" inputmode="text">
+      </div>
+
       <div class="acoes">
         <button type="submit" class="btn-entrar" id="btn-entrar" disabled>Entrar</button>
         <div class="erro" id="erro" role="alert" aria-live="polite"></div>
@@ -506,15 +554,29 @@
 <script src="../assets/js/supabase.js"></script>
 <script src="../assets/js/auth.js"></script>
 <script>
-  const form  = document.getElementById('login-form');
-  const btn   = document.getElementById('btn-entrar');
-  const erro  = document.getElementById('erro');
-  const hidden = document.getElementById('nome-selecionado');
+  const form     = document.getElementById('login-form');
+  const btn      = document.getElementById('btn-entrar');
+  const erro     = document.getElementById('erro');
+  const hidden   = document.getElementById('nome-selecionado');
+  const senhaBox = document.getElementById('senha-bloco');
+  const senhaInp = document.getElementById('senha-mestre');
+
+  // Gate UX local — segurança real é o RLS do Supabase.
+  const SENHA_MESTRE = 'Master123';
+  const NOME_MESTRE  = 'Mestre123';
 
   (async () => {
     const u = await window.Auth.getUser();
     if (u) location.replace('../index.html');
   })();
+
+  function ehMestreSelecionado() { return hidden.value === NOME_MESTRE; }
+
+  function atualizarVisibilidadeSenha() {
+    const mestre = ehMestreSelecionado();
+    senhaBox.hidden = !mestre;
+    if (!mestre) { senhaInp.value = ''; }
+  }
 
   document.querySelectorAll('.pj-card, .mestre-card').forEach(b => {
     b.addEventListener('click', () => {
@@ -527,6 +589,8 @@
       hidden.value = b.dataset.nome;
       btn.disabled = false;
       btn.textContent = 'Entrar como ' + (b.querySelector('.pj-nome, .info-nome')?.textContent || '...');
+      atualizarVisibilidadeSenha();
+      if (ehMestreSelecionado()) setTimeout(() => senhaInp.focus(), 100);
     });
   });
 
@@ -535,6 +599,14 @@
     erro.classList.remove('show');
     const nome = hidden.value;
     if (!nome) { erro.textContent = 'Escolha um jogador.'; erro.classList.add('show'); return; }
+
+    if (ehMestreSelecionado() && senhaInp.value !== SENHA_MESTRE) {
+      erro.textContent = 'Senha do Mestre incorreta.';
+      erro.classList.add('show');
+      senhaInp.focus();
+      senhaInp.select();
+      return;
+    }
 
     btn.disabled = true; btn.textContent = 'Entrando…';
     const r = await window.Auth.entrarPorNome(nome);

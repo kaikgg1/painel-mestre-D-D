@@ -1,0 +1,2018 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Strahd von Zarovich — Ficha de Combate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-deep:        #0a0608;
+    --bg-card:        #1a1216;
+    --bg-card-2:      #221820;
+    --bg-card-3:      #2a1f28;
+    --blood:          #8b1a1a;
+    --blood-dark:     #5a0e0e;
+    --blood-bright:   #c4302b;
+    --gold:           #c9a961;
+    --gold-bright:    #e8c87a;
+    --gold-dim:       #8a7340;
+    --bone:           #e8dfc7;
+    --bone-dim:       #b8ad8e;
+    --shadow:         #050203;
+    --text-body:      #d4c8a8;
+    --text-muted:     #8a7d5e;
+    --border:         #4a3a2a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg-deep);
+    color: var(--text-body);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 15px;
+    line-height: 1.4;
+    min-height: 100vh;
+  }
+  body {
+    background:
+      radial-gradient(ellipse at 20% 0%, rgba(139,26,26,0.12), transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(201,169,97,0.05), transparent 50%),
+      var(--bg-deep);
+    background-attachment: fixed;
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    pointer-events: none;
+    opacity: 0.3;
+    z-index: 1;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.05 0 0 0 0 0.05 0 0 0 0.3 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    mix-blend-mode: overlay;
+  }
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px 24px 60px;
+    position: relative;
+    z-index: 2;
+  }
+  .top-bar {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(10,6,8,0.96);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+    margin: -20px -24px 16px;
+    padding: 12px 24px;
+  }
+  .top-bar-inner {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    max-width: 1400px; margin: 0 auto;
+  }
+  .brand {
+    font-family: 'Cinzel', serif; font-weight: 700; font-size: 1rem;
+    letter-spacing: 0.18em; color: var(--bone); text-transform: uppercase;
+  }
+  .brand-sub {
+    font-family: 'IM Fell English', serif; font-style: italic;
+    font-size: 11px; color: var(--gold-dim); letter-spacing: 0.15em;
+  }
+  .save-controls { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+  header {
+    text-align: center; padding: 8px 0 16px; margin-bottom: 16px;
+    border-bottom: 1px solid var(--border); position: relative;
+  }
+  header::after {
+    content: '✦'; position: absolute; bottom: -10px; left: 50%;
+    transform: translateX(-50%); background: var(--bg-deep);
+    padding: 0 12px; color: var(--gold); font-size: 16px;
+  }
+  h1 {
+    font-family: 'Cinzel', serif; font-weight: 900;
+    font-size: clamp(1.8rem, 4vw, 2.6rem); letter-spacing: 0.1em;
+    color: var(--bone); line-height: 1.05;
+    text-shadow: 0 0 20px rgba(139,26,26,0.4);
+  }
+  .subtitle {
+    font-style: italic; font-size: 0.95rem; color: var(--gold);
+    margin-top: 6px; letter-spacing: 0.03em;
+  }
+  .combat-bar {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;
+  }
+  @media (max-width: 880px) { .combat-bar { grid-template-columns: 1fr; } }
+  .panel {
+    background: var(--bg-card); border: 1px solid var(--border);
+    padding: 10px 14px; border-radius: 2px;
+  }
+  .panel-title {
+    font-family: 'Cinzel', serif; font-size: 10px;
+    letter-spacing: 0.2em; color: var(--gold);
+    text-transform: uppercase; margin-bottom: 8px;
+  }
+  .hp-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .hp-input {
+    background: var(--shadow); border: 1px solid var(--blood-dark);
+    color: var(--bone); font-family: 'Cinzel', serif;
+    font-size: 1rem; padding: 4px 8px; width: 70px;
+    text-align: center; border-radius: 2px; outline: none;
+  }
+  .hp-input:focus { border-color: var(--gold); }
+  .hp-bar-container {
+    flex: 1; min-width: 120px; height: 18px;
+    background: var(--shadow); border: 1px solid var(--border);
+    position: relative; overflow: hidden;
+  }
+  .hp-bar {
+    height: 100%; background: linear-gradient(90deg, var(--blood-dark), var(--blood));
+    transition: width 0.4s ease;
+    box-shadow: inset 0 0 8px rgba(0,0,0,0.5);
+  }
+  .hp-label {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cinzel', serif; font-size: 10px;
+    color: var(--bone); letter-spacing: 0.1em;
+    text-shadow: 0 0 4px black;
+  }
+  .btn {
+    background: transparent; border: 1px solid var(--gold-dim);
+    color: var(--gold); padding: 4px 10px;
+    font-family: 'Cinzel', serif; font-size: 10px;
+    letter-spacing: 0.1em; cursor: pointer;
+    transition: all 0.15s; border-radius: 2px; text-transform: uppercase;
+  }
+  .btn:hover { background: var(--blood-dark); color: var(--bone); border-color: var(--blood); }
+  .btn.gold:hover { background: var(--gold-dim); color: var(--shadow); border-color: var(--gold); }
+  .react-row { display: flex; align-items: center; gap: 10px; }
+  .react-dot {
+    width: 22px; height: 22px; border: 2px solid var(--blood);
+    border-radius: 50%; cursor: pointer; background: transparent; position: relative;
+  }
+  .react-dot.used { background: var(--blood); }
+  .react-dot.used::after {
+    content: '✗'; position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--bone); font-size: 12px;
+  }
+  .condition-row {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin-bottom: 14px; align-items: center;
+  }
+  .cond-label {
+    font-family: 'Cinzel', serif; font-size: 10px; color: var(--gold);
+    letter-spacing: 0.18em; text-transform: uppercase; margin-right: 4px;
+  }
+  .chip {
+    padding: 3px 10px; background: var(--bg-card); border: 1px solid var(--border);
+    color: var(--text-muted); font-family: 'Cinzel', serif;
+    font-size: 10px; letter-spacing: 0.08em; cursor: pointer;
+    border-radius: 2px; user-select: none; transition: all 0.15s;
+  }
+  .chip:hover { border-color: var(--gold-dim); color: var(--bone-dim); }
+  .chip.active {
+    background: var(--blood-dark); border-color: var(--blood-bright); color: var(--bone);
+  }
+  .phase-tabs {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 8px; margin-bottom: 14px;
+  }
+  .phase-tab {
+    background: var(--bg-card); border: 1px solid var(--border);
+    padding: 10px 12px; cursor: pointer; text-align: center;
+    border-radius: 2px; transition: all 0.25s;
+  }
+  .phase-tab.active {
+    background: linear-gradient(180deg, var(--bg-card-3), var(--bg-card));
+    border-color: var(--gold);
+    box-shadow: 0 0 14px rgba(201,169,97,0.15);
+  }
+  .phase-tab.active .phase-num { color: var(--blood-bright); }
+  .phase-tab.active .phase-name { color: var(--bone); }
+  .phase-num {
+    font-family: 'IM Fell English', serif; font-size: 0.7rem;
+    color: var(--gold-dim); letter-spacing: 0.18em; font-style: italic;
+  }
+  .phase-name {
+    font-family: 'Cinzel', serif; font-weight: 600;
+    font-size: clamp(0.85rem, 1.6vw, 1.05rem);
+    color: var(--text-body); letter-spacing: 0.1em; text-transform: uppercase;
+  }
+  .phase-tagline {
+    font-style: italic; font-size: 0.78rem;
+    color: var(--text-muted); margin-top: 1px;
+  }
+  .stats-bar {
+    display: grid; grid-template-columns: repeat(6, 1fr);
+    gap: 4px; margin-bottom: 12px;
+    background: var(--bg-card); padding: 8px;
+    border: 1px solid var(--border); border-radius: 2px;
+  }
+  .stat {
+    text-align: center; border-right: 1px solid var(--border); padding: 2px 0;
+  }
+  .stat:last-child { border-right: none; }
+  .stat-label {
+    font-family: 'Cinzel', serif; font-size: 9px;
+    letter-spacing: 0.2em; color: var(--gold);
+  }
+  .stat-value {
+    font-family: 'IM Fell English', serif; font-size: 1.25rem;
+    color: var(--bone); line-height: 1.1;
+  }
+  .stat-mod { font-size: 0.85rem; color: var(--gold-dim); }
+  .info-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 6px; margin-bottom: 12px;
+  }
+  .info-card {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-left: 3px solid var(--blood);
+    padding: 6px 10px; border-radius: 2px;
+  }
+  .info-card .label {
+    font-family: 'Cinzel', serif; font-size: 9px;
+    letter-spacing: 0.15em; color: var(--gold); text-transform: uppercase;
+  }
+  .info-card .value {
+    font-family: 'IM Fell English', serif; font-size: 1rem; color: var(--bone);
+  }
+  .info-card .editable {
+    background: transparent; border: none; border-bottom: 1px dashed var(--gold-dim);
+    color: var(--bone); font-family: 'IM Fell English', serif; font-size: 1rem;
+    width: 50px; text-align: center; outline: none;
+  }
+  .info-card .editable:focus { border-bottom-color: var(--gold); color: var(--gold-bright); }
+  .meta-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;
+  }
+  @media (max-width: 720px) { .meta-row { grid-template-columns: 1fr; } }
+  .meta-box {
+    background: var(--bg-card); border: 1px solid var(--border);
+    padding: 8px 12px; border-radius: 2px;
+  }
+  .meta-title {
+    font-family: 'Cinzel', serif; font-size: 9px; color: var(--gold);
+    letter-spacing: 0.2em; text-transform: uppercase;
+    margin-bottom: 4px; padding-bottom: 3px;
+    border-bottom: 1px solid var(--border);
+  }
+  .meta-content { font-size: 0.88rem; color: var(--text-body); line-height: 1.45; }
+  .meta-content strong { color: var(--bone); font-weight: 600; }
+  .phase-content { display: none; }
+  .phase-content.active { display: block; animation: fadeIn 0.3s ease; }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .section { margin-bottom: 14px; }
+  .section-title {
+    font-family: 'Cinzel', serif; font-weight: 700;
+    font-size: 0.95rem; color: var(--blood-bright);
+    letter-spacing: 0.12em; text-transform: uppercase;
+    margin-bottom: 8px; padding-bottom: 5px;
+    border-bottom: 1px solid var(--blood-dark);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-title::before {
+    content: ''; width: 6px; height: 6px;
+    background: var(--blood); transform: rotate(45deg);
+    box-shadow: 0 0 6px var(--blood);
+  }
+  .ability-grid { display: grid; grid-template-columns: 1fr; gap: 5px; }
+  .ability {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-left: 3px solid var(--gold-dim); border-radius: 2px;
+    transition: border-left-color 0.15s, background 0.15s;
+  }
+  .ability.attack { border-left-color: var(--blood); }
+  .ability.bonus { border-left-color: #8b6f3a; }
+  .ability.reaction { border-left-color: #4a6a8a; }
+  .ability.lair { border-left-color: #5a3a6a; }
+  .ability-header {
+    padding: 7px 12px; cursor: pointer;
+    display: flex; align-items: baseline; gap: 10px;
+    flex-wrap: wrap; user-select: none;
+  }
+  .ability-header:hover { background: var(--bg-card-2); }
+  .ability-name {
+    font-family: 'Cinzel', serif; font-weight: 600;
+    font-size: 0.92rem; color: var(--bone); letter-spacing: 0.04em;
+  }
+  .ability-tag {
+    font-family: 'IM Fell English', serif; font-style: italic;
+    font-size: 0.78rem; color: var(--gold); letter-spacing: 0.05em;
+  }
+  .toggle-icon {
+    margin-left: auto; color: var(--gold-dim);
+    font-size: 0.75rem; transition: transform 0.2s;
+  }
+  .ability.open .toggle-icon { transform: rotate(180deg); color: var(--gold); }
+  .ability-body {
+    padding: 0 12px 10px; font-size: 0.92rem;
+    color: var(--text-body); line-height: 1.5; display: none;
+  }
+  .ability.open .ability-body { display: block; }
+  .ability-body strong { color: var(--bone-dim); font-weight: 600; }
+  .ability-body em { color: var(--gold); font-style: normal; font-weight: 500; }
+  .desc-flavor {
+    font-style: italic; color: var(--text-muted);
+    border-left: 2px solid var(--gold-dim);
+    padding-left: 10px; margin: 6px 0; font-size: 0.86rem;
+  }
+  .dmg {
+    display: inline-block; padding: 0 6px;
+    background: rgba(139,26,26,0.2); border: 1px solid var(--blood-dark);
+    color: var(--bone); border-radius: 2px;
+    font-family: 'IM Fell English', serif; font-size: 0.85rem; margin: 0 1px;
+  }
+  .cd {
+    display: inline-block; padding: 0 6px;
+    background: rgba(201,169,97,0.13); border: 1px solid var(--gold-dim);
+    color: var(--gold-bright); border-radius: 2px;
+    font-family: 'IM Fell English', serif; font-size: 0.85rem; margin: 0 1px;
+  }
+  .spell-slots {
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-radius: 2px; padding: 10px 14px; margin-bottom: 12px;
+  }
+  .spell-slots-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px;
+  }
+  .slot-level {
+    text-align: center; background: var(--bg-card-2);
+    border: 1px solid var(--border); padding: 6px; border-radius: 2px;
+  }
+  .slot-level-label {
+    font-family: 'Cinzel', serif; font-size: 9px;
+    letter-spacing: 0.18em; color: var(--gold);
+    text-transform: uppercase; margin-bottom: 4px;
+  }
+  .slot-dots {
+    display: flex; justify-content: center; gap: 4px; flex-wrap: wrap;
+  }
+  .slot-dot {
+    width: 14px; height: 14px; border: 1.5px solid var(--gold);
+    border-radius: 50%; cursor: pointer; transition: all 0.15s; background: transparent;
+  }
+  .slot-dot.used { background: var(--blood); border-color: var(--blood-dark); }
+  .spell-search {
+    width: 100%; background: var(--shadow); border: 1px solid var(--border);
+    color: var(--text-body); font-size: 0.9rem;
+    padding: 6px 12px; border-radius: 2px; outline: none; margin-bottom: 8px;
+  }
+  .spell-search:focus { border-color: var(--gold); }
+  .spell-level-group { margin-bottom: 8px; }
+  .spell-level-header {
+    font-family: 'Cinzel', serif; font-size: 0.78rem;
+    color: var(--gold); letter-spacing: 0.15em;
+    margin-bottom: 4px; padding: 4px 0;
+    border-bottom: 1px dashed var(--border);
+    text-transform: uppercase;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .spell-chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 3px 10px; margin: 2px 3px 2px 0;
+    background: var(--bg-card); border: 1px solid var(--border);
+    color: var(--text-body); font-size: 0.87rem;
+    border-radius: 2px; cursor: pointer; transition: all 0.15s;
+  }
+  .spell-chip:hover {
+    border-color: var(--gold); background: var(--bg-card-2); color: var(--bone);
+  }
+  .spell-chip.no-cost {
+    border-style: dashed; opacity: 0.85;
+  }
+  .spell-chip .flavor {
+    color: var(--text-muted); font-style: italic;
+    font-size: 0.78rem; margin-left: 4px;
+  }
+  .spell-chip.hidden { display: none; }
+  .spell-chip.cast {
+    opacity: 0.45;
+    text-decoration: line-through;
+    text-decoration-color: var(--blood);
+  }
+  .legend {
+    display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 10px;
+    font-family: 'Cinzel', serif; font-size: 9px;
+    letter-spacing: 0.12em; color: var(--text-muted); text-transform: uppercase;
+  }
+  .legend-item { display: flex; align-items: center; gap: 5px; }
+  .legend-swatch { width: 12px; height: 3px; display: inline-block; }
+  .notes-section {
+    margin-top: 18px; background: var(--bg-card);
+    border: 1px solid var(--border); padding: 10px 14px; border-radius: 2px;
+  }
+  .notes-section h3 {
+    font-family: 'Cinzel', serif; font-size: 0.78rem;
+    color: var(--gold); letter-spacing: 0.2em;
+    margin-bottom: 6px; text-transform: uppercase;
+  }
+  .notes-area {
+    width: 100%; min-height: 70px; background: var(--shadow);
+    border: 1px solid var(--border); color: var(--text-body);
+    font-family: 'Cormorant Garamond', serif; font-size: 0.92rem;
+    padding: 8px 10px; border-radius: 2px; resize: vertical;
+    outline: none; line-height: 1.45;
+  }
+  .notes-area:focus { border-color: var(--gold); }
+  footer {
+    margin-top: 24px; padding-top: 12px;
+    border-top: 1px solid var(--border); text-align: center;
+    color: var(--text-muted); font-family: 'IM Fell English', serif;
+    font-style: italic; font-size: 0.85rem;
+  }
+  .toast {
+    position: fixed; top: 16px; right: 16px;
+    background: var(--bg-card-3); border: 1px solid var(--gold);
+    color: var(--bone); padding: 10px 16px;
+    font-family: 'Cinzel', serif; font-size: 0.85rem;
+    letter-spacing: 0.1em; border-radius: 2px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    z-index: 200; opacity: 0; transform: translateY(-10px);
+    transition: all 0.3s; pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .section-actions { display: flex; gap: 4px; margin-left: 8px; }
+  .mini-btn {
+    background: transparent; border: none; color: var(--gold-dim);
+    font-family: 'IM Fell English', serif; font-style: italic;
+    font-size: 0.72rem; cursor: pointer;
+    text-decoration: underline; padding: 0 4px;
+    letter-spacing: 0.05em;
+  }
+  .mini-btn:hover { color: var(--gold); }
+
+  /* ============ MODAL ============ */
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(5,2,3,0.85);
+    backdrop-filter: blur(4px);
+    z-index: 100;
+    display: none;
+    align-items: center; justify-content: center;
+    padding: 24px;
+    animation: fadeIn 0.2s ease;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: var(--bg-card);
+    border: 1px solid var(--gold-dim);
+    border-radius: 2px;
+    max-width: 640px; width: 100%;
+    max-height: 85vh; overflow-y: auto;
+    position: relative;
+    box-shadow: 0 12px 60px rgba(0,0,0,0.8), 0 0 24px rgba(139,26,26,0.3);
+  }
+  .modal::before {
+    content: ''; position: absolute;
+    top: 8px; left: 8px; right: 8px; bottom: 8px;
+    border: 1px solid var(--border);
+    pointer-events: none;
+  }
+  .modal-header {
+    padding: 20px 24px 14px;
+    border-bottom: 1px solid var(--blood-dark);
+    position: sticky; top: 0;
+    background: var(--bg-card);
+    z-index: 1;
+  }
+  .modal-close {
+    position: absolute; top: 14px; right: 14px;
+    background: transparent; border: 1px solid var(--gold-dim);
+    color: var(--gold); width: 28px; height: 28px;
+    cursor: pointer; border-radius: 2px;
+    font-size: 1rem; line-height: 1;
+    transition: all 0.15s;
+  }
+  .modal-close:hover {
+    background: var(--blood-dark); color: var(--bone); border-color: var(--blood);
+  }
+  .modal-title {
+    font-family: 'Cinzel', serif; font-weight: 700;
+    font-size: 1.3rem; color: var(--bone);
+    letter-spacing: 0.08em; margin-right: 40px;
+    text-shadow: 0 0 12px rgba(139,26,26,0.3);
+  }
+  .modal-school {
+    font-family: 'IM Fell English', serif; font-style: italic;
+    font-size: 0.9rem; color: var(--gold); margin-top: 4px;
+    letter-spacing: 0.05em;
+  }
+  .modal-body { padding: 16px 24px 24px; }
+  .modal-meta {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 8px; margin-bottom: 14px;
+    padding-bottom: 12px; border-bottom: 1px dashed var(--border);
+  }
+  .modal-meta-item {
+    font-size: 0.88rem;
+  }
+  .modal-meta-item .label {
+    font-family: 'Cinzel', serif; font-size: 9px;
+    color: var(--gold); letter-spacing: 0.18em; text-transform: uppercase;
+  }
+  .modal-meta-item .val { color: var(--bone); font-weight: 500; }
+  .modal-desc {
+    font-size: 0.95rem; line-height: 1.55;
+    color: var(--text-body);
+  }
+  .modal-desc p { margin-bottom: 10px; }
+  .modal-desc strong { color: var(--bone); }
+  .modal-desc em { color: var(--gold); font-style: italic; }
+  .modal-flavor {
+    font-style: italic;
+    color: var(--text-muted);
+    border-left: 2px solid var(--gold-dim);
+    padding-left: 12px; margin: 12px 0;
+    font-size: 0.9rem;
+  }
+  .modal-actions {
+    margin-top: 16px; padding-top: 14px;
+    border-top: 1px solid var(--border);
+    display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+  }
+  .modal-actions .info-text {
+    font-style: italic; color: var(--text-muted); font-size: 0.85rem;
+  }
+
+  @media (max-width: 720px) {
+    .container { padding: 12px 12px 50px; }
+    .top-bar { margin: -12px -12px 12px; padding: 10px 12px; }
+    .stats-bar { grid-template-columns: repeat(3, 1fr); }
+    .stat:nth-child(3) { border-right: none; }
+    .phase-tabs { grid-template-columns: 1fr; }
+    .modal-overlay { padding: 12px; }
+    .modal-header, .modal-body { padding-left: 16px; padding-right: 16px; }
+  }
+  @media print {
+    body { background: white; color: black; }
+    .top-bar, .notes-section, .combat-bar, .condition-row, .save-controls { display: none; }
+    .phase-content { display: block !important; page-break-after: always; }
+    .ability-body { display: block !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toast" id="toast"></div>
+
+<!-- ============ MODAL ============ -->
+<div class="modal-overlay" id="spellModal" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <button class="modal-close" onclick="closeModal()" aria-label="Fechar">✕</button>
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">—</div>
+      <div class="modal-school" id="modalSchool">—</div>
+    </div>
+    <div class="modal-body">
+      <div class="modal-meta" id="modalMeta"></div>
+      <div class="modal-flavor" id="modalFlavor" style="display:none"></div>
+      <div class="modal-desc" id="modalDesc"></div>
+      <div class="modal-actions" id="modalActions"></div>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <div class="top-bar">
+    <div class="top-bar-inner">
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <a href="index.html" class="btn" style="text-decoration:none">← Vilões</a>
+        <div>
+          <div class="brand">Strahd von Zarovich</div>
+          <div class="brand-sub">Ficha de Combate · 3 Fases · <span id="syncStatus" style="color:var(--gold-dim)">○ local</span></div>
+        </div>
+      </div>
+      <div class="save-controls">
+        <button class="btn gold" onclick="saveState()">💾 Salvar</button>
+        <button class="btn" onclick="loadState()">↺ Carregar</button>
+        <button class="btn" onclick="exportJSON()">↓ Exportar</button>
+        <label class="btn" style="cursor:pointer;">
+          ↑ Importar
+          <input type="file" id="importInput" accept=".json" style="display:none" onchange="importJSON(event)">
+        </label>
+        <button class="btn" onclick="resetAll()">⟲ Resetar</button>
+      </div>
+    </div>
+  </div>
+
+  <header>
+    <h1>Strahd von Zarovich</h1>
+    <div class="subtitle">Médio morto-vivo (metamorfo) · Leal e Maligno · ND 21 (33.000 XP) — 19 (22.000 XP) sob luz solar</div>
+  </header>
+
+  <!-- HP + REACTIONS -->
+  <div class="combat-bar">
+    <div class="panel">
+      <div class="panel-title">◆ Pontos de Vida (compartilhados entre fases)</div>
+      <div class="hp-row">
+        <input type="number" id="hpCurrent" class="hp-input" value="331" min="0">
+        <span style="color:var(--gold-dim)">/</span>
+        <input type="number" id="hpMax" class="hp-input" value="331" min="1">
+        <div class="hp-bar-container">
+          <div class="hp-bar" id="hpBar" style="width:100%"></div>
+          <div class="hp-label" id="hpLabel">100%</div>
+        </div>
+      </div>
+      <div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap">
+        <button class="btn" onclick="adjustHP(-10)">−10</button>
+        <button class="btn" onclick="adjustHP(-5)">−5</button>
+        <button class="btn" onclick="adjustHP(-1)">−1</button>
+        <button class="btn" onclick="adjustHP(1)">+1</button>
+        <button class="btn" onclick="adjustHP(20)">+20 Regen</button>
+        <button class="btn" onclick="resetHP()">Reset</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">◆ Reações da Rodada (máx 3 · 1 por turno)</div>
+      <div class="react-row">
+        <div class="react-dot" onclick="toggleReact(this)"></div>
+        <div class="react-dot" onclick="toggleReact(this)"></div>
+        <div class="react-dot" onclick="toggleReact(this)"></div>
+        <button class="btn" onclick="resetReactions()">Nova Rodada</button>
+      </div>
+      <div style="margin-top:8px;font-size:0.85rem;color:var(--text-muted);font-style:italic;line-height:1.35">
+        Se perder reações e não estiver incapacitado, perde apenas <em style="color:var(--gold);font-style:normal">1</em> em vez de todas.
+      </div>
+    </div>
+  </div>
+
+  <!-- CONDITIONS -->
+  <div class="condition-row">
+    <span class="cond-label">Condições:</span>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">☀ Sob Luz Solar</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">✦ Regen Bloqueada</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">◉ Concentrando</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">◈ Atordoado</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">⛓ Restrito</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">♥ Enfeitiçado</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">↓ Caído</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">⊘ Agarrado</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">✤ Invisível</div>
+  </div>
+
+  <!-- PHASE TABS -->
+  <div class="phase-tabs">
+    <div class="phase-tab active" data-phase="1" onclick="switchPhase(1)">
+      <div class="phase-num">~ Primeira Forma ~</div>
+      <div class="phase-name">O Mago</div>
+      <div class="phase-tagline">Manipulador arcano</div>
+    </div>
+    <div class="phase-tab" data-phase="2" onclick="switchPhase(2)">
+      <div class="phase-num">~ Segunda Forma ~</div>
+      <div class="phase-name">O Soldado</div>
+      <div class="phase-tagline">Comandante da escuridão</div>
+    </div>
+    <div class="phase-tab" data-phase="3" onclick="switchPhase(3)">
+      <div class="phase-num">~ Terceira Forma ~</div>
+      <div class="phase-name">O Vampiro</div>
+      <div class="phase-tagline">Predador desenfreado</div>
+    </div>
+  </div>
+
+  <!-- ============================= FASE 1: O MAGO ============================= -->
+  <div class="phase-content active" id="phase-1">
+    <div class="stats-bar">
+      <div class="stat"><div class="stat-label">FOR</div><div class="stat-value">20</div><div class="stat-mod">+5</div></div>
+      <div class="stat"><div class="stat-label">DES</div><div class="stat-value">20</div><div class="stat-mod">+5</div></div>
+      <div class="stat"><div class="stat-label">CON</div><div class="stat-value">18</div><div class="stat-mod">+4</div></div>
+      <div class="stat"><div class="stat-label">INT</div><div class="stat-value">20</div><div class="stat-mod">+5</div></div>
+      <div class="stat"><div class="stat-label">SAB</div><div class="stat-value">15</div><div class="stat-mod">+2</div></div>
+      <div class="stat"><div class="stat-label">CAR</div><div class="stat-value">20</div><div class="stat-mod">+5</div></div>
+    </div>
+    <div class="info-grid">
+      <div class="info-card"><div class="label">Classe Armadura</div><div class="value"><input type="number" class="editable ca-input" data-phase="1" value="16"></div></div>
+      <div class="info-card"><div class="label">Deslocamento</div><div class="value">12m / escalar 12m</div></div>
+      <div class="info-card"><div class="label">Bônus Prof.</div><div class="value">+7</div></div>
+      <div class="info-card"><div class="label">Visão no Escuro</div><div class="value">36 m</div></div>
+      <div class="info-card"><div class="label">Perc. Passiva</div><div class="value">24</div></div>
+      <div class="info-card"><div class="label">CD Magia</div><div class="value">20</div></div>
+      <div class="info-card"><div class="label">+Ataque Mágico</div><div class="value">+12</div></div>
+    </div>
+    <div class="meta-row">
+      <div class="meta-box">
+        <div class="meta-title">Testes de Resistência</div>
+        <div class="meta-content"><strong>Des</strong> +12 · <strong>Sab</strong> +9 · <strong>Car</strong> +12</div>
+      </div>
+      <div class="meta-box">
+        <div class="meta-title">Resistências & Idiomas</div>
+        <div class="meta-content"><strong>Resistência:</strong> necrótico; contundente, perfurante e cortante de ataques não mágicos<br><strong>Idiomas:</strong> Abissal, Comum, Dracônico, Élfico, Gigante, Infernal</div>
+      </div>
+    </div>
+    <div class="meta-box" style="margin-bottom:12px;">
+      <div class="meta-title">Perícias</div>
+      <div class="meta-content"><strong>Arcanismo</strong> +19 · <strong>Atletismo</strong> +12 · <strong>Enganação</strong> +19 · <strong>Intuição</strong> +9 · <strong>Percepção</strong> +16 · <strong>Religião</strong> +12 · <strong>Furtividade</strong> +19</div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">Traços</h2>
+      <div class="ability-grid">
+        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Conjuração Complexa</div><span class="toggle-icon">▼</span></div><div class="ability-body">Se Strahd conjurar uma magia em seu turno como ação bônus, ele <em>ainda pode usar sua ação</em> para conjurar uma magia de nível (não truque).</div></div>
+        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Regeneração</div><span class="toggle-icon">▼</span></div><div class="ability-body">Recupera <em>20 PV</em> no início de seu turno se tiver ≥1 PV e não estiver sob luz solar. Se sofrer <strong>dano radiante</strong>, este traço não funciona no próximo turno.</div></div>
+        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Escalada de Aranha</div><span class="toggle-icon">▼</span></div><div class="ability-body">Move-se em superfícies verticais e tetos de cabeça para baixo sem testes, mãos livres.</div></div>
+        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Hipersensibilidade à Luz Solar</div><span class="toggle-icon">▼</span></div><div class="ability-body">Sob luz solar: sofre <span class="dmg">20 radiante</span> no início de cada turno e tem <em>desvantagem</em> em ataques e testes.</div></div>
+        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Conjuração Inata</div><span class="ability-tag">INT · CD 20</span><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>3/dia:</strong> detectar pensamentos, animar mortos<br><strong>1/dia:</strong> vidência</div></div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><span class="legend-swatch" style="background:var(--blood)"></span>Ação</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#8b6f3a"></span>Bônus</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#4a6a8a"></span>Reação</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#5a3a6a"></span>Covil</div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">Ações</h2>
+      <div class="ability-grid">
+        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Multiataque</div><span class="toggle-icon">▼</span></div><div class="ability-body">Strahd usa <strong>Toque Vampírico duas vezes</strong>, ou <strong>Toque Vampírico + Apreensão Telecinética</strong> uma vez cada.</div></div>
+        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Toque Vampírico</div><span class="ability-tag">Magia 3º · Necromancia · +12 ataque corpo a corpo</span><span class="toggle-icon">▼</span></div><div class="ability-body">
+          <div class="desc-flavor">"O toque da mão coberta de sombras pode drenar a força vital dos outros para curar seus ferimentos."</div>
+          <strong>Tempo:</strong> 1 ação · <strong>Alcance:</strong> Pessoal · <strong>Componentes:</strong> V, S · <strong>Duração:</strong> Concentração, até 1 minuto<br>
+          Ataque corpo a corpo com magia. Se acertar: <span class="dmg">3d6 necrótico</span> e Strahd recupera PV iguais à <strong>metade</strong> do dano. Em turnos seguintes, pode atacar novamente como ação.<br>
+          <strong>Nível Superior:</strong> +1d6 por nível acima do 3º.<br>
+          <em>Bônus por traço:</em> alvo faz <em>CON CD 20</em> ou fica <strong>atordoado leve (dazed)</strong> até o início do próximo turno de Strahd.
+        </div></div>
+        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Apreensão Telecinética</div><span class="ability-tag">Magia 2º · Transmutação · 18m · 1 rodada</span><span class="toggle-icon">▼</span></div><div class="ability-body">
+          <div class="desc-flavor">"Sombras invisíveis erguem a vítima no ar, esmagando seu corpo com força arcana."</div>
+          Alvo à vista. <em>Força CD 20</em>.<br>
+          <strong>Falha:</strong> erguido até <strong>6 m</strong>, sofre <span class="dmg">7 (2d6) necrótico</span> e fica <strong>restrito</strong> até o fim do próximo turno de Strahd. Cai ao terminar.
+        </div></div>
+        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Dissipar Magia</div><span class="ability-tag">3/dia · 3º · Abjuração</span><span class="toggle-icon">▼</span></div><div class="ability-body">
+          Magia de 3 ou menor termina automaticamente; 4º+ exige teste de habilidade de conjuração CD 10 + nível.
+        </div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">Ações Bônus</h2>
+      <div class="ability-grid">
+        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Círculo da Doença</div><span class="ability-tag">3º · Necromancia · CD 20 CON · raio 3m</span><span class="toggle-icon">▼</span></div><div class="ability-body">
+          <div class="desc-flavor">"Uma esfera pulsante de energia negativa explode ao seu redor, dilacerando os vivos."</div>
+          Cada criatura a até <strong>3 m</strong>: <em>CON CD 20</em>.<br>
+          <strong>Falha:</strong> <span class="dmg">28 (8d6) necrótico</span> + desvantagem no próximo ataque até o fim do turno seguinte.<br>
+          <strong>Sucesso:</strong> metade do dano, sem penalidade.
+        </div></div>
+        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Relâmpago</div><span class="ability-tag">3º · Evocação · CD 20 DES · linha 30m × 1,5m</span><span class="toggle-icon">▼</span></div><div class="ability-body">
+          <div class="desc-flavor">"Um raio brilhante de força elétrica corta o ar em linha reta."</div>
+          Cada criatura na linha: <em>DES CD 20</em>. <strong>Falha:</strong> <span class="dmg">8d6 elétrico</span>. <strong>Sucesso:</strong> metade.
+        </div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">Reações</h2>
+      <div class="ability-grid">
+        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Indomável</div><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> criatura hostil termina turno.<br><strong>Efeito:</strong> repete um teste de resistência contra condição/efeito ativo.</div></div>
+        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Passo Nebuloso</div><span class="ability-tag">2º · Conjuração</span><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> sofre dano.<br><strong>Efeito:</strong> teletransporta-se até <strong>9 m</strong> a espaço desocupado visível.</div></div>
+        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Cegueira/Surdez</div><span class="ability-tag">2º · Necromancia · CD 20 CON</span><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> sofre dano de ataque corpo a corpo.<br><strong>Efeito:</strong> atacante faz <em>CON CD 20</em>. Falha: cego ou surdo por 1 min + <span class="dmg">7 (2d6) necrótico</span> adicional.</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">Ações de Covil</h2>
+      <p style="font-style:italic;color:var(--text-muted);margin-bottom:8px;font-size:0.88rem">Em <strong style="color:var(--gold)">iniciativa 20</strong>, se ao ar livre e o <strong>Pântano Profanado</strong> não tiver sido reconsagrado.</p>
+      <div class="ability-grid">
+        <div class="ability lair"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Controlar Água</div><span class="ability-tag">Fane do Pântano</span><span class="toggle-icon">▼</span></div><div class="ability-body">Conjura <em>controlar água</em> sem componentes ou concentração. Pode inundar, redirecionar, abrir caminhos secos ou criar ondas.</div></div>
+        <div class="ability lair"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Névoa</div><span class="ability-tag">Fane do Pântano</span><span class="toggle-icon">▼</span></div><div class="ability-body"><em>Nuvem de névoa</em> no 5º nível sem componentes/concentração. Esfera <strong>raio 20 m</strong>. <strong>Strahd tem visão às cegas até as bordas dela.</strong></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================= FASE 2: O SOLDADO ============================= -->
+  <div class="phase-content" id="phase-2">
+    <div class="stats-bar">
+      <div class="stat"><div class="stat-label">FOR</div><div class="stat-value">20</div><div class="stat-mod">+5</div></div>
+      <div class="stat"><div class="stat-label">DES</div><div class="stat-value">20</div><div class="stat-mod">+5</div></div>
+      <div class="stat"><div class="stat-label">CON</div><div class="stat-value">18</div><div class="stat-mod">+4</div></div>
+      <div class="stat"><div class="stat-label">INT</div><div class="stat-value">20</div><div class="stat-mod">+5</div></div>
+      <div class="stat"><div class="stat-label">SAB</div><div class="stat-value">15</div><div class="stat-mod">+2</div></div>
+      <div class="stat"><div class="stat-label">CAR</div><div class="stat-value">20</div><div class="stat-mod">+5</div></div>
+    </div>
+    <div class="info-grid">
+      <div class="info-card"><div class="label">Classe Armadura</div><div class="value"><input type="number" class="editable ca-input" data-phase="2" value="16"></div></div>
+      <div class="info-card"><div class="label">Deslocamento</div><div class="value">12m / escalar 12m</div></div>
+      <div class="info-card"><div class="label">Bônus Prof.</div><div class="value">+7</div></div>
+      <div class="info-card"><div class="label">Visão no Escuro</div><div class="value">36 m</div></div>
+      <div class="info-card"><div class="label">Perc. Passiva</div><div class="value">24</div></div>
+      <div class="info-card"><div class="label">CD Magia</div><div class="value">20</div></div>
+      <div class="info-card"><div class="label">+Ataque</div><div class="value">+12</div></div>
+    </div>
+    <div class="meta-row">
+      <div class="meta-box">
+        <div class="meta-title">Testes de Resistência</div>
+        <div class="meta-content"><strong>Des</strong> +12 · <strong>Sab</strong> +9 · <strong>Car</strong> +12</div>
+      </div>
+      <div class="meta-box">
+        <div class="meta-title">Resistências & Idiomas</div>
+        <div class="meta-content"><strong>Resistência:</strong> necrótico; contundente, perfurante e cortante de ataques não mágicos<br><strong>Idiomas:</strong> Abissal, Comum, Dracônico, Élfico, Gigante, Infernal</div>
+      </div>
+    </div>
+    <div class="meta-box" style="margin-bottom:12px;">
+      <div class="meta-title">Perícias</div>
+      <div class="meta-content"><strong>Arcanismo</strong> +19 · <strong>Atletismo</strong> +12 · <strong>Enganação</strong> +19 · <strong>Intuição</strong> +9 · <strong>Percepção</strong> +16 · <strong>Religião</strong> +12 · <strong>Furtividade</strong> +19</div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">Traços</h2>
+      <div class="ability-grid">
+        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Consciência de Campo de Batalha</div><span class="toggle-icon">▼</span></div><div class="ability-body"><em>Vantagem</em> em testes de FOR/DES contra efeitos que possa ver ou ouvir. <strong>Não pode ser desarmado.</strong></div></div>
+        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Regeneração</div><span class="toggle-icon">▼</span></div><div class="ability-body">Recupera <em>20 PV</em> no início do turno se ≥1 PV e não estiver sob luz solar. Dano radiante bloqueia 1 turno.</div></div>
+        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Escalada de Aranha</div><span class="toggle-icon">▼</span></div><div class="ability-body">Move-se em superfícies verticais e tetos sem usar as mãos.</div></div>
+        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Hipersensibilidade à Luz Solar</div><span class="toggle-icon">▼</span></div><div class="ability-body">Sob luz solar: <span class="dmg">20 radiante</span> por turno, desvantagem em ataques e testes.</div></div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><span class="legend-swatch" style="background:var(--blood)"></span>Ação</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#8b6f3a"></span>Bônus</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#4a6a8a"></span>Reação</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#5a3a6a"></span>Covil</div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">Ações</h2>
+      <div class="ability-grid">
+        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Ataque Múltiplo</div><span class="toggle-icon">▼</span></div><div class="ability-body">Dois ataques. <strong>Apenas um pode ser Rede Umbral.</strong></div></div>
+        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Espada Longa</div><span class="ability-tag">+12 corpo a corpo · 1,5m</span><span class="toggle-icon">▼</span></div><div class="ability-body">
+          <div class="desc-flavor">"A lâmina pulsa com a fome do túmulo, fendendo carne e alma."</div>
+          <span class="dmg">11 (1d10+5) cortante</span> + <span class="dmg">7 (2d6) necrótico</span><br>
+          Se criatura: <em>Força CD 20</em> ou empurrada <strong>1,5 m</strong> e <strong>caída</strong>.
+        </div></div>
+        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Rede Umbral</div><span class="ability-tag">Ataque mágico à distância +12 · 9/18m</span><span class="toggle-icon">▼</span></div><div class="ability-body">
+          <div class="desc-flavor">"Uma teia de sombras vivas se enrola na vítima, sugando sua vontade."</div>
+          <span class="dmg">7 (2d6) necrótico</span><br>
+          Alvo <strong>restrito</strong> até o início do próximo turno de Strahd.
+        </div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">Ações Bônus</h2>
+      <div class="ability-grid">
+        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Onda Trovejante</div><span class="ability-tag">CD 20 FOR · raio 1,5m</span><span class="toggle-icon">▼</span></div><div class="ability-body">
+          <div class="desc-flavor">"Strahd finca a espada no chão; uma onda de choque sônica se irradia da lâmina."</div>
+          Cada criatura a até <strong>1,5 m</strong>: <em>Força CD 20</em>.<br>
+          <strong>Falha:</strong> <span class="dmg">14 (3d8) trovejante</span> + empurrada 1,5 m. <strong>Sucesso:</strong> metade.
+        </div></div>
+        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Voleio Sombrio</div><span class="ability-tag">CD 20 DES · até 36m · cilindro 3m × 12m</span><span class="toggle-icon">▼</span></div><div class="ability-body">
+          <div class="desc-flavor">"Uma chuva de flechas feitas de pura escuridão desce sobre o ponto escolhido — flechas que não fazem som, mas tocam a alma."</div>
+          Ponto visível até <strong>36 m</strong>. Cilindro <strong>raio 3 m, altura 12 m</strong>. <em>Destreza CD 20</em>.<br>
+          <strong>Falha:</strong> <span class="dmg">18 (4d8) necrótico</span>. <strong>Sucesso:</strong> metade.
+        </div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">Reações</h2>
+      <div class="ability-grid">
+        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Indomável</div><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> criatura hostil termina turno.<br><strong>Efeito:</strong> repete um teste contra efeito/condição ativo.</div></div>
+        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Retirada do Comandante</div><span class="ability-tag">CD 20 FOR</span><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> sofre dano corpo a corpo.<br><strong>Efeito:</strong> atacante faz <em>Força CD 20</em> ou empurrado 1,5 m. Strahd move-se até seu deslocamento <strong>sem provocar OAs</strong>.</div></div>
+        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Golpe Vingativo</div><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> sofre dano de ataque ou magia.<br><strong>Efeito:</strong> move-se até seu deslocamento em direção ao atacante e faz <em>um ataque com espada longa</em>. Sem provocar OAs.</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">Ações de Covil</h2>
+      <p style="font-style:italic;color:var(--text-muted);margin-bottom:8px;font-size:0.88rem">Em <strong style="color:var(--gold)">iniciativa 20</strong>, se ao ar livre e o <strong>Santuário do Pântano</strong> não tiver sido reconsagrado.</p>
+      <div class="ability-grid">
+        <div class="ability lair"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Crescimento de Plantas</div><span class="toggle-icon">▼</span></div><div class="ability-body">Em <strong>raio 30 m</strong>, vegetação se torna densa: cada metro custa <strong>4× movimento normal</strong>.</div></div>
+        <div class="ability lair"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Ira da Natureza</div><span class="ability-tag">sem rochas</span><span class="toggle-icon">▼</span></div><div class="ability-body">Cubo 18 m: plantas/galhos atacam, restringindo inimigos (FOR/DES CD 20). <strong>Não pode usar efeito de rochas.</strong></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================= FASE 3: O VAMPIRO ============================= -->
+  <div class="phase-content" id="phase-3">
+    <div class="stats-bar">
+      <div class="stat"><div class="stat-label">FOR</div><div class="stat-value">20</div><div class="stat-mod">+5</div></div>
+      <div class="stat"><div class="stat-label">DES</div><div class="stat-value">20</div><div class="stat-mod">+5</div></div>
+      <div class="stat"><div class="stat-label">CON</div><div class="stat-value">18</div><div class="stat-mod">+4</div></div>
+      <div class="stat"><div class="stat-label">INT</div><div class="stat-value">20</div><div class="stat-mod">+5</div></div>
+      <div class="stat"><div class="stat-label">SAB</div><div class="stat-value">15</div><div class="stat-mod">+2</div></div>
+      <div class="stat"><div class="stat-label">CAR</div><div class="stat-value">20</div><div class="stat-mod">+5</div></div>
+    </div>
+    <div class="info-grid">
+      <div class="info-card"><div class="label">Classe Armadura</div><div class="value"><input type="number" class="editable ca-input" data-phase="3" value="16"></div></div>
+      <div class="info-card"><div class="label">Deslocamento</div><div class="value">12m / escalar 12m</div></div>
+      <div class="info-card"><div class="label">Bônus Prof.</div><div class="value">+7</div></div>
+      <div class="info-card"><div class="label">Visão no Escuro</div><div class="value">36 m</div></div>
+      <div class="info-card"><div class="label">Perc. Passiva</div><div class="value">24</div></div>
+      <div class="info-card"><div class="label">CD Magia</div><div class="value">20</div></div>
+      <div class="info-card"><div class="label">+Ataque</div><div class="value">+12</div></div>
+    </div>
+    <div class="meta-row">
+      <div class="meta-box">
+        <div class="meta-title">Testes de Resistência</div>
+        <div class="meta-content"><strong>Des</strong> +12 · <strong>Sab</strong> +9 · <strong>Car</strong> +12</div>
+      </div>
+      <div class="meta-box">
+        <div class="meta-title">Resistências & Idiomas</div>
+        <div class="meta-content"><strong>Resistência:</strong> necrótico; contundente, perfurante e cortante de ataques não mágicos<br><strong>Idiomas:</strong> Abissal, Comum, Dracônico, Élfico, Gigante, Infernal</div>
+      </div>
+    </div>
+    <div class="meta-box" style="margin-bottom:12px;">
+      <div class="meta-title">Perícias</div>
+      <div class="meta-content"><strong>Arcanismo</strong> +19 · <strong>Atletismo</strong> +12 · <strong>Enganação</strong> +19 · <strong>Intuição</strong> +9 · <strong>Percepção</strong> +16 · <strong>Religião</strong> +13 · <strong>Furtividade</strong> +19</div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">Traços</h2>
+      <div class="ability-grid">
+        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Regeneração</div><span class="toggle-icon">▼</span></div><div class="ability-body">Recupera <em>20 PV</em> no início do turno se ≥1 PV e não estiver sob luz solar. Dano radiante bloqueia 1 turno.</div></div>
+        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Escalada de Aranha</div><span class="toggle-icon">▼</span></div><div class="ability-body">Move-se em superfícies verticais e tetos sem usar as mãos.</div></div>
+        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Hipersensibilidade à Luz Solar</div><span class="toggle-icon">▼</span></div><div class="ability-body">Sob luz solar: <span class="dmg">20 radiante</span> por turno, desvantagem em ataques e testes.</div></div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <div class="legend-item"><span class="legend-swatch" style="background:var(--blood)"></span>Ação</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#8b6f3a"></span>Bônus</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#4a6a8a"></span>Reação</div>
+      <div class="legend-item"><span class="legend-swatch" style="background:#5a3a6a"></span>Covil</div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">Ações</h2>
+      <div class="ability-grid">
+        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Ataque Múltiplo</div><span class="toggle-icon">▼</span></div><div class="ability-body">Dois ataques. <strong>Apenas um pode ser Mordida.</strong> Pode substituir um por <em>Encantar</em>.</div></div>
+        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Golpe Desarmado</div><span class="ability-tag">+12 corpo a corpo · 1,5m</span><span class="toggle-icon">▼</span></div><div class="ability-body">
+          <div class="desc-flavor">"As garras vampíricas dilaceram com força bruta sobrenatural."</div>
+          <span class="dmg">10 (1d8+5) cortante</span> + <span class="dmg">14 (4d6) necrótico</span><br>
+          Strahd pode <strong>agarrar</strong> (<em>CD 20 para escapar</em>).
+        </div></div>
+        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Mordida</div><span class="ability-tag">+12 · alvo disposto, agarrado, incapacitado ou restrito</span><span class="toggle-icon">▼</span></div><div class="ability-body">
+          <div class="desc-flavor">"As presas afundam, drenando a vida e a essência da vítima."</div>
+          <span class="dmg">8 (1d6+5) perfurante</span> + <span class="dmg">10 (3d6) necrótico</span><br>
+          ◆ <strong>Drenagem:</strong> máx de PV do alvo reduzido pelo dano necrótico, Strahd recupera PV iguais.<br>
+          ◆ <strong>Morte:</strong> se máx de PV = 0, alvo morre. Humanoide enterrado retorna no próximo pôr do sol como <strong>servo vampírico</strong>.<br>
+          ◆ <strong>Recuperação:</strong> sobrevivente: a cada descanso longo sem ser mordido, rola 1 dado de vida + Con; máx aumenta nesse valor.
+        </div></div>
+        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Encantar</div><span class="ability-tag">CD 20 SAB · 9m · 1 minuto</span><span class="toggle-icon">▼</span></div><div class="ability-body">
+          <div class="desc-flavor">"O olhar sedutor de Strahd dobra a vontade dos mortais a seus desejos."</div>
+          Humanoide a até <strong>9 m</strong> que veja Strahd: <em>Sabedoria CD 20</em> ou <strong>enfeitiçado</strong> por 1 min.<br>
+          ◆ Se não puder ver Strahd, passa automaticamente.<br>
+          ◆ Trata Strahd como amigo confiável e <strong>permite ser mordido</strong>.<br>
+          ◆ Repete teste no final de cada turno.<br>
+          ◆ Após 1 min ainda enfeitiçado: dura <strong>24 h</strong>, até Strahd ser destruído, ou Strahd encerrar (ação bônus).
+        </div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">Ações Bônus</h2>
+      <div class="ability-grid">
+        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Frenesi dos Morcegos</div><span class="ability-tag">CD 20 DES · raio 3m</span><span class="toggle-icon">▼</span></div><div class="ability-body">
+          <div class="desc-flavor">"Sombras se desprendem da capa em forma de morcegos famintos."</div>
+          Cada criatura a até <strong>3 m</strong>: <em>DES CD 20</em>.<br>
+          <strong>Falha:</strong> <span class="dmg">15 (6d4) necrótico</span> + desvantagem no próximo ataque.<br>
+          <strong>Sucesso:</strong> metade, sem desvantagem.
+        </div></div>
+        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Fúria Predatória</div><span class="ability-tag">CD 20 DES · até 2 alvos · 18m</span><span class="toggle-icon">▼</span></div><div class="ability-body">
+          <div class="desc-flavor">"Lobos espectrais saltam da capa, derrubando suas presas."</div>
+          Até <strong>2 criaturas</strong> a até 18 m, dentro de 1,5 m uma da outra. <em>DES CD 20</em>.<br>
+          <strong>Falha:</strong> <span class="dmg">16 (2d10+5) força</span> + derrubado. <strong>Sucesso:</strong> metade.
+        </div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">Reações</h2>
+      <div class="ability-grid">
+        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Indomável</div><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> criatura hostil termina turno.<br><strong>Efeito:</strong> repete teste contra efeito/condição.</div></div>
+        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Retirada Noturna</div><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> sofre dano.<br><strong>Efeito:</strong> <em>voa</em> até seu deslocamento sem provocar OAs. Se agarrado, <strong>se liberta automaticamente</strong>.</div></div>
+        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Frenesi de Sangue</div><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> sofre dano.<br><strong>Efeito:</strong> move-se até seu deslocamento em direção ao atacante e faz <em>um golpe desarmado</em>.</div></div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2 class="section-title">Ações de Covil</h2>
+      <p style="font-style:italic;color:var(--text-muted);margin-bottom:8px;font-size:0.88rem">Em <strong style="color:var(--gold)">iniciativa 20</strong>, se o <strong>Santuário da Montanha</strong> não tiver sido reconsagrado.</p>
+      <div class="ability-grid">
+        <div class="ability lair"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Controlar o Clima</div><span class="toggle-icon">▼</span></div><div class="ability-body">Conjura <em>controlar o clima</em> sem componentes/concentração. Altera qualquer número de condições para qualquer estágio.</div></div>
+        <div class="ability lair"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Chamar Relâmpagos</div><span class="ability-tag">tempestade = dano máximo</span><span class="toggle-icon">▼</span></div><div class="ability-body">Conjura <em>chamar relâmpagos</em> sem componentes/concentração. <strong>Ao ar livre em tempestade: dano sempre máximo</strong>.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================= GRIMÓRIO ============================= -->
+  <div class="section" style="margin-top:24px;">
+    <h2 class="section-title">⚜ Grimório de Strahd — Magias Conhecidas
+      <span style="font-size:0.7em;color:var(--text-muted);letter-spacing:0.05em;text-transform:none;font-style:italic;margin-left:8px">CD de Magia Universal: <strong style="color:var(--gold)">20</strong></span>
+    </h2>
+
+    <div class="spell-slots">
+      <div class="panel-title" style="margin-bottom:8px">◆ Espaços de Magia · Conjurador nível 18 equivalente</div>
+      <div class="spell-slots-grid" id="spellSlotsGrid"></div>
+      <div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;align-items:center">
+        <button class="btn" onclick="resetSlots()">⟲ Descanso Longo</button>
+        <span style="font-size:0.82rem;color:var(--text-muted);font-style:italic">Clique nas magias para abrir descrição e gastar espaços automaticamente.</span>
+      </div>
+    </div>
+
+    <input type="text" class="spell-search" id="spellSearch" placeholder="🔍 Buscar magia..." oninput="filterSpells()">
+
+    <div id="spellList"></div>
+  </div>
+
+  <div class="notes-section">
+    <h3>◆ Notas do Mestre — Tática e Lembretes</h3>
+    <textarea class="notes-area" id="notesArea" placeholder="Anote aqui: condições ativas, alvos prioritários, gatilhos de transição entre fases, magias já gastas, status de servos, momento do dia..."></textarea>
+  </div>
+
+  <footer>
+    "Os séculos passam, eu permaneço. Eu sou a Antiga."
+    <div style="margin-top:6px;font-size:0.75rem;letter-spacing:0.15em">Atalhos: <strong style="color:var(--gold)">1 2 3</strong> trocar fase · <strong style="color:var(--gold)">Ctrl+S</strong> salvar · <strong style="color:var(--gold)">Esc</strong> fechar modal</div>
+  </footer>
+
+</div>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="../../assets/js/supabase.js"></script>
+<script src="../../assets/js/auth.js"></script>
+<script src="../../assets/js/master_state.js"></script>
+<script>
+/* ============================================================
+   BANCO DE DADOS DE MAGIAS — descrições adaptadas do PHB 5e
+   ============================================================ */
+const SPELL_DB = {
+  // ===== TRUQUES =====
+  "Ilusão Menor": {
+    level: 0, school: "Ilusão",
+    time: "1 ação", range: "9 metros", components: "S, M",
+    duration: "1 minuto",
+    desc: "Você cria um som ou uma imagem de um objeto até 9 metros, com duração de 1 minuto. O som pode variar do sussurro ao grito; pode ser sua voz, a voz de outra pessoa, o rugido de um leão, batidas de tambor, etc. A imagem pode caber num cubo de 1,5 m. A ilusão não é tangível e qualquer interação física a revela como ilusão. Investigação CD 20 a revela como ilusória."
+  },
+  "Lufada": {
+    level: 0, school: "Transmutação",
+    time: "1 ação", range: "9 metros", components: "V, S",
+    duration: "Instantânea",
+    desc: "Você cria uma rajada de vento dirigida. Escolha uma criatura em até 9 m: deve fazer um teste de Força ou ser empurrada 1,5 m. Você pode também usar a magia para apagar chamas pequenas, dispersar gás ou fumaça, ou pressionar objetos minúsculos."
+  },
+  "Moldar Água": {
+    level: 0, school: "Transmutação",
+    time: "1 ação", range: "9 metros", components: "S",
+    duration: "Instantânea ou 1 hora",
+    desc: "Escolha uma área de água que caiba num cubo de 1,5 m, em até 9 m. Você pode: (1) mover instantaneamente a água até 1,5 m em qualquer direção; (2) mudar drasticamente a forma da água por 1 hora; (3) mudar a cor ou opacidade por 1 hora; (4) congelar a água por 1 hora (não pode prender criaturas).",
+    flavor: "\"Útil, dada minha condição.\""
+  },
+  "Prestidigitação": {
+    level: 0, school: "Transmutação",
+    time: "1 ação", range: "3 metros", components: "V, S",
+    duration: "Até 1 hora",
+    desc: "Truque versátil. Pode criar efeito sensorial inofensivo (chuva de faíscas, vento momentâneo), acender/apagar velas, limpar/sujar objeto pequeno, esquentar/esfriar matéria não-viva, marcar superfície com palavra, ou criar pequeno objeto ou ilusão que cabe na mão por 1 rodada. Até 3 efeitos não-instantâneos ativos."
+  },
+  "Raio de Gelo": {
+    level: 0, school: "Evocação",
+    time: "1 ação", range: "18 metros", components: "V, S",
+    duration: "1 rodada",
+    desc: "Um feixe de gelo gélido cintilante atira-se contra uma criatura. Faça ataque mágico à distância. Se acertar, alvo sofre 1d8 de dano de frio e seu deslocamento é reduzido em 3 metros até o início do seu próximo turno. <em>Em nível superior:</em> 2d8 no 5º, 3d8 no 11º, 4d8 no 17º."
+  },
+  "Raio de Fogo": {
+    level: 0, school: "Evocação",
+    time: "1 ação", range: "36 metros", components: "V, S",
+    duration: "Instantânea",
+    desc: "Você arremessa um raio de chamas contra uma criatura. Ataque mágico à distância. Acerto: 1d10 de dano de fogo. Objetos inflamáveis no alvo pegam fogo se não estiverem sendo usados. <em>Em nível superior:</em> 2d10 no 5º, 3d10 no 11º, 4d10 no 17º."
+  },
+  "Rajada Mística": {
+    level: 0, school: "Evocação",
+    time: "1 ação", range: "36 metros", components: "V, S",
+    duration: "Instantânea",
+    desc: "Um raio de energia crepitante é arremessado contra uma criatura. Faça um ataque mágico à distância. Acerto: 1d10 de dano de força. <em>Em nível superior:</em> dois raios no 5º, três no 11º, quatro no 17º. Cada raio pode ter alvo diferente, todos lançados como parte da mesma ação."
+  },
+
+  // ===== NÍVEL 1 =====
+  "Causar Medo": {
+    level: 1, school: "Ilusão",
+    time: "1 ação", range: "18 metros", components: "V",
+    duration: "Concentração, até 1 minuto",
+    desc: "Você desperta um sentimento de medo profundo. Uma criatura à sua escolha deve fazer um teste de Sabedoria CD 20. Mortos-vivos e construtos são imunes. Em falha: amedrontada até o fim da duração. A criatura repete o teste no fim de cada um de seus turnos, encerrando o efeito em caso de sucesso.",
+    flavor: "\"Não que sábios precisem ser forçados a me temer.\""
+  },
+  "Imagem Silenciosa": {
+    level: 1, school: "Ilusão",
+    time: "1 ação", range: "18 metros", components: "V, S, M",
+    duration: "Concentração, até 10 minutos",
+    desc: "Você cria a imagem de objeto, criatura ou outro fenômeno visível que não maior que um cubo de 4,5 m. A imagem aparece num ponto que você possa ver e dura por toda a duração. Pode mover a imagem 9 m por turno usando sua ação. Investigação CD 20 a revela como ilusória."
+  },
+  "Névoa Obscurecente": {
+    level: 1, school: "Conjuração",
+    time: "1 ação", range: "18 metros", components: "V, S",
+    duration: "Concentração, até 1 hora",
+    desc: "Você conjura uma esfera de neblina de 6 m de raio centrada em um ponto. A esfera se espalha por cantos. Sua área é obscurecimento intenso. Vento moderado (16 km/h) dispersa em 4 rodadas; vento forte em 1 rodada. <em>Em nível superior:</em> o raio aumenta em 6 m por nível acima do 1º.",
+    flavor: "\"As névoas de Barovia servem a mim, e são minha prisão.\""
+  },
+  "Raio de Bruxa": {
+    level: 1, school: "Evocação",
+    time: "1 ação", range: "9 metros", components: "V, S",
+    duration: "Concentração, até 1 minuto",
+    desc: "Um raio de energia crepitante é projetado contra uma criatura. Ataque mágico à distância. Acerto: 1d12 de dano de força. Até a magia terminar, em turnos seguintes pode usar a ação para causar dano automaticamente (sem ataque), desde que o alvo continue à vista e em alcance. <em>Em nível superior:</em> +1d12 por nível acima do 1º (apenas no primeiro acerto)."
+  },
+  "Riso Histérico de Tasha": {
+    level: 1, school: "Encantamento",
+    time: "1 ação", range: "9 metros", components: "V, S, M",
+    duration: "Concentração, até 1 minuto",
+    desc: "Uma criatura que possa ouvi-lo a até 9 m deve fazer Sabedoria CD 20 (criaturas com INT 4 ou menos são imunes). Falha: cai no chão e fica incapacitada, gargalhando incontrolavelmente. Repete o teste no final de cada turno, com vantagem se sofrer dano. Encerra em caso de sucesso."
+  }
+  ,
+  // ===== NÍVEL 2 =====
+  "Aura Mágica de Nystul": {
+    level: 2, school: "Ilusão",
+    time: "1 ação", range: "Toque", components: "V, S, M",
+    duration: "24 horas",
+    desc: "Você coloca uma ilusão num objeto ou criatura que possa tocar (não maior que um cubo de 3 m), até o fim da duração. <strong>Aura Falsa:</strong> faz objeto não mágico parecer mágico (ou inverte). <strong>Máscara:</strong> mascara a aura mágica para parecer outra coisa (ex: morto-vivo parecer vivo a <em>detectar mortos-vivos</em>).",
+    flavor: "\"Oculta minha natureza sobrenatural quando necessária.\""
+  },
+  "Detectar Pensamentos": {
+    level: 2, school: "Adivinhação",
+    time: "1 ação", range: "Pessoal", components: "V, S, M",
+    duration: "Concentração, até 1 minuto",
+    desc: "Pode ler pensamentos de criaturas. Foque numa criatura visível em até 9 m: ela faz Sabedoria CD 20. Falha: você lê seus pensamentos superficiais (o que mais ocupa sua mente no momento). Ação extra: sondar mais fundo — nova resistência; falha revela raciocínio, estado emocional, principal preocupação. Sucesso encerra a magia para aquele alvo.",
+    flavor: "\"Bem divertida.\""
+  },
+  "Escuridão": {
+    level: 2, school: "Evocação",
+    time: "1 ação", range: "18 metros", components: "V, M",
+    duration: "Concentração, até 10 minutos",
+    desc: "Escuridão mágica se espalha de um ponto numa esfera de raio 4,5 m. Dura a duração. Criaturas com visão no escuro não enxergam através. Luz não-mágica não penetra. Se conjurada sobre objeto que você toca, viaja com ele; cobrir bloqueia.",
+  },
+  "Imobilizar Pessoa": {
+    level: 2, school: "Encantamento",
+    time: "1 ação", range: "18 metros", components: "V, S, M",
+    duration: "Concentração, até 1 minuto",
+    desc: "Escolha um humanoide à vista até 18 m. Sabedoria CD 20 ou fica paralisado. Repete o teste no final de cada turno; sucesso encerra. <em>Em nível superior:</em> +1 alvo por nível acima do 2º (devem estar a 9 m um do outro)."
+  },
+  "Invisibilidade": {
+    level: 2, school: "Ilusão",
+    time: "1 ação", range: "Toque", components: "V, S, M",
+    duration: "Concentração, até 1 hora",
+    desc: "Toque uma criatura: torna-se invisível até a magia acabar. Qualquer coisa que ela carregue/use é também invisível enquanto estiver com ela. A magia termina se o alvo atacar ou conjurar magia. <em>Em nível superior:</em> +1 alvo por nível acima do 2º.",
+    flavor: "\"Desnecessária.\""
+  },
+  "Raio do Enfraquecimento": {
+    level: 2, school: "Necromancia",
+    time: "1 ação", range: "18 metros", components: "V, S",
+    duration: "Concentração, até 1 minuto",
+    desc: "Um raio de energia negra atinge uma criatura. Ataque mágico à distância. Acerto: por toda a duração, o alvo causa <strong>metade do dano</strong> com ataques de arma que usem Força. No final de cada turno, pode fazer Constituição CD 20 para encerrar a magia."
+  },
+  "Vento Protetor": {
+    level: 2, school: "Abjuração",
+    time: "1 ação", range: "Pessoal", components: "V",
+    duration: "Concentração, até 10 minutos",
+    desc: "Vento sobrenatural envolve você (raio 3 m). O vento dura a duração. Vento extingue chamas expostas e impede gases/vapores. Criaturas (incluindo você) na área têm vantagem em testes contra inalação ou vento. Pequenos objetos sem peso jogados em você são desviados."
+  },
+  "Ver o Invisível": {
+    level: 2, school: "Adivinhação",
+    time: "1 ação", range: "Pessoal", components: "V, S, M",
+    duration: "1 hora",
+    desc: "Pela duração, você vê criaturas invisíveis e objetos como se fossem visíveis (translúcidos brilhantes), e enxerga no Plano Etéreo até 9 m."
+  },
+
+  // ===== NÍVEL 3 =====
+  "Animar os Mortos": {
+    level: 3, school: "Necromancia",
+    time: "1 minuto", range: "3 metros", components: "V, S, M",
+    duration: "Instantânea",
+    desc: "Imbui um corpo de criatura Média/Pequena morta. Escolha esqueleto (CR 1/4) ou zumbi (CR 1/4). No próximo turno após conjurado, dá comandos mentais por ação bônus (raio 18 m). Comandos persistem por 24 h; após isso, fica imóvel. Para manter sob seu controle, reconjure-a — pode reafirmar até 4 mortos-vivos. <em>Em nível superior:</em> +2 mortos-vivos por nível acima do 3º.",
+    flavor: "\"Isso não me anima nem um pouco.\""
+  },
+  "Bola de Fogo": {
+    level: 3, school: "Evocação",
+    time: "1 ação", range: "45 metros", components: "V, S, M",
+    duration: "Instantânea",
+    desc: "Uma luz brilhante e amarela se expande num ponto, dentro de uma esfera de 6 m de raio. Cada criatura na área faz Destreza CD 20. Falha: <strong>8d6 de fogo</strong>. Sucesso: metade. Inflama objetos inflamáveis na área que não estejam sendo usados. <em>Em nível superior:</em> +1d6 por nível acima do 3º.",
+    flavor: "\"Se eles se sentirem seguros demais em suas casas.\""
+  },
+  "Clarividência": {
+    level: 3, school: "Adivinhação",
+    time: "10 minutos", range: "1,5 km", components: "V, S, M",
+    duration: "Concentração, até 10 minutos",
+    desc: "Cria um sensor invisível e intangível num ponto familiar (visitado antes, ou local óbvio: atrás de porta, perto de fonte). Escolha ver ou ouvir através do sensor (mude com ação). Tem visão/audição normal. Criaturas com Percepção 20+ podem detectar o sensor como esfera de luz prateada.",
+    flavor: "\"Ótima para lidar com o tédio.\""
+  },
+  "Contramagia": {
+    level: 3, school: "Abjuração",
+    time: "1 reação (quando ver alguém conjurando)", range: "18 metros", components: "S",
+    duration: "Instantânea",
+    desc: "Tenta interromper uma criatura no processo de conjurar uma magia. Se for de 3º nível ou menor, falha automaticamente. Se for de 4º+, faça teste de habilidade de conjuração: CD 10 + nível da magia para anular. <em>Em nível superior:</em> magias de nível igual ou menor ao slot usado são anuladas automaticamente."
+  },
+  "Dissipar Magia": {
+    level: 3, school: "Abjuração",
+    time: "1 ação", range: "36 metros", components: "V, S",
+    duration: "Instantânea",
+    desc: "Escolha criatura, objeto ou efeito mágico. Qualquer magia de 3º nível ou menor nele termina. Para magias de 4º+: faça teste de habilidade de conjuração CD 10 + nível da magia. Sucesso encerra. <em>Em nível superior:</em> termina automaticamente magias de nível igual ou menor ao slot usado."
+  },
+  "Falar com os Mortos": {
+    level: 3, school: "Necromancia",
+    time: "1 ação", range: "3 metros", components: "V, S, M",
+    duration: "10 minutos",
+    desc: "Dá a um cadáver à vista a aparência semelhante à vida e faz até 5 perguntas. Cadáver deve ter boca e não ser morto-vivo. A magia falha se o cadáver foi alvo desta magia nos últimos 10 dias. Respostas costumam ser breves, enigmáticas ou repetitivas. Não compelido a dizer a verdade se hostil. Não conhece eventos após a morte.",
+    flavor: "\"Eles acham que podem escapar de mim na morte...\""
+  },
+  "Lentidão": {
+    level: 3, school: "Transmutação",
+    time: "1 ação", range: "36 metros", components: "V, S, M",
+    duration: "Concentração, até 1 minuto",
+    desc: "Altera o tempo ao redor de até 6 criaturas dentro de cubo de 12 m. Sabedoria CD 20 ou: deslocamento reduzido pela metade, -2 em CA e Destreza, sem reações. No turno, só pode usar uma ação OU ação bônus. Se conjurar magia de 1 ação, 50% (rolar 1d20 ≥ 11) de funcionar — caso contrário se perde. Repete teste no final de cada turno; sucesso encerra para essa criatura.",
+    flavor: "\"Eles sequer têm pra onde fugir?\""
+  },
+  "Medo": {
+    level: 3, school: "Ilusão",
+    time: "1 ação", range: "Pessoal (cone 9 m)", components: "V, S, M",
+    duration: "Concentração, até 1 minuto",
+    desc: "Cada criatura num cone de 9 m partindo de você deve fazer Sabedoria CD 20. Falha: <strong>derruba o que estiver segurando</strong> e fica <strong>amedrontada</strong> pela duração. Enquanto amedrontada, usa seu turno para Esquivar e movendo-se para longe (pelo caminho mais seguro). Se não puder, usa Esquivar. No fim do turno, se afastou-se da linha de visão direta, repete o teste para encerrar.",
+    flavor: "\"Do tipo paralisante, não psicológico.\""
+  },
+  "Relâmpago": {
+    level: 3, school: "Evocação",
+    time: "1 ação", range: "Pessoal (linha 30 m × 1,5 m)", components: "V, S, M",
+    duration: "Instantânea",
+    desc: "Um raio de força elétrica forma linha de 30 m × 1,5 m partindo de você. Cada criatura na linha faz Destreza CD 20. Falha: <strong>8d6 elétrico</strong>. Sucesso: metade. Inflama objetos não-usados na área. <em>Em nível superior:</em> +1d6 por nível acima do 3º."
+  },
+  "Toque Vampírico": {
+    level: 3, school: "Necromancia",
+    time: "1 ação", range: "Pessoal", components: "V, S",
+    duration: "Concentração, até 1 minuto",
+    desc: "O toque da sua mão coberta de sombras pode drenar a força vital. Faça ataque corpo a corpo com magia contra criatura. Acerto: <strong>3d6 necrótico</strong> e você recupera PV iguais à metade do dano. Até a magia acabar, pode atacar de novo como ação. <em>Em nível superior:</em> +1d6 por nível acima do 3º.",
+    flavor: "\"Às vezes é repulsivo morder alguém imundo.\""
+  },
+
+  // ===== NÍVEL 4 =====
+  "Assassino Fantasmagórico": {
+    level: 4, school: "Ilusão",
+    time: "1 ação", range: "36 metros", components: "V, S",
+    duration: "Concentração, até 1 minuto",
+    desc: "Coloca a forma de um pesadelo na mente de uma criatura — apenas ela vê. Inteligência CD 20. Falha: <strong>4d10 psíquico</strong> e amedrontada até a magia acabar. No final de cada turno do alvo, ele faz nova resistência de INT. Falha: <strong>4d10 psíquico</strong>. Sucesso: encerra a magia. <em>Em nível superior:</em> +1d10 por nível acima do 4º.",
+    flavor: "\"É interessante.\""
+  },
+  "Fabricar": {
+    level: 4, school: "Transmutação",
+    time: "10 minutos", range: "36 metros", components: "V, S",
+    duration: "Instantânea",
+    desc: "Converte matérias-primas em produtos do mesmo material. Pode produzir objeto Médio (até cubo de 1,5 m) ou 8 objetos Pequenos. Item criado deve ser algo que você ou outra criatura veja sendo feito (não pode produzir armas ou itens muito complexos sem treinamento adequado).",
+    flavor: "\"Útil.\""
+  },
+  "Invocar Demônio Maior": {
+    level: 4, school: "Conjuração",
+    time: "1 ação", range: "18 metros", components: "V, S, M (uma pedra preciosa de pelo menos 500 po)",
+    duration: "Concentração, até 1 hora",
+    desc: "Você invoca um demônio do Abismo. Escolha um tipo de demônio cujo desafio é 5 ou menor. O demônio aparece num espaço desocupado em até 18 m. Some quando reduzido a 0 PV ou quando a magia acabar. O demônio é hostil a você. No início de cada turno dele, faça <strong>Carisma vs o teste de Carisma do demônio</strong>: se vencer, controla suas ações. Se falhar 3 vezes seguidas, magia acaba e demônio age livre."
+  },
+  "Sombra de Transtorno": {
+    level: 4, school: "Ilusão",
+    time: "1 ação", range: "Pessoal", components: "V, S, M",
+    duration: "Concentração, até 1 minuto",
+    desc: "Você cria a ilusão de que sua sombra está fora de controle. Sua sombra parece se mover por conta própria, fazendo gestos macabros. Qualquer criatura que termine o turno a até 18 m e possa ver você sob iluminação não-mínima deve fazer Sabedoria CD 20. Falha: <strong>4d10 psíquico</strong> e fica amedrontada de você até o início de seu próximo turno.",
+    flavor: "\"O medo nos rostos quando a luz não os protege...\""
+  },
+
+  // ===== NÍVEL 5 =====
+  "Dominar Pessoa": {
+    level: 5, school: "Encantamento",
+    time: "1 ação", range: "18 metros", components: "V, S",
+    duration: "Concentração, até 1 hora",
+    desc: "Você tenta domar um humanoide. Sabedoria CD 20 (com vantagem se em combate com você). Falha: enfeitiçado pela duração. Cria conexão telepática (mesmo plano). Pode dar comandos enquanto consciente: \"ataque essa criatura\", \"corra\", \"vá buscar aquele objeto\". Sem ordens, defende-se. Por ação, controle total como se fosse seu corpo. Cada vez que sofre dano, repete teste; sucesso encerra. <em>Em nível superior:</em> 6º = 10 min, 7º = 1 hora, 8º+ = 8 horas.",
+    flavor: "\"Não funcionou em Tatyana...\""
+  },
+  "Imolação": {
+    level: 5, school: "Evocação",
+    time: "1 ação", range: "27 metros", components: "V",
+    duration: "Concentração, até 1 minuto",
+    desc: "Chamas envolvem uma criatura à vista. Destreza CD 20. Falha: <strong>8d6 fogo</strong> e arde por toda a duração. Sucesso: <strong>4d6 fogo</strong>, sem queimar. Enquanto arde, sofre <strong>4d6 fogo</strong> no início de cada turno. Pode terminar mergulhando em água ou usando ação para apagar (DC 10 Destreza). Quem morrer arde por 1 minuto após, depois vira pó.",
+    flavor: "\"Tão sem classe, mas mostra a devida seriedade.\""
+  },
+  "Modificar Memória": {
+    level: 5, school: "Encantamento",
+    time: "1 ação", range: "9 metros", components: "V, S",
+    duration: "Concentração, até 1 minuto",
+    desc: "Tenta remodelar lembranças. Sabedoria CD 20. Falha: alvo fica enfeitiçado e incapacitado, com sentidos embotados. Enquanto durar, você pode acessar e ajustar suas memórias de um evento das últimas 24 h. Pode apagar, alterar detalhes, ou plantar memória inteiramente nova. A nova memória dura permanente. <em>Em nível superior:</em> 6º = 7 dias, 7º = 30 dias, 8º = 1 ano, 9º = qualquer tempo.",
+    flavor: "\"Uma de minhas favoritas.\""
+  },
+  "Passo Distante": {
+    level: 5, school: "Conjuração",
+    time: "1 ação", range: "Pessoal", components: "V",
+    duration: "Concentração, até 1 minuto",
+    desc: "Você ganha a capacidade de se teletransportar até 9 m a um espaço desocupado que possa ver, como ação bônus, em cada turno até a duração acabar. Você pode usar essa habilidade <strong>até 5 vezes</strong> antes da magia acabar (qualquer uso restante é perdido)."
+  },
+  "Praga": {
+    level: 5, school: "Necromancia",
+    time: "1 ação", range: "9 metros", components: "V, S, M",
+    duration: "Concentração, até 1 minuto",
+    desc: "Você invoca uma maldição de doença numa criatura. Constituição CD 20. Falha: <strong>5d8 necrótico</strong> e o máximo de PV é <strong>reduzido pela metade</strong> pela duração. Se reduzido a 0 enquanto a magia ativa, morre. Termina cedo se removida (remover maldição, etc). <em>Em nível superior:</em> +1d8 por nível acima do 5º."
+  },
+  "Praga de Insetos": {
+    level: 5, school: "Conjuração",
+    time: "1 ação", range: "90 metros", components: "V, S, M",
+    duration: "Concentração, até 10 minutos",
+    desc: "Gafanhotos famintos enxameiam em uma esfera de 6 m de raio centrada num ponto. Esfera se espalha por cantos; dura toda duração ou até a magia ser dissipada. Área é terreno difícil. Quando criatura entra na área primeira vez no turno ou inicia turno lá: <strong>4d10 perfurante</strong>; sucesso em Constituição CD 20 reduz à metade. <em>Em nível superior:</em> +1d10 por nível acima do 5º."
+  },
+  "Reviver os Mortos": {
+    level: 5, school: "Necromancia",
+    time: "1 hora", range: "Toque", components: "V, S, M (250 po de diamantes)",
+    duration: "Instantânea",
+    desc: "Você toca uma criatura morta por no máximo 10 dias e a traz de volta com 1 PV. Não pode reviver criatura cuja alma não queira/não esteja livre. Membros faltantes não são restaurados. Por sair da morte: -4 em todos os ataques, testes e resistências por 4 descansos longos (penalidade reduz em 1 por descanso longo).",
+    flavor: "\"Se eu tivesse o corpo de Tatyana...\""
+  },
+  "Vidência": {
+    level: 5, school: "Adivinhação",
+    time: "10 minutos", range: "Auto", components: "V, S, M (1.000 po)",
+    duration: "Concentração, até 10 minutos",
+    desc: "Pode ver e ouvir uma criatura escolhida em qualquer lugar do mesmo plano. Sabedoria CD 20 (com modificadores baseados em quanto conhece o alvo). Falha: surge um sensor invisível perto do alvo, e você pode ver/ouvir como se estivesse lá pela duração. Pode mudar focar para outra área num raio de 3 m do sensor.",
+    flavor: "\"Muito bom para se entreter.\""
+  },
+
+  // ===== NÍVEL 6 =====
+  "Criar Mortos-Vivos": {
+    level: 6, school: "Necromancia",
+    time: "1 minuto", range: "3 metros", components: "V, S, M (250 po de pó de ônix por cadáver)",
+    duration: "Instantânea",
+    desc: "Você anima até <strong>três cadáveres</strong> como <strong>carniçais</strong> sob seu controle. Em vez disso, no 7º nível: até 2 ghouls (CR 1) ou 1 ghast/wight. No 8º: até 6 ghouls, ou 3 ghasts/wights, ou 2 múmias. No 9º: até 6 ghouls, 3 ghasts/wights/múmias, ou 2 espectros. Comandos por ação bônus, raio 36 m, comandos persistem por 24 h. Para manter, reconjure antes de 24 h.",
+    flavor: "\"Haverá um dia em que este vale terá mais mortos que almas...\""
+  },
+  "Prisão Mental": {
+    level: 6, school: "Ilusão",
+    time: "1 ação", range: "18 metros", components: "S",
+    duration: "Concentração, até 1 minuto",
+    desc: "Cria uma cela ilusória ao redor de uma criatura visível. O alvo é totalmente incapacitado e não pode se mover (Inteligência CD 20 nega). Falha: enxerga a si mesmo aprisionado. Sofre <strong>5d10 psíquico</strong> quando sofre qualquer dano (em vez do dano normal). Magia acaba se outra criatura usar ação para examinar e desbloquear (INT contra sua CD). <em>Em nível superior:</em> +1d10 dano psíquico por nível acima do 6º."
+  },
+  "Invocar Diabo": {
+    level: 6, school: "Conjuração",
+    time: "1 minuto", range: "27 metros", components: "V, S, M (uma gema preciosa de 999 po)",
+    duration: "Concentração, até 1 hora",
+    desc: "Você invoca um espírito-diabo do Hades. Escolha um diabo de desafio 6 ou menor. Aparece num espaço desocupado em até 27 m. Some quando reduzido a 0 PV ou quando a magia acabar. Você controla suas ações se vencer Carisma vs Carisma no início de cada turno do diabo."
+  },
+
+  // ===== NÍVEL 7 =====
+  "Dedo da Morte": {
+    level: 7, school: "Necromancia",
+    time: "1 ação", range: "18 metros", components: "V, S",
+    duration: "Instantânea",
+    desc: "Energia negativa percorre o corpo da criatura. Constituição CD 20. Falha: <strong>7d8 + 30 necrótico</strong>. Sucesso: metade. Se humanoide morrer pela magia, ressurge no início do próximo turno como <strong>zumbi sob controle permanente</strong> de Strahd, com instruções verbais.",
+    flavor: "\"Uma punição adequada a invasores desordeiros.\""
+  },
+  "Inverter a Gravidade": {
+    level: 7, school: "Transmutação",
+    time: "1 ação", range: "30 metros", components: "V, S, M",
+    duration: "Concentração, até 1 minuto",
+    desc: "Em um cilindro de 15 m de raio e 30 m de altura centrado num ponto visível, a gravidade <strong>inverte</strong>. Criaturas e objetos não fixados caem para cima e atingem o topo. Quem termina turno lá fica seguro até a magia acabar. Destreza CD 20 para se agarrar a objeto fixado e evitar.",
+    flavor: "\"Esta aqui é simplesmente cômica.\""
+  },
+  "Miragem": {
+    level: 7, school: "Ilusão",
+    time: "10 minutos", range: "Visualização", components: "V, S",
+    duration: "10 dias",
+    desc: "Você faz o terreno numa área de até 1,5 km² parecer outra coisa: vila parecer terra arrasada, brejo parecer prado. Inclui som, cheiro, temperatura. Investigação CD 20 (de muito perto) a revela. Criatura pode caminhar pela ilusão sem perceber (terreno parece sólido até toque revelar).",
+    flavor: "\"Ótima para restaurar o Castelo a sua beleza de outrora.\""
+  },
+  "Palavra de Poder: Dor": {
+    level: 7, school: "Encantamento",
+    time: "1 ação", range: "18 metros", components: "V",
+    duration: "Até dissipada",
+    desc: "Você profere uma palavra de poder que esmaga uma criatura escolhida com agonia se ela tiver <strong>100 PV ou menos</strong>. Sem teste. Enquanto sofre, deslocamento ≤ 3 m, desvantagem em ataques e testes (exceto Constituição), conjurar magia exige Constituição CD 20. Repete Constituição CD 20 ao final de cada turno; sucesso encerra. Criaturas com mais de 100 PV são imunes.",
+    flavor: "\"Uma punição adequada a qualquer um que me insulte propositalmente.\""
+  },
+  "Projetar Imagem": {
+    level: 7, school: "Ilusão",
+    time: "1 ação", range: "500 milhas", components: "V, S, M",
+    duration: "Concentração, até 1 dia",
+    desc: "Cria cópia ilusória de você mesmo até 800 km de distância em local que conheça. Imagem se parece com você, mas inerte; pode usar ação para se transferir e usar os sentidos da imagem como se fosse seu corpo, e falar/agir por ela. Você fica catatônico enquanto fizer. Toque revela ilusória; Investigação CD 20 a vê como imagem."
+  },
+
+  // ===== NÍVEL 8 =====
+  "Escuridão Enlouquecedora": {
+    level: 8, school: "Evocação",
+    time: "1 ação", range: "45 metros", components: "V",
+    duration: "Concentração, até 10 minutos",
+    desc: "Escuridão mágica preenche esfera de 18 m de raio (não-mágica e a maioria das mágicas não a dispersam). Criaturas que iniciem turno na área: Sabedoria CD 20 ou <strong>8d8 psíquico</strong>; sucesso reduz à metade. Visibilidade reduzida a obscurecimento intenso; mortos-vivos sob controle de Strahd ignoram.",
+    flavor: "\"Se isso não desencorajar, saberei que lido com alguém de verdadeira determinação.\""
+  },
+
+  // ===== NÍVEL 9 =====
+  "Encarnação Fantasmagórica": {
+    level: 9, school: "Ilusão",
+    time: "1 ação", range: "9 metros", components: "V, S",
+    duration: "Concentração, até 1 hora",
+    desc: "Você atinge o subconsciente do alvo, materializando seus piores medos como ilusão. Sabedoria CD 20 (com vantagem se vir você ou perceber a ilusão como falsa). Falha: <strong>incapacitado</strong> e fica em transe. No início de cada turno, sofre <strong>4d10 psíquico</strong>. Magia termina se sofrer dano e a fonte do medo não fizer mais sentido. Repete Sabedoria no final de cada turno; sucesso encerra.",
+    flavor: "\"Todos têm seus medos, e todos sucumbem a eles.\""
+  },
+  "Parar o Tempo": {
+    level: 9, school: "Transmutação",
+    time: "1 ação", range: "Pessoal", components: "V",
+    duration: "Instantânea",
+    desc: "Para brevemente o fluxo do tempo para todos exceto você. Nenhum tempo passa para outras criaturas, enquanto você ganha <strong>1d4+1 turnos</strong> seguidos durante os quais pode usar ações e movimentos normalmente. Magia termina se uma das ações afetar criatura que não seja você ou objeto carregado/portado por outro. Também termina se você se mover para mais de 300 m do local em que conjurou.",
+    flavor: "\"Fiz até mesmo o tempo se dobrar a mim.\""
+  }
+};
+
+/* ============================================================
+   LISTA DE MAGIAS POR NÍVEL (após remoções pedidas)
+   ============================================================ */
+const SPELLS_BY_LEVEL = {
+  0: ["Ilusão Menor", "Lufada", "Moldar Água", "Prestidigitação", "Raio de Gelo", "Raio de Fogo", "Rajada Mística"],
+  1: ["Causar Medo", "Imagem Silenciosa", "Névoa Obscurecente", "Raio de Bruxa", "Riso Histérico de Tasha"],
+  2: ["Aura Mágica de Nystul", "Detectar Pensamentos", "Escuridão", "Imobilizar Pessoa", "Raio do Enfraquecimento", "Vento Protetor", "Ver o Invisível"],
+  3: ["Animar os Mortos", "Bola de Fogo", "Clarividência", "Contramagia", "Dissipar Magia", "Falar com os Mortos", "Lentidão", "Medo", "Relâmpago", "Toque Vampírico"],
+  4: ["Assassino Fantasmagórico", "Fabricar", "Invocar Demônio Maior", "Sombra de Transtorno"],
+  5: ["Dominar Pessoa", "Imolação", "Modificar Memória", "Passo Distante", "Praga", "Praga de Insetos", "Reviver os Mortos", "Vidência"],
+  6: ["Criar Mortos-Vivos", "Prisão Mental", "Invocar Diabo"],
+  7: ["Dedo da Morte", "Inverter a Gravidade", "Miragem", "Palavra de Poder: Dor", "Projetar Imagem"],
+  8: ["Escuridão Enlouquecedora"],
+  9: ["Encarnação Fantasmagórica", "Parar o Tempo"]
+};
+
+/* ============================================================
+   ESPAÇOS DE MAGIA — Nível 18 equivalente (ND 21)
+   ============================================================ */
+const SLOT_LEVELS = [
+  { level: 1, max: 4 },
+  { level: 2, max: 3 },
+  { level: 3, max: 3 },
+  { level: 4, max: 3 },
+  { level: 5, max: 3 },
+  { level: 6, max: 1 },
+  { level: 7, max: 1 },
+  { level: 8, max: 1 },
+  { level: 9, max: 1 },
+];
+
+/* ============================================================
+   BUILD SPELL SLOTS UI
+   ============================================================ */
+function buildSlotsUI() {
+  const grid = document.getElementById('spellSlotsGrid');
+  grid.innerHTML = '';
+  SLOT_LEVELS.forEach(({level, max}) => {
+    const div = document.createElement('div');
+    div.className = 'slot-level';
+    let dots = '';
+    for (let i = 0; i < max; i++) {
+      dots += `<div class="slot-dot" data-level="${level}" data-index="${i}" onclick="toggleSlot(this)"></div>`;
+    }
+    div.innerHTML = `<div class="slot-level-label">Nível ${level}</div><div class="slot-dots">${dots}</div>`;
+    grid.appendChild(div);
+  });
+}
+
+function toggleSlot(el) {
+  el.classList.toggle('used');
+  saveState(true);
+}
+
+function resetSlots() {
+  document.querySelectorAll('.slot-dot').forEach(d => d.classList.remove('used'));
+  showToast('Espaços recuperados');
+  saveState(true);
+}
+
+/* ============================================================
+   GASTAR / RECUPERAR SLOT POR NÍVEL
+   ============================================================ */
+function consumeSlot(level) {
+  // procura primeiro slot não usado desse nível
+  const dots = document.querySelectorAll(`.slot-dot[data-level="${level}"]`);
+  for (const d of dots) {
+    if (!d.classList.contains('used')) {
+      d.classList.add('used');
+      saveState(true);
+      return true;
+    }
+  }
+  return false; // sem slots disponíveis
+}
+
+function recoverSlot(level) {
+  const dots = Array.from(document.querySelectorAll(`.slot-dot[data-level="${level}"]`));
+  // recupera o último usado
+  for (let i = dots.length - 1; i >= 0; i--) {
+    if (dots[i].classList.contains('used')) {
+      dots[i].classList.remove('used');
+      saveState(true);
+      return true;
+    }
+  }
+  return false;
+}
+
+function getSlotsRemaining(level) {
+  const dots = document.querySelectorAll(`.slot-dot[data-level="${level}"]`);
+  let used = 0;
+  dots.forEach(d => { if (d.classList.contains('used')) used++; });
+  return { used, total: dots.length, free: dots.length - used };
+}
+
+/* ============================================================
+   BUILD SPELL LIST
+   ============================================================ */
+function buildSpellList() {
+  const container = document.getElementById('spellList');
+  container.innerHTML = '';
+
+  // Cabeçalhos por nível
+  const labels = {
+    0: { label: "Truques", note: "à vontade" },
+    1: { label: "Nível 1", note: "" },
+    2: { label: "Nível 2", note: "" },
+    3: { label: "Nível 3", note: "" },
+    4: { label: "Nível 4", note: "" },
+    5: { label: "Nível 5", note: "" },
+    6: { label: "Nível 6", note: "" },
+    7: { label: "Nível 7", note: "" },
+    8: { label: "Nível 8", note: "" },
+    9: { label: "Nível 9", note: "" }
+  };
+
+  Object.keys(SPELLS_BY_LEVEL).sort((a,b) => +a - +b).forEach(lvl => {
+    const group = document.createElement('div');
+    group.className = 'spell-level-group';
+    group.dataset.level = lvl;
+
+    const info = labels[lvl];
+    let header = `<div class="spell-level-header">${info.label}`;
+    if (info.note) header += ` <span style="margin-left:auto;font-style:italic;color:var(--text-muted);font-size:0.75rem;text-transform:none;letter-spacing:0.03em">${info.note}</span>`;
+    header += `</div>`;
+    group.innerHTML = header;
+
+    SPELLS_BY_LEVEL[lvl].forEach(spellName => {
+      const data = SPELL_DB[spellName];
+      const chip = document.createElement('span');
+      chip.className = 'spell-chip' + (lvl === '0' ? ' no-cost' : '');
+      chip.dataset.spell = spellName;
+      chip.dataset.level = lvl;
+
+      let chipHTML = spellName;
+      if (data && data.flavor) {
+        chipHTML += ` <span class="flavor">${data.flavor}</span>`;
+      }
+      chip.innerHTML = chipHTML;
+      chip.onclick = () => openSpellModal(spellName);
+      group.appendChild(chip);
+    });
+
+    container.appendChild(group);
+  });
+}
+
+/* ============================================================
+   MODAL DE MAGIA
+   ============================================================ */
+function openSpellModal(spellName) {
+  const data = SPELL_DB[spellName];
+  if (!data) {
+    showToast('Descrição não disponível');
+    return;
+  }
+
+  document.getElementById('modalTitle').textContent = spellName;
+  document.getElementById('modalSchool').textContent =
+    (data.level === 0 ? 'Truque' : `${ordinal(data.level)} nível`) + ' de ' + data.school;
+
+  // META
+  const metaEl = document.getElementById('modalMeta');
+  metaEl.innerHTML = `
+    <div class="modal-meta-item"><div class="label">Tempo</div><div class="val">${data.time || '—'}</div></div>
+    <div class="modal-meta-item"><div class="label">Alcance</div><div class="val">${data.range || '—'}</div></div>
+    <div class="modal-meta-item"><div class="label">Componentes</div><div class="val">${data.components || '—'}</div></div>
+    <div class="modal-meta-item"><div class="label">Duração</div><div class="val">${data.duration || '—'}</div></div>
+  `;
+
+  // FLAVOR (se houver)
+  const flavorEl = document.getElementById('modalFlavor');
+  if (data.flavor) {
+    flavorEl.textContent = data.flavor;
+    flavorEl.style.display = 'block';
+  } else {
+    flavorEl.style.display = 'none';
+  }
+
+  // DESC
+  document.getElementById('modalDesc').innerHTML = `<p>${data.desc}</p>`;
+
+  // ACTIONS
+  const actionsEl = document.getElementById('modalActions');
+  actionsEl.innerHTML = '';
+
+  if (data.level === 0) {
+    actionsEl.innerHTML = '<span class="info-text">Truques não consomem espaços de magia — uso ilimitado.</span>';
+  } else {
+    const slots = getSlotsRemaining(data.level);
+    const consumed = isSpellCast(spellName);
+
+    const statusText = document.createElement('span');
+    statusText.className = 'info-text';
+    statusText.innerHTML = `Espaços de nível ${data.level}: <strong style="color:${slots.free > 0 ? 'var(--gold)' : 'var(--blood-bright)'}">${slots.free} / ${slots.total} disponíveis</strong>`;
+    actionsEl.appendChild(statusText);
+
+    actionsEl.appendChild(document.createElement('div')).style.flexBasis = '100%';
+
+    // Botão gastar
+    const castBtn = document.createElement('button');
+    castBtn.className = 'btn gold';
+    castBtn.textContent = `▼ Gastar espaço nível ${data.level}`;
+    castBtn.disabled = slots.free === 0;
+    castBtn.style.opacity = slots.free === 0 ? '0.4' : '1';
+    castBtn.style.cursor = slots.free === 0 ? 'not-allowed' : 'pointer';
+    castBtn.onclick = () => {
+      if (consumeSlot(data.level)) {
+        markSpellCast(spellName);
+        showToast(`✓ ${spellName} conjurada (-1 slot nível ${data.level})`);
+        openSpellModal(spellName); // recarrega para atualizar contador
+      } else {
+        showToast('Sem espaços disponíveis');
+      }
+    };
+    actionsEl.appendChild(castBtn);
+
+    // Botão recuperar
+    const recoverBtn = document.createElement('button');
+    recoverBtn.className = 'btn';
+    recoverBtn.textContent = `↺ Recuperar espaço nível ${data.level}`;
+    recoverBtn.disabled = slots.used === 0;
+    recoverBtn.style.opacity = slots.used === 0 ? '0.4' : '1';
+    recoverBtn.style.cursor = slots.used === 0 ? 'not-allowed' : 'pointer';
+    recoverBtn.onclick = () => {
+      if (recoverSlot(data.level)) {
+        unmarkSpellCast(spellName);
+        showToast(`✓ Espaço de nível ${data.level} recuperado`);
+        openSpellModal(spellName);
+      }
+    };
+    actionsEl.appendChild(recoverBtn);
+
+    // Botão gastar em nível superior (apenas para magias com escalonamento)
+    if (data.level < 9 && /n[íi]vel superior/i.test(data.desc)) {
+      const upcastBtn = document.createElement('button');
+      upcastBtn.className = 'btn';
+      upcastBtn.textContent = `▲ Em nível superior...`;
+      upcastBtn.onclick = () => showUpcastOptions(spellName, data.level);
+      actionsEl.appendChild(upcastBtn);
+    }
+  }
+
+  document.getElementById('spellModal').classList.add('show');
+}
+
+function showUpcastOptions(spellName, baseLevel) {
+  const actionsEl = document.getElementById('modalActions');
+  actionsEl.innerHTML = '<span class="info-text">Escolha o nível do espaço a usar:</span>';
+  actionsEl.appendChild(document.createElement('div')).style.flexBasis = '100%';
+
+  for (let lvl = baseLevel; lvl <= 9; lvl++) {
+    const slots = getSlotsRemaining(lvl);
+    const btn = document.createElement('button');
+    btn.className = 'btn' + (lvl === baseLevel ? '' : ' gold');
+    btn.textContent = `Nível ${lvl} (${slots.free}/${slots.total})`;
+    btn.disabled = slots.free === 0;
+    btn.style.opacity = slots.free === 0 ? '0.4' : '1';
+    btn.onclick = () => {
+      if (consumeSlot(lvl)) {
+        markSpellCast(spellName);
+        showToast(`✓ ${spellName} conjurada em nível ${lvl}`);
+        openSpellModal(spellName);
+      }
+    };
+    actionsEl.appendChild(btn);
+  }
+
+  // botão voltar
+  const back = document.createElement('button');
+  back.className = 'btn';
+  back.textContent = '← Voltar';
+  back.onclick = () => openSpellModal(spellName);
+  actionsEl.appendChild(back);
+}
+
+function closeModal() {
+  document.getElementById('spellModal').classList.remove('show');
+}
+
+/* ===== MARCADORES DE MAGIA CONJURADA (visual) ===== */
+function markSpellCast(spellName) {
+  document.querySelectorAll(`.spell-chip[data-spell="${spellName}"]`).forEach(c => {
+    c.classList.add('cast');
+    // remove marcação após 4s para dar feedback de "acabou de conjurar"
+    setTimeout(() => c.classList.remove('cast'), 4000);
+  });
+}
+
+function unmarkSpellCast(spellName) {
+  document.querySelectorAll(`.spell-chip[data-spell="${spellName}"]`).forEach(c => c.classList.remove('cast'));
+}
+
+function isSpellCast(spellName) {
+  const chip = document.querySelector(`.spell-chip[data-spell="${spellName}"]`);
+  return chip && chip.classList.contains('cast');
+}
+
+function ordinal(n) {
+  if (n === 1) return '1º';
+  if (n === 2) return '2º';
+  if (n === 3) return '3º';
+  return n + 'º';
+}
+
+/* ============================================================
+   PHASE SWITCH / HP / REACTIONS / NOTES — todo o resto
+   ============================================================ */
+function switchPhase(num) {
+  document.querySelectorAll('.phase-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.phase-content').forEach(c => c.classList.remove('active'));
+  document.querySelector(`.phase-tab[data-phase="${num}"]`).classList.add('active');
+  document.getElementById(`phase-${num}`).classList.add('active');
+  saveState(true);
+}
+
+const hpCurrent = document.getElementById('hpCurrent');
+const hpMax = document.getElementById('hpMax');
+const hpBar = document.getElementById('hpBar');
+const hpLabel = document.getElementById('hpLabel');
+
+function updateHPBar() {
+  const cur = parseInt(hpCurrent.value) || 0;
+  const max = parseInt(hpMax.value) || 1;
+  const pct = Math.max(0, Math.min(100, (cur / max) * 100));
+  hpBar.style.width = pct + '%';
+  hpLabel.textContent = Math.round(pct) + '%';
+  if (pct > 50) hpBar.style.background = 'linear-gradient(90deg, var(--blood-dark), var(--blood))';
+  else if (pct > 25) hpBar.style.background = 'linear-gradient(90deg, #5a0e0e, #a82020)';
+  else hpBar.style.background = 'linear-gradient(90deg, #3a0808, #6a0e0e)';
+}
+
+function adjustHP(delta) {
+  const max = parseInt(hpMax.value) || 1;
+  let cur = parseInt(hpCurrent.value) || 0;
+  cur = Math.max(0, Math.min(max, cur + delta));
+  hpCurrent.value = cur;
+  updateHPBar();
+  saveState(true);
+}
+
+function resetHP() {
+  hpCurrent.value = hpMax.value;
+  updateHPBar();
+  saveState(true);
+}
+
+hpCurrent.addEventListener('input', () => { updateHPBar(); saveState(true); });
+hpMax.addEventListener('input', () => { updateHPBar(); saveState(true); });
+
+function toggleReact(el) { el.classList.toggle('used'); saveState(true); }
+function resetReactions() {
+  document.querySelectorAll('.react-dot').forEach(d => d.classList.remove('used'));
+  saveState(true);
+}
+
+function toggleAbility(header) {
+  header.parentElement.classList.toggle('open');
+}
+
+/* ============================================================
+   SPELL SEARCH
+   ============================================================ */
+function filterSpells() {
+  const q = document.getElementById('spellSearch').value.toLowerCase().trim();
+  document.querySelectorAll('#spellList .spell-chip').forEach(chip => {
+    const txt = chip.textContent.toLowerCase();
+    chip.classList.toggle('hidden', q !== '' && !txt.includes(q));
+  });
+  document.querySelectorAll('.spell-level-group').forEach(g => {
+    const visible = Array.from(g.querySelectorAll('.spell-chip')).some(c => !c.classList.contains('hidden'));
+    g.style.display = visible || q === '' ? '' : 'none';
+  });
+}
+
+/* ============================================================
+   SAVE / LOAD STATE (localStorage + import/export JSON)
+   ============================================================ */
+const STORAGE_KEY = 'strahd_ficha_v3';
+
+function getState() {
+  return {
+    hpCurrent: hpCurrent.value,
+    hpMax: hpMax.value,
+    ca: Array.from(document.querySelectorAll('.ca-input')).map(i => ({ phase: i.dataset.phase, val: i.value })),
+    activePhase: document.querySelector('.phase-tab.active').dataset.phase,
+    reactions: Array.from(document.querySelectorAll('.react-dot')).map(d => d.classList.contains('used')),
+    conditions: Array.from(document.querySelectorAll('.condition-row .chip')).map(c => c.classList.contains('active')),
+    slots: Array.from(document.querySelectorAll('.slot-dot')).map(d => ({
+      level: d.dataset.level, index: d.dataset.index, used: d.classList.contains('used')
+    })),
+    notes: document.getElementById('notesArea').value,
+    openAbilities: Array.from(document.querySelectorAll('.ability.open')).map(a => {
+      const phase = a.closest('.phase-content').id;
+      const name = a.querySelector('.ability-name').textContent;
+      return `${phase}::${name}`;
+    })
+  };
+}
+
+function applyState(s) {
+  if (!s) return;
+  hpCurrent.value = s.hpCurrent ?? 331;
+  hpMax.value = s.hpMax ?? 331;
+  updateHPBar();
+  if (s.ca) {
+    s.ca.forEach(c => {
+      const inp = document.querySelector(`.ca-input[data-phase="${c.phase}"]`);
+      if (inp) inp.value = c.val;
+    });
+  }
+  if (s.activePhase) switchPhaseSilent(parseInt(s.activePhase));
+  (s.reactions || []).forEach((u, i) => {
+    const d = document.querySelectorAll('.react-dot')[i];
+    if (d) d.classList.toggle('used', u);
+  });
+  (s.conditions || []).forEach((u, i) => {
+    const c = document.querySelectorAll('.condition-row .chip')[i];
+    if (c) c.classList.toggle('active', u);
+  });
+  if (s.slots) {
+    s.slots.forEach(slot => {
+      const el = document.querySelector(`.slot-dot[data-level="${slot.level}"][data-index="${slot.index}"]`);
+      if (el) el.classList.toggle('used', slot.used);
+    });
+  }
+  document.getElementById('notesArea').value = s.notes || '';
+  if (s.openAbilities) {
+    s.openAbilities.forEach(key => {
+      const [phase, name] = key.split('::');
+      document.querySelectorAll(`#${phase} .ability`).forEach(a => {
+        if (a.querySelector('.ability-name').textContent === name) a.classList.add('open');
+      });
+    });
+  }
+}
+
+function switchPhaseSilent(num) {
+  document.querySelectorAll('.phase-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.phase-content').forEach(c => c.classList.remove('active'));
+  document.querySelector(`.phase-tab[data-phase="${num}"]`).classList.add('active');
+  document.getElementById(`phase-${num}`).classList.add('active');
+}
+
+// Sync remoto via window.MasterState (Supabase). Mantém local como fallback.
+const MS_CHAVE = 'vilao:strahd';
+let _msAplicando = false;  // evita loop quando aplica payload recebido por realtime
+
+function _setSyncStatus(txt, cor) {
+  const el = document.getElementById('syncStatus');
+  if (el) { el.textContent = txt; el.style.color = cor || 'var(--gold-dim)'; }
+}
+
+function saveState(silent = false) {
+  if (_msAplicando) return;
+  try {
+    const dados = getState();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+    if (window.MasterState) {
+      _setSyncStatus('⟳ sincronizando…', 'var(--gold-dim)');
+      window.MasterState.salvarDebounced(MS_CHAVE, dados, silent ? 600 : 0);
+      setTimeout(() => _setSyncStatus('● sincronizado', 'var(--gold)'), silent ? 800 : 200);
+    }
+    if (!silent) showToast('✓ Salvo');
+  } catch(e) { if (!silent) showToast('Erro ao salvar'); }
+}
+
+async function loadState() {
+  try {
+    // tenta remoto primeiro
+    let dados = null;
+    if (window.MasterState) {
+      dados = await window.MasterState.carregar(MS_CHAVE);
+    }
+    if (!dados) {
+      const local = localStorage.getItem(STORAGE_KEY);
+      if (local) dados = JSON.parse(local);
+    }
+    if (!dados) { showToast('Nada salvo'); return; }
+    _msAplicando = true;
+    applyState(dados);
+    _msAplicando = false;
+    _setSyncStatus(window.MasterState ? '● sincronizado' : '○ local', window.MasterState ? 'var(--gold)' : 'var(--gold-dim)');
+    showToast('✓ Carregado');
+  } catch(e) { _msAplicando = false; showToast('Erro ao carregar'); }
+}
+
+function resetAll() {
+  if (!confirm('Resetar tudo? (HP, CA, slots, condições, notas)')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  hpCurrent.value = 331;
+  hpMax.value = 331;
+  document.querySelectorAll('.ca-input').forEach(i => i.value = 16);
+  updateHPBar();
+  document.querySelectorAll('.react-dot, .slot-dot').forEach(d => d.classList.remove('used'));
+  document.querySelectorAll('.condition-row .chip').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.ability.open').forEach(a => a.classList.remove('open'));
+  document.querySelectorAll('.spell-chip.cast').forEach(c => c.classList.remove('cast'));
+  document.getElementById('notesArea').value = '';
+  switchPhase(1);
+  showToast('✓ Resetado');
+}
+
+function exportJSON() {
+  const blob = new Blob([JSON.stringify(getState(), null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `strahd_combate_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✓ Exportado');
+}
+
+function importJSON(evt) {
+  const file = evt.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      applyState(JSON.parse(e.target.result));
+      showToast('✓ Importado');
+      saveState(true);
+    } catch (err) { showToast('Arquivo inválido'); }
+  };
+  reader.readAsText(file);
+  evt.target.value = '';
+}
+
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+/* ============================================================
+   CA EDITÁVEL — salvar ao alterar
+   ============================================================ */
+document.querySelectorAll('.ca-input').forEach(inp => {
+  inp.addEventListener('input', () => saveState(true));
+});
+
+/* ============================================================
+   AUTOSAVE NOTES
+   ============================================================ */
+document.getElementById('notesArea').addEventListener('input', () => {
+  clearTimeout(window._notesTimer);
+  window._notesTimer = setTimeout(() => saveState(true), 600);
+});
+
+/* ============================================================
+   KEYBOARD SHORTCUTS
+   ============================================================ */
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    closeModal();
+    return;
+  }
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+    if (e.ctrlKey && e.key === 's') { e.preventDefault(); saveState(); }
+    return;
+  }
+  if (e.ctrlKey && e.key === 's') { e.preventDefault(); saveState(); return; }
+  if (e.key === '1') switchPhase(1);
+  if (e.key === '2') switchPhase(2);
+  if (e.key === '3') switchPhase(3);
+});
+
+/* ============================================================
+   INIT
+   ============================================================ */
+buildSlotsUI();
+buildSpellList();
+updateHPBar();
+
+(async function bootstrap() {
+  // Auth gate: só Mestre pode abrir
+  if (window.Auth) {
+    const u = await window.Auth.requerLogin('../login.html');
+    if (!u) return;
+    const ehMestre = await window.Auth.ehMestre();
+    if (!ehMestre) {
+      document.body.innerHTML = '<div style="padding:60px;text-align:center;color:var(--bone);font-family:Cinzel,serif"><h2>Acesso restrito ao Mestre.</h2><p style="margin-top:14px"><a href="../../index.html" style="color:var(--gold)">Voltar</a></p></div>';
+      return;
+    }
+  }
+  await loadState();
+  // Realtime: re-aplica quando outro dispositivo do mestre alterar
+  if (window.MasterState) {
+    window.MasterState.iniciarRealtime(MS_CHAVE, dados => {
+      if (!dados) return;
+      _msAplicando = true;
+      applyState(dados);
+      _msAplicando = false;
+      _setSyncStatus('● sincronizado', 'var(--gold)');
+    });
+  }
+})();
+</script>
+
+</body>
+</html>

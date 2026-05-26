@@ -694,6 +694,8 @@
   <a href="../index.html" class="back-link" aria-label="Voltar à tela inicial">← Voltar</a>
   <button onclick="adicionarCard()" aria-label="Adicionar novo personagem">+ Adicionar Personagem</button>
   <button onclick="descansoLongo()" aria-label="Aplicar descanso longo a todos"><span aria-hidden="true">🌙</span> Descanso Longo</button>
+  <button type="button" onclick="abrirNotasMestre()" aria-label="Abrir anotações do mestre"><span aria-hidden="true">📒</span> Anotações</button>
+  <a href="vilao/index.html" class="back-link" style="text-decoration:none" aria-label="Abrir fichas de vilão"><span aria-hidden="true">🧛</span> Vilões</a>
   <button onclick="window.print()" aria-label="Imprimir painel"><span aria-hidden="true">🖨</span> Imprimir</button>
   <span class="auth-slot" id="auth-slot" aria-label="Status de login" style="margin-left:auto;display:flex;gap:8px;align-items:center;font-family:'Cinzel',serif;font-size:11px;color:var(--red-dark)"></span>
 </nav>
@@ -713,6 +715,7 @@
 <script src="../assets/js/auth.js"></script>
 <script src="../assets/js/dbsync.js"></script>
 <script src="../assets/js/phb_slots.js"></script>
+<script src="../assets/js/master_notes.js"></script>
 <script>
 const CONDICOES = [
   'Agarrado', 'Amedrontado', 'Atordoado', 'Caído', 'Cego', 'Enfeitiçado',
@@ -888,12 +891,49 @@ function render() {
   }
 }
 
+// Anti-flicker: debounce por card + skip se o usuário está editando dentro dele.
+const _rerenderTimers = new Map();
+const _rerenderPending = new Map();
+
 function rerenderCard(p) {
+  if (!p?.id) return;
+  // Sempre guarda o estado mais recente (sobrescreve pending anterior)
+  _rerenderPending.set(p.id, p);
+
+  if (_rerenderTimers.has(p.id)) clearTimeout(_rerenderTimers.get(p.id));
+  _rerenderTimers.set(p.id, setTimeout(() => {
+    _rerenderTimers.delete(p.id);
+    _aplicarRerender(p.id);
+  }, 280));
+}
+
+function _aplicarRerender(id) {
   const grid = document.getElementById('grid');
-  if (!grid || !p?.id) return;
-  const antigo = grid.querySelector(`[data-card-id="${p.id}"]`);
-  if (!antigo) { render(); return; }
-  antigo.replaceWith(criarCard(p));
+  if (!grid) return;
+  const antigo = grid.querySelector(`[data-card-id="${id}"]`);
+  if (!antigo) { _rerenderPending.delete(id); render(); return; }
+  // Se há foco dentro deste card, adia até perder foco — não interrompe digitação.
+  if (antigo.contains(document.activeElement)) {
+    const handler = () => {
+      antigo.removeEventListener('focusout', handler);
+      // espera 1 tick + 200ms pra não interromper auto-save subsequente
+      setTimeout(() => {
+        if (!antigo.contains(document.activeElement)) _aplicarRerender(id);
+      }, 250);
+    };
+    antigo.addEventListener('focusout', handler, { once: true });
+    return;
+  }
+  const dados = _rerenderPending.get(id);
+  _rerenderPending.delete(id);
+  if (!dados) return;
+  // preserva altura para evitar "pulo" visual
+  const h = antigo.offsetHeight;
+  const novo = criarCard(dados);
+  novo.style.minHeight = h + 'px';
+  antigo.replaceWith(novo);
+  // remove o min-height na próxima frame (já assumiu nova altura natural)
+  requestAnimationFrame(() => requestAnimationFrame(() => { novo.style.minHeight = ''; }));
 }
 
 function criarCard(p) {
@@ -964,7 +1004,7 @@ function criarCard(p) {
   hpLabel.textContent = 'Pontos de Vida';
   const hpVal = document.createElement('div');
   hpVal.className = 'stat-value hp-grouped';
-  const hpCur = inputNumerico(p.hpAtual, v => { p.hpAtual = v; salvar(); toast(`PV atualizado: ${v}`); }, 'hp-current-input', 0);
+  const hpCur = inputNumerico(p.hpAtual, v => { p.hpAtual = v; salvar(p); toast(`PV atualizado: ${v}`); }, 'hp-current-input', 0);
   const hpSep = document.createElement('span');
   hpSep.className = 'hp-sep';
   hpSep.textContent = '/';
@@ -1183,7 +1223,7 @@ function criarCard(p) {
   salvarBtn.className = 'save-card';
   salvarBtn.textContent = '💾 Salvar';
   salvarBtn.onclick = () => {
-    salvar();
+    salvar(p);
     salvarBtn.textContent = '✓ Salvo';
     salvarBtn.classList.add('saved');
     setTimeout(() => {

@@ -25,6 +25,7 @@ const SCRIPTS = [
   '011_storage_retratos.sql',
   '012_recursos_usados.sql',
   '013_features_personalizadas.sql',
+  '014_master_state_e_notas.sql',
 ];
 
 (async () => {
