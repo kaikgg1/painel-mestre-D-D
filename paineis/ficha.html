@@ -1058,31 +1058,40 @@
   /* ===== Retrato do personagem ===== */
   .retrato-wrap {
     display: grid;
-    grid-template-columns: 160px 1fr;
-    gap: 18px; align-items: start;
+    grid-template-columns: 200px 1fr;
+    gap: 20px; align-items: start;
     margin-bottom: 14px;
   }
   @media (max-width: 600px) {
     .retrato-wrap { grid-template-columns: 1fr; }
-    .retrato-preview { margin: 0 auto; }
+    .retrato-preview { margin: 0 auto; max-width: 240px; }
   }
+  /* Caixa adapta à proporção da imagem (sem bordas pretas).
+     Quando não há imagem, mantém quadrado pelo aspect-ratio do placeholder. */
   .retrato-preview {
-    width: 160px; height: 160px;
+    width: 200px;
     background: linear-gradient(160deg, var(--bg-card-soft), var(--bg-card));
     border: 2px solid var(--gold);
     border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
     overflow: hidden;
-    box-shadow: inset 0 0 14px rgba(0,0,0,0.5);
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.4);
+    line-height: 0;  /* remove gap inline-block padrão de <img> */
   }
-  .retrato-preview img { width: 100%; height: 100%; object-fit: contain; background: rgba(0,0,0,0.4); }
+  .retrato-preview img {
+    width: 100%; height: auto;
+    display: block;
+    max-height: 320px;
+    object-fit: contain;
+  }
   .retrato-placeholder {
+    aspect-ratio: 1;
     color: var(--text-dim); font-size: 14px; text-align: center;
     font-style: italic; line-height: 1.4;
-    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+    padding: 12px;
   }
   .retrato-placeholder span { font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
-  .retrato-controles { display: flex; flex-direction: column; gap: 4px; }
+  .retrato-controles { display: flex; flex-direction: column; gap: 10px; }
 
   .btn-upload {
     display: inline-flex; align-items: center; gap: 8px;
