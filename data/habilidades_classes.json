@@ -52,8 +52,9 @@
   "clerigo": [
     { "nivel": 1, "nome": "Conjuração", "desc": "Conjura magias divinas usando Sabedoria. Símbolo sagrado como foco." },
     { "nivel": 1, "nome": "Domínio Divino", "desc": "Escolha um domínio. Concede magias adicionais e características nos níveis 1, 2, 6, 8 e 17." },
-    { "nivel": 2, "nome": "Canalizar Divindade (1/descanso)", "desc": "Canaliza energia divina por uma das opções do domínio. Recupera em descanso curto/longo." },
-    { "nivel": 5, "nome": "Destruir Mortos-Vivos (CR 1/2)", "desc": "Quando expulsa, mortos-vivos com ND ≤ 1/2 são destruídos automaticamente." },
+    { "nivel": 2, "nome": "Canalizar Divindade (1/descanso)", "desc": "Canaliza energia divina pra produzir um efeito mágico. Sempre tem ao menos 2 opções: Expulsar Mortos-Vivos + a opção do seu domínio. CD = 8 + bônus de proficiência + mod SAB. Recupera em descanso curto ou longo." },
+    { "nivel": 2, "nome": "Canalizar Divindade: Expulsar Mortos-Vivos", "desc": "Opção padrão de todo Clérigo. Ação: apresenta seu símbolo sagrado. Cada morto-vivo a até 9m que possa ver ou ouvir você faz teste de SAB. Falha: fica expulso por 1 minuto ou até sofrer dano. Expulso = se afasta o mais rápido possível e não pode chegar a 9m de você; ações são Disparar (Dash) ou Esquivar (Dodge), e não pode usar reações pra deixar a área." },
+    { "nivel": 5, "nome": "Destruir Mortos-Vivos (CR 1/2)", "desc": "Quando expulsa mortos-vivos, os de ND ≤ 1/2 são destruídos automaticamente em vez de fugirem." },
     { "nivel": 6, "nome": "Canalizar Divindade (2/descanso)", "desc": "Pode usar Canalizar Divindade 2x entre descansos." },
     { "nivel": 8, "nome": "Destruir Mortos-Vivos (CR 1)", "desc": "Destrói automaticamente mortos-vivos com ND ≤ 1." },
     { "nivel": 10, "nome": "Intervenção Divina", "desc": "Ação: peça ajuda da sua divindade. Chance % igual ao seu nível. Se sucesso, MD decide o efeito. Reseta em 7 dias." },

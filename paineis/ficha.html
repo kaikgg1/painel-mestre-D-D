@@ -761,6 +761,35 @@
     *, *::before, *::after { animation: none !important; transition: none !important; }
   }
 
+  /* ===== Retrato do personagem ===== */
+  .retrato-wrap {
+    display: grid;
+    grid-template-columns: 160px 1fr;
+    gap: 18px; align-items: start;
+    margin-bottom: 14px;
+  }
+  @media (max-width: 600px) {
+    .retrato-wrap { grid-template-columns: 1fr; }
+    .retrato-preview { margin: 0 auto; }
+  }
+  .retrato-preview {
+    width: 160px; height: 160px;
+    background: linear-gradient(160deg, var(--bg-card-soft), var(--bg-card));
+    border: 2px solid var(--gold);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+    box-shadow: inset 0 0 14px rgba(0,0,0,0.5);
+  }
+  .retrato-preview img { width: 100%; height: 100%; object-fit: cover; }
+  .retrato-placeholder {
+    color: var(--text-dim); font-size: 14px; text-align: center;
+    font-style: italic; line-height: 1.4;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+  }
+  .retrato-placeholder span { font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
+  .retrato-controles { display: flex; flex-direction: column; gap: 10px; }
+
   /* ===== TOAST de notificação externa (Mestre editou) ===== */
   .toast-externo {
     position: fixed;
@@ -965,21 +994,28 @@ function escutarMudancasExternas() {
     .subscribe();
 }
 
+let _toastDebounce = null;
 function onUpdateExterno(novo) {
   // Ignora se foi nosso próprio save (echo do realtime — em até 3s)
   if (Date.now() - _ultimoSaveLocal < 3000) return;
-  // Só notifica se for o PJ ativo (atualizações em outros PJs ficam silenciosas)
-  if (!charAtivo || novo.id !== charAtivo.id) {
-    // Atualiza chars silenciosamente
-    const idx = chars.findIndex(c => c.id === novo.id);
-    if (idx >= 0) chars[idx] = novo;
-    return;
-  }
+  // Atualiza chars silenciosamente sempre (mantém cache fresco)
+  const idx = chars.findIndex(c => c.id === novo.id);
+  if (idx >= 0) chars[idx] = novo;
+  // Só notifica se for o PJ ativo
+  if (!charAtivo || novo.id !== charAtivo.id) return;
+  // Sempre guarda a versão MAIS RECENTE (substitui pendente)
   mudancaPendente = novo;
-  const tEl = document.getElementById('toast-externo');
-  const tMsg = document.getElementById('te-msg');
-  if (tMsg) tMsg.textContent = `O Mestre editou "${novo.nome}". Aplicar mudanças agora?`;
-  if (tEl) tEl.classList.add('show');
+  // Debounce de 2s: enquanto chegarem updates, espera. Só mostra toast
+  // quando o Mestre parar de digitar (evita spam de notificação durante auto-save).
+  if (_toastDebounce) clearTimeout(_toastDebounce);
+  _toastDebounce = setTimeout(() => {
+    _toastDebounce = null;
+    if (!mudancaPendente) return;
+    const tEl = document.getElementById('toast-externo');
+    const tMsg = document.getElementById('te-msg');
+    if (tMsg) tMsg.textContent = `O Mestre editou "${mudancaPendente.nome}". Aplicar mudanças agora?`;
+    if (tEl) tEl.classList.add('show');
+  }, 2000);
 }
 
 function configurarToastExterno() {
@@ -1302,6 +1338,7 @@ function renderCombate(c) {
       </div>
     </div>
 
+    <input type="hidden" name="_aba_combate" value="1">
     <h3>Salvaguardas <span style="font-size:11px;color:var(--text-dim);font-weight:normal;font-style:italic">(valores calculados auto: modificador + ${bonusProf(c.nivel)} se proficiente)</span></h3>
     <div class="check-grid">
       ${ATRIBUTOS.map(([k, nome]) => {
@@ -1536,7 +1573,23 @@ function renderTabelaItens(tipo, itens, colunas, campos) {
 }
 
 function renderRoleplay(c) {
+  const imgUrl = c.imagem_url || '';
   return `
+    <h3>Retrato do Personagem</h3>
+    <div class="retrato-wrap">
+      <div class="retrato-preview" id="retrato-preview">
+        ${imgUrl ? `<img src="${escape(imgUrl)}" alt="Retrato de ${escape(c.nome||'')}" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="retrato-placeholder" style="display:none">⚠ não carregou</div>` :
+        `<div class="retrato-placeholder">🎭<br><span>Sem imagem</span></div>`}
+      </div>
+      <div class="retrato-controles">
+        <div class="campo"><label>URL da imagem</label>
+          <input name="imagem_url" type="url" id="input-imagem" value="${escape(imgUrl)}" placeholder="https://...">
+          <span class="ajuda">Cole o link de qualquer imagem (Imgur, Discord, etc.).</span>
+        </div>
+      </div>
+    </div>
+
     <h3>Roleplay</h3>
     <div class="grid-2">
       <div class="campo"><label>Traços de Personalidade</label>
@@ -1735,6 +1788,20 @@ function conectarListeners() {
 
   // Botões de equipamento
   if (tabAtiva === 'equipamento') conectarListenersEquipamento();
+
+  // Preview de retrato (roleplay)
+  if (tabAtiva === 'roleplay') {
+    const inp = document.getElementById('input-imagem');
+    const prev = document.getElementById('retrato-preview');
+    if (inp && prev) inp.addEventListener('input', () => {
+      const url = inp.value.trim();
+      if (url) {
+        prev.innerHTML = `<img src="${url.replace(/"/g, '&quot;')}" alt="Retrato" onerror="this.outerHTML='<div class=\\'retrato-placeholder\\' style=\\'color:#e88a8a\\'>⚠ não carregou</div>'">`;
+      } else {
+        prev.innerHTML = '<div class="retrato-placeholder">🎭<br><span>Sem imagem</span></div>';
+      }
+    });
+  }
 
   // Submit manual (botão)
   const form = $('#ficha-form');
@@ -1997,8 +2064,10 @@ async function salvar(e) {
     payload.slots_magia = slots;
   }
 
-  // Salvaguardas + Perícias + Magia (apenas se tab combate ativa)
-  if (fd.has('salv_for')) {
+  // Salvaguardas + Perícias + Magia (só se tab Combate aberta — usa marker hidden)
+  // Bug evitado: checkboxes desmarcados NÃO aparecem no FormData,
+  // por isso não dá pra usar fd.has('salv_for') como detecção.
+  if (fd.has('_aba_combate')) {
     const salv = {};
     for (const [k] of ATRIBUTOS) salv[k] = fd.has('salv_' + k);
     payload.salvaguardas = salv;
@@ -2034,6 +2103,7 @@ async function salvar(e) {
   set('defeitos', txt('defeitos'));
   set('historia', txt('historia'));
   set('notas', txt('notas'));
+  set('imagem_url', txt('imagem_url'));
 
   // Remove campos que não vão pro UPDATE
   delete payload.id;
