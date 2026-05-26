@@ -602,6 +602,47 @@
     .hab-tracker-max { min-height: 32px; width: 42px; }
   }
 
+  /* Características personalizadas */
+  .hab-add-bar {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 10px; flex-wrap: wrap;
+    margin-top: 20px; padding-top: 14px;
+    border-top: 1px solid rgba(139,105,20,0.25);
+  }
+  .hab-add-bar h3 { margin: 0; }
+  .hab-feature { position: relative; }
+  .cfeat-remove {
+    position: absolute; top: 8px; right: 0;
+    background: transparent; border: 1px solid rgba(139,29,29,0.5);
+    color: #c47a5a;
+    width: 26px; height: 26px; border-radius: 50%;
+    cursor: pointer; font-size: 12px;
+    transition: all 0.15s;
+  }
+  .cfeat-remove:hover { background: var(--blood); color: var(--parchment); }
+  .cfeat-nome {
+    width: 100%; padding: 8px 10px;
+    background: rgba(0,0,0,0.25);
+    border: 1px solid rgba(139,105,20,0.35);
+    border-radius: 4px;
+    color: var(--gold-bright);
+    font-family: 'Cinzel', serif; font-size: 14px; font-weight: 700;
+    margin-bottom: 6px;
+    outline: none;
+  }
+  .cfeat-nome:focus { border-color: var(--gold); background: rgba(0,0,0,0.4); }
+  .cfeat-desc {
+    width: 100%; padding: 8px 10px;
+    background: rgba(0,0,0,0.18);
+    border: 1px solid rgba(139,105,20,0.25);
+    border-radius: 4px;
+    color: var(--parchment);
+    font-family: 'EB Garamond', serif; font-size: 13px; line-height: 1.5;
+    min-height: 50px; resize: vertical;
+    outline: none;
+  }
+  .cfeat-desc:focus { border-color: var(--gold-bright); background: rgba(0,0,0,0.3); }
+
   /* PERÍCIAS / SALVAGUARDAS */
   .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; }
   @media (max-width: 600px) { .check-grid { grid-template-columns: 1fr; } }
@@ -1837,7 +1878,6 @@ function renderSlotsMagia(c, slots) {
 }
 
 function renderHabilidades(c) {
-  const chave = chaveDeClasse(c.classe);
   return `
     <h3>Habilidades de Classe</h3>
     <p style="color:var(--text-dim);font-style:italic;font-size:12px;margin-bottom:14px">
@@ -1846,12 +1886,21 @@ function renderHabilidades(c) {
     </p>
     <div id="hab-wrap">Carregando…</div>
 
-    <h3>Características Adicionais</h3>
+    <div class="hab-add-bar">
+      <h3 style="margin:0">Características Personalizadas</h3>
+      <button type="button" class="btn" id="btn-add-feature">+ Adicionar característica</button>
+    </div>
+    <p style="color:var(--text-dim);font-style:italic;font-size:12px;margin-bottom:10px">
+      Talentos (feats), habilidades raciais especiais, dons de campanha, ou qualquer característica fora do catálogo.
+    </p>
+    <div id="hab-custom-wrap"></div>
+
+    <h3 style="margin-top:18px">Notas Livres</h3>
     <p style="color:var(--text-dim);font-style:italic;font-size:12px;margin-bottom:8px">
-      Use este espaço para registrar habilidades de subclasse, talentos (feats), ou qualquer outra característica especial.
+      Para anotações que não cabem como uma característica estruturada.
     </p>
     <div class="campo">
-      <textarea name="caracteristicas_adicionais" style="min-height:160px">${escape(c.caracteristicas_adicionais || '')}</textarea>
+      <textarea name="caracteristicas_adicionais" style="min-height:120px">${escape(c.caracteristicas_adicionais || '')}</textarea>
     </div>
   `;
 }
@@ -2023,6 +2072,144 @@ async function salvarRecursos() {
       .update({ recursos_usados: charAtivo.recursos_usados || {} })
       .eq('id', charAtivo.id);
   } catch (e) { console.warn('[recursos] erro ao salvar:', e); }
+}
+
+// Salva features_personalizadas via UPDATE direto
+async function salvarFeaturesPersonalizadas() {
+  if (!charAtivo?.id) return;
+  try {
+    _ultimoSaveLocal = Date.now();
+    await window.sb.from('characters')
+      .update({ features_personalizadas: charAtivo.features_personalizadas || [] })
+      .eq('id', charAtivo.id);
+  } catch (e) { console.warn('[features] erro ao salvar:', e); }
+}
+
+// Renderiza a lista de features personalizadas (cards estruturados)
+function popularFeaturesPersonalizadas() {
+  const wrap = document.getElementById('hab-custom-wrap');
+  if (!wrap) return;
+  const lista = Array.isArray(charAtivo.features_personalizadas) ? charAtivo.features_personalizadas : [];
+  if (!lista.length) {
+    wrap.innerHTML = `<div class="item-vazio" style="padding:14px">Nenhuma característica personalizada ainda. Clique <strong>+ Adicionar característica</strong> acima.</div>`;
+    return;
+  }
+  const recursos = charAtivo.recursos_usados || {};
+  wrap.innerHTML = `<div class="habilidade-card">
+    ${lista.map((f, idx) => {
+      const slug = 'custom_' + (f.id || idx);
+      const max = +f.max || 0;
+      const r = recursos[slug] || { atual: 0, max: 0 };
+      const maxEfetivo = max > 0 ? max : (+r.max || 0);
+      const usos = Math.min(+r.atual || 0, maxEfetivo);
+      const disp = Math.max(0, maxEfetivo - usos);
+      const pips = maxEfetivo > 0 ? Array.from({length: maxEfetivo}).map((_, i) =>
+        `<button type="button" class="hab-pip ${i < usos ? 'gasto' : ''}" data-cfeat-slug="${slug}" data-cfeat-idx="${i}" aria-label="Uso ${i+1}"></button>`
+      ).join('') : '';
+      return `<div class="hab-feature ${maxEfetivo > 0 ? 'ativa' : 'passiva'}" data-cfeat-idx="${idx}">
+        <button type="button" class="cfeat-remove" data-cfeat-rm="${idx}" title="Remover" aria-label="Remover característica">✕</button>
+        <div class="hab-feature-head">
+          <div class="hab-feature-titulo">
+            <input type="text" class="cfeat-nome" data-cfeat-field="nome" data-cfeat-idx="${idx}" value="${escape(f.nome || '')}" placeholder="Nome da característica" aria-label="Nome">
+            <textarea class="cfeat-desc" data-cfeat-field="desc" data-cfeat-idx="${idx}" placeholder="Descrição (opcional)" aria-label="Descrição">${escape(f.desc || '')}</textarea>
+          </div>
+          <div class="hab-tracker">
+            <label class="hab-tracker-lbl">Usos:</label>
+            ${maxEfetivo > 0 ? `
+              <span class="hab-pips">${pips}</span>
+              <span class="hab-disp"><strong>${disp}</strong>/${maxEfetivo}</span>
+            ` : ''}
+            <input type="text" inputmode="numeric" class="hab-tracker-max" value="${max}" data-cfeat-max="${idx}" title="Máximo de usos (0 = passiva, sem tracker)" aria-label="Máximo de usos">
+          </div>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+
+  // Pip click → toggle gasto
+  wrap.querySelectorAll('.hab-pip[data-cfeat-slug]').forEach(pip => {
+    pip.addEventListener('click', () => {
+      const slug = pip.dataset.cfeatSlug;
+      const idx  = +pip.dataset.cfeatIdx;
+      const rec  = charAtivo.recursos_usados || {};
+      const featList = charAtivo.features_personalizadas || [];
+      const featIdx = featList.findIndex((f, i) => 'custom_' + (f.id || i) === slug);
+      const max = featIdx >= 0 ? (+featList[featIdx].max || 0) : 0;
+      const cur = rec[slug] || { atual: 0, max };
+      cur.max = max;
+      cur.atual = pip.classList.contains('gasto') ? idx : (idx + 1);
+      cur.atual = Math.max(0, Math.min(max, cur.atual));
+      rec[slug] = cur;
+      charAtivo.recursos_usados = rec;
+      salvarRecursos();
+      popularFeaturesPersonalizadas();
+    });
+  });
+
+  // Nome / desc / max — salva no estado
+  wrap.querySelectorAll('[data-cfeat-field]').forEach(el => {
+    el.addEventListener('input', () => {
+      const idx = +el.dataset.cfeatIdx;
+      const field = el.dataset.cfeatField;
+      if (!charAtivo.features_personalizadas[idx]) return;
+      charAtivo.features_personalizadas[idx][field] = el.value;
+      salvarFeaturesPersonalizadas();
+    });
+  });
+
+  wrap.querySelectorAll('.hab-tracker-max[data-cfeat-max]').forEach(inp => {
+    inp.addEventListener('change', () => {
+      const idx = +inp.dataset.cfeatMax;
+      const val = Math.max(0, Math.min(20, parseInt(inp.value, 10) || 0));
+      if (!charAtivo.features_personalizadas[idx]) return;
+      charAtivo.features_personalizadas[idx].max = val;
+      // Ajusta recursos_usados também
+      const f = charAtivo.features_personalizadas[idx];
+      const slug = 'custom_' + (f.id || idx);
+      const rec = charAtivo.recursos_usados || {};
+      const cur = rec[slug] || { atual: 0, max: 0 };
+      cur.max = val;
+      cur.atual = Math.min(cur.atual, val);
+      rec[slug] = cur;
+      charAtivo.recursos_usados = rec;
+      salvarFeaturesPersonalizadas();
+      salvarRecursos();
+      popularFeaturesPersonalizadas();
+    });
+  });
+
+  // Remover
+  wrap.querySelectorAll('[data-cfeat-rm]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = +btn.dataset.cfeatRm;
+      if (!confirm('Remover esta característica?')) return;
+      const f = charAtivo.features_personalizadas[idx];
+      if (f) {
+        const slug = 'custom_' + (f.id || idx);
+        const rec = charAtivo.recursos_usados || {};
+        delete rec[slug];
+        charAtivo.recursos_usados = rec;
+      }
+      charAtivo.features_personalizadas.splice(idx, 1);
+      salvarFeaturesPersonalizadas();
+      salvarRecursos();
+      popularFeaturesPersonalizadas();
+    });
+  });
+}
+
+function adicionarFeaturePersonalizada() {
+  if (!Array.isArray(charAtivo.features_personalizadas)) charAtivo.features_personalizadas = [];
+  const id = 'f' + Date.now().toString(36) + Math.random().toString(36).slice(2,6);
+  charAtivo.features_personalizadas.push({ id, nome: '', desc: '', max: 0 });
+  salvarFeaturesPersonalizadas();
+  popularFeaturesPersonalizadas();
+  // Foca o input do nome novo
+  setTimeout(() => {
+    const wrap = document.getElementById('hab-custom-wrap');
+    const inputs = wrap?.querySelectorAll('.cfeat-nome');
+    if (inputs?.length) inputs[inputs.length - 1].focus();
+  }, 50);
 }
 
 function renderMagias(c) {
@@ -2485,7 +2672,12 @@ function conectarListeners() {
   if (tabAtiva === 'magias') carregarMagiasPreparadas();
 
   // Habilidades — carrega quando entra
-  if (tabAtiva === 'habilidades') popularHabilidades(charAtivo.classe, charAtivo.nivel, charAtivo.subclasse);
+  if (tabAtiva === 'habilidades') {
+    popularHabilidades(charAtivo.classe, charAtivo.nivel, charAtivo.subclasse);
+    popularFeaturesPersonalizadas();
+    const btnAdd = document.getElementById('btn-add-feature');
+    if (btnAdd) btnAdd.addEventListener('click', adicionarFeaturePersonalizada);
+  }
 
   // Listeners de tags (idiomas/ferramentas) — só na aba identidade
   if (tabAtiva === 'identidade') {
