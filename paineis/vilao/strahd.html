@@ -165,14 +165,19 @@
     letter-spacing: 0.18em; text-transform: uppercase; margin-right: 4px;
   }
   .chip {
-    padding: 3px 10px; background: var(--bg-card); border: 1px solid var(--border);
-    color: var(--text-muted); font-family: 'Cinzel', serif;
-    font-size: 10px; letter-spacing: 0.08em; cursor: pointer;
-    border-radius: 2px; user-select: none; transition: all 0.15s;
+    padding: 5px 12px;
+    background: linear-gradient(180deg, rgba(0,0,0,0.2), rgba(26,18,22,0.7));
+    border: 1px solid var(--border);
+    color: var(--text-muted); font-family: 'Cinzel', serif; font-weight: 600;
+    font-size: 10px; letter-spacing: 0.1em; cursor: pointer;
+    border-radius: 14px; user-select: none; transition: all 0.15s;
+    min-height: 26px; display: inline-flex; align-items: center;
   }
-  .chip:hover { border-color: var(--gold-dim); color: var(--bone-dim); }
+  .chip:hover { border-color: var(--gold-dim); color: var(--bone-dim); transform: translateY(-1px); }
   .chip.active {
-    background: var(--blood-dark); border-color: var(--blood-bright); color: var(--bone);
+    background: linear-gradient(180deg, var(--blood), var(--blood-dark));
+    border-color: var(--blood-bright); color: var(--bone);
+    box-shadow: 0 0 8px rgba(139,26,26,0.4);
   }
   .phase-tabs {
     display: grid; grid-template-columns: repeat(3, 1fr);
@@ -205,23 +210,39 @@
   }
   .stats-bar {
     display: grid; grid-template-columns: repeat(6, 1fr);
-    gap: 4px; margin-bottom: 12px;
-    background: var(--bg-card); padding: 8px;
-    border: 1px solid var(--border); border-radius: 2px;
+    gap: 6px; margin-bottom: 14px;
+    background: linear-gradient(180deg, rgba(26,18,22,0.7), rgba(13,8,11,0.7));
+    padding: 10px 8px;
+    border: 1px solid var(--border); border-radius: 6px;
+    box-shadow: inset 0 1px 0 rgba(232,200,122,0.05);
   }
   .stat {
-    text-align: center; border-right: 1px solid var(--border); padding: 2px 0;
+    text-align: center;
+    padding: 6px 4px;
+    background: linear-gradient(180deg, rgba(0,0,0,0.25), transparent);
+    border: 1px solid rgba(74,58,42,0.6);
+    border-radius: 4px;
+    transition: border-color 0.2s, transform 0.15s;
   }
-  .stat:last-child { border-right: none; }
+  .stat:hover { border-color: var(--gold-dim); transform: translateY(-1px); }
   .stat-label {
-    font-family: 'Cinzel', serif; font-size: 9px;
-    letter-spacing: 0.2em; color: var(--gold);
+    font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700;
+    letter-spacing: 0.2em; color: var(--gold-bright);
+    text-shadow: 0 0 8px rgba(232,200,122,0.2);
   }
   .stat-value {
-    font-family: 'IM Fell English', serif; font-size: 1.25rem;
-    color: var(--bone); line-height: 1.1;
+    font-family: 'IM Fell English', serif; font-size: 1.5rem;
+    color: var(--bone); line-height: 1.1; font-weight: 600;
+    margin-top: 2px;
   }
-  .stat-mod { font-size: 0.85rem; color: var(--gold-dim); }
+  .stat-mod {
+    font-family: 'Cinzel', serif; font-weight: 700;
+    font-size: 0.95rem; color: var(--gold);
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--gold-dim);
+    border-radius: 12px; padding: 1px 8px;
+    display: inline-block; margin-top: 4px;
+  }
   .info-grid {
     display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: 6px; margin-bottom: 12px;
@@ -338,25 +359,103 @@
     border-radius: 2px; padding: 10px 14px; margin-bottom: 12px;
   }
   .spell-slots-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(96px, 1fr)); gap: 10px;
   }
   .slot-level {
-    text-align: center; background: var(--bg-card-2);
-    border: 1px solid var(--border); padding: 6px; border-radius: 2px;
+    text-align: center;
+    background: linear-gradient(180deg, rgba(201,169,97,0.08), rgba(0,0,0,0.25));
+    border: 1px solid var(--border); padding: 9px 6px; border-radius: 6px;
+    position: relative; overflow: hidden;
+    transition: border-color 0.2s, transform 0.15s;
   }
+  .slot-level:hover { border-color: var(--gold); }
+  .slot-level::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0.5;
+  }
+  .slot-level.esgotado { opacity: 0.55; }
   .slot-level-label {
-    font-family: 'Cinzel', serif; font-size: 9px;
-    letter-spacing: 0.18em; color: var(--gold);
-    text-transform: uppercase; margin-bottom: 4px;
+    font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700;
+    letter-spacing: 0.2em; color: var(--gold-bright);
+    text-transform: uppercase; margin-bottom: 6px;
+    text-shadow: 0 0 8px rgba(232,200,122,0.25);
   }
+  .slot-level-count {
+    font-family: 'Cinzel', serif;
+    font-size: 11px; color: var(--bone-dim);
+    margin-top: 5px; letter-spacing: 0.1em;
+  }
+  .slot-level-count strong { color: var(--gold-bright); font-weight: 700; }
   .slot-dots {
-    display: flex; justify-content: center; gap: 4px; flex-wrap: wrap;
+    display: flex; justify-content: center; gap: 5px; flex-wrap: wrap;
   }
   .slot-dot {
-    width: 14px; height: 14px; border: 1.5px solid var(--gold);
-    border-radius: 50%; cursor: pointer; transition: all 0.15s; background: transparent;
+    width: 20px; height: 20px;
+    border: 2px solid var(--gold);
+    border-radius: 50%;
+    cursor: pointer;
+    transition: transform 0.15s, background 0.15s, border-color 0.15s, box-shadow 0.15s;
+    background: radial-gradient(circle, rgba(232,200,122,0.18), rgba(0,0,0,0.4));
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
+    position: relative;
   }
-  .slot-dot.used { background: var(--blood); border-color: var(--blood-dark); }
+  .slot-dot:hover {
+    transform: scale(1.15);
+    border-color: var(--gold-bright);
+    box-shadow: 0 0 10px rgba(232,200,122,0.4), inset 0 1px 2px rgba(0,0,0,0.5);
+  }
+  .slot-dot.used {
+    background: radial-gradient(circle, var(--blood-bright), var(--blood-dark));
+    border-color: var(--blood-dark);
+    box-shadow: inset 0 1px 4px rgba(0,0,0,0.6), 0 0 6px rgba(139,26,26,0.4);
+  }
+  .slot-dot.used::after {
+    content: '✕'; position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.4); font-size: 11px; font-weight: 700;
+  }
+
+  /* Tracker de usos em habilidades limitadas */
+  .ability-usage {
+    display: inline-flex; align-items: center; gap: 4px;
+    margin-left: auto;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+    padding: 3px 8px; border-radius: 12px;
+    font-family: 'Cinzel', serif; font-size: 10px;
+    letter-spacing: 0.5px; color: var(--gold);
+  }
+  .ability-usage-dots {
+    display: inline-flex; gap: 3px;
+  }
+  .ability-usage-dot {
+    width: 11px; height: 11px;
+    border: 1.5px solid var(--gold);
+    border-radius: 50%; cursor: pointer;
+    background: radial-gradient(circle, rgba(232,200,122,0.18), rgba(0,0,0,0.4));
+    transition: transform 0.12s, background 0.12s;
+  }
+  .ability-usage-dot:hover { transform: scale(1.2); border-color: var(--gold-bright); }
+  .ability-usage-dot.gasto {
+    background: radial-gradient(circle, var(--blood-bright), var(--blood-dark));
+    border-color: var(--blood-dark);
+  }
+  .ability-usage-period {
+    font-style: italic; color: var(--gold-dim);
+    font-size: 9px; text-transform: uppercase;
+  }
+  .ability-usage-reset {
+    background: transparent; border: 1px solid var(--gold-dim);
+    color: var(--gold-dim); padding: 1px 6px; border-radius: 3px;
+    font-family: 'Cinzel', serif; font-size: 9px;
+    cursor: pointer; transition: all 0.15s;
+    margin-left: 4px;
+  }
+  .ability-usage-reset:hover { border-color: var(--gold); color: var(--gold); }
+  .ability.tem-usos .ability-header { padding-right: 6px; }
+  .ability.tudo-gasto { opacity: 0.55; }
+  .ability.tudo-gasto .ability-name { text-decoration: line-through; text-decoration-color: var(--blood); }
   .spell-search {
     width: 100%; background: var(--shadow); border: 1px solid var(--border);
     color: var(--text-body); font-size: 0.9rem;
@@ -374,27 +473,63 @@
   }
   .spell-chip {
     display: inline-flex; align-items: center; gap: 6px;
-    padding: 3px 10px; margin: 2px 3px 2px 0;
-    background: var(--bg-card); border: 1px solid var(--border);
-    color: var(--text-body); font-size: 0.87rem;
-    border-radius: 2px; cursor: pointer; transition: all 0.15s;
+    padding: 5px 4px 5px 12px; margin: 3px 4px 3px 0;
+    background: linear-gradient(180deg, rgba(26,18,22,0.9), rgba(13,8,11,0.9));
+    border: 1px solid var(--border);
+    color: var(--text-body); font-size: 0.88rem;
+    border-radius: 4px; cursor: pointer;
+    transition: all 0.15s;
+    box-shadow: inset 0 1px 0 rgba(232,200,122,0.04);
   }
   .spell-chip:hover {
-    border-color: var(--gold); background: var(--bg-card-2); color: var(--bone);
+    border-color: var(--gold);
+    background: linear-gradient(180deg, rgba(40,28,32,0.95), rgba(20,12,16,0.95));
+    color: var(--bone);
+    transform: translateY(-1px);
+    box-shadow: 0 3px 8px rgba(0,0,0,0.5);
   }
   .spell-chip.no-cost {
-    border-style: dashed; opacity: 0.85;
+    border-style: dashed; opacity: 0.92;
   }
   .spell-chip .flavor {
     color: var(--text-muted); font-style: italic;
-    font-size: 0.78rem; margin-left: 4px;
+    font-size: 0.78rem;
   }
+  .spell-chip .chip-name { font-family: 'Cinzel', serif; font-weight: 500; letter-spacing: 0.02em; }
   .spell-chip.hidden { display: none; }
   .spell-chip.cast {
     opacity: 0.45;
     text-decoration: line-through;
     text-decoration-color: var(--blood);
   }
+  .chip-cast-btn {
+    background: linear-gradient(180deg, var(--blood), var(--blood-dark));
+    border: 1px solid var(--blood-bright);
+    color: var(--bone);
+    font-size: 11px; font-weight: 700;
+    width: 24px; height: 22px;
+    border-radius: 3px; cursor: pointer;
+    display: inline-flex; align-items: center; justify-content: center;
+    margin-left: 4px;
+    transition: all 0.12s;
+    flex-shrink: 0;
+  }
+  .chip-cast-btn:hover {
+    background: linear-gradient(180deg, var(--blood-bright), var(--blood));
+    box-shadow: 0 0 8px rgba(196,48,43,0.5);
+    transform: scale(1.08);
+  }
+  .chip-cast-btn[data-act="info"] {
+    background: transparent;
+    border-color: var(--gold-dim);
+    color: var(--gold-dim);
+  }
+  .chip-cast-btn[data-act="info"]:hover {
+    border-color: var(--gold);
+    color: var(--gold);
+    background: rgba(232,200,122,0.1);
+  }
+  .spell-chip.cast .chip-cast-btn { opacity: 0.4; pointer-events: none; }
   .legend {
     display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 10px;
     font-family: 'Cinzel', serif; font-size: 9px;
@@ -1444,28 +1579,235 @@ const SLOT_LEVELS = [
 /* ============================================================
    BUILD SPELL SLOTS UI
    ============================================================ */
+/* ============================================================
+   TRACKER DE USOS EM HABILIDADES LIMITADAS
+   ============================================================ */
+// Palavras-número em PT-BR → inteiro
+const PALAVRAS_NUM = {
+  'uma':1,'um':1,'duas':2,'dois':2,'três':3,'tres':3,'quatro':4,'cinco':5,
+  'seis':6,'sete':7,'oito':8,'nove':9,'dez':10
+};
+function palavraNum(s) {
+  if (!s) return null;
+  const n = parseInt(s, 10);
+  if (Number.isFinite(n)) return n;
+  return PALAVRAS_NUM[s.toLowerCase()] ?? null;
+}
+
+// Normaliza qualquer texto de período pra um rótulo curto e canônico.
+function normPeriodo(raw) {
+  const t = (raw || '').toLowerCase().replace(/\s+/g, ' ').trim();
+  // ordem importa — composto antes do genérico
+  if (/curto descanso|descanso curto|short rest/.test(t)) return 'curto descanso';
+  if (/longo descanso|descanso longo|long rest/.test(t)) return 'longo descanso';
+  if (/\bdescanso\b|\brest\b/.test(t)) return 'descanso';
+  if (/\bdia\b|\bday\b/.test(t)) return 'dia';
+  if (/rodada|round/.test(t)) return 'rodada';
+  if (/turno|turn/.test(t)) return 'turno';
+  if (/encontro|combate/.test(t)) return 'encontro';
+  if (/hora|hour/.test(t)) return 'hora';
+  return t || 'uso';
+}
+
+// "Sufixo de período" reutilizável — composto vem ANTES dos genéricos para ter prioridade.
+const PERIODO_PAT = '(?:curto\\s+descanso|descanso\\s+curto|longo\\s+descanso|descanso\\s+longo|short\\s+rest|long\\s+rest|descanso|rest|dia|day|rodada|round|turno|turn|encontro|combate|hora|hour)';
+
+// Lista de regexes em ORDEM de especificidade — primeira que casar vence.
+const USOS_REGEXES = [
+  // "3/dia", "1/dia", "5/curto descanso", "3 / descanso longo"
+  { re: new RegExp('(\\d+)\\s*/\\s*(' + PERIODO_PAT + ')', 'i'),
+    parse: m => ({ max: +m[1], periodo: normPeriodo(m[2]) }) },
+  // "3 por dia", "1 por descanso curto", "5 vezes por descanso longo"
+  { re: new RegExp('(\\d+)\\s+(?:vez(?:es)?\\s+)?por\\s+(' + PERIODO_PAT + ')', 'i'),
+    parse: m => ({ max: +m[1], periodo: normPeriodo(m[2]) }) },
+  // "duas vezes por dia", "uma vez por descanso curto", "três vezes por rodada"
+  { re: new RegExp('\\b(uma|um|duas|dois|tr[êe]s|quatro|cinco|seis|sete|oito|nove|dez)\\s+vez(?:es)?\\s+por\\s+(' + PERIODO_PAT + ')', 'i'),
+    parse: m => ({ max: palavraNum(m[1]) || 1, periodo: normPeriodo(m[2]) }) },
+  // "5 vezes ao dia"
+  { re: /\b(\d+|uma|um|duas|dois|tr[êe]s|quatro|cinco|seis|sete|oito|nove|dez)\s+vez(?:es)?\s+ao\s+(dia)/i,
+    parse: m => ({ max: palavraNum(m[1]) || 1, periodo: 'dia' }) },
+  // "pode usar 3 vezes [por X]" / "pode usar essa magia uma vez por descanso longo"
+  { re: new RegExp('pode\\s+usar\\s+(?:essa\\s+(?:magia|habilidade|capacidade|caracter[íi]stica)\\s+)?(\\d+|uma|um|duas|dois|tr[êe]s|quatro|cinco|seis|sete|oito|nove|dez)\\s+vez(?:es)?(?:\\s+por\\s+(' + PERIODO_PAT + '))?', 'i'),
+    parse: m => ({ max: palavraNum(m[1]) || 1, periodo: normPeriodo(m[2] || 'uso') }) },
+  // "X usos por dia/descanso"
+  { re: new RegExp('(\\d+)\\s+usos?\\s+por\\s+(' + PERIODO_PAT + ')', 'i'),
+    parse: m => ({ max: +m[1], periodo: normPeriodo(m[2]) }) },
+  // "Recarga 5-6" / "Recarga 6"
+  { re: /recarga\s*([2-6])(?:\s*[-–]\s*([2-6]))?/i,
+    parse: m => ({ max: 1, periodo: `recarga ${m[1]}${m[2] ? '-'+m[2] : ''}` }) },
+  // "(1/dia)" no nome da habilidade
+  { re: new RegExp('\\((\\d+)\\s*/\\s*(' + PERIODO_PAT + ')\\)', 'i'),
+    parse: m => ({ max: +m[1], periodo: normPeriodo(m[2]) }) },
+];
+
+function detectarUsos(textoCompleto) {
+  for (const {re, parse} of USOS_REGEXES) {
+    const m = textoCompleto.match(re);
+    if (m) {
+      const r = parse(m);
+      if (r && r.max >= 1 && r.max <= 12) return r;
+    }
+  }
+  return null;
+}
+
+// Parser do override manual: data-usos="3/dia" ou data-usos="2/curto descanso"
+function parseOverrideUsos(str) {
+  if (!str) return null;
+  const m = str.match(/(\d+)\s*\/\s*(.+)/);
+  if (!m) return null;
+  return { max: +m[1], periodo: normPeriodo(m[2]) };
+}
+
+// Keywords que indicam ataque/multiataque (NÃO são limitadas — pulam detecção)
+const NOMES_NAO_LIMITADOS = /^(multiataque|ataque m[úu]ltiplo|golpe desarmado|mordida|espada longa|garra|cauda|sopro|cuspe)\b/i;
+
+function aplicarTrackersHabilidades() {
+  document.querySelectorAll('.ability').forEach((ab, abIdx) => {
+    if (ab.dataset.usosInjetado) return;
+    const header = ab.querySelector('.ability-header');
+    const nome = (ab.querySelector('.ability-name')?.textContent || '').trim();
+    const corpo = ab.querySelector('.ability-body')?.textContent || '';
+    const tag = ab.querySelector('.ability-tag')?.textContent || '';
+
+    // 1) Override manual via data-usos="X/periodo"
+    let usos = parseOverrideUsos(ab.dataset.usos);
+    // 2) Auto-detecta na tag (mais confiável) → nome → corpo
+    if (!usos) usos = detectarUsos(tag) || detectarUsos(nome);
+    // 3) Só varre o corpo se NÃO for um ataque comum (evita "duas vezes" do Multiataque)
+    if (!usos && !NOMES_NAO_LIMITADOS.test(nome)) usos = detectarUsos(corpo);
+    if (!usos || usos.max < 1 || usos.max > 12) return;
+
+    ab.classList.add('tem-usos');
+    ab.dataset.usosInjetado = '1';
+    ab.dataset.usosMax = usos.max;
+    ab.dataset.usosPeriodo = usos.periodo;
+    // chave estável: phase + nome
+    const phaseEl = ab.closest('.phase-content');
+    const phaseKey = phaseEl ? phaseEl.id : 'global';
+    ab.dataset.usosChave = `${phaseKey}::${nome.trim()}`;
+
+    const wrap = document.createElement('span');
+    wrap.className = 'ability-usage';
+    let pips = '';
+    for (let i = 0; i < usos.max; i++) {
+      pips += `<span class="ability-usage-dot" data-pip-idx="${i}" title="Clique para gastar/recuperar"></span>`;
+    }
+    wrap.innerHTML = `
+      <span class="ability-usage-dots">${pips}</span>
+      <span class="ability-usage-period">${usos.periodo}</span>
+      <button type="button" class="ability-usage-reset" title="Recuperar todos os usos">⟲</button>
+    `;
+    // Insere antes do toggle-icon (no header)
+    const toggle = header.querySelector('.toggle-icon');
+    if (toggle) header.insertBefore(wrap, toggle);
+    else header.appendChild(wrap);
+
+    // Para não abrir o accordion ao clicar nos pips
+    wrap.addEventListener('click', e => e.stopPropagation());
+    wrap.querySelectorAll('.ability-usage-dot').forEach(dot => {
+      dot.addEventListener('click', e => {
+        e.stopPropagation();
+        toggleAbilityUsage(ab, +dot.dataset.pipIdx);
+      });
+    });
+    wrap.querySelector('.ability-usage-reset').addEventListener('click', e => {
+      e.stopPropagation();
+      resetAbilityUsage(ab);
+    });
+  });
+  // depois de injetar, aplica o estado salvo
+  aplicarEstadoUsosSalvo();
+}
+
+function toggleAbilityUsage(ab, idx) {
+  const dots = [...ab.querySelectorAll('.ability-usage-dot')];
+  const total = dots.length;
+  const eraGasto = dots[idx].classList.contains('gasto');
+  // Mesma lógica do ficha do jogador: clique no primeiro disponível gasta;
+  // clique no último gasto recupera.
+  let novoGastos;
+  if (eraGasto) novoGastos = idx;
+  else novoGastos = idx + 1;
+  dots.forEach((d, i) => d.classList.toggle('gasto', i < novoGastos));
+  ab.classList.toggle('tudo-gasto', novoGastos >= total);
+  saveState(true);
+}
+
+function resetAbilityUsage(ab) {
+  ab.querySelectorAll('.ability-usage-dot').forEach(d => d.classList.remove('gasto'));
+  ab.classList.remove('tudo-gasto');
+  saveState(true);
+}
+
+function getEstadoUsos() {
+  const out = {};
+  document.querySelectorAll('.ability.tem-usos').forEach(ab => {
+    const k = ab.dataset.usosChave;
+    if (!k) return;
+    const dots = [...ab.querySelectorAll('.ability-usage-dot')];
+    out[k] = dots.filter(d => d.classList.contains('gasto')).length;
+  });
+  return out;
+}
+
+function aplicarEstadoUsosSalvo() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const st = JSON.parse(raw);
+    const usos = st?.usos || {};
+    Object.entries(usos).forEach(([chave, gastos]) => {
+      const ab = document.querySelector(`.ability[data-usos-chave="${CSS.escape(chave)}"]`);
+      if (!ab) return;
+      const dots = [...ab.querySelectorAll('.ability-usage-dot')];
+      dots.forEach((d, i) => d.classList.toggle('gasto', i < gastos));
+      ab.classList.toggle('tudo-gasto', gastos >= dots.length && dots.length > 0);
+    });
+  } catch {}
+}
+
 function buildSlotsUI() {
   const grid = document.getElementById('spellSlotsGrid');
   grid.innerHTML = '';
   SLOT_LEVELS.forEach(({level, max}) => {
     const div = document.createElement('div');
     div.className = 'slot-level';
+    div.dataset.slotLevel = level;
     let dots = '';
     for (let i = 0; i < max; i++) {
-      dots += `<div class="slot-dot" data-level="${level}" data-index="${i}" onclick="toggleSlot(this)"></div>`;
+      dots += `<div class="slot-dot" data-level="${level}" data-index="${i}" onclick="toggleSlot(this)" title="Clique para gastar/recuperar"></div>`;
     }
-    div.innerHTML = `<div class="slot-level-label">Nível ${level}</div><div class="slot-dots">${dots}</div>`;
+    div.innerHTML = `
+      <div class="slot-level-label">Nível ${level}</div>
+      <div class="slot-dots">${dots}</div>
+      <div class="slot-level-count" data-count-level="${level}"><strong>${max}</strong> / ${max}</div>`;
     grid.appendChild(div);
   });
+  atualizarContadoresSlots();
 }
 
 function toggleSlot(el) {
   el.classList.toggle('used');
+  atualizarContadoresSlots();
   saveState(true);
+}
+
+function atualizarContadoresSlots() {
+  document.querySelectorAll('.slot-level').forEach(box => {
+    const lvl = +box.dataset.slotLevel;
+    const dots = box.querySelectorAll('.slot-dot');
+    const livres = [...dots].filter(d => !d.classList.contains('used')).length;
+    const total = dots.length;
+    const cnt = box.querySelector(`[data-count-level="${lvl}"]`);
+    if (cnt) cnt.innerHTML = `<strong>${livres}</strong> / ${total}`;
+    box.classList.toggle('esgotado', livres === 0 && total > 0);
+  });
 }
 
 function resetSlots() {
   document.querySelectorAll('.slot-dot').forEach(d => d.classList.remove('used'));
+  atualizarContadoresSlots();
   showToast('Espaços recuperados');
   saveState(true);
 }
@@ -1479,6 +1821,7 @@ function consumeSlot(level) {
   for (const d of dots) {
     if (!d.classList.contains('used')) {
       d.classList.add('used');
+      atualizarContadoresSlots();
       saveState(true);
       return true;
     }
@@ -1492,6 +1835,7 @@ function recoverSlot(level) {
   for (let i = dots.length - 1; i >= 0; i--) {
     if (dots[i].classList.contains('used')) {
       dots[i].classList.remove('used');
+      atualizarContadoresSlots();
       saveState(true);
       return true;
     }
@@ -1545,12 +1889,21 @@ function buildSpellList() {
       chip.dataset.spell = spellName;
       chip.dataset.level = lvl;
 
-      let chipHTML = spellName;
-      if (data && data.flavor) {
-        chipHTML += ` <span class="flavor">${data.flavor}</span>`;
-      }
-      chip.innerHTML = chipHTML;
-      chip.onclick = () => openSpellModal(spellName);
+      const flavor = data && data.flavor ? ` <span class="flavor">${data.flavor}</span>` : '';
+      const castBtn = lvl === '0'
+        ? `<button type="button" class="chip-cast-btn" data-act="info" title="Ver detalhes">ℹ</button>`
+        : `<button type="button" class="chip-cast-btn cast-fire" data-act="cast" title="Conjurar (gasta espaço de nível ${lvl})">▶</button>`;
+      chip.innerHTML = `<span class="chip-name">${spellName}</span>${flavor}${castBtn}`;
+      chip.onclick = (e) => {
+        if (e.target.closest('.chip-cast-btn')) return;
+        openSpellModal(spellName);
+      };
+      const btn = chip.querySelector('.chip-cast-btn');
+      btn.addEventListener('click', e => {
+        e.stopPropagation();
+        if (btn.dataset.act === 'cast') castSpellDirect(spellName, parseInt(lvl));
+        else openSpellModal(spellName);
+      });
       group.appendChild(chip);
     });
 
@@ -1692,6 +2045,17 @@ function closeModal() {
 }
 
 /* ===== MARCADORES DE MAGIA CONJURADA (visual) ===== */
+// Conjura uma magia direto pelo botão ▶ do chip — gasta o slot do nível base.
+function castSpellDirect(spellName, level) {
+  if (level === 0) { openSpellModal(spellName); return; }
+  if (!consumeSlot(level)) {
+    showToast(`✕ Sem espaço de nível ${level}`);
+    return;
+  }
+  markSpellCast(spellName);
+  showToast(`⚡ ${spellName} — espaço de nível ${level} gasto`);
+}
+
 function markSpellCast(spellName) {
   document.querySelectorAll(`.spell-chip[data-spell="${spellName}"]`).forEach(c => {
     c.classList.add('cast');
@@ -1807,7 +2171,8 @@ function getState() {
       const phase = a.closest('.phase-content').id;
       const name = a.querySelector('.ability-name').textContent;
       return `${phase}::${name}`;
-    })
+    }),
+    usos: getEstadoUsos()
   };
 }
 
@@ -1846,6 +2211,16 @@ function applyState(s) {
       });
     });
   }
+  if (s.usos) {
+    Object.entries(s.usos).forEach(([chave, gastos]) => {
+      const ab = document.querySelector(`.ability[data-usos-chave="${CSS.escape(chave)}"]`);
+      if (!ab) return;
+      const dots = [...ab.querySelectorAll('.ability-usage-dot')];
+      dots.forEach((d, i) => d.classList.toggle('gasto', i < gastos));
+      ab.classList.toggle('tudo-gasto', gastos >= dots.length && dots.length > 0);
+    });
+  }
+  atualizarContadoresSlots();
 }
 
 function switchPhaseSilent(num) {
@@ -1988,6 +2363,7 @@ document.addEventListener('keydown', (e) => {
 buildSlotsUI();
 buildSpellList();
 updateHPBar();
+aplicarTrackersHabilidades();
 
 (async function bootstrap() {
   // Auth gate: só Mestre pode abrir

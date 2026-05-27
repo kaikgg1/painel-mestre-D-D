@@ -101,9 +101,16 @@
   .mn-pj .count {
     background: rgba(0,0,0,0.4); color: #d4c5a0;
     padding: 1px 7px; border-radius: 10px; font-size: 10px;
-    font-weight: 600;
+    font-weight: 600; flex-shrink: 0;
   }
   .mn-pj.ativo .count { background: rgba(255,255,255,0.2); color: #050304; }
+  .mn-pj-info { display: flex; flex-direction: column; gap: 1px; min-width: 0; flex: 1; }
+  .mn-pj-nome { font-size: 12px; font-weight: 700; }
+  .mn-pj-sub {
+    font-size: 9px; opacity: 0.7;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
 
   .mn-main { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
   .mn-cats {
@@ -308,11 +315,27 @@
 
   // ===== DADOS =====
   async function carregarPjs() {
-    const { data } = await window.sb
+    // Busca characters + profile do dono separadamente (sem FK auto-resolvido)
+    const { data: chars, error } = await window.sb
       .from('characters')
-      .select('id, nome, jogador:profiles(nome)')
+      .select('id, nome, classe, nivel, user_id, is_active')
       .order('nome');
-    _pjs = (data || []).filter(c => c.id && c.nome);
+    if (error) { console.warn('[Notes] carregar chars:', error.message); _pjs = []; return; }
+
+    const userIds = [...new Set((chars || []).map(c => c.user_id).filter(Boolean))];
+    let nomesUser = {};
+    if (userIds.length) {
+      const { data: profs } = await window.sb
+        .from('profiles')
+        .select('id, nome')
+        .in('id', userIds);
+      (profs || []).forEach(p => { nomesUser[p.id] = p.nome; });
+    }
+
+    _pjs = (chars || []).filter(c => c.id && c.nome).map(c => ({
+      ...c,
+      jogadorNome: nomesUser[c.user_id] || '?',
+    }));
   }
 
   async function carregarNotas(pjId) {
@@ -378,7 +401,14 @@
       b.type = 'button';
       b.className = 'mn-pj' + (p.id === _pjSelId ? ' ativo' : '');
       const n = contagens[p.id] || 0;
-      b.innerHTML = `<span>${escapeHtml(p.nome)}</span><span class="count">${n}</span>`;
+      const sub = [p.classe, p.nivel ? 'N'+p.nivel : '', p.jogadorNome && p.jogadorNome !== '?' ? '· ' + p.jogadorNome : '']
+        .filter(Boolean).join(' ');
+      b.innerHTML = `
+        <span class="mn-pj-info">
+          <span class="mn-pj-nome">${escapeHtml(p.nome)}${p.is_active ? ' ★' : ''}</span>
+          ${sub ? `<span class="mn-pj-sub">${escapeHtml(sub)}</span>` : ''}
+        </span>
+        <span class="count">${n}</span>`;
       b.addEventListener('click', () => { selecionarPj(p.id); });
       wrap.appendChild(b);
     });
