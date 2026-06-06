@@ -22,6 +22,8 @@
     return `${d}/${m}/${y}`;
   }
 
+  // TODAS as categorias possíveis — usadas pra renderização de notas antigas
+  // (mesmo que filtradas no formulário do contexto atual).
   const CATEGORIAS = [
     { id: 'historia',    label: 'História',    icon: '📜', cor: '#b88a2c' },
     { id: 'equipamento', label: 'Equipamento', icon: '⚔',  cor: '#8a8a4a' },
@@ -32,6 +34,15 @@
     { id: 'outro',       label: 'Outro',       icon: '✦',  cor: '#8c7d5e' },
   ];
   const POR_ID = Object.fromEntries(CATEGORIAS.map(c => [c.id, c]));
+
+  // Categorias DISPONÍVEIS por contexto (PJ vs Campanha)
+  const CATEGORIAS_PJ       = ['historia', 'loot'];
+  const CATEGORIAS_CAMPANHA = ['historia', 'npc', 'equipamento'];
+
+  function categoriasAtuais() {
+    const ids = _modoCampanha ? CATEGORIAS_CAMPANHA : CATEGORIAS_PJ;
+    return ids.map(id => POR_ID[id]).filter(Boolean);
+  }
 
   let _injetado = false;
   let _pjs = [];          // {id, nome}
@@ -440,37 +451,58 @@
       if (e.ctrlKey && e.key === 'Enter') { e.preventDefault(); onSubmit(e); }
     });
 
-    // Categorias no select
-    const sel = document.getElementById('mn-cat');
-    CATEGORIAS.forEach(c => {
-      const opt = document.createElement('option');
-      opt.value = c.id;
-      opt.textContent = `${c.icon} ${c.label}`;
-      sel.appendChild(opt);
-    });
-    // Categorias como pills de filtro
-    const wrap = document.getElementById('mn-cats');
-    const todasBtn = document.createElement('button');
-    todasBtn.type = 'button';
-    todasBtn.className = 'mn-cat-pill ativo';
-    todasBtn.textContent = 'Todas';
-    todasBtn.dataset.cat = '';
-    todasBtn.style.setProperty('--cat-cor', '#8B6914');
-    todasBtn.addEventListener('click', () => filtrarCat(null));
-    wrap.appendChild(todasBtn);
-    CATEGORIAS.forEach(c => {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'mn-cat-pill';
-      b.textContent = `${c.icon} ${c.label}`;
-      b.dataset.cat = c.id;
-      b.style.setProperty('--cat-cor', c.cor);
-      b.addEventListener('click', () => filtrarCat(c.id));
-      wrap.appendChild(b);
-    });
+    rebuildCategorias();
 
     document.addEventListener('keydown', escListener);
     document.getElementById('mn-data').value = hojeLocal();
+  }
+
+  // Reconstrói o select e as pills de categoria baseado no contexto atual
+  // (PJ = História + Loot; Campanha = História + NPC + Equipamento).
+  function rebuildCategorias() {
+    const cats = categoriasAtuais();
+    // Select
+    const sel = document.getElementById('mn-cat');
+    if (sel) {
+      const valorAtual = sel.value;
+      sel.innerHTML = '';
+      cats.forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = `${c.icon} ${c.label}`;
+        sel.appendChild(opt);
+      });
+      // Se o valor que tava selecionado ainda existe na nova lista, mantém
+      if (cats.some(c => c.id === valorAtual)) sel.value = valorAtual;
+      else if (cats.length) sel.value = cats[0].id;
+    }
+    // Pills
+    const wrap = document.getElementById('mn-cats');
+    if (wrap) {
+      wrap.innerHTML = '';
+      const todasBtn = document.createElement('button');
+      todasBtn.type = 'button';
+      todasBtn.className = 'mn-cat-pill' + (_filtroCat ? '' : ' ativo');
+      todasBtn.textContent = 'Todas';
+      todasBtn.dataset.cat = '';
+      todasBtn.style.setProperty('--cat-cor', '#8B6914');
+      todasBtn.addEventListener('click', () => filtrarCat(null));
+      wrap.appendChild(todasBtn);
+      cats.forEach(c => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'mn-cat-pill' + (_filtroCat === c.id ? ' ativo' : '');
+        b.textContent = `${c.icon} ${c.label}`;
+        b.dataset.cat = c.id;
+        b.style.setProperty('--cat-cor', c.cor);
+        b.addEventListener('click', () => filtrarCat(c.id));
+        wrap.appendChild(b);
+      });
+      // Se o filtro ativo não existe mais nesse contexto, limpa
+      if (_filtroCat && !cats.some(c => c.id === _filtroCat)) {
+        _filtroCat = null;
+      }
+    }
   }
 
   function escListener(e) {
@@ -647,6 +679,7 @@
     _modoCampanha = true;
     _pjSelId = null;
     cancelarEdicao();
+    rebuildCategorias();
     renderListaPj();
     renderTimeline();
   }
@@ -655,6 +688,7 @@
     _modoCampanha = false;
     _pjSelId = id;
     cancelarEdicao();
+    rebuildCategorias();
     renderListaPj();
     renderTimeline();
   }
@@ -786,6 +820,7 @@
     await carregarPjs();
     // Default: abre na visão de Campanha (pediu pra ser proeminente)
     if (!_modoCampanha && !_pjSelId) _modoCampanha = true;
+    rebuildCategorias();
     await renderListaPj();
     await renderTimeline();
 
