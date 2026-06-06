@@ -455,10 +455,13 @@
       (profs || []).forEach(p => { nomesUser[p.id] = p.nome; });
     }
 
-    _pjs = (chars || []).filter(c => c.id && c.nome).map(c => ({
-      ...c,
-      jogadorNome: nomesUser[c.user_id] || '?',
-    }));
+    // Filtra "Personagem Padrão" — placeholder criado pelo grimório p/ ancorar favoritas
+    _pjs = (chars || [])
+      .filter(c => c.id && c.nome && c.nome.trim().toLowerCase() !== 'personagem padrão')
+      .map(c => ({
+        ...c,
+        jogadorNome: nomesUser[c.user_id] || '?',
+      }));
   }
 
   async function carregarNotas(pjId) {

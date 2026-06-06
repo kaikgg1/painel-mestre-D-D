@@ -65,6 +65,9 @@
     if (!user) return new Set();  // sem login = sem favoritas
     usuarioId = user.id;
 
+    // Mestre não tem PJ próprio nem favorita magias — não cria placeholder
+    if (await window.Auth.ehMestre()) return new Set();
+
     personagemId = await garantirPersonagem(user.id);
     if (!personagemId) return new Set();
 
