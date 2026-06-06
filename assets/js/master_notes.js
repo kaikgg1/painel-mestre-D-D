@@ -35,7 +35,9 @@
 
   let _injetado = false;
   let _pjs = [];          // {id, nome}
-  let _pjSelId = null;
+  let _pjSelId = null;    // id do PJ ativo OU null se modo campanha
+  let _modoCampanha = false;
+  let _campanha = { chave: 'mestre', titulo: 'Campanha' };
   let _filtroCat = null;  // categoria ativa ou null
   let _canalRealtime = null;
   let _editandoId = null;
@@ -135,6 +137,47 @@
     background: linear-gradient(180deg, #b88a2c, #8B6914);
     color: #1a1014; border-color: #d4a843; font-weight: 700;
     box-shadow: 0 4px 12px rgba(184,138,44,0.25);
+  }
+  /* ===== Card especial — Campanha ===== */
+  .mn-pj.mn-campanha {
+    background: linear-gradient(160deg, rgba(139,29,29,0.25), rgba(74,8,8,0.15));
+    border: 1px solid #8b1d1d;
+    border-left: 4px solid #c4302b;
+    margin-bottom: 4px;
+    position: relative;
+  }
+  .mn-pj.mn-campanha::before {
+    content: '';
+    position: absolute; left: 0; right: 0; top: 0; height: 1px;
+    background: linear-gradient(to right, transparent, #c4302b, transparent);
+    opacity: 0.7;
+  }
+  .mn-pj.mn-campanha:hover {
+    background: linear-gradient(160deg, rgba(139,29,29,0.4), rgba(74,8,8,0.25));
+    border-color: #c4302b; transform: translateX(2px);
+  }
+  .mn-pj.mn-campanha.ativo {
+    background: linear-gradient(180deg, #8b1d1d, #5a0e0e);
+    color: #d4c5a0; border-color: #c4302b;
+    box-shadow: 0 4px 14px rgba(139,29,29,0.35);
+  }
+  .mn-pj.mn-campanha.ativo .mn-pj-nome { color: #f4b8a8; }
+  .mn-pj.mn-campanha .mn-pj-sub { color: #a89878; opacity: 0.85; }
+  .mn-pj.mn-campanha.ativo .mn-pj-sub { color: rgba(244,184,168,0.75); }
+  .mn-pj.mn-campanha .count {
+    background: rgba(139,29,29,0.5);
+    color: #f4b8a8;
+  }
+  .mn-pj.mn-campanha.ativo .count { background: rgba(0,0,0,0.4); color: #f4b8a8; }
+
+  /* Sub-header "Jogadores" entre Campanha e a lista */
+  .mn-pj-sub-header {
+    font-family: 'Cinzel', serif; font-size: 9px;
+    color: #b88a2c; letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 12px 4px 6px;
+    border-bottom: 1px dashed rgba(139,105,20,0.25);
+    margin-bottom: 4px;
+    font-weight: 700;
   }
   .mn-pj .count {
     background: rgba(0,0,0,0.5); color: #d4c5a0;
@@ -475,18 +518,48 @@
     return data || [];
   }
 
+  // Anotações da CAMPANHA: character_id IS NULL + campanha = chave
+  async function carregarNotasCampanha(chave) {
+    const { data: u } = await window.sb.auth.getUser();
+    if (!u?.user) return [];
+    const { data, error } = await window.sb
+      .from('master_notes')
+      .select('id, categoria, texto, data_ref, created_at')
+      .is('character_id', null)
+      .eq('user_id', u.user.id)
+      .eq('campanha', chave)
+      .order('data_ref', { ascending: false })
+      .order('created_at', { ascending: false });
+    if (error) { console.warn('[Notes] carregar campanha:', error.message); return []; }
+    return data || [];
+  }
+
+  async function contarNotasCampanha(chave) {
+    const { data: u } = await window.sb.auth.getUser();
+    if (!u?.user) return 0;
+    const { count } = await window.sb
+      .from('master_notes')
+      .select('id', { count: 'exact', head: true })
+      .is('character_id', null)
+      .eq('user_id', u.user.id)
+      .eq('campanha', chave);
+    return count || 0;
+  }
+
   async function inserirNota(pjId, categoria, texto, dataRef) {
     const { data: u } = await window.sb.auth.getUser();
     if (!u?.user) return null;
+    const payload = {
+      user_id: u.user.id,
+      categoria,
+      texto,
+      data_ref: dataRef || hojeLocal()
+    };
+    if (pjId) payload.character_id = pjId;
+    else payload.campanha = _campanha.chave;
     const { data, error } = await window.sb
       .from('master_notes')
-      .insert({
-        user_id: u.user.id,
-        character_id: pjId,
-        categoria,
-        texto,
-        data_ref: dataRef || hojeLocal()
-      })
+      .insert(payload)
       .select().single();
     if (error) { alert('Erro ao salvar: ' + error.message); return null; }
     return data;
@@ -511,21 +584,51 @@
   async function renderListaPj() {
     const wrap = document.getElementById('mn-pj-list');
     wrap.innerHTML = '';
+
+    // ===== CARD DE CAMPANHA (sempre primeiro) =====
+    const nCamp = await contarNotasCampanha(_campanha.chave);
+    const camp = document.createElement('button');
+    camp.type = 'button';
+    camp.className = 'mn-pj mn-campanha' + (_modoCampanha ? ' ativo' : '');
+    camp.innerHTML = `
+      <span class="mn-pj-info">
+        <span class="mn-pj-nome">📜 ${escapeHtml(_campanha.titulo)}</span>
+        <span class="mn-pj-sub">Anotações da campanha</span>
+      </span>
+      <span class="count">${nCamp}</span>`;
+    camp.addEventListener('click', selecionarCampanha);
+    wrap.appendChild(camp);
+
+    // Header "Jogadores"
+    if (_pjs.length) {
+      const hdr = document.createElement('div');
+      hdr.className = 'mn-pj-sub-header';
+      hdr.textContent = 'Jogadores';
+      wrap.appendChild(hdr);
+    }
+
     if (!_pjs.length) {
-      wrap.innerHTML = '<div class="mn-empty" style="padding:16px"><span class="ic">📭</span><div>Nenhum personagem cadastrado.</div></div>';
+      const empty = document.createElement('div');
+      empty.className = 'mn-empty';
+      empty.style.padding = '16px';
+      empty.innerHTML = '<span class="ic">📭</span><div>Nenhum personagem cadastrado.</div>';
+      wrap.appendChild(empty);
       return;
     }
+
     // contagem de notas por PJ
     let contagens = {};
     try {
-      const { data } = await window.sb.from('master_notes').select('character_id');
+      const { data } = await window.sb.from('master_notes')
+        .select('character_id')
+        .not('character_id', 'is', null);
       (data || []).forEach(r => { contagens[r.character_id] = (contagens[r.character_id] || 0) + 1; });
     } catch {}
 
     _pjs.forEach(p => {
       const b = document.createElement('button');
       b.type = 'button';
-      b.className = 'mn-pj' + (p.id === _pjSelId ? ' ativo' : '');
+      b.className = 'mn-pj' + (!_modoCampanha && p.id === _pjSelId ? ' ativo' : '');
       const n = contagens[p.id] || 0;
       const sub = [p.classe, p.nivel ? 'N'+p.nivel : '', p.jogadorNome && p.jogadorNome !== '?' ? '· ' + p.jogadorNome : '']
         .filter(Boolean).join(' ');
@@ -540,7 +643,16 @@
     });
   }
 
+  function selecionarCampanha() {
+    _modoCampanha = true;
+    _pjSelId = null;
+    cancelarEdicao();
+    renderListaPj();
+    renderTimeline();
+  }
+
   function selecionarPj(id) {
+    _modoCampanha = false;
     _pjSelId = id;
     cancelarEdicao();
     renderListaPj();
@@ -564,17 +676,20 @@
   let _cacheNotas = [];
   async function renderTimeline() {
     const wrap = document.getElementById('mn-timeline');
-    if (!_pjSelId) {
-      wrap.innerHTML = '<div class="mn-empty"><span class="ic">👆</span><div>Selecione um jogador na lista ao lado para ver suas anotações.</div></div>';
+    if (!_modoCampanha && !_pjSelId) {
+      wrap.innerHTML = '<div class="mn-empty"><span class="ic">👆</span><div>Selecione um jogador ou a campanha para ver as anotações.</div></div>';
       return;
     }
     wrap.innerHTML = '<div class="mn-empty"><span class="ic">⏳</span><div>Carregando…</div></div>';
-    _cacheNotas = await carregarNotas(_pjSelId);
+    _cacheNotas = _modoCampanha
+      ? await carregarNotasCampanha(_campanha.chave)
+      : await carregarNotas(_pjSelId);
     let lista = _cacheNotas;
     if (_filtroCat) lista = lista.filter(n => n.categoria === _filtroCat);
 
+    const escopo = _modoCampanha ? 'esta campanha' : 'este jogador';
     if (!lista.length) {
-      wrap.innerHTML = `<div class="mn-empty"><span class="ic">📝</span><div>${_filtroCat ? 'Nenhuma anotação nesta categoria.' : 'Ainda não há anotações para este jogador.'}<br><span style="font-size:12px;opacity:0.7">Use o formulário acima para adicionar a primeira.</span></div></div>`;
+      wrap.innerHTML = `<div class="mn-empty"><span class="ic">📝</span><div>${_filtroCat ? 'Nenhuma anotação nesta categoria.' : `Ainda não há anotações para ${escopo}.`}<br><span style="font-size:12px;opacity:0.7">Use o formulário acima para adicionar a primeira.</span></div></div>`;
       return;
     }
     wrap.innerHTML = '';
@@ -624,7 +739,7 @@
 
   async function onSubmit(e) {
     e.preventDefault();
-    if (!_pjSelId) { alert('Selecione um jogador.'); return; }
+    if (!_modoCampanha && !_pjSelId) { alert('Selecione um jogador ou a campanha.'); return; }
     const texto = document.getElementById('mn-texto').value.trim();
     if (!texto) return;
     const cat   = document.getElementById('mn-cat').value;
@@ -635,7 +750,8 @@
     if (_editandoId) {
       ok = await atualizarNota(_editandoId, cat, texto, data);
     } else {
-      ok = !!(await inserirNota(_pjSelId, cat, texto, data));
+      // Em modo campanha, pjId=null força a inserção como nota de campanha
+      ok = !!(await inserirNota(_modoCampanha ? null : _pjSelId, cat, texto, data));
     }
     document.getElementById('mn-submit').disabled = false;
     if (ok) {
@@ -650,16 +766,26 @@
   }
 
   // ===== ABRIR/FECHAR =====
-  async function abrir() {
+  async function abrir(opts) {
     if (!window.Auth || !window.sb) { alert('Auth/Supabase não carregado.'); return; }
     const ehMestre = await window.Auth.ehMestre();
     if (!ehMestre) { alert('Apenas o Mestre pode acessar as anotações.'); return; }
 
+    // Aceita string legada OU { chave, titulo }
+    if (typeof opts === 'string') _campanha = { chave: opts, titulo: 'Campanha' };
+    else if (opts && opts.chave) _campanha = { chave: opts.chave, titulo: opts.titulo || 'Campanha' };
+    // Se não passou nada, mantém o último (default 'mestre' / 'Campanha')
+
     montar();
+    // Atualiza título do modal pra refletir a campanha atual
+    const t = document.getElementById('mn-title');
+    if (t) t.innerHTML = `<span aria-hidden="true">📒</span> Anotações — ${escapeHtml(_campanha.titulo)}`;
+
     document.getElementById('mn-overlay').classList.add('open');
     document.body.style.overflow = 'hidden';
     await carregarPjs();
-    if (!_pjSelId && _pjs.length) _pjSelId = _pjs[0].id;
+    // Default: abre na visão de Campanha (pediu pra ser proeminente)
+    if (!_modoCampanha && !_pjSelId) _modoCampanha = true;
     await renderListaPj();
     await renderTimeline();
 
