@@ -792,6 +792,7 @@
 <script src="../assets/js/dbsync.js"></script>
 <script src="../assets/js/phb_slots.js"></script>
 <script src="../assets/js/master_notes.js"></script>
+<script src="../assets/js/confirmar.js"></script>
 <script>
 const CONDICOES = [
   'Agarrado','Amedrontado','Atordoado','Caído','Cego','Enfeitiçado',
@@ -916,20 +917,24 @@ async function carregarCatalogoMagias() {
 }
 async function carregarMagiasPreparadasMestre(characterId) {
   if (!window.sb || !characterId) return [];
+  const timeout = new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 8000));
   try {
-    const { data } = await window.sb.from('spell_lists')
-      .select('spell_names')
-      .eq('character_id', characterId)
-      .eq('nome', 'Favoritas')
-      .maybeSingle();
-    const nomes = new Set(data?.spell_names || []);
-    if (!nomes.size) return [];
-    const todas = await carregarCatalogoMagias();
-    return todas.filter(m => nomes.has(m.nome))
-      .sort((a,b) => a.nivel - b.nivel || a.nome.localeCompare(b.nome, 'pt'));
+    const fetch = (async () => {
+      const { data } = await window.sb.from('spell_lists')
+        .select('spell_names')
+        .eq('character_id', characterId)
+        .eq('nome', 'Favoritas')
+        .maybeSingle();
+      const nomes = new Set(data?.spell_names || []);
+      if (!nomes.size) return [];
+      const todas = await carregarCatalogoMagias();
+      return todas.filter(m => nomes.has(m.nome))
+        .sort((a,b) => a.nivel - b.nivel || a.nome.localeCompare(b.nome, 'pt'));
+    })();
+    return await Promise.race([fetch, timeout]);
   } catch (e) {
     console.warn('[barovia] preparadas:', e);
-    return [];
+    return null;
   }
 }
 
@@ -1285,7 +1290,15 @@ function criarCard(p) {
     wrap.innerHTML = `<span class="magia-prep-vazio">Carregando…</span>`;
     magiasSection.appendChild(wrap);
     card.appendChild(magiasSection);
-    carregarMagiasPreparadasMestre(p.id).then(magias => {
+    function pintarMagias(magias) {
+      if (magias === null) {
+        wrap.innerHTML = `<span class="magia-prep-vazio" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">⚠ Erro ao carregar magias.<button type="button" class="back-link" style="padding:4px 10px;font-size:10px" data-retry-magias="${p.id}">Tentar de novo</button></span>`;
+        wrap.querySelector('[data-retry-magias]')?.addEventListener('click', () => {
+          wrap.innerHTML = `<span class="magia-prep-vazio">Carregando…</span>`;
+          carregarMagiasPreparadasMestre(p.id).then(pintarMagias);
+        });
+        return;
+      }
       if (!magias.length) {
         wrap.innerHTML = `<span class="magia-prep-vazio">Nenhuma magia favoritada pelo jogador.</span>`;
         return;
@@ -1296,7 +1309,8 @@ function criarCard(p) {
           <span class="nv">${nv}</span>${escapeHtml(m.nome)}
         </span>`;
       }).join('');
-    });
+    }
+    carregarMagiasPreparadasMestre(p.id).then(pintarMagias);
   }
 
   // ===== CONDIÇÕES =====
@@ -1346,8 +1360,13 @@ function criarCard(p) {
     descBtn.style.borderColor = 'var(--blood)';
     descBtn.style.color = 'var(--parchment-dim)';
     descBtn.textContent = '🌙 Desc. Longo';
-    descBtn.onclick = () => {
-      if (!confirm(`Descanso longo para ${p.nome}?`)) return;
+    descBtn.onclick = async () => {
+      const ok = await window.Confirmar.perguntar({
+        titulo: '🌙 Descanso Longo',
+        mensagem: `Aplicar descanso longo em ${p.nome}?`,
+        confirmar: 'Descansar'
+      });
+      if (!ok) return;
       aplicarDescansoLongo(p);
       rerenderCard(p);
       toast(`🌙 ${p.nome} descansou`);
@@ -1358,7 +1377,13 @@ function criarCard(p) {
   remover.className = 'remove-card';
   remover.textContent = '✕ remover';
   remover.onclick = async () => {
-    if (confirm(`Remover "${p.nome}"?`)) {
+    const ok = await window.Confirmar.perguntar({
+      titulo: 'Remover do painel?',
+      mensagem: `"${p.nome}" será removido do banco. Esta ação não pode ser desfeita.`,
+      confirmar: 'Remover',
+      danger: true
+    });
+    if (ok) {
       try {
         await window.DBSync.deletar(p.id);
         estado.personagens = estado.personagens.filter(x => x.id !== p.id);
@@ -1412,7 +1437,12 @@ function aplicarDescansoLongo(p) {
 
 async function descansoLongo() {
   if (!ehMestre) { toast('⚠ Apenas o Mestre pode aplicar descanso longo'); return; }
-  if (!confirm('Aplicar descanso longo a TODOS: PV máximo, slots cheios, recursos resetados, exaustão −1, dado de vida recupera metade do nível. Confirma?')) return;
+  const ok = await window.Confirmar.perguntar({
+    titulo: '🌙 Descanso Longo — Todos',
+    mensagem: 'Aplicar a TODOS os personagens:\n\n• PV ao máximo\n• Slots cheios\n• Recursos resetados\n• Exaustão −1\n• Dado de vida recupera metade do nível',
+    confirmar: 'Descansar'
+  });
+  if (!ok) return;
   for (const p of estado.personagens) aplicarDescansoLongo(p);
   render();
   toast('🌙 Descanso longo concluído pra todos');

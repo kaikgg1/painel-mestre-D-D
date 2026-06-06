@@ -1574,13 +1574,32 @@
     opacity: 0.75;
   }
 
-  /* Touch targets mínimos em mobile p/ botões pequenos */
+  /* Touch targets mínimos em mobile p/ botões pequenos (WCAG 2.5.5) */
   @media (max-width: 600px) {
     .contador-bloco { min-width: 44px !important; min-height: 44px !important; }
     .item-tabela .lixo,
-    .cfeat-remove { min-width: 44px !important; min-height: 44px !important; padding: 8px 10px !important; }
-    .hab-pip { min-width: 22px; min-height: 22px; }
-    .slot-pip { min-width: 24px; min-height: 24px; }
+    .cfeat-remove,
+    .lixo,
+    .btn-rm { min-width: 44px !important; min-height: 44px !important; padding: 8px 10px !important; font-size: 16px !important; }
+    /* Pips visuais ficam pequenos por design, mas ganham hit area maior via padding extra */
+    .hab-pip,
+    .slot-pip {
+      min-width: 18px; min-height: 18px;
+      /* Hit area expandido via box invisível ao redor */
+      box-shadow: 0 0 0 11px transparent;
+      box-sizing: content-box;
+    }
+    .hab-pip { margin: 11px; }
+    .slot-pip { margin: 11px; }
+    /* Botões de ação geral (Salvar, Editar, +Novo, Deletar) */
+    .btn, .btn-lock-toggle, .estrela-ativo {
+      min-height: 44px !important;
+      padding: 10px 14px !important;
+    }
+    /* Estrela de favoritar magia */
+    .fav-btn { min-width: 44px !important; min-height: 44px !important; font-size: 18px !important; }
+    /* Tabs ainda navegáveis (já estão grandes) */
+    .tab { min-height: 44px; padding: 12px 14px; }
   }
 </style>
 </head>
@@ -1679,11 +1698,20 @@ const PERICIAS = [
 let HABILIDADES_CLASSES = null;
 async function carregarHabilidadesClasses() {
   if (HABILIDADES_CLASSES) return HABILIDADES_CLASSES;
+  // Timeout de 8s pra não ficar carregando pra sempre
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), 8000);
   try {
-    const r = await fetch('../data/habilidades_classes.json');
+    const r = await fetch('../data/habilidades_classes.json', { signal: ctrl.signal });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
     HABILIDADES_CLASSES = await r.json();
     return HABILIDADES_CLASSES;
-  } catch { return {}; }
+  } catch (e) {
+    console.warn('[habilidades] falha ao carregar:', e);
+    return null;  // sinaliza falha pro caller
+  } finally {
+    clearTimeout(t);
+  }
 }
 function chaveDeClasse(classe) {
   return (classe || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
@@ -2369,79 +2397,161 @@ function renderRecursosClasse(c) {
   if (ehFeit) ligarConversorFeiticaria();
 }
 
+// Event delegation: 1 listener no painel inteiro, em vez de N listeners individuais.
+// Evita memory leak quando renderRecursosClasse é chamada muitas vezes (realtime updates).
 function ligarListenersRecursos() {
-  // Pips clicáveis (igual ao Strahd: clique gasta o próximo, clicar num gasto recupera dali)
-  document.querySelectorAll('.rc-pip').forEach(pip => {
-    pip.addEventListener('click', () => alternarPipRecurso(pip));
-    pip.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); alternarPipRecurso(pip); } });
-  });
-  // Botões do pool numérico (Cura pelas Mãos etc)
-  document.querySelectorAll('.rc-pool-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const id = btn.dataset.rc;
-      const passo = +btn.dataset.rcStep || 1;
-      const delta = btn.dataset.act === 'menos' ? +passo : -passo;
+  const painel = document.querySelector('.rc-painel');
+  if (!painel) return;
+  if (painel.dataset.rcWired === '1') return;  // idempotente
+  painel.dataset.rcWired = '1';
+
+  painel.addEventListener('click', e => {
+    const pip = e.target.closest('.rc-pip');
+    if (pip) { alternarPipRecurso(pip); return; }
+
+    const poolBtn = e.target.closest('.rc-pool-btn');
+    if (poolBtn) {
+      const id = poolBtn.dataset.rc;
+      const passo = +poolBtn.dataset.rcStep || 1;
+      const delta = poolBtn.dataset.act === 'menos' ? +passo : -passo;
       ajustarRecurso(id, delta);
-    });
-  });
-  // Reset
-  document.querySelectorAll('.rc-reset').forEach(b => {
-    b.addEventListener('click', () => {
-      const id = b.dataset.rcReset;
+      return;
+    }
+
+    const reset = e.target.closest('.rc-reset');
+    if (reset) {
+      const id = reset.dataset.rcReset;
       if (!charAtivo) return;
       const rec = charAtivo.recursos_usados || {};
-      rec[id] = 0;
+      gravarUsadoRecurso(rec, id, 0);
       charAtivo.recursos_usados = rec;
       renderRecursosClasse(charAtivo);
-      salvarRecursos();
-    });
+      salvarRecursosSeguro();
+      return;
+    }
+  });
+
+  // Acessibilidade: Enter/Espaço nos pips
+  painel.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    const pip = e.target.closest('.rc-pip');
+    if (!pip) return;
+    e.preventDefault();
+    alternarPipRecurso(pip);
   });
 }
 
-function alternarPipRecurso(pip) {
+// Lock por recurso — bloqueia cliques múltiplos durante o salvamento
+// (evita race entre alternarPipRecurso → realtime → ajustarRecurso)
+const _lockRecurso = new Set();
+
+// Lê o valor atual de "usado" de um recurso lidando com 2 formatos
+// (number bruto OU objeto {atual, max} pras features personalizadas)
+function lerUsadoRecurso(rec, id) {
+  const v = rec[id];
+  if (typeof v === 'number') return v;
+  if (v && typeof v.atual === 'number') return v.atual;
+  return 0;
+}
+function gravarUsadoRecurso(rec, id, novoUsado) {
+  // Preserva o formato existente (não migra dado entre execuções)
+  const v = rec[id];
+  if (v && typeof v === 'object' && 'atual' in v) {
+    rec[id] = { ...v, atual: novoUsado };
+  } else {
+    rec[id] = novoUsado;
+  }
+}
+
+async function alternarPipRecurso(pip) {
   const grupo = pip.closest('.rc-pips');
   const id = grupo.dataset.rc;
+  if (_lockRecurso.has(id)) return;  // já tem um save em voo
   const max = +grupo.dataset.rcMax;
   const idx = +pip.dataset.rcIdx;
   const pips = [...grupo.querySelectorAll('.rc-pip')];
   const eraGasto = pip.classList.contains('gasto');
-  // Clique no primeiro disponível → gasta. Clique no último gasto → recupera dali.
-  const novoGastos = eraGasto ? idx : idx + 1;
+  const novoGastos = Math.max(0, Math.min(max, eraGasto ? idx : idx + 1));
   if (!charAtivo) return;
+
+  // Snapshot pra rollback se o save falhar
   const rec = charAtivo.recursos_usados || {};
-  rec[id] = Math.max(0, Math.min(max, novoGastos));
+  const antes = lerUsadoRecurso(rec, id);
+
+  // Otimismo: atualiza UI imediato
+  gravarUsadoRecurso(rec, id, novoGastos);
   charAtivo.recursos_usados = rec;
   pips.forEach((p, i) => p.classList.toggle('gasto', i < novoGastos));
-  // Atualiza fração
   const frac = grupo.querySelector('.rc-frac');
   if (frac) frac.innerHTML = `<strong>${max - novoGastos}</strong>/${max}`;
-  salvarRecursos();
+
+  _lockRecurso.add(id);
+  try {
+    await salvarRecursos();
+  } catch (e) {
+    // Rollback
+    gravarUsadoRecurso(rec, id, antes);
+    charAtivo.recursos_usados = rec;
+    pips.forEach((p, i) => p.classList.toggle('gasto', i < antes));
+    if (frac) frac.innerHTML = `<strong>${max - antes}</strong>/${max}`;
+    if (typeof toast === 'function') toast('⚠ Falha ao salvar — tente novamente');
+    console.warn('[recursos] rollback:', e);
+  } finally {
+    _lockRecurso.delete(id);
+  }
 }
 
-function ajustarRecurso(id, delta) {
+async function ajustarRecurso(id, delta) {
   if (!charAtivo) return;
+  if (_lockRecurso.has(id)) return;
   const recs = recursosPara(charAtivo, charAtivo.atributos);
   const def = recs.find(r => r.id === id);
   if (!def) return;
+
   const rec = charAtivo.recursos_usados || {};
-  const atual = rec[id] || 0;
-  rec[id] = Math.max(0, Math.min(def.max, atual + delta));
+  const antes = lerUsadoRecurso(rec, id);
+  const novo = Math.max(0, Math.min(def.max, antes + delta));
+  if (novo === antes) return;  // sem mudança
+
+  gravarUsadoRecurso(rec, id, novo);
   charAtivo.recursos_usados = rec;
+
   // Atualiza display do card desse recurso (sem re-render geral pra evitar flicker)
   const card = document.querySelector(`[data-rc-card="${CSS.escape(id)}"]`);
   if (card) {
-    const livre = def.max - rec[id];
+    const livre = def.max - novo;
     const lEl = card.querySelector('.rc-pool-livre');
     if (lEl) lEl.textContent = livre;
     const frac = card.querySelector('.rc-frac');
     if (frac) frac.innerHTML = `<strong>${livre}</strong>/${def.max}`;
-    // Sincroniza pips se for tracker pip
     const grupo = card.querySelector('.rc-pips');
     if (grupo) {
-      grupo.querySelectorAll('.rc-pip').forEach((p, i) => p.classList.toggle('gasto', i < rec[id]));
+      grupo.querySelectorAll('.rc-pip').forEach((p, i) => p.classList.toggle('gasto', i < novo));
     }
   }
-  salvarRecursos();
+
+  _lockRecurso.add(id);
+  try {
+    await salvarRecursos();
+  } catch (e) {
+    gravarUsadoRecurso(rec, id, antes);
+    charAtivo.recursos_usados = rec;
+    if (card) {
+      const livre = def.max - antes;
+      const lEl = card.querySelector('.rc-pool-livre');
+      if (lEl) lEl.textContent = livre;
+      const frac = card.querySelector('.rc-frac');
+      if (frac) frac.innerHTML = `<strong>${livre}</strong>/${def.max}`;
+      const grupo = card.querySelector('.rc-pips');
+      if (grupo) {
+        grupo.querySelectorAll('.rc-pip').forEach((p, i) => p.classList.toggle('gasto', i < antes));
+      }
+    }
+    if (typeof toast === 'function') toast('⚠ Falha ao salvar — tente novamente');
+    console.warn('[recursos] rollback:', e);
+  } finally {
+    _lockRecurso.delete(id);
+  }
 }
 
 /* ===== FEITICEIRO: Conversor Pontos ⇄ Slots ===== */
@@ -2534,7 +2644,7 @@ function abrirModalConversorFeit() {
       rec.pontos_feiticaria = usados + custo;
       charAtivo.recursos_usados = rec;
       toast(`✓ Slot de nível ${lvl} criado (-${custo} pt)`);
-      salvarRecursos();
+      salvarRecursosSeguro();
       // Salva slots_magia direto
       window.sb.from('characters').update({ slots_magia: charAtivo.slots_magia }).eq('id', charAtivo.id);
       fechar();
@@ -2558,7 +2668,7 @@ function abrirModalConversorFeit() {
       charAtivo.slots_magia = sm;
       charAtivo.recursos_usados = rec;
       toast(`✓ Slot ${lvl}° → +${lvl} pt`);
-      salvarRecursos();
+      salvarRecursosSeguro();
       window.sb.from('characters').update({ slots_magia: charAtivo.slots_magia }).eq('id', charAtivo.id);
       fechar();
       renderRecursosClasse(charAtivo);
@@ -2660,6 +2770,14 @@ async function popularHabilidades(classe, nivel, subclasse) {
     return;
   }
   const db = await carregarHabilidadesClasses();
+  if (!db) {
+    wrap.innerHTML = `
+      <div class="item-vazio" style="text-align:center;padding:20px">
+        ⚠ Não foi possível carregar as habilidades.
+        <button type="button" class="btn no-lock" style="display:block;margin:12px auto 0" onclick="popularHabilidades('${escape(classe)}', ${+nivel||1}, '${escape(subclasse||'')}')">Tentar de novo</button>
+      </div>`;
+    return;
+  }
   const todas = db[chaveDeClasse(classe)] || [];
   // Filtra: nivel <= atual AND (sem subclasse OR subclasse === subclasse do PJ)
   const habs = todas.filter(h => h.nivel <= (nivel || 1) && (!h.subclasse || h.subclasse === subclasse));
@@ -2735,7 +2853,7 @@ async function popularHabilidades(classe, nivel, subclasse) {
       cur.atual = Math.max(0, Math.min(cur.max, cur.atual));
       rec[slug] = cur;
       charAtivo.recursos_usados = rec;
-      salvarRecursos();
+      salvarRecursosSeguro();
       popularHabilidades(classe, nivel, subclasse);  // re-render
     });
   });
@@ -2750,21 +2868,28 @@ async function popularHabilidades(classe, nivel, subclasse) {
       cur.atual = Math.min(cur.atual, val);
       rec[slug] = cur;
       charAtivo.recursos_usados = rec;
-      salvarRecursos();
+      salvarRecursosSeguro();
       popularHabilidades(classe, nivel, subclasse);
     });
   });
 }
 
-// Salva recursos_usados via UPDATE direto (sem passar pelo form geral, que pode estar em outra tab)
+// Salva recursos_usados via UPDATE direto.
+// Lança em caso de erro — use salvarRecursosSeguro() pra fire-and-forget.
 async function salvarRecursos() {
   if (!charAtivo?.id) return;
-  try {
-    _ultimoSaveLocal = Date.now();
-    await window.sb.from('characters')
-      .update({ recursos_usados: charAtivo.recursos_usados || {} })
-      .eq('id', charAtivo.id);
-  } catch (e) { console.warn('[recursos] erro ao salvar:', e); }
+  _ultimoSaveLocal = Date.now();
+  const { error } = await window.sb.from('characters')
+    .update({ recursos_usados: charAtivo.recursos_usados || {} })
+    .eq('id', charAtivo.id);
+  if (error) {
+    console.warn('[recursos] erro ao salvar:', error);
+    throw error;
+  }
+}
+// Wrapper pra chamadores fire-and-forget que não querem propagação de erro.
+function salvarRecursosSeguro() {
+  salvarRecursos().catch(() => {/* já loga no warn acima */});
 }
 
 // Salva features_personalizadas via UPDATE direto
@@ -2834,7 +2959,7 @@ function popularFeaturesPersonalizadas() {
       cur.atual = Math.max(0, Math.min(max, cur.atual));
       rec[slug] = cur;
       charAtivo.recursos_usados = rec;
-      salvarRecursos();
+      salvarRecursosSeguro();
       popularFeaturesPersonalizadas();
     });
   });
@@ -2866,7 +2991,7 @@ function popularFeaturesPersonalizadas() {
       rec[slug] = cur;
       charAtivo.recursos_usados = rec;
       salvarFeaturesPersonalizadas();
-      salvarRecursos();
+      salvarRecursosSeguro();
       popularFeaturesPersonalizadas();
     });
   });
@@ -2885,7 +3010,7 @@ function popularFeaturesPersonalizadas() {
       }
       charAtivo.features_personalizadas.splice(idx, 1);
       salvarFeaturesPersonalizadas();
-      salvarRecursos();
+      salvarRecursosSeguro();
       popularFeaturesPersonalizadas();
     });
   });
@@ -3289,6 +3414,35 @@ function aplicarEstadoLock() {
   try { unlock = localStorage.getItem('ficha_unlock') === '1'; } catch {}
   document.body.classList.toggle('modo-unlock', unlock);
   atualizarLockLabel();
+  aplicarTabIndexLock();
+}
+
+// Remove inputs travados do tab order (a11y) e adiciona aria-disabled.
+function aplicarTabIndexLock() {
+  const unlock = document.body.classList.contains('modo-unlock');
+  document.querySelectorAll('.tab-content').forEach(zona => {
+    const elementos = zona.querySelectorAll('input:not([type="hidden"]), select, textarea, [contenteditable="true"]');
+    elementos.forEach(el => {
+      // Não mexe nos elementos marcados como no-lock (toggles internos)
+      if (el.closest('.no-lock')) return;
+      if (unlock) {
+        if (el.dataset.lockTabidxOrig !== undefined) {
+          if (el.dataset.lockTabidxOrig === '') el.removeAttribute('tabindex');
+          else el.setAttribute('tabindex', el.dataset.lockTabidxOrig);
+          delete el.dataset.lockTabidxOrig;
+        } else {
+          el.removeAttribute('tabindex');
+        }
+        el.removeAttribute('aria-disabled');
+      } else {
+        if (el.dataset.lockTabidxOrig === undefined) {
+          el.dataset.lockTabidxOrig = el.getAttribute('tabindex') ?? '';
+        }
+        el.setAttribute('tabindex', '-1');
+        el.setAttribute('aria-disabled', 'true');
+      }
+    });
+  });
 }
 function atualizarLockLabel() {
   const lbl = document.getElementById('lock-toggle-label');
@@ -3332,6 +3486,7 @@ function conectarListeners() {
       document.body.classList.toggle('modo-unlock', ativo);
       try { localStorage.setItem('ficha_unlock', ativo ? '1' : '0'); } catch {}
       atualizarLockLabel();
+      aplicarTabIndexLock();
     });
   }
 

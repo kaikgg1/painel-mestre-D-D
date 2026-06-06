@@ -271,9 +271,11 @@
     background: rgba(0,0,0,0.4);
     border: 1px solid rgba(139,105,20,0.4);
     color: #d4c5a0;
-    font-family: 'EB Garamond', serif; font-size: 14px; line-height: 1.5;
+    font-family: 'EB Garamond', serif; font-size: 14px; line-height: 1.6;
     padding: 10px 12px; border-radius: 5px; outline: none;
-    resize: vertical; transition: border-color 0.15s, box-shadow 0.15s;
+    resize: none; /* auto-grow controla a altura */
+    overflow-y: auto;
+    transition: border-color 0.15s, box-shadow 0.15s, height 0.1s;
   }
   .mn-form textarea:focus {
     border-color: #b88a2c;
@@ -386,8 +388,52 @@
     word-wrap: break-word;
   }
   .mn-entry-text {
-    color: #d4c5a0; font-size: 14px; line-height: 1.6;
-    white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word;
+    color: #d4c5a0; font-size: 14px; line-height: 1.65;
+    word-wrap: break-word; overflow-wrap: break-word;
+    max-width: 72ch;  /* limite de largura pra leitura confortável */
+  }
+  .mn-entry-text p {
+    margin: 0 0 10px;
+  }
+  .mn-entry-text p:last-child { margin-bottom: 0; }
+  /* Cabeçalho de seção dentro do corpo (linhas que terminam em ":") */
+  .mn-entry-text .mn-section {
+    font-family: 'Cinzel', serif;
+    color: #d4a843;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin: 14px 0 6px;
+    padding-bottom: 3px;
+    border-bottom: 1px solid rgba(212,168,67,0.2);
+  }
+  .mn-entry-text .mn-section:first-child { margin-top: 2px; }
+
+  /* Colapso de entradas longas */
+  .mn-entry.mn-colapsavel { position: relative; }
+  .mn-entry.mn-colapsavel.colapsado .mn-entry-text {
+    max-height: 200px;
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);
+            mask-image: linear-gradient(to bottom, #000 70%, transparent 100%);
+  }
+  .mn-ver-mais {
+    background: linear-gradient(180deg, rgba(139,105,20,0.25), rgba(0,0,0,0.4));
+    border: 1px solid rgba(184,138,44,0.35);
+    color: #d4a843;
+    font-family: 'Cinzel', serif;
+    font-size: 11px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+    padding: 6px 14px; margin-top: 10px;
+    border-radius: 14px;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.15s;
+  }
+  .mn-ver-mais:hover {
+    background: linear-gradient(180deg, rgba(184,138,44,0.4), rgba(139,105,20,0.2));
+    border-color: #d4a843; color: #f4d878;
   }
   .mn-empty {
     text-align: center; padding: 40px 20px;
@@ -501,14 +547,18 @@
     document.getElementById('mn-close-btn').addEventListener('click', fechar);
     document.getElementById('mn-form').addEventListener('submit', onSubmit);
     document.getElementById('mn-cancel').addEventListener('click', cancelarEdicao);
-    document.getElementById('mn-texto').addEventListener('keydown', e => {
+    const taEl = document.getElementById('mn-texto');
+    taEl.addEventListener('keydown', e => {
       if (e.ctrlKey && e.key === 'Enter') { e.preventDefault(); onSubmit(e); }
     });
+    // Auto-grow: cresce com o conteúdo (até um teto generoso)
+    taEl.addEventListener('input', () => autoGrowTextarea(taEl));
 
     // Templates por categoria — preenche o textarea quando o usuário muda
     // pra essa categoria E o campo está vazio (sem sobrescrever conteúdo).
     document.getElementById('mn-cat').addEventListener('change', e => {
       aplicarTemplateCategoria(e.target.value);
+      autoGrowTextarea(taEl);
     });
 
     rebuildCategorias();
@@ -815,31 +865,39 @@
         <div class="mn-entry-text"></div>
       `;
       if (n.titulo) div.querySelector('.mn-entry-titulo').textContent = n.titulo;
-      div.querySelector('.mn-entry-text').textContent = n.texto;
+      div.querySelector('.mn-entry-text').innerHTML = renderTextoLeve(n.texto);
       div.querySelector('[data-act="edit"]').addEventListener('click', () => iniciarEdicao(n));
       div.querySelector('[data-act="del"]').addEventListener('click', async () => {
         if (!confirm('Apagar esta anotação?')) return;
-        if (await deletarNota(n.id)) renderTimeline().then(renderListaPj);
+        if (await deletarNota(n.id)) {
+          await renderTimeline();
+          await renderListaPj();
+        }
       });
       wrap.appendChild(div);
+      aplicarColapso(div);
     });
   }
 
   function iniciarEdicao(n) {
     _editandoId = n.id;
     document.getElementById('mn-titulo').value = n.titulo || '';
-    document.getElementById('mn-texto').value = n.texto;
+    const ta = document.getElementById('mn-texto');
+    ta.value = n.texto;
     document.getElementById('mn-cat').value = n.categoria;
     document.getElementById('mn-data').value = n.data_ref || hojeLocal();
     document.getElementById('mn-submit').textContent = 'Salvar edição';
     document.getElementById('mn-cancel').style.display = '';
     document.getElementById('mn-titulo').focus();
+    autoGrowTextarea(ta);
+    // Rola o form pra ele aparecer
+    document.querySelector('.mn-form')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
   function cancelarEdicao() {
     _editandoId = null;
     const t = document.getElementById('mn-titulo'); if (t) t.value = '';
-    const ta = document.getElementById('mn-texto'); if (ta) ta.value = '';
+    const ta = document.getElementById('mn-texto'); if (ta) { ta.value = ''; autoGrowTextarea(ta); }
     const s = document.getElementById('mn-submit'); if (s) s.textContent = '+ Adicionar';
     const c = document.getElementById('mn-cancel'); if (c) c.style.display = 'none';
   }
@@ -871,6 +929,66 @@
 
   function escapeHtml(s) {
     return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+
+  // Textarea cresce com o conteúdo (até um teto pra não ocupar a tela inteira).
+  function autoGrowTextarea(el) {
+    if (!el) return;
+    el.style.height = 'auto';
+    const max = 520; // px — depois disso volta a ter scroll
+    el.style.height = Math.min(el.scrollHeight + 2, max) + 'px';
+  }
+
+  // Render leve do texto: linhas curtas terminando em ':' viram cabeçalho de seção.
+  // Tudo escapado pra evitar XSS. Sem markdown completo, apenas estrutura visual.
+  function renderTextoLeve(texto) {
+    if (!texto) return '';
+    const linhas = texto.split('\n');
+    let html = '';
+    let buffer = [];
+
+    const flush = () => {
+      if (!buffer.length) return;
+      html += `<p>${buffer.join('<br>')}</p>`;
+      buffer = [];
+    };
+
+    for (const linha of linhas) {
+      const trim = linha.trim();
+      if (trim === '') { flush(); continue; }
+      // Heading: curto (< 50 chars) E termina com ":" E não tem pontuação narrativa antes
+      const semDois = trim.slice(0, -1);
+      if (trim.length < 50 && /:$/.test(trim) && !/[.!?]/.test(semDois)) {
+        flush();
+        html += `<h5 class="mn-section">${escapeHtml(trim)}</h5>`;
+        continue;
+      }
+      buffer.push(escapeHtml(linha));  // preserva espaços iniciais
+    }
+    flush();
+    return html;
+  }
+
+  // Aplica colapso visual ao card: se for muito alto, esconde excesso com fade
+  // e mostra botão "Ver mais"/"Ver menos".
+  function aplicarColapso(div) {
+    const textEl = div.querySelector('.mn-entry-text');
+    if (!textEl) return;
+    // Mede altura natural após o paint
+    requestAnimationFrame(() => {
+      const ALT_MAX = 240; // px — limite antes de colapsar
+      if (textEl.scrollHeight <= ALT_MAX + 40) return;  // pequeno o suficiente
+      div.classList.add('mn-colapsavel', 'colapsado');
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'mn-ver-mais';
+      btn.textContent = '▾ Ver mais';
+      btn.addEventListener('click', () => {
+        const aberto = div.classList.toggle('colapsado') === false;
+        btn.textContent = aberto ? '▴ Ver menos' : '▾ Ver mais';
+      });
+      div.appendChild(btn);
+    });
   }
 
   // ===== ABRIR/FECHAR =====
