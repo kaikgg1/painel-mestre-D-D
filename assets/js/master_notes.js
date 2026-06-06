@@ -44,6 +44,32 @@
     return ids.map(id => POR_ID[id]).filter(Boolean);
   }
 
+  // Templates: estrutura sugerida ao escolher certas categorias.
+  // Só preenche se o textarea estiver totalmente vazio (não atrapalha quem digita).
+  const TEMPLATES = {
+    npc: '🎭 Características:\n\n📜 História:\n\n🎯 Objetivos:\n',
+    equipamento: '📋 Descrição:\n\n⚙ Mecânica/efeito:\n\n📍 Localização:\n',
+    historia: '',
+    loot: '',
+    decisao: '',
+    segredo: '',
+    outro: ''
+  };
+  function aplicarTemplateCategoria(catId) {
+    if (_editandoId) return;  // não bagunça quando está editando
+    const tpl = TEMPLATES[catId];
+    if (!tpl) return;
+    const ta = document.getElementById('mn-texto');
+    if (!ta) return;
+    if (ta.value.trim() === '') {
+      ta.value = tpl;
+      // posiciona o cursor depois do primeiro ":" pra começar a digitar logo
+      const firstColon = tpl.indexOf(':');
+      const pos = firstColon >= 0 ? firstColon + 1 : tpl.length;
+      try { ta.setSelectionRange(pos, pos); ta.focus(); } catch {}
+    }
+  }
+
   let _injetado = false;
   let _pjs = [];          // {id, nome}
   let _pjSelId = null;    // id do PJ ativo OU null se modo campanha
@@ -181,15 +207,11 @@
   }
   .mn-pj.mn-campanha.ativo .count { background: rgba(0,0,0,0.4); color: #f4b8a8; }
 
-  /* Sub-header "Jogadores" entre Campanha e a lista */
-  .mn-pj-sub-header {
-    font-family: 'Cinzel', serif; font-size: 9px;
-    color: #b88a2c; letter-spacing: 1.5px; text-transform: uppercase;
-    padding: 12px 4px 6px;
-    border-bottom: 1px dashed rgba(139,105,20,0.25);
-    margin-bottom: 4px;
-    font-weight: 700;
+  /* Bloco da Campanha (no topo da sidebar, acima do label "Jogadores") */
+  .mn-campanha-section {
+    padding: 10px 8px 4px;
   }
+  .mn-campanha-section:empty { display: none; }
   .mn-pj .count {
     background: rgba(0,0,0,0.5); color: #d4c5a0;
     padding: 2px 9px; border-radius: 10px; font-size: 10px;
@@ -258,6 +280,25 @@
     box-shadow: 0 0 0 3px rgba(184,138,44,0.12);
   }
   .mn-form textarea::placeholder { color: #6a5a3a; font-style: italic; }
+  .mn-titulo-input {
+    width: 100%;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(139,105,20,0.4);
+    border-left: 3px solid #b88a2c;
+    color: #d4a843;
+    font-family: 'Cinzel', serif;
+    font-size: 16px; font-weight: 700; letter-spacing: 0.5px;
+    padding: 10px 14px; border-radius: 5px; outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .mn-titulo-input::placeholder {
+    color: #6a5a3a; font-style: italic; font-weight: 400; letter-spacing: 0.3px;
+  }
+  .mn-titulo-input:focus {
+    border-color: #b88a2c;
+    border-left-color: #d4a843;
+    box-shadow: 0 0 0 3px rgba(184,138,44,0.12);
+  }
   .mn-form select, .mn-form input[type="date"] {
     background: rgba(0,0,0,0.4);
     border: 1px solid rgba(139,105,20,0.4);
@@ -335,6 +376,15 @@
     font-size: 13px; transition: all 0.15s; min-width: 32px; min-height: 32px;
   }
   .mn-entry-actions button:hover { background: rgba(139,29,29,0.3); color: #d4c5a0; border-color: rgba(139,29,29,0.4); }
+  .mn-entry-titulo {
+    font-family: 'Cinzel Decorative', serif;
+    color: #d4a843;
+    font-size: 17px; font-weight: 700; line-height: 1.25;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+    text-shadow: 0 0 14px rgba(212,168,67,0.18);
+    word-wrap: break-word;
+  }
   .mn-entry-text {
     color: #d4c5a0; font-size: 14px; line-height: 1.6;
     white-space: pre-wrap; word-wrap: break-word; overflow-wrap: break-word;
@@ -392,6 +442,8 @@
     .mn-form .mn-add-btn,
     .mn-form .mn-cancel-btn { width: 100%; }
     .mn-form textarea { min-height: 80px; font-size: 15px; }
+    .mn-titulo-input { font-size: 15px; padding: 10px 12px; }
+    .mn-entry-titulo { font-size: 15px; }
     .mn-timeline-wrap { padding: 12px 12px 20px; }
     .mn-entry { padding: 10px 12px; }
     .mn-entry-text { font-size: 13px; }
@@ -421,12 +473,14 @@
         </div>
         <div class="mn-body">
           <aside class="mn-sidebar">
+            <div class="mn-campanha-section" id="mn-campanha-section"></div>
             <div class="mn-sidebar-label">Jogadores</div>
             <div class="mn-pj-list-wrap" id="mn-pj-list"></div>
           </aside>
           <section class="mn-main">
             <div class="mn-cats" id="mn-cats" role="toolbar" aria-label="Filtrar e definir categoria"></div>
             <form class="mn-form" id="mn-form" autocomplete="off" novalidate>
+              <input type="text" id="mn-titulo" class="mn-titulo-input" placeholder="Título  (ex.: Fiona Watcher, Bola de Fogo, Sessão 5…)" maxlength="120">
               <textarea id="mn-texto" placeholder="Escreva a anotação…  (Ctrl+Enter para salvar)" required></textarea>
               <div class="mn-form-row">
                 <select id="mn-cat" aria-label="Categoria"></select>
@@ -449,6 +503,12 @@
     document.getElementById('mn-cancel').addEventListener('click', cancelarEdicao);
     document.getElementById('mn-texto').addEventListener('keydown', e => {
       if (e.ctrlKey && e.key === 'Enter') { e.preventDefault(); onSubmit(e); }
+    });
+
+    // Templates por categoria — preenche o textarea quando o usuário muda
+    // pra essa categoria E o campo está vazio (sem sobrescrever conteúdo).
+    document.getElementById('mn-cat').addEventListener('change', e => {
+      aplicarTemplateCategoria(e.target.value);
     });
 
     rebuildCategorias();
@@ -542,7 +602,7 @@
   async function carregarNotas(pjId) {
     const { data, error } = await window.sb
       .from('master_notes')
-      .select('id, categoria, texto, data_ref, created_at')
+      .select('id, categoria, texto, data_ref, created_at, titulo')
       .eq('character_id', pjId)
       .order('data_ref', { ascending: false })
       .order('created_at', { ascending: false });
@@ -556,7 +616,7 @@
     if (!u?.user) return [];
     const { data, error } = await window.sb
       .from('master_notes')
-      .select('id, categoria, texto, data_ref, created_at')
+      .select('id, categoria, texto, data_ref, created_at, titulo')
       .is('character_id', null)
       .eq('user_id', u.user.id)
       .eq('campanha', chave)
@@ -578,14 +638,15 @@
     return count || 0;
   }
 
-  async function inserirNota(pjId, categoria, texto, dataRef) {
+  async function inserirNota(pjId, categoria, texto, dataRef, titulo) {
     const { data: u } = await window.sb.auth.getUser();
     if (!u?.user) return null;
     const payload = {
       user_id: u.user.id,
       categoria,
       texto,
-      data_ref: dataRef || hojeLocal()
+      data_ref: dataRef || hojeLocal(),
+      titulo: (titulo || '').trim() || null,
     };
     if (pjId) payload.character_id = pjId;
     else payload.campanha = _campanha.chave;
@@ -597,10 +658,10 @@
     return data;
   }
 
-  async function atualizarNota(id, categoria, texto, dataRef) {
+  async function atualizarNota(id, categoria, texto, dataRef, titulo) {
     const { error } = await window.sb
       .from('master_notes')
-      .update({ categoria, texto, data_ref: dataRef })
+      .update({ categoria, texto, data_ref: dataRef, titulo: (titulo || '').trim() || null })
       .eq('id', id);
     if (error) { alert('Erro ao atualizar: ' + error.message); return false; }
     return true;
@@ -613,42 +674,22 @@
   }
 
   // ===== RENDER =====
+  // Token de render — anti-race: várias chamadas concorrentes (onSubmit + realtime)
+  // tentavam pintar o mesmo wrap ao mesmo tempo, causando duplicação.
+  // Só o token mais recente chega a tocar o DOM.
+  let _tokListaPj = 0;
+
   async function renderListaPj() {
+    const tok = ++_tokListaPj;
+    const campWrap = document.getElementById('mn-campanha-section');
     const wrap = document.getElementById('mn-pj-list');
-    wrap.innerHTML = '';
+    if (!campWrap || !wrap) return;
 
-    // ===== CARD DE CAMPANHA (sempre primeiro) =====
-    const nCamp = await contarNotasCampanha(_campanha.chave);
-    const camp = document.createElement('button');
-    camp.type = 'button';
-    camp.className = 'mn-pj mn-campanha' + (_modoCampanha ? ' ativo' : '');
-    camp.innerHTML = `
-      <span class="mn-pj-info">
-        <span class="mn-pj-nome">📜 ${escapeHtml(_campanha.titulo)}</span>
-        <span class="mn-pj-sub">Anotações da campanha</span>
-      </span>
-      <span class="count">${nCamp}</span>`;
-    camp.addEventListener('click', selecionarCampanha);
-    wrap.appendChild(camp);
+    // ===== Busca dados (awaits) =====
+    let nCamp = 0;
+    try { nCamp = await contarNotasCampanha(_campanha.chave); } catch {}
+    if (tok !== _tokListaPj) return;
 
-    // Header "Jogadores"
-    if (_pjs.length) {
-      const hdr = document.createElement('div');
-      hdr.className = 'mn-pj-sub-header';
-      hdr.textContent = 'Jogadores';
-      wrap.appendChild(hdr);
-    }
-
-    if (!_pjs.length) {
-      const empty = document.createElement('div');
-      empty.className = 'mn-empty';
-      empty.style.padding = '16px';
-      empty.innerHTML = '<span class="ic">📭</span><div>Nenhum personagem cadastrado.</div>';
-      wrap.appendChild(empty);
-      return;
-    }
-
-    // contagem de notas por PJ
     let contagens = {};
     try {
       const { data } = await window.sb.from('master_notes')
@@ -656,22 +697,45 @@
         .not('character_id', 'is', null);
       (data || []).forEach(r => { contagens[r.character_id] = (contagens[r.character_id] || 0) + 1; });
     } catch {}
+    if (tok !== _tokListaPj) return;
 
-    _pjs.forEach(p => {
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'mn-pj' + (!_modoCampanha && p.id === _pjSelId ? ' ativo' : '');
-      const n = contagens[p.id] || 0;
-      const sub = [p.classe, p.nivel ? 'N'+p.nivel : '', p.jogadorNome && p.jogadorNome !== '?' ? '· ' + p.jogadorNome : '']
-        .filter(Boolean).join(' ');
-      b.innerHTML = `
+    // ===== Constrói HTML como string (atômico) =====
+    const campHtml = `
+      <button type="button" class="mn-pj mn-campanha${_modoCampanha ? ' ativo' : ''}">
         <span class="mn-pj-info">
-          <span class="mn-pj-nome">${escapeHtml(p.nome)}${p.is_active ? ' ★' : ''}</span>
-          ${sub ? `<span class="mn-pj-sub">${escapeHtml(sub)}</span>` : ''}
+          <span class="mn-pj-nome">📜 ${escapeHtml(_campanha.titulo)}</span>
+          <span class="mn-pj-sub">Anotações da campanha</span>
         </span>
-        <span class="count">${n}</span>`;
-      b.addEventListener('click', () => { selecionarPj(p.id); });
-      wrap.appendChild(b);
+        <span class="count">${nCamp}</span>
+      </button>`;
+
+    let pjHtml;
+    if (!_pjs.length) {
+      pjHtml = '<div class="mn-empty" style="padding:16px"><span class="ic">📭</span><div>Nenhum personagem cadastrado.</div></div>';
+    } else {
+      pjHtml = _pjs.map(p => {
+        const n = contagens[p.id] || 0;
+        const sub = [p.classe, p.nivel ? 'N'+p.nivel : '', p.jogadorNome && p.jogadorNome !== '?' ? '· ' + p.jogadorNome : '']
+          .filter(Boolean).join(' ');
+        return `
+          <button type="button" class="mn-pj${!_modoCampanha && p.id === _pjSelId ? ' ativo' : ''}" data-pj-id="${escapeHtml(p.id)}">
+            <span class="mn-pj-info">
+              <span class="mn-pj-nome">${escapeHtml(p.nome)}${p.is_active ? ' ★' : ''}</span>
+              ${sub ? `<span class="mn-pj-sub">${escapeHtml(sub)}</span>` : ''}
+            </span>
+            <span class="count">${n}</span>
+          </button>`;
+      }).join('');
+    }
+
+    if (tok !== _tokListaPj) return;
+    campWrap.innerHTML = campHtml;
+    wrap.innerHTML = pjHtml;
+
+    // Wire-up dos cliques
+    campWrap.querySelector('.mn-campanha')?.addEventListener('click', selecionarCampanha);
+    wrap.querySelectorAll('[data-pj-id]').forEach(b => {
+      b.addEventListener('click', () => selecionarPj(b.dataset.pjId));
     });
   }
 
@@ -708,16 +772,21 @@
   }
 
   let _cacheNotas = [];
+  let _tokTimeline = 0;
   async function renderTimeline() {
+    const tok = ++_tokTimeline;
     const wrap = document.getElementById('mn-timeline');
+    if (!wrap) return;
     if (!_modoCampanha && !_pjSelId) {
       wrap.innerHTML = '<div class="mn-empty"><span class="ic">👆</span><div>Selecione um jogador ou a campanha para ver as anotações.</div></div>';
       return;
     }
     wrap.innerHTML = '<div class="mn-empty"><span class="ic">⏳</span><div>Carregando…</div></div>';
-    _cacheNotas = _modoCampanha
+    const notas = _modoCampanha
       ? await carregarNotasCampanha(_campanha.chave)
       : await carregarNotas(_pjSelId);
+    if (tok !== _tokTimeline) return;  // chamada mais recente já está em andamento
+    _cacheNotas = notas;
     let lista = _cacheNotas;
     if (_filtroCat) lista = lista.filter(n => n.categoria === _filtroCat);
 
@@ -742,8 +811,10 @@
             <button type="button" data-act="del" title="Apagar">🗑</button>
           </span>
         </div>
+        ${n.titulo ? `<div class="mn-entry-titulo"></div>` : ''}
         <div class="mn-entry-text"></div>
       `;
+      if (n.titulo) div.querySelector('.mn-entry-titulo').textContent = n.titulo;
       div.querySelector('.mn-entry-text').textContent = n.texto;
       div.querySelector('[data-act="edit"]').addEventListener('click', () => iniciarEdicao(n));
       div.querySelector('[data-act="del"]').addEventListener('click', async () => {
@@ -756,19 +827,21 @@
 
   function iniciarEdicao(n) {
     _editandoId = n.id;
+    document.getElementById('mn-titulo').value = n.titulo || '';
     document.getElementById('mn-texto').value = n.texto;
     document.getElementById('mn-cat').value = n.categoria;
     document.getElementById('mn-data').value = n.data_ref || hojeLocal();
     document.getElementById('mn-submit').textContent = 'Salvar edição';
     document.getElementById('mn-cancel').style.display = '';
-    document.getElementById('mn-texto').focus();
+    document.getElementById('mn-titulo').focus();
   }
 
   function cancelarEdicao() {
     _editandoId = null;
-    document.getElementById('mn-texto').value = '';
-    document.getElementById('mn-submit').textContent = '+ Adicionar';
-    document.getElementById('mn-cancel').style.display = 'none';
+    const t = document.getElementById('mn-titulo'); if (t) t.value = '';
+    const ta = document.getElementById('mn-texto'); if (ta) ta.value = '';
+    const s = document.getElementById('mn-submit'); if (s) s.textContent = '+ Adicionar';
+    const c = document.getElementById('mn-cancel'); if (c) c.style.display = 'none';
   }
 
   async function onSubmit(e) {
@@ -776,16 +849,17 @@
     if (!_modoCampanha && !_pjSelId) { alert('Selecione um jogador ou a campanha.'); return; }
     const texto = document.getElementById('mn-texto').value.trim();
     if (!texto) return;
-    const cat   = document.getElementById('mn-cat').value;
-    const data  = document.getElementById('mn-data').value || null;
+    const cat    = document.getElementById('mn-cat').value;
+    const data   = document.getElementById('mn-data').value || null;
+    const titulo = document.getElementById('mn-titulo').value;
 
     document.getElementById('mn-submit').disabled = true;
     let ok;
     if (_editandoId) {
-      ok = await atualizarNota(_editandoId, cat, texto, data);
+      ok = await atualizarNota(_editandoId, cat, texto, data, titulo);
     } else {
       // Em modo campanha, pjId=null força a inserção como nota de campanha
-      ok = !!(await inserirNota(_modoCampanha ? null : _pjSelId, cat, texto, data));
+      ok = !!(await inserirNota(_modoCampanha ? null : _pjSelId, cat, texto, data, titulo));
     }
     document.getElementById('mn-submit').disabled = false;
     if (ok) {
