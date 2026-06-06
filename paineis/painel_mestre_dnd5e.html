@@ -449,6 +449,42 @@
     font-style: italic; padding: 4px 0;
   }
 
+  /* ===== MOEDAS (visão do mestre — somente leitura) ===== */
+  .moedas-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+  }
+  .moeda-box-mestre {
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    padding: 6px 4px;
+    background: linear-gradient(180deg, rgba(201,162,74,0.12), rgba(0,0,0,0.25));
+    border: 1px solid rgba(201,162,74,0.35);
+    border-radius: 5px;
+    transition: border-color 0.15s, transform 0.15s;
+    min-height: 56px;
+  }
+  .moeda-box-mestre:hover { border-color: var(--gold); transform: translateY(-1px); }
+  .moeda-box-mestre.zero { opacity: 0.4; }
+  .moeda-box-mestre .m-ic { font-size: 16px; line-height: 1; }
+  .moeda-box-mestre .m-val {
+    font-family: 'Cinzel', serif; font-weight: 700;
+    color: var(--gold); font-size: 14px; line-height: 1.1;
+    margin-top: 3px;
+  }
+  .moeda-box-mestre .m-tag {
+    font-family: 'Cinzel', serif; font-size: 9px;
+    color: var(--brown-soft); letter-spacing: 1px;
+    margin-top: 2px;
+  }
+  @media (max-width: 640px) {
+    .moedas-grid { grid-template-columns: repeat(5, 1fr); gap: 4px; }
+    .moeda-box-mestre { padding: 5px 2px; min-height: 50px; }
+    .moeda-box-mestre .m-val { font-size: 13px; }
+    .moeda-box-mestre .m-tag { font-size: 8px; }
+  }
+
   /* ===== MAGIAS PREPARADAS ===== */
   .spell-list {
     min-height: 30px;
@@ -1171,6 +1207,28 @@ function criarCard(p) {
     });
     slotsSection.appendChild(slotsGrid);
     card.appendChild(slotsSection);
+
+    // === MOEDAS (somente leitura — vem do inventario do jogador) ===
+    if (p.moedas && Object.values(p.moedas).some(v => +v > 0)) {
+      const moedasSection = document.createElement('div');
+      moedasSection.className = 'section';
+      moedasSection.innerHTML = `<div class="section-title">Bolsa</div>`;
+      const moedasGrid = document.createElement('div');
+      moedasGrid.className = 'moedas-grid';
+      const ICONES = { pl:'🔷', po:'🟡', pe:'🟢', pp:'⚪', pc:'🟫' };
+      const NOMES  = { pl:'Platina', po:'Ouro', pe:'Eletro', pp:'Prata', pc:'Cobre' };
+      // Ordem: maior valor primeiro
+      ['pl','po','pe','pp','pc'].forEach(k => {
+        const v = +p.moedas[k] || 0;
+        const box = document.createElement('div');
+        box.className = 'moeda-box-mestre' + (v === 0 ? ' zero' : '');
+        box.title = `${NOMES[k]}: ${v}`;
+        box.innerHTML = `<span class="m-ic" aria-hidden="true">${ICONES[k]}</span><span class="m-val">${v}</span><span class="m-tag">${k.toUpperCase()}</span>`;
+        moedasGrid.appendChild(box);
+      });
+      moedasSection.appendChild(moedasGrid);
+      card.appendChild(moedasSection);
+    }
 
     // === MAGIAS PREPARADAS (do spell_lists do jogador) ===
     const magiasSection = document.createElement('div');

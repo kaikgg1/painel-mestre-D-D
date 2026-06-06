@@ -108,6 +108,10 @@
       isActive: !!row.is_active,
       recursosUsados: row.recursos_usados || {},
       dadoVidaAtual: row.dado_vida_atual ?? 0,
+      // Moedas — extraído de inventario.moedas (JSON livre na ficha)
+      moedas: (row.inventario && row.inventario.moedas)
+              ? { ...{ pc:0, pp:0, pe:0, po:0, pl:0 }, ...row.inventario.moedas }
+              : { pc:0, pp:0, pe:0, po:0, pl:0 },
       // Originais pra exibição (não vão pro UI_TO_DB; só pra leitura)
       _subclasse: row.subclasse || '',
     };
