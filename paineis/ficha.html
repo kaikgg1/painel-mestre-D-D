@@ -1252,6 +1252,261 @@
     .toast-externo { left: 12px; right: 12px; bottom: 12px; max-width: none; }
   }
 
+  /* ===== RECURSOS DE CLASSE — painel personalizado por classe ===== */
+  .rc-painel {
+    background: linear-gradient(160deg, rgba(139,105,20,0.10), rgba(107,16,16,0.06));
+    border: 1px solid rgba(139,105,20,0.4);
+    border-radius: 8px;
+    padding: 14px 16px 16px;
+    margin-bottom: 22px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.4), inset 0 1px 0 rgba(212,168,67,0.08);
+    position: relative;
+    overflow: hidden;
+  }
+  .rc-painel::before {
+    content: '';
+    position: absolute; left: 0; right: 0; top: 0; height: 2px;
+    background: linear-gradient(to right, transparent, var(--gold-bright), transparent);
+  }
+  .rc-cabecalho {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px; flex-wrap: wrap; margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px dashed rgba(139,105,20,0.3);
+  }
+  .rc-cabecalho h3 {
+    font-family: 'Cinzel', serif; color: var(--gold-bright);
+    font-size: 16px; letter-spacing: 1px;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .rc-nv {
+    background: var(--gold-bright); color: var(--shadow);
+    padding: 2px 9px; border-radius: 10px;
+    font-size: 10px; font-weight: 700; letter-spacing: 1px;
+    vertical-align: middle;
+  }
+  .rc-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 10px;
+  }
+  .rc-card {
+    background: linear-gradient(180deg, rgba(0,0,0,0.3), rgba(0,0,0,0.15));
+    border: 1px solid rgba(139,105,20,0.3);
+    border-radius: 6px;
+    padding: 12px;
+    display: flex; flex-direction: column; gap: 9px;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+  .rc-card:hover { border-color: rgba(184,138,44,0.5); }
+  .rc-head {
+    display: flex; align-items: flex-start; gap: 10px;
+  }
+  .rc-icone {
+    font-size: 22px; line-height: 1;
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 6px rgba(184,138,44,0.3));
+  }
+  .rc-titulo-wrap { flex: 1; min-width: 0; }
+  .rc-nome {
+    font-family: 'Cinzel', serif;
+    color: var(--parchment); font-weight: 700;
+    font-size: 13px; letter-spacing: 0.5px;
+    line-height: 1.2;
+  }
+  .rc-periodo {
+    font-style: italic; color: var(--text-dim);
+    font-size: 10px; letter-spacing: 0.5px;
+    margin-top: 2px;
+  }
+  .rc-reset {
+    background: transparent; border: 1px solid rgba(140,125,94,0.3);
+    color: var(--text-dim); padding: 4px 8px; border-radius: 4px;
+    cursor: pointer; font-size: 14px; line-height: 1;
+    min-width: 32px; min-height: 32px;
+    transition: all 0.15s; flex-shrink: 0;
+  }
+  .rc-reset:hover { border-color: var(--gold-bright); color: var(--gold-bright); transform: rotate(-180deg); }
+  .rc-pips {
+    display: flex; align-items: center; flex-wrap: wrap; gap: 5px;
+    padding: 4px 0;
+  }
+  .rc-pip {
+    width: 22px; height: 22px;
+    border: 2px solid var(--gold);
+    border-radius: 50%;
+    cursor: pointer;
+    background: radial-gradient(circle, rgba(184,138,44,0.18), rgba(0,0,0,0.4));
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.5);
+    transition: transform 0.12s, background 0.12s, border-color 0.12s, box-shadow 0.12s;
+    position: relative;
+  }
+  .rc-pip:hover {
+    transform: scale(1.15);
+    border-color: var(--gold-bright);
+    box-shadow: 0 0 8px rgba(184,138,44,0.4), inset 0 1px 2px rgba(0,0,0,0.5);
+  }
+  .rc-pip.gasto {
+    background: radial-gradient(circle, var(--blood-bright), var(--blood));
+    border-color: var(--blood);
+    box-shadow: inset 0 1px 4px rgba(0,0,0,0.6);
+  }
+  .rc-pip.gasto::after {
+    content: '✕'; position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: rgba(255,255,255,0.4); font-size: 11px; font-weight: 700;
+  }
+  .rc-frac {
+    margin-left: auto;
+    font-family: 'Cinzel', serif;
+    color: var(--text-dim); font-size: 11px;
+    letter-spacing: 0.5px;
+  }
+  .rc-frac strong { color: var(--gold-bright); font-weight: 700; }
+
+  /* Pool numérico (Cura pelas Mãos, Pontos de Feitiçaria, Chi etc.) */
+  .rc-pool {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(139,105,20,0.25);
+    border-radius: 6px;
+    padding: 6px 8px;
+  }
+  .rc-pool-btn {
+    background: linear-gradient(180deg, rgba(107,16,16,0.4), rgba(56,8,8,0.6));
+    border: 1px solid var(--blood);
+    color: var(--parchment);
+    font-family: 'Cinzel', serif; font-weight: 700;
+    width: 32px; height: 32px;
+    border-radius: 4px; cursor: pointer;
+    font-size: 14px;
+    transition: all 0.12s;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .rc-pool-btn.rc-pool-btn-big { width: 38px; font-size: 11px; padding: 0 4px; }
+  .rc-pool-btn:hover { background: linear-gradient(180deg, var(--blood-bright), var(--blood)); transform: translateY(-1px); }
+  .rc-pool-btn[data-act="mais"] {
+    background: linear-gradient(180deg, rgba(139,105,20,0.4), rgba(80,60,12,0.6));
+    border-color: var(--gold);
+  }
+  .rc-pool-btn[data-act="mais"]:hover { background: linear-gradient(180deg, var(--gold-bright), var(--gold)); color: var(--shadow); }
+  .rc-pool-display {
+    flex: 1; text-align: center;
+    font-family: 'Cinzel', serif; font-size: 15px;
+    color: var(--parchment);
+  }
+  .rc-pool-livre { color: var(--gold-bright); font-weight: 700; font-size: 18px; }
+  .rc-pool-sep { color: var(--text-dim); margin: 0 4px; }
+  .rc-pool-max { color: var(--text-dim); }
+  .rc-dica {
+    font-style: italic; color: var(--text-dim);
+    font-size: 11px; line-height: 1.4;
+    padding-top: 6px;
+    border-top: 1px dashed rgba(139,105,20,0.15);
+  }
+
+  /* ===== MODAL FEITIÇARIA — Converter pontos ⇄ slots ===== */
+  .fei-overlay {
+    position: fixed; inset: 0; z-index: 300;
+    background: rgba(0,0,0,0.8);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.18s ease-out;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .fei-modal {
+    background: linear-gradient(160deg, #1f1416 0%, #160c10 100%);
+    border: 2px solid var(--gold);
+    border-radius: 8px;
+    max-width: 520px; width: 100%;
+    max-height: 90vh; max-height: 90dvh;
+    overflow-y: auto;
+    padding: 22px 24px;
+    box-shadow: 0 0 0 1px var(--blood-bright) inset, 0 24px 60px rgba(0,0,0,0.8);
+    position: relative;
+    animation: feiIn 0.2s ease-out;
+  }
+  @keyframes feiIn { from { transform: scale(0.96); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .fei-close {
+    position: absolute; top: 12px; right: 12px;
+    background: transparent; border: 1px solid var(--text-dim);
+    color: var(--text-dim); cursor: pointer;
+    width: 32px; height: 32px; border-radius: 4px;
+    font-size: 14px; line-height: 1;
+    transition: all 0.15s;
+  }
+  .fei-close:hover { border-color: var(--blood-bright); color: var(--parchment); background: var(--blood); }
+  .fei-titulo {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 20px; color: var(--gold-bright);
+    letter-spacing: 1.5px; margin-bottom: 8px;
+    padding-right: 36px;
+  }
+  .fei-status {
+    font-family: 'Cinzel', serif; font-size: 13px;
+    color: var(--parchment); letter-spacing: 0.5px;
+    padding: 8px 12px; border-radius: 4px;
+    background: rgba(184,138,44,0.1);
+    border: 1px solid rgba(184,138,44,0.3);
+    margin-bottom: 16px;
+  }
+  .fei-status strong { color: var(--gold-bright); font-size: 16px; }
+  .fei-sec { margin-bottom: 16px; }
+  .fei-sec-titulo {
+    font-family: 'Cinzel', serif; font-size: 11px;
+    color: var(--gold); letter-spacing: 1.5px;
+    text-transform: uppercase; margin-bottom: 8px;
+  }
+  .fei-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+    gap: 6px;
+  }
+  .fei-opt {
+    background: linear-gradient(180deg, rgba(139,105,20,0.2), rgba(0,0,0,0.3));
+    border: 1px solid rgba(139,105,20,0.4);
+    color: var(--parchment);
+    padding: 10px 12px; border-radius: 5px;
+    cursor: pointer;
+    font-family: 'Cinzel', serif; font-size: 12px;
+    display: flex; flex-direction: column; gap: 2px;
+    transition: all 0.15s; min-height: 56px;
+    align-items: center; justify-content: center;
+  }
+  .fei-opt:hover:not(.desabilitada) {
+    border-color: var(--gold-bright);
+    background: linear-gradient(180deg, rgba(184,138,44,0.3), rgba(139,105,20,0.2));
+    transform: translateY(-2px);
+  }
+  .fei-opt.desabilitada {
+    opacity: 0.4; cursor: not-allowed;
+  }
+  .fei-opt-lvl { font-weight: 700; letter-spacing: 0.5px; }
+  .fei-opt-custo {
+    font-size: 10px; color: var(--gold-bright);
+    letter-spacing: 0.5px; font-style: italic;
+  }
+  .fei-vazio {
+    grid-column: 1/-1; padding: 14px; text-align: center;
+    color: var(--text-dim); font-style: italic; font-size: 12px;
+  }
+  .fei-rodape {
+    font-size: 10px; color: var(--text-dim);
+    font-style: italic; padding-top: 10px;
+    border-top: 1px solid rgba(139,105,20,0.2);
+    margin-top: 10px; line-height: 1.4;
+  }
+
+  @media (max-width: 600px) {
+    .rc-grid { grid-template-columns: 1fr; }
+    .rc-pip { width: 26px; height: 26px; }
+    .rc-pool-btn { width: 38px; height: 38px; }
+    .rc-pool-btn.rc-pool-btn-big { width: 44px; }
+    .rc-reset { min-width: 38px; min-height: 38px; }
+    .fei-modal { padding: 18px; }
+    .fei-titulo { font-size: 17px; }
+    .fei-opt { min-height: 52px; }
+  }
+
   /* ===== LOCK GLOBAL — modo "ler" por padrão ===== */
   .btn-lock-toggle {
     padding: 8px 12px;
@@ -1950,8 +2205,373 @@ function renderSlotsMagia(c, slots) {
   </div>`;
 }
 
+/* ============================================================
+   RECURSOS DE CLASSE — trackers por classe × nível
+   Cada classe define recursos rastreáveis que escalam com o nível.
+   Pips clicáveis salvam em charAtivo.recursos_usados (mesma tabela
+   usada pelas features auto-detectadas).
+   ============================================================ */
+const _max1 = v => Math.max(1, v);
+const RECURSOS_POR_CLASSE = {
+  barbaro: (nv) => [
+    { id: 'furia', nome: 'Fúria', icone: '🔥',
+      max: nv >= 17 ? 6 : nv >= 12 ? 5 : nv >= 6 ? 4 : nv >= 3 ? 3 : 2,
+      periodo: 'descanso longo', dica: 'Ação bônus · Dano de fúria: ' + (nv >= 16 ? '+4' : nv >= 9 ? '+3' : '+2') }
+  ],
+  bardo: (nv, a) => [
+    { id: 'inspiracao_bardica', nome: 'Inspiração Bárdica', icone: '🎵',
+      max: _max1(mod(a.car)),
+      periodo: nv >= 5 ? 'descanso curto' : 'descanso longo',
+      dica: 'Dado: ' + (nv >= 15 ? 'd12' : nv >= 10 ? 'd10' : nv >= 5 ? 'd8' : 'd6') + ' · Ação bônus' }
+  ],
+  bruxo: (nv) => {
+    const r = [];
+    const slotsPacto = nv >= 11 ? 3 : nv >= 2 ? 2 : 1;
+    const nivelSlot = nv >= 9 ? 5 : nv >= 7 ? 4 : nv >= 5 ? 3 : nv >= 3 ? 2 : 1;
+    r.push({ id: 'magias_pacto', nome: 'Magias do Pacto', icone: '🔮',
+      max: slotsPacto, periodo: 'descanso curto',
+      dica: `Slots de nível ${nivelSlot}` });
+    if (nv >= 11) r.push({ id: 'arcano_6', nome: 'Arcano Místico 6°', icone: '◆', max: 1, periodo: 'descanso longo' });
+    if (nv >= 13) r.push({ id: 'arcano_7', nome: 'Arcano Místico 7°', icone: '◆', max: 1, periodo: 'descanso longo' });
+    if (nv >= 15) r.push({ id: 'arcano_8', nome: 'Arcano Místico 8°', icone: '◆', max: 1, periodo: 'descanso longo' });
+    if (nv >= 17) r.push({ id: 'arcano_9', nome: 'Arcano Místico 9°', icone: '◆', max: 1, periodo: 'descanso longo' });
+    return r;
+  },
+  clerigo: (nv) => [
+    { id: 'canalizar_divindade', nome: 'Canalizar Divindade', icone: '✨',
+      max: nv >= 18 ? 3 : nv >= 6 ? 2 : 1, periodo: 'descanso curto',
+      dica: 'Expulsar Mortos-Vivos + opção do domínio' }
+  ],
+  druida: (nv) => [
+    { id: 'forma_selvagem', nome: 'Forma Selvagem', icone: '🐺',
+      max: nv >= 20 ? 99 : 2, periodo: 'descanso curto',
+      dica: nv >= 20 ? 'Ilimitada (Arquidruida)' : `CR ${nv >= 8 ? '1' : nv >= 4 ? '1/2' : '1/4'}` }
+  ],
+  feiticeiro: (nv) => [
+    { id: 'pontos_feiticaria', nome: 'Pontos de Feitiçaria', icone: '✨',
+      max: nv, periodo: 'descanso longo',
+      dica: 'Converte ⇄ slots · Custos: slot 1°=2pt, 2°=3, 3°=5, 4°=6, 5°=7' }
+  ],
+  guerreiro: (nv) => {
+    const r = [
+      { id: 'retomar_folego', nome: 'Retomar o Fôlego', icone: '💨', max: 1, periodo: 'descanso curto',
+        dica: `Cura 1d10 + ${nv} PV (ação bônus)` },
+      { id: 'surto_acao', nome: 'Surto de Ação', icone: '⚡',
+        max: nv >= 17 ? 2 : 1, periodo: 'descanso curto', dica: 'Ação adicional no turno' },
+    ];
+    if (nv >= 9) r.push({ id: 'indomavel', nome: 'Indomável', icone: '🛡',
+      max: nv >= 17 ? 3 : nv >= 13 ? 2 : 1, periodo: 'descanso longo',
+      dica: 'Re-rola teste de resistência falhado' });
+    return r;
+  },
+  ladino: (nv) => [
+    { id: 'golpe_sorte', nome: 'Golpe de Sorte', icone: '🍀', max: 1, periodo: 'descanso curto',
+      dica: 'Falha → sucesso (ou sucesso inimigo → falha)', visivel: nv >= 20 }
+  ].filter(r => r.visivel !== false),
+  mago: (nv) => [
+    { id: 'recuperacao_arcana', nome: 'Recuperação Arcana', icone: '🔮',
+      max: 1, periodo: 'descanso longo',
+      dica: `Recupera slots: soma ≤ ${Math.ceil(nv/2)}, nenhum acima do 5°` }
+  ],
+  monge: (nv) => {
+    if (nv < 2) return [];
+    return [
+      { id: 'chi', nome: 'Pontos de Chi', icone: '☯', max: nv, periodo: 'descanso curto',
+        dica: 'Rajada de Golpes (1) · Defesa Paciente (1) · Passo do Vento (1) · Golpe Atordoante (1)' }
+    ];
+  },
+  paladino: (nv, a) => {
+    const r = [
+      { id: 'cura_maos', nome: 'Cura pelas Mãos', icone: '💚', max: nv * 5, periodo: 'descanso longo',
+        dica: 'Pool de PV · Distribua como quiser entre toques', step: 1 },
+      { id: 'sentido_divino', nome: 'Sentido Divino', icone: '👁',
+        max: 1 + Math.max(0, mod(a.car)), periodo: 'descanso longo',
+        dica: 'Detecta celestiais/mortos-vivos/corruptos em 18m' },
+    ];
+    if (nv >= 14) r.push({ id: 'toque_purificador', nome: 'Toque Purificador', icone: '✨',
+      max: _max1(mod(a.car)), periodo: 'descanso longo', dica: 'Termina 1 efeito mágico' });
+    return r;
+  },
+  patrulheiro: (nv) => {
+    // Patrulheiro PHB tem poucos slots rastreáveis fora dos slots de magia
+    return [];
+  },
+};
+
+function recursosPara(c, atrs) {
+  if (!c) return [];
+  const chave = chaveDeClasse(c.classe);
+  const fn = RECURSOS_POR_CLASSE[chave];
+  if (!fn) return [];
+  const nv = +c.nivel || 1;
+  try { return fn(nv, atrs || c.atributos || {}); }
+  catch { return []; }
+}
+
+function renderRecursosClasse(c) {
+  const wrap = document.getElementById('recursos-classe-wrap');
+  if (!wrap) return;
+  const recursos = recursosPara(c, c.atributos);
+  if (!recursos.length) { wrap.innerHTML = ''; return; }
+
+  const usados = c.recursos_usados || {};
+  const ehFeit = chaveDeClasse(c.classe) === 'feiticeiro';
+
+  const cards = recursos.map(r => {
+    const usado = Math.min(r.max, usados[r.id] || 0);
+    const livre = r.max - usado;
+    const passo = r.step || 1;
+    // Pool grande (>10) usa input numérico; senão pips visuais
+    const usaPool = r.max > 12;
+    const corpoTracker = usaPool
+      ? `<div class="rc-pool">
+           <button type="button" class="rc-pool-btn no-lock" data-act="menos" data-rc="${escape(r.id)}" data-rc-step="${passo}" aria-label="Usar 1">−</button>
+           <button type="button" class="rc-pool-btn rc-pool-btn-big no-lock" data-act="menos" data-rc="${escape(r.id)}" data-rc-step="5" aria-label="Usar 5">−5</button>
+           <div class="rc-pool-display"><strong class="rc-pool-livre">${livre}</strong><span class="rc-pool-sep">/</span><span class="rc-pool-max">${r.max}</span></div>
+           <button type="button" class="rc-pool-btn rc-pool-btn-big no-lock" data-act="mais" data-rc="${escape(r.id)}" data-rc-step="5" aria-label="Recuperar 5">+5</button>
+           <button type="button" class="rc-pool-btn no-lock" data-act="mais" data-rc="${escape(r.id)}" data-rc-step="${passo}" aria-label="Recuperar 1">+</button>
+         </div>`
+      : `<div class="rc-pips" data-rc="${escape(r.id)}" data-rc-max="${r.max}">
+           ${Array.from({length: r.max}, (_, i) =>
+             `<span class="rc-pip ${i < usado ? 'gasto' : ''}" data-rc-idx="${i}" role="button" tabindex="0" aria-label="Uso ${i+1} de ${r.max}"></span>`
+           ).join('')}
+           <span class="rc-frac"><strong>${livre}</strong>/${r.max}</span>
+         </div>`;
+
+    return `
+      <div class="rc-card" data-rc-card="${escape(r.id)}">
+        <div class="rc-head">
+          <span class="rc-icone" aria-hidden="true">${r.icone || '●'}</span>
+          <div class="rc-titulo-wrap">
+            <div class="rc-nome">${escape(r.nome)}</div>
+            <div class="rc-periodo">↻ ${escape(r.periodo || '')}</div>
+          </div>
+          <button type="button" class="rc-reset no-lock" data-rc-reset="${escape(r.id)}" title="Recuperar tudo" aria-label="Recuperar todos os usos">⟲</button>
+        </div>
+        ${corpoTracker}
+        ${r.dica ? `<div class="rc-dica">${escape(r.dica)}</div>` : ''}
+      </div>`;
+  }).join('');
+
+  const cabec = `
+    <div class="rc-cabecalho">
+      <h3 style="margin:0">Recursos de ${escape(c.classe || 'Classe')} <span class="rc-nv">N${+c.nivel || 1}</span></h3>
+      ${ehFeit ? `<button type="button" class="btn no-lock" id="btn-fei-converter" title="Converter pontos ⇄ slots">⇄ Converter</button>` : ''}
+    </div>`;
+
+  wrap.innerHTML = `
+    <div class="rc-painel">
+      ${cabec}
+      <div class="rc-grid">${cards}</div>
+    </div>`;
+
+  ligarListenersRecursos();
+  if (ehFeit) ligarConversorFeiticaria();
+}
+
+function ligarListenersRecursos() {
+  // Pips clicáveis (igual ao Strahd: clique gasta o próximo, clicar num gasto recupera dali)
+  document.querySelectorAll('.rc-pip').forEach(pip => {
+    pip.addEventListener('click', () => alternarPipRecurso(pip));
+    pip.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); alternarPipRecurso(pip); } });
+  });
+  // Botões do pool numérico (Cura pelas Mãos etc)
+  document.querySelectorAll('.rc-pool-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.rc;
+      const passo = +btn.dataset.rcStep || 1;
+      const delta = btn.dataset.act === 'menos' ? +passo : -passo;
+      ajustarRecurso(id, delta);
+    });
+  });
+  // Reset
+  document.querySelectorAll('.rc-reset').forEach(b => {
+    b.addEventListener('click', () => {
+      const id = b.dataset.rcReset;
+      if (!charAtivo) return;
+      const rec = charAtivo.recursos_usados || {};
+      rec[id] = 0;
+      charAtivo.recursos_usados = rec;
+      renderRecursosClasse(charAtivo);
+      salvarRecursos();
+    });
+  });
+}
+
+function alternarPipRecurso(pip) {
+  const grupo = pip.closest('.rc-pips');
+  const id = grupo.dataset.rc;
+  const max = +grupo.dataset.rcMax;
+  const idx = +pip.dataset.rcIdx;
+  const pips = [...grupo.querySelectorAll('.rc-pip')];
+  const eraGasto = pip.classList.contains('gasto');
+  // Clique no primeiro disponível → gasta. Clique no último gasto → recupera dali.
+  const novoGastos = eraGasto ? idx : idx + 1;
+  if (!charAtivo) return;
+  const rec = charAtivo.recursos_usados || {};
+  rec[id] = Math.max(0, Math.min(max, novoGastos));
+  charAtivo.recursos_usados = rec;
+  pips.forEach((p, i) => p.classList.toggle('gasto', i < novoGastos));
+  // Atualiza fração
+  const frac = grupo.querySelector('.rc-frac');
+  if (frac) frac.innerHTML = `<strong>${max - novoGastos}</strong>/${max}`;
+  salvarRecursos();
+}
+
+function ajustarRecurso(id, delta) {
+  if (!charAtivo) return;
+  const recs = recursosPara(charAtivo, charAtivo.atributos);
+  const def = recs.find(r => r.id === id);
+  if (!def) return;
+  const rec = charAtivo.recursos_usados || {};
+  const atual = rec[id] || 0;
+  rec[id] = Math.max(0, Math.min(def.max, atual + delta));
+  charAtivo.recursos_usados = rec;
+  // Atualiza display do card desse recurso (sem re-render geral pra evitar flicker)
+  const card = document.querySelector(`[data-rc-card="${CSS.escape(id)}"]`);
+  if (card) {
+    const livre = def.max - rec[id];
+    const lEl = card.querySelector('.rc-pool-livre');
+    if (lEl) lEl.textContent = livre;
+    const frac = card.querySelector('.rc-frac');
+    if (frac) frac.innerHTML = `<strong>${livre}</strong>/${def.max}`;
+    // Sincroniza pips se for tracker pip
+    const grupo = card.querySelector('.rc-pips');
+    if (grupo) {
+      grupo.querySelectorAll('.rc-pip').forEach((p, i) => p.classList.toggle('gasto', i < rec[id]));
+    }
+  }
+  salvarRecursos();
+}
+
+/* ===== FEITICEIRO: Conversor Pontos ⇄ Slots ===== */
+function ligarConversorFeiticaria() {
+  const btn = document.getElementById('btn-fei-converter');
+  if (!btn) return;
+  btn.addEventListener('click', abrirModalConversorFeit);
+}
+
+// Custos PHB para criar slot via pontos de feitiçaria
+const CUSTO_SLOT_DE_PONTOS = { 1: 2, 2: 3, 3: 5, 4: 6, 5: 7 };
+
+function abrirModalConversorFeit() {
+  if (!charAtivo) return;
+  const nv = +charAtivo.nivel || 1;
+  const recs = recursosPara(charAtivo, charAtivo.atributos);
+  const ptDef = recs.find(r => r.id === 'pontos_feiticaria');
+  if (!ptDef) return;
+  const ptUsados = (charAtivo.recursos_usados || {}).pontos_feiticaria || 0;
+  const ptLivres = ptDef.max - ptUsados;
+
+  // Quais slots o feiticeiro pode criar? (PHB: até 5° nível)
+  const slotsMagia = charAtivo.slots_magia || {};
+  let opcoes = '';
+  for (let lvl = 1; lvl <= 5; lvl++) {
+    const custo = CUSTO_SLOT_DE_PONTOS[lvl];
+    const podePagar = ptLivres >= custo;
+    opcoes += `
+      <button type="button" class="fei-opt ${podePagar ? '' : 'desabilitada'}"
+              data-fei-criar="${lvl}" ${podePagar ? '' : 'disabled'}>
+        <span class="fei-opt-lvl">Slot ${lvl}°</span>
+        <span class="fei-opt-custo">${custo} pt</span>
+      </button>`;
+  }
+
+  // Quais slots pode converter EM pontos? (PHB: 1 slot de nível X = X pontos)
+  let conversaoVolta = '';
+  for (let lvl = 1; lvl <= 9; lvl++) {
+    const s = slotsMagia[lvl];
+    if (!s) continue;
+    const livres = (s.max || 0) - (s.used || 0);
+    if (livres <= 0) continue;
+    conversaoVolta += `
+      <button type="button" class="fei-opt" data-fei-quebrar="${lvl}">
+        <span class="fei-opt-lvl">Slot ${lvl}°</span>
+        <span class="fei-opt-custo">→ ${lvl} pt</span>
+      </button>`;
+  }
+  if (!conversaoVolta) conversaoVolta = '<div class="fei-vazio">Nenhum slot disponível para converter.</div>';
+
+  const overlay = document.createElement('div');
+  overlay.className = 'fei-overlay';
+  overlay.innerHTML = `
+    <div class="fei-modal" role="dialog" aria-modal="true" aria-labelledby="fei-titulo">
+      <button class="fei-close" type="button" aria-label="Fechar">✕</button>
+      <div class="fei-titulo" id="fei-titulo">⇄ Fonte de Magia</div>
+      <div class="fei-status">Pontos de Feitiçaria: <strong>${ptLivres}</strong> / ${ptDef.max}</div>
+      <div class="fei-sec">
+        <div class="fei-sec-titulo">Criar slot (gasta pontos)</div>
+        <div class="fei-grid">${opcoes}</div>
+      </div>
+      <div class="fei-sec">
+        <div class="fei-sec-titulo">Quebrar slot em pontos</div>
+        <div class="fei-grid">${conversaoVolta}</div>
+      </div>
+      <div class="fei-rodape">PHB: 1 slot 1°=2 · 2°=3 · 3°=5 · 4°=6 · 5°=7. Sem conversão acima do 5° nível.</div>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  const fechar = () => overlay.remove();
+  overlay.querySelector('.fei-close').onclick = fechar;
+  overlay.addEventListener('click', e => { if (e.target === overlay) fechar(); });
+
+  // Criar slot
+  overlay.querySelectorAll('[data-fei-criar]').forEach(b => {
+    b.onclick = () => {
+      const lvl = +b.dataset.feiCriar;
+      const custo = CUSTO_SLOT_DE_PONTOS[lvl];
+      const rec = charAtivo.recursos_usados || {};
+      const usados = rec.pontos_feiticaria || 0;
+      if (ptDef.max - usados < custo) return;
+      // Garante que existe entry de slot desse nível
+      const sm = charAtivo.slots_magia || {};
+      if (!sm[lvl]) sm[lvl] = { max: 0, used: 0 };
+      sm[lvl].max = Math.max(sm[lvl].max, 1);
+      sm[lvl].used = Math.max(0, (sm[lvl].used || 0) - 1);
+      // Se used já era 0, aumenta max (slot extra). Mais simples: max += 1, used não muda.
+      // Padrão "criou um slot novo disponível": se used > 0, decrementa; senão max += 1
+      charAtivo.slots_magia = sm;
+      rec.pontos_feiticaria = usados + custo;
+      charAtivo.recursos_usados = rec;
+      toast(`✓ Slot de nível ${lvl} criado (-${custo} pt)`);
+      salvarRecursos();
+      // Salva slots_magia direto
+      window.sb.from('characters').update({ slots_magia: charAtivo.slots_magia }).eq('id', charAtivo.id);
+      fechar();
+      renderRecursosClasse(charAtivo);
+      // Re-render aba Combate se aberta (slots aparecem lá)
+      const tabAtual = document.querySelector('.tab.ativa')?.dataset.tab;
+      if (tabAtual === 'combate') render();
+    };
+  });
+
+  // Quebrar slot
+  overlay.querySelectorAll('[data-fei-quebrar]').forEach(b => {
+    b.onclick = () => {
+      const lvl = +b.dataset.feiQuebrar;
+      const sm = charAtivo.slots_magia || {};
+      if (!sm[lvl] || (sm[lvl].max - (sm[lvl].used || 0)) <= 0) return;
+      sm[lvl].used = (sm[lvl].used || 0) + 1;
+      const rec = charAtivo.recursos_usados || {};
+      const usados = rec.pontos_feiticaria || 0;
+      rec.pontos_feiticaria = Math.max(0, usados - lvl);
+      charAtivo.slots_magia = sm;
+      charAtivo.recursos_usados = rec;
+      toast(`✓ Slot ${lvl}° → +${lvl} pt`);
+      salvarRecursos();
+      window.sb.from('characters').update({ slots_magia: charAtivo.slots_magia }).eq('id', charAtivo.id);
+      fechar();
+      renderRecursosClasse(charAtivo);
+      const tabAtual = document.querySelector('.tab.ativa')?.dataset.tab;
+      if (tabAtual === 'combate') render();
+    };
+  });
+}
+
 function renderHabilidades(c) {
   return `
+    <div id="recursos-classe-wrap"></div>
+
     <h3>Habilidades de Classe</h3>
     <p style="color:var(--text-dim);font-style:italic;font-size:12px;margin-bottom:14px">
       Preenchido automaticamente com base na classe e nível.
@@ -2765,6 +3385,7 @@ function conectarListeners() {
 
   // Habilidades — carrega quando entra
   if (tabAtiva === 'habilidades') {
+    renderRecursosClasse(charAtivo);
     popularHabilidades(charAtivo.classe, charAtivo.nivel, charAtivo.subclasse);
     popularFeaturesPersonalizadas();
     const btnAdd = document.getElementById('btn-add-feature');
