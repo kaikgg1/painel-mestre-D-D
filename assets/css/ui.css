@@ -1,0 +1,86 @@
+/* assets/css/ui.css
+   Normalização visual de caixas de opções (<select>) em todas as telas.
+   - Remove a seta nativa feia e coloca uma seta dourada custom.
+   - Força o popup de opções em tema escuro (color-scheme), legível.
+   - Estiliza as <option> com cor/contraste do tema.
+   Usa !important nas propriedades-chave pra vencer estilos inline (shorthand
+   `background:`) sem precisar reescrever o CSS de cada tela. As cores de
+   fundo/borda específicas de cada select continuam valendo. */
+
+select {
+  /* Remove aparência nativa (seta do SO) */
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+
+  /* Popup de opções em tema escuro nativo (Chrome/Edge/Firefox/Safari) */
+  color-scheme: dark;
+
+  /* Seta dourada custom (chevron) */
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23b88a2c' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 12px center !important;
+  background-size: 14px 14px !important;
+
+  /* Espaço pra seta não cobrir o texto */
+  padding-right: 36px !important;
+
+  cursor: pointer;
+  min-height: 42px;
+  text-overflow: ellipsis;
+  transition: border-color 0.18s, box-shadow 0.18s, background-color 0.18s;
+}
+
+/* Hover/focus mais visíveis e consistentes */
+select:hover {
+  border-color: var(--gold-bright, #b88a2c) !important;
+}
+select:focus,
+select:focus-visible {
+  outline: none;
+  border-color: var(--gold-bright, #b88a2c) !important;
+  box-shadow: 0 0 0 3px rgba(184, 138, 44, 0.18) !important;
+}
+
+/* Seta clareia no hover */
+select:hover {
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23d4a843' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") !important;
+}
+
+/* Select desabilitado: seta apagada */
+select:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* As opções dentro do popup (respeitado por Blink e Firefox) */
+select option,
+select optgroup {
+  background-color: #1a1018;
+  color: #d4c5a0;
+  font-size: 14px;
+  padding: 10px 12px;
+  line-height: 1.5;
+}
+select option:checked,
+select option:hover {
+  background-color: #2a1a28;
+  color: #e8c87a;
+}
+select optgroup {
+  color: #b88a2c;
+  font-style: normal;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* Em mobile, alvos de toque maiores e fonte que evita zoom no iOS */
+@media (max-width: 600px) {
+  select {
+    min-height: 46px !important;
+    font-size: 16px !important;        /* >=16px evita auto-zoom no iOS */
+    background-position: right 14px center !important;
+    padding-right: 40px !important;
+  }
+  select option { font-size: 16px; padding: 12px; }
+}

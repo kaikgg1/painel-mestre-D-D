@@ -692,18 +692,37 @@
   .check-row .exp-marker {
     display: inline-flex; align-items: center; gap: 4px;
     font-size: 10px; color: var(--text-dim); letter-spacing: 1px;
-    margin-left: auto;
+    flex-shrink: 0;
   }
   .check-row .exp-marker input { accent-color: var(--gold-bright); }
-  /* Valor calculado da salvaguarda/perícia (modificador + proficiência) */
+  /* Campo de bônus extra editável (± item/dádiva/situacional) */
+  .check-row .bonus-wrap {
+    display: inline-flex; align-items: center; gap: 2px;
+    flex-shrink: 0;
+  }
+  .check-row .bonus-pm { font-size: 11px; color: var(--text-dim); font-weight: 700; }
+  .check-row .bonus-input {
+    width: 40px; text-align: center;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(139,105,20,0.35);
+    color: var(--parchment);
+    border-radius: 6px; padding: 4px 2px;
+    font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700;
+    outline: none; transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .check-row .bonus-input:focus {
+    border-color: var(--gold-bright);
+    box-shadow: 0 0 0 2px rgba(184,138,44,0.18);
+  }
+  /* Valor calculado da salvaguarda/perícia (modificador + proficiência + bônus) */
   .check-row .valor-calc {
     font-family: 'Cinzel', serif; font-weight: 700;
     font-size: 14px; color: var(--gold-bright);
     background: rgba(139,105,20,0.18);
     border: 1px solid rgba(184,138,44,0.4);
     padding: 3px 9px; border-radius: 12px;
-    min-width: 38px; text-align: center;
-    margin-left: auto;
+    min-width: 42px; text-align: center;
+    flex-shrink: 0;
   }
 
   /* ============ VISUAL COMBATE: HP + stats principais ============ */
@@ -966,6 +985,7 @@
     .tab { padding: 14px 14px; font-size: 11px; min-height: 44px; }
     /* Check rows: touch friendly */
     .check-row { padding: 10px 12px; }
+    .check-row .bonus-input { width: 50px; min-height: 40px; font-size: 16px; }
     .check-row input[type="checkbox"] { width: 22px; height: 22px; }
     .moedas { grid-template-columns: repeat(3, 1fr); }
     .moeda-box input { font-size: 16px; min-height: 36px; }
@@ -1758,6 +1778,7 @@
     .tab { min-height: 44px; padding: 12px 14px; }
   }
 </style>
+<link rel="stylesheet" href="../assets/css/ui.css">
 </head>
 <body>
 
@@ -1876,6 +1897,10 @@ const mod = v => Math.floor(((+v||10) - 10) / 2);
 const fmtMod = m => (m >= 0 ? '+' : '') + m;
 // Bônus de proficiência por nível (PHB 5e): 1-4=+2, 5-8=+3, 9-12=+4, 13-16=+5, 17-20=+6
 const bonusProf = nv => Math.floor(((+nv || 1) - 1) / 4) + 2;
+
+// Salvaguardas aceitam formato legado (bool = proficiência) OU objeto {prof,bonus}
+function salvProf(salv, k) { const v = salv?.[k]; return v === true || !!(v && v.prof); }
+function salvBonus(salv, k) { const v = salv?.[k]; return (v && typeof v === 'object' && +v.bonus) || 0; }
 
 let usuario = null;
 let chars = [];
@@ -2329,21 +2354,27 @@ function renderCombate(c) {
     </div>
 
     <input type="hidden" name="_aba_combate" value="1">
-    <h3>Salvaguardas <span style="font-size:11px;color:var(--text-dim);font-weight:normal;font-style:italic">(valores calculados auto: modificador + ${bonusProf(c.nivel)} se proficiente)</span></h3>
+    <h3>Salvaguardas <span style="font-size:11px;color:var(--text-dim);font-weight:normal;font-style:italic">(auto: modificador + ${bonusProf(c.nivel)} se proficiente · campo ± = bônus extra)</span></h3>
     <div class="check-grid">
       ${ATRIBUTOS.map(([k, nome]) => {
         const m = mod((c.atributos||{})[k] ?? 10);
-        const valor = m + (salv[k] ? bonusProf(c.nivel) : 0);
+        const prof = salvProf(salv, k);
+        const bonus = salvBonus(salv, k);
+        const valor = m + (prof ? bonusProf(c.nivel) : 0) + bonus;
         return `
           <div class="check-row">
-            <label><input type="checkbox" name="salv_${k}" ${salv[k] ? 'checked' : ''} data-salv="${k}"> ${nome}</label>
+            <label><input type="checkbox" name="salv_${k}" ${prof ? 'checked' : ''} data-salv="${k}"> ${nome}</label>
+            <span class="bonus-wrap" title="Bônus extra (item, dádiva, situacional)">
+              <span class="bonus-pm">±</span>
+              <input class="bonus-input" type="text" inputmode="numeric" name="salv_${k}_bonus" value="${bonus||0}" data-salv-bonus="${k}" aria-label="Bônus extra de ${nome}">
+            </span>
             <span class="valor-calc" data-salv-valor="${k}">${fmtMod(valor)}</span>
           </div>
         `;
       }).join('')}
     </div>
 
-    <h3>Perícias <span style="font-size:11px;color:var(--text-dim);font-weight:normal;font-style:italic">(P = Proficiente · E = Expertise — dobra o bônus)</span></h3>
+    <h3>Perícias <span style="font-size:11px;color:var(--text-dim);font-weight:normal;font-style:italic">(P = Proficiente · E = Expertise · campo ± = bônus extra)</span></h3>
     <div class="check-grid">
       ${PERICIAS.map(([k, nome, atr]) => {
         const p = per[k] || {};
@@ -2351,12 +2382,15 @@ function renderCombate(c) {
         const m = mod((c.atributos||{})[atr] ?? 10);
         const bp = bonusProf(c.nivel);
         const valor = m + (p.prof ? bp : 0) + (p.exp ? bp : 0) + bonus;
-        const selo = bonus ? `<span class="bonus-mestre" title="Bônus do Mestre: ${fmtMod(bonus)}">${fmtMod(bonus)}</span>` : '';
         return `
           <div class="check-row">
             <label><input type="checkbox" name="per_${k}_prof" ${p.prof?'checked':''} data-per="${k}" data-atr="${atr}"> ${nome}<span class="atr-tag">${atr.toUpperCase()}</span></label>
             <span class="exp-marker"><input type="checkbox" name="per_${k}_exp" ${p.exp?'checked':''} ${p.prof?'':'disabled'} data-per-exp="${k}"> E</span>
-            <span class="valor-calc" data-per-valor="${k}">${fmtMod(valor)}${selo}</span>
+            <span class="bonus-wrap" title="Bônus extra (item, dádiva, situacional)">
+              <span class="bonus-pm">±</span>
+              <input class="bonus-input" type="text" inputmode="numeric" name="per_${k}_bonus" value="${bonus||0}" data-per-bonus="${k}" aria-label="Bônus extra de ${nome}">
+            </span>
+            <span class="valor-calc" data-per-valor="${k}">${fmtMod(valor)}</span>
           </div>
         `;
       }).join('')}
@@ -3526,22 +3560,24 @@ const TEMPLATES_CRIATURA = {
     nome: 'Golem de Carne', tipo: 'Constructo Médio, neutro',
     ca: 9, hp_max: 93, hp_atual: 93, deslocamento: '9 m',
     atributos: { for:19, dex:9, con:18, int:6, sab:10, car:5 },
-    resistencias: 'Concussão, perfurante e cortante de armas não-mágicas',
-    imunidades: 'Elétrico, veneno · Condições: enfeitiçado, exausto, amedrontado, paralisado, petrificado, envenenado',
+    resistencias: '',
+    imunidades: 'Dano: elétrico, veneno; concussão, cortante e perfurante de ataques não-mágicos que não sejam de adamante · Condições: amedrontado, enfeitiçado, envenenado, exausto, paralisado, petrificado',
     sentidos: 'Visão no escuro 18 m · Percepção passiva 10',
-    idiomas: 'Entende os idiomas do criador, mas não fala',
+    idiomas: 'Compreende os idiomas do seu criador, mas não pode falar',
     nd: '5 (1.800 XP)',
     tracos: [
-      { nome: 'Aversão a Fogo', desc: 'Se sofrer dano de fogo, tem desvantagem em ataques e testes de habilidade até o fim do próximo turno.' },
-      { nome: 'Absorver Eletricidade', desc: 'Sempre que sofreria dano elétrico, em vez disso não sofre dano e recupera PV iguais ao dano elétrico. (Aprimoramento)' },
-      { nome: 'Imutável', desc: 'Imune a qualquer magia ou efeito que altere sua forma.' },
-      { nome: 'Vulnerabilidade Mágica', desc: 'Tem desvantagem em testes de resistência contra magias.' },
+      { nome: 'Absorção de Eletricidade', desc: 'Sempre que for alvo de dano elétrico, não sofre dano e recupera PV iguais ao dano elétrico causado.' },
+      { nome: 'Arma Mágica', desc: 'Os ataques de armas do golem são mágicos.' },
+      { nome: 'Aversão a Fogo', desc: 'Se sofrer dano de fogo, tem desvantagem nas jogadas de ataque e testes de habilidade até o final do próximo turno.' },
+      { nome: 'Forma Imutável', desc: 'Imune a qualquer magia ou efeito que poderia alterar sua forma.' },
+      { nome: 'Fúria', desc: 'Sempre que começar um turno com 40 PV ou menos, role 1d6. Num 6, entra em fúria e ataca a criatura mais próxima a cada turno até ser destruído ou recuperar todos os PV. O criador a até 18 m pode usar uma ação e Carisma (Persuasão) CD 15 para acalmá-lo.' },
+      { nome: 'Resistência à Magia', desc: 'Tem vantagem nos testes de resistência contra magias e outros efeitos mágicos.' },
     ],
     acoes: [
-      { nome: 'Multiataque', desc: 'O golem faz dois ataques de Açoite.' },
-      { nome: 'Açoite (Slam)', desc: '+7 para acertar, alcance 1,5 m, um alvo. Acerto: 13 (2d8+4) de dano de concussão.' },
+      { nome: 'Ataques Múltiplos', desc: 'O golem realiza dois ataques de pancada.' },
+      { nome: 'Pancada', desc: 'Ataque Corpo-a-Corpo com Arma: +7 para atingir, alcance 1,5 m, um alvo. Acerto: 13 (2d8+4) de dano de concussão.' },
     ],
-    notas: '',
+    notas: 'Fonte: Manual dos Monstros, pág. 176.',
   },
   lobo: {
     nome: 'Lobo', tipo: 'Besta Média, não-alinhado',
@@ -4183,7 +4219,12 @@ function conectarListeners() {
     });
   });
   $$('input[name^="per_"][name$="_exp"]').forEach(cb => cb.addEventListener('change', recalcularValoresPericiasSalv));
-  $$('input[name^="salv_"]').forEach(cb => cb.addEventListener('change', recalcularValoresPericiasSalv));
+  $$('input[type="checkbox"][name^="salv_"]').forEach(cb => cb.addEventListener('change', recalcularValoresPericiasSalv));
+
+  // Inputs de bônus extra (salvaguardas e perícias) — recalcula ao vivo
+  $$('[data-per-bonus], [data-salv-bonus]').forEach(inp => {
+    inp.addEventListener('input', recalcularValoresPericiasSalv);
+  });
 
   // Botões de equipamento
   if (tabAtiva === 'equipamento') conectarListenersEquipamento();
@@ -4315,21 +4356,21 @@ function recalcularValoresPericiasSalv() {
     const cb = document.querySelector(`[data-salv="${k}"]`);
     const out = document.querySelector(`[data-salv-valor="${k}"]`);
     if (!cb || !out) return;
+    const bonusEl = document.querySelector(`[data-salv-bonus="${k}"]`);
+    const bonus = bonusEl ? (parseInt(bonusEl.value, 10) || 0) : 0;
     const m = mod(atrs[k] ?? 10);
-    out.textContent = fmtMod(m + (cb.checked ? bp : 0));
+    out.textContent = fmtMod(m + (cb.checked ? bp : 0) + bonus);
   });
   // Perícias
-  const perAtual = charAtivo.pericias || {};
   PERICIAS.forEach(([k, , atr]) => {
     const prof = document.querySelector(`[data-per="${k}"]`);
     const exp = document.querySelector(`[data-per-exp="${k}"]`);
     const out = document.querySelector(`[data-per-valor="${k}"]`);
     if (!prof || !out) return;
+    const bonusEl = document.querySelector(`[data-per-bonus="${k}"]`);
+    const bonus = bonusEl ? (parseInt(bonusEl.value, 10) || 0) : 0;
     const m = mod(atrs[atr] ?? 10);
-    const bonus = +(perAtual[k]?.bonus) || 0;
-    const valor = m + (prof.checked ? bp : 0) + (exp?.checked ? bp : 0) + bonus;
-    const selo = bonus ? `<span class="bonus-mestre" title="Bônus do Mestre: ${fmtMod(bonus)}">${fmtMod(bonus)}</span>` : '';
-    out.innerHTML = fmtMod(valor) + selo;
+    out.textContent = fmtMod(m + (prof.checked ? bp : 0) + (exp?.checked ? bp : 0) + bonus);
   });
 }
 
@@ -4521,14 +4562,19 @@ async function salvar(e) {
   // por isso não dá pra usar fd.has('salv_for') como detecção.
   if (fd.has('_aba_combate')) {
     const salv = {};
-    for (const [k] of ATRIBUTOS) salv[k] = fd.has('salv_' + k);
+    for (const [k] of ATRIBUTOS) {
+      const prof = fd.has('salv_' + k);
+      const bonus = parseInt(fd.get('salv_' + k + '_bonus'), 10) || 0;
+      // objeto {prof,bonus} quando há bônus; bool quando só proficiência (enxuto + compat)
+      if (bonus) salv[k] = { prof, bonus };
+      else if (prof) salv[k] = true;
+    }
     payload.salvaguardas = salv;
     const per = {};
-    const perAtual = charAtivo.pericias || {};   // preserva bonus do Mestre
     for (const [k] of PERICIAS) {
       const prof = fd.has('per_' + k + '_prof');
       const exp  = fd.has('per_' + k + '_exp');
-      const bonus = +(perAtual[k]?.bonus) || 0;
+      const bonus = parseInt(fd.get('per_' + k + '_bonus'), 10) || 0;
       if (prof || exp || bonus) {
         per[k] = { prof, exp };
         if (bonus) per[k].bonus = bonus;
