@@ -753,6 +753,7 @@
 <script src="../assets/js/phb_slots.js"></script>
 <script src="../assets/js/master_notes.js"></script>
 <script src="../assets/js/confirmar.js"></script>
+<script src="../assets/js/pericias_mestre.js"></script>
 <script>
 const CONDICOES = [
   'Agarrado', 'Amedrontado', 'Atordoado', 'Caído', 'Cego', 'Enfeitiçado',
@@ -1323,6 +1324,14 @@ function criarCard(p) {
     toast(`🌙 ${p.nome} descansou`);
   };
 
+  const periciasBtn = document.createElement('button');
+  periciasBtn.className = 'save-card';
+  periciasBtn.textContent = '🎯 Perícias';
+  periciasBtn.title = 'Dar/tirar bônus de perícia';
+  periciasBtn.onclick = () => {
+    if (window.AjustePericias) window.AjustePericias.abrir(p.id, p.nome);
+  };
+
   const remover = document.createElement('button');
   remover.className = 'remove-card';
   remover.textContent = '✕ remover';
@@ -1344,6 +1353,7 @@ function criarCard(p) {
 
   actions.appendChild(salvarBtn);
   actions.appendChild(descBtn);
+  actions.appendChild(periciasBtn);
   actions.appendChild(remover);
   card.appendChild(actions);
 

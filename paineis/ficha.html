@@ -1210,6 +1210,162 @@
     outline: none !important;
   }
 
+  /* ===== ALIADOS / CRIATURAS ===== */
+  .aliados-topo {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 14px; flex-wrap: wrap; margin-bottom: 16px;
+  }
+  .aliados-add { display: flex; gap: 8px; align-items: center; }
+  .aliados-add select {
+    background: rgba(255,255,255,0.04); border: 1px solid var(--gold);
+    color: var(--parchment); border-radius: 4px; padding: 8px 10px;
+    font-family: 'EB Garamond', serif; font-size: 13px; min-height: 40px;
+  }
+  .criatura-card {
+    background: linear-gradient(160deg, var(--bg-card, #1a1018), var(--bg-card-soft, #221520));
+    border: 1px solid rgba(139,105,20,0.4);
+    border-left: 3px solid var(--blood-bright, #8b1d1d);
+    border-radius: 8px; padding: 14px; margin-bottom: 14px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+  }
+  .criatura-head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; }
+  .criatura-id { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+  .criatura-nome {
+    font-family: 'Cinzel', serif; font-weight: 700; font-size: 16px;
+    color: var(--gold-bright); background: transparent;
+    border: none; border-bottom: 1px solid transparent; padding: 2px 0; outline: none;
+  }
+  .criatura-nome:focus { border-bottom-color: var(--gold); }
+  .criatura-tipo {
+    font-style: italic; font-size: 12px; color: var(--parchment-dim);
+    background: transparent; border: none; border-bottom: 1px solid transparent; padding: 2px 0; outline: none;
+  }
+  .criatura-tipo:focus { border-bottom-color: var(--gold); }
+  .criatura-del {
+    background: transparent; border: 1px solid var(--blood); color: var(--parchment-dim);
+    border-radius: 5px; cursor: pointer; padding: 6px 10px; font-size: 15px;
+    min-width: 40px; min-height: 40px; transition: all 0.15s; flex-shrink: 0;
+  }
+  .criatura-del:hover { background: var(--blood); color: var(--parchment); }
+
+  .criatura-combate {
+    display: grid; grid-template-columns: auto 1.4fr auto auto; gap: 10px;
+    margin-bottom: 12px; align-items: end;
+  }
+  .cc-box { display: flex; flex-direction: column; gap: 3px; }
+  .cc-box label { font-family: 'Cinzel', serif; font-size: 10px; color: var(--gold); letter-spacing: 0.5px; }
+  .cc-num, .cc-txt {
+    background: rgba(0,0,0,0.3); border: 1px solid rgba(139,105,20,0.4);
+    color: var(--parchment); border-radius: 4px; padding: 6px 8px;
+    font-size: 14px; outline: none; width: 100%; min-height: 38px;
+  }
+  .cc-num { text-align: center; width: 56px; font-weight: 700; }
+  .cc-num:focus, .cc-txt:focus { border-color: var(--gold-bright); }
+  .cc-hp { min-width: 0; }
+  .cc-hp-row { display: flex; align-items: center; gap: 4px; }
+  .cc-hp-row .cc-num { width: 52px; }
+  .cc-hpbar { height: 6px; background: rgba(0,0,0,0.4); border-radius: 3px; overflow: hidden; margin-top: 4px; }
+  .cc-hpfill { height: 100%; background: linear-gradient(90deg, #2e7d32, #66bb6a); transition: width 0.2s, background 0.2s; }
+  .cc-hpfill.medio { background: linear-gradient(90deg, #c9a227, #e0c050); }
+  .cc-hpfill.baixo { background: linear-gradient(90deg, #c46a1a, #e08a2a); }
+  .cc-hpfill.critico { background: linear-gradient(90deg, #8b1d1d, #c4302b); }
+  .cc-hp-quick { display: flex; gap: 3px; margin-top: 5px; }
+  .cc-hp-quick button {
+    flex: 1; background: rgba(139,105,20,0.15); border: 1px solid rgba(139,105,20,0.4);
+    color: var(--parchment); border-radius: 4px; cursor: pointer; font-size: 11px;
+    padding: 5px 0; min-height: 32px; transition: all 0.12s;
+  }
+  .cc-hp-quick button:hover { background: var(--gold); color: var(--shadow); }
+
+  .criatura-atrs {
+    display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-bottom: 12px;
+  }
+  .cr-atr {
+    text-align: center; background: rgba(0,0,0,0.25);
+    border: 1px solid rgba(139,105,20,0.3); border-radius: 6px; padding: 6px 2px;
+  }
+  .cr-atr-lbl { display: block; font-family: 'Cinzel', serif; font-size: 9px; color: var(--gold); letter-spacing: 1px; }
+  .cr-atr-val {
+    width: 100%; background: transparent; border: none; color: var(--parchment);
+    text-align: center; font-size: 15px; font-weight: 700; outline: none; margin: 2px 0;
+  }
+  .cr-atr-mod { display: block; font-size: 11px; color: var(--gold-bright); font-family: 'Cinzel', serif; }
+
+  .criatura-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+  .cm-row { display: flex; flex-direction: column; gap: 2px; }
+  .cm-row label { font-family: 'Cinzel', serif; font-size: 9px; color: var(--gold); letter-spacing: 0.5px; text-transform: uppercase; }
+  .cm-row input {
+    background: rgba(0,0,0,0.25); border: 1px solid rgba(139,105,20,0.3);
+    color: var(--parchment); border-radius: 4px; padding: 6px 8px; font-size: 12px; outline: none; min-height: 36px;
+  }
+  .cm-row input:focus { border-color: var(--gold-bright); }
+  .criatura-sec { margin-bottom: 10px; }
+  .criatura-sec h4 {
+    font-family: 'Cinzel', serif; font-size: 11px; color: var(--gold);
+    letter-spacing: 1px; text-transform: uppercase; margin: 0 0 5px;
+    padding-bottom: 3px; border-bottom: 1px solid rgba(139,105,20,0.25);
+  }
+  .criatura-lista { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.5; color: var(--parchment); }
+  .criatura-lista li { margin-bottom: 4px; }
+  .criatura-lista strong { color: var(--gold-bright); }
+  .criatura-notas {
+    width: 100%; min-height: 60px; background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(139,105,20,0.3); color: var(--parchment);
+    border-radius: 4px; padding: 8px; font-family: 'EB Garamond', serif;
+    font-size: 13px; line-height: 1.5; outline: none; resize: vertical;
+  }
+  .criatura-notas:focus { border-color: var(--gold-bright); }
+
+  @media (max-width: 600px) {
+    .aliados-topo { flex-direction: column; }
+    .aliados-add { width: 100%; }
+    .aliados-add select { flex: 1; }
+    .criatura-combate { grid-template-columns: 1fr 1fr; }
+    .criatura-atrs { grid-template-columns: repeat(3, 1fr); }
+    .criatura-meta { grid-template-columns: 1fr; }
+    .cc-num { width: 100%; }
+  }
+
+  /* Selo de bônus do Mestre em perícias */
+  .bonus-mestre {
+    display: inline-block;
+    margin-left: 5px;
+    font-size: 9px;
+    font-weight: 700;
+    color: var(--gold-bright, #b88a2c);
+    background: rgba(184,138,44,0.15);
+    border: 1px solid rgba(184,138,44,0.45);
+    border-radius: 8px;
+    padding: 0 5px;
+    vertical-align: middle;
+    font-family: 'Cinzel', serif;
+  }
+
+  /* ===== TOAST simples (auto-aviso) ===== */
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    z-index: 250;
+    background: linear-gradient(160deg, #1f1416, #150c0e);
+    border: 1px solid var(--gold);
+    border-left: 3px solid var(--gold-bright);
+    color: var(--parchment);
+    font-family: 'Cinzel', serif;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    padding: 10px 18px;
+    border-radius: 6px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s, transform 0.25s;
+    max-width: 90vw;
+    text-align: center;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
   /* ===== TOAST de notificação externa (Mestre editou) ===== */
   .toast-externo {
     position: fixed;
@@ -1617,15 +1773,8 @@
   </div>
 </main>
 
-<!-- Toast de notificação quando a ficha foi editada externamente (Mestre) -->
-<div class="toast-externo" id="toast-externo" role="alert" aria-live="polite">
-  <div class="te-titulo"><span aria-hidden="true">✏</span> Ficha atualizada</div>
-  <div class="te-msg" id="te-msg">O Mestre editou sua ficha. Atualizar pra ver?</div>
-  <div class="te-acoes">
-    <button type="button" id="te-ignorar">Ignorar</button>
-    <button type="button" class="primary" id="te-atualizar">Atualizar</button>
-  </div>
-</div>
+<!-- (Removido) Toast de permissão — mudanças do Mestre agora se aplicam automaticamente -->
+<div class="toast" id="toast-auto" role="status" aria-live="polite"></div>
 
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script src="../assets/js/supabase.js"></script>
@@ -1734,7 +1883,7 @@ let charAtivo = null;
 let tabAtiva = 'identidade';
 let _ultimoSaveLocal = 0;          // pra ignorar echo do próprio save
 let canalFicha = null;             // canal realtime
-let mudancaPendente = null;        // payload do update externo aguardando
+// (mudancaPendente removido — updates externos se aplicam automaticamente)
 
 // Favoritas: SOMENTE do banco (spell_lists do PJ ativo)
 async function carregarFavoritasDoBanco() {
@@ -1780,47 +1929,91 @@ function escutarMudancasExternas() {
     .subscribe();
 }
 
-let _toastDebounce = null;
+// Campos que, se mudarem, justificam re-render. Ignora ruído de updated_at etc.
+function _assinaturaRelevante(c) {
+  if (!c) return '';
+  const campos = [
+    'nome','raca','classe','subclasse','nivel','origem','alinhamento',
+    'hp_max','hp_atual','hp_temp','ca','iniciativa_bonus','deslocamento',
+    'dado_vida_tipo','dado_vida_atual','exaustao','inspiracao',
+    'atributos','salvaguardas','pericias','slots_magia','condicoes',
+    'recursos_usados','features_personalizadas','companions','inventario',
+    'truques_conhecidos','magias_conhecidas','cd_resistencia','bonus_atq_magia',
+    'tracos_pessoais','ideais','vinculos','defeitos','historia','notas',
+    'tracos_raciais','idiomas','ferramentas','imagem_url','caracteristicas_adicionais'
+  ];
+  try { return JSON.stringify(campos.map(k => c[k] ?? null)); } catch { return ''; }
+}
+
+let _aplicarExternoPendente = null;
 function onUpdateExterno(novo) {
   // Ignora se foi nosso próprio save (echo do realtime — em até 3s)
   if (Date.now() - _ultimoSaveLocal < 3000) return;
   // Atualiza chars silenciosamente sempre (mantém cache fresco)
   const idx = chars.findIndex(c => c.id === novo.id);
   if (idx >= 0) chars[idx] = novo;
-  // Só notifica se for o PJ ativo
+  // Só age se for o PJ ativo aberto
   if (!charAtivo || novo.id !== charAtivo.id) return;
-  // Sempre guarda a versão MAIS RECENTE (substitui pendente)
-  mudancaPendente = novo;
-  // Debounce de 2s: enquanto chegarem updates, espera. Só mostra toast
-  // quando o Mestre parar de digitar (evita spam de notificação durante auto-save).
-  if (_toastDebounce) clearTimeout(_toastDebounce);
-  _toastDebounce = setTimeout(() => {
-    _toastDebounce = null;
-    if (!mudancaPendente) return;
-    const tEl = document.getElementById('toast-externo');
-    const tMsg = document.getElementById('te-msg');
-    if (tMsg) tMsg.textContent = `O Mestre editou "${mudancaPendente.nome}". Aplicar mudanças agora?`;
-    if (tEl) tEl.classList.add('show');
-  }, 2000);
+  // Nada relevante mudou? Não re-renderiza (evita "piscar" sem motivo)
+  if (_assinaturaRelevante(novo) === _assinaturaRelevante(charAtivo)) {
+    charAtivo = novo;  // sincroniza cache mesmo assim
+    chars = chars.map(c => c.id === charAtivo.id ? charAtivo : c);
+    return;
+  }
+  // Aplica automaticamente — mas não atropela o jogador se ele está digitando.
+  aplicarExterno(novo);
+}
+
+// Aplica o estado externo. Se o jogador está com foco em algum campo editável,
+// adia até ele sair do campo (focusout) pra não perder o que está digitando.
+function aplicarExterno(novo) {
+  const ativo = document.activeElement;
+  const editando = ativo && ativo.closest && ativo.closest('.tab-content') &&
+    /input|textarea|select/i.test(ativo.tagName || '');
+
+  if (editando) {
+    _aplicarExternoPendente = novo;
+    const form = document.getElementById('ficha-form');
+    if (form && !form._aguardandoBlur) {
+      form._aguardandoBlur = true;
+      form.addEventListener('focusout', function handler() {
+        form.removeEventListener('focusout', handler);
+        form._aguardandoBlur = false;
+        // pequeno atraso pra deixar o auto-save do campo concluir
+        setTimeout(() => {
+          const pend = _aplicarExternoPendente;
+          _aplicarExternoPendente = null;
+          if (pend && (!document.activeElement || !document.activeElement.closest('.tab-content'))) {
+            charAtivo = pend;
+            chars = chars.map(c => c.id === charAtivo.id ? charAtivo : c);
+            render();
+            toast('✏ Ficha atualizada pelo Mestre');
+          }
+        }, 300);
+      });
+    }
+    return;
+  }
+
+  charAtivo = novo;
+  chars = chars.map(c => c.id === charAtivo.id ? charAtivo : c);
+  render();
+  toast('✏ Ficha atualizada pelo Mestre');
 }
 
 function configurarToastExterno() {
-  const tEl = document.getElementById('toast-externo');
-  const btnAtualizar = document.getElementById('te-atualizar');
-  const btnIgnorar  = document.getElementById('te-ignorar');
-  if (btnAtualizar) btnAtualizar.addEventListener('click', () => {
-    if (mudancaPendente) {
-      charAtivo = mudancaPendente;
-      chars = chars.map(c => c.id === charAtivo.id ? charAtivo : c);
-      mudancaPendente = null;
-      render();
-    }
-    if (tEl) tEl.classList.remove('show');
-  });
-  if (btnIgnorar) btnIgnorar.addEventListener('click', () => {
-    mudancaPendente = null;
-    if (tEl) tEl.classList.remove('show');
-  });
+  // Mantido por compatibilidade (chamado no init). O sistema de toast de
+  // permissão foi removido — mudanças do Mestre agora se aplicam sozinhas.
+}
+
+let _toastTimer = null;
+function toast(msg) {
+  const el = document.getElementById('toast-auto');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+  if (_toastTimer) clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
 }
 
 async function carregarPersonagens() {
@@ -1943,6 +2136,7 @@ function render() {
         <button class="tab ${tabAtiva==='habilidades'?'ativa':''}" data-tab="habilidades" role="tab">Habilidades</button>
         ${classeUsaMagia(c) ? `<button class="tab ${tabAtiva==='magias'?'ativa':''}" data-tab="magias" role="tab">Magias</button>` : ''}
         <button class="tab ${tabAtiva==='equipamento'?'ativa':''}" data-tab="equipamento" role="tab">Equipamento</button>
+        <button class="tab ${tabAtiva==='aliados'?'ativa':''}" data-tab="aliados" role="tab">Aliados</button>
         <button class="tab ${tabAtiva==='roleplay'?'ativa':''}" data-tab="roleplay" role="tab">Roleplay</button>
       </div>
     </div>
@@ -1991,6 +2185,7 @@ function renderTab(c, atrs) {
     case 'habilidades': return renderHabilidades(c);
     case 'magias':      return renderMagias(c);
     case 'equipamento': return renderEquipamento(c);
+    case 'aliados':     return renderAliados(c);
     case 'roleplay':    return renderRoleplay(c);
   }
 }
@@ -2152,14 +2347,16 @@ function renderCombate(c) {
     <div class="check-grid">
       ${PERICIAS.map(([k, nome, atr]) => {
         const p = per[k] || {};
+        const bonus = +p.bonus || 0;
         const m = mod((c.atributos||{})[atr] ?? 10);
         const bp = bonusProf(c.nivel);
-        const valor = m + (p.prof ? bp : 0) + (p.exp ? bp : 0);
+        const valor = m + (p.prof ? bp : 0) + (p.exp ? bp : 0) + bonus;
+        const selo = bonus ? `<span class="bonus-mestre" title="Bônus do Mestre: ${fmtMod(bonus)}">${fmtMod(bonus)}</span>` : '';
         return `
           <div class="check-row">
             <label><input type="checkbox" name="per_${k}_prof" ${p.prof?'checked':''} data-per="${k}" data-atr="${atr}"> ${nome}<span class="atr-tag">${atr.toUpperCase()}</span></label>
             <span class="exp-marker"><input type="checkbox" name="per_${k}_exp" ${p.exp?'checked':''} ${p.prof?'':'disabled'} data-per-exp="${k}"> E</span>
-            <span class="valor-calc" data-per-valor="${k}">${fmtMod(valor)}</span>
+            <span class="valor-calc" data-per-valor="${k}">${fmtMod(valor)}${selo}</span>
           </div>
         `;
       }).join('')}
@@ -3316,6 +3513,287 @@ function renderTabelaItens(tipo, itens, colunas, campos) {
   </table>`;
 }
 
+/* ============================================================
+   ALIADOS — criaturas/NPCs controlados pelo personagem
+   (invocações, familiares, golems, companheiros animais)
+   Persiste em characters.companions (jsonb array)
+   ============================================================ */
+const ATR_CRIATURA = [['for','FOR'],['dex','DES'],['con','CON'],['int','INT'],['sab','SAB'],['car','CAR']];
+
+// Templates do Bestiário (stats do Manual dos Monstros / Livro do Jogador 5e)
+const TEMPLATES_CRIATURA = {
+  golem_carne: {
+    nome: 'Golem de Carne', tipo: 'Constructo Médio, neutro',
+    ca: 9, hp_max: 93, hp_atual: 93, deslocamento: '9 m',
+    atributos: { for:19, dex:9, con:18, int:6, sab:10, car:5 },
+    resistencias: 'Concussão, perfurante e cortante de armas não-mágicas',
+    imunidades: 'Elétrico, veneno · Condições: enfeitiçado, exausto, amedrontado, paralisado, petrificado, envenenado',
+    sentidos: 'Visão no escuro 18 m · Percepção passiva 10',
+    idiomas: 'Entende os idiomas do criador, mas não fala',
+    nd: '5 (1.800 XP)',
+    tracos: [
+      { nome: 'Aversão a Fogo', desc: 'Se sofrer dano de fogo, tem desvantagem em ataques e testes de habilidade até o fim do próximo turno.' },
+      { nome: 'Absorver Eletricidade', desc: 'Sempre que sofreria dano elétrico, em vez disso não sofre dano e recupera PV iguais ao dano elétrico. (Aprimoramento)' },
+      { nome: 'Imutável', desc: 'Imune a qualquer magia ou efeito que altere sua forma.' },
+      { nome: 'Vulnerabilidade Mágica', desc: 'Tem desvantagem em testes de resistência contra magias.' },
+    ],
+    acoes: [
+      { nome: 'Multiataque', desc: 'O golem faz dois ataques de Açoite.' },
+      { nome: 'Açoite (Slam)', desc: '+7 para acertar, alcance 1,5 m, um alvo. Acerto: 13 (2d8+4) de dano de concussão.' },
+    ],
+    notas: '',
+  },
+  lobo: {
+    nome: 'Lobo', tipo: 'Besta Média, não-alinhado',
+    ca: 13, hp_max: 11, hp_atual: 11, deslocamento: '12 m',
+    atributos: { for:12, dex:15, con:12, int:3, sab:12, car:6 },
+    resistencias: '', imunidades: '',
+    sentidos: 'Percepção passiva 13 · Faro e audição apurados (vantagem em Percepção)',
+    idiomas: '—', nd: '1/4 (50 XP)',
+    tracos: [
+      { nome: 'Faro Aguçado', desc: 'Vantagem em testes de Percepção (Sabedoria) que dependam de audição ou olfato.' },
+      { nome: 'Táticas de Matilha', desc: 'Vantagem no ataque se um aliado do lobo estiver a até 1,5 m do alvo e não estiver incapacitado.' },
+    ],
+    acoes: [
+      { nome: 'Mordida', desc: '+4 para acertar, alcance 1,5 m. Acerto: 7 (2d4+2) perfurante. Alvo deve passar em FOR CD 11 ou cai caído.' },
+    ],
+    notas: '',
+  },
+  urso_pardo: {
+    nome: 'Urso-pardo', tipo: 'Besta Grande, não-alinhado',
+    ca: 11, hp_max: 34, hp_atual: 34, deslocamento: '12 m, escalar 9 m',
+    atributos: { for:19, dex:10, con:16, int:2, sab:13, car:7 },
+    resistencias: '', imunidades: '',
+    sentidos: 'Percepção passiva 13', idiomas: '—', nd: '1 (200 XP)',
+    tracos: [
+      { nome: 'Faro Aguçado', desc: 'Vantagem em testes de Percepção (Sabedoria) que dependam de olfato.' },
+    ],
+    acoes: [
+      { nome: 'Multiataque', desc: 'Uma mordida e uma garrada.' },
+      { nome: 'Mordida', desc: '+6 para acertar, alcance 1,5 m. Acerto: 8 (1d8+4) perfurante.' },
+      { nome: 'Garras', desc: '+6 para acertar, alcance 1,5 m. Acerto: 11 (2d6+4) cortante.' },
+    ],
+    notas: '',
+  },
+  novo: {
+    nome: 'Nova Criatura', tipo: '',
+    ca: 10, hp_max: 1, hp_atual: 1, deslocamento: '9 m',
+    atributos: { for:10, dex:10, con:10, int:10, sab:10, car:10 },
+    resistencias: '', imunidades: '', sentidos: '', idiomas: '', nd: '',
+    tracos: [], acoes: [], notas: '',
+  },
+};
+
+function modCriatura(v) { return Math.floor(((+v||10) - 10) / 2); }
+
+function renderAliados(c) {
+  const lista = Array.isArray(c.companions) ? c.companions : [];
+  const cards = lista.map((cr, i) => renderCardCriatura(cr, i)).join('');
+  return `
+    <div class="aliados-topo">
+      <div>
+        <h3 style="margin:0">Aliados & Criaturas</h3>
+        <p style="color:var(--text-dim);font-style:italic;font-size:12px;margin:4px 0 0">
+          NPCs, familiares, invocações e companheiros que você controla. HP gastável em combate.
+        </p>
+      </div>
+      <div class="aliados-add no-lock">
+        <select id="aliado-template" class="no-lock" aria-label="Modelo de criatura">
+          <option value="novo">+ Em branco</option>
+          <option value="golem_carne">Golem de Carne (ND 5)</option>
+          <option value="lobo">Lobo (ND 1/4)</option>
+          <option value="urso_pardo">Urso-pardo (ND 1)</option>
+        </select>
+        <button type="button" class="btn primary no-lock" id="btn-add-aliado">+ Adicionar</button>
+      </div>
+    </div>
+    <div id="aliados-wrap">
+      ${lista.length ? cards : `<div class="item-vazio">Nenhuma criatura. Escolha um modelo acima e clique <strong>+ Adicionar</strong>.</div>`}
+    </div>
+  `;
+}
+
+function renderCardCriatura(cr, i) {
+  const a = cr.atributos || {};
+  const hpMax = cr.hp_max ?? 1;
+  const hpAtual = cr.hp_atual ?? hpMax;
+  const pct = hpMax > 0 ? Math.max(0, Math.min(100, Math.round(hpAtual / hpMax * 100))) : 0;
+  const classeBar = pct <= 15 ? 'critico' : pct <= 35 ? 'baixo' : pct <= 65 ? 'medio' : '';
+  const tracos = (cr.tracos || []).map(t => `<li><strong>${escape(t.nome)}.</strong> ${escape(t.desc)}</li>`).join('');
+  const acoes = (cr.acoes || []).map(t => `<li><strong>${escape(t.nome)}.</strong> ${escape(t.desc)}</li>`).join('');
+  return `
+    <div class="criatura-card" data-cr="${i}">
+      <div class="criatura-head">
+        <div class="criatura-id">
+          <input class="criatura-nome" data-cr-campo="nome" data-cr="${i}" value="${escape(cr.nome||'')}" placeholder="Nome" aria-label="Nome da criatura">
+          <input class="criatura-tipo" data-cr-campo="tipo" data-cr="${i}" value="${escape(cr.tipo||'')}" placeholder="Tipo (ex.: Besta Média)" aria-label="Tipo">
+        </div>
+        <button type="button" class="criatura-del no-lock" data-cr-del="${i}" title="Remover criatura" aria-label="Remover criatura">🗑</button>
+      </div>
+
+      <div class="criatura-combate">
+        <div class="cc-box">
+          <label>🛡️ CA</label>
+          <input class="cc-num" data-cr-campo="ca" data-cr="${i}" inputmode="numeric" value="${cr.ca ?? 10}">
+        </div>
+        <div class="cc-box cc-hp">
+          <label>❤️ PV</label>
+          <div class="cc-hp-row">
+            <input class="cc-num" data-cr-campo="hp_atual" data-cr="${i}" inputmode="numeric" value="${hpAtual}" aria-label="PV atual">
+            <span>/</span>
+            <input class="cc-num" data-cr-campo="hp_max" data-cr="${i}" inputmode="numeric" value="${hpMax}" aria-label="PV máximo">
+          </div>
+          <div class="cc-hpbar"><div class="cc-hpfill ${classeBar}" style="width:${pct}%"></div></div>
+          <div class="cc-hp-quick no-lock">
+            <button type="button" data-cr-dmg="${i}" data-v="-5">-5</button>
+            <button type="button" data-cr-dmg="${i}" data-v="-1">-1</button>
+            <button type="button" data-cr-dmg="${i}" data-v="1">+1</button>
+            <button type="button" data-cr-dmg="${i}" data-v="5">+5</button>
+          </div>
+        </div>
+        <div class="cc-box">
+          <label>👣 Desloc.</label>
+          <input class="cc-txt" data-cr-campo="deslocamento" data-cr="${i}" value="${escape(cr.deslocamento||'')}" placeholder="9 m">
+        </div>
+        <div class="cc-box">
+          <label>⚔ ND</label>
+          <input class="cc-txt" data-cr-campo="nd" data-cr="${i}" value="${escape(cr.nd||'')}" placeholder="—">
+        </div>
+      </div>
+
+      <div class="criatura-atrs">
+        ${ATR_CRIATURA.map(([k, lbl]) => `
+          <div class="cr-atr">
+            <span class="cr-atr-lbl">${lbl}</span>
+            <input class="cr-atr-val" data-cr-atr="${k}" data-cr="${i}" inputmode="numeric" value="${a[k] ?? 10}" aria-label="${lbl}">
+            <span class="cr-atr-mod" data-cr-mod="${i}-${k}">${fmtMod(modCriatura(a[k]))}</span>
+          </div>
+        `).join('')}
+      </div>
+
+      <div class="criatura-meta">
+        <div class="cm-row"><label>Resistências</label><input data-cr-campo="resistencias" data-cr="${i}" value="${escape(cr.resistencias||'')}" placeholder="—"></div>
+        <div class="cm-row"><label>Imunidades</label><input data-cr-campo="imunidades" data-cr="${i}" value="${escape(cr.imunidades||'')}" placeholder="—"></div>
+        <div class="cm-row"><label>Sentidos</label><input data-cr-campo="sentidos" data-cr="${i}" value="${escape(cr.sentidos||'')}" placeholder="—"></div>
+        <div class="cm-row"><label>Idiomas</label><input data-cr-campo="idiomas" data-cr="${i}" value="${escape(cr.idiomas||'')}" placeholder="—"></div>
+      </div>
+
+      ${tracos ? `<div class="criatura-sec"><h4>Traços</h4><ul class="criatura-lista">${tracos}</ul></div>` : ''}
+      ${acoes ? `<div class="criatura-sec"><h4>Ações</h4><ul class="criatura-lista">${acoes}</ul></div>` : ''}
+
+      <div class="criatura-sec">
+        <h4>Notas</h4>
+        <textarea class="criatura-notas" data-cr-campo="notas" data-cr="${i}" placeholder="Anotações livres, traços/ações personalizadas…">${escape(cr.notas||'')}</textarea>
+      </div>
+    </div>
+  `;
+}
+
+function _companionsAtuais() {
+  if (!Array.isArray(charAtivo.companions)) charAtivo.companions = [];
+  return charAtivo.companions;
+}
+
+async function salvarCompanions() {
+  if (!charAtivo?.id) return;
+  _ultimoSaveLocal = Date.now();
+  const { error } = await window.sb.from('characters')
+    .update({ companions: charAtivo.companions || [] })
+    .eq('id', charAtivo.id);
+  if (error) console.warn('[aliados] erro ao salvar:', error);
+}
+function salvarCompanionsSeguro() { salvarCompanions().catch(()=>{}); }
+
+function conectarListenersAliados() {
+  const wrap = document.getElementById('aliados-wrap');
+
+  // Adicionar criatura
+  const btnAdd = document.getElementById('btn-add-aliado');
+  if (btnAdd) btnAdd.addEventListener('click', () => {
+    const sel = document.getElementById('aliado-template');
+    const tplKey = sel ? sel.value : 'novo';
+    const tpl = TEMPLATES_CRIATURA[tplKey] || TEMPLATES_CRIATURA.novo;
+    const nova = JSON.parse(JSON.stringify(tpl));
+    nova.id = 'cr_' + Date.now().toString(36);
+    _companionsAtuais().push(nova);
+    salvarCompanionsSeguro();
+    render();  // re-render mantém aba 'aliados'
+  });
+
+  if (!wrap) return;
+
+  // Edição de campos de texto/número (delegação)
+  wrap.addEventListener('input', e => {
+    const el = e.target;
+    const i = el.dataset.cr;
+    if (i === undefined) return;
+    const cr = _companionsAtuais()[+i];
+    if (!cr) return;
+
+    if (el.dataset.crCampo) {
+      const campo = el.dataset.crCampo;
+      if (['ca','hp_atual','hp_max'].includes(campo)) {
+        cr[campo] = parseInt(el.value, 10) || 0;
+        if (campo === 'hp_atual' || campo === 'hp_max') atualizarBarraHpCriatura(+i);
+      } else {
+        cr[campo] = el.value;
+      }
+    } else if (el.dataset.crAtr) {
+      if (!cr.atributos) cr.atributos = {};
+      cr.atributos[el.dataset.crAtr] = parseInt(el.value, 10) || 10;
+      const modEl = document.querySelector(`[data-cr-mod="${i}-${el.dataset.crAtr}"]`);
+      if (modEl) modEl.textContent = fmtMod(modCriatura(cr.atributos[el.dataset.crAtr]));
+    }
+    agendarSalvarCompanions();
+  });
+
+  // Botões de dano/cura rápida + deletar (click delegado)
+  wrap.addEventListener('click', e => {
+    const dmg = e.target.closest('[data-cr-dmg]');
+    if (dmg) {
+      const i = +dmg.dataset.crDmg;
+      const v = +dmg.dataset.v;
+      const cr = _companionsAtuais()[i];
+      if (!cr) return;
+      const max = cr.hp_max ?? 1;
+      cr.hp_atual = Math.max(0, Math.min(max, (cr.hp_atual ?? max) + v));
+      const inp = document.querySelector(`input[data-cr-campo="hp_atual"][data-cr="${i}"]`);
+      if (inp) inp.value = cr.hp_atual;
+      atualizarBarraHpCriatura(i);
+      agendarSalvarCompanions();
+      return;
+    }
+    const del = e.target.closest('[data-cr-del]');
+    if (del) {
+      const i = +del.dataset.crDel;
+      const cr = _companionsAtuais()[i];
+      window.Confirmar
+        ? window.Confirmar.perguntar({ titulo: 'Remover criatura?', mensagem: `"${cr?.nome||'Criatura'}" será removida.`, confirmar: 'Remover', danger: true }).then(ok => {
+            if (ok) { _companionsAtuais().splice(i, 1); salvarCompanionsSeguro(); render(); }
+          })
+        : (confirm('Remover criatura?') && (_companionsAtuais().splice(i,1), salvarCompanionsSeguro(), render()));
+    }
+  });
+}
+
+function atualizarBarraHpCriatura(i) {
+  const cr = _companionsAtuais()[i];
+  if (!cr) return;
+  const max = cr.hp_max ?? 1;
+  const pct = max > 0 ? Math.max(0, Math.min(100, Math.round((cr.hp_atual ?? max) / max * 100))) : 0;
+  const fill = document.querySelector(`.criatura-card[data-cr="${i}"] .cc-hpfill`);
+  if (fill) {
+    fill.style.width = pct + '%';
+    fill.className = 'cc-hpfill ' + (pct <= 15 ? 'critico' : pct <= 35 ? 'baixo' : pct <= 65 ? 'medio' : '');
+  }
+}
+
+let _salvarCompTimer = null;
+function agendarSalvarCompanions() {
+  if (_salvarCompTimer) clearTimeout(_salvarCompTimer);
+  _salvarCompTimer = setTimeout(salvarCompanionsSeguro, 700);
+}
+
 function renderRoleplay(c) {
   const imgUrl = c.imagem_url || '';
   const insp = +c.inspiracao || 0;
@@ -3710,6 +4188,9 @@ function conectarListeners() {
   // Botões de equipamento
   if (tabAtiva === 'equipamento') conectarListenersEquipamento();
 
+  // Aba Aliados (criaturas controladas)
+  if (tabAtiva === 'aliados') conectarListenersAliados();
+
   // Roleplay: preview + upload de retrato
   if (tabAtiva === 'roleplay') {
     const inp = document.getElementById('input-imagem');
@@ -3838,13 +4319,17 @@ function recalcularValoresPericiasSalv() {
     out.textContent = fmtMod(m + (cb.checked ? bp : 0));
   });
   // Perícias
+  const perAtual = charAtivo.pericias || {};
   PERICIAS.forEach(([k, , atr]) => {
     const prof = document.querySelector(`[data-per="${k}"]`);
     const exp = document.querySelector(`[data-per-exp="${k}"]`);
     const out = document.querySelector(`[data-per-valor="${k}"]`);
     if (!prof || !out) return;
     const m = mod(atrs[atr] ?? 10);
-    out.textContent = fmtMod(m + (prof.checked ? bp : 0) + (exp?.checked ? bp : 0));
+    const bonus = +(perAtual[k]?.bonus) || 0;
+    const valor = m + (prof.checked ? bp : 0) + (exp?.checked ? bp : 0) + bonus;
+    const selo = bonus ? `<span class="bonus-mestre" title="Bônus do Mestre: ${fmtMod(bonus)}">${fmtMod(bonus)}</span>` : '';
+    out.innerHTML = fmtMod(valor) + selo;
   });
 }
 
@@ -4039,10 +4524,15 @@ async function salvar(e) {
     for (const [k] of ATRIBUTOS) salv[k] = fd.has('salv_' + k);
     payload.salvaguardas = salv;
     const per = {};
+    const perAtual = charAtivo.pericias || {};   // preserva bonus do Mestre
     for (const [k] of PERICIAS) {
       const prof = fd.has('per_' + k + '_prof');
       const exp  = fd.has('per_' + k + '_exp');
-      if (prof || exp) per[k] = { prof, exp };
+      const bonus = +(perAtual[k]?.bonus) || 0;
+      if (prof || exp || bonus) {
+        per[k] = { prof, exp };
+        if (bonus) per[k].bonus = bonus;
+      }
     }
     payload.pericias = per;
     set('truques_conhecidos', num('truques_conhecidos'));

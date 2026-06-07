@@ -28,6 +28,7 @@ const SCRIPTS = [
   '014_master_state_e_notas.sql',
   '015_anotacoes_campanha.sql',
   '016_anotacoes_titulo.sql',
+  '017_companions.sql',
 ];
 
 (async () => {
