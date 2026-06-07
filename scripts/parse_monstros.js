@@ -51,6 +51,21 @@ function acharNomeETipo(caIdx) {
   return { nome, tipo };
 }
 
+// Índice onde o statblock COMEÇA (linha do nome), pra recortar o bloco anterior
+// sem incluir o nome/tipo do próximo monstro.
+function inicioBloco(caIdx) {
+  let j = caIdx - 1;
+  while (j >= 0 && !linhas[j].trim()) j--;
+  let tipoIdx = -1;
+  if (j >= 0 && ehTipo(linhas[j])) { tipoIdx = j; j--; }
+  let k = j, voltas = 0;
+  while (k >= 0 && voltas < 6) {
+    if (linhas[k].trim() && ehTitulo(linhas[k])) return k;  // linha do nome
+    k--; voltas++;
+  }
+  return tipoIdx >= 0 ? tipoIdx : caIdx;
+}
+
 function pegarCampo(arr, regex) {
   for (const l of arr) { const m = l.match(regex); if (m) return m[1].trim(); }
   return '';
@@ -93,6 +108,9 @@ function parseBloco(caIdx, nextCaIdx) {
   const pvLine = pegarCampo(trecho, /^Pontos de Vida\s+(.+)$/i);
   const pvNum = (pvLine.match(/^(\d+)/) || [])[1];
   const hp = pvNum ? +pvNum : 1;
+  // Fórmula de dados de vida, ex.: "11d8 + 44"
+  const pvDadosM = pvLine.match(/\(([^)]+)\)/);
+  const pvDados = pvDadosM ? pvDadosM[1].replace(/\s+/g, ' ').trim() : '';
 
   const desloc = pegarCampo(trecho, /^Deslocamento\s+(.+)$/i);
 
@@ -144,7 +162,7 @@ function parseBloco(caIdx, nextCaIdx) {
 
   return {
     nome, tipo, ca, ca_extra: caExtra,
-    hp_max: hp, hp_atual: hp, deslocamento: desloc,
+    hp_max: hp, hp_atual: hp, pv_dados: pvDados, deslocamento: desloc,
     atributos, resistencias, vulnerabilidades: vulnerab,
     imunidades, sentidos, idiomas, pericias, salvaguardas,
     nd: ndLine, tracos, acoes,
@@ -154,7 +172,9 @@ function parseBloco(caIdx, nextCaIdx) {
 const monstros = [];
 const vistos = new Set();
 for (let b = 0; b < blocos.length; b++) {
-  const obj = parseBloco(blocos[b], b + 1 < blocos.length ? blocos[b + 1] : null);
+  // fim do bloco atual = início do próximo statblock (exclui nome/tipo do próximo)
+  const fim = b + 1 < blocos.length ? inicioBloco(blocos[b + 1]) : null;
+  const obj = parseBloco(blocos[b], fim);
   if (!obj || !obj.nome) continue;
   const chave = obj.nome.toLowerCase();
   if (vistos.has(chave)) continue;

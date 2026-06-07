@@ -1235,7 +1235,8 @@
     display: flex; align-items: flex-start; justify-content: space-between;
     gap: 14px; flex-wrap: wrap; margin-bottom: 16px;
   }
-  .aliados-add { display: flex; gap: 8px; align-items: center; }
+  .aliados-add { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .aliados-add #btn-buscar-monstro { white-space: nowrap; }
   .aliados-add select {
     background: rgba(255,255,255,0.04); border: 1px solid var(--gold);
     color: var(--parchment); border-radius: 4px; padding: 8px 10px;
@@ -1284,6 +1285,14 @@
   .cc-hp { min-width: 0; }
   .cc-hp-row { display: flex; align-items: center; gap: 4px; }
   .cc-hp-row .cc-num { width: 52px; }
+  .cc-dados { font-size: 10px; color: var(--gold-bright); font-weight: 400; letter-spacing: 0.3px; }
+  .cc-rolar {
+    background: rgba(139,105,20,0.18); border: 1px solid var(--gold);
+    color: var(--gold-bright); border-radius: 5px; cursor: pointer;
+    font-size: 15px; line-height: 1; padding: 4px 7px; min-height: 36px;
+    transition: all 0.12s;
+  }
+  .cc-rolar:hover { background: var(--gold); color: var(--shadow); transform: scale(1.05); }
   .cc-hpbar { height: 6px; background: rgba(0,0,0,0.4); border-radius: 3px; overflow: hidden; margin-top: 4px; }
   .cc-hpfill { height: 100%; background: linear-gradient(90deg, #2e7d32, #66bb6a); transition: width 0.2s, background 0.2s; }
   .cc-hpfill.medio { background: linear-gradient(90deg, #c9a227, #e0c050); }
@@ -1339,11 +1348,14 @@
   @media (max-width: 600px) {
     .aliados-topo { flex-direction: column; }
     .aliados-add { width: 100%; }
-    .aliados-add select { flex: 1; }
+    .aliados-add #btn-buscar-monstro { flex: 1 1 100%; min-height: 46px; }
+    .aliados-add select { flex: 1 1 auto; min-height: 46px; }
+    .aliados-add #btn-add-aliado { flex: 0 0 auto; min-height: 46px; }
     .criatura-combate { grid-template-columns: 1fr 1fr; }
     .criatura-atrs { grid-template-columns: repeat(3, 1fr); }
     .criatura-meta { grid-template-columns: 1fr; }
     .cc-num { width: 100%; }
+    .cc-hp-row { flex-wrap: wrap; }
   }
 
   /* ===== BUSCADOR DO BESTIÁRIO ===== */
@@ -1388,6 +1400,19 @@
   .bm-search input:focus { border-color: var(--gold-bright); box-shadow: 0 0 0 3px rgba(184,138,44,0.15); }
   .bm-result { flex: 1; overflow-y: auto; padding: 8px 12px 14px; }
   .bm-dica { font-size: 11px; color: var(--text-dim); font-style: italic; padding: 8px 4px; text-align: center; }
+  .bm-secao {
+    font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700;
+    color: var(--gold-bright); letter-spacing: 1px; text-transform: uppercase;
+    padding: 10px 4px 4px; border-bottom: 1px solid rgba(139,105,20,0.25); margin-bottom: 4px;
+  }
+  .bm-fav {
+    flex-shrink: 0; background: transparent; border: none; cursor: pointer;
+    color: var(--text-dim); font-size: 20px; line-height: 1; padding: 4px 6px;
+    min-width: 40px; min-height: 40px; border-radius: 6px;
+    transition: color 0.15s, transform 0.15s;
+  }
+  .bm-fav:hover { color: var(--gold-bright); transform: scale(1.15); }
+  .bm-fav.on { color: var(--gold-bright); text-shadow: 0 0 8px rgba(184,138,44,0.5); }
   .bm-vazio { text-align: center; padding: 30px 16px; color: var(--text-dim); font-style: italic; }
   .bm-item {
     display: flex; align-items: center; gap: 10px;
@@ -3626,7 +3651,7 @@ const ATR_CRIATURA = [['for','FOR'],['dex','DES'],['con','CON'],['int','INT'],['
 const TEMPLATES_CRIATURA = {
   golem_carne: {
     nome: 'Golem de Carne', tipo: 'Constructo Médio, neutro',
-    ca: 9, hp_max: 93, hp_atual: 93, deslocamento: '9 m',
+    ca: 9, hp_max: 93, hp_atual: 93, pv_dados: '11d8 + 44', deslocamento: '9 m',
     atributos: { for:19, dex:9, con:18, int:6, sab:10, car:5 },
     resistencias: '',
     imunidades: 'Dano: elétrico, veneno; concussão, cortante e perfurante de ataques não-mágicos que não sejam de adamante · Condições: amedrontado, enfeitiçado, envenenado, exausto, paralisado, petrificado',
@@ -3649,7 +3674,7 @@ const TEMPLATES_CRIATURA = {
   },
   corvo: {
     nome: 'Corvo', tipo: 'Besta Miúda, imparcial',
-    ca: 12, hp_max: 1, hp_atual: 1, deslocamento: '3 m, voo 15 m',
+    ca: 12, hp_max: 1, hp_atual: 1, pv_dados: '1d4 - 1', deslocamento: '3 m, voo 15 m',
     atributos: { for:2, dex:14, con:8, int:2, sab:12, car:6 },
     resistencias: '', imunidades: '',
     sentidos: 'Percepção passiva 13 · Perícia: Percepção +3',
@@ -3664,7 +3689,7 @@ const TEMPLATES_CRIATURA = {
   },
   novo: {
     nome: 'Nova Criatura', tipo: '',
-    ca: 10, hp_max: 1, hp_atual: 1, deslocamento: '9 m',
+    ca: 10, hp_max: 1, hp_atual: 1, pv_dados: '', deslocamento: '9 m',
     atributos: { for:10, dex:10, con:10, int:10, sab:10, car:10 },
     resistencias: '', imunidades: '', sentidos: '', idiomas: '', nd: '',
     tracos: [], acoes: [], notas: '',
@@ -3724,12 +3749,14 @@ function renderCardCriatura(cr, i) {
           <input class="cc-num" data-cr-campo="ca" data-cr="${i}" inputmode="numeric" value="${cr.ca ?? 10}">
         </div>
         <div class="cc-box cc-hp">
-          <label>❤️ PV</label>
+          <label>❤️ PV ${cr.pv_dados ? `<span class="cc-dados" title="Dados de Vida — clique 🎲 pra rolar">(${escape(cr.pv_dados)})</span>` : ''}</label>
           <div class="cc-hp-row">
             <input class="cc-num" data-cr-campo="hp_atual" data-cr="${i}" inputmode="numeric" value="${hpAtual}" aria-label="PV atual">
             <span>/</span>
             <input class="cc-num" data-cr-campo="hp_max" data-cr="${i}" inputmode="numeric" value="${hpMax}" aria-label="PV máximo">
+            ${cr.pv_dados ? `<button type="button" class="cc-rolar no-lock" data-cr-rolar="${i}" title="Rolar ${escape(cr.pv_dados)} para definir o PV máximo">🎲</button>` : ''}
           </div>
+          <input type="hidden" data-cr-campo="pv_dados" data-cr="${i}" value="${escape(cr.pv_dados||'')}">
           <div class="cc-hpbar"><div class="cc-hpfill ${classeBar}" style="width:${pct}%"></div></div>
           <div class="cc-hp-quick no-lock">
             <button type="button" data-cr-dmg="${i}" data-v="-5">-5</button>
@@ -3795,6 +3822,26 @@ function salvarCompanionsSeguro() { salvarCompanions().catch(()=>{}); }
 let _bestiario = null;          // cache do monstros_data.json
 let _bestiarioErro = false;
 
+/* Favoritos do bestiário (por nome) — persistidos em localStorage */
+let _favBestiario = null;
+function favCarregar() {
+  if (_favBestiario) return _favBestiario;
+  try { _favBestiario = new Set(JSON.parse(localStorage.getItem('bestiario_favoritos') || '[]')); }
+  catch { _favBestiario = new Set(); }
+  return _favBestiario;
+}
+function favSalvar() {
+  try { localStorage.setItem('bestiario_favoritos', JSON.stringify([..._favBestiario])); } catch {}
+}
+function favTem(nome) { return favCarregar().has(nome); }
+function favToggle(nome) {
+  favCarregar();
+  if (_favBestiario.has(nome)) _favBestiario.delete(nome);
+  else _favBestiario.add(nome);
+  favSalvar();
+  return _favBestiario.has(nome);
+}
+
 function semAcento(s) {
   return (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 }
@@ -3847,10 +3894,20 @@ function abrirBuscadorMonstros() {
     });
     const inp = document.getElementById('bm-input');
     inp.addEventListener('input', () => renderResultadosMonstros(inp.value));
-    // delegação dos botões adicionar
+    // delegação: adicionar + favoritar
     document.getElementById('bm-result').addEventListener('click', e => {
-      const btn = e.target.closest('[data-add-monstro]');
-      if (btn) adicionarMonstroBusca(+btn.dataset.addMonstro, btn);
+      const add = e.target.closest('[data-add-monstro]');
+      if (add) { adicionarMonstroBusca(+add.dataset.addMonstro, add); return; }
+      const fav = e.target.closest('[data-fav-monstro]');
+      if (fav) {
+        const m = _bestiario[+fav.dataset.favMonstro];
+        if (!m) return;
+        const agora = favToggle(m.nome);
+        fav.textContent = agora ? '★' : '☆';
+        fav.classList.toggle('on', agora);
+        fav.setAttribute('aria-pressed', String(agora));
+        fav.title = agora ? 'Remover dos favoritos' : 'Favoritar';
+      }
     });
   }
   ov.classList.add('open');
@@ -3873,33 +3930,49 @@ function fecharBuscadorMonstros() {
   if (_bmAdicionou && tabAtiva === 'aliados') { _bmAdicionou = false; render(); }
 }
 
+function itemMonstroHTML(m) {
+  const idx = _bestiario.indexOf(m);
+  const fav = favTem(m.nome);
+  return `
+    <div class="bm-item">
+      <button type="button" class="bm-fav ${fav ? 'on' : ''}" data-fav-monstro="${idx}" aria-pressed="${fav}" title="${fav ? 'Remover dos favoritos' : 'Favoritar'}">${fav ? '★' : '☆'}</button>
+      <div class="bm-item-info">
+        <div class="bm-item-nome">${escape(tituloBonito(m.nome))}</div>
+        <div class="bm-item-meta">${escape(m.tipo || '')}</div>
+        <div class="bm-item-stats">🛡️ CA ${m.ca} · ❤️ ${m.hp_max} PV · ⚔ ${escape(m.nd || 'ND —')}</div>
+      </div>
+      <button type="button" class="bm-add no-lock" data-add-monstro="${idx}" title="Adicionar à ficha">+ Adicionar</button>
+    </div>`;
+}
+
 function renderResultadosMonstros(termo) {
   const result = document.getElementById('bm-result');
   if (!_bestiario) return;
   const q = semAcento(termo).trim();
-  let lista = _bestiario;
-  if (q) lista = _bestiario.filter(m => semAcento(m.nome).includes(q));
+
+  if (!q) {
+    // Sem busca: mostra Favoritos no topo + dica
+    const favs = _bestiario.filter(m => favTem(m.nome));
+    let html = '';
+    if (favs.length) {
+      html += `<div class="bm-secao">⭐ Favoritos</div>` + favs.map(itemMonstroHTML).join('');
+      html += `<div class="bm-secao">Todas as criaturas</div>`;
+    }
+    html += `<div class="bm-dica">${_bestiario.length} criaturas. Digite para filtrar pelo nome.</div>`;
+    html += _bestiario.slice(0, 60).map(itemMonstroHTML).join('');
+    if (_bestiario.length > 60) html += `<div class="bm-dica">Mostrando 60 de ${_bestiario.length}. Use a busca.</div>`;
+    result.innerHTML = html;
+    return;
+  }
+
+  const lista = _bestiario.filter(m => semAcento(m.nome).includes(q));
   const total = lista.length;
-  lista = lista.slice(0, 80);  // limita render
   if (!total) {
     result.innerHTML = `<div class="bm-vazio">Nenhuma criatura encontrada para “${escape(termo)}”.</div>`;
     return;
   }
   result.innerHTML =
-    (q ? '' : `<div class="bm-dica">${_bestiario.length} criaturas. Digite para filtrar.</div>`) +
-    lista.map((m, i) => {
-      // índice no array original (pra adicionar)
-      const idx = _bestiario.indexOf(m);
-      return `
-        <div class="bm-item">
-          <div class="bm-item-info">
-            <div class="bm-item-nome">${escape(tituloBonito(m.nome))}</div>
-            <div class="bm-item-meta">${escape(m.tipo || '')}</div>
-            <div class="bm-item-stats">🛡️ CA ${m.ca} · ❤️ ${m.hp_max} PV · ⚔ ${escape(m.nd || 'ND —')}</div>
-          </div>
-          <button type="button" class="bm-add no-lock" data-add-monstro="${idx}" title="Adicionar à ficha">+ Adicionar</button>
-        </div>`;
-    }).join('') +
+    lista.slice(0, 80).map(itemMonstroHTML).join('') +
     (total > 80 ? `<div class="bm-dica">Mostrando 80 de ${total}. Refine a busca.</div>` : '');
 }
 
@@ -3913,6 +3986,7 @@ function adicionarMonstroBusca(idx, btn) {
     nome: tituloBonito(m.nome),
     tipo: m.tipo || '',
     ca: m.ca || 10, hp_max: m.hp_max || 1, hp_atual: m.hp_max || 1,
+    pv_dados: m.pv_dados || '',
     deslocamento: m.deslocamento || '',
     atributos: { ...m.atributos },
     resistencias: resist,
@@ -4000,6 +4074,24 @@ function conectarListenersAliados() {
       agendarSalvarCompanions();
       return;
     }
+    const rolar = e.target.closest('[data-cr-rolar]');
+    if (rolar) {
+      const i = +rolar.dataset.crRolar;
+      const cr = _companionsAtuais()[i];
+      if (!cr || !cr.pv_dados) return;
+      const novoHp = rolarDadosVida(cr.pv_dados);
+      if (novoHp == null) { toast('⚠ Fórmula de dados inválida'); return; }
+      cr.hp_max = novoHp;
+      cr.hp_atual = novoHp;
+      const inpMax = document.querySelector(`input[data-cr-campo="hp_max"][data-cr="${i}"]`);
+      const inpAtu = document.querySelector(`input[data-cr-campo="hp_atual"][data-cr="${i}"]`);
+      if (inpMax) inpMax.value = novoHp;
+      if (inpAtu) inpAtu.value = novoHp;
+      atualizarBarraHpCriatura(i);
+      agendarSalvarCompanions();
+      toast(`🎲 ${cr.nome}: ${cr.pv_dados} = ${novoHp} PV`);
+      return;
+    }
     const del = e.target.closest('[data-cr-del]');
     if (del) {
       const i = +del.dataset.crDel;
@@ -4011,6 +4103,17 @@ function conectarListenersAliados() {
         : (confirm('Remover criatura?') && (_companionsAtuais().splice(i,1), salvarCompanionsSeguro(), render()));
     }
   });
+}
+
+// Rola uma fórmula de dados de vida (ex.: "11d8 + 44", "2d8 - 1") e retorna o total (mín. 1)
+function rolarDadosVida(formula) {
+  const m = (formula || '').replace(/\s/g, '').replace('–', '-').match(/^(\d+)d(\d+)([+-]\d+)?$/i);
+  if (!m) return null;
+  const qtd = +m[1], faces = +m[2], bonus = m[3] ? +m[3] : 0;
+  if (qtd < 1 || qtd > 100 || faces < 2) return null;
+  let total = 0;
+  for (let r = 0; r < qtd; r++) total += 1 + Math.floor(Math.random() * faces);
+  return Math.max(1, total + bonus);
 }
 
 function atualizarBarraHpCriatura(i) {
