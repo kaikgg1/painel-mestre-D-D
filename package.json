@@ -5,6 +5,7 @@
   "description": "Painel do Mestre — D&D 5e",
   "scripts": {
     "parse": "node scripts/parse_magias.js",
+    "parse-monstros": "node scripts/parse_monstros.js",
     "gerar-md": "node scripts/gerar_md.js",
     "extrair-pdf": "node scripts/extrair_pdf.js",
     "extrair-mestre": "node scripts/extrair_pdf.js Mestre.pdf",

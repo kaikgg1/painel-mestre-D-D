@@ -1346,6 +1346,74 @@
     .cc-num { width: 100%; }
   }
 
+  /* ===== BUSCADOR DO BESTIÁRIO ===== */
+  .bm-overlay {
+    position: fixed; inset: 0; z-index: 7000;
+    background: rgba(0,0,0,0.82);
+    backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+    display: none; align-items: center; justify-content: center; padding: 16px;
+  }
+  .bm-overlay.open { display: flex; animation: fadeIn 0.18s ease-out; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .bm-modal {
+    background: linear-gradient(160deg, #1f1416, #160c10);
+    border: 2px solid var(--gold); border-radius: 10px;
+    max-width: 640px; width: 100%;
+    max-height: 88vh; max-height: 88dvh;
+    display: flex; flex-direction: column; overflow: hidden;
+    box-shadow: 0 0 0 1px var(--blood-bright) inset, 0 24px 70px rgba(0,0,0,0.85);
+  }
+  .bm-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 16px 20px 14px; border-bottom: 1px solid var(--blood);
+    background: linear-gradient(180deg, #251618, #1a1014); flex-shrink: 0;
+  }
+  .bm-titulo {
+    font-family: 'Cinzel Decorative', serif; font-size: 17px; font-weight: 700;
+    color: var(--gold-bright); letter-spacing: 1px; flex: 1;
+  }
+  .bm-close {
+    background: transparent; border: 1px solid var(--blood); color: var(--parchment);
+    padding: 8px 12px; border-radius: 4px; cursor: pointer;
+    font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; min-height: 38px;
+  }
+  .bm-close:hover { background: var(--blood); color: #fff; }
+  .bm-search { padding: 12px 16px; border-bottom: 1px solid rgba(139,105,20,0.2); flex-shrink: 0; }
+  .bm-search input {
+    width: 100%; background: rgba(0,0,0,0.4);
+    border: 1px solid var(--gold); border-radius: 6px;
+    color: var(--parchment); font-family: 'EB Garamond', serif;
+    font-size: 15px; padding: 11px 14px; outline: none; min-height: 46px;
+  }
+  .bm-search input:focus { border-color: var(--gold-bright); box-shadow: 0 0 0 3px rgba(184,138,44,0.15); }
+  .bm-result { flex: 1; overflow-y: auto; padding: 8px 12px 14px; }
+  .bm-dica { font-size: 11px; color: var(--text-dim); font-style: italic; padding: 8px 4px; text-align: center; }
+  .bm-vazio { text-align: center; padding: 30px 16px; color: var(--text-dim); font-style: italic; }
+  .bm-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 10px; border-radius: 6px;
+    border-bottom: 1px solid rgba(139,105,20,0.12);
+  }
+  .bm-item:hover { background: rgba(139,105,20,0.07); }
+  .bm-item-info { flex: 1; min-width: 0; }
+  .bm-item-nome { font-family: 'Cinzel', serif; font-weight: 700; color: var(--gold-bright); font-size: 14px; }
+  .bm-item-meta { font-style: italic; color: var(--parchment-dim); font-size: 11px; }
+  .bm-item-stats { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+  .bm-add {
+    flex-shrink: 0; background: linear-gradient(180deg, var(--gold), #6a4f0e);
+    border: 1px solid var(--gold-bright); color: var(--shadow);
+    font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.5px; padding: 8px 12px; border-radius: 5px; cursor: pointer;
+    min-height: 40px; white-space: nowrap; transition: all 0.15s;
+  }
+  .bm-add:hover { background: linear-gradient(180deg, var(--gold-bright), var(--gold)); }
+  .bm-add.add-ok { background: linear-gradient(180deg, #2e7d32, #1b5e20); color: #fff; border-color: #66bb6a; }
+  @media (max-width: 600px) {
+    .bm-overlay { padding: 0; }
+    .bm-modal { max-width: 100%; max-height: 100vh; max-height: 100dvh; height: 100%; border-radius: 0; }
+    .bm-item { flex-wrap: wrap; }
+  }
+
   /* Selo de bônus do Mestre em perícias */
   .bonus-mestre {
     display: inline-block;
@@ -3579,37 +3647,20 @@ const TEMPLATES_CRIATURA = {
     ],
     notas: 'Fonte: Manual dos Monstros, pág. 176.',
   },
-  lobo: {
-    nome: 'Lobo', tipo: 'Besta Média, não-alinhado',
-    ca: 13, hp_max: 11, hp_atual: 11, deslocamento: '12 m',
-    atributos: { for:12, dex:15, con:12, int:3, sab:12, car:6 },
+  corvo: {
+    nome: 'Corvo', tipo: 'Besta Miúda, imparcial',
+    ca: 12, hp_max: 1, hp_atual: 1, deslocamento: '3 m, voo 15 m',
+    atributos: { for:2, dex:14, con:8, int:2, sab:12, car:6 },
     resistencias: '', imunidades: '',
-    sentidos: 'Percepção passiva 13 · Faro e audição apurados (vantagem em Percepção)',
-    idiomas: '—', nd: '1/4 (50 XP)',
+    sentidos: 'Percepção passiva 13 · Perícia: Percepção +3',
+    idiomas: '—', nd: '0 (10 XP)',
     tracos: [
-      { nome: 'Faro Aguçado', desc: 'Vantagem em testes de Percepção (Sabedoria) que dependam de audição ou olfato.' },
-      { nome: 'Táticas de Matilha', desc: 'Vantagem no ataque se um aliado do lobo estiver a até 1,5 m do alvo e não estiver incapacitado.' },
+      { nome: 'Mímica', desc: 'Capaz de imitar sons simples que ouve (pessoas cochichando, bebê chorando, animal rangendo). Quem ouvir pode perceber que são imitações com um teste de Sabedoria (Intuição) CD 10.' },
     ],
     acoes: [
-      { nome: 'Mordida', desc: '+4 para acertar, alcance 1,5 m. Acerto: 7 (2d4+2) perfurante. Alvo deve passar em FOR CD 11 ou cai caído.' },
+      { nome: 'Bicada', desc: 'Ataque Corpo-a-Corpo com Arma: +4 para atingir, alcance 1,5 m, um alvo. Acerto: 1 de dano perfurante.' },
     ],
-    notas: '',
-  },
-  urso_pardo: {
-    nome: 'Urso-pardo', tipo: 'Besta Grande, não-alinhado',
-    ca: 11, hp_max: 34, hp_atual: 34, deslocamento: '12 m, escalar 9 m',
-    atributos: { for:19, dex:10, con:16, int:2, sab:13, car:7 },
-    resistencias: '', imunidades: '',
-    sentidos: 'Percepção passiva 13', idiomas: '—', nd: '1 (200 XP)',
-    tracos: [
-      { nome: 'Faro Aguçado', desc: 'Vantagem em testes de Percepção (Sabedoria) que dependam de olfato.' },
-    ],
-    acoes: [
-      { nome: 'Multiataque', desc: 'Uma mordida e uma garrada.' },
-      { nome: 'Mordida', desc: '+6 para acertar, alcance 1,5 m. Acerto: 8 (1d8+4) perfurante.' },
-      { nome: 'Garras', desc: '+6 para acertar, alcance 1,5 m. Acerto: 11 (2d6+4) cortante.' },
-    ],
-    notas: '',
+    notas: 'Fonte: Manual dos Monstros, pág. 326.',
   },
   novo: {
     nome: 'Nova Criatura', tipo: '',
@@ -3634,13 +3685,13 @@ function renderAliados(c) {
         </p>
       </div>
       <div class="aliados-add no-lock">
+        <button type="button" class="btn primary no-lock" id="btn-buscar-monstro">🔍 Buscar no Bestiário</button>
         <select id="aliado-template" class="no-lock" aria-label="Modelo de criatura">
           <option value="novo">+ Em branco</option>
+          <option value="corvo">Corvo (ND 0)</option>
           <option value="golem_carne">Golem de Carne (ND 5)</option>
-          <option value="lobo">Lobo (ND 1/4)</option>
-          <option value="urso_pardo">Urso-pardo (ND 1)</option>
         </select>
-        <button type="button" class="btn primary no-lock" id="btn-add-aliado">+ Adicionar</button>
+        <button type="button" class="btn no-lock" id="btn-add-aliado">+ Adicionar</button>
       </div>
     </div>
     <div id="aliados-wrap">
@@ -3740,10 +3791,156 @@ async function salvarCompanions() {
 }
 function salvarCompanionsSeguro() { salvarCompanions().catch(()=>{}); }
 
+/* ===== BUSCADOR DO BESTIÁRIO (Manual dos Monstros) ===== */
+let _bestiario = null;          // cache do monstros_data.json
+let _bestiarioErro = false;
+
+function semAcento(s) {
+  return (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+}
+function tituloBonito(s) {
+  // "GOLEM DE CARNE" → "Golem de Carne"
+  const minusc = new Set(['de','da','do','dos','das','e','a','o','com','na','no','à']);
+  return (s || '').toLowerCase().split(/\s+/).map((w, i) =>
+    (i > 0 && minusc.has(w)) ? w : (w.charAt(0).toUpperCase() + w.slice(1))
+  ).join(' ');
+}
+
+async function carregarBestiario() {
+  if (_bestiario) return _bestiario;
+  const ctrl = new AbortController();
+  const t = setTimeout(() => ctrl.abort(), 10000);
+  try {
+    const r = await fetch('../data/monstros_data.json', { signal: ctrl.signal });
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    _bestiario = await r.json();
+    return _bestiario;
+  } catch (e) {
+    _bestiarioErro = true;
+    console.warn('[bestiário] falha:', e);
+    return null;
+  } finally { clearTimeout(t); }
+}
+
+function abrirBuscadorMonstros() {
+  let ov = document.getElementById('bm-overlay');
+  if (!ov) {
+    ov = document.createElement('div');
+    ov.id = 'bm-overlay';
+    ov.className = 'bm-overlay';
+    ov.innerHTML = `
+      <div class="bm-modal" role="dialog" aria-modal="true" aria-labelledby="bm-titulo">
+        <div class="bm-header">
+          <div class="bm-titulo" id="bm-titulo">🔍 Bestiário — Manual dos Monstros</div>
+          <button type="button" class="bm-close" id="bm-close">Fechar ✕</button>
+        </div>
+        <div class="bm-search">
+          <input type="search" id="bm-input" placeholder="Buscar criatura pelo nome… (ex.: dragão, golem, lobo)" autocomplete="off">
+        </div>
+        <div class="bm-result" id="bm-result"></div>
+      </div>`;
+    document.body.appendChild(ov);
+    ov.addEventListener('click', e => { if (e.target === ov) fecharBuscadorMonstros(); });
+    document.getElementById('bm-close').addEventListener('click', fecharBuscadorMonstros);
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && document.getElementById('bm-overlay')?.classList.contains('open')) fecharBuscadorMonstros();
+    });
+    const inp = document.getElementById('bm-input');
+    inp.addEventListener('input', () => renderResultadosMonstros(inp.value));
+    // delegação dos botões adicionar
+    document.getElementById('bm-result').addEventListener('click', e => {
+      const btn = e.target.closest('[data-add-monstro]');
+      if (btn) adicionarMonstroBusca(+btn.dataset.addMonstro, btn);
+    });
+  }
+  ov.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  const result = document.getElementById('bm-result');
+  result.innerHTML = '<div class="bm-vazio">Carregando bestiário…</div>';
+  carregarBestiario().then(b => {
+    if (!b) { result.innerHTML = '<div class="bm-vazio">⚠ Não foi possível carregar o bestiário.</div>'; return; }
+    renderResultadosMonstros(document.getElementById('bm-input').value);
+    setTimeout(() => document.getElementById('bm-input')?.focus(), 60);
+  });
+}
+
+let _bmAdicionou = false;
+function fecharBuscadorMonstros() {
+  const ov = document.getElementById('bm-overlay');
+  if (ov) ov.classList.remove('open');
+  document.body.style.overflow = '';
+  // Atualiza a lista de aliados por trás se algo foi adicionado
+  if (_bmAdicionou && tabAtiva === 'aliados') { _bmAdicionou = false; render(); }
+}
+
+function renderResultadosMonstros(termo) {
+  const result = document.getElementById('bm-result');
+  if (!_bestiario) return;
+  const q = semAcento(termo).trim();
+  let lista = _bestiario;
+  if (q) lista = _bestiario.filter(m => semAcento(m.nome).includes(q));
+  const total = lista.length;
+  lista = lista.slice(0, 80);  // limita render
+  if (!total) {
+    result.innerHTML = `<div class="bm-vazio">Nenhuma criatura encontrada para “${escape(termo)}”.</div>`;
+    return;
+  }
+  result.innerHTML =
+    (q ? '' : `<div class="bm-dica">${_bestiario.length} criaturas. Digite para filtrar.</div>`) +
+    lista.map((m, i) => {
+      // índice no array original (pra adicionar)
+      const idx = _bestiario.indexOf(m);
+      return `
+        <div class="bm-item">
+          <div class="bm-item-info">
+            <div class="bm-item-nome">${escape(tituloBonito(m.nome))}</div>
+            <div class="bm-item-meta">${escape(m.tipo || '')}</div>
+            <div class="bm-item-stats">🛡️ CA ${m.ca} · ❤️ ${m.hp_max} PV · ⚔ ${escape(m.nd || 'ND —')}</div>
+          </div>
+          <button type="button" class="bm-add no-lock" data-add-monstro="${idx}" title="Adicionar à ficha">+ Adicionar</button>
+        </div>`;
+    }).join('') +
+    (total > 80 ? `<div class="bm-dica">Mostrando 80 de ${total}. Refine a busca.</div>` : '');
+}
+
+function adicionarMonstroBusca(idx, btn) {
+  const m = _bestiario && _bestiario[idx];
+  if (!m) return;
+  const sentidos = [m.sentidos, m.pericias && ('Perícias: ' + m.pericias)].filter(Boolean).join(' · ');
+  const resist = [m.resistencias, m.vulnerabilidades && ('Vulnerável: ' + m.vulnerabilidades)].filter(Boolean).join(' · ');
+  const nova = {
+    id: 'cr_' + Date.now().toString(36) + Math.floor(Math.random()*1000),
+    nome: tituloBonito(m.nome),
+    tipo: m.tipo || '',
+    ca: m.ca || 10, hp_max: m.hp_max || 1, hp_atual: m.hp_max || 1,
+    deslocamento: m.deslocamento || '',
+    atributos: { ...m.atributos },
+    resistencias: resist,
+    imunidades: m.imunidades || '',
+    sentidos,
+    idiomas: m.idiomas || '',
+    nd: m.nd || '',
+    tracos: (m.tracos || []).map(t => ({ ...t })),
+    acoes: (m.acoes || []).map(t => ({ ...t })),
+    notas: 'Fonte: Manual dos Monstros.',
+  };
+  _companionsAtuais().push(nova);
+  _bmAdicionou = true;
+  salvarCompanionsSeguro();
+  // feedback sem fechar (permite adicionar vários)
+  if (btn) {
+    const orig = btn.textContent;
+    btn.textContent = '✓ Adicionado';
+    btn.classList.add('add-ok');
+    setTimeout(() => { btn.textContent = orig; btn.classList.remove('add-ok'); }, 1400);
+  }
+  toast(`✓ ${nova.nome} adicionado aos Aliados`);
+}
+
 function conectarListenersAliados() {
   const wrap = document.getElementById('aliados-wrap');
 
-  // Adicionar criatura
+  // Adicionar criatura (template rápido)
   const btnAdd = document.getElementById('btn-add-aliado');
   if (btnAdd) btnAdd.addEventListener('click', () => {
     const sel = document.getElementById('aliado-template');
@@ -3755,6 +3952,10 @@ function conectarListenersAliados() {
     salvarCompanionsSeguro();
     render();  // re-render mantém aba 'aliados'
   });
+
+  // Buscar no bestiário completo
+  const btnBuscar = document.getElementById('btn-buscar-monstro');
+  if (btnBuscar) btnBuscar.addEventListener('click', abrirBuscadorMonstros);
 
   if (!wrap) return;
 
