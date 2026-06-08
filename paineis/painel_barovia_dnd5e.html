@@ -790,6 +790,7 @@
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script src="../assets/js/supabase.js"></script>
 <script src="../assets/js/auth.js"></script>
+<script src="../assets/js/efeitos.js"></script>
 <script src="../assets/js/dbsync.js"></script>
 <script src="../assets/js/phb_slots.js"></script>
 <script src="../assets/js/master_notes.js"></script>
@@ -1095,7 +1096,14 @@ function criarCard(p) {
   hpLabel.textContent = 'Pontos de Vida';
   const hpVal = document.createElement('div');
   hpVal.className = 'stat-value hp-grouped';
-  const hpCur = inputNumerico(p.hpAtual, v => { p.hpAtual = v; salvar(p); toast(`PV atualizado: ${v}`); }, 'hp-current-input', 0);
+  const hpCur = inputNumerico(p.hpAtual, v => {
+    const delta = v - (p.hpAtual ?? v);
+    p.hpAtual = v; salvar(p); toast(`PV atualizado: ${v}`);
+    if (window.FX && delta !== 0) {
+      const alvo = hpCur.closest('.card') || hpCur;
+      if (delta < 0) FX.dano(alvo, delta); else FX.cura(alvo, delta);
+    }
+  }, 'hp-current-input', 0);
   const hpSep = document.createElement('span');
   hpSep.className = 'hp-sep';
   hpSep.textContent = '/';

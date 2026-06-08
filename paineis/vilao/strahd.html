@@ -1174,6 +1174,7 @@
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script src="../../assets/js/supabase.js"></script>
 <script src="../../assets/js/auth.js"></script>
+<script src="../../assets/js/efeitos.js"></script>
 <script src="../../assets/js/master_state.js"></script>
 <script>
 /* ============================================================
@@ -1792,6 +1793,7 @@ function buildSlotsUI() {
 
 function toggleSlot(el) {
   el.classList.toggle('used');
+  if (window.FX) FX.slot(el);
   atualizarContadoresSlots();
   saveState(true);
 }
@@ -2056,6 +2058,10 @@ function castSpellDirect(spellName, level) {
     return;
   }
   markSpellCast(spellName);
+  if (window.FX) {
+    const chip = document.querySelector(`.spell-chip[data-spell="${spellName}"]`);
+    if (chip) { FX.flash(chip, 'arcano'); FX.flutuante(chip, '✦ ' + level + '°', 'arcano'); }
+  }
   showToast(`⚡ ${spellName} — espaço de nível ${level} gasto`);
 }
 
@@ -2113,9 +2119,15 @@ function updateHPBar() {
 function adjustHP(delta) {
   const max = parseInt(hpMax.value) || 1;
   let cur = parseInt(hpCurrent.value) || 0;
+  const antes = cur;
   cur = Math.max(0, Math.min(max, cur + delta));
   hpCurrent.value = cur;
   updateHPBar();
+  const mudou = cur - antes;
+  if (window.FX && mudou !== 0) {
+    const alvo = document.querySelector('.combat-bar .panel') || hpCurrent;
+    if (mudou < 0) FX.dano(alvo, mudou); else FX.cura(alvo, mudou);
+  }
   saveState(true);
 }
 

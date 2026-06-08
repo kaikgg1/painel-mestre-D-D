@@ -1250,6 +1250,19 @@
     box-shadow: 0 4px 14px rgba(0,0,0,0.4);
   }
   .criatura-head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; }
+  .criatura-img {
+    flex-shrink: 0; width: 56px; height: 56px; border-radius: 8px;
+    border: 1px solid rgba(139,105,20,0.4); background: rgba(0,0,0,0.3);
+    cursor: pointer; overflow: hidden; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+  .criatura-img:hover { border-color: var(--gold-bright); transform: scale(1.04); }
+  .criatura-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .criatura-img-ph { font-size: 24px; opacity: 0.5; }
+  .criatura-img.erro img { display: none; }
+  .criatura-img.erro::after { content: '⚠'; font-size: 22px; color: var(--blood-bright); }
+  @media (max-width: 600px) { .criatura-img { width: 48px; height: 48px; } }
   .criatura-id { flex: 1; display: flex; flex-direction: column; gap: 4px; }
   .criatura-nome {
     font-family: 'Cinzel', serif; font-weight: 700; font-size: 16px;
@@ -1420,6 +1433,14 @@
     border-bottom: 1px solid rgba(139,105,20,0.12);
   }
   .bm-item:hover { background: rgba(139,105,20,0.07); }
+  .bm-thumb {
+    flex-shrink: 0; width: 52px; height: 52px; border-radius: 6px;
+    overflow: hidden; background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(139,105,20,0.3);
+    display: flex; align-items: center; justify-content: center; font-size: 22px;
+  }
+  .bm-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .bm-thumb-vazio { opacity: 0.4; }
   .bm-item-info { flex: 1; min-width: 0; }
   .bm-item-nome { font-family: 'Cinzel', serif; font-weight: 700; color: var(--gold-bright); font-size: 14px; }
   .bm-item-meta { font-style: italic; color: var(--parchment-dim); font-size: 11px; }
@@ -1893,6 +1914,7 @@
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script src="../assets/js/supabase.js"></script>
 <script src="../assets/js/auth.js"></script>
+<script src="../assets/js/efeitos.js"></script>
 <script src="../assets/js/phb_catalogo.js"></script>
 <script src="../assets/js/phb_slots.js"></script>
 <script>
@@ -2270,8 +2292,8 @@ function render() {
     <form class="tab-content" id="ficha-form" novalidate>
       ${renderTab(c, atrs)}
       <div class="acoes">
-        <span class="status-msg" id="status" aria-live="polite">💾 Auto-save ativo · alterações salvam em ~1s</span>
-        <button class="btn primary" type="submit" id="btn-salvar" title="Forçar salvamento imediato">💾 Salvar agora</button>
+        <span class="status-msg" id="status" aria-live="polite">💾 Auto-save ativo · suas alterações salvam sozinhas</span>
+        <!-- Botão "Salvar agora" removido: auto-save cuida de tudo. O submit ainda é disparado programaticamente. -->
       </div>
     </form>
   `;
@@ -2814,6 +2836,7 @@ async function alternarPipRecurso(pip) {
   gravarUsadoRecurso(rec, id, novoGastos);
   charAtivo.recursos_usados = rec;
   pips.forEach((p, i) => p.classList.toggle('gasto', i < novoGastos));
+  if (window.FX) FX.slot(pip);
   const frac = grupo.querySelector('.rc-frac');
   if (frac) frac.innerHTML = `<strong>${max - novoGastos}</strong>/${max}`;
 
@@ -3744,6 +3767,9 @@ function renderCardCriatura(cr, i) {
   return `
     <div class="criatura-card" data-cr="${i}">
       <div class="criatura-head">
+        <button type="button" class="criatura-img no-lock ${cr.imagem ? 'tem' : ''}" data-cr-img="${i}" title="${cr.imagem ? 'Trocar/remover imagem' : 'Adicionar imagem (URL)'}" aria-label="Imagem da criatura">
+          ${cr.imagem ? `<img src="${escape(cr.imagem)}" alt="${escape(cr.nome||'')}" onerror="this.parentElement.classList.add('erro')">` : '<span class="criatura-img-ph">🖼️</span>'}
+        </button>
         <div class="criatura-id">
           <input class="criatura-nome" data-cr-campo="nome" data-cr="${i}" value="${escape(cr.nome||'')}" placeholder="Nome" aria-label="Nome da criatura">
           <input class="criatura-tipo" data-cr-campo="tipo" data-cr="${i}" value="${escape(cr.tipo||'')}" placeholder="Tipo (ex.: Besta Média)" aria-label="Tipo">
@@ -3814,6 +3840,14 @@ function renderCardCriatura(cr, i) {
 function _companionsAtuais() {
   if (!Array.isArray(charAtivo.companions)) charAtivo.companions = [];
   return charAtivo.companions;
+}
+
+// Destaca o último card de criatura (efeito "novo") após adicionar
+function destacarUltimaCriatura() {
+  if (!window.FX) return;
+  const cards = document.querySelectorAll('.criatura-card');
+  const ult = cards[cards.length - 1];
+  if (ult) { FX.novo(ult); ult.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
 }
 
 async function salvarCompanions() {
@@ -3919,6 +3953,7 @@ function abrirBuscadorMonstros() {
         fav.classList.toggle('on', agora);
         fav.setAttribute('aria-pressed', String(agora));
         fav.title = agora ? 'Remover dos favoritos' : 'Favoritar';
+        if (window.FX) FX.favorito(fav, agora);
       }
     });
   }
@@ -3946,9 +3981,13 @@ function fecharBuscadorMonstros() {
 function itemMonstroHTML(m) {
   const idx = _bestiario.indexOf(m);
   const fav = favTem(m.nome);
+  const thumb = m.imagem
+    ? `<div class="bm-thumb"><img src="${escape(m.imagem)}" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></div>`
+    : `<div class="bm-thumb bm-thumb-vazio">🐲</div>`;
   return `
     <div class="bm-item">
       <button type="button" class="bm-fav ${fav ? 'on' : ''}" data-fav-monstro="${idx}" aria-pressed="${fav}" title="${fav ? 'Remover dos favoritos' : 'Favoritar'}">${fav ? '★' : '☆'}</button>
+      ${thumb}
       <div class="bm-item-info">
         <div class="bm-item-nome">${escape(tituloBonito(m.nome))}</div>
         <div class="bm-item-meta">${escape(m.tipo || '')}</div>
@@ -4000,6 +4039,7 @@ function adicionarMonstroObj(m) {
     tipo: m.tipo || '',
     ca: m.ca || 10, hp_max: m.hp_max || 1, hp_atual: m.hp_max || 1,
     pv_dados: m.pv_dados || '',
+    imagem: m.imagem || '',
     deslocamento: m.deslocamento || '',
     atributos: { ...m.atributos },
     resistencias: resist,
@@ -4049,6 +4089,7 @@ function conectarListenersAliados() {
       if (!m) { toast('⚠ Criatura não encontrada no bestiário'); return; }
       adicionarMonstroObj(m);
       render();
+      destacarUltimaCriatura();
       return;
     }
     // Em branco
@@ -4057,6 +4098,7 @@ function conectarListenersAliados() {
     _companionsAtuais().push(nova);
     salvarCompanionsSeguro();
     render();
+    destacarUltimaCriatura();
   });
 
   // Buscar no bestiário completo
@@ -4117,11 +4159,36 @@ function conectarListenersAliados() {
       cr.hp_atual = novoHp;
       const inpMax = document.querySelector(`input[data-cr-campo="hp_max"][data-cr="${i}"]`);
       const inpAtu = document.querySelector(`input[data-cr-campo="hp_atual"][data-cr="${i}"]`);
-      if (inpMax) inpMax.value = novoHp;
-      if (inpAtu) inpAtu.value = novoHp;
-      atualizarBarraHpCriatura(i);
-      agendarSalvarCompanions();
-      toast(`🎲 ${cr.nome}: ${cr.pv_dados} = ${novoHp} PV`);
+      const aplicar = () => {
+        if (inpAtu) inpAtu.value = novoHp;
+        atualizarBarraHpCriatura(i);
+        agendarSalvarCompanions();
+        toast(`🎲 ${cr.nome}: ${cr.pv_dados} = ${novoHp} PV`);
+      };
+      // Animação de rolagem no campo de PV máx, depois assenta
+      if (window.FX && inpMax && inpMax.tagName === 'INPUT') {
+        // input não anima textContent; embaralha o value
+        let n = 0; const passos = 12;
+        const timer = setInterval(() => {
+          n++; inpMax.value = 1 + Math.floor(Math.random() * Math.max(novoHp, 6));
+          if (n >= passos) { clearInterval(timer); inpMax.value = novoHp; FX.pulso(inpMax); aplicar(); }
+        }, 45);
+      } else {
+        if (inpMax) inpMax.value = novoHp;
+        aplicar();
+      }
+      return;
+    }
+    const img = e.target.closest('[data-cr-img]');
+    if (img) {
+      const i = +img.dataset.crImg;
+      const cr = _companionsAtuais()[i];
+      if (!cr) return;
+      const url = prompt('Cole a URL da imagem da criatura (deixe vazio para remover):', cr.imagem || '');
+      if (url === null) return;  // cancelou
+      cr.imagem = url.trim();
+      salvarCompanionsSeguro();
+      render();
       return;
     }
     const del = e.target.closest('[data-cr-del]');
@@ -4447,6 +4514,7 @@ function conectarListeners() {
       }
       novoGastos = Math.max(0, Math.min(max, novoGastos));
       pips.forEach((pip, i) => pip.classList.toggle('gasto', i < novoGastos));
+      if (window.FX) FX.slot(p);
       // Atualiza o hidden input + status text
       const wrap = grupo.closest('.slot-card');
       if (wrap) {
@@ -4505,11 +4573,17 @@ function conectarListeners() {
     let novo = atual + delta;
     if (novo < 0) novo = 0;
     if (max > 0 && novo > max) novo = max;
+    const mudou = novo - atual;
     hpAtual.value = novo;
     // Feedback visual no input
     hpAtual.style.color = delta < 0 ? '#e88a8a' : '#8fc28f';
     setTimeout(() => { hpAtual.style.color = ''; }, 600);
     atualizarBarraHP();
+    // Efeito dinâmico (FX) no bloco de HP
+    if (window.FX && mudou !== 0) {
+      const alvo = document.querySelector('.hp-wrap') || hpAtual;
+      if (mudou < 0) FX.dano(alvo, mudou); else FX.cura(alvo, mudou);
+    }
     // Dispara input event para auto-save pegar
     hpAtual.dispatchEvent(new Event('input', { bubbles: true }));
   }
@@ -4828,7 +4902,8 @@ async function salvar(e) {
     return;
   }
 
-  btn.disabled = true; status.className = 'status-msg'; status.textContent = 'Salvando…';
+  if (btn) btn.disabled = true;
+  status.className = 'status-msg'; status.textContent = 'Salvando…';
 
   const f = e.target;
   const fd = new FormData(f);
@@ -4986,9 +5061,10 @@ async function salvar(e) {
     chars = chars.map(c => c.id === charAtivo.id ? charAtivo : c);
     status.className = 'status-msg ok';
     status.textContent = '✓ Salvo  ·  ' + new Date().toLocaleTimeString('pt-BR');
+    if (window.FX) FX.salvo(status);
     setTimeout(() => { if (status.classList.contains('ok')) status.textContent = '💾 Auto-save ativo'; }, 2500);
   }
-  btn.disabled = false;
+  if (btn) btn.disabled = false;
 }
 
 init();

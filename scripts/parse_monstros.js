@@ -18,7 +18,7 @@ const linhas = fs.readFileSync(TXT, 'utf8').split('\n')
 function ehTitulo(t) {
   t = t.trim();
   if (t.length < 2 || t.length > 50) return false;
-  if (/^(ACOES|AÇÕES|REACOES|REAÇÕES|AÇÕES LENDÁRIAS|AÇÕES DE COVIL|CLASSE DE ARMADURA)$/i.test(t)) return false;
+  if (/^(A[ÇC][ÕO]ES|REA[ÇC][ÕO]ES|CLASSE DE ARMADURA|VARIANTE)/i.test(t)) return false;  // seções, não monstros
   const letras = t.replace(/[^A-Za-zÀ-ÿ]/g, '');
   if (letras.length < 2) return false;
   const maiusc = t.replace(/[^A-ZÀ-Þ]/g, '');
@@ -101,40 +101,45 @@ function parseBloco(caIdx, nextCaIdx) {
   const { nome, tipo } = acharNomeETipo(caIdx);
   if (!nome) return null;
 
-  const caM = (trecho[0] || '').match(/Classe de Armadura\s+(\d+)\s*(.*)$/i);
+  // \s* (não \s+) — OCR às vezes cola "Vida13", "Armadura12" sem espaço.
+  const caM = (trecho[0] || '').match(/Classe de Armadura\s*(\d+)\s*(.*)$/i);
   const ca = caM ? +caM[1] : 10;
   const caExtra = caM && caM[2] ? caM[2].trim() : '';
 
-  const pvLine = pegarCampo(trecho, /^Pontos de Vida\s+(.+)$/i);
-  const pvNum = (pvLine.match(/^(\d+)/) || [])[1];
+  const pvLine = pegarCampo(trecho, /^Pontos de Vida\s*(.+)$/i);
+  const pvNum = (pvLine.match(/(\d+)/) || [])[1];
   const hp = pvNum ? +pvNum : 1;
   // Fórmula de dados de vida, ex.: "11d8 + 44"
   const pvDadosM = pvLine.match(/\(([^)]+)\)/);
   const pvDados = pvDadosM ? pvDadosM[1].replace(/\s+/g, ' ').trim() : '';
 
-  const desloc = pegarCampo(trecho, /^Deslocamento\s+(.+)$/i);
+  const desloc = pegarCampo(trecho, /^Deslocamento\s*(.+)$/i);
 
+  // Atributos: aceita valor na mesma linha ("FOR 10 (+0)" / "FOR10(+0)")
+  // OU na próxima linha (formato em coluna). Tolerante a OCR.
   const atributos = { for:10, dex:10, con:10, int:10, sab:10, car:10 };
   for (let i = 0; i < trecho.length; i++) {
-    const lbl = trecho[i].trim().toUpperCase();
-    if (ATRMAP[lbl]) {
-      for (let n = i + 1; n < Math.min(i + 3, trecho.length); n++) {
-        const mm = trecho[n].match(/(\d+)\s*\(/);
-        if (mm) { atributos[ATRMAP[lbl]] = +mm[1]; break; }
-      }
+    const t = trecho[i].trim();
+    const mlab = t.match(/^(FOR|DES|CON|INT|SAB|CAR)\b\s*(\d+)?/i);
+    if (!mlab) continue;
+    const key = ATRMAP[mlab[1].toUpperCase()];
+    if (mlab[2]) { atributos[key] = +mlab[2]; continue; }   // valor colado/na mesma linha
+    for (let n = i + 1; n < Math.min(i + 3, trecho.length); n++) {
+      const mm = trecho[n].match(/^\s*(\d+)\s*[(（]/);          // "10 (+0)"
+      if (mm) { atributos[key] = +mm[1]; break; }
     }
   }
 
-  const resistencias = pegarCampo(trecho, /^Resist[êe]ncia a Dano\s+(.+)$/i);
-  const vulnerab     = pegarCampo(trecho, /^Vulnerabilidade a Dano\s+(.+)$/i);
-  const imunDano     = pegarCampo(trecho, /^Imunidade a Dano\s+(.+)$/i);
-  const imunCond     = pegarCampo(trecho, /^Imunidade a Condi[çc][ãa]o\s+(.+)$/i);
+  const resistencias = pegarCampo(trecho, /^Resist[êe]ncia a Dano\s*(.+)$/i);
+  const vulnerab     = pegarCampo(trecho, /^Vulnerabilidade a Dano\s*(.+)$/i);
+  const imunDano     = pegarCampo(trecho, /^Imunidade a Dano\s*(.+)$/i);
+  const imunCond     = pegarCampo(trecho, /^Imunidade a Condi[çc][ãa]o\s*(.+)$/i);
   const imunidades = [imunDano && ('Dano: ' + imunDano), imunCond && ('Condições: ' + imunCond)].filter(Boolean).join(' · ');
-  const sentidos     = pegarCampo(trecho, /^Sentidos\s+(.+)$/i);
-  const idiomas      = pegarCampo(trecho, /^Idiomas\s+(.+)$/i);
-  const pericias     = pegarCampo(trecho, /^Per[íi]cias\s+(.+)$/i);
-  const salvaguardas = pegarCampo(trecho, /^Testes de Resist[êe]ncia\s+(.+)$/i) || pegarCampo(trecho, /^Salvaguardas\s+(.+)$/i);
-  const ndLine       = pegarCampo(trecho, /^N[íi]vel de Desafio\s+(.+)$/i);
+  const sentidos     = pegarCampo(trecho, /^Sentidos\s*(.+)$/i);
+  const idiomas      = pegarCampo(trecho, /^Idiomas\s*(.+)$/i);
+  const pericias     = pegarCampo(trecho, /^Per[íi]cias\s*(.+)$/i);
+  const salvaguardas = pegarCampo(trecho, /^Testes de Resist[êe]ncia\s*(.+)$/i) || pegarCampo(trecho, /^Salvaguardas\s*(.+)$/i);
+  const ndLine       = pegarCampo(trecho, /^N[íi]vel de Desafio\s*(.+)$/i);
 
   const ndPos       = trecho.findIndex(l => /^N[íi]vel de Desafio/i.test(l.trim()));
   const acoesPos    = trecho.findIndex(l => /^A[ÇC][ÕO]ES\s*$/i.test(l.trim()));
