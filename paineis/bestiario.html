@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Bestiário completo de D&D 5e em PT-BR — 358 criaturas do Manual dos Monstros com fichas e imagens.">
+<meta name="theme-color" content="#0a0608">
+<link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
+<link rel="stylesheet" href="../assets/css/ui.css">
+<title>Bestiário — D&D 5e</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,700;1,400&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { min-height: 100vh; min-height: 100dvh; background: #0a0608;
+    background-image: radial-gradient(ellipse at top, #2a1518 0%, #150a0c 40%, #050304 100%);
+    font-family: 'EB Garamond', Georgia, serif; color: #d4c5a0; }
+  .site-header { position: sticky; top: 0; z-index: 30;
+    background: linear-gradient(180deg, rgba(15,8,10,0.96), rgba(10,6,8,0.92)); backdrop-filter: blur(10px);
+    border-bottom: 1px solid #8B6914; padding: 12px 20px; display: flex; align-items: center; gap: 14px; }
+  .back-btn { text-decoration: none; color: #a89878; font-family: 'Cinzel', serif; font-size: 11px; font-weight: 600;
+    letter-spacing: 1.5px; text-transform: uppercase; padding: 8px 14px; border: 1px solid #8B6914; border-radius: 3px; transition: .2s; white-space: nowrap; }
+  .back-btn:hover { background: #8B6914; color: #050304; }
+  .header-title { font-family: 'Cinzel Decorative', serif; font-size: clamp(18px, 3vw, 26px); font-weight: 700;
+    color: #b88a2c; letter-spacing: 2px; text-shadow: 0 0 24px rgba(184,138,44,0.35); flex: 1; text-align: center; }
+  main { position: relative; z-index: 1; max-width: 960px; margin: 22px auto; padding: 0 16px 40px;
+    display: flex; flex-direction: column; min-height: calc(100vh - 120px); }
+  #cp { flex: 1; display: flex; flex-direction: column; }
+</style>
+</head>
+<body data-ambiente="brasas">
+<header class="site-header">
+  <a href="../index.html" class="back-btn">← Início</a>
+  <div class="header-title">🐉 Bestiário</div>
+  <span style="width:70px"></span>
+</header>
+<main><div id="cp"></div></main>
+
+<script src="../assets/js/compendio.js"></script>
+<script>
+  Compendio.base = '../data/';
+  Compendio.inline(document.getElementById('cp'), 'monstros');
+</script>
+<script src="../assets/js/ambiente.js"></script>
+<script src="../assets/js/polish.js"></script>
+</body>
+</html>

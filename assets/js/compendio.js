@@ -1,13 +1,16 @@
 // assets/js/compendio.js
-// Compêndio reutilizável: modal de busca para ITENS MÁGICOS e MONSTROS.
-// Uso:  window.Compendio.abrir('itens')   |   window.Compendio.abrir('monstros')
-// Lê data/itens_data.json e data/monstros_data.json (caminho relativo configurável
-// via window.Compendio.base, padrão '../data/').
-// Auto-contido: injeta CSS + modal no DOM sob demanda.
+// Compêndio reutilizável: busca de ITENS MÁGICOS e MONSTROS.
+// Dois modos:
+//   • Modal:  window.Compendio.abrir('itens' | 'monstros')      (usado em painéis)
+//   • Página: window.Compendio.inline(containerEl, 'itens'|'monstros')  (página dedicada)
+// Lê data/itens_data.json e data/monstros_data.json (base configurável via Compendio.base).
+// Auto-contido: injeta CSS sob demanda.
 
 (function () {
   const cache = {};
-  let _tipoAtual = null;
+  let _tipo = null;      // tipo atual
+  let _root = null;      // elemento que contém .cp-input/.cp-chips/.cp-corpo
+  let _filtroRar = '';
 
   const norm = s => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
   const esc = s => (s == null ? '' : String(s)).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -23,35 +26,24 @@
   const CSS = `
   .cp-ov { position: fixed; inset: 0; z-index: 1200; display: none; background: rgba(5,3,4,0.82); backdrop-filter: blur(4px); padding: 3vh 2vw; }
   .cp-ov.open { display: flex; }
-  .cp-modal {
-    margin: auto; width: 100%; max-width: 920px; max-height: 94vh; display: flex; flex-direction: column;
-    background: linear-gradient(160deg, #1a1018, #120b10);
-    border: 2px solid #8B6914; border-radius: 12px; box-shadow: 0 12px 50px rgba(0,0,0,0.8); overflow: hidden;
-    font-family: 'EB Garamond','Libre Baskerville',Georgia,serif; color: #d4c5a0;
-  }
+  .cp-modal { margin: auto; width: 100%; max-width: 920px; max-height: 94vh; display: flex; flex-direction: column;
+    background: linear-gradient(160deg, #1a1018, #120b10); border: 2px solid #8B6914; border-radius: 12px; box-shadow: 0 12px 50px rgba(0,0,0,0.8); overflow: hidden; }
   .cp-head { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-bottom: 1px solid rgba(139,105,20,0.5); }
   .cp-head h2 { margin: 0; font-family: 'Cinzel','Cinzel Decorative',serif; font-size: 19px; color: #b88a2c; letter-spacing: 1px; flex: 1; }
   .cp-x { background: none; border: none; color: #a89878; font-size: 26px; cursor: pointer; line-height: 1; padding: 2px 8px; }
   .cp-x:hover { color: #d4a843; }
-  .cp-busca { padding: 12px 18px 8px; }
-  .cp-busca input {
-    width: 100%; padding: 11px 14px; font-size: 16px; border-radius: 8px;
-    background: rgba(0,0,0,0.35); border: 1px solid #8B6914; color: #f0e6cf; font-family: inherit;
-  }
+  /* host (modal-body ou container inline) */
+  .cp-host { display: flex; flex-direction: column; min-height: 0; font-family: 'EB Garamond','Libre Baskerville',Georgia,serif; color: #d4c5a0; }
+  .cp-host.cp-inline { flex: 1; }
+  .cp-busca { padding: 12px 4px 8px; }
+  .cp-busca input { width: 100%; padding: 11px 14px; font-size: 16px; border-radius: 8px; background: rgba(0,0,0,0.35); border: 1px solid #8B6914; color: #f0e6cf; font-family: inherit; }
   .cp-busca input:focus { outline: none; box-shadow: 0 0 0 2px rgba(184,138,44,0.4); }
-  .cp-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 18px 10px; }
-  .cp-chip {
-    font-family: 'Cinzel',serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px;
-    padding: 4px 10px; border-radius: 20px; cursor: pointer; background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(139,105,20,0.5); color: #a89878;
-  }
+  .cp-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 4px 10px; }
+  .cp-chip { font-family: 'Cinzel',serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; padding: 4px 10px; border-radius: 20px; cursor: pointer; background: rgba(255,255,255,0.05); border: 1px solid rgba(139,105,20,0.5); color: #a89878; }
   .cp-chip.on { background: #8B6914; color: #120b10; border-color: #b88a2c; }
-  .cp-corpo { flex: 1; overflow-y: auto; padding: 4px 18px 18px; }
+  .cp-corpo { flex: 1; overflow-y: auto; padding: 4px 4px 18px; }
   .cp-lista { display: grid; gap: 8px; }
-  .cp-item {
-    display: flex; align-items: center; gap: 12px; padding: 10px 12px; cursor: pointer;
-    background: rgba(255,255,255,0.03); border: 1px solid rgba(139,105,20,0.3); border-radius: 8px; transition: .15s;
-  }
+  .cp-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; cursor: pointer; background: rgba(255,255,255,0.03); border: 1px solid rgba(139,105,20,0.3); border-radius: 8px; transition: .15s; }
   .cp-item:hover { border-color: #b88a2c; background: rgba(184,138,44,0.08); transform: translateX(2px); }
   .cp-thumb { flex-shrink: 0; width: 48px; height: 48px; border-radius: 6px; overflow: hidden; background: rgba(0,0,0,.35); display: flex; align-items: center; justify-content: center; font-size: 20px; border: 1px solid rgba(139,105,20,.3); }
   .cp-thumb img { width: 100%; height: 100%; object-fit: cover; }
@@ -60,8 +52,6 @@
   .cp-tag { display: inline-block; font-family: 'Cinzel',serif; font-size: 9px; font-weight: 700; text-transform: uppercase; padding: 2px 7px; border-radius: 4px; margin-left: 6px; }
   .cp-vazio, .cp-dica { text-align: center; color: #8c7d5e; font-style: italic; padding: 24px 10px; }
   .cp-dica { padding: 8px; font-size: 12px; }
-
-  /* Detalhe (ficha) */
   .cp-voltar { background: none; border: 1px solid #8B6914; color: #a89878; font-family: 'Cinzel',serif; font-size: 11px; padding: 6px 12px; border-radius: 6px; cursor: pointer; margin-bottom: 12px; }
   .cp-voltar:hover { background: #8B6914; color: #120b10; }
   .cp-ficha h3 { font-family: 'Cinzel Decorative','Cinzel',serif; color: #b88a2c; font-size: 22px; margin: 0 0 2px; }
@@ -80,34 +70,25 @@
   @media (max-width: 600px) { .cp-modal { max-height: 96vh; } .cp-ficha .cp-img { float: none; width: 100%; max-width: 100%; margin: 0 0 12px; } }
   `;
 
-  let _ov;
-  function montar() {
-    const s = document.createElement('style'); s.textContent = CSS; document.head.appendChild(s);
-    _ov = document.createElement('div');
-    _ov.className = 'cp-ov';
-    _ov.innerHTML = `
-      <div class="cp-modal" role="dialog" aria-modal="true">
-        <div class="cp-head"><h2 id="cp-titulo"></h2><button class="cp-x" aria-label="Fechar">✕</button></div>
-        <div class="cp-busca"><input id="cp-input" type="search" autocomplete="off"></div>
-        <div class="cp-chips" id="cp-chips"></div>
-        <div class="cp-corpo" id="cp-corpo"></div>
-      </div>`;
-    document.body.appendChild(_ov);
-    _ov.addEventListener('click', e => { if (e.target === _ov || e.target.classList.contains('cp-x')) fechar(); });
-    _ov.querySelector('#cp-input').addEventListener('input', e => renderLista(e.target.value));
-    document.addEventListener('keydown', e => { if (e.key === 'Escape' && _ov.classList.contains('open')) fechar(); });
+  let _cssInjetado = false;
+  function injetarCSS() { if (_cssInjetado) return; _cssInjetado = true; const s = document.createElement('style'); s.textContent = CSS; document.head.appendChild(s); }
+
+  // HTML interno de busca/lista, montado em qualquer host
+  function montarUI(host) {
+    host.classList.add('cp-host');
+    host.innerHTML = `
+      <div class="cp-busca"><input class="cp-input" type="search" autocomplete="off"></div>
+      <div class="cp-chips"></div>
+      <div class="cp-corpo"></div>`;
+    host.querySelector('.cp-input').addEventListener('input', e => renderLista(e.target.value));
+    return host;
   }
 
-  let _filtroRar = '';
-  async function abrir(tipo) {
-    if (!CFG[tipo]) return;
-    if (!_ov) montar();
-    _tipoAtual = tipo; _filtroRar = '';
-    _ov.querySelector('#cp-titulo').textContent = CFG[tipo].titulo;
-    _ov.querySelector('#cp-input').value = '';
-    _ov.querySelector('#cp-input').placeholder = CFG[tipo].ph;
-    // chips de raridade só p/ itens
-    const chips = _ov.querySelector('#cp-chips');
+  async function popular(tipo) {
+    _tipo = tipo; _filtroRar = '';
+    const inp = _root.querySelector('.cp-input');
+    inp.value = ''; inp.placeholder = CFG[tipo].ph;
+    const chips = _root.querySelector('.cp-chips');
     if (tipo === 'itens') {
       chips.style.display = 'flex';
       chips.innerHTML = `<span class="cp-chip on" data-rar="">Todos</span>` +
@@ -115,21 +96,48 @@
       chips.querySelectorAll('.cp-chip').forEach(c => c.addEventListener('click', () => {
         _filtroRar = c.dataset.rar;
         chips.querySelectorAll('.cp-chip').forEach(x => x.classList.toggle('on', x === c));
-        renderLista(_ov.querySelector('#cp-input').value);
+        renderLista(_root.querySelector('.cp-input').value);
       }));
     } else { chips.style.display = 'none'; chips.innerHTML = ''; }
 
-    _ov.classList.add('open');
-    document.body.style.overflow = 'hidden';
-    const corpo = _ov.querySelector('#cp-corpo');
+    const corpo = _root.querySelector('.cp-corpo');
     corpo.innerHTML = '<div class="cp-dica">Carregando…</div>';
     const dados = await carregar(tipo);
     if (!dados) { corpo.innerHTML = '<div class="cp-vazio">⚠ Não foi possível carregar.</div>'; return; }
     renderLista('');
-    setTimeout(() => _ov.querySelector('#cp-input').focus(), 60);
+    setTimeout(() => inp.focus(), 60);
   }
 
+  // ---- MODAL ----
+  let _ov;
+  async function abrir(tipo) {
+    if (!CFG[tipo]) return;
+    injetarCSS();
+    if (!_ov) {
+      _ov = document.createElement('div');
+      _ov.className = 'cp-ov';
+      _ov.innerHTML = `<div class="cp-modal"><div class="cp-head"><h2 class="cp-titulo"></h2><button class="cp-x" aria-label="Fechar">✕</button></div><div class="cp-host cp-modal-body" style="flex:1;min-height:0;padding:0 18px 12px"></div></div>`;
+      document.body.appendChild(_ov);
+      _ov.addEventListener('click', e => { if (e.target === _ov || e.target.classList.contains('cp-x')) fechar(); });
+      document.addEventListener('keydown', e => { if (e.key === 'Escape' && _ov.classList.contains('open')) fechar(); });
+      montarUI(_ov.querySelector('.cp-modal-body'));
+    }
+    _root = _ov.querySelector('.cp-modal-body');
+    _ov.querySelector('.cp-titulo').textContent = CFG[tipo].titulo;
+    _ov.classList.add('open');
+    document.body.style.overflow = 'hidden';
+    await popular(tipo);
+  }
   function fechar() { if (_ov) { _ov.classList.remove('open'); document.body.style.overflow = ''; } }
+
+  // ---- PÁGINA (inline) ----
+  async function inline(container, tipo) {
+    if (!CFG[tipo] || !container) return;
+    injetarCSS();
+    container.classList.add('cp-inline');
+    _root = montarUI(container);
+    await popular(tipo);
+  }
 
   async function carregar(tipo) {
     if (cache[tipo]) return cache[tipo];
@@ -146,16 +154,15 @@
   }
 
   function renderLista(termo) {
-    const corpo = _ov.querySelector('#cp-corpo');
-    const dados = cache[_tipoAtual] || [];
+    const corpo = _root.querySelector('.cp-corpo');
+    const dados = cache[_tipo] || [];
     const q = norm(termo).trim();
     let lista = dados;
-    if (_tipoAtual === 'itens' && _filtroRar) lista = lista.filter(i => i.raridade === _filtroRar);
+    if (_tipo === 'itens' && _filtroRar) lista = lista.filter(i => i.raridade === _filtroRar);
     if (q) lista = lista.filter(x => norm(x.nome).includes(q) || norm(x.tipo).includes(q));
-
     if (!lista.length) { corpo.innerHTML = '<div class="cp-vazio">Nada encontrado.</div>'; return; }
-    const cab = `<div class="cp-dica">${lista.length} ${_tipoAtual === 'itens' ? 'itens' : 'criaturas'}${q || _filtroRar ? ' (filtrado)' : ''}</div>`;
-    const html = lista.slice(0, 300).map((x, i) => _tipoAtual === 'itens' ? itemHTML(x, dados.indexOf(x)) : monstroHTML(x, dados.indexOf(x))).join('');
+    const cab = `<div class="cp-dica">${lista.length} ${_tipo === 'itens' ? 'itens' : 'criaturas'}${q || _filtroRar ? ' (filtrado)' : ''}</div>`;
+    const html = lista.slice(0, 300).map(x => _tipo === 'itens' ? itemHTML(x, dados.indexOf(x)) : monstroHTML(x, dados.indexOf(x))).join('');
     corpo.innerHTML = cab + `<div class="cp-lista">${html}</div>` + (lista.length > 300 ? '<div class="cp-dica">Refine a busca para ver mais.</div>' : '');
     corpo.querySelectorAll('[data-idx]').forEach(el => el.addEventListener('click', () => abrirDetalhe(+el.dataset.idx)));
     corpo.scrollTop = 0;
@@ -163,8 +170,9 @@
 
   function itemHTML(it, idx) {
     const cor = CORES_RAR[it.raridade] || '#a89878';
+    const icon = { Poção: '🧪', Anel: '💍', Varinha: '🪄', Cajado: '🪄', Bastão: '🦯', Arma: '⚔️', Armadura: '🛡️', Escudo: '🛡️', Manto: '🧥', Botas: '🥾', Pergaminho: '📜' }[it.tipo.split(' ')[0]] || '✨';
     return `<div class="cp-item" data-idx="${idx}">
-      <div class="cp-thumb">${{Poção:'🧪',Anel:'💍',Varinha:'🪄',Cajado:'🪄',Bastão:'🦯',Arma:'⚔️',Armadura:'🛡️',Escudo:'🛡️',Manto:'🧥',Botas:'🥾',Pergaminho:'📜'}[it.tipo.split(' ')[0]] || '✨'}</div>
+      <div class="cp-thumb">${icon}</div>
       <div style="flex:1;min-width:0">
         <div class="cp-item-nome">${esc(titulo(it.nome))}<span class="cp-tag" style="background:${cor}22;color:${cor};border:1px solid ${cor}66">${esc(it.raridade)}</span></div>
         <div class="cp-item-meta">${esc(it.tipo)}${it.sintonia ? ' · requer sintonização' : ''}</div>
@@ -180,12 +188,11 @@
   }
 
   function abrirDetalhe(idx) {
-    const corpo = _ov.querySelector('#cp-corpo');
-    const x = (cache[_tipoAtual] || [])[idx];
+    const corpo = _root.querySelector('.cp-corpo');
+    const x = (cache[_tipo] || [])[idx];
     if (!x) return;
-    corpo.innerHTML = `<button class="cp-voltar" id="cp-voltar">← Voltar à lista</button>` +
-      (_tipoAtual === 'itens' ? fichaItem(x) : fichaMonstro(x));
-    corpo.querySelector('#cp-voltar').addEventListener('click', () => renderLista(_ov.querySelector('#cp-input').value));
+    corpo.innerHTML = `<button class="cp-voltar">← Voltar à lista</button>` + (_tipo === 'itens' ? fichaItem(x) : fichaMonstro(x));
+    corpo.querySelector('.cp-voltar').addEventListener('click', () => renderLista(_root.querySelector('.cp-input').value));
     corpo.scrollTop = 0;
   }
 
@@ -194,8 +201,7 @@
     return `<div class="cp-ficha">
       <h3>${esc(titulo(it.nome))}</h3>
       <div class="cp-sub">${esc(it.tipo)}, <b style="color:${cor}">${esc(it.raridade)}</b>${it.sintonia ? ` · requer sintonização${it.sintonia_detalhe ? ' ' + esc(it.sintonia_detalhe) : ''}` : ''}</div>
-      <div class="cp-desc">${esc(it.descricao)}</div>
-    </div>`;
+      <div class="cp-desc">${esc(it.descricao)}</div></div>`;
   }
   function fichaMonstro(m) {
     const a = m.atributos || {};
@@ -228,5 +234,5 @@
     </div>`;
   }
 
-  window.Compendio = { abrir, fechar, base: '../data/' };
+  window.Compendio = { abrir, fechar, inline, base: '../data/' };
 })();
