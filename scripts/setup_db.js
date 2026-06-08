@@ -29,6 +29,8 @@ const SCRIPTS = [
   '015_anotacoes_campanha.sql',
   '016_anotacoes_titulo.sql',
   '017_companions.sql',
+  '018_updated_by.sql',
+  '019_bestiario_favoritos.sql',
 ];
 
 (async () => {

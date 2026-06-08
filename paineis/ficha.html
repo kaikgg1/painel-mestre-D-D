@@ -2064,8 +2064,9 @@ function _assinaturaRelevante(c) {
 }
 
 let _aplicarExternoPendente = null;
+let _aplicarExternoAvisar = false;
 function onUpdateExterno(novo) {
-  // Ignora se foi nosso próprio save (echo do realtime — em até 3s)
+  // Ignora se foi nosso próprio save (echo do realtime — em até 3s, mesmo aparelho)
   if (Date.now() - _ultimoSaveLocal < 3000) return;
   // Atualiza chars silenciosamente sempre (mantém cache fresco)
   const idx = chars.findIndex(c => c.id === novo.id);
@@ -2078,19 +2079,25 @@ function onUpdateExterno(novo) {
     chars = chars.map(c => c.id === charAtivo.id ? charAtivo : c);
     return;
   }
+  // Quem alterou? Só avisa "pelo Mestre" se o autor for DIFERENTE do jogador
+  // (o próprio jogador em outro aparelho NÃO deve gerar o aviso).
+  const meuId = usuario && usuario.id;
+  const foiOutraPessoa = !!(novo.updated_by && meuId && novo.updated_by !== meuId);
   // Aplica automaticamente — mas não atropela o jogador se ele está digitando.
-  aplicarExterno(novo);
+  aplicarExterno(novo, foiOutraPessoa);
 }
 
 // Aplica o estado externo. Se o jogador está com foco em algum campo editável,
 // adia até ele sair do campo (focusout) pra não perder o que está digitando.
-function aplicarExterno(novo) {
+// avisar=true → mostra o toast "atualizada pelo Mestre".
+function aplicarExterno(novo, avisar) {
   const ativo = document.activeElement;
   const editando = ativo && ativo.closest && ativo.closest('.tab-content') &&
     /input|textarea|select/i.test(ativo.tagName || '');
 
   if (editando) {
     _aplicarExternoPendente = novo;
+    _aplicarExternoAvisar = avisar;
     const form = document.getElementById('ficha-form');
     if (form && !form._aguardandoBlur) {
       form._aguardandoBlur = true;
@@ -2100,12 +2107,13 @@ function aplicarExterno(novo) {
         // pequeno atraso pra deixar o auto-save do campo concluir
         setTimeout(() => {
           const pend = _aplicarExternoPendente;
+          const avisarPend = _aplicarExternoAvisar;
           _aplicarExternoPendente = null;
           if (pend && (!document.activeElement || !document.activeElement.closest('.tab-content'))) {
             charAtivo = pend;
             chars = chars.map(c => c.id === charAtivo.id ? charAtivo : c);
             render();
-            toast('✏ Ficha atualizada pelo Mestre');
+            if (avisarPend) toast('✏ Ficha atualizada pelo Mestre');
           }
         }, 300);
       });
@@ -2116,7 +2124,7 @@ function aplicarExterno(novo) {
   charAtivo = novo;
   chars = chars.map(c => c.id === charAtivo.id ? charAtivo : c);
   render();
-  toast('✏ Ficha atualizada pelo Mestre');
+  if (avisar) toast('✏ Ficha atualizada pelo Mestre');
 }
 
 function configurarToastExterno() {
@@ -3711,16 +3719,16 @@ function renderAliados(c) {
       </div>
       <div class="aliados-add no-lock">
         <button type="button" class="btn primary no-lock" id="btn-buscar-monstro">🔍 Buscar no Bestiário</button>
-        <select id="aliado-template" class="no-lock" aria-label="Modelo de criatura">
+        <select id="aliado-template" class="no-lock" aria-label="Adicionar criatura favorita ou em branco">
           <option value="novo">+ Em branco</option>
-          <option value="corvo">Corvo (ND 0)</option>
-          <option value="golem_carne">Golem de Carne (ND 5)</option>
+          ${favLista().map(n => `<option value="fav:${escape(n)}">⭐ ${escape(tituloBonito(n))}</option>`).join('')}
         </select>
         <button type="button" class="btn no-lock" id="btn-add-aliado">+ Adicionar</button>
       </div>
     </div>
+    ${favLista().length ? '' : `<p style="color:var(--text-dim);font-style:italic;font-size:11px;margin:0 0 12px">⭐ Dica: favorite criaturas no <strong>🔍 Buscar no Bestiário</strong> (estrela) para elas aparecerem aqui como atalho rápido.</p>`}
     <div id="aliados-wrap">
-      ${lista.length ? cards : `<div class="item-vazio">Nenhuma criatura. Escolha um modelo acima e clique <strong>+ Adicionar</strong>.</div>`}
+      ${lista.length ? cards : `<div class="item-vazio">Nenhuma criatura ainda. Use <strong>🔍 Buscar no Bestiário</strong> ou escolha um favorito acima.</div>`}
     </div>
   `;
 }
@@ -3822,24 +3830,28 @@ function salvarCompanionsSeguro() { salvarCompanions().catch(()=>{}); }
 let _bestiario = null;          // cache do monstros_data.json
 let _bestiarioErro = false;
 
-/* Favoritos do bestiário (por nome) — persistidos em localStorage */
-let _favBestiario = null;
-function favCarregar() {
-  if (_favBestiario) return _favBestiario;
-  try { _favBestiario = new Set(JSON.parse(localStorage.getItem('bestiario_favoritos') || '[]')); }
-  catch { _favBestiario = new Set(); }
-  return _favBestiario;
+/* Favoritos do bestiário POR PERSONAGEM — em characters.bestiario_favoritos (banco).
+   Guardados pelo NOME canônico (maiúsculas, como no monstros_data.json). */
+function favLista() {
+  if (!charAtivo) return [];
+  if (!Array.isArray(charAtivo.bestiario_favoritos)) charAtivo.bestiario_favoritos = [];
+  return charAtivo.bestiario_favoritos;
 }
-function favSalvar() {
-  try { localStorage.setItem('bestiario_favoritos', JSON.stringify([..._favBestiario])); } catch {}
-}
-function favTem(nome) { return favCarregar().has(nome); }
+function favTem(nome) { return favLista().includes(nome); }
 function favToggle(nome) {
-  favCarregar();
-  if (_favBestiario.has(nome)) _favBestiario.delete(nome);
-  else _favBestiario.add(nome);
-  favSalvar();
-  return _favBestiario.has(nome);
+  const lista = favLista();
+  const i = lista.indexOf(nome);
+  if (i >= 0) lista.splice(i, 1); else lista.push(nome);
+  salvarFavoritosBestiario();
+  return lista.includes(nome);
+}
+async function salvarFavoritosBestiario() {
+  if (!charAtivo?.id) return;
+  _ultimoSaveLocal = Date.now();
+  const { error } = await window.sb.from('characters')
+    .update({ bestiario_favoritos: charAtivo.bestiario_favoritos || [] })
+    .eq('id', charAtivo.id);
+  if (error) console.warn('[favoritos] erro ao salvar:', error);
 }
 
 function semAcento(s) {
@@ -3926,8 +3938,9 @@ function fecharBuscadorMonstros() {
   const ov = document.getElementById('bm-overlay');
   if (ov) ov.classList.remove('open');
   document.body.style.overflow = '';
-  // Atualiza a lista de aliados por trás se algo foi adicionado
-  if (_bmAdicionou && tabAtiva === 'aliados') { _bmAdicionou = false; render(); }
+  _bmAdicionou = false;
+  // Re-renderiza a aba (atualiza lista de aliados E o dropdown de favoritos)
+  if (tabAtiva === 'aliados') render();
 }
 
 function itemMonstroHTML(m) {
@@ -3976,9 +3989,9 @@ function renderResultadosMonstros(termo) {
     (total > 80 ? `<div class="bm-dica">Mostrando 80 de ${total}. Refine a busca.</div>` : '');
 }
 
-function adicionarMonstroBusca(idx, btn) {
-  const m = _bestiario && _bestiario[idx];
-  if (!m) return;
+// Converte um monstro do bestiário em companion e adiciona à ficha.
+function adicionarMonstroObj(m) {
+  if (!m) return null;
   const sentidos = [m.sentidos, m.pericias && ('Perícias: ' + m.pericias)].filter(Boolean).join(' · ');
   const resist = [m.resistencias, m.vulnerabilidades && ('Vulnerável: ' + m.vulnerabilidades)].filter(Boolean).join(' · ');
   const nova = {
@@ -3999,8 +4012,16 @@ function adicionarMonstroBusca(idx, btn) {
     notas: 'Fonte: Manual dos Monstros.',
   };
   _companionsAtuais().push(nova);
-  _bmAdicionou = true;
   salvarCompanionsSeguro();
+  toast(`✓ ${nova.nome} adicionado aos Aliados`);
+  return nova;
+}
+
+function adicionarMonstroBusca(idx, btn) {
+  const m = _bestiario && _bestiario[idx];
+  if (!m) return;
+  adicionarMonstroObj(m);
+  _bmAdicionou = true;
   // feedback sem fechar (permite adicionar vários)
   if (btn) {
     const orig = btn.textContent;
@@ -4008,7 +4029,6 @@ function adicionarMonstroBusca(idx, btn) {
     btn.classList.add('add-ok');
     setTimeout(() => { btn.textContent = orig; btn.classList.remove('add-ok'); }, 1400);
   }
-  toast(`✓ ${nova.nome} adicionado aos Aliados`);
 }
 
 function conectarListenersAliados() {
@@ -4016,15 +4036,27 @@ function conectarListenersAliados() {
 
   // Adicionar criatura (template rápido)
   const btnAdd = document.getElementById('btn-add-aliado');
-  if (btnAdd) btnAdd.addEventListener('click', () => {
+  if (btnAdd) btnAdd.addEventListener('click', async () => {
     const sel = document.getElementById('aliado-template');
-    const tplKey = sel ? sel.value : 'novo';
-    const tpl = TEMPLATES_CRIATURA[tplKey] || TEMPLATES_CRIATURA.novo;
-    const nova = JSON.parse(JSON.stringify(tpl));
+    const valor = sel ? sel.value : 'novo';
+    if (valor.startsWith('fav:')) {
+      // Favorito → busca a criatura no bestiário pelo nome canônico
+      const nome = valor.slice(4);
+      btnAdd.disabled = true;
+      const bestiario = await carregarBestiario();
+      btnAdd.disabled = false;
+      const m = bestiario && bestiario.find(x => x.nome === nome);
+      if (!m) { toast('⚠ Criatura não encontrada no bestiário'); return; }
+      adicionarMonstroObj(m);
+      render();
+      return;
+    }
+    // Em branco
+    const nova = JSON.parse(JSON.stringify(TEMPLATES_CRIATURA.novo));
     nova.id = 'cr_' + Date.now().toString(36);
     _companionsAtuais().push(nova);
     salvarCompanionsSeguro();
-    render();  // re-render mantém aba 'aliados'
+    render();
   });
 
   // Buscar no bestiário completo
