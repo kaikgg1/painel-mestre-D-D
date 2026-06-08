@@ -196,6 +196,10 @@
     border-radius: 0 0 4px 4px;
     padding: 22px;
   }
+  /* Transição de entrada ao trocar de aba */
+  .tab-content.tab-anim { animation: tabEntra 0.3s ease; }
+  @keyframes tabEntra { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+  @media (prefers-reduced-motion: reduce) { .tab-content.tab-anim { animation: none; } }
 
   /* ============ CAMPOS ============ */
   h3 {
@@ -1250,19 +1254,50 @@
     box-shadow: 0 4px 14px rgba(0,0,0,0.4);
   }
   .criatura-head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; }
+  .criatura-img-wrap { position: relative; flex-shrink: 0; }
+  .criatura-img-edit {
+    position: absolute; bottom: 4px; right: 4px;
+    width: 28px; height: 28px; border-radius: 6px;
+    background: rgba(10,6,8,0.85); border: 1px solid var(--gold);
+    color: var(--gold-bright); cursor: pointer; font-size: 14px;
+    display: flex; align-items: center; justify-content: center;
+    transition: background 0.15s, transform 0.15s;
+  }
+  .criatura-img-edit:hover { background: var(--gold); color: var(--shadow); transform: scale(1.1); }
   .criatura-img {
-    flex-shrink: 0; width: 56px; height: 56px; border-radius: 8px;
-    border: 1px solid rgba(139,105,20,0.4); background: rgba(0,0,0,0.3);
+    flex-shrink: 0; width: 120px; height: 120px; border-radius: 10px;
+    border: 2px solid rgba(139,105,20,0.5); background: rgba(0,0,0,0.3);
     cursor: pointer; overflow: hidden; padding: 0;
     display: flex; align-items: center; justify-content: center;
-    transition: border-color 0.15s, transform 0.15s;
+    transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.5);
   }
-  .criatura-img:hover { border-color: var(--gold-bright); transform: scale(1.04); }
+  .criatura-img.tem { cursor: zoom-in; }
+  .criatura-img:hover { border-color: var(--gold-bright); transform: scale(1.03); box-shadow: 0 4px 16px rgba(0,0,0,0.6); }
   .criatura-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
-  .criatura-img-ph { font-size: 24px; opacity: 0.5; }
+  .criatura-img-ph { font-size: 46px; opacity: 0.45; }
   .criatura-img.erro img { display: none; }
-  .criatura-img.erro::after { content: '⚠'; font-size: 22px; color: var(--blood-bright); }
-  @media (max-width: 600px) { .criatura-img { width: 48px; height: 48px; } }
+  .criatura-img.erro::after { content: '⚠'; font-size: 38px; color: var(--blood-bright); }
+  @media (max-width: 600px) { .criatura-img { width: 92px; height: 92px; } }
+
+  /* Lightbox p/ ver a imagem da criatura em tamanho grande */
+  .cr-lightbox {
+    position: fixed; inset: 0; z-index: 1000; display: none;
+    align-items: center; justify-content: center;
+    background: rgba(0,0,0,0.88); backdrop-filter: blur(4px);
+    padding: 24px; cursor: zoom-out;
+  }
+  .cr-lightbox.open { display: flex; }
+  .cr-lightbox img {
+    max-width: 92vw; max-height: 88vh; border-radius: 10px;
+    border: 2px solid var(--gold); box-shadow: 0 8px 40px rgba(0,0,0,0.85);
+    object-fit: contain;
+  }
+  .cr-lb-fechar {
+    position: absolute; top: 14px; right: 20px; font-size: 32px;
+    color: var(--parchment); background: none; border: none; cursor: pointer;
+    line-height: 1; padding: 6px 12px;
+  }
   .criatura-id { flex: 1; display: flex; flex-direction: column; gap: 4px; }
   .criatura-nome {
     font-family: 'Cinzel', serif; font-weight: 700; font-size: 16px;
@@ -1894,7 +1929,7 @@
 </style>
 <link rel="stylesheet" href="../assets/css/ui.css">
 </head>
-<body>
+<body data-ambiente="fagulhas">
 
 <header class="site-header">
   <a href="../index.html" class="back-btn">← Voltar</a>
@@ -3767,9 +3802,12 @@ function renderCardCriatura(cr, i) {
   return `
     <div class="criatura-card" data-cr="${i}">
       <div class="criatura-head">
-        <button type="button" class="criatura-img no-lock ${cr.imagem ? 'tem' : ''}" data-cr-img="${i}" title="${cr.imagem ? 'Trocar/remover imagem' : 'Adicionar imagem (URL)'}" aria-label="Imagem da criatura">
-          ${cr.imagem ? `<img src="${escape(cr.imagem)}" alt="${escape(cr.nome||'')}" onerror="this.parentElement.classList.add('erro')">` : '<span class="criatura-img-ph">🖼️</span>'}
-        </button>
+        <div class="criatura-img-wrap">
+          <div class="criatura-img no-lock ${cr.imagem ? 'tem' : ''}" data-cr-img="${i}" role="button" tabindex="0" title="${cr.imagem ? 'Clique para ampliar' : 'Adicionar imagem (URL)'}" aria-label="Imagem da criatura">
+            ${cr.imagem ? `<img src="${escape(cr.imagem)}" alt="${escape(cr.nome||'')}" onerror="this.parentElement.classList.add('erro')">` : '<span class="criatura-img-ph">🖼️</span>'}
+          </div>
+          <button type="button" class="criatura-img-edit no-lock" data-cr-img-edit="${i}" title="Trocar/remover imagem (URL)" aria-label="Editar imagem">✎</button>
+        </div>
         <div class="criatura-id">
           <input class="criatura-nome" data-cr-campo="nome" data-cr="${i}" value="${escape(cr.nome||'')}" placeholder="Nome" aria-label="Nome da criatura">
           <input class="criatura-tipo" data-cr-campo="tipo" data-cr="${i}" value="${escape(cr.tipo||'')}" placeholder="Tipo (ex.: Besta Média)" aria-label="Tipo">
@@ -3840,6 +3878,25 @@ function renderCardCriatura(cr, i) {
 function _companionsAtuais() {
   if (!Array.isArray(charAtivo.companions)) charAtivo.companions = [];
   return charAtivo.companions;
+}
+
+// Lightbox: amplia a imagem da criatura em tela cheia
+function abrirLightboxCriatura(url, nome) {
+  let lb = document.getElementById('cr-lightbox');
+  if (!lb) {
+    lb = document.createElement('div');
+    lb.id = 'cr-lightbox';
+    lb.className = 'cr-lightbox';
+    lb.innerHTML = '<button type="button" class="cr-lb-fechar" aria-label="Fechar">✕</button><img alt="">';
+    document.body.appendChild(lb);
+    const fechar = () => { lb.classList.remove('open'); document.body.style.overflow = ''; };
+    lb.addEventListener('click', e => { if (e.target === lb || e.target.classList.contains('cr-lb-fechar')) fechar(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') fechar(); });
+  }
+  const im = lb.querySelector('img');
+  im.src = url; im.alt = nome || '';
+  lb.classList.add('open');
+  document.body.style.overflow = 'hidden';
 }
 
 // Destaca o último card de criatura (efeito "novo") após adicionar
@@ -3960,7 +4017,15 @@ function abrirBuscadorMonstros() {
   ov.classList.add('open');
   document.body.style.overflow = 'hidden';
   const result = document.getElementById('bm-result');
-  result.innerHTML = '<div class="bm-vazio">Carregando bestiário…</div>';
+  result.innerHTML = Array.from({length:6}, () => `
+    <div class="bm-item bm-skel">
+      <div class="bm-thumb shimmer"></div>
+      <div class="bm-item-info" style="flex:1">
+        <div class="shimmer" style="height:14px;width:55%;border-radius:4px;margin-bottom:7px"></div>
+        <div class="shimmer" style="height:11px;width:38%;border-radius:4px;margin-bottom:7px"></div>
+        <div class="shimmer" style="height:11px;width:70%;border-radius:4px"></div>
+      </div>
+    </div>`).join('');
   carregarBestiario().then(b => {
     if (!b) { result.innerHTML = '<div class="bm-vazio">⚠ Não foi possível carregar o bestiário.</div>'; return; }
     renderResultadosMonstros(document.getElementById('bm-input').value);
@@ -4179,9 +4244,9 @@ function conectarListenersAliados() {
       }
       return;
     }
-    const img = e.target.closest('[data-cr-img]');
-    if (img) {
-      const i = +img.dataset.crImg;
+    const imgEdit = e.target.closest('[data-cr-img-edit]');
+    if (imgEdit) {
+      const i = +imgEdit.dataset.crImgEdit;
       const cr = _companionsAtuais()[i];
       if (!cr) return;
       const url = prompt('Cole a URL da imagem da criatura (deixe vazio para remover):', cr.imagem || '');
@@ -4189,6 +4254,21 @@ function conectarListenersAliados() {
       cr.imagem = url.trim();
       salvarCompanionsSeguro();
       render();
+      return;
+    }
+    const img = e.target.closest('[data-cr-img]');
+    if (img) {
+      const i = +img.dataset.crImg;
+      const cr = _companionsAtuais()[i];
+      if (!cr) return;
+      if (cr.imagem) abrirLightboxCriatura(cr.imagem, cr.nome);   // tem imagem → amplia
+      else {                                                       // sem imagem → adiciona
+        const url = prompt('Cole a URL da imagem da criatura:', '');
+        if (url === null) return;
+        cr.imagem = url.trim();
+        salvarCompanionsSeguro();
+        render();
+      }
       return;
     }
     const del = e.target.closest('[data-cr-del]');
@@ -4415,6 +4495,9 @@ function conectarListeners() {
     if (form) form.dispatchEvent(new Event('submit', { cancelable: true }));
     tabAtiva = t.dataset.tab;
     render();
+    // Transição suave de entrada do conteúdo da nova aba
+    const novoForm = document.getElementById('ficha-form');
+    if (novoForm) { novoForm.classList.remove('tab-anim'); void novoForm.offsetWidth; novoForm.classList.add('tab-anim'); }
     if (tabAtiva === 'magias') carregarMagiasPreparadas();
   }));
   // Tabs scroll indicator (gradient hints)
@@ -4579,12 +4662,13 @@ function conectarListeners() {
     hpAtual.style.color = delta < 0 ? '#e88a8a' : '#8fc28f';
     setTimeout(() => { hpAtual.style.color = ''; }, 600);
     atualizarBarraHP();
-    // Efeito dinâmico (FX) no bloco de HP
+    // Efeito dinâmico (FX) no bloco de HP + contagem animada do número
     if (window.FX && mudou !== 0) {
       const alvo = document.querySelector('.hp-wrap') || hpAtual;
       if (mudou < 0) FX.dano(alvo, mudou); else FX.cura(alvo, mudou);
+      if (FX.contarInput) FX.contarInput(hpAtual, atual, novo);
     }
-    // Dispara input event para auto-save pegar
+    // Dispara input event para auto-save pegar (valor final)
     hpAtual.dispatchEvent(new Event('input', { bubbles: true }));
   }
 
@@ -5069,5 +5153,7 @@ async function salvar(e) {
 
 init();
 </script>
+<script src="../assets/js/ambiente.js"></script>
+<script src="../assets/js/polish.js"></script>
 </body>
 </html>

@@ -694,7 +694,7 @@
 </style>
 <link rel="stylesheet" href="../../assets/css/ui.css">
 </head>
-<body>
+<body data-ambiente="brasas">
 
 <div class="toast" id="toast"></div>
 
@@ -2127,6 +2127,7 @@ function adjustHP(delta) {
   if (window.FX && mudou !== 0) {
     const alvo = document.querySelector('.combat-bar .panel') || hpCurrent;
     if (mudou < 0) FX.dano(alvo, mudou); else FX.cura(alvo, mudou);
+    if (FX.contarInput) FX.contarInput(hpCurrent, antes, cur);
   }
   saveState(true);
 }
@@ -2405,5 +2406,7 @@ aplicarTrackersHabilidades();
 })();
 </script>
 
+<script src="../../assets/js/ambiente.js"></script>
+<script src="../../assets/js/polish.js"></script>
 </body>
 </html>

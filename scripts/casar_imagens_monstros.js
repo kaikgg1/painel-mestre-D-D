@@ -6,7 +6,7 @@ const fs = require('fs');
 const path = require('path');
 
 const BEST = path.join(__dirname, '..', 'data', 'monstros_data.json');
-const LIDOS = path.join(__dirname, '..', '_tmp_gallery', 'lidos.txt');
+const LIDOS = path.join(__dirname, '..', 'data', 'galeria_nomes.txt');
 
 const norm = s => (s||'').normalize('NFD').replace(/[̀-ͯ]/g,'')
   .toLowerCase().replace(/[^a-z0-9 ]/g,' ').replace(/\s+/g,' ').trim();

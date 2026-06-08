@@ -186,6 +186,23 @@
     }, 45);
   }
 
+  // Contagem animada do VALUE de um input (ex.: HP 26 → 21)
+  function contarInput(input, de, para, dur) {
+    if (!input) return;
+    de = +de; para = +para;
+    if (reduz || isNaN(de) || isNaN(para)) { input.value = para; return; }
+    dur = dur || 420;
+    const t0 = performance.now();
+    function frame(t) {
+      const k = Math.min(1, (t - t0) / dur);
+      const e = 1 - Math.pow(1 - k, 3);
+      input.value = Math.round(de + (para - de) * e);
+      if (k < 1) requestAnimationFrame(frame);
+      else input.value = para;
+    }
+    requestAnimationFrame(frame);
+  }
+
   injetar();
-  window.FX = { dano, cura, flutuante, shake, flash, pulso, favorito, slot, novo, salvo, rolar };
+  window.FX = Object.assign(window.FX || {}, { dano, cura, flutuante, shake, flash, pulso, favorito, slot, novo, salvo, rolar, contarInput });
 })();

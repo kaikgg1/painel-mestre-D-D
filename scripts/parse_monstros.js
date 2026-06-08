@@ -187,6 +187,70 @@ for (let b = 0; b < blocos.length; b++) {
   monstros.push(obj);
 }
 
+// EXTRAS: statblocks de página inteira que o parser não captura (nome longe da CA).
+// Adicionados manualmente com dados fiéis ao Manual dos Monstros (PT-BR) + imagem.
+const EXTRAS = [
+  {
+    nome:'VAMPIRO', tipo:'Morto-vivo Médio (metamorfo), leal e mau',
+    ca:16, ca_extra:'(armadura natural)', hp_max:144, hp_atual:144, pv_dados:'17d8 + 68',
+    deslocamento:'9 m',
+    atributos:{for:18,dex:18,con:18,int:17,sab:15,car:18},
+    resistencias:'Necrótico; concussão, cortante e perfurante de ataques não-mágicos',
+    vulnerabilidades:'', imunidades:'',
+    sentidos:'Visão no escuro 36 m · Percepção passiva 17',
+    salvaguardas:'Des +9, Sab +7, Car +9', pericias:'Furtividade +9, Percepção +7',
+    idiomas:'Os idiomas que conhecia em vida', nd:'13 (10.000 XP)',
+    tracos:[
+      {nome:'Regeneração', desc:'Recupera 20 PV no início de cada turno se tiver ≥1 PV e não estiver sob luz solar ou água corrente. Dano radiante ou de água benta bloqueia este traço até o início do próximo turno.'},
+      {nome:'Resistência Lendária (3/Dia)', desc:'Se falhar em um teste de resistência, pode escolher obter sucesso.'},
+      {nome:'Metamorfo', desc:'Fora de luz solar/água corrente, usa a ação para virar morcego Miúdo, nuvem de neblina Média, ou voltar à forma verdadeira.'},
+      {nome:'Neblina de Escapada', desc:'Ao cair a 0 PV fora do covil (e não sob luz solar/água corrente), vira nuvem de neblina em vez de cair inconsciente. Deve voltar ao covil em 2 horas ou é destruído.'},
+      {nome:'Escalada Aracnídea', desc:'Escala superfícies difíceis e tetos sem teste de habilidade.'},
+      {nome:'Fraquezas Vampíricas', desc:'Estaca no Coração (madeira no coração no covil → paralisado); Ferido por Água Corrente (20 de dano ao terminar turno em água corrente); Hipersensibilidade à Luz Solar (20 de dano radiante ao começar turno no sol + desvantagem em ataques e testes); Proibição (não entra em residência sem convite).'},
+    ],
+    acoes:[
+      {nome:'Ataques Múltiplos (Forma de Vampiro)', desc:'Dois ataques, apenas um pode ser de mordida.'},
+      {nome:'Golpe Desarmado (Forma de Vampiro)', desc:'+9 para atingir, alcance 1,5 m. Acerto: 8 (1d8+4) de concussão. Em vez do dano, pode agarrar (CD 18 para escapar).'},
+      {nome:'Mordida (Forma de Morcego/Vampiro)', desc:'+9 para atingir, alvo voluntário/agarrado/incapacitado/impedido. Acerto: 7 (1d6+4) perfurante + 10 (3d6) necrótico. Reduz o PV máximo do alvo pelo necrótico e o vampiro recupera igual. Humanoide morto assim vira cria vampírica.'},
+      {nome:'Enfeitiçar', desc:'Um humanoide a até 9 m que veja o vampiro: SAB CD 17 ou fica enfeitiçado por 24h, tratando o vampiro como amigo e sendo alvo voluntário da mordida.'},
+      {nome:'Filhos da Noite (1/Dia)', desc:'Convoca 2d4 enxames de morcegos/ratos (à noite) ou 3d6 lobos (ao ar livre). Chegam em 1d4 rodadas, duram 1 hora.'},
+    ],
+    imagem:'../assets/img/monstros/pag_191.jpg',
+    notas:'Fonte: Manual dos Monstros. Ações Lendárias (3): Movimento; Golpe Desarmado; Mordida (custa 2 ações).',
+  },
+  {
+    nome:'TARRASQUE', tipo:'Monstruosidade Enorme (titã), sem alinhamento',
+    ca:25, ca_extra:'(armadura natural)', hp_max:676, hp_atual:676, pv_dados:'33d20 + 330',
+    deslocamento:'12 m',
+    atributos:{for:30,dex:11,con:30,int:3,sab:11,car:11},
+    resistencias:'', vulnerabilidades:'',
+    imunidades:'Dano: fogo, veneno; concussão, cortante e perfurante de ataques não-mágicos · Condições: amedrontado, enfeitiçado, envenenado, paralisado',
+    sentidos:'Percepção às cegas 36 m · Percepção passiva 10',
+    salvaguardas:'Int +5, Sab +9, Car +9', pericias:'',
+    idiomas:'—', nd:'30 (155.000 XP)',
+    tracos:[
+      {nome:'Carapaça Reflexiva', desc:'Contra mísseis mágicos, magia de linha ou ataque mágico à distância: role 1d6. Em 1–5 não é afetado; em 6 não é afetado e o efeito é refletido de volta no conjurador.'},
+      {nome:'Monstro de Cerco', desc:'Causa o dobro do dano a objetos e estruturas.'},
+      {nome:'Resistência à Magia', desc:'Vantagem em testes de resistência contra magias e outros efeitos mágicos.'},
+      {nome:'Resistência Lendária (3/Dia)', desc:'Se falhar em um teste de resistência, pode escolher obter sucesso.'},
+    ],
+    acoes:[
+      {nome:'Ataques Múltiplos', desc:'Usa Presença Aterradora; depois realiza cinco ataques: uma mordida, duas garras, um de chifres e um de cauda. Pode usar Engolir no lugar da mordida.'},
+      {nome:'Mordida', desc:'+19 para atingir, alcance 3 m. Acerto: 36 (4d12+10) perfurante; o alvo fica agarrado (CD 20 para escapar) e impedido, e o tarrasque não pode morder outro.'},
+      {nome:'Garras', desc:'+19 para atingir, alcance 4,5 m. Acerto: 28 (4d8+10) cortante.'},
+      {nome:'Chifres', desc:'+19 para atingir, alcance 3 m. Acerto: 32 (4d10+10) perfurante.'},
+      {nome:'Cauda', desc:'+19 para atingir, alcance 6 m. Acerto: 24 (4d6+10) de concussão; o alvo deve passar em FOR CD 20 ou é derrubado.'},
+      {nome:'Presença Aterradora', desc:'Cada criatura à escolha do tarrasque a até 36 m e ciente dele: SAB CD 17 ou fica amedrontada por 1 minuto (repete o teste no fim de cada turno).'},
+      {nome:'Engolir', desc:'Mordida contra alvo Grande ou menor que esteja agarrado. Se acertar, o alvo é engolido: cego, impedido, com cobertura total contra ataques de fora, e sofre 56 (16d6) de dano ácido no início de cada turno do tarrasque.'},
+    ],
+    imagem:'../assets/img/monstros/pag_184.jpg',
+    notas:'Fonte: Manual dos Monstros. Ações Lendárias (3): Ataque (garra ou cauda); Movimento (½ deslocamento); Mastigar (custa 2 ações: mordida ou Engolir).',
+  },
+];
+for (const ex of EXTRAS) {
+  if (!vistos.has(ex.nome.toLowerCase())) { monstros.push(ex); vistos.add(ex.nome.toLowerCase()); }
+}
+
 monstros.sort((a, b) => a.nome.localeCompare(b.nome, 'pt'));
 fs.writeFileSync(OUT, JSON.stringify(monstros), 'utf8');
 
