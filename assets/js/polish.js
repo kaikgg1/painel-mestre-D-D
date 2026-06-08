@@ -28,9 +28,6 @@
     transition: box-shadow 0.18s ease;
   }
 
-  /* Tilt 3D — perspectiva aplicada via inline transform pelo JS */
-  .pl-tilt { transition: transform 0.12s ease-out; transform-style: preserve-3d; will-change: transform; }
-
   /* Shimmer (skeleton de carregamento) */
   .shimmer {
     position: relative; overflow: hidden;
@@ -46,7 +43,6 @@
 
   @media (prefers-reduced-motion: reduce) {
     .pl-ripple, .shimmer::after { animation: none !important; }
-    .pl-tilt { transition: none !important; }
   }
   `;
 
@@ -76,37 +72,6 @@
     }, { passive: true });
   }
 
-  // ---- Tilt 3D em cards (só desktop com mouse fino) ----
-  function ligarTilt() {
-    if (!window.matchMedia || !window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
-    const SEL = '.card, .criatura-card, .villain-card, .vilao-card, .slot-card';
-    const MAX = 6; // graus
-    let alvo = null;
-
-    document.addEventListener('pointermove', e => {
-      const card = e.target.closest(SEL);
-      if (card !== alvo) {
-        if (alvo) { alvo.style.transform = ''; alvo.classList.remove('pl-tilt'); }
-        alvo = card;
-        if (alvo) alvo.classList.add('pl-tilt');
-      }
-      if (!alvo) return;
-      // não inclina enquanto interage com campos
-      if (e.target.closest('input, textarea, select, button, [contenteditable="true"]')) {
-        alvo.style.transform = ''; return;
-      }
-      const r = alvo.getBoundingClientRect();
-      const px = (e.clientX - r.left) / r.width - 0.5;
-      const py = (e.clientY - r.top) / r.height - 0.5;
-      alvo.style.transform =
-        `perspective(900px) rotateX(${(-py * MAX).toFixed(2)}deg) rotateY(${(px * MAX).toFixed(2)}deg)`;
-    }, { passive: true });
-
-    document.addEventListener('pointerleave', () => {
-      if (alvo) { alvo.style.transform = ''; alvo.classList.remove('pl-tilt'); alvo = null; }
-    }, true);
-  }
-
   // ---- Helper: contagem animada de número ----
   function contar(el, de, para, dur) {
     if (!el) return;
@@ -125,7 +90,9 @@
   }
 
   injetar();
-  if (!reduz) { ligarRipple(); ligarTilt(); }
+  // Tilt 3D desativado: causava "tremor" dos cards a cada micro-movimento do mouse,
+  // atrapalhando cards editáveis (painéis, ficha). Mantidos ripple + glow + shimmer.
+  if (!reduz) { ligarRipple(); }
   // expõe o helper de contagem (mescla com FX se já existir)
   window.FX = window.FX || {};
   window.FX.contar = contar;

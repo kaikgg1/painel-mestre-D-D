@@ -203,6 +203,18 @@
     requestAnimationFrame(frame);
   }
 
+  // Confete em momentos épicos (usa canvas-confetti via CDN, se presente).
+  function confete(tipo) {
+    if (reduz || typeof window.confetti !== 'function') return;
+    const ouro = ['#d4a843', '#b88a2c', '#ffe9a8', '#8B6914'];
+    if (tipo === 'cura') {
+      window.confetti({ particleCount: 55, spread: 90, startVelocity: 32, origin: { y: 0.62 }, colors: ['#6ee07a', '#d4a843', '#ffe9a8'], scalar: 0.8, ticks: 120 });
+    } else { // level up: jatos dourados das duas laterais
+      window.confetti({ particleCount: 70, angle: 60, spread: 65, origin: { x: 0, y: 0.7 }, colors: ouro, scalar: 0.9 });
+      window.confetti({ particleCount: 70, angle: 120, spread: 65, origin: { x: 1, y: 0.7 }, colors: ouro, scalar: 0.9 });
+    }
+  }
+
   injetar();
-  window.FX = Object.assign(window.FX || {}, { dano, cura, flutuante, shake, flash, pulso, favorito, slot, novo, salvo, rolar, contarInput });
+  window.FX = Object.assign(window.FX || {}, { dano, cura, flutuante, shake, flash, pulso, favorito, slot, novo, salvo, rolar, contarInput, confete });
 })();

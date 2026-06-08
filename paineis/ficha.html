@@ -1949,6 +1949,7 @@
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script src="../assets/js/supabase.js"></script>
 <script src="../assets/js/auth.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js" defer></script>
 <script src="../assets/js/efeitos.js"></script>
 <script src="../assets/js/phb_catalogo.js"></script>
 <script src="../assets/js/phb_slots.js"></script>
@@ -2210,6 +2211,13 @@ async function carregarPersonagens() {
   }
   chars = data || [];
   if (!chars.length) {
+    // O Mestre não deve ganhar uma ficha de jogador automática.
+    let ehMestre = false;
+    try { ehMestre = window.Auth && await window.Auth.ehMestre(); } catch {}
+    if (ehMestre) {
+      $('#conteudo').innerHTML = `<div class="estado">Esta é a conta do <strong>Mestre</strong> — sem ficha de jogador. Use o <a href="painel_mestre_dnd5e.html">Painel do Mestre</a>.</div>`;
+      return;
+    }
     await criarPersonagem('Meu Personagem', true);  // novo PJ já ativo
     return;
   }
@@ -2233,7 +2241,16 @@ async function deletarPersonagem(id) {
   if (error) { alert('Erro ao deletar: ' + error.message); return; }
   chars = chars.filter(c => c.id !== id);
   charAtivo = chars[0] || null;
-  if (!charAtivo) { await criarPersonagem('Meu Personagem', true); return; }
+  if (!charAtivo) {
+    let ehMestre = false;
+    try { ehMestre = window.Auth && await window.Auth.ehMestre(); } catch {}
+    if (ehMestre) {
+      $('#conteudo').innerHTML = `<div class="estado">Conta do <strong>Mestre</strong> — sem ficha de jogador. Use o <a href="painel_mestre_dnd5e.html">Painel do Mestre</a>.</div>`;
+      return;
+    }
+    await criarPersonagem('Meu Personagem', true);
+    return;
+  }
   render();
 }
 
@@ -4667,6 +4684,8 @@ function conectarListeners() {
       const alvo = document.querySelector('.hp-wrap') || hpAtual;
       if (mudou < 0) FX.dano(alvo, mudou); else FX.cura(alvo, mudou);
       if (FX.contarInput) FX.contarInput(hpAtual, atual, novo);
+      // Cura total → confete
+      if (mudou > 0 && max > 0 && novo === max && atual < max && FX.confete) FX.confete('cura');
     }
     // Dispara input event para auto-save pegar (valor final)
     hpAtual.dispatchEvent(new Event('input', { bubbles: true }));
@@ -5150,6 +5169,15 @@ async function salvar(e) {
   }
   if (btn) btn.disabled = false;
 }
+
+// Confete ao subir de nível (compara com o nível antes do auto-save aplicar)
+document.addEventListener('change', e => {
+  if (e.target && e.target.name === 'nivel' && charAtivo && window.FX && FX.confete) {
+    const novo = parseInt(e.target.value, 10);
+    const antigo = parseInt(charAtivo.nivel, 10) || 0;
+    if (!isNaN(novo) && novo > antigo && novo <= 20) FX.confete('levelup');
+  }
+});
 
 init();
 </script>

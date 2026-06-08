@@ -732,6 +732,8 @@
   <button onclick="adicionarCard()" aria-label="Adicionar novo personagem">+ Adicionar Personagem</button>
   <button onclick="descansoLongo()" aria-label="Aplicar descanso longo a todos"><span aria-hidden="true">🌙</span> Descanso Longo</button>
   <button type="button" onclick="abrirNotasMestre({ chave: 'mestre', titulo: 'Crônica dos Aventureiros' })" aria-label="Abrir anotações do mestre"><span aria-hidden="true">📒</span> Anotações</button>
+  <button type="button" onclick="window.Compendio && Compendio.abrir('itens')" aria-label="Abrir itens mágicos"><span aria-hidden="true">📜</span> Itens Mágicos</button>
+  <button type="button" onclick="window.Compendio && Compendio.abrir('monstros')" aria-label="Abrir bestiário"><span aria-hidden="true">🐉</span> Bestiário</button>
   <a href="vilao/index.html" class="back-link" style="text-decoration:none" aria-label="Abrir fichas de vilão"><span aria-hidden="true">🧛</span> Vilões</a>
   <button onclick="window.print()" aria-label="Imprimir painel"><span aria-hidden="true">🖨</span> Imprimir</button>
   <span class="auth-slot" id="auth-slot" aria-label="Status de login" style="margin-left:auto;display:flex;gap:8px;align-items:center;font-family:'Cinzel',serif;font-size:11px;color:var(--red-dark)"></span>
@@ -751,6 +753,7 @@
 <script src="../assets/js/supabase.js"></script>
 <script src="../assets/js/auth.js"></script>
 <script src="../assets/js/efeitos.js"></script>
+<script src="../assets/js/compendio.js"></script>
 <script src="../assets/js/dbsync.js"></script>
 <script src="../assets/js/phb_slots.js"></script>
 <script src="../assets/js/master_notes.js"></script>
