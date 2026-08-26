@@ -12,51 +12,37 @@
 <style>
   :root {
     --bg-deep:        #0a0608;
-    --bg-card:        #191115;
+    --bg-card:        #1a1216;
     --bg-card-2:      #221820;
-    --bg-card-3:      #2c2029;
-    --blood:          #9b1f1f;
+    --bg-card-3:      #2a1f28;
+    --blood:          #8b1a1a;
     --blood-dark:     #5a0e0e;
-    --blood-bright:   #d13731;
-    --gold:           #cbac67;
-    --gold-bright:    #f0d089;
+    --blood-bright:   #c4302b;
+    --gold:           #c9a961;
+    --gold-bright:    #e8c87a;
     --gold-dim:       #8a7340;
-    --bone:           #efe6cf;
-    --bone-dim:       #c2b795;
+    --bone:           #e8dfc7;
+    --bone-dim:       #b8ad8e;
     --shadow:         #050203;
-    --text-body:      #ddd2b2;
-    --text-muted:     #948767;
+    --text-body:      #d4c8a8;
+    --text-muted:     #8a7d5e;
     --border:         #4a3a2a;
-    --border-soft:    rgba(203,172,103,0.16);
-    --radius:         10px;
-    /* Accent dinâmico por fase — sobrescrito em body[data-fase] */
-    --accent:         #cbac67;
-    --accent-bright:  #f0d089;
-    --accent-glow:    rgba(203,172,103,0.35);
-    --accent-soft:    rgba(203,172,103,0.10);
   }
-  /* ===== TEMAS POR FASE ===== */
-  body[data-fase="1"] { --accent:#8b6fd6; --accent-bright:#b9a3f2; --accent-glow:rgba(139,111,214,0.40); --accent-soft:rgba(139,111,214,0.12); }
-  body[data-fase="2"] { --accent:#8fa2b8; --accent-bright:#c4d3e4; --accent-glow:rgba(143,162,184,0.38); --accent-soft:rgba(143,162,184,0.12); }
-  body[data-fase="3"] { --accent:#d13731; --accent-bright:#f56b60; --accent-glow:rgba(209,55,49,0.42); --accent-soft:rgba(209,55,49,0.13); }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body {
     background: var(--bg-deep);
     color: var(--text-body);
     font-family: 'Cormorant Garamond', serif;
-    font-size: 16px;
-    line-height: 1.48;
+    font-size: 15px;
+    line-height: 1.4;
     min-height: 100vh;
-    -webkit-font-smoothing: antialiased;
   }
   body {
     background:
-      radial-gradient(ellipse at 50% -10%, var(--accent-soft), transparent 55%),
-      radial-gradient(ellipse at 18% 4%, rgba(155,31,31,0.16), transparent 48%),
-      radial-gradient(ellipse at 84% 96%, rgba(203,172,103,0.06), transparent 50%),
+      radial-gradient(ellipse at 20% 0%, rgba(139,26,26,0.12), transparent 50%),
+      radial-gradient(ellipse at 80% 100%, rgba(201,169,97,0.05), transparent 50%),
       var(--bg-deep);
     background-attachment: fixed;
-    transition: background 0.6s ease;
   }
   body::before {
     content: '';
@@ -96,53 +82,24 @@
   }
   .save-controls { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
   header {
-    text-align: center; padding: 26px 16px 26px; margin-bottom: 18px;
-    position: relative; border-radius: var(--radius);
-    background:
-      radial-gradient(ellipse at 50% 0%, var(--accent-soft), transparent 70%),
-      linear-gradient(180deg, rgba(20,10,14,0.85), rgba(10,6,8,0.4));
-    border: 1px solid var(--border);
-    box-shadow: inset 0 1px 0 rgba(240,208,137,0.06), 0 10px 40px rgba(0,0,0,0.5);
-    overflow: hidden;
-  }
-  header::before {
-    content: ''; position: absolute; inset: 0; pointer-events: none;
-    background: linear-gradient(90deg, transparent, var(--accent), transparent);
-    height: 2px; top: 0; opacity: 0.55;
+    text-align: center; padding: 8px 0 16px; margin-bottom: 16px;
+    border-bottom: 1px solid var(--border); position: relative;
   }
   header::after {
-    content: '✦'; position: absolute; bottom: -11px; left: 50%;
+    content: '✦'; position: absolute; bottom: -10px; left: 50%;
     transform: translateX(-50%); background: var(--bg-deep);
-    padding: 0 14px; color: var(--accent); font-size: 18px;
-    text-shadow: 0 0 12px var(--accent-glow);
-  }
-  .crest {
-    font-size: clamp(2rem, 6vw, 3rem); line-height: 1;
-    margin-bottom: 6px; filter: drop-shadow(0 0 14px var(--accent-glow));
-    animation: crestPulse 4s ease-in-out infinite;
-  }
-  @keyframes crestPulse { 0%,100%{opacity:.85;transform:scale(1)} 50%{opacity:1;transform:scale(1.05)} }
-  .eyebrow {
-    font-family: 'Cinzel', serif; font-size: 0.62rem; font-weight: 700;
-    letter-spacing: 0.42em; color: var(--accent-bright);
-    text-transform: uppercase; margin-bottom: 8px; opacity: 0.85;
+    padding: 0 12px; color: var(--gold); font-size: 16px;
   }
   h1 {
     font-family: 'Cinzel', serif; font-weight: 900;
-    font-size: clamp(2rem, 5vw, 3.1rem); letter-spacing: 0.09em;
-    line-height: 1.02;
-    background: linear-gradient(180deg, var(--bone) 30%, var(--accent-bright));
-    -webkit-background-clip: text; background-clip: text;
-    -webkit-text-fill-color: transparent;
-    text-shadow: 0 0 34px var(--accent-glow);
-    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.6));
+    font-size: clamp(1.8rem, 4vw, 2.6rem); letter-spacing: 0.1em;
+    color: var(--bone); line-height: 1.05;
+    text-shadow: 0 0 20px rgba(139,26,26,0.4);
   }
   .subtitle {
-    font-style: italic; font-size: 1rem; color: var(--gold);
-    margin-top: 10px; letter-spacing: 0.03em; line-height: 1.5;
-    max-width: 780px; margin-left: auto; margin-right: auto;
+    font-style: italic; font-size: 0.95rem; color: var(--gold);
+    margin-top: 6px; letter-spacing: 0.03em;
   }
-  .subtitle strong { color: var(--bone); font-style: normal; }
   .combat-bar {
     display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;
   }
@@ -226,106 +183,83 @@
   }
   .phase-tabs {
     display: grid; grid-template-columns: repeat(3, 1fr);
-    gap: 10px; margin-bottom: 16px;
+    gap: 8px; margin-bottom: 14px;
   }
   .phase-tab {
-    background: linear-gradient(180deg, rgba(26,18,22,0.6), rgba(10,6,8,0.6));
-    border: 1px solid var(--border);
-    padding: 13px 12px 15px; cursor: pointer; text-align: center;
-    border-radius: var(--radius); transition: all 0.25s;
-    position: relative; overflow: hidden;
+    background: var(--bg-card); border: 1px solid var(--border);
+    padding: 10px 12px; cursor: pointer; text-align: center;
+    border-radius: 2px; transition: all 0.25s;
   }
-  .phase-tab::before {
-    content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 3px;
-    background: var(--accent); transform: scaleX(0);
-    transition: transform 0.3s ease; opacity: 0.9;
-  }
-  .phase-tab:hover { border-color: var(--gold-dim); transform: translateY(-2px); }
   .phase-tab.active {
-    background: linear-gradient(180deg, var(--accent-soft), rgba(10,6,8,0.55));
-    border-color: var(--accent);
-    box-shadow: 0 0 22px var(--accent-glow), inset 0 1px 0 rgba(255,255,255,0.06);
+    background: linear-gradient(180deg, var(--bg-card-3), var(--bg-card));
+    border-color: var(--gold);
+    box-shadow: 0 0 14px rgba(201,169,97,0.15);
   }
-  .phase-tab.active::before { transform: scaleX(1); }
-  .phase-tab.active .phase-num  { color: var(--accent-bright); }
-  .phase-tab.active .phase-name { color: var(--bone); text-shadow: 0 0 12px var(--accent-glow); }
-  .phase-icon {
-    font-size: 1.5rem; line-height: 1; margin-bottom: 4px;
-    display: block; filter: grayscale(0.4); transition: filter 0.25s, transform 0.25s;
-  }
-  .phase-tab.active .phase-icon { filter: grayscale(0) drop-shadow(0 0 10px var(--accent-glow)); transform: scale(1.12); }
+  .phase-tab.active .phase-num { color: var(--blood-bright); }
+  .phase-tab.active .phase-name { color: var(--bone); }
   .phase-num {
-    font-family: 'IM Fell English', serif; font-size: 0.72rem;
+    font-family: 'IM Fell English', serif; font-size: 0.7rem;
     color: var(--gold-dim); letter-spacing: 0.18em; font-style: italic;
   }
   .phase-name {
-    font-family: 'Cinzel', serif; font-weight: 700;
-    font-size: clamp(0.9rem, 1.7vw, 1.12rem);
+    font-family: 'Cinzel', serif; font-weight: 600;
+    font-size: clamp(0.85rem, 1.6vw, 1.05rem);
     color: var(--text-body); letter-spacing: 0.1em; text-transform: uppercase;
-    margin-top: 2px;
   }
   .phase-tagline {
-    font-style: italic; font-size: 0.8rem;
-    color: var(--text-muted); margin-top: 2px;
+    font-style: italic; font-size: 0.78rem;
+    color: var(--text-muted); margin-top: 1px;
   }
   .stats-bar {
     display: grid; grid-template-columns: repeat(6, 1fr);
-    gap: 8px; margin-bottom: 14px;
+    gap: 6px; margin-bottom: 14px;
     background: linear-gradient(180deg, rgba(26,18,22,0.7), rgba(13,8,11,0.7));
-    padding: 12px 10px;
-    border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 10px 8px;
+    border: 1px solid var(--border); border-radius: 6px;
     box-shadow: inset 0 1px 0 rgba(232,200,122,0.05);
   }
   .stat {
     text-align: center;
-    padding: 9px 4px 7px;
-    background: linear-gradient(180deg, rgba(0,0,0,0.3), transparent);
+    padding: 6px 4px;
+    background: linear-gradient(180deg, rgba(0,0,0,0.25), transparent);
     border: 1px solid rgba(74,58,42,0.6);
-    border-radius: 8px;
-    transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+    border-radius: 4px;
+    transition: border-color 0.2s, transform 0.15s;
   }
-  .stat:hover {
-    border-color: var(--accent); transform: translateY(-2px);
-    box-shadow: 0 4px 14px rgba(0,0,0,0.4), 0 0 12px var(--accent-glow);
-  }
+  .stat:hover { border-color: var(--gold-dim); transform: translateY(-1px); }
   .stat-label {
-    font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700;
-    letter-spacing: 0.22em; color: var(--gold-bright);
+    font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700;
+    letter-spacing: 0.2em; color: var(--gold-bright);
     text-shadow: 0 0 8px rgba(232,200,122,0.2);
   }
   .stat-value {
-    font-family: 'IM Fell English', serif; font-size: 1.75rem;
-    color: var(--bone); line-height: 1.05; font-weight: 600;
-    margin-top: 3px;
+    font-family: 'IM Fell English', serif; font-size: 1.5rem;
+    color: var(--bone); line-height: 1.1; font-weight: 600;
+    margin-top: 2px;
   }
   .stat-mod {
     font-family: 'Cinzel', serif; font-weight: 700;
-    font-size: 0.95rem; color: var(--accent-bright);
-    background: rgba(0,0,0,0.35);
-    border: 1px solid var(--accent);
-    border-radius: 12px; padding: 1px 9px;
-    display: inline-block; margin-top: 6px;
-    box-shadow: 0 0 10px var(--accent-glow);
+    font-size: 0.95rem; color: var(--gold);
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--gold-dim);
+    border-radius: 12px; padding: 1px 8px;
+    display: inline-block; margin-top: 4px;
   }
   .info-grid {
     display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
     gap: 6px; margin-bottom: 12px;
   }
   .info-card {
-    background: linear-gradient(180deg, var(--bg-card), rgba(10,6,8,0.5));
-    border: 1px solid var(--border);
-    border-left: 3px solid var(--accent);
-    padding: 8px 12px; border-radius: 6px;
-    transition: border-color 0.2s, transform 0.15s;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-left: 3px solid var(--blood);
+    padding: 6px 10px; border-radius: 2px;
   }
-  .info-card:hover { transform: translateY(-1px); border-left-color: var(--accent-bright); }
   .info-card .label {
     font-family: 'Cinzel', serif; font-size: 9px;
     letter-spacing: 0.15em; color: var(--gold); text-transform: uppercase;
   }
   .info-card .value {
-    font-family: 'IM Fell English', serif; font-size: 1.08rem; color: var(--bone);
-    margin-top: 1px;
+    font-family: 'IM Fell English', serif; font-size: 1rem; color: var(--bone);
   }
   .info-card .editable {
     background: transparent; border: none; border-bottom: 1px dashed var(--gold-dim);
@@ -338,17 +272,16 @@
   }
   @media (max-width: 720px) { .meta-row { grid-template-columns: 1fr; } }
   .meta-box {
-    background: linear-gradient(180deg, var(--bg-card), rgba(10,6,8,0.4));
-    border: 1px solid var(--border);
-    padding: 10px 14px; border-radius: 8px;
+    background: var(--bg-card); border: 1px solid var(--border);
+    padding: 8px 12px; border-radius: 2px;
   }
   .meta-title {
-    font-family: 'Cinzel', serif; font-size: 9px; color: var(--accent-bright);
+    font-family: 'Cinzel', serif; font-size: 9px; color: var(--gold);
     letter-spacing: 0.2em; text-transform: uppercase;
-    margin-bottom: 6px; padding-bottom: 5px;
-    border-bottom: 1px solid var(--border-soft);
+    margin-bottom: 4px; padding-bottom: 3px;
+    border-bottom: 1px solid var(--border);
   }
-  .meta-content { font-size: 0.95rem; color: var(--text-body); line-height: 1.55; }
+  .meta-content { font-size: 0.88rem; color: var(--text-body); line-height: 1.45; }
   .meta-content strong { color: var(--bone); font-weight: 600; }
   .phase-content { display: none; }
   .phase-content.active { display: block; animation: fadeIn 0.3s ease; }
@@ -356,97 +289,72 @@
     from { opacity: 0; transform: translateY(4px); }
     to { opacity: 1; transform: translateY(0); }
   }
-  .section { margin-bottom: 18px; }
+  .section { margin-bottom: 14px; }
   .section-title {
     font-family: 'Cinzel', serif; font-weight: 700;
-    font-size: 1.02rem; color: var(--blood-bright);
-    letter-spacing: 0.14em; text-transform: uppercase;
-    margin-bottom: 10px; padding-bottom: 7px;
+    font-size: 0.95rem; color: var(--blood-bright);
+    letter-spacing: 0.12em; text-transform: uppercase;
+    margin-bottom: 8px; padding-bottom: 5px;
     border-bottom: 1px solid var(--blood-dark);
-    display: flex; align-items: center; gap: 10px;
-    position: relative;
+    display: flex; align-items: center; gap: 8px;
   }
   .section-title::before {
-    content: ''; width: 7px; height: 7px;
+    content: ''; width: 6px; height: 6px;
     background: var(--blood); transform: rotate(45deg);
-    box-shadow: 0 0 8px var(--blood-bright); flex-shrink: 0;
+    box-shadow: 0 0 6px var(--blood);
   }
-  .section-title::after {
-    content: ''; position: absolute; left: 0; bottom: -1px; width: 60px; height: 1px;
-    background: linear-gradient(90deg, var(--blood-bright), transparent);
-  }
-  .ability-grid { display: grid; grid-template-columns: 1fr; gap: 7px; }
+  .ability-grid { display: grid; grid-template-columns: 1fr; gap: 5px; }
   .ability {
-    background: linear-gradient(180deg, var(--bg-card), rgba(10,6,8,0.35));
-    border: 1px solid var(--border);
-    border-left: 4px solid var(--gold-dim); border-radius: 8px;
-    transition: border-left-color 0.15s, background 0.15s, box-shadow 0.2s, transform 0.15s;
-    overflow: hidden;
+    background: var(--bg-card); border: 1px solid var(--border);
+    border-left: 3px solid var(--gold-dim); border-radius: 2px;
+    transition: border-left-color 0.15s, background 0.15s;
   }
-  .ability:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.35); }
-  .ability.open { box-shadow: 0 6px 22px rgba(0,0,0,0.45); }
-  .ability.attack   { border-left-color: var(--blood-bright); }
-  .ability.bonus    { border-left-color: #c08a3e; }
-  .ability.reaction { border-left-color: #5f8bb8; }
-  .ability.lair     { border-left-color: #9061b8; }
+  .ability.attack { border-left-color: var(--blood); }
+  .ability.bonus { border-left-color: #8b6f3a; }
+  .ability.reaction { border-left-color: #4a6a8a; }
+  .ability.lair { border-left-color: #5a3a6a; }
   .ability-header {
-    padding: 10px 14px; cursor: pointer;
-    display: flex; align-items: center; gap: 10px;
+    padding: 7px 12px; cursor: pointer;
+    display: flex; align-items: baseline; gap: 10px;
     flex-wrap: wrap; user-select: none;
   }
-  .ability-header:hover { background: rgba(255,255,255,0.03); }
-  /* Rótulo do tipo de ação (bolinha colorida antes do nome) */
-  .ability-header::before {
-    content: ''; width: 8px; height: 8px; border-radius: 50%;
-    background: var(--gold-dim); flex-shrink: 0;
-    box-shadow: 0 0 8px currentColor;
-  }
-  .ability.attack   .ability-header::before { background: var(--blood-bright); color: var(--blood-bright); }
-  .ability.bonus    .ability-header::before { background: #c08a3e; color: #c08a3e; }
-  .ability.reaction .ability-header::before { background: #5f8bb8; color: #5f8bb8; }
-  .ability.lair     .ability-header::before { background: #9061b8; color: #9061b8; }
+  .ability-header:hover { background: var(--bg-card-2); }
   .ability-name {
     font-family: 'Cinzel', serif; font-weight: 600;
-    font-size: 1rem; color: var(--bone); letter-spacing: 0.04em;
+    font-size: 0.92rem; color: var(--bone); letter-spacing: 0.04em;
   }
   .ability-tag {
     font-family: 'IM Fell English', serif; font-style: italic;
-    font-size: 0.82rem; color: var(--gold); letter-spacing: 0.03em;
-    background: var(--accent-soft); border: 1px solid var(--border-soft);
-    padding: 1px 8px; border-radius: 10px;
+    font-size: 0.78rem; color: var(--gold); letter-spacing: 0.05em;
   }
   .toggle-icon {
     margin-left: auto; color: var(--gold-dim);
-    font-size: 0.72rem; transition: transform 0.2s;
+    font-size: 0.75rem; transition: transform 0.2s;
   }
   .ability.open .toggle-icon { transform: rotate(180deg); color: var(--gold); }
   .ability-body {
-    padding: 2px 16px 12px 34px; font-size: 0.98rem;
-    color: var(--text-body); line-height: 1.58; display: none;
+    padding: 0 12px 10px; font-size: 0.92rem;
+    color: var(--text-body); line-height: 1.5; display: none;
   }
   .ability.open .ability-body { display: block; }
-  .ability-body strong { color: var(--bone); font-weight: 600; }
-  .ability-body em { color: var(--gold-bright); font-style: normal; font-weight: 500; }
+  .ability-body strong { color: var(--bone-dim); font-weight: 600; }
+  .ability-body em { color: var(--gold); font-style: normal; font-weight: 500; }
   .desc-flavor {
-    font-style: italic; color: var(--bone-dim);
-    border-left: 2px solid var(--accent);
-    padding: 4px 0 4px 12px; margin: 4px 0 10px; font-size: 0.92rem;
-    background: linear-gradient(90deg, var(--accent-soft), transparent);
-    border-radius: 0 4px 4px 0;
+    font-style: italic; color: var(--text-muted);
+    border-left: 2px solid var(--gold-dim);
+    padding-left: 10px; margin: 6px 0; font-size: 0.86rem;
   }
   .dmg {
-    display: inline-block; padding: 1px 8px;
-    background: linear-gradient(180deg, rgba(155,31,31,0.28), rgba(90,14,14,0.28));
-    border: 1px solid var(--blood); color: #ffd9d0; border-radius: 5px;
-    font-family: 'IM Fell English', serif; font-size: 0.9rem; margin: 0 2px;
-    font-weight: 600; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+    display: inline-block; padding: 0 6px;
+    background: rgba(139,26,26,0.2); border: 1px solid var(--blood-dark);
+    color: var(--bone); border-radius: 2px;
+    font-family: 'IM Fell English', serif; font-size: 0.85rem; margin: 0 1px;
   }
   .cd {
-    display: inline-block; padding: 1px 8px;
-    background: rgba(203,172,103,0.16); border: 1px solid var(--gold-dim);
-    color: var(--gold-bright); border-radius: 5px;
-    font-family: 'IM Fell English', serif; font-size: 0.9rem; margin: 0 2px;
-    font-weight: 600;
+    display: inline-block; padding: 0 6px;
+    background: rgba(201,169,97,0.13); border: 1px solid var(--gold-dim);
+    color: var(--gold-bright); border-radius: 2px;
+    font-family: 'IM Fell English', serif; font-size: 0.85rem; margin: 0 1px;
   }
   .spell-slots {
     background: var(--bg-card); border: 1px solid var(--border);
@@ -558,15 +466,12 @@
   .spell-search:focus { border-color: var(--gold); }
   .spell-level-group { margin-bottom: 8px; }
   .spell-level-header {
-    font-family: 'Cinzel', serif; font-size: 0.82rem;
-    color: var(--gold-bright); letter-spacing: 0.15em;
-    margin-bottom: 6px; padding: 5px 0;
+    font-family: 'Cinzel', serif; font-size: 0.78rem;
+    color: var(--gold); letter-spacing: 0.15em;
+    margin-bottom: 4px; padding: 4px 0;
     border-bottom: 1px dashed var(--border);
     text-transform: uppercase;
     display: flex; align-items: center; gap: 8px;
-  }
-  .spell-level-header::before {
-    content: '✦'; color: var(--accent); font-size: 0.8em;
   }
   .spell-chip {
     display: inline-flex; align-items: center; gap: 6px;
@@ -780,100 +685,6 @@
     .modal-overlay { padding: 12px; }
     .modal-header, .modal-body { padding-left: 16px; padding-right: 16px; }
   }
-  /* ============ COMPONENTES NOVOS ============ */
-  .panel {
-    background: linear-gradient(180deg, var(--bg-card), rgba(10,6,8,0.5));
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
-  }
-  .panel-title {
-    display: flex; align-items: center; gap: 6px;
-    border-bottom: 1px solid var(--border-soft); padding-bottom: 6px;
-  }
-
-  /* Tracker de Rodada / Turno */
-  .round-tracker {
-    display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
-  }
-  .round-display {
-    display: flex; align-items: baseline; gap: 6px;
-    background: rgba(0,0,0,0.35); border: 1px solid var(--accent);
-    border-radius: 8px; padding: 4px 14px;
-    box-shadow: 0 0 14px var(--accent-glow);
-  }
-  .round-num {
-    font-family: 'IM Fell English', serif; font-size: 1.6rem;
-    color: var(--accent-bright); line-height: 1; font-weight: 600;
-    min-width: 24px; text-align: center;
-  }
-  .round-lbl {
-    font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.2em;
-    color: var(--gold-dim); text-transform: uppercase;
-  }
-
-  /* Barra de Resistência Lendária / Indomável */
-  .legendary-bar {
-    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
-  }
-  .legendary-pips { display: inline-flex; gap: 6px; }
-  .leg-pip {
-    width: 26px; height: 26px; cursor: pointer; position: relative;
-    border: 2px solid var(--gold); border-radius: 50%;
-    background: radial-gradient(circle, rgba(240,208,137,0.18), rgba(0,0,0,0.4));
-    transition: transform 0.15s, background 0.15s;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 12px; color: var(--gold-bright);
-  }
-  .leg-pip::before { content: '✦'; }
-  .leg-pip:hover { transform: scale(1.12); border-color: var(--gold-bright); }
-  .leg-pip.used {
-    background: radial-gradient(circle, rgba(90,14,14,0.6), rgba(0,0,0,0.5));
-    border-color: var(--blood-dark); color: transparent;
-  }
-  .leg-pip.used::before { content: '✗'; color: var(--blood-bright); }
-
-  /* Grid de Fraquezas */
-  .weakness-grid {
-    display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-    gap: 10px;
-  }
-  .weakness-card {
-    background: linear-gradient(180deg, rgba(30,14,14,0.7), rgba(10,6,8,0.5));
-    border: 1px solid var(--blood-dark);
-    border-top: 3px solid var(--blood-bright);
-    border-radius: 8px; padding: 12px 14px;
-    transition: transform 0.15s, box-shadow 0.2s;
-  }
-  .weakness-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.4), 0 0 14px rgba(209,55,49,0.2); }
-  .wk-title {
-    font-family: 'Cinzel', serif; font-weight: 700; font-size: 0.98rem;
-    color: var(--blood-bright); letter-spacing: 0.04em;
-    display: flex; align-items: center; gap: 8px; margin-bottom: 6px;
-  }
-  .wk-title .wk-icon { font-size: 1.2rem; filter: drop-shadow(0 0 6px rgba(209,55,49,0.5)); }
-  .wk-desc { font-size: 0.92rem; color: var(--text-body); line-height: 1.5; }
-  .wk-desc strong { color: var(--bone); }
-
-  /* Destaque especial (Forma Nebulosa) */
-  .special-callout {
-    background:
-      radial-gradient(ellipse at 0% 0%, rgba(143,162,184,0.14), transparent 60%),
-      linear-gradient(180deg, var(--bg-card-2), rgba(10,6,8,0.5));
-    border: 1px solid #5f7488;
-    border-left: 4px solid #8fa2b8;
-    border-radius: 10px; padding: 14px 16px; margin-bottom: 14px;
-  }
-  .special-callout .sc-title {
-    font-family: 'Cinzel', serif; font-weight: 700; font-size: 1rem;
-    color: #c4d3e4; letter-spacing: 0.06em; margin-bottom: 8px;
-    display: flex; align-items: center; gap: 8px;
-  }
-  .special-callout .sc-body { font-size: 0.95rem; color: var(--text-body); line-height: 1.55; }
-  .special-callout .sc-body strong { color: var(--bone); }
-  .special-callout .sc-body em { color: #c4d3e4; font-style: normal; font-weight: 500; }
-
-  @media (max-width: 720px) {
-    .weakness-grid { grid-template-columns: 1fr; }
-  }
   @media print {
     body { background: white; color: black; }
     .top-bar, .notes-section, .combat-bar, .condition-row, .save-controls { display: none; }
@@ -929,10 +740,8 @@
   </div>
 
   <header>
-    <div class="crest">🦇</div>
-    <div class="eyebrow">O Senhor de Barovia · Ancião de Ravenloft</div>
     <h1>Strahd von Zarovich</h1>
-    <div class="subtitle">Médio morto-vivo (metamorfo) · Leal e Maligno · <strong>ND 21</strong> (33.000 XP) — 19 (22.000 XP) sob luz solar</div>
+    <div class="subtitle">Médio morto-vivo (metamorfo) · Leal e Maligno · ND 21 (33.000 XP) — 19 (22.000 XP) sob luz solar</div>
   </header>
 
   <!-- HP + REACTIONS -->
@@ -970,37 +779,6 @@
         Se perder reações e não estiver incapacitado, perde apenas <em style="color:var(--gold);font-style:normal">1</em> em vez de todas.
       </div>
     </div>
-
-    <div class="panel">
-      <div class="panel-title">◆ Rodada de Combate</div>
-      <div class="round-tracker">
-        <button class="btn" onclick="adjustRound(-1)">−</button>
-        <div class="round-display">
-          <span class="round-num" id="roundCounter">1</span>
-          <span class="round-lbl">Rodada</span>
-        </div>
-        <button class="btn gold" onclick="adjustRound(1)">Próxima ▸</button>
-        <button class="btn" onclick="resetRound()">⟲ Zerar</button>
-      </div>
-      <div style="margin-top:8px;font-size:0.82rem;color:var(--text-muted);font-style:italic;line-height:1.35">
-        Avançar a rodada <strong style="color:var(--gold);font-weight:600">recupera as 3 reações</strong> automaticamente.
-      </div>
-    </div>
-
-    <div class="panel">
-      <div class="panel-title">◆ Indomável — Resistência Lendária (3/dia)</div>
-      <div class="legendary-bar">
-        <div class="legendary-pips">
-          <div class="leg-pip" onclick="toggleLegPip(this)" title="Gastar/recuperar"></div>
-          <div class="leg-pip" onclick="toggleLegPip(this)" title="Gastar/recuperar"></div>
-          <div class="leg-pip" onclick="toggleLegPip(this)" title="Gastar/recuperar"></div>
-        </div>
-        <button class="btn" onclick="resetLegPips()">Descanso</button>
-      </div>
-      <div style="margin-top:8px;font-size:0.82rem;color:var(--text-muted);font-style:italic;line-height:1.35">
-        Gaste um selo para <em style="color:var(--gold);font-style:normal">passar automaticamente</em> num teste de resistência falhado.
-      </div>
-    </div>
   </div>
 
   <!-- CONDITIONS -->
@@ -1020,19 +798,16 @@
   <!-- PHASE TABS -->
   <div class="phase-tabs">
     <div class="phase-tab active" data-phase="1" onclick="switchPhase(1)">
-      <span class="phase-icon">🔮</span>
       <div class="phase-num">~ Primeira Forma ~</div>
       <div class="phase-name">O Mago</div>
       <div class="phase-tagline">Manipulador arcano</div>
     </div>
     <div class="phase-tab" data-phase="2" onclick="switchPhase(2)">
-      <span class="phase-icon">⚔️</span>
       <div class="phase-num">~ Segunda Forma ~</div>
       <div class="phase-name">O Soldado</div>
       <div class="phase-tagline">Comandante da escuridão</div>
     </div>
     <div class="phase-tab" data-phase="3" onclick="switchPhase(3)">
-      <span class="phase-icon">🩸</span>
       <div class="phase-num">~ Terceira Forma ~</div>
       <div class="phase-name">O Vampiro</div>
       <div class="phase-tagline">Predador desenfreado</div>
@@ -1360,49 +1135,6 @@
       <div class="ability-grid">
         <div class="ability lair"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Controlar o Clima</div><span class="toggle-icon">▼</span></div><div class="ability-body">Conjura <em>controlar o clima</em> sem componentes/concentração. Altera qualquer número de condições para qualquer estágio.</div></div>
         <div class="ability lair"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Chamar Relâmpagos</div><span class="ability-tag">tempestade = dano máximo</span><span class="toggle-icon">▼</span></div><div class="ability-body">Conjura <em>chamar relâmpagos</em> sem componentes/concentração. <strong>Ao ar livre em tempestade: dano sempre máximo</strong>.</div></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ============================= FRAQUEZAS & REGRAS ESPECIAIS (compartilhado) ============================= -->
-  <div class="section" style="margin-top:24px;">
-    <h2 class="section-title">☠ Fraquezas do Vampiro
-      <span style="font-size:0.7em;color:var(--text-muted);letter-spacing:0.05em;text-transform:none;font-style:italic;margin-left:8px">válidas em todas as fases — a esperança dos heróis</span>
-    </h2>
-
-    <div class="special-callout">
-      <div class="sc-title">🌫️ Forma Nebulosa — Fuga do Túmulo</div>
-      <div class="sc-body">
-        Enquanto <strong>não estiver sob luz solar nem em água corrente</strong>, ao ser reduzido a <strong>0 PV</strong> Strahd não morre: transforma-se numa <em>nuvem de névoa</em> em vez de cair inconsciente (a menos que esteja incapacitado por água corrente, luz solar ou uma estaca).<br>
-        ◆ Na forma nebulosa <em>não pode agir</em>, tem velocidade de voo 6 m, resistência a todo dano não-mágico e imunidade a agarrar. Deve chegar ao seu <strong>caixão em até 2 horas</strong> ou é <strong>destruído</strong>.<br>
-        ◆ Uma vez em repouso no caixão, volta à forma física e fica <strong>paralisado</strong> até recuperar ≥1 PV (regenera 20/turno). Reduzido a 0 novamente enquanto paralisado no caixão → destruído.
-      </div>
-    </div>
-
-    <div class="weakness-grid">
-      <div class="weakness-card">
-        <div class="wk-title"><span class="wk-icon">🪵</span>Estaca no Coração</div>
-        <div class="wk-desc">Se uma <strong>arma de madeira</strong> perfurar seu coração enquanto ele estiver <strong>incapacitado em seu caixão</strong>, Strahd fica <strong>paralisado</strong> até a estaca ser removida.</div>
-      </div>
-      <div class="weakness-card">
-        <div class="wk-title"><span class="wk-icon">☀️</span>Luz Solar</div>
-        <div class="wk-desc">Sob luz solar sofre <span class="dmg">20 radiante</span> no início de cada turno e tem <strong>desvantagem</strong> em ataques e testes. Bloqueia sua <strong>regeneração</strong> e a Forma Nebulosa.</div>
-      </div>
-      <div class="weakness-card">
-        <div class="wk-title"><span class="wk-icon">🌊</span>Água Corrente</div>
-        <div class="wk-desc">Sofre <span class="dmg">20 ácido</span> se <strong>terminar o turno em água corrente</strong>. Não pode usar a Forma Nebulosa nem regenerar enquanto submerso nela.</div>
-      </div>
-      <div class="weakness-card">
-        <div class="wk-title"><span class="wk-icon">✝️</span>Repelido por Símbolos</div>
-        <div class="wk-desc">Não tolera o cheiro de <strong>alho</strong>; não pode entrar numa residência sem <strong>convite</strong> de um morador; recua de um <strong>símbolo sagrado</strong> apresentado com fé; não projeta reflexo em <strong>espelhos</strong>.</div>
-      </div>
-      <div class="weakness-card">
-        <div class="wk-title"><span class="wk-icon">🩸</span>Regeneração Frágil</div>
-        <div class="wk-desc">Recupera <strong>20 PV/turno</strong> — mas sofrer <strong>dano radiante</strong> ou estar sob luz solar <strong>desliga</strong> a regeneração no próximo turno. Priorize luz e magia sagrada.</div>
-      </div>
-      <div class="weakness-card">
-        <div class="wk-title"><span class="wk-icon">⚰️</span>Vínculo com Barovia</div>
-        <div class="wk-desc">As <strong>névoas</strong> o aprisionam no vale — ele não pode deixar Barovia. Enquanto os <strong>Santuários Profanados</strong> não forem reconsagrados, ele mantém suas Ações de Covil.</div>
       </div>
     </div>
   </div>
@@ -2365,7 +2097,6 @@ function switchPhase(num) {
   document.querySelectorAll('.phase-content').forEach(c => c.classList.remove('active'));
   document.querySelector(`.phase-tab[data-phase="${num}"]`).classList.add('active');
   document.getElementById(`phase-${num}`).classList.add('active');
-  document.body.dataset.fase = num;
   saveState(true);
 }
 
@@ -2416,30 +2147,6 @@ function resetReactions() {
   saveState(true);
 }
 
-/* ===== TRACKER DE RODADA ===== */
-function adjustRound(delta) {
-  const el = document.getElementById('roundCounter');
-  if (!el) return;
-  let n = parseInt(el.textContent) || 1;
-  n = Math.max(1, n + delta);
-  el.textContent = n;
-  // Avançar a rodada recupera as reações do início do turno de Strahd
-  if (delta > 0) document.querySelectorAll('.react-dot').forEach(d => d.classList.remove('used'));
-  saveState(true);
-}
-function resetRound() {
-  const el = document.getElementById('roundCounter');
-  if (el) el.textContent = 1;
-  saveState(true);
-}
-
-/* ===== RESISTÊNCIA LENDÁRIA (INDOMÁVEL) ===== */
-function toggleLegPip(el) { el.classList.toggle('used'); saveState(true); }
-function resetLegPips() {
-  document.querySelectorAll('.leg-pip').forEach(p => p.classList.remove('used'));
-  saveState(true);
-}
-
 function toggleAbility(header) {
   header.parentElement.classList.toggle('open');
 }
@@ -2476,11 +2183,8 @@ function getState() {
       level: d.dataset.level, index: d.dataset.index, used: d.classList.contains('used')
     })),
     notes: document.getElementById('notesArea').value,
-    round: (document.getElementById('roundCounter')?.textContent) || '1',
-    legPips: Array.from(document.querySelectorAll('.leg-pip')).map(p => p.classList.contains('used')),
     openAbilities: Array.from(document.querySelectorAll('.ability.open')).map(a => {
-      const phaseEl = a.closest('.phase-content');
-      const phase = phaseEl ? phaseEl.id : 'global';
+      const phase = a.closest('.phase-content').id;
       const name = a.querySelector('.ability-name').textContent;
       return `${phase}::${name}`;
     }),
@@ -2515,12 +2219,6 @@ function applyState(s) {
     });
   }
   document.getElementById('notesArea').value = s.notes || '';
-  const roundEl = document.getElementById('roundCounter');
-  if (roundEl) roundEl.textContent = s.round || '1';
-  if (s.legPips) {
-    const pips = document.querySelectorAll('.leg-pip');
-    s.legPips.forEach((used, i) => { if (pips[i]) pips[i].classList.toggle('used', used); });
-  }
   if (s.openAbilities) {
     s.openAbilities.forEach(key => {
       const [phase, name] = key.split('::');
@@ -2546,7 +2244,6 @@ function switchPhaseSilent(num) {
   document.querySelectorAll('.phase-content').forEach(c => c.classList.remove('active'));
   document.querySelector(`.phase-tab[data-phase="${num}"]`).classList.add('active');
   document.getElementById(`phase-${num}`).classList.add('active');
-  document.body.dataset.fase = num;
 }
 
 // Sync remoto via window.MasterState (Supabase). Mantém local como fallback.
@@ -2599,15 +2296,11 @@ function resetAll() {
   hpMax.value = 331;
   document.querySelectorAll('.ca-input').forEach(i => i.value = 16);
   updateHPBar();
-  document.querySelectorAll('.react-dot, .slot-dot, .leg-pip').forEach(d => d.classList.remove('used'));
+  document.querySelectorAll('.react-dot, .slot-dot').forEach(d => d.classList.remove('used'));
   document.querySelectorAll('.condition-row .chip').forEach(c => c.classList.remove('active'));
   document.querySelectorAll('.ability.open').forEach(a => a.classList.remove('open'));
-  document.querySelectorAll('.ability-usage-dot.gasto').forEach(d => d.classList.remove('gasto'));
-  document.querySelectorAll('.ability.tudo-gasto').forEach(a => a.classList.remove('tudo-gasto'));
   document.querySelectorAll('.spell-chip.cast').forEach(c => c.classList.remove('cast'));
   document.getElementById('notesArea').value = '';
-  const roundEl = document.getElementById('roundCounter');
-  if (roundEl) roundEl.textContent = 1;
   switchPhase(1);
   showToast('✓ Resetado');
 }
@@ -2687,7 +2380,6 @@ buildSlotsUI();
 buildSpellList();
 updateHPBar();
 aplicarTrackersHabilidades();
-document.body.dataset.fase = document.querySelector('.phase-tab.active')?.dataset.phase || '1';
 
 (async function bootstrap() {
   // Auth gate: só Mestre pode abrir
