@@ -142,7 +142,9 @@
     filter: drop-shadow(0 0 12px rgba(139,29,29,0.4));
     align-self: center;
     line-height: 1;
+    color: var(--gold-light);
   }
+  .villain-card:hover .vil-icon { color: var(--gold-bright, #d4a843); }
   .vil-nome {
     font-family: 'Cinzel Decorative', serif;
     font-size: 22px; font-weight: 700;
@@ -221,6 +223,25 @@
   .acesso-restrito.show { display: block; }
   .villain-grid.hidden { display: none; }
 
+  .filtro-bar {
+    display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
+    margin-bottom: 26px;
+  }
+  .filtro-btn {
+    font-family: 'Cinzel', serif; font-size: 11px; font-weight: 600;
+    letter-spacing: 1px; text-transform: uppercase;
+    padding: 8px 16px; border-radius: 20px; cursor: pointer;
+    background: transparent; color: var(--parchment-dim);
+    border: 1px solid var(--gold); transition: all 0.2s;
+  }
+  .filtro-btn:hover { color: var(--gold-light); border-color: var(--gold-bright); }
+  .filtro-btn.active {
+    background: linear-gradient(180deg, var(--gold), var(--gold-bright));
+    color: var(--shadow); border-color: var(--gold-bright);
+    box-shadow: 0 0 14px rgba(184,138,44,0.35);
+  }
+  .villain-card.oculto, .add-card.oculto { display: none; }
+
   @media (max-width: 600px) {
     .site-header { padding: 10px 14px; gap: 12px; }
     main { padding: 0 14px 40px; margin-top: 24px; }
@@ -229,13 +250,14 @@
     .add-card { min-height: 0; padding: 28px 20px; }
   }
 </style>
+<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
 <link rel="stylesheet" href="../../assets/css/ui.css">
 </head>
 <body data-ambiente="brasas">
 
 <header class="site-header">
   <a href="../../index.html" class="back-btn">← Início</a>
-  <div class="header-title">Fichas de Vilão</div>
+  <div class="header-title">Personagens</div>
   <div class="auth-slot" id="auth-slot"></div>
 </header>
 
@@ -247,20 +269,26 @@
 
 <main id="main-content" style="display:none">
   <div class="intro">
-    <h1>Fichas de Vilão</h1>
-    <p>Selecione o vilão principal da campanha. Cada ficha mantém HP, slots, condições e notas <strong style="color:var(--gold-bright)">sincronizados em tempo real</strong> entre os seus dispositivos.</p>
+    <h1>Personagens</h1>
+    <p>Selecione um personagem da campanha. Cada ficha mantém HP, condições e notas <strong style="color:var(--gold-bright)">sincronizados em tempo real</strong> entre os seus dispositivos.</p>
     <hr>
+  </div>
+
+  <div class="filtro-bar" role="tablist" aria-label="Filtrar personagens">
+    <button class="filtro-btn active" data-filtro="todos" onclick="filtrar(this)">Todos</button>
+    <button class="filtro-btn" data-filtro="vilao" onclick="filtrar(this)">⚔ Vilões</button>
+    <button class="filtro-btn" data-filtro="npc" onclick="filtrar(this)">🕊 Aliados & NPCs</button>
   </div>
 
   <div class="villain-grid">
 
     <!-- Strahd -->
-    <a href="strahd.html" class="villain-card strahd" aria-label="Abrir ficha de Strahd von Zarovich">
+    <a href="strahd.html" class="villain-card strahd" data-cat="vilao" aria-label="Abrir ficha de Strahd von Zarovich">
       <span class="corner tl" aria-hidden="true">✠</span>
       <span class="corner tr" aria-hidden="true">✠</span>
       <span class="corner bl" aria-hidden="true">✠</span>
       <span class="corner br" aria-hidden="true">✠</span>
-      <div class="vil-icon" aria-hidden="true">🧛</div>
+      <div class="vil-icon" aria-hidden="true"><iconify-icon icon="game-icons:vampire-dracula"></iconify-icon></div>
       <div class="vil-nome">Strahd von Zarovich</div>
       <div class="vil-titulo">Conde de Barovia · O Vampiro</div>
       <div class="vil-meta">
@@ -273,12 +301,12 @@
     </a>
 
     <!-- Anastrasya -->
-    <a href="anastrasya.html" class="villain-card strahd" aria-label="Abrir ficha de Anastrasya">
+    <a href="anastrasya.html" class="villain-card strahd" data-cat="vilao" aria-label="Abrir ficha de Anastrasya">
       <span class="corner tl" aria-hidden="true">✠</span>
       <span class="corner tr" aria-hidden="true">✠</span>
       <span class="corner bl" aria-hidden="true">✠</span>
       <span class="corner br" aria-hidden="true">✠</span>
-      <div class="vil-icon" aria-hidden="true">🦇</div>
+      <div class="vil-icon" aria-hidden="true"><iconify-icon icon="game-icons:bat"></iconify-icon></div>
       <div class="vil-nome">Anastrasya</div>
       <div class="vil-titulo">Noiva de Strahd · Socialite Vampírica</div>
       <div class="vil-meta">
@@ -291,12 +319,12 @@
     </a>
 
     <!-- Emil Toranescu -->
-    <a href="emil.html" class="villain-card strahd" aria-label="Abrir ficha de Emil Toranescu">
+    <a href="emil.html" class="villain-card strahd" data-cat="npc" aria-label="Abrir ficha de Emil Toranescu">
       <span class="corner tl" aria-hidden="true">✠</span>
       <span class="corner tr" aria-hidden="true">✠</span>
       <span class="corner bl" aria-hidden="true">✠</span>
       <span class="corner br" aria-hidden="true">✠</span>
-      <div class="vil-icon" aria-hidden="true">🐺</div>
+      <div class="vil-icon" aria-hidden="true"><iconify-icon icon="game-icons:werewolf"></iconify-icon></div>
       <div class="vil-nome">Emil Toranescu</div>
       <div class="vil-titulo">Lobisomem de Barovia · Protetor</div>
       <div class="vil-meta">
@@ -309,12 +337,12 @@
     </a>
 
     <!-- Volenta Popofsky -->
-    <a href="volenta.html" class="villain-card strahd" aria-label="Abrir ficha de Volenta Popofsky">
+    <a href="volenta.html" class="villain-card strahd" data-cat="vilao" aria-label="Abrir ficha de Volenta Popofsky">
       <span class="corner tl" aria-hidden="true">✠</span>
       <span class="corner tr" aria-hidden="true">✠</span>
       <span class="corner bl" aria-hidden="true">✠</span>
       <span class="corner br" aria-hidden="true">✠</span>
-      <div class="vil-icon" aria-hidden="true">🩸</div>
+      <div class="vil-icon" aria-hidden="true"><iconify-icon icon="game-icons:round-bottom-flask"></iconify-icon></div>
       <div class="vil-nome">Volenta Popofsky</div>
       <div class="vil-titulo">Noiva de Strahd · A Sádica Alquimista</div>
       <div class="vil-meta">
@@ -326,10 +354,154 @@
       <div class="vil-cta">Abrir Ficha</div>
     </a>
 
-    <!-- Placeholder para novos vilões -->
+    <!-- Ludmilla Vilisevic -->
+    <a href="ludmilla.html" class="villain-card strahd" data-cat="vilao" aria-label="Abrir ficha de Ludmilla Vilisevic">
+      <span class="corner tl" aria-hidden="true">✠</span>
+      <span class="corner tr" aria-hidden="true">✠</span>
+      <span class="corner bl" aria-hidden="true">✠</span>
+      <span class="corner br" aria-hidden="true">✠</span>
+      <div class="vil-icon" aria-hidden="true"><iconify-icon icon="game-icons:crystal-ball"></iconify-icon></div>
+      <div class="vil-nome">Ludmilla Vilisevic</div>
+      <div class="vil-titulo">Noiva de Strahd · A Feiticeira</div>
+      <div class="vil-meta">
+        <span class="meta-tag">ND 6–8</span>
+        <span class="meta-tag">3 Formas</span>
+        <span class="meta-tag">PV 82</span>
+      </div>
+      <div class="vil-resumo">Maga fria e calculista em 3 formas (Conjuradora, Elementalista e Demônio da Névoa). Adaptada do Curse of Strahd: Reloaded, com dossiê de interpretação.</div>
+      <div class="vil-cta">Abrir Ficha</div>
+    </a>
+
+    <!-- Rahadin -->
+    <a href="rahadin.html" class="villain-card strahd" data-cat="vilao" aria-label="Abrir ficha de Rahadin">
+      <span class="corner tl" aria-hidden="true">✠</span>
+      <span class="corner tr" aria-hidden="true">✠</span>
+      <span class="corner bl" aria-hidden="true">✠</span>
+      <span class="corner br" aria-hidden="true">✠</span>
+      <div class="vil-icon" aria-hidden="true"><iconify-icon icon="game-icons:elf-helmet"></iconify-icon></div>
+      <div class="vil-nome">Rahadin</div>
+      <div class="vil-titulo">Camareiro de Ravenloft · Executor de Strahd</div>
+      <div class="vil-meta">
+        <span class="meta-tag">ND 14–19</span>
+        <span class="meta-tag">4 Formas</span>
+        <span class="meta-tag">PV 180–225</span>
+      </div>
+      <div class="vil-resumo">Elfo assassino em 4 formas (Camareiro, Matador e a via da Corrupção do Âmbar). Adaptado do Curse of Strahd: Reloaded, com dossiê de interpretação.</div>
+      <div class="vil-cta">Abrir Ficha</div>
+    </a>
+
+    <!-- Escher -->
+    <a href="escher.html" class="villain-card strahd" data-cat="npc" aria-label="Abrir ficha de Escher">
+      <span class="corner tl" aria-hidden="true">✠</span>
+      <span class="corner tr" aria-hidden="true">✠</span>
+      <span class="corner bl" aria-hidden="true">✠</span>
+      <span class="corner br" aria-hidden="true">✠</span>
+      <div class="vil-icon" aria-hidden="true"><iconify-icon icon="game-icons:batwing-emblem"></iconify-icon></div>
+      <div class="vil-nome">Escher</div>
+      <div class="vil-titulo">Consorte de Strahd · O Cortesão Vaidoso</div>
+      <div class="vil-meta">
+        <span class="meta-tag">ND 5</span>
+        <span class="meta-tag">Vampiro Nascido</span>
+        <span class="meta-tag">PV 121</span>
+      </div>
+      <div class="vil-resumo">Consorte extravagante e cheio de culpa. Bloco de Vampiro Nascido + dossiê de interpretação do Curse of Strahd: Reloaded.</div>
+      <div class="vil-cta">Abrir Ficha</div>
+    </a>
+
+    <!-- Sasha Ivliskova -->
+    <a href="sasha.html" class="villain-card strahd" data-cat="npc" aria-label="Abrir ficha de Sasha Ivliskova">
+      <span class="corner tl" aria-hidden="true">✠</span>
+      <span class="corner tr" aria-hidden="true">✠</span>
+      <span class="corner bl" aria-hidden="true">✠</span>
+      <span class="corner br" aria-hidden="true">✠</span>
+      <div class="vil-icon" aria-hidden="true"><iconify-icon icon="game-icons:coffin"></iconify-icon></div>
+      <div class="vil-nome">Sasha Ivliskova</div>
+      <div class="vil-titulo">Primeira Noiva de Strahd · A Melancólica</div>
+      <div class="vil-meta">
+        <span class="meta-tag">ND 5</span>
+        <span class="meta-tag">Vampiro Nascido</span>
+        <span class="meta-tag">PV 121</span>
+      </div>
+      <div class="vil-resumo">Noiva simpática que anseia por liberdade — possível aliada. Bloco de Vampiro Nascido + dossiê de interpretação.</div>
+      <div class="vil-cta">Abrir Ficha</div>
+    </a>
+
+    <!-- Cyrus Belview -->
+    <a href="cyrus.html" class="villain-card strahd" data-cat="npc" aria-label="Abrir ficha de Cyrus Belview">
+      <span class="corner tl" aria-hidden="true">✠</span>
+      <span class="corner tr" aria-hidden="true">✠</span>
+      <span class="corner bl" aria-hidden="true">✠</span>
+      <span class="corner br" aria-hidden="true">✠</span>
+      <div class="vil-icon" aria-hidden="true"><iconify-icon icon="game-icons:old-lantern"></iconify-icon></div>
+      <div class="vil-nome">Cyrus Belview</div>
+      <div class="vil-titulo">Mordomo de Ravenloft · Patriarca Belview</div>
+      <div class="vil-meta">
+        <span class="meta-tag">NPC</span>
+        <span class="meta-tag">Não-combatente</span>
+        <span class="meta-tag">Mongrelfolk</span>
+      </div>
+      <div class="vil-resumo">Mordomo idoso e caduco, cheio de teorias conspiratórias. Ficha de lore/NPC com dossiê de interpretação.</div>
+      <div class="vil-cta">Abrir Ficha</div>
+    </a>
+
+    <!-- Amontoado de Carne / Walter -->
+    <a href="fleshmound.html" class="villain-card strahd" data-cat="vilao" aria-label="Abrir ficha do Amontoado de Carne / Walter">
+      <span class="corner tl" aria-hidden="true">✠</span>
+      <span class="corner tr" aria-hidden="true">✠</span>
+      <span class="corner bl" aria-hidden="true">✠</span>
+      <span class="corner br" aria-hidden="true">✠</span>
+      <div class="vil-icon" aria-hidden="true"><iconify-icon icon="game-icons:internal-organ"></iconify-icon></div>
+      <div class="vil-nome">Amontoado de Carne / Walter</div>
+      <div class="vil-titulo">Casa da Morte · O Horror do Porão</div>
+      <div class="vil-meta">
+        <span class="meta-tag">ND 4</span>
+        <span class="meta-tag">2 Formas</span>
+        <span class="meta-tag">PV 143</span>
+      </div>
+      <div class="vil-resumo">Massa de carne que engolfa vítimas e revela o bebê morto Walter no cerne. Chefe final da Casa da Morte.</div>
+      <div class="vil-cta">Abrir Ficha</div>
+    </a>
+
+    <!-- Izek Strazni -->
+    <a href="izek.html" class="villain-card strahd" data-cat="vilao" aria-label="Abrir ficha de Izek Strazni">
+      <span class="corner tl" aria-hidden="true">✠</span>
+      <span class="corner tr" aria-hidden="true">✠</span>
+      <span class="corner bl" aria-hidden="true">✠</span>
+      <span class="corner br" aria-hidden="true">✠</span>
+      <div class="vil-icon" aria-hidden="true"><iconify-icon icon="game-icons:fire-punch"></iconify-icon></div>
+      <div class="vil-nome">Izek Strazni</div>
+      <div class="vil-titulo">Capitão da Guarda de Vallaki · O Braço Demoníaco</div>
+      <div class="vil-meta">
+        <span class="meta-tag">ND 6</span>
+        <span class="meta-tag">2 Formas</span>
+        <span class="meta-tag">PV 110</span>
+      </div>
+      <div class="vil-resumo">Bruto com um braço demoníaco flamejante que, ao cair, explode em fúria de fogo. Obcecado por Ireena.</div>
+      <div class="vil-cta">Abrir Ficha</div>
+    </a>
+
+    <!-- Coven Bonegrinder -->
+    <a href="bonegrinder.html" class="villain-card strahd" data-cat="vilao" aria-label="Abrir ficha do Coven Bonegrinder">
+      <span class="corner tl" aria-hidden="true">✠</span>
+      <span class="corner tr" aria-hidden="true">✠</span>
+      <span class="corner bl" aria-hidden="true">✠</span>
+      <span class="corner br" aria-hidden="true">✠</span>
+      <div class="vil-icon" aria-hidden="true"><iconify-icon icon="game-icons:witch-face"></iconify-icon></div>
+      <div class="vil-nome">Coven Bonegrinder</div>
+      <div class="vil-titulo">Moinho Bonegrinder · Morgantha, Bella & Offalia</div>
+      <div class="vil-meta">
+        <span class="meta-tag">ND 14–15</span>
+        <span class="meta-tag">2 Formas</span>
+        <span class="meta-tag">PV 210</span>
+      </div>
+      <div class="vil-resumo">Coven de três bruxas noturnas que agem em iniciativas separadas e viram Os Três Pesadelos (crocodilo, elefante e sombra) ao cair.</div>
+      <div class="vil-cta">Abrir Ficha</div>
+    </a>
+
+    <!-- Placeholder para novos personagens -->
     <div class="add-card">
       <div class="add-icon" aria-hidden="true">＋</div>
-      <p>Novos vilões serão adicionados aqui conforme as campanhas avançarem.</p>
+      <p>Novos personagens serão adicionados aqui conforme as campanhas avançarem.</p>
     </div>
 
   </div>
@@ -350,6 +522,18 @@
     }
     document.getElementById('main-content').style.display = 'block';
   })();
+
+  function filtrar(btn) {
+    const cat = btn.dataset.filtro;
+    document.querySelectorAll('.filtro-btn').forEach(b => b.classList.toggle('active', b === btn));
+    document.querySelectorAll('.villain-card').forEach(card => {
+      const mostra = (cat === 'todos') || (card.dataset.cat === cat);
+      card.classList.toggle('oculto', !mostra);
+    });
+    // o placeholder só aparece em "todos"
+    const add = document.querySelector('.add-card');
+    if (add) add.classList.toggle('oculto', cat !== 'todos');
+  }
 </script>
 
 <script src="../../assets/js/ambiente.js"></script>

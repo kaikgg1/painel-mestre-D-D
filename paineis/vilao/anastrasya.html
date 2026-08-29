@@ -618,6 +618,7 @@
     .ability-body { display: block !important; }
   }
 </style>
+<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
 <link rel="stylesheet" href="../../assets/css/ui.css">
 </head>
 <body data-ambiente="brasas">
@@ -649,7 +650,7 @@
   </div>
 
   <header>
-    <div class="crest">🦇</div>
+    <div class="crest"><iconify-icon icon="game-icons:bat" style="color:var(--accent-bright)"></iconify-icon></div>
     <div class="eyebrow">Noiva de Strahd · Socialite Vampírica</div>
     <h1>Anastrasya Karelova</h1>
     <div class="subtitle">Médio morto-vivo · Neutro · <strong>ND 7</strong> (2.900 XP) — Bônus de Proficiência <strong>+3</strong></div>
@@ -660,16 +661,16 @@
     <div class="panel">
       <div class="panel-title">◆ Pontos de Vida (por forma — recomeça na Mudança de Pele)</div>
       <div class="hp-row">
-        <input type="number" id="hpCurrent" class="hp-input" value="82" min="0">
+        <input type="number" id="hpCurrent" class="hp-input" value="121" min="0">
         <span style="color:var(--gold-dim)">/</span>
-        <input type="number" id="hpMax" class="hp-input" value="82" min="1">
+        <input type="number" id="hpMax" class="hp-input" value="121" min="1">
         <div class="hp-bar-container">
           <div class="hp-bar" id="hpBar" style="width:100%"></div>
           <div class="hp-label" id="hpLabel">100%</div>
         </div>
       </div>
       <div style="margin-top:4px;font-size:0.82rem;color:var(--text-muted);font-style:italic">
-        Média <strong style="color:var(--gold);font-style:normal">82</strong> · <strong style="color:var(--bone);font-style:normal">11d8 + 33</strong>
+        Máx <strong style="color:var(--gold);font-style:normal">121</strong> · Média 82 · <strong style="color:var(--bone);font-style:normal">11d8 + 33</strong>
       </div>
       <div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap">
         <button class="btn" onclick="adjustHP(-10)">−10</button>
@@ -677,6 +678,7 @@
         <button class="btn" onclick="adjustHP(-1)">−1</button>
         <button class="btn" onclick="adjustHP(1)">+1</button>
         <button class="btn" onclick="adjustHP(10)">+10 Regen</button>
+        <button class="btn" onclick="setMedia()">Usar média (82)</button>
         <button class="btn" onclick="resetHP()">Reset</button>
       </div>
     </div>
@@ -755,13 +757,13 @@
   <!-- PHASE TABS -->
   <div class="phase-tabs">
     <div class="phase-tab active" data-phase="1" onclick="switchPhase(1)">
-      <span class="phase-icon">🥂</span>
+      <iconify-icon class="phase-icon" icon="game-icons:wine-glass" style="color:var(--accent-bright)"></iconify-icon>
       <div class="phase-num">~ Primeira Forma ~</div>
       <div class="phase-name">A Socialite</div>
       <div class="phase-tagline">Predadora encantadora</div>
     </div>
     <div class="phase-tab" data-phase="2" onclick="switchPhase(2)">
-      <span class="phase-icon">🦇</span>
+      <iconify-icon class="phase-icon" icon="game-icons:fluffy-wing" style="color:var(--accent-bright)"></iconify-icon>
       <div class="phase-num">~ Segunda Forma ~</div>
       <div class="phase-name">A Abominação</div>
       <div class="phase-tagline">Morcego grotesco e inchado</div>
@@ -1142,6 +1144,7 @@ function adjustHP(delta) {
   }
   saveState(true);
 }
+function setMedia() { hpMax.value = 82; hpCurrent.value = 82; updateHPBar(); saveState(true); showToast('✓ PV na média (82)'); }
 function resetHP() {
   hpCurrent.value = hpMax.value;
   updateHPBar();
@@ -1209,8 +1212,8 @@ function getState() {
 
 function applyState(s) {
   if (!s) return;
-  hpCurrent.value = s.hpCurrent ?? 82;
-  hpMax.value = s.hpMax ?? 82;
+  hpCurrent.value = s.hpCurrent ?? 121;
+  hpMax.value = s.hpMax ?? 121;
   updateHPBar();
   if (s.ca) {
     s.ca.forEach(c => {
@@ -1285,8 +1288,8 @@ async function loadState() {
 function resetAll() {
   if (!confirm('Resetar tudo? (HP, CA, reações, condições, usos, notas)')) return;
   localStorage.removeItem(STORAGE_KEY);
-  hpCurrent.value = 82;
-  hpMax.value = 82;
+  hpCurrent.value = 121;
+  hpMax.value = 121;
   document.querySelectorAll('.ca-input').forEach(i => i.value = 15);
   updateHPBar();
   document.querySelectorAll('.react-dot').forEach(d => d.classList.remove('used'));

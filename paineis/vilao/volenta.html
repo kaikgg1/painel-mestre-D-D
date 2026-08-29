@@ -566,6 +566,7 @@
     .ability-body { display: block !important; }
   }
 </style>
+<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
 <link rel="stylesheet" href="../../assets/css/ui.css">
 </head>
 <body data-ambiente="brasas">
@@ -597,7 +598,7 @@
   </div>
 
   <header>
-    <div class="crest">🩸</div>
+    <div class="crest"><iconify-icon icon="game-icons:round-bottom-flask" style="color:var(--accent-bright)"></iconify-icon></div>
     <div class="eyebrow">Noiva de Strahd · A Sádica Alquimista</div>
     <h1>Volenta Popofsky</h1>
     <div class="subtitle">Médio morto-vivo · Caótico e Mau · <strong>ND <span id="ndHeader">5</span></strong> · Bônus de Proficiência <strong>+3</strong></div>
@@ -608,16 +609,16 @@
     <div class="panel">
       <div class="panel-title">◆ Pontos de Vida (recomeça a cada mudança de forma)</div>
       <div class="hp-row">
-        <input type="number" id="hpCurrent" class="hp-input" value="82" min="0">
+        <input type="number" id="hpCurrent" class="hp-input" value="121" min="0">
         <span style="color:var(--gold-dim)">/</span>
-        <input type="number" id="hpMax" class="hp-input" value="82" min="1">
+        <input type="number" id="hpMax" class="hp-input" value="121" min="1">
         <div class="hp-bar-container">
           <div class="hp-bar" id="hpBar" style="width:100%"></div>
           <div class="hp-label" id="hpLabel">100%</div>
         </div>
       </div>
       <div style="margin-top:4px;font-size:0.82rem;color:var(--text-muted);font-style:italic">
-        Média <strong style="color:var(--gold);font-style:normal">82</strong> · <strong style="color:var(--bone);font-style:normal">11d8 + 33</strong>
+        Máx <strong style="color:var(--gold);font-style:normal">121</strong> · Média 82 · <strong style="color:var(--bone);font-style:normal">11d8 + 33</strong>
       </div>
       <div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap">
         <button class="btn" onclick="adjustHP(-10)">−10</button>
@@ -625,6 +626,7 @@
         <button class="btn" onclick="adjustHP(-1)">−1</button>
         <button class="btn" onclick="adjustHP(1)">+1</button>
         <button class="btn" onclick="adjustHP(10)">+10 Regen</button>
+        <button class="btn" onclick="setMedia()">Usar média (82)</button>
         <button class="btn" onclick="resetHP()">Reset</button>
       </div>
     </div>
@@ -730,25 +732,25 @@
   <!-- FORM TABS -->
   <div class="phase-tabs">
     <div class="phase-tab active" data-phase="1" onclick="switchPhase(1)">
-      <span class="phase-icon">🎪</span>
+      <iconify-icon class="phase-icon" icon="game-icons:thrown-daggers" style="color:var(--accent-bright)"></iconify-icon>
       <div class="phase-num">~ 1º Encontro ~</div>
       <div class="phase-name">Primeira Forma</div>
       <div class="phase-tagline">Alquimista · ND 5</div>
     </div>
     <div class="phase-tab" data-phase="2" onclick="switchPhase(2)">
-      <span class="phase-icon">🩸</span>
+      <iconify-icon class="phase-icon" icon="game-icons:fangs" style="color:var(--accent-bright)"></iconify-icon>
       <div class="phase-num">~ 1º Encontro ~</div>
       <div class="phase-name">Segunda Forma</div>
       <div class="phase-tagline">Sede de sangue · ND 6</div>
     </div>
     <div class="phase-tab" data-phase="3" onclick="switchPhase(3)">
-      <span class="phase-icon">🧪</span>
+      <iconify-icon class="phase-icon" icon="game-icons:potion-ball" style="color:var(--accent-bright)"></iconify-icon>
       <div class="phase-num">~ 2º Encontro ~</div>
       <div class="phase-name">Sábia da Alquimia</div>
       <div class="phase-tagline">Armas geladas · ND 5</div>
     </div>
     <div class="phase-tab" data-phase="4" onclick="switchPhase(4)">
-      <span class="phase-icon">🐺</span>
+      <iconify-icon class="phase-icon" icon="game-icons:claws" style="color:var(--accent-bright)"></iconify-icon>
       <div class="phase-num">~ 2º Encontro ~</div>
       <div class="phase-name">Prole Frenética</div>
       <div class="phase-tagline">Frenesi total · ND 6</div>
@@ -1126,6 +1128,7 @@ function adjustHP(delta) {
   }
   saveState(true);
 }
+function setMedia() { hpMax.value = 82; hpCurrent.value = 82; updateHPBar(); saveState(true); showToast('✓ PV na média (82)'); }
 function resetHP() {
   hpCurrent.value = hpMax.value;
   updateHPBar();
@@ -1190,8 +1193,8 @@ function getState() {
 
 function applyState(s) {
   if (!s) return;
-  hpCurrent.value = s.hpCurrent ?? 82;
-  hpMax.value = s.hpMax ?? 82;
+  hpCurrent.value = s.hpCurrent ?? 121;
+  hpMax.value = s.hpMax ?? 121;
   updateHPBar();
   const caInp = document.querySelector('.ca-input');
   if (caInp && s.ca != null) caInp.value = s.ca;
@@ -1264,8 +1267,8 @@ async function loadState() {
 function resetAll() {
   if (!confirm('Resetar tudo? (HP, forma, reações, condições, usos, notas)')) return;
   localStorage.removeItem(STORAGE_KEY);
-  hpCurrent.value = 82;
-  hpMax.value = 82;
+  hpCurrent.value = 121;
+  hpMax.value = 121;
   const caInp = document.querySelector('.ca-input');
   if (caInp) caInp.value = 15;
   updateHPBar();

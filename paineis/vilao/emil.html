@@ -576,6 +576,7 @@
     .ability.fera-only { opacity: 1 !important; }
   }
 </style>
+<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
 <link rel="stylesheet" href="../../assets/css/ui.css">
 </head>
 <body data-ambiente="brasas">
@@ -607,7 +608,7 @@
   </div>
 
   <header>
-    <div class="crest">🐺</div>
+    <div class="crest"><iconify-icon icon="game-icons:werewolf" style="color:var(--accent-bright)"></iconify-icon></div>
     <div class="eyebrow">Lobisomem de Barovia · Protetor</div>
     <h1>Emil Toranescu</h1>
     <div class="subtitle">Humano Médio (metamorfoseador) · Neutro e Bom · <strong>ND 3</strong> (700 XP) — 2 sem Regeneração · Bônus de Proficiência <strong>+2</strong></div>
@@ -618,16 +619,16 @@
     <div class="panel">
       <div class="panel-title">◆ Pontos de Vida</div>
       <div class="hp-row">
-        <input type="number" id="hpCurrent" class="hp-input" value="97" min="0">
+        <input type="number" id="hpCurrent" class="hp-input" value="150" min="0">
         <span style="color:var(--gold-dim)">/</span>
-        <input type="number" id="hpMax" class="hp-input" value="97" min="1">
+        <input type="number" id="hpMax" class="hp-input" value="150" min="1">
         <div class="hp-bar-container">
           <div class="hp-bar" id="hpBar" style="width:100%"></div>
           <div class="hp-label" id="hpLabel">100%</div>
         </div>
       </div>
       <div style="margin-top:4px;font-size:0.82rem;color:var(--text-muted);font-style:italic">
-        Média <strong style="color:var(--gold);font-style:normal">97</strong> · <strong style="color:var(--bone);font-style:normal">15d8 + 30</strong>
+        Máx <strong style="color:var(--gold);font-style:normal">150</strong> · Média 97 · <strong style="color:var(--bone);font-style:normal">15d8 + 30</strong>
       </div>
       <div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap">
         <button class="btn" onclick="adjustHP(-10)">−10</button>
@@ -635,6 +636,7 @@
         <button class="btn" onclick="adjustHP(-1)">−1</button>
         <button class="btn" onclick="adjustHP(1)">+1</button>
         <button class="btn" onclick="adjustHP(10)">+10 Regen</button>
+        <button class="btn" onclick="setMedia()">Usar média (97)</button>
         <button class="btn" onclick="resetHP()">Reset</button>
       </div>
     </div>
@@ -690,19 +692,19 @@
   <!-- FORM TABS -->
   <div class="phase-tabs">
     <div class="phase-tab active" data-phase="1" onclick="switchPhase(1)">
-      <span class="phase-icon">🧍</span>
+      <iconify-icon class="phase-icon" icon="game-icons:hooded-figure" style="color:var(--accent-bright)"></iconify-icon>
       <div class="phase-num">~ Forma Verdadeira ~</div>
       <div class="phase-name">Humanoide</div>
       <div class="phase-tagline">CA 11 · fala · sem garras</div>
     </div>
     <div class="phase-tab" data-phase="2" onclick="switchPhase(2)">
-      <span class="phase-icon">🐺</span>
+      <iconify-icon class="phase-icon" icon="game-icons:wolf-head" style="color:var(--accent-bright)"></iconify-icon>
       <div class="phase-num">~ Forma Bestial ~</div>
       <div class="phase-name">Lobo</div>
       <div class="phase-tagline">CA 12 · 12 m · não fala</div>
     </div>
     <div class="phase-tab" data-phase="3" onclick="switchPhase(3)">
-      <span class="phase-icon">🐾</span>
+      <iconify-icon class="phase-icon" icon="game-icons:werewolf" style="color:var(--accent-bright)"></iconify-icon>
       <div class="phase-num">~ Forma Híbrida ~</div>
       <div class="phase-name">Híbrida</div>
       <div class="phase-tagline">CA 12 · fala · garras</div>
@@ -1022,6 +1024,7 @@ function resetHP() {
   updateHPBar();
   saveState(true);
 }
+function setMedia() { hpMax.value = 97; hpCurrent.value = 97; updateHPBar(); saveState(true); showToast('✓ PV na média (97)'); }
 hpCurrent.addEventListener('input', () => { updateHPBar(); saveState(true); });
 hpMax.addEventListener('input', () => { updateHPBar(); saveState(true); });
 
@@ -1076,8 +1079,8 @@ function getState() {
 
 function applyState(s) {
   if (!s) return;
-  hpCurrent.value = s.hpCurrent ?? 97;
-  hpMax.value = s.hpMax ?? 97;
+  hpCurrent.value = s.hpCurrent ?? 150;
+  hpMax.value = s.hpMax ?? 150;
   updateHPBar();
   switchPhaseSilent(parseInt(s.activePhase) || 1);
   (s.reactions || []).forEach((u, i) => {
@@ -1145,8 +1148,8 @@ async function loadState() {
 function resetAll() {
   if (!confirm('Resetar tudo? (HP, forma, reações, condições, usos, notas)')) return;
   localStorage.removeItem(STORAGE_KEY);
-  hpCurrent.value = 97;
-  hpMax.value = 97;
+  hpCurrent.value = 150;
+  hpMax.value = 150;
   updateHPBar();
   document.querySelectorAll('.react-dot').forEach(d => d.classList.remove('used'));
   document.querySelectorAll('.condition-row .chip').forEach(c => c.classList.remove('active'));
