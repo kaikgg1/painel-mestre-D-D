@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a0608">
+<link rel="icon" type="image/svg+xml" href="../../assets/img/favicon.svg">
+<title>Sir Godfrey Gwilym — Ficha de NPC</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+<style>
+  :root {
+    --bg-deep:#0a0608; --bg-card:#191115; --bg-card-2:#221820; --bg-card-3:#2c2029;
+    --blood:#9b1f1f; --blood-dark:#5a0e0e; --blood-bright:#d13731;
+    --gold:#cbac67; --gold-bright:#f0d089; --gold-dim:#8a7340;
+    --bone:#efe6cf; --bone-dim:#c2b795; --shadow:#050203;
+    --text-body:#ddd2b2; --text-muted:#948767;
+    --border:#4a3a2a; --border-soft:rgba(203,172,103,0.16); --radius:10px;
+    --accent:#7c8a9c; --accent-bright:#b5c2d4; --accent-glow:rgba(124,138,156,0.38); --accent-soft:rgba(124,138,156,0.12);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg-deep); color: var(--text-body); font-family: 'Cormorant Garamond', serif; font-size: 16px; line-height: 1.48; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+  body { background: radial-gradient(ellipse at 50% -10%, var(--accent-soft), transparent 55%), radial-gradient(ellipse at 18% 4%, rgba(155,31,31,0.14), transparent 48%), radial-gradient(ellipse at 84% 96%, rgba(203,172,103,0.06), transparent 50%), var(--bg-deep); background-attachment: fixed; }
+  body::before { content: ''; position: fixed; inset: 0; pointer-events: none; opacity: 0.3; z-index: 1; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.05 0 0 0 0 0.05 0 0 0 0.3 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>"); mix-blend-mode: overlay; }
+  .container { max-width: 900px; margin: 0 auto; padding: 20px 24px 60px; position: relative; z-index: 2; }
+  .top-bar { position: sticky; top: 0; z-index: 50; background: rgba(10,6,8,0.96); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); margin: -20px -24px 16px; padding: 12px 24px; }
+  .top-bar-inner { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; max-width: 900px; margin: 0 auto; }
+  .brand { font-family: 'Cinzel', serif; font-weight: 700; font-size: 1rem; letter-spacing: 0.18em; color: var(--bone); text-transform: uppercase; }
+  .brand-sub { font-family: 'IM Fell English', serif; font-style: italic; font-size: 11px; color: var(--gold-dim); letter-spacing: 0.15em; }
+  .save-controls { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+  header { text-align: center; padding: 26px 16px 26px; margin-bottom: 18px; position: relative; border-radius: var(--radius); background: radial-gradient(ellipse at 50% 0%, var(--accent-soft), transparent 70%), linear-gradient(180deg, rgba(20,10,14,0.85), rgba(10,6,8,0.4)); border: 1px solid var(--border); box-shadow: inset 0 1px 0 rgba(240,208,137,0.06), 0 10px 40px rgba(0,0,0,0.5); overflow: hidden; }
+  header::before { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, transparent, var(--accent), transparent); height: 2px; top: 0; opacity: 0.55; }
+  header::after { content: '✦'; position: absolute; bottom: -11px; left: 50%; transform: translateX(-50%); background: var(--bg-deep); padding: 0 14px; color: var(--accent); font-size: 18px; text-shadow: 0 0 12px var(--accent-glow); }
+  .crest { font-size: clamp(2.4rem, 6vw, 3.4rem); line-height: 1; margin-bottom: 6px; color: var(--accent-bright); filter: drop-shadow(0 0 14px var(--accent-glow)); display: inline-block; }
+  .eyebrow { font-family: 'Cinzel', serif; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.42em; color: var(--accent-bright); text-transform: uppercase; margin-bottom: 8px; opacity: 0.85; }
+  h1 { font-family: 'Cinzel', serif; font-weight: 900; font-size: clamp(1.9rem, 4.6vw, 2.8rem); letter-spacing: 0.07em; line-height: 1.02; background: linear-gradient(180deg, var(--bone) 30%, var(--accent-bright)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 34px var(--accent-glow); filter: drop-shadow(0 2px 2px rgba(0,0,0,0.6)); }
+  .subtitle { font-style: italic; font-size: 1rem; color: var(--gold); margin-top: 10px; letter-spacing: 0.03em; line-height: 1.5; max-width: 700px; margin-left: auto; margin-right: auto; }
+  .subtitle strong { color: var(--bone); font-style: normal; }
+  .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 6px; margin-bottom: 14px; }
+  .info-card { background: linear-gradient(180deg, var(--bg-card), rgba(10,6,8,0.5)); border: 1px solid var(--border); border-left: 3px solid var(--accent); padding: 8px 12px; border-radius: 6px; }
+  .info-card .label { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.15em; color: var(--gold); text-transform: uppercase; }
+  .info-card .value { font-family: 'IM Fell English', serif; font-size: 1.02rem; color: var(--bone); margin-top: 1px; }
+  .section { margin-bottom: 18px; }
+  .section-title { font-family: 'Cinzel', serif; font-weight: 700; font-size: 1.02rem; color: var(--accent-bright); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 10px; padding-bottom: 7px; border-bottom: 1px solid var(--accent); display: flex; align-items: center; gap: 10px; position: relative; }
+  .section-title::before { content: ''; width: 7px; height: 7px; background: var(--accent); transform: rotate(45deg); box-shadow: 0 0 8px var(--accent-glow); flex-shrink: 0; }
+  .ability-grid { display: grid; grid-template-columns: 1fr; gap: 7px; }
+  .ability { background: linear-gradient(180deg, var(--bg-card), rgba(10,6,8,0.35)); border: 1px solid var(--border); border-left: 4px solid var(--accent); border-radius: 8px; overflow: hidden; transition: box-shadow 0.2s; }
+  .ability:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.35); }
+  .ability.combat { border-left-color: var(--blood-bright); }
+  .ability-header { padding: 10px 14px; cursor: pointer; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; user-select: none; }
+  .ability-header:hover { background: rgba(255,255,255,0.03); }
+  .ability-header::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; box-shadow: 0 0 8px currentColor; color: var(--accent); }
+  .ability.combat .ability-header::before { background: var(--blood-bright); color: var(--blood-bright); }
+  .ability-name { font-family: 'Cinzel', serif; font-weight: 600; font-size: 1rem; color: var(--bone); letter-spacing: 0.04em; }
+  .toggle-icon { margin-left: auto; color: var(--gold-dim); font-size: 0.72rem; transition: transform 0.2s; }
+  .ability.open .toggle-icon { transform: rotate(180deg); color: var(--gold); }
+  .ability-body { padding: 2px 16px 12px 34px; font-size: 0.98rem; color: var(--text-body); line-height: 1.58; display: none; }
+  .ability.open .ability-body { display: block; }
+  .ability-body strong { color: var(--bone); font-weight: 600; }
+  .ability-body em { color: var(--gold-bright); font-style: normal; font-weight: 500; }
+  .insp-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .insp-tag { font-family: 'Cinzel', serif; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; color: var(--accent-bright); background: var(--accent-soft); border: 1px solid var(--border-soft); padding: 4px 10px; border-radius: 12px; }
+  .notes-section { margin-top: 18px; background: var(--bg-card); border: 1px solid var(--border); padding: 10px 14px; border-radius: 2px; }
+  .notes-section h3 { font-family: 'Cinzel', serif; font-size: 0.78rem; color: var(--gold); letter-spacing: 0.2em; margin-bottom: 6px; text-transform: uppercase; }
+  .notes-area { width: 100%; min-height: 70px; background: var(--shadow); border: 1px solid var(--border); color: var(--text-body); font-family: 'Cormorant Garamond', serif; font-size: 0.92rem; padding: 8px 10px; border-radius: 2px; resize: vertical; outline: none; line-height: 1.45; }
+  .notes-area:focus { border-color: var(--gold); }
+  .btn { background: transparent; border: 1px solid var(--gold-dim); color: var(--gold); padding: 4px 10px; font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.1em; cursor: pointer; transition: all 0.15s; border-radius: 2px; text-transform: uppercase; }
+  .btn:hover { background: var(--blood-dark); color: var(--bone); border-color: var(--blood); }
+  footer { margin-top: 24px; padding-top: 12px; border-top: 1px solid var(--border); text-align: center; color: var(--text-muted); font-family: 'IM Fell English', serif; font-style: italic; font-size: 0.85rem; }
+  .footer-credit { display: block; margin-top: 6px; font-size: 0.78rem; }
+  .footer-credit a { color: var(--gold-dim); }
+  .toast { position: fixed; top: 16px; right: 16px; background: var(--bg-card-3); border: 1px solid var(--gold); color: var(--bone); padding: 10px 16px; font-family: 'Cinzel', serif; font-size: 0.85rem; letter-spacing: 0.1em; border-radius: 2px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); z-index: 200; opacity: 0; transform: translateY(-10px); transition: all 0.3s; pointer-events: none; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  @media (max-width: 720px) { .container { padding: 12px 12px 50px; } .top-bar { margin: -12px -12px 12px; padding: 10px 12px; } }
+</style>
+<link rel="stylesheet" href="../../assets/css/ui.css">
+</head>
+<body data-ambiente="brasas">
+
+<div class="toast" id="toast"></div>
+
+<div class="container">
+
+  <div class="top-bar">
+    <div class="top-bar-inner">
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <a href="index.html" class="btn" style="text-decoration:none">← Personagens</a>
+        <div>
+          <div class="brand">Sir Godfrey Gwilym</div>
+          <div class="brand-sub">Ficha de NPC · Cavaleiro Renascido · <span id="syncStatus" style="color:var(--gold-dim)">○ local</span></div>
+        </div>
+      </div>
+      <div class="save-controls">
+        <button class="btn gold" onclick="saveState()">💾 Salvar</button>
+        <button class="btn" onclick="loadState()">↺ Carregar</button>
+        <button class="btn" onclick="resetAll()">⟲ Resetar</button>
+      </div>
+    </div>
+  </div>
+
+  <header>
+    <iconify-icon class="crest" icon="game-icons:crested-helmet"></iconify-icon>
+    <div class="eyebrow">Membro da Ordem do Dragão de Prata · Marido de Vladimir</div>
+    <h1>Sir Godfrey Gwilym</h1>
+    <div class="subtitle">Renascido preso ao juramento · <strong>NPC aliado</strong> (sem statblock próprio no guia) · Deseja redimir Vladimir</div>
+  </header>
+
+  <div class="info-grid">
+    <div class="info-card"><div class="label">Tipo</div><div class="value">Morto-vivo (renascido)</div></div>
+    <div class="info-card"><div class="label">Papel</div><div class="value">Ordem do Dragão de Prata</div></div>
+    <div class="info-card"><div class="label">Em Combate</div><div class="value">Sem bloco próprio</div></div>
+    <div class="info-card"><div class="label">Disposição</div><div class="value">Aliado potencial</div></div>
+  </div>
+
+  <!-- DOSSIÊ -->
+  <div class="section">
+    <h2 class="section-title"><iconify-icon icon="game-icons:drama-masks" style="color:var(--accent-bright)"></iconify-icon> Dossiê de Interpretação</h2>
+    <div class="ability-grid">
+      <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Ressonância</div><span class="toggle-icon">▼</span></div><div class="ability-body">Deve provocar <em>pena</em> por seu aprisionamento, e <em>simpatia</em> por seu desejo de redimir Vladimir.</div></div>
+      <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Emoções</div><span class="toggle-icon">▼</span></div><div class="ability-body">Geralmente se sente <strong>tristeza e remorso</strong> pelo que aconteceu a Vladimir, <em>esperança</em> de que alguém venha restaurar o poder de Argynvost, e <em>desconfiança</em> em relação a quem busca o Templo do Âmbar.</div></div>
+      <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Motivações</div><span class="toggle-icon">▼</span></div><div class="ability-body">Quer <em>encontrar heróis</em> que busquem os sussurros do espírito de Argynvost.</div></div>
+      <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Persona</div><span class="toggle-icon">▼</span></div><div class="ability-body">Para o mundo, é um <strong>renascido atormentado</strong>, preso pelo juramento a Vladimir. Para quem confia, é um <em>marido fiel</em> que acredita que o amor pode conquistar a vingança.</div></div>
+      <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Moral</div><span class="toggle-icon">▼</span></div><div class="ability-body">Numa luta, <em>pega em armas com prazer</em> contra quem vê como maligno, ou que se aproveita dos fracos.</div></div>
+      <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Relacionamentos</div><span class="toggle-icon">▼</span></div><div class="ability-body">Membro da <strong>Ordem do Dragão de Prata</strong> (a quem jurou lealdade), e <em>marido de Vladimir Horngaard</em> (relação que Vladimir esqueceu).</div></div>
+      <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Inspirações</div><span class="toggle-icon">▼</span></div><div class="ability-body">Referências para interpretar Sir Godfrey:
+        <div class="insp-row"><span class="insp-tag">Théoden · O Senhor dos Anéis</span><span class="insp-tag">Aragorn · O Senhor dos Anéis</span><span class="insp-tag">Ned Stark · GoT</span></div>
+      </div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title" style="color:var(--blood-bright);border-bottom-color:var(--blood-dark)"><iconify-icon icon="game-icons:shield-echoes" style="color:var(--blood-bright)"></iconify-icon> Em Combate</h2>
+    <div class="ability-grid">
+      <div class="ability combat"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Sem statblock próprio</div><span class="toggle-icon">▼</span></div><div class="ability-body">Sir Godfrey <strong>não tem statblock</strong> no guia — aparece apenas como fonte de lore e diálogo. Para uma rara necessidade mecânica, use o bloco de <em>Renascido</em> (Revenant, Monster Manual) como aproximação, ou reaproveite a <strong>Primeira Forma de Vladimir Horngaard</strong> ajustando o alinhamento e removendo o Vínculo de Juramento.</div></div>
+    </div>
+  </div>
+
+  <div class="notes-section">
+    <h3>◆ Notas do Mestre</h3>
+    <textarea class="notes-area" id="notesArea" placeholder="Anote aqui: pistas sobre Argynvost que Godfrey revela, estado do juramento, tentativas de redimir Vladimir, localização atual..."></textarea>
+  </div>
+
+  <footer>
+    Sir Godfrey Gwilym — sincronizado em tempo real entre os dispositivos do Mestre.
+    <span class="footer-credit">Interpretação adaptada de <a href="https://www.strahdreloaded.com/" target="_blank" rel="noopener">Curse of Strahd: Reloaded</a>, de DragnaCarta (conteúdo de fã da WotC).</span>
+  </footer>
+
+</div>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="../../assets/js/supabase.js"></script>
+<script src="../../assets/js/auth.js"></script>
+<script src="../../assets/js/master_state.js"></script>
+<script>
+const STORAGE_KEY = 'godfrey_ficha_v1';
+const MS_CHAVE = 'vilao:godfrey';
+let _msAplicando = false;
+function _setSyncStatus(txt, cor) { const el = document.getElementById('syncStatus'); if (el) { el.textContent = txt; el.style.color = cor || 'var(--gold-dim)'; } }
+function toggleAbility(header) { header.parentElement.classList.toggle('open'); }
+function getState() {
+  return {
+    notes: document.getElementById('notesArea').value,
+    openAbilities: Array.from(document.querySelectorAll('.ability.open')).map(a => a.querySelector('.ability-name').textContent)
+  };
+}
+function applyState(s) {
+  if (!s) return;
+  document.getElementById('notesArea').value = s.notes || '';
+  if (s.openAbilities) s.openAbilities.forEach(name => document.querySelectorAll('.ability').forEach(a => { if (a.querySelector('.ability-name').textContent === name) a.classList.add('open'); }));
+}
+function saveState(silent = false) {
+  if (_msAplicando) return;
+  try {
+    const dados = getState();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+    if (window.MasterState) { _setSyncStatus('⟳ sincronizando…', 'var(--gold-dim)'); window.MasterState.salvarDebounced(MS_CHAVE, dados, silent ? 600 : 0); setTimeout(() => _setSyncStatus('● sincronizado', 'var(--gold)'), silent ? 800 : 200); }
+    if (!silent) showToast('✓ Salvo');
+  } catch(e) { if (!silent) showToast('Erro ao salvar'); }
+}
+async function loadState() {
+  try {
+    let dados = null;
+    if (window.MasterState) dados = await window.MasterState.carregar(MS_CHAVE);
+    if (!dados) { const local = localStorage.getItem(STORAGE_KEY); if (local) dados = JSON.parse(local); }
+    if (!dados) { showToast('Nada salvo'); return; }
+    _msAplicando = true; applyState(dados); _msAplicando = false;
+    _setSyncStatus(window.MasterState ? '● sincronizado' : '○ local', window.MasterState ? 'var(--gold)' : 'var(--gold-dim)');
+    showToast('✓ Carregado');
+  } catch(e) { _msAplicando = false; showToast('Erro ao carregar'); }
+}
+function resetAll() {
+  if (!confirm('Limpar notas de Sir Godfrey?')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  document.getElementById('notesArea').value = '';
+  document.querySelectorAll('.ability.open').forEach(a => a.classList.remove('open'));
+  showToast('✓ Resetado');
+}
+let toastTimer;
+function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 1800); }
+document.getElementById('notesArea').addEventListener('input', () => { clearTimeout(window._notesTimer); window._notesTimer = setTimeout(() => saveState(true), 600); });
+document.addEventListener('keydown', (e) => { if (e.ctrlKey && e.key === 's') { e.preventDefault(); saveState(); } });
+(async function bootstrap() {
+  if (window.Auth) {
+    const u = await window.Auth.requerLogin('../login.html'); if (!u) return;
+    const ehMestre = await window.Auth.ehMestre();
+    if (!ehMestre) { document.body.innerHTML = '<div style="padding:60px;text-align:center;color:var(--bone);font-family:Cinzel,serif"><h2>Acesso restrito ao Mestre.</h2><p style="margin-top:14px"><a href="../../index.html" style="color:var(--gold)">Voltar</a></p></div>'; return; }
+  }
+  await loadState();
+  if (window.MasterState) window.MasterState.iniciarRealtime(MS_CHAVE, dados => { if (!dados) return; _msAplicando = true; applyState(dados); _msAplicando = false; _setSyncStatus('● sincronizado', 'var(--gold)'); });
+})();
+</script>
+
+<script src="../../assets/js/ambiente.js"></script>
+<script src="../../assets/js/polish.js"></script>
+</body>
+</html>
