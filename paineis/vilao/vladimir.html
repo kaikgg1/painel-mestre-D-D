@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0a0608">
 <link rel="icon" type="image/svg+xml" href="../../assets/img/favicon.svg">
-<title>Coven Bonegrinder — Ficha de Combate</title>
+<title>Vladimir Horngaard — Ficha de Combate</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
@@ -20,8 +20,8 @@
     --border:#4a3a2a; --border-soft:rgba(203,172,103,0.16); --radius:10px;
     --accent:#cbac67; --accent-bright:#f0d089; --accent-glow:rgba(203,172,103,0.35); --accent-soft:rgba(203,172,103,0.10);
   }
-  body[data-fase="1"] { --accent:#6f8a4e; --accent-bright:#a6c47f; --accent-glow:rgba(111,138,78,0.40); --accent-soft:rgba(111,138,78,0.12); }
-  body[data-fase="2"] { --accent:#8a3a6a; --accent-bright:#c26fa0; --accent-glow:rgba(138,58,106,0.44); --accent-soft:rgba(138,58,106,0.14); }
+  body[data-fase="1"] { --accent:#8a8f9c; --accent-bright:#c3c8d4; --accent-glow:rgba(138,143,156,0.38); --accent-soft:rgba(138,143,156,0.12); }
+  body[data-fase="2"] { --accent:#3f3a5a; --accent-bright:#8f7fc4; --accent-glow:rgba(63,58,90,0.48); --accent-soft:rgba(63,58,90,0.16); }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { background: var(--bg-deep); color: var(--text-body); font-family: 'Cormorant Garamond', serif; font-size: 16px; line-height: 1.48; min-height: 100vh; -webkit-font-smoothing: antialiased; }
   body { background: radial-gradient(ellipse at 50% -10%, var(--accent-soft), transparent 55%), radial-gradient(ellipse at 18% 4%, rgba(155,31,31,0.16), transparent 48%), radial-gradient(ellipse at 84% 96%, rgba(203,172,103,0.06), transparent 50%), var(--bg-deep); background-attachment: fixed; transition: background 0.6s ease; }
@@ -37,7 +37,7 @@
   header::after { content: '✦'; position: absolute; bottom: -11px; left: 50%; transform: translateX(-50%); background: var(--bg-deep); padding: 0 14px; color: var(--accent); font-size: 18px; text-shadow: 0 0 12px var(--accent-glow); }
   .crest { font-size: clamp(2.4rem, 6vw, 3.4rem); line-height: 1; margin-bottom: 6px; color: var(--accent-bright); filter: drop-shadow(0 0 14px var(--accent-glow)); display: inline-block; }
   .eyebrow { font-family: 'Cinzel', serif; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.42em; color: var(--accent-bright); text-transform: uppercase; margin-bottom: 8px; opacity: 0.85; }
-  h1 { font-family: 'Cinzel', serif; font-weight: 900; font-size: clamp(1.9rem, 5vw, 3rem); letter-spacing: 0.07em; line-height: 1.02; background: linear-gradient(180deg, var(--bone) 30%, var(--accent-bright)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 34px var(--accent-glow); filter: drop-shadow(0 2px 2px rgba(0,0,0,0.6)); }
+  h1 { font-family: 'Cinzel', serif; font-weight: 900; font-size: clamp(1.8rem, 4.6vw, 2.9rem); letter-spacing: 0.06em; line-height: 1.02; background: linear-gradient(180deg, var(--bone) 30%, var(--accent-bright)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 34px var(--accent-glow); filter: drop-shadow(0 2px 2px rgba(0,0,0,0.6)); }
   .subtitle { font-style: italic; font-size: 1rem; color: var(--gold); margin-top: 10px; letter-spacing: 0.03em; line-height: 1.5; max-width: 800px; margin-left: auto; margin-right: auto; }
   .subtitle strong { color: var(--bone); font-style: normal; }
   .combat-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
@@ -101,6 +101,9 @@
   .section-title { font-family: 'Cinzel', serif; font-weight: 700; font-size: 1.02rem; color: var(--blood-bright); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 10px; padding-bottom: 7px; border-bottom: 1px solid var(--blood-dark); display: flex; align-items: center; gap: 10px; position: relative; }
   .section-title::before { content: ''; width: 7px; height: 7px; background: var(--blood); transform: rotate(45deg); box-shadow: 0 0 8px var(--blood-bright); flex-shrink: 0; }
   .section-title::after { content: ''; position: absolute; left: 0; bottom: -1px; width: 60px; height: 1px; background: linear-gradient(90deg, var(--blood-bright), transparent); }
+  .section-title.lore { color: var(--accent-bright); border-bottom-color: var(--accent); }
+  .section-title.lore::before { background: var(--accent); box-shadow: 0 0 8px var(--accent-glow); }
+  .section-title.lore::after { background: linear-gradient(90deg, var(--accent), transparent); }
   .special-callout { background: radial-gradient(ellipse at 0% 0%, var(--accent-soft), transparent 60%), linear-gradient(180deg, var(--bg-card-2), rgba(10,6,8,0.5)); border: 1px solid var(--accent); border-left: 4px solid var(--accent-bright); border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; }
   .special-callout .sc-title { font-family: 'Cinzel', serif; font-weight: 700; font-size: 1rem; color: var(--accent-bright); letter-spacing: 0.06em; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
   .special-callout .sc-body { font-size: 0.95rem; color: var(--text-body); line-height: 1.55; }
@@ -113,20 +116,16 @@
   .ability.attack { border-left-color: var(--blood-bright); }
   .ability.bonus { border-left-color: #c08a3e; }
   .ability.reaction { border-left-color: #5f8bb8; }
-  .ability.lair { border-left-color: #9061b8; }
+  .ability.lore { border-left-color: var(--accent); }
   .ability-header { padding: 10px 14px; cursor: pointer; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; user-select: none; }
   .ability-header:hover { background: rgba(255,255,255,0.03); }
   .ability-header::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--gold-dim); flex-shrink: 0; box-shadow: 0 0 8px currentColor; }
   .ability.attack .ability-header::before { background: var(--blood-bright); color: var(--blood-bright); }
   .ability.bonus .ability-header::before { background: #c08a3e; color: #c08a3e; }
   .ability.reaction .ability-header::before { background: #5f8bb8; color: #5f8bb8; }
-  .ability.lair .ability-header::before { background: #9061b8; color: #9061b8; }
+  .ability.lore .ability-header::before { background: var(--accent); color: var(--accent); }
   .ability-name { font-family: 'Cinzel', serif; font-weight: 600; font-size: 1rem; color: var(--bone); letter-spacing: 0.04em; }
   .ability-tag { font-family: 'IM Fell English', serif; font-style: italic; font-size: 0.82rem; color: var(--gold); letter-spacing: 0.03em; background: var(--accent-soft); border: 1px solid var(--border-soft); padding: 1px 8px; border-radius: 10px; }
-  .tag-bella { background: rgba(90,140,209,0.16); border-color: rgba(90,140,209,0.4); color: #9cc3ea; }
-  .tag-offalia { background: rgba(180,120,60,0.16); border-color: rgba(180,120,60,0.4); color: #e0b078; }
-  .tag-morgantha { background: rgba(150,90,180,0.16); border-color: rgba(150,90,180,0.4); color: #c99ad6; }
-  .tag-any { background: rgba(203,172,103,0.16); border-color: rgba(203,172,103,0.4); color: var(--gold-bright); }
   .toggle-icon { margin-left: auto; color: var(--gold-dim); font-size: 0.72rem; transition: transform 0.2s; }
   .ability.open .toggle-icon { transform: rotate(180deg); color: var(--gold); }
   .ability-body { padding: 2px 16px 12px 34px; font-size: 0.98rem; color: var(--text-body); line-height: 1.58; display: none; }
@@ -135,6 +134,8 @@
   .ability-body em { color: var(--gold-bright); font-style: normal; font-weight: 500; }
   .dmg { display: inline-block; padding: 1px 8px; background: linear-gradient(180deg, rgba(155,31,31,0.28), rgba(90,14,14,0.28)); border: 1px solid var(--blood); color: #ffd9d0; border-radius: 5px; font-family: 'IM Fell English', serif; font-size: 0.9rem; margin: 0 2px; font-weight: 600; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
   .cd { display: inline-block; padding: 1px 8px; background: rgba(203,172,103,0.16); border: 1px solid var(--gold-dim); color: var(--gold-bright); border-radius: 5px; font-family: 'IM Fell English', serif; font-size: 0.9rem; margin: 0 2px; font-weight: 600; }
+  .insp-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .insp-tag { font-family: 'Cinzel', serif; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; color: var(--accent-bright); background: var(--accent-soft); border: 1px solid var(--border-soft); padding: 4px 10px; border-radius: 12px; }
   .legend { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.12em; color: var(--text-muted); text-transform: uppercase; }
   .legend-item { display: flex; align-items: center; gap: 5px; }
   .legend-swatch { width: 12px; height: 3px; display: inline-block; }
@@ -167,7 +168,7 @@
       <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
         <a href="index.html" class="btn" style="text-decoration:none">← Personagens</a>
         <div>
-          <div class="brand">Coven Bonegrinder</div>
+          <div class="brand">Vladimir Horngaard</div>
           <div class="brand-sub">Ficha de Combate · 2 Formas · <span id="syncStatus" style="color:var(--gold-dim)">○ local</span></div>
         </div>
       </div>
@@ -182,49 +183,49 @@
   </div>
 
   <header>
-    <iconify-icon class="crest" icon="game-icons:witch-flight"></iconify-icon>
-    <div class="eyebrow">Moinho Bonegrinder · Morgantha, Bella & Offalia</div>
-    <h1>Coven Bonegrinder</h1>
-    <div class="subtitle">Trio de diabos Médios · Neutro e Mau · <strong>ND <span id="ndHeader">14</span></strong> (ou 12 com armas prateadas) · Bônus de Proficiência <strong>+5</strong></div>
+    <iconify-icon class="crest" icon="game-icons:iron-mask"></iconify-icon>
+    <div class="eyebrow">Comandante da Ordem do Dragão de Prata · Renascido Vingativo</div>
+    <h1>Vladimir Horngaard</h1>
+    <div class="subtitle">Morto-vivo Médio · Leal e Mau · <strong>ND <span id="ndHeader">15</span></strong> · Bônus de Proficiência <strong>+5</strong></div>
   </header>
 
   <div class="combat-bar">
     <div class="panel">
-      <div class="panel-title">◆ Pontos de Vida (compartilhados pelas 3 bruxas)</div>
+      <div class="panel-title">◆ Pontos de Vida (compartilhados entre formas)</div>
       <div class="hp-row">
-        <input type="number" id="hpCurrent" class="hp-input" value="308" min="0">
+        <input type="number" id="hpCurrent" class="hp-input" value="312" min="0">
         <span style="color:var(--gold-dim)">/</span>
-        <input type="number" id="hpMax" class="hp-input" value="308" min="1">
+        <input type="number" id="hpMax" class="hp-input" value="312" min="1">
         <div class="hp-bar-container"><div class="hp-bar" id="hpBar" style="width:100%"></div><div class="hp-label" id="hpLabel">100%</div></div>
       </div>
-      <div style="margin-top:4px;font-size:0.82rem;color:var(--text-muted);font-style:italic">Máx <strong style="color:var(--gold);font-style:normal">308</strong> · Média 210 · <strong style="color:var(--bone);font-style:normal">28d8 + 84</strong></div>
+      <div style="margin-top:4px;font-size:0.82rem;color:var(--text-muted);font-style:italic">Máx <strong style="color:var(--gold);font-style:normal">312</strong> · Média 228 · <strong style="color:var(--bone);font-style:normal">24d8 + 120</strong></div>
       <div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap">
         <button class="btn" onclick="adjustHP(-20)">−20</button>
         <button class="btn" onclick="adjustHP(-10)">−10</button>
         <button class="btn" onclick="adjustHP(-5)">−5</button>
         <button class="btn" onclick="adjustHP(-1)">−1</button>
-        <button class="btn" onclick="adjustHP(1)">+1</button>
-        <button class="btn" onclick="setMedia()">Usar média (210)</button>
+        <button class="btn" onclick="adjustHP(10)">+10 Regen</button>
+        <button class="btn" onclick="setMedia()">Usar média (228)</button>
         <button class="btn" onclick="resetHP()">Reset</button>
       </div>
     </div>
 
     <div class="panel">
-      <div class="panel-title">◆ Coven de Bruxas</div>
+      <div class="panel-title">◆ Regeneração & Ódio Ardente</div>
       <div style="font-size:0.9rem;color:var(--text-body);line-height:1.45">
-        As <strong style="color:var(--gold)">3 bruxas</strong> agem em <em>iniciativas separadas</em> — cada uma tem sua ação, bônus, reação e movimento próprios, e sofre condições de forma independente. Todo dano sofrido por qualquer uma é subtraído do <em>PV compartilhado</em>.
+        Recupera <strong style="color:var(--gold)">10 PV</strong> no início do turno. <span class="dmg">Fogo</span> ou <span class="dmg">radiante</span> bloqueiam no próximo turno. Só é destruído se começar o turno com 0 PV sem regenerar. A <strong>0 PV</strong>, chamas negras envolvem sua espada: vira o <em>Cavaleiro da Morte</em>.
       </div>
     </div>
 
     <div class="panel">
-      <div class="panel-title">◆ Reações (1 por bruxa por rodada)</div>
+      <div class="panel-title">◆ Reações da Rodada (até 3 · 1 por turno)</div>
       <div class="react-row">
-        <div class="react-dot" title="Bella" onclick="toggleReact(this)"></div>
-        <div class="react-dot" title="Offalia" onclick="toggleReact(this)"></div>
-        <div class="react-dot" title="Morgantha" onclick="toggleReact(this)"></div>
+        <div class="react-dot" onclick="toggleReact(this)"></div>
+        <div class="react-dot" onclick="toggleReact(this)"></div>
+        <div class="react-dot" onclick="toggleReact(this)"></div>
         <button class="btn" onclick="resetReactions()">Nova Rodada</button>
       </div>
-      <div style="margin-top:8px;font-size:0.82rem;color:var(--text-muted);font-style:italic;line-height:1.35">Uma reação por bruxa (Bella · Offalia · Morgantha).</div>
+      <div style="margin-top:8px;font-size:0.82rem;color:var(--text-muted);font-style:italic;line-height:1.35">Se perder reações, perde apenas <em style="color:var(--gold);font-style:normal">1</em> em vez de todas.</div>
     </div>
 
     <div class="panel">
@@ -235,31 +236,48 @@
         <button class="btn gold" onclick="adjustRound(1)">Próxima ▸</button>
         <button class="btn" onclick="resetRound()">⟲ Zerar</button>
       </div>
-      <div style="margin-top:8px;font-size:0.82rem;color:var(--text-muted);font-style:italic;line-height:1.35">Ações de covil na <strong style="color:var(--gold)">iniciativa 20</strong> (no moinho).</div>
+      <div style="margin-top:8px;font-size:0.82rem;color:var(--text-muted);font-style:italic;line-height:1.35">Avançar a rodada <strong style="color:var(--gold);font-weight:600">recupera as reações</strong>.</div>
     </div>
   </div>
 
   <div class="condition-row">
     <span class="cond-label">Condições:</span>
-    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">🥈 Combate com Prata</div>
-    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">◉ Concentrando (Bella)</div>
-    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">◉ Concentrando (Offalia)</div>
-    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">◉ Concentrando (Morgantha)</div>
-    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">⚡ Relâmpago Recarregado</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">✦ Regen Bloqueada</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">🎯 Alvo Marcado (Juramento)</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">🔥 Chamas Negras (alvo)</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">😱 Amedrontado (alvo)</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">◈ Paralisado (alvo)</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">↓ Caído (alvo)</div>
+  </div>
+
+  <!-- DOSSIÊ -->
+  <div class="section">
+    <h2 class="section-title lore"><iconify-icon icon="game-icons:despair" style="color:var(--accent-bright)"></iconify-icon> Dossiê de Interpretação</h2>
+    <div class="ability-grid">
+      <div class="ability lore"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Ressonância</div><span class="toggle-icon">▼</span></div><div class="ability-body">Deve provocar <em>inquietação e desconforto</em> por sua suspeita e paranoia, <em>raiva (contida)</em> por sua apatia com o sofrimento do povo baroviano, e <em>pena</em> por como sua fúria e dor o cegaram.</div></div>
+      <div class="ability lore"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Emoções</div><span class="toggle-icon">▼</span></div><div class="ability-body">Geralmente se sente <strong>desconfiado, enfurecido, irritado, plácido, estoico ou apático</strong>.</div></div>
+      <div class="ability lore"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Motivações</div><span class="toggle-icon">▼</span></div><div class="ability-body">Quer <em>preservar a prisão de Strahd nas Névoas</em> para vingar a profanação do corpo de Argynvost e a destruição da Ordem do Dragão de Prata.</div></div>
+      <div class="ability lore"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Persona</div><span class="toggle-icon">▼</span></div><div class="ability-body">Para o mundo, é uma criatura <strong>cruel, apática e autojustificada</strong>, consumida por vingança e ódio.</div></div>
+      <div class="ability lore"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Moral</div><span class="toggle-icon">▼</span></div><div class="ability-body">Numa luta, <em>pega em armas com prazer</em> contra qualquer um que o insulte, desobedeça ou ameace.</div></div>
+      <div class="ability lore"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Relacionamentos</div><span class="toggle-icon">▼</span></div><div class="ability-body">Comandante da <strong>Ordem do Dragão de Prata</strong>, fonte da não-morte dos outros renascidos (pelo juramento que fizeram a ele), e <em>marido de Sir Godfrey Gwilym</em> (relação que Vladimir esqueceu).</div></div>
+      <div class="ability lore"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Inspirações</div><span class="toggle-icon">▼</span></div><div class="ability-body">Referências para interpretar Vladimir:
+        <div class="insp-row"><span class="insp-tag">Stannis Baratheon · GoT</span><span class="insp-tag">Frank Castle · O Justiceiro</span><span class="insp-tag">Rorschach · Watchmen</span></div>
+      </div></div>
+    </div>
   </div>
 
   <div class="phase-tabs">
     <div class="phase-tab active" data-phase="1" onclick="switchPhase(1)">
-      <iconify-icon class="phase-icon" icon="game-icons:cauldron"></iconify-icon>
+      <iconify-icon class="phase-icon" icon="game-icons:two-handed-sword"></iconify-icon>
       <div class="phase-num">~ Primeira Forma ~</div>
-      <div class="phase-name">O Coven</div>
-      <div class="phase-tagline">Conjuradoras · ND 14</div>
+      <div class="phase-name">Renascido Vingativo</div>
+      <div class="phase-tagline">Fantasmas e vingança · ND 15</div>
     </div>
     <div class="phase-tab" data-phase="2" onclick="switchPhase(2)">
-      <iconify-icon class="phase-icon" icon="game-icons:daemon-skull"></iconify-icon>
+      <iconify-icon class="phase-icon" icon="game-icons:flame"></iconify-icon>
       <div class="phase-num">~ Segunda Forma ~</div>
-      <div class="phase-name">Os Três Pesadelos</div>
-      <div class="phase-tagline">Feras monstruosas · ND 15</div>
+      <div class="phase-name">Cavaleiro da Morte</div>
+      <div class="phase-tagline">Chamas negras · ND 15</div>
     </div>
   </div>
 
@@ -267,168 +285,142 @@
     <div class="legend-item"><span class="legend-swatch" style="background:var(--blood)"></span>Ação</div>
     <div class="legend-item"><span class="legend-swatch" style="background:#c08a3e"></span>Bônus</div>
     <div class="legend-item"><span class="legend-swatch" style="background:#5f8bb8"></span>Reação</div>
-    <div class="legend-item"><span class="legend-swatch" style="background:#9061b8"></span>Covil</div>
   </div>
 
-  <!-- FORMA 1: O COVEN -->
+  <!-- FORMA 1 -->
   <div class="phase-content active" id="phase-1">
     <div class="stats-bar">
-      <div class="stat"><div class="stat-label">FOR</div><div class="stat-value">18</div><div class="stat-mod">+4</div></div>
-      <div class="stat"><div class="stat-label">DES</div><div class="stat-value">15</div><div class="stat-mod">+2</div></div>
-      <div class="stat"><div class="stat-label">CON</div><div class="stat-value">16</div><div class="stat-mod">+3</div></div>
-      <div class="stat"><div class="stat-label">INT</div><div class="stat-value">18</div><div class="stat-mod">+4</div></div>
-      <div class="stat"><div class="stat-label">SAB</div><div class="stat-value">14</div><div class="stat-mod">+2</div></div>
-      <div class="stat"><div class="stat-label">CAR</div><div class="stat-value">16</div><div class="stat-mod">+3</div></div>
+      <div class="stat"><div class="stat-label">FOR</div><div class="stat-value">20</div><div class="stat-mod">+5</div></div>
+      <div class="stat"><div class="stat-label">DES</div><div class="stat-value">14</div><div class="stat-mod">+2</div></div>
+      <div class="stat"><div class="stat-label">CON</div><div class="stat-value">20</div><div class="stat-mod">+5</div></div>
+      <div class="stat"><div class="stat-label">INT</div><div class="stat-value">13</div><div class="stat-mod">+1</div></div>
+      <div class="stat"><div class="stat-label">SAB</div><div class="stat-value">16</div><div class="stat-mod">+3</div></div>
+      <div class="stat"><div class="stat-label">CAR</div><div class="stat-value">18</div><div class="stat-mod">+4</div></div>
     </div>
     <div class="info-grid">
-      <div class="info-card"><div class="label">Classe Armadura</div><div class="value"><input type="number" class="editable ca-input" data-phase="1" value="17"> <span style="font-size:0.72rem;color:var(--text-muted)">(armadura natural)</span></div></div>
+      <div class="info-card"><div class="label">Classe Armadura</div><div class="value"><input type="number" class="editable ca-input" data-phase="1" value="17"> <span style="font-size:0.72rem;color:var(--text-muted)">(meia armadura)</span></div></div>
       <div class="info-card"><div class="label">Deslocamento</div><div class="value">9 m</div></div>
       <div class="info-card"><div class="label">Bônus Prof.</div><div class="value">+5</div></div>
-      <div class="info-card"><div class="label">Visão no Escuro</div><div class="value">36 m</div></div>
-      <div class="info-card"><div class="label">Perc. Passiva</div><div class="value">16</div></div>
-      <div class="info-card"><div class="label">CD Magia</div><div class="value">17 · +9 ataque</div></div>
+      <div class="info-card"><div class="label">Visão no Escuro</div><div class="value">18 m</div></div>
+      <div class="info-card"><div class="label">Perc. Passiva</div><div class="value">18</div></div>
+      <div class="info-card"><div class="label">Nível de Desafio</div><div class="value" style="color:var(--accent-bright)">15</div></div>
     </div>
     <div class="meta-row">
-      <div class="meta-box"><div class="meta-title">Perícias, Sentidos & Idiomas</div><div class="meta-content"><strong>Perícias:</strong> Enganação +8 · Intuição +7 · Percepção +7 · Furtividade +7<br><strong>Sentidos:</strong> visão no escuro 36 m, PP 16 · <strong>Idiomas:</strong> Abissal, Comum, Infernal, Primordial</div></div>
-      <div class="meta-box"><div class="meta-title">Resistências & Imunidades</div><div class="meta-content"><strong>Resist. a Dano:</strong> frio, fogo; contundente, perfurante e cortante de ataques não mágicos que não sejam prateados<br><strong>Imune a Condição:</strong> enfeitiçado</div></div>
+      <div class="meta-box"><div class="meta-title">Testes de Resistência & Perícias</div><div class="meta-content"><strong>Resistência:</strong> For +10 · Con +10 · Sab +8 · Car +9<br><strong>Perícias:</strong> Atletismo +10 · História +6 · Intimidação +9 · Percepção +8</div></div>
+      <div class="meta-box"><div class="meta-title">Resistências, Imunidades & Idiomas</div><div class="meta-content"><strong>Resist.:</strong> necrótico, psíquico · <strong>Imune a Dano:</strong> veneno<br><strong>Imune a Condição:</strong> enfeitiçado, exaustão, amedrontado, paralisado, envenenado, atordoado · <strong>Idiomas:</strong> Comum, Dracônico</div></div>
     </div>
 
     <div class="section">
       <h2 class="section-title">Características</h2>
       <div class="ability-grid">
-        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Coven de Bruxas</div><span class="toggle-icon">▼</span></div><div class="ability-body">O coven inclui três bruxas: <strong>Morgantha, Bella e Offalia</strong>. Cada uma age em sua própria iniciativa, mantém concentração e sofre condições de forma independente, e tem ação, ação bônus, reação e movimento próprios. Todo dano sofrido por uma bruxa é subtraído dos PV do coven. (Se várias bruxas sofrem dano da mesma fonte, o coven perde PV esse número de vezes.)</div></div>
-        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Lutadora de Curta Distância</div><span class="toggle-icon">▼</span></div><div class="ability-body">Não sofre <em>desvantagem</em> em ataques à distância por estar a até 1,5 m de uma criatura hostil.</div></div>
-        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Resistência à Magia</div><span class="toggle-icon">▼</span></div><div class="ability-body"><em>Vantagem</em> em testes de resistência contra magias e efeitos mágicos.</div></div>
-        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Conjuração</div><span class="ability-tag tag-any">INT · CD 17 · +9</span><span class="toggle-icon">▼</span></div><div class="ability-body">A habilidade de conjuração do coven é Inteligência (CD 17, +9 para atingir com ataques mágicos).</div></div>
-        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Conjuração Complexa</div><span class="toggle-icon">▼</span></div><div class="ability-body">Se uma bruxa conjura uma magia em seu turno como <em>ação bônus</em>, ela ainda pode usar sua ação para conjurar uma magia de nível (não truque) no mesmo turno.</div></div>
-        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Segunda Fase</div><span class="ability-tag tag-any">Gatilho de 2ª forma</span><span class="toggle-icon">▼</span></div><div class="ability-body">A <strong>0 PV</strong>, as estatísticas viram as de <strong>Os Três Pesadelos</strong>. A iniciativa não muda. O dano excedente não transfere, mas <em>mantém as condições</em>. Magias de concentração terminam.</div></div>
+        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Regeneração</div><span class="toggle-icon">▼</span></div><div class="ability-body">Recupera <em>10 PV</em> no início do turno. <span class="dmg">Fogo</span> ou <span class="dmg">radiante</span> desativam no próximo turno. Seu corpo só é destruído se começar o turno com 0 PV sem regenerar.</div></div>
+        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Imunidade a Expulsão</div><span class="toggle-icon">▼</span></div><div class="ability-body">Imune a efeitos que expulsam mortos-vivos.</div></div>
+        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Vínculo de Juramento</div><span class="toggle-icon">▼</span></div><div class="ability-body">Se sua espada longa +2 fosse causar dano fatal a uma criatura moribunda, pode estabilizá-la e sujeitá-la a um <em>geas</em> em vez disso. Dura até dissipado; pode causar dano à criatura várias vezes por dia. O alvo fica <strong>restrito</strong> até o início de seu próximo turno ao sofrer o dano. O <em>geas</em> só termina com <em>restauração maior</em>, <em>desejo</em>, ou se Vladimir a dispensar.</div></div>
+        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Ódio Ardente</div><span class="ability-tag">Gatilho de 2ª forma</span><span class="toggle-icon">▼</span></div><div class="ability-body">A <strong>0 PV</strong>, chamas negras envolvem o punho de sua espada e as sombras ao redor da lâmina viram arames pretos espinhosos. Vira o <strong>Cavaleiro da Morte</strong>. A iniciativa não muda; dano excedente não transfere; <em>não</em> mantém condições.</div></div>
       </div>
     </div>
 
     <div class="section">
       <h2 class="section-title">Ações</h2>
       <div class="ability-grid">
-        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Cegueira/Surdez</div><span class="ability-tag tag-bella">Bella</span><span class="toggle-icon">▼</span></div><div class="ability-body">Conjura <em>cegueira/surdez</em>. O alvo sofre <span class="dmg">7 (2d6) necrótico</span> adicional se falhar, ou metade em sucesso.</div></div>
-        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Fulgor Pútrido</div><span class="ability-tag tag-bella">Bella · 9 m · CON CD 17</span><span class="toggle-icon">▼</span></div><div class="ability-body">Necromancia de 2º. Cada criatura numa esfera de raio 3 m (num ponto a até 9 m) faz <em>Constituição</em> <span class="cd">CD 17</span> ou sofre <span class="dmg">2d6 radiante</span> e fica <strong>envenenada</strong> até o fim de seu próximo turno.</div></div>
-        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Raio do Enfraquecimento</div><span class="ability-tag tag-offalia">Offalia</span><span class="toggle-icon">▼</span></div><div class="ability-body">Conjura <em>raio do enfraquecimento</em>. O alvo sofre <span class="dmg">9 (2d8) necrótico</span> adicional no acerto.</div></div>
-        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Flecha Ácida de Melf</div><span class="ability-tag tag-offalia">Offalia</span><span class="toggle-icon">▼</span></div><div class="ability-body">Conjura <em>flecha ácida de Melf</em>.</div></div>
-        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Raio da Enfermidade</div><span class="ability-tag tag-morgantha">Morgantha</span><span class="toggle-icon">▼</span></div><div class="ability-body">Conjura <em>raio da enfermidade</em>.</div></div>
-        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Podridão Definhante</div><span class="ability-tag tag-morgantha">Morgantha · 9 m · CON</span><span class="toggle-icon">▼</span></div><div class="ability-body">Necromancia de 1º. Uma criatura a até 9 m faz <em>Constituição</em>: <span class="dmg">13 (3d8) necrótico</span> em falha, metade em sucesso.</div></div>
-        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Garras</div><span class="ability-tag tag-any">Qualquer · +9 · 1,5 m</span><span class="toggle-icon">▼</span></div><div class="ability-body">Acerto: <span class="dmg">13 (2d8+4) cortante</span>.</div></div>
+        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Ataque Múltiplo</div><span class="toggle-icon">▼</span></div><div class="ability-body">Faz <strong>dois</strong> ataques com a espadona +2. Pode substituir um por <em>Convocar Fantasmas</em>.</div></div>
+        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Espadona +2</div><span class="ability-tag">+12 · 1,5 m</span><span class="toggle-icon">▼</span></div><div class="ability-body">Acerto: <span class="dmg">14 (2d6+7) cortante</span>. Pode empurrar o alvo até 1,5 m; ou em vez disso, força <em>Força</em> <span class="cd">CD 18</span> ou <strong>caído</strong>.</div></div>
+        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Convocar Fantasmas</div><span class="toggle-icon">▼</span></div><div class="ability-body">Convoca dois guerreiros fantasmas junto a uma criatura hostil visível. Cada um ataca com espada longa espectral, depois desaparece. O alvo atingido <strong>não recupera PV</strong> até o início do próximo turno de Vladimir.</div></div>
       </div>
     </div>
 
     <div class="section">
       <h2 class="section-title">Ações Bônus</h2>
       <div class="ability-grid">
-        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Coroa da Loucura</div><span class="ability-tag tag-bella">Bella</span><span class="toggle-icon">▼</span></div><div class="ability-body">Conjura <em>coroa da loucura</em>. +<span class="dmg">5 (2d4) psíquico</span> se falhar, metade em sucesso. Pode usar a ação bônus para manter o controle do alvo (em vez da ação).</div></div>
-        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Força Fantasmal</div><span class="ability-tag tag-bella">Bella</span><span class="toggle-icon">▼</span></div><div class="ability-body">Conjura <em>força fantasmal</em>. +<span class="dmg">5 (2d4) psíquico</span> se falhar, metade em sucesso.</div></div>
-        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Causar Medo</div><span class="ability-tag tag-offalia">Offalia · 2º</span><span class="toggle-icon">▼</span></div><div class="ability-body">Conjura <em>causar medo</em> no 2º nível. +<span class="dmg">5 (2d4) psíquico</span> se falhar, metade em sucesso.</div></div>
-        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Conceder Maldição</div><span class="ability-tag tag-offalia">Offalia · 9 m</span><span class="toggle-icon">▼</span></div><div class="ability-body">Conjura <em>conceder maldição</em> (alcance 9 m). +<span class="dmg">7 (2d6) necrótico</span> se falhar, metade em sucesso.</div></div>
-        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Imobilizar Pessoa</div><span class="ability-tag tag-morgantha">Morgantha · 3º</span><span class="toggle-icon">▼</span></div><div class="ability-body">Conjura <em>imobilizar pessoa</em> no 3º nível. +<span class="dmg">5 (2d4) necrótico</span> se falhar, metade em sucesso.</div></div>
-        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Relâmpago (Recarga 5-6)</div><span class="ability-tag tag-morgantha">Morgantha</span><span class="toggle-icon">▼</span></div><div class="ability-body">Conjura <em>relâmpago</em>. (Marque <strong>Relâmpago Recarregado</strong> nas condições.)</div></div>
+        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Investida Devastadora</div><span class="ability-tag">Cone 4,5 m · CON CD 18</span><span class="toggle-icon">▼</span></div><div class="ability-body">Onda de choque num cone de 4,5 m. Cada criatura faz <em>Constituição</em> <span class="cd">CD 18</span>: <span class="dmg">21 (6d6) cortante</span> e empurrado 1,5 m em falha; metade e sem empurrar em sucesso.</div></div>
+        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Armadilha Sombria</div><span class="ability-tag">Raio 1,5 m · DES CD 18</span><span class="toggle-icon">▼</span></div><div class="ability-body">Arames pretos espinhosos brotam da terra num raio de 1,5 m. <em>Destreza</em> <span class="cd">CD 18</span>: <span class="dmg">14 (4d6) perfurante</span> e <strong>agarrado</strong> (escapar <span class="cd">CD 19</span>) até o início do próximo turno; metade e sem agarrar em sucesso. Tentar escapar causa <span class="dmg">7 (2d6) perfurante</span> adicional, sucesso ou falha.</div></div>
       </div>
     </div>
 
     <div class="section">
-      <h2 class="section-title">Reações <span style="font-size:0.7em;color:var(--text-muted);text-transform:none;font-style:italic;margin-left:8px">1 por bruxa</span></h2>
+      <h2 class="section-title">Reações <span style="font-size:0.7em;color:var(--text-muted);text-transform:none;font-style:italic;margin-left:8px">até 3/rodada · 1/turno</span></h2>
       <div class="ability-grid">
-        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Sombras Espectrais</div><span class="ability-tag tag-bella">Bella</span><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> é atingida por um ataque.<br><strong>Efeito:</strong> conjura duas duplicatas ilusórias em seu espaço. O atacante rola 1d6: acerta Bella em <em>5 ou 6</em>, uma duplicata caso contrário.</div></div>
-        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Riso Maníaco</div><span class="ability-tag tag-offalia">Offalia · 9 m · SAB CD 17</span><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> sofre dano de criatura visível a até 9 m.<br><strong>Efeito:</strong> a criatura faz <em>Sabedoria</em> <span class="cd">CD 17</span> ou cai no riso: fica <strong>caída e incapacitada</strong>, sem poder se levantar, até o fim de seu próximo turno ou até sofrer dano.</div></div>
-        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Arco de Fogo-Fátuo</div><span class="ability-tag tag-morgantha">Morgantha · 9 m · CON CD 17</span><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> sofre dano de criatura visível a até 9 m.<br><strong>Efeito:</strong> a criatura faz <em>Constituição</em> <span class="cd">CD 17</span> ou <span class="dmg">6 (1d12) elétrico</span>. Em falha, forma um <em>arco de relâmpago</em> até o início do próximo turno dela: Morgantha tem <strong>resistência a todo dano</strong> e reflete o mesmo dano à criatura conectada.</div></div>
-        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Passo Nebuloso</div><span class="ability-tag tag-any">Qualquer</span><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> sofre dano.<br><strong>Efeito:</strong> a bruxa conjura <em>passo nebuloso</em>.</div></div>
-      </div>
-    </div>
-
-    <div class="section">
-      <h2 class="section-title">Ações de Covil <span style="font-size:0.7em;color:var(--text-muted);text-transform:none;font-style:italic;margin-left:8px">iniciativa 20, no moinho</span></h2>
-      <div class="ability-grid">
-        <div class="ability lair"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Vento Protetor</div><span class="toggle-icon">▼</span></div><div class="ability-body">O coven conjura <em>vento protetor</em>.</div></div>
-        <div class="ability lair"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Rajada de Vento</div><span class="toggle-icon">▼</span></div><div class="ability-body">O coven conjura <em>rajada de vento</em>.</div></div>
-        <div class="ability lair"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Cacofonia Anfíbia</div><span class="ability-tag">36 m · CAR CD 10</span><span class="toggle-icon">▼</span></div><div class="ability-body">As rãs ao redor do moinho croam uma canção hipnótica. Cada criatura a até 36 m do moinho que as ouça faz <em>Carisma</em> <span class="cd">CD 10</span> ou usa todo o movimento no início de seu próximo turno para se aproximar do moinho.</div></div>
-        <div class="ability lair"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Dissipar Magia (1/dia)</div><span class="toggle-icon">▼</span></div><div class="ability-body">O coven conjura <em>dissipar magia</em> no 5º nível.</div></div>
+        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Indomável</div><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> criatura hostil termina o turno.<br><strong>Efeito:</strong> repete um TR contra um efeito/condição ativo.</div></div>
+        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Retribuição Jurada (1/rodada)</div><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> sofre dano de criatura visível.<br><strong>Efeito:</strong> marca essa criatura até o fim de seu próximo turno. Enquanto marcada, não provoca AoO ao se mover em direção a ela, tem <em>vantagem</em> no primeiro ataque corpo a corpo contra ela por turno, e acerta crítico com <strong>19-20</strong> contra ela.</div></div>
+        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Comando Fantasmagórico</div><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> sofre dano de ataque ou magia.<br><strong>Efeito:</strong> convoca um soldado fantasma para blindá-lo, reduzindo o dano à metade (arred. para cima), no máximo 10.</div></div>
+        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Represália Marcial</div><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> sofre dano de ataque ou magia.<br><strong>Efeito:</strong> move-se até metade do deslocamento em direção ao atacante/conjurador e ataca com a espadona se estiver ao alcance.</div></div>
       </div>
     </div>
   </div>
 
-  <!-- FORMA 2: OS TRÊS PESADELOS -->
+  <!-- FORMA 2: CAVALEIRO DA MORTE -->
   <div class="phase-content" id="phase-2">
     <div class="special-callout">
-      <div class="sc-title"><iconify-icon icon="game-icons:daemon-skull" style="color:var(--accent-bright)"></iconify-icon> Os Três Pesadelos — segunda forma</div>
-      <div class="sc-body">A 0 PV, as bruxas se transformam: <strong>Bella</strong> vira um <em>crocodilo Enorme</em>, <strong>Offalia</strong> um <em>elefante Enorme</em>, e <strong>Morgantha</strong> se envolve num manto de sombras. <em>Mantém os PV atuais</em> e as condições. Se o coven chegar a 0 PV agora, <strong>todas as bruxas morrem</strong>.</div>
+      <div class="sc-title"><iconify-icon icon="game-icons:flame" style="color:var(--accent-bright)"></iconify-icon> Cavaleiro da Morte — segunda forma</div>
+      <div class="sc-body">Alcançada pelo <strong>Ódio Ardente</strong> a 0 PV. Chamas negras e espinhos envolvem sua espada. <em>Mantém os PV atuais</em> (excedente não transfere; sem condições). Ganha <strong>Rejuvenescimento</strong>: se o corpo for destruído, a alma retorna após 24 h em outro cadáver — só <em>desejo</em> impede.</div>
     </div>
     <div class="stats-bar">
-      <div class="stat"><div class="stat-label">FOR</div><div class="stat-value">21</div><div class="stat-mod">+5</div></div>
-      <div class="stat"><div class="stat-label">DES</div><div class="stat-value">15</div><div class="stat-mod">+2</div></div>
-      <div class="stat"><div class="stat-label">CON</div><div class="stat-value">16</div><div class="stat-mod">+3</div></div>
-      <div class="stat"><div class="stat-label">INT</div><div class="stat-value">18</div><div class="stat-mod">+4</div></div>
-      <div class="stat"><div class="stat-label">SAB</div><div class="stat-value">14</div><div class="stat-mod">+2</div></div>
-      <div class="stat"><div class="stat-label">CAR</div><div class="stat-value">16</div><div class="stat-mod">+3</div></div>
+      <div class="stat"><div class="stat-label">FOR</div><div class="stat-value">20</div><div class="stat-mod">+5</div></div>
+      <div class="stat"><div class="stat-label">DES</div><div class="stat-value">14</div><div class="stat-mod">+2</div></div>
+      <div class="stat"><div class="stat-label">CON</div><div class="stat-value">20</div><div class="stat-mod">+5</div></div>
+      <div class="stat"><div class="stat-label">INT</div><div class="stat-value">13</div><div class="stat-mod">+1</div></div>
+      <div class="stat"><div class="stat-label">SAB</div><div class="stat-value">16</div><div class="stat-mod">+3</div></div>
+      <div class="stat"><div class="stat-label">CAR</div><div class="stat-value">18</div><div class="stat-mod">+4</div></div>
     </div>
     <div class="info-grid">
-      <div class="info-card"><div class="label">Classe Armadura</div><div class="value"><input type="number" class="editable ca-input" data-phase="2" value="17"> <span style="font-size:0.72rem;color:var(--text-muted)">(armadura natural)</span></div></div>
+      <div class="info-card"><div class="label">Classe Armadura</div><div class="value"><input type="number" class="editable ca-input" data-phase="2" value="17"> <span style="font-size:0.72rem;color:var(--text-muted)">(meia armadura)</span></div></div>
       <div class="info-card"><div class="label">Deslocamento</div><div class="value">9 m</div></div>
       <div class="info-card"><div class="label">Bônus Prof.</div><div class="value">+5</div></div>
-      <div class="info-card"><div class="label">Visão no Escuro</div><div class="value">36 m</div></div>
-      <div class="info-card"><div class="label">Perc. Passiva</div><div class="value">16</div></div>
-      <div class="info-card"><div class="label">Nível de Desafio</div><div class="value" style="color:var(--accent-bright)">15 (13 com prata)</div></div>
+      <div class="info-card"><div class="label">Visão no Escuro</div><div class="value">18 m</div></div>
+      <div class="info-card"><div class="label">Perc. Passiva</div><div class="value">18</div></div>
+      <div class="info-card"><div class="label">Nível de Desafio</div><div class="value" style="color:var(--accent-bright)">15</div></div>
     </div>
     <div class="meta-row">
-      <div class="meta-box"><div class="meta-title">Perícias, Sentidos & Idiomas</div><div class="meta-content"><strong>Perícias:</strong> Enganação +8 · Intuição +7 · Percepção +7 · Furtividade +7<br><strong>Sentidos:</strong> visão no escuro 36 m, PP 16 · <strong>Idiomas:</strong> Abissal, Comum, Infernal, Primordial</div></div>
-      <div class="meta-box"><div class="meta-title">Resistências & Imunidades</div><div class="meta-content"><strong>Resist. a Dano:</strong> frio, fogo; contundente, perfurante e cortante de ataques não mágicos que não sejam prateados<br><strong>Imune a Condição:</strong> enfeitiçado</div></div>
+      <div class="meta-box"><div class="meta-title">Testes de Resistência & Perícias</div><div class="meta-content"><strong>Resistência:</strong> For +10 · Con +10 · Sab +8 · Car +9<br><strong>Perícias:</strong> Atletismo +10 · História +6 · Intimidação +9 · Percepção +8</div></div>
+      <div class="meta-box"><div class="meta-title">Resistências, Imunidades & Idiomas</div><div class="meta-content"><strong>Resist.:</strong> necrótico, psíquico · <strong>Imune a Dano:</strong> veneno<br><strong>Imune a Condição:</strong> enfeitiçado, exaustão, amedrontado, paralisado, envenenado, atordoado · <strong>Idiomas:</strong> Comum, Dracônico</div></div>
     </div>
 
     <div class="section">
       <h2 class="section-title">Características</h2>
       <div class="ability-grid">
-        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Coven de Bruxas</div><span class="toggle-icon">▼</span></div><div class="ability-body">As três bruxas agem independentemente (ação, bônus, reação e movimento próprios). Todo dano sofrido por uma é subtraído dos PV do coven. <strong>Se o coven chegar a 0 PV, todas morrem.</strong></div></div>
-        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Formas de Pesadelo</div><span class="toggle-icon">▼</span></div><div class="ability-body">Bella assume a forma de um <em>crocodilo Enorme</em>, Offalia de um <em>elefante Enorme</em>, e Morgantha se envolve num <em>manto de sombras rodopiantes</em>.</div></div>
-        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Resistência à Magia</div><span class="toggle-icon">▼</span></div><div class="ability-body"><em>Vantagem</em> em testes de resistência contra magias e efeitos mágicos.</div></div>
-        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Investida</div><span class="ability-tag tag-offalia">Offalia</span><span class="toggle-icon">▼</span></div><div class="ability-body">Se Offalia se mover ao menos 6 m em linha reta em direção a um alvo e o acertar com <em>chifrada</em> no mesmo turno, o alvo sofre <span class="dmg">11 (2d10) perfurante</span> adicional e faz <em>Força</em> <span class="cd">CD 18</span> ou é empurrado 3 m e cai.</div></div>
+        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Lutador de Curta Distância</div><span class="toggle-icon">▼</span></div><div class="ability-body">Não sofre <em>desvantagem</em> em ataques à distância por estar a até 1,5 m de uma criatura hostil.</div></div>
+        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Regeneração</div><span class="toggle-icon">▼</span></div><div class="ability-body">Recupera <em>10 PV</em> no início do turno. <span class="dmg">Fogo</span> ou <span class="dmg">radiante</span> desativam no próximo turno.</div></div>
+        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Rejuvenescimento</div><span class="toggle-icon">▼</span></div><div class="ability-body">Quando seu corpo é destruído, a alma persiste. Após 24 h, habita e anima outro cadáver no mesmo plano, recuperando todos os PV. Enquanto sem corpo, <em>desejo</em> pode forçar a alma ao além, sem retorno.</div></div>
+        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Imunidade a Expulsão</div><span class="toggle-icon">▼</span></div><div class="ability-body">Imune a efeitos que expulsam mortos-vivos.</div></div>
+        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Vínculo de Juramento</div><span class="toggle-icon">▼</span></div><div class="ability-body">Se sua espadona +2 fosse <strong>matar</strong> uma criatura, pode estabilizá-la e sujeitá-la a um <em>geas</em> em vez disso (mesmas regras da 1ª forma).</div></div>
       </div>
     </div>
 
     <div class="section">
       <h2 class="section-title">Ações</h2>
       <div class="ability-grid">
-        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Mordida</div><span class="ability-tag tag-bella">Bella · +10 · 1,5 m</span><span class="toggle-icon">▼</span></div><div class="ability-body">Acerto: <span class="dmg">16 (2d10+5) perfurante</span> e o alvo fica <strong>agarrado</strong> (escapar <span class="cd">CD 17</span>). Enquanto agarrado, fica restrito e Bella não pode morder outro alvo.</div></div>
-        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Cauda</div><span class="ability-tag tag-bella">Bella · +10 · 3 m</span><span class="toggle-icon">▼</span></div><div class="ability-body">Contra alvo não agarrado por ela. Acerto: <span class="dmg">14 (2d8+5) contundente</span>. <em>Força</em> <span class="cd">CD 17</span> ou <strong>caído</strong>.</div></div>
-        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Chifrada</div><span class="ability-tag tag-offalia">Offalia · +10 · 1,5 m</span><span class="toggle-icon">▼</span></div><div class="ability-body">Acerto: <span class="dmg">14 (2d8+5) perfurante</span>.</div></div>
-        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Olho Aterrador</div><span class="ability-tag tag-morgantha">Morgantha · CD 17</span><span class="toggle-icon">▼</span></div><div class="ability-body">Usa <em>olho aterrador</em> (CD 17). Um alvo que passe no teste fica <strong>atordoado leve</strong> até o fim de seu próximo turno (pode mover-se OU agir, não ambos; sem bônus/reação).</div></div>
+        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Ataque Múltiplo</div><span class="toggle-icon">▼</span></div><div class="ability-body">Faz <strong>dois</strong> ataques corpo a corpo. Pode substituir um por <em>Chamas Negras</em>.</div></div>
+        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Espadona +2</div><span class="ability-tag">+12 · 1,5 m</span><span class="toggle-icon">▼</span></div><div class="ability-body">Acerto: <span class="dmg">14 (2d6+7) cortante</span> + <span class="dmg">3 (1d6) perfurante</span>. O alvo faz <em>Sabedoria</em> <span class="cd">CD 18</span> ou tem <strong>desvantagem</strong> no primeiro ataque ou teste até o fim de seu próximo turno.</div></div>
+        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Chamas Negras</div><span class="ability-tag">Distância · +10 · 9 m</span><span class="toggle-icon">▼</span></div><div class="ability-body">Acerto: <span class="dmg">7 (2d6) fogo</span> + <span class="dmg">3 (1d6) necrótico</span>; o alvo pega fogo. No início do próximo turno, ele e criaturas a até 1,5 m fazem <em>Constituição</em> <span class="cd">CD 17</span> ou sofrem <span class="dmg">7 (2d6) fogo</span> adicional (chamas não se apagam por meios não mágicos).</div></div>
       </div>
     </div>
 
     <div class="section">
       <h2 class="section-title">Ações Bônus</h2>
       <div class="ability-grid">
-        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Golpe de Cauda</div><span class="ability-tag tag-bella">Bella · cone 3 m · DES CD 18</span><span class="toggle-icon">▼</span></div><div class="ability-body">Cone de 3 m. <em>Destreza</em> <span class="cd">CD 18</span>: <span class="dmg">9 (2d8) contundente</span> e <strong>caído</strong> em falha; sucesso metade e sem cair.</div></div>
-        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Névoa Alucinógena</div><span class="ability-tag tag-bella">Bella · cone 9 m · CON CD 17</span><span class="toggle-icon">▼</span></div><div class="ability-body">Cone de 9 m de névoa perolada. <em>Constituição</em> <span class="cd">CD 17</span> ou <strong>atordoado leve</strong> até o início do próximo turno de Bella.</div></div>
-        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Pisão</div><span class="ability-tag tag-offalia">Offalia · raio 1,5 m · DES CD 18</span><span class="toggle-icon">▼</span></div><div class="ability-body">Criaturas a até 1,5 m fazem <em>Destreza</em> <span class="cd">CD 18</span>: <span class="dmg">11 (2d10) contundente</span> em falha, metade em sucesso.</div></div>
-        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Trombeta do Diabo</div><span class="ability-tag tag-offalia">Offalia · raio 18 m · SAB CD 17</span><span class="toggle-icon">▼</span></div><div class="ability-body">Cada humanoide a até 18 m faz <em>Sabedoria</em> <span class="cd">CD 17</span> ou subtrai <span class="dmg">1d4</span> de sua próxima jogada de ataque, teste ou TR.</div></div>
-        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Anel Enervante</div><span class="ability-tag tag-morgantha">Morgantha · raio 3 m · CON CD 16</span><span class="toggle-icon">▼</span></div><div class="ability-body">Tentáculos de escuridão tocam cada criatura a até 3 m. <em>Constituição</em> <span class="cd">CD 16</span> ou <span class="dmg">9 (2d8) necrótico</span> e <strong>lenta</strong> até o fim de seu próximo turno.</div></div>
-        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Infligir Pesadelos</div><span class="ability-tag tag-morgantha">Morgantha · 9 m · SAB CD 17</span><span class="toggle-icon">▼</span></div><div class="ability-body">Uma criatura a até 9 m faz <em>Sabedoria</em> <span class="cd">CD 17</span> ou fica <strong>atordoada</strong> até sofrer dano ou outra criatura acordá-la. Sofre <span class="dmg">9 (2d8) psíquico</span> ao fim do turno se ainda atordoada.</div></div>
+        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Piraeda Sepulcral</div><span class="ability-tag">36 m · raio 3 m · DES CD 17</span><span class="toggle-icon">▼</span></div><div class="ability-body">Arremessa uma esfera de chamas negras que explode num ponto a até 36 m. Esfera de 3 m (contorna cantos). <em>Destreza</em> <span class="cd">CD 17</span>: <span class="dmg">10 (3d6) fogo</span> + <span class="dmg">10 (3d6) necrótico</span> em falha (metade em sucesso); falha também dá desvantagem no próximo ataque até o início do próximo turno de Vladimir.</div></div>
+        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Onda Destrutiva</div><span class="ability-tag">Raio 3 m · CON CD 18</span><span class="toggle-icon">▼</span></div><div class="ability-body">Golpeia o chão criando uma explosão de energia destrutiva. Cada criatura a até 3 m faz <em>Constituição</em> <span class="cd">CD 18</span>: <span class="dmg">10 (3d6) trovejante</span> + <span class="dmg">10 (3d6) necrótico</span> e <strong>caído</strong> em falha; metade e sem cair em sucesso.</div></div>
       </div>
     </div>
 
     <div class="section">
-      <h2 class="section-title">Reações <span style="font-size:0.7em;color:var(--text-muted);text-transform:none;font-style:italic;margin-left:8px">1 por bruxa</span></h2>
+      <h2 class="section-title">Reações <span style="font-size:0.7em;color:var(--text-muted);text-transform:none;font-style:italic;margin-left:8px">até 3/rodada · 1/turno</span></h2>
       <div class="ability-grid">
-        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Chicotada de Cauda</div><span class="ability-tag tag-bella">Bella</span><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> sofre dano de criatura a até 3 m.<br><strong>Efeito:</strong> faz um ataque de <em>cauda</em> contra o atacante.</div></div>
-        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Presas</div><span class="ability-tag tag-offalia">Offalia</span><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> sofre dano de ataque corpo a corpo.<br><strong>Efeito:</strong> faz uma <em>chifrada</em> contra o atacante.</div></div>
-        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Passo Sombrio</div><span class="ability-tag tag-morgantha">Morgantha</span><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> sofre dano de criatura visível.<br><strong>Efeito:</strong> sofre <em>metade</em> do dano e teletransporta-se até 9 m.</div></div>
-        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Repreensão da Matrona</div><span class="ability-tag tag-morgantha">Morgantha · 18 m · DES CD 17</span><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> sofre dano de criatura visível a até 18 m.<br><strong>Efeito:</strong> a criatura faz <em>Destreza</em> <span class="cd">CD 17</span> ou <span class="dmg">11 (2d10) necrótico</span>.</div></div>
-        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Absorver Elementos</div><span class="ability-tag tag-any">Qualquer</span><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> sofre dano de ácido, frio, fogo, elétrico ou trovejante.<br><strong>Efeito:</strong> a bruxa conjura <em>absorver elementos</em>.</div></div>
+        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Indomável</div><span class="toggle-icon">▼</span></div><div class="ability-body">Repete um TR contra um efeito/condição ativo.</div></div>
+        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Arremetida Vingativa</div><span class="ability-tag">FOR CD 18</span><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> um inimigo acerta ou erra um ataque contra ele.<br><strong>Efeito:</strong> avança 4,5 m em linha reta sem provocar AoO. Se terminar a até 1,5 m do inimigo, força <em>Força</em> <span class="cd">CD 18</span>: <strong>falha:</strong> <span class="dmg">2d6 contundente</span> e ambos se movem mais até 3 m juntos; por cada 1,5 m não percorrido, +<span class="dmg">1d6 contundente</span>.</div></div>
+        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Olhar Vingativo</div><span class="ability-tag">9 m · SAB CD 17</span><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> sofre dano de inimigo a até 9 m.<br><strong>Efeito:</strong> a criatura faz <em>Sabedoria</em> <span class="cd">CD 17</span> ou fica <strong>amedrontada</strong> até ele causar dano nela ou até o fim de seu próximo turno. Falha por 5+: fica <strong>paralisada</strong> em vez disso.</div></div>
+        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Golpe do Sentinela</div><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> uma criatura tenta sair de seu alcance sem usar Desengajar.<br><strong>Efeito:</strong> ataca com a espadona; em acerto, sem dano, mas o alvo fica <strong>caído</strong> e seu deslocamento vira 0 pelo resto do turno.</div></div>
       </div>
     </div>
   </div>
 
   <div class="notes-section">
     <h3>◆ Notas do Mestre</h3>
-    <textarea class="notes-area" id="notesArea" placeholder="Anote aqui: iniciativa de cada bruxa, quem está concentrando em quê, recarga do Relâmpago, quem foi morta, alvos enfeitiçados/atordoados..."></textarea>
+    <textarea class="notes-area" id="notesArea" placeholder="Anote aqui: alvo marcado (Retribuição Jurada), quem sofreu Vínculo de Juramento (geas), forma atual, se a alma retornará em 24h..."></textarea>
   </div>
 
   <footer>
-    Coven Bonegrinder — sincronizado em tempo real entre os dispositivos do Mestre.
+    Vladimir Horngaard — sincronizado em tempo real entre os dispositivos do Mestre.
     <span class="footer-credit">Statblock adaptado de <a href="https://www.strahdreloaded.com/" target="_blank" rel="noopener">Curse of Strahd: Reloaded</a>, de DragnaCarta (conteúdo de fã da WotC).</span>
   </footer>
 
@@ -440,7 +432,7 @@
 <script src="../../assets/js/efeitos.js"></script>
 <script src="../../assets/js/master_state.js"></script>
 <script>
-const FORMAS = { 1: { nd: '14' }, 2: { nd: '15' } };
+const FORMAS = { 1: { nd: '15' }, 2: { nd: '15' } };
 function switchPhase(num) { switchPhaseSilent(num); saveState(true); }
 function switchPhaseSilent(num) {
   const f = FORMAS[num] || FORMAS[1];
@@ -472,7 +464,7 @@ function adjustHP(delta) {
   saveState(true);
 }
 function resetHP() { hpCurrent.value = hpMax.value; updateHPBar(); saveState(true); }
-function setMedia() { hpMax.value = 210; hpCurrent.value = 210; updateHPBar(); saveState(true); showToast('✓ PV na média (210)'); }
+function setMedia() { hpMax.value = 228; hpCurrent.value = 228; updateHPBar(); saveState(true); showToast('✓ PV na média (228)'); }
 hpCurrent.addEventListener('input', () => { updateHPBar(); saveState(true); });
 hpMax.addEventListener('input', () => { updateHPBar(); saveState(true); });
 function toggleReact(el) { el.classList.toggle('used'); saveState(true); }
@@ -486,8 +478,8 @@ function adjustRound(delta) {
 function resetRound() { const el = document.getElementById('roundCounter'); if (el) el.textContent = 1; saveState(true); }
 function toggleAbility(header) { header.parentElement.classList.toggle('open'); }
 
-const STORAGE_KEY = 'bonegrinder_ficha_v1';
-const MS_CHAVE = 'vilao:bonegrinder';
+const STORAGE_KEY = 'vladimir_ficha_v1';
+const MS_CHAVE = 'vilao:vladimir';
 let _msAplicando = false;
 function _setSyncStatus(txt, cor) { const el = document.getElementById('syncStatus'); if (el) { el.textContent = txt; el.style.color = cor || 'var(--gold-dim)'; } }
 function getState() {
@@ -504,7 +496,7 @@ function getState() {
 }
 function applyState(s) {
   if (!s) return;
-  hpCurrent.value = s.hpCurrent ?? 308; hpMax.value = s.hpMax ?? 308; updateHPBar();
+  hpCurrent.value = s.hpCurrent ?? 312; hpMax.value = s.hpMax ?? 312; updateHPBar();
   if (s.ca) s.ca.forEach(c => { const inp = document.querySelector(`.ca-input[data-phase="${c.phase}"]`); if (inp) inp.value = c.val; });
   switchPhaseSilent(parseInt(s.activePhase) || 1);
   (s.reactions || []).forEach((u, i) => { const d = document.querySelectorAll('.react-dot')[i]; if (d) d.classList.toggle('used', u); });
@@ -541,7 +533,7 @@ async function loadState() {
 function resetAll() {
   if (!confirm('Resetar tudo? (HP, forma, reações, condições, notas)')) return;
   localStorage.removeItem(STORAGE_KEY);
-  hpCurrent.value = 308; hpMax.value = 308;
+  hpCurrent.value = 312; hpMax.value = 312;
   document.querySelectorAll('.ca-input').forEach(i => i.value = 17);
   updateHPBar();
   document.querySelectorAll('.react-dot').forEach(d => d.classList.remove('used'));
@@ -554,7 +546,7 @@ function resetAll() {
 function exportJSON() {
   const blob = new Blob([JSON.stringify(getState(), null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob); const a = document.createElement('a');
-  a.href = url; a.download = `bonegrinder_combate_${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(url);
+  a.href = url; a.download = `vladimir_combate_${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(url);
   showToast('✓ Exportado');
 }
 function importJSON(evt) {

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0a0608">
 <link rel="icon" type="image/svg+xml" href="../../assets/img/favicon.svg">
-<title>Coven Bonegrinder — Ficha de Combate</title>
+<title>Kiril Stoyanovich — Ficha de Combate</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
@@ -20,8 +20,8 @@
     --border:#4a3a2a; --border-soft:rgba(203,172,103,0.16); --radius:10px;
     --accent:#cbac67; --accent-bright:#f0d089; --accent-glow:rgba(203,172,103,0.35); --accent-soft:rgba(203,172,103,0.10);
   }
-  body[data-fase="1"] { --accent:#6f8a4e; --accent-bright:#a6c47f; --accent-glow:rgba(111,138,78,0.40); --accent-soft:rgba(111,138,78,0.12); }
-  body[data-fase="2"] { --accent:#8a3a6a; --accent-bright:#c26fa0; --accent-glow:rgba(138,58,106,0.44); --accent-soft:rgba(138,58,106,0.14); }
+  body[data-fase="1"] { --accent:#7f8a5a; --accent-bright:#b6c088; --accent-glow:rgba(127,138,90,0.40); --accent-soft:rgba(127,138,90,0.12); }
+  body[data-fase="2"] { --accent:#7a4a8a; --accent-bright:#b184c4; --accent-glow:rgba(122,74,138,0.44); --accent-soft:rgba(122,74,138,0.14); }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { background: var(--bg-deep); color: var(--text-body); font-family: 'Cormorant Garamond', serif; font-size: 16px; line-height: 1.48; min-height: 100vh; -webkit-font-smoothing: antialiased; }
   body { background: radial-gradient(ellipse at 50% -10%, var(--accent-soft), transparent 55%), radial-gradient(ellipse at 18% 4%, rgba(155,31,31,0.16), transparent 48%), radial-gradient(ellipse at 84% 96%, rgba(203,172,103,0.06), transparent 50%), var(--bg-deep); background-attachment: fixed; transition: background 0.6s ease; }
@@ -45,7 +45,7 @@
   .panel { background: linear-gradient(180deg, var(--bg-card), rgba(10,6,8,0.5)); border: 1px solid var(--border); padding: 10px 14px; border-radius: 2px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.04); }
   .panel-title { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.2em; color: var(--gold); text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid var(--border-soft); padding-bottom: 6px; }
   .hp-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-  .hp-input { background: var(--shadow); border: 1px solid var(--blood-dark); color: var(--bone); font-family: 'Cinzel', serif; font-size: 1rem; padding: 4px 8px; width: 72px; text-align: center; border-radius: 2px; outline: none; }
+  .hp-input { background: var(--shadow); border: 1px solid var(--blood-dark); color: var(--bone); font-family: 'Cinzel', serif; font-size: 1rem; padding: 4px 8px; width: 74px; text-align: center; border-radius: 2px; outline: none; }
   .hp-input:focus { border-color: var(--gold); }
   .hp-bar-container { flex: 1; min-width: 120px; height: 18px; background: var(--shadow); border: 1px solid var(--border); position: relative; overflow: hidden; }
   .hp-bar { height: 100%; background: linear-gradient(90deg, var(--blood-dark), var(--blood)); transition: width 0.4s ease; box-shadow: inset 0 0 8px rgba(0,0,0,0.5); }
@@ -113,20 +113,14 @@
   .ability.attack { border-left-color: var(--blood-bright); }
   .ability.bonus { border-left-color: #c08a3e; }
   .ability.reaction { border-left-color: #5f8bb8; }
-  .ability.lair { border-left-color: #9061b8; }
   .ability-header { padding: 10px 14px; cursor: pointer; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; user-select: none; }
   .ability-header:hover { background: rgba(255,255,255,0.03); }
   .ability-header::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--gold-dim); flex-shrink: 0; box-shadow: 0 0 8px currentColor; }
   .ability.attack .ability-header::before { background: var(--blood-bright); color: var(--blood-bright); }
   .ability.bonus .ability-header::before { background: #c08a3e; color: #c08a3e; }
   .ability.reaction .ability-header::before { background: #5f8bb8; color: #5f8bb8; }
-  .ability.lair .ability-header::before { background: #9061b8; color: #9061b8; }
   .ability-name { font-family: 'Cinzel', serif; font-weight: 600; font-size: 1rem; color: var(--bone); letter-spacing: 0.04em; }
   .ability-tag { font-family: 'IM Fell English', serif; font-style: italic; font-size: 0.82rem; color: var(--gold); letter-spacing: 0.03em; background: var(--accent-soft); border: 1px solid var(--border-soft); padding: 1px 8px; border-radius: 10px; }
-  .tag-bella { background: rgba(90,140,209,0.16); border-color: rgba(90,140,209,0.4); color: #9cc3ea; }
-  .tag-offalia { background: rgba(180,120,60,0.16); border-color: rgba(180,120,60,0.4); color: #e0b078; }
-  .tag-morgantha { background: rgba(150,90,180,0.16); border-color: rgba(150,90,180,0.4); color: #c99ad6; }
-  .tag-any { background: rgba(203,172,103,0.16); border-color: rgba(203,172,103,0.4); color: var(--gold-bright); }
   .toggle-icon { margin-left: auto; color: var(--gold-dim); font-size: 0.72rem; transition: transform 0.2s; }
   .ability.open .toggle-icon { transform: rotate(180deg); color: var(--gold); }
   .ability-body { padding: 2px 16px 12px 34px; font-size: 0.98rem; color: var(--text-body); line-height: 1.58; display: none; }
@@ -167,7 +161,7 @@
       <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
         <a href="index.html" class="btn" style="text-decoration:none">← Personagens</a>
         <div>
-          <div class="brand">Coven Bonegrinder</div>
+          <div class="brand">Kiril Stoyanovich</div>
           <div class="brand-sub">Ficha de Combate · 2 Formas · <span id="syncStatus" style="color:var(--gold-dim)">○ local</span></div>
         </div>
       </div>
@@ -182,49 +176,52 @@
   </div>
 
   <header>
-    <iconify-icon class="crest" icon="game-icons:witch-flight"></iconify-icon>
-    <div class="eyebrow">Moinho Bonegrinder · Morgantha, Bella & Offalia</div>
-    <h1>Coven Bonegrinder</h1>
-    <div class="subtitle">Trio de diabos Médios · Neutro e Mau · <strong>ND <span id="ndHeader">14</span></strong> (ou 12 com armas prateadas) · Bônus de Proficiência <strong>+5</strong></div>
+    <iconify-icon class="crest" icon="game-icons:werewolf"></iconify-icon>
+    <div class="eyebrow">Alfa da Matilha de Lobisomens · Mutado por Baba Lysaga</div>
+    <h1>Kiril Stoyanovich</h1>
+    <div class="subtitle">Monstruosidade (metamorfo) · Caótico e Mau · <strong>ND <span id="ndHeader">18</span></strong> (<span id="ndSem">16</span> sem regeneração) · Bônus de Proficiência <strong id="pbHeader">+5</strong></div>
   </header>
 
   <div class="combat-bar">
     <div class="panel">
-      <div class="panel-title">◆ Pontos de Vida (compartilhados pelas 3 bruxas)</div>
+      <div class="panel-title">◆ Pontos de Vida (variam por forma)</div>
       <div class="hp-row">
-        <input type="number" id="hpCurrent" class="hp-input" value="308" min="0">
+        <input type="number" id="hpCurrent" class="hp-input" value="448" min="0">
         <span style="color:var(--gold-dim)">/</span>
-        <input type="number" id="hpMax" class="hp-input" value="308" min="1">
+        <input type="number" id="hpMax" class="hp-input" value="448" min="1">
         <div class="hp-bar-container"><div class="hp-bar" id="hpBar" style="width:100%"></div><div class="hp-label" id="hpLabel">100%</div></div>
       </div>
-      <div style="margin-top:4px;font-size:0.82rem;color:var(--text-muted);font-style:italic">Máx <strong style="color:var(--gold);font-style:normal">308</strong> · Média 210 · <strong style="color:var(--bone);font-style:normal">28d8 + 84</strong></div>
+      <div style="margin-top:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+        <span style="font-size:0.82rem;color:var(--text-muted);font-style:italic">Máx <strong id="hpMediaMax" style="color:var(--gold);font-style:normal">448</strong> · Média <strong id="hpMedia" style="color:var(--bone);font-style:normal">304</strong> · <strong id="hpDados" style="color:var(--bone-dim);font-style:normal">32d10 + 128</strong></span>
+        <button class="btn" onclick="aplicarPVForma()">↺ PV máx</button>
+        <button class="btn" onclick="aplicarMediaForma()">Média</button>
+      </div>
       <div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap">
         <button class="btn" onclick="adjustHP(-20)">−20</button>
         <button class="btn" onclick="adjustHP(-10)">−10</button>
         <button class="btn" onclick="adjustHP(-5)">−5</button>
         <button class="btn" onclick="adjustHP(-1)">−1</button>
-        <button class="btn" onclick="adjustHP(1)">+1</button>
-        <button class="btn" onclick="setMedia()">Usar média (210)</button>
+        <button class="btn" onclick="adjustHP(20)">+20 Regen</button>
         <button class="btn" onclick="resetHP()">Reset</button>
       </div>
     </div>
 
     <div class="panel">
-      <div class="panel-title">◆ Coven de Bruxas</div>
+      <div class="panel-title">◆ Regeneração</div>
       <div style="font-size:0.9rem;color:var(--text-body);line-height:1.45">
-        As <strong style="color:var(--gold)">3 bruxas</strong> agem em <em>iniciativas separadas</em> — cada uma tem sua ação, bônus, reação e movimento próprios, e sofre condições de forma independente. Todo dano sofrido por qualquer uma é subtraído do <em>PV compartilhado</em>.
+        Recupera <strong style="color:var(--gold)">20 PV</strong> no início do turno. <span class="dmg">Necrótico</span> ou dano contundente/perfurante/cortante de <span class="dmg">arma prateada</span> bloqueiam no próximo turno — marque <em style="color:var(--gold);font-style:normal">Regen Bloqueada</em> abaixo. O <em>colar de espinhos de prata</em> impede a regeneração.
       </div>
     </div>
 
     <div class="panel">
-      <div class="panel-title">◆ Reações (1 por bruxa por rodada)</div>
+      <div class="panel-title">◆ Reações da Rodada (até 3 · 1 por turno)</div>
       <div class="react-row">
-        <div class="react-dot" title="Bella" onclick="toggleReact(this)"></div>
-        <div class="react-dot" title="Offalia" onclick="toggleReact(this)"></div>
-        <div class="react-dot" title="Morgantha" onclick="toggleReact(this)"></div>
+        <div class="react-dot" onclick="toggleReact(this)"></div>
+        <div class="react-dot" onclick="toggleReact(this)"></div>
+        <div class="react-dot" onclick="toggleReact(this)"></div>
         <button class="btn" onclick="resetReactions()">Nova Rodada</button>
       </div>
-      <div style="margin-top:8px;font-size:0.82rem;color:var(--text-muted);font-style:italic;line-height:1.35">Uma reação por bruxa (Bella · Offalia · Morgantha).</div>
+      <div style="margin-top:8px;font-size:0.82rem;color:var(--text-muted);font-style:italic;line-height:1.35">Se perder reações, perde apenas <em style="color:var(--gold);font-style:normal">1</em> em vez de todas.</div>
     </div>
 
     <div class="panel">
@@ -235,31 +232,32 @@
         <button class="btn gold" onclick="adjustRound(1)">Próxima ▸</button>
         <button class="btn" onclick="resetRound()">⟲ Zerar</button>
       </div>
-      <div style="margin-top:8px;font-size:0.82rem;color:var(--text-muted);font-style:italic;line-height:1.35">Ações de covil na <strong style="color:var(--gold)">iniciativa 20</strong> (no moinho).</div>
+      <div style="margin-top:8px;font-size:0.82rem;color:var(--text-muted);font-style:italic;line-height:1.35">Avançar a rodada <strong style="color:var(--gold);font-weight:600">recupera as reações</strong> e a <strong style="color:var(--gold);font-weight:600">Regeneração</strong>.</div>
     </div>
   </div>
 
   <div class="condition-row">
     <span class="cond-label">Condições:</span>
-    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">🥈 Combate com Prata</div>
-    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">◉ Concentrando (Bella)</div>
-    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">◉ Concentrando (Offalia)</div>
-    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">◉ Concentrando (Morgantha)</div>
-    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">⚡ Relâmpago Recarregado</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">✦ Regen Bloqueada</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">⛓ Colar de Prata</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">🐺 Forma de Lobo</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">🧑 Forma Humana</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">⊘ Agarrando</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">↓ Caído (alvo)</div>
   </div>
 
   <div class="phase-tabs">
     <div class="phase-tab active" data-phase="1" onclick="switchPhase(1)">
-      <iconify-icon class="phase-icon" icon="game-icons:cauldron"></iconify-icon>
+      <iconify-icon class="phase-icon" icon="game-icons:wolf-howl"></iconify-icon>
       <div class="phase-num">~ Primeira Forma ~</div>
-      <div class="phase-name">O Coven</div>
-      <div class="phase-tagline">Conjuradoras · ND 14</div>
+      <div class="phase-name">Alfa Lobisomem</div>
+      <div class="phase-tagline">Líder da matilha · ND 18</div>
     </div>
     <div class="phase-tab" data-phase="2" onclick="switchPhase(2)">
       <iconify-icon class="phase-icon" icon="game-icons:daemon-skull"></iconify-icon>
       <div class="phase-num">~ Segunda Forma ~</div>
-      <div class="phase-name">Os Três Pesadelos</div>
-      <div class="phase-tagline">Feras monstruosas · ND 15</div>
+      <div class="phase-name">Licano Mutante</div>
+      <div class="phase-tagline">Abominação Enorme · ND 18</div>
     </div>
   </div>
 
@@ -267,168 +265,140 @@
     <div class="legend-item"><span class="legend-swatch" style="background:var(--blood)"></span>Ação</div>
     <div class="legend-item"><span class="legend-swatch" style="background:#c08a3e"></span>Bônus</div>
     <div class="legend-item"><span class="legend-swatch" style="background:#5f8bb8"></span>Reação</div>
-    <div class="legend-item"><span class="legend-swatch" style="background:#9061b8"></span>Covil</div>
   </div>
 
-  <!-- FORMA 1: O COVEN -->
+  <!-- FORMA 1: ALFA LOBISOMEM -->
   <div class="phase-content active" id="phase-1">
     <div class="stats-bar">
       <div class="stat"><div class="stat-label">FOR</div><div class="stat-value">18</div><div class="stat-mod">+4</div></div>
-      <div class="stat"><div class="stat-label">DES</div><div class="stat-value">15</div><div class="stat-mod">+2</div></div>
-      <div class="stat"><div class="stat-label">CON</div><div class="stat-value">16</div><div class="stat-mod">+3</div></div>
-      <div class="stat"><div class="stat-label">INT</div><div class="stat-value">18</div><div class="stat-mod">+4</div></div>
-      <div class="stat"><div class="stat-label">SAB</div><div class="stat-value">14</div><div class="stat-mod">+2</div></div>
+      <div class="stat"><div class="stat-label">DES</div><div class="stat-value">18</div><div class="stat-mod">+4</div></div>
+      <div class="stat"><div class="stat-label">CON</div><div class="stat-value">18</div><div class="stat-mod">+4</div></div>
+      <div class="stat"><div class="stat-label">INT</div><div class="stat-value">12</div><div class="stat-mod">+1</div></div>
+      <div class="stat"><div class="stat-label">SAB</div><div class="stat-value">16</div><div class="stat-mod">+3</div></div>
       <div class="stat"><div class="stat-label">CAR</div><div class="stat-value">16</div><div class="stat-mod">+3</div></div>
     </div>
     <div class="info-grid">
-      <div class="info-card"><div class="label">Classe Armadura</div><div class="value"><input type="number" class="editable ca-input" data-phase="1" value="17"> <span style="font-size:0.72rem;color:var(--text-muted)">(armadura natural)</span></div></div>
-      <div class="info-card"><div class="label">Deslocamento</div><div class="value">9 m</div></div>
+      <div class="info-card"><div class="label">Classe Armadura</div><div class="value"><input type="number" class="editable ca-input" data-phase="1" value="16"> <span style="font-size:0.72rem;color:var(--text-muted)">(armadura natural)</span></div></div>
+      <div class="info-card"><div class="label">Deslocamento</div><div class="value">12 m</div></div>
       <div class="info-card"><div class="label">Bônus Prof.</div><div class="value">+5</div></div>
-      <div class="info-card"><div class="label">Visão no Escuro</div><div class="value">36 m</div></div>
-      <div class="info-card"><div class="label">Perc. Passiva</div><div class="value">16</div></div>
-      <div class="info-card"><div class="label">CD Magia</div><div class="value">17 · +9 ataque</div></div>
+      <div class="info-card"><div class="label">Perc. Passiva</div><div class="value">14</div></div>
+      <div class="info-card"><div class="label">Tamanho</div><div class="value">Grande</div></div>
+      <div class="info-card"><div class="label">Nível de Desafio</div><div class="value" style="color:var(--accent-bright)">18 (16 s/ regen)</div></div>
     </div>
     <div class="meta-row">
-      <div class="meta-box"><div class="meta-title">Perícias, Sentidos & Idiomas</div><div class="meta-content"><strong>Perícias:</strong> Enganação +8 · Intuição +7 · Percepção +7 · Furtividade +7<br><strong>Sentidos:</strong> visão no escuro 36 m, PP 16 · <strong>Idiomas:</strong> Abissal, Comum, Infernal, Primordial</div></div>
-      <div class="meta-box"><div class="meta-title">Resistências & Imunidades</div><div class="meta-content"><strong>Resist. a Dano:</strong> frio, fogo; contundente, perfurante e cortante de ataques não mágicos que não sejam prateados<br><strong>Imune a Condição:</strong> enfeitiçado</div></div>
+      <div class="meta-box"><div class="meta-title">Perícias & Sentidos</div><div class="meta-content"><strong>Perícias:</strong> Percepção +8 · Furtividade +8<br><strong>Sentidos:</strong> Percepção passiva 14</div></div>
+      <div class="meta-box"><div class="meta-title">Idiomas</div><div class="meta-content">Comum (não fala na forma de lobo terrível)</div></div>
     </div>
 
     <div class="section">
       <h2 class="section-title">Características</h2>
       <div class="ability-grid">
-        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Coven de Bruxas</div><span class="toggle-icon">▼</span></div><div class="ability-body">O coven inclui três bruxas: <strong>Morgantha, Bella e Offalia</strong>. Cada uma age em sua própria iniciativa, mantém concentração e sofre condições de forma independente, e tem ação, ação bônus, reação e movimento próprios. Todo dano sofrido por uma bruxa é subtraído dos PV do coven. (Se várias bruxas sofrem dano da mesma fonte, o coven perde PV esse número de vezes.)</div></div>
-        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Lutadora de Curta Distância</div><span class="toggle-icon">▼</span></div><div class="ability-body">Não sofre <em>desvantagem</em> em ataques à distância por estar a até 1,5 m de uma criatura hostil.</div></div>
-        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Resistência à Magia</div><span class="toggle-icon">▼</span></div><div class="ability-body"><em>Vantagem</em> em testes de resistência contra magias e efeitos mágicos.</div></div>
-        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Conjuração</div><span class="ability-tag tag-any">INT · CD 17 · +9</span><span class="toggle-icon">▼</span></div><div class="ability-body">A habilidade de conjuração do coven é Inteligência (CD 17, +9 para atingir com ataques mágicos).</div></div>
-        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Conjuração Complexa</div><span class="toggle-icon">▼</span></div><div class="ability-body">Se uma bruxa conjura uma magia em seu turno como <em>ação bônus</em>, ela ainda pode usar sua ação para conjurar uma magia de nível (não truque) no mesmo turno.</div></div>
-        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Segunda Fase</div><span class="ability-tag tag-any">Gatilho de 2ª forma</span><span class="toggle-icon">▼</span></div><div class="ability-body">A <strong>0 PV</strong>, as estatísticas viram as de <strong>Os Três Pesadelos</strong>. A iniciativa não muda. O dano excedente não transfere, mas <em>mantém as condições</em>. Magias de concentração terminam.</div></div>
+        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Regeneração</div><span class="toggle-icon">▼</span></div><div class="ability-body">Recupera <em>20 PV</em> no início do turno. <span class="dmg">Necrótico</span> ou dano de <span class="dmg">arma prateada</span> desativam no próximo turno.</div></div>
+        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Audição e Olfato Aguçados</div><span class="toggle-icon">▼</span></div><div class="ability-body"><em>Vantagem</em> em testes de Percepção (Sabedoria) baseados em audição ou olfato.</div></div>
+        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Segunda Fase</div><span class="ability-tag">Gatilho de 2ª forma</span><span class="toggle-icon">▼</span></div><div class="ability-body">A <strong>0 PV</strong>, Kiril crava as garras no próprio peito, arranca e devora o próprio coração, dobrando de tamanho: vira o <strong>Licano Mutante</strong>. A iniciativa não muda. O dano excedente e as condições <em>não</em> transferem.</div></div>
       </div>
     </div>
 
     <div class="section">
       <h2 class="section-title">Ações</h2>
       <div class="ability-grid">
-        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Cegueira/Surdez</div><span class="ability-tag tag-bella">Bella</span><span class="toggle-icon">▼</span></div><div class="ability-body">Conjura <em>cegueira/surdez</em>. O alvo sofre <span class="dmg">7 (2d6) necrótico</span> adicional se falhar, ou metade em sucesso.</div></div>
-        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Fulgor Pútrido</div><span class="ability-tag tag-bella">Bella · 9 m · CON CD 17</span><span class="toggle-icon">▼</span></div><div class="ability-body">Necromancia de 2º. Cada criatura numa esfera de raio 3 m (num ponto a até 9 m) faz <em>Constituição</em> <span class="cd">CD 17</span> ou sofre <span class="dmg">2d6 radiante</span> e fica <strong>envenenada</strong> até o fim de seu próximo turno.</div></div>
-        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Raio do Enfraquecimento</div><span class="ability-tag tag-offalia">Offalia</span><span class="toggle-icon">▼</span></div><div class="ability-body">Conjura <em>raio do enfraquecimento</em>. O alvo sofre <span class="dmg">9 (2d8) necrótico</span> adicional no acerto.</div></div>
-        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Flecha Ácida de Melf</div><span class="ability-tag tag-offalia">Offalia</span><span class="toggle-icon">▼</span></div><div class="ability-body">Conjura <em>flecha ácida de Melf</em>.</div></div>
-        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Raio da Enfermidade</div><span class="ability-tag tag-morgantha">Morgantha</span><span class="toggle-icon">▼</span></div><div class="ability-body">Conjura <em>raio da enfermidade</em>.</div></div>
-        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Podridão Definhante</div><span class="ability-tag tag-morgantha">Morgantha · 9 m · CON</span><span class="toggle-icon">▼</span></div><div class="ability-body">Necromancia de 1º. Uma criatura a até 9 m faz <em>Constituição</em>: <span class="dmg">13 (3d8) necrótico</span> em falha, metade em sucesso.</div></div>
-        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Garras</div><span class="ability-tag tag-any">Qualquer · +9 · 1,5 m</span><span class="toggle-icon">▼</span></div><div class="ability-body">Acerto: <span class="dmg">13 (2d8+4) cortante</span>.</div></div>
+        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Ataque Múltiplo</div><span class="toggle-icon">▼</span></div><div class="ability-body">Faz <strong>três</strong> ataques corpo a corpo, sendo até <em>um</em> deles uma Mordida.</div></div>
+        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Garra</div><span class="ability-tag">+9 · 1,5 m</span><span class="toggle-icon">▼</span></div><div class="ability-body">Acerto: <span class="dmg">13 (2d8+4) cortante</span>. O alvo faz <em>Força</em> <span class="cd">CD 17</span> ou fica <strong>caído</strong>.</div></div>
+        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Mordida</div><span class="ability-tag">+9 · 1,5 m</span><span class="toggle-icon">▼</span></div><div class="ability-body">Acerto: <span class="dmg">11 (2d6+4) perfurante</span>. Humanoide faz <em>Constituição</em> <span class="cd">CD 17</span> ou é amaldiçoado com <strong>licantropia de lobisomem</strong> até Kiril morrer. Se já amaldiçoado, não pode regenerar até completar um descanso longo.</div></div>
       </div>
     </div>
 
     <div class="section">
       <h2 class="section-title">Ações Bônus</h2>
       <div class="ability-grid">
-        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Coroa da Loucura</div><span class="ability-tag tag-bella">Bella</span><span class="toggle-icon">▼</span></div><div class="ability-body">Conjura <em>coroa da loucura</em>. +<span class="dmg">5 (2d4) psíquico</span> se falhar, metade em sucesso. Pode usar a ação bônus para manter o controle do alvo (em vez da ação).</div></div>
-        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Força Fantasmal</div><span class="ability-tag tag-bella">Bella</span><span class="toggle-icon">▼</span></div><div class="ability-body">Conjura <em>força fantasmal</em>. +<span class="dmg">5 (2d4) psíquico</span> se falhar, metade em sucesso.</div></div>
-        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Causar Medo</div><span class="ability-tag tag-offalia">Offalia · 2º</span><span class="toggle-icon">▼</span></div><div class="ability-body">Conjura <em>causar medo</em> no 2º nível. +<span class="dmg">5 (2d4) psíquico</span> se falhar, metade em sucesso.</div></div>
-        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Conceder Maldição</div><span class="ability-tag tag-offalia">Offalia · 9 m</span><span class="toggle-icon">▼</span></div><div class="ability-body">Conjura <em>conceder maldição</em> (alcance 9 m). +<span class="dmg">7 (2d6) necrótico</span> se falhar, metade em sucesso.</div></div>
-        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Imobilizar Pessoa</div><span class="ability-tag tag-morgantha">Morgantha · 3º</span><span class="toggle-icon">▼</span></div><div class="ability-body">Conjura <em>imobilizar pessoa</em> no 3º nível. +<span class="dmg">5 (2d4) necrótico</span> se falhar, metade em sucesso.</div></div>
-        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Relâmpago (Recarga 5-6)</div><span class="ability-tag tag-morgantha">Morgantha</span><span class="toggle-icon">▼</span></div><div class="ability-body">Conjura <em>relâmpago</em>. (Marque <strong>Relâmpago Recarregado</strong> nas condições.)</div></div>
+        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Uivo do Alfa</div><span class="ability-tag">18 m · SAB CD 17</span><span class="toggle-icon">▼</span></div><div class="ability-body">Qualquer nº de alvos amaldiçoados por Kiril a até 18 m que o ouçam fazem <em>Sabedoria</em> <span class="cd">CD 17</span>: em sucesso, perdem 1 nível de <em>corrupção licantrópica</em> (mín. 0); em falha, ganham 1 nível (máx. 2) e usam imediatamente a reação para mover-se em direção a uma criatura aleatória (que não Kiril) e desferir golpes desarmados iguais aos seus níveis de corrupção.<br><em>1 nível:</em> garras (2d4 + FOR, mín. 2). <em>2 níveis:</em> também mordida (1d8 + FOR, mín. 2; humanoide mordido faz CON CD 17 ou vira lobisomem).</div></div>
+        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Frenesi Selvagem</div><span class="ability-tag">1,5 m · DES CD 17</span><span class="toggle-icon">▼</span></div><div class="ability-body">Salta até seu deslocamento sem provocar ataques de oportunidade. Cada criatura a até 1,5 m faz <em>Destreza</em> <span class="cd">CD 17</span>: <span class="dmg">7 (2d6) cortante</span>, metade em sucesso.</div></div>
+        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Metamorfose</div><span class="toggle-icon">▼</span></div><div class="ability-body">Transforma-se em <em>forma humana</em>, <em>lobo terrível</em>, ou de volta à forma verdadeira (híbrido lobo-humanoide). As estatísticas, exceto a CA, são iguais. Reverte à forma humana ao morrer.</div></div>
       </div>
     </div>
 
     <div class="section">
-      <h2 class="section-title">Reações <span style="font-size:0.7em;color:var(--text-muted);text-transform:none;font-style:italic;margin-left:8px">1 por bruxa</span></h2>
+      <h2 class="section-title">Reações <span style="font-size:0.7em;color:var(--text-muted);text-transform:none;font-style:italic;margin-left:8px">até 3/rodada · 1/turno</span></h2>
       <div class="ability-grid">
-        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Sombras Espectrais</div><span class="ability-tag tag-bella">Bella</span><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> é atingida por um ataque.<br><strong>Efeito:</strong> conjura duas duplicatas ilusórias em seu espaço. O atacante rola 1d6: acerta Bella em <em>5 ou 6</em>, uma duplicata caso contrário.</div></div>
-        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Riso Maníaco</div><span class="ability-tag tag-offalia">Offalia · 9 m · SAB CD 17</span><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> sofre dano de criatura visível a até 9 m.<br><strong>Efeito:</strong> a criatura faz <em>Sabedoria</em> <span class="cd">CD 17</span> ou cai no riso: fica <strong>caída e incapacitada</strong>, sem poder se levantar, até o fim de seu próximo turno ou até sofrer dano.</div></div>
-        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Arco de Fogo-Fátuo</div><span class="ability-tag tag-morgantha">Morgantha · 9 m · CON CD 17</span><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> sofre dano de criatura visível a até 9 m.<br><strong>Efeito:</strong> a criatura faz <em>Constituição</em> <span class="cd">CD 17</span> ou <span class="dmg">6 (1d12) elétrico</span>. Em falha, forma um <em>arco de relâmpago</em> até o início do próximo turno dela: Morgantha tem <strong>resistência a todo dano</strong> e reflete o mesmo dano à criatura conectada.</div></div>
-        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Passo Nebuloso</div><span class="ability-tag tag-any">Qualquer</span><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> sofre dano.<br><strong>Efeito:</strong> a bruxa conjura <em>passo nebuloso</em>.</div></div>
-      </div>
-    </div>
-
-    <div class="section">
-      <h2 class="section-title">Ações de Covil <span style="font-size:0.7em;color:var(--text-muted);text-transform:none;font-style:italic;margin-left:8px">iniciativa 20, no moinho</span></h2>
-      <div class="ability-grid">
-        <div class="ability lair"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Vento Protetor</div><span class="toggle-icon">▼</span></div><div class="ability-body">O coven conjura <em>vento protetor</em>.</div></div>
-        <div class="ability lair"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Rajada de Vento</div><span class="toggle-icon">▼</span></div><div class="ability-body">O coven conjura <em>rajada de vento</em>.</div></div>
-        <div class="ability lair"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Cacofonia Anfíbia</div><span class="ability-tag">36 m · CAR CD 10</span><span class="toggle-icon">▼</span></div><div class="ability-body">As rãs ao redor do moinho croam uma canção hipnótica. Cada criatura a até 36 m do moinho que as ouça faz <em>Carisma</em> <span class="cd">CD 10</span> ou usa todo o movimento no início de seu próximo turno para se aproximar do moinho.</div></div>
-        <div class="ability lair"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Dissipar Magia (1/dia)</div><span class="toggle-icon">▼</span></div><div class="ability-body">O coven conjura <em>dissipar magia</em> no 5º nível.</div></div>
+        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Indomável</div><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> criatura hostil termina o turno.<br><strong>Efeito:</strong> repete um TR contra um efeito/condição ativo.</div></div>
+        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Bote</div><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> uma criatura se move a até 9 m.<br><strong>Efeito:</strong> move-se até seu deslocamento em direção a ela sem provocar ataques de oportunidade.</div></div>
+        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Garra (reação)</div><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> um ataque de criatura a até 1,5 m erra Kiril.<br><strong>Efeito:</strong> ataca essa criatura com as garras.</div></div>
+        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Mordida (reação)</div><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> é atingido por um ataque de criatura a até 1,5 m.<br><strong>Efeito:</strong> ataca essa criatura com a mordida.</div></div>
       </div>
     </div>
   </div>
 
-  <!-- FORMA 2: OS TRÊS PESADELOS -->
+  <!-- FORMA 2: LICANO MUTANTE -->
   <div class="phase-content" id="phase-2">
     <div class="special-callout">
-      <div class="sc-title"><iconify-icon icon="game-icons:daemon-skull" style="color:var(--accent-bright)"></iconify-icon> Os Três Pesadelos — segunda forma</div>
-      <div class="sc-body">A 0 PV, as bruxas se transformam: <strong>Bella</strong> vira um <em>crocodilo Enorme</em>, <strong>Offalia</strong> um <em>elefante Enorme</em>, e <strong>Morgantha</strong> se envolve num manto de sombras. <em>Mantém os PV atuais</em> e as condições. Se o coven chegar a 0 PV agora, <strong>todas as bruxas morrem</strong>.</div>
+      <div class="sc-title"><iconify-icon icon="game-icons:daemon-skull" style="color:var(--accent-bright)"></iconify-icon> Licano Mutante — segunda forma</div>
+      <div class="sc-body">A 0 PV, Kiril devora o próprio coração e dobra de tamanho (<strong>Enorme</strong>): costas curvas, protuberâncias ósseas, cabeça inchada com mandíbulas no lugar dos olhos. <em>Mantém os PV atuais</em> (excedente e condições não transferem). Agora imune a <strong>amedrontado</strong>.</div>
     </div>
     <div class="stats-bar">
       <div class="stat"><div class="stat-label">FOR</div><div class="stat-value">21</div><div class="stat-mod">+5</div></div>
-      <div class="stat"><div class="stat-label">DES</div><div class="stat-value">15</div><div class="stat-mod">+2</div></div>
-      <div class="stat"><div class="stat-label">CON</div><div class="stat-value">16</div><div class="stat-mod">+3</div></div>
-      <div class="stat"><div class="stat-label">INT</div><div class="stat-value">18</div><div class="stat-mod">+4</div></div>
-      <div class="stat"><div class="stat-label">SAB</div><div class="stat-value">14</div><div class="stat-mod">+2</div></div>
-      <div class="stat"><div class="stat-label">CAR</div><div class="stat-value">16</div><div class="stat-mod">+3</div></div>
+      <div class="stat"><div class="stat-label">DES</div><div class="stat-value">8</div><div class="stat-mod">−1</div></div>
+      <div class="stat"><div class="stat-label">CON</div><div class="stat-value">19</div><div class="stat-mod">+4</div></div>
+      <div class="stat"><div class="stat-label">INT</div><div class="stat-value">5</div><div class="stat-mod">−3</div></div>
+      <div class="stat"><div class="stat-label">SAB</div><div class="stat-value">9</div><div class="stat-mod">−1</div></div>
+      <div class="stat"><div class="stat-label">CAR</div><div class="stat-value">18</div><div class="stat-mod">+4</div></div>
     </div>
     <div class="info-grid">
       <div class="info-card"><div class="label">Classe Armadura</div><div class="value"><input type="number" class="editable ca-input" data-phase="2" value="17"> <span style="font-size:0.72rem;color:var(--text-muted)">(armadura natural)</span></div></div>
       <div class="info-card"><div class="label">Deslocamento</div><div class="value">9 m</div></div>
-      <div class="info-card"><div class="label">Bônus Prof.</div><div class="value">+5</div></div>
-      <div class="info-card"><div class="label">Visão no Escuro</div><div class="value">36 m</div></div>
-      <div class="info-card"><div class="label">Perc. Passiva</div><div class="value">16</div></div>
-      <div class="info-card"><div class="label">Nível de Desafio</div><div class="value" style="color:var(--accent-bright)">15 (13 com prata)</div></div>
+      <div class="info-card"><div class="label">Bônus Prof.</div><div class="value">+6</div></div>
+      <div class="info-card"><div class="label">Perc. Passiva</div><div class="value">15</div></div>
+      <div class="info-card"><div class="label">Tamanho</div><div class="value">Enorme</div></div>
+      <div class="info-card"><div class="label">Nível de Desafio</div><div class="value" style="color:var(--accent-bright)">18 (17 s/ regen)</div></div>
     </div>
     <div class="meta-row">
-      <div class="meta-box"><div class="meta-title">Perícias, Sentidos & Idiomas</div><div class="meta-content"><strong>Perícias:</strong> Enganação +8 · Intuição +7 · Percepção +7 · Furtividade +7<br><strong>Sentidos:</strong> visão no escuro 36 m, PP 16 · <strong>Idiomas:</strong> Abissal, Comum, Infernal, Primordial</div></div>
-      <div class="meta-box"><div class="meta-title">Resistências & Imunidades</div><div class="meta-content"><strong>Resist. a Dano:</strong> frio, fogo; contundente, perfurante e cortante de ataques não mágicos que não sejam prateados<br><strong>Imune a Condição:</strong> enfeitiçado</div></div>
+      <div class="meta-box"><div class="meta-title">Testes de Resistência & Perícias</div><div class="meta-content"><strong>Resistência:</strong> For +11 · Con +10<br><strong>Perícias:</strong> Percepção +5</div></div>
+      <div class="meta-box"><div class="meta-title">Imunidades, Sentidos & Idiomas</div><div class="meta-content"><strong>Imune a Condição:</strong> amedrontado<br><strong>Sentidos:</strong> PP 15 · <strong>Idiomas:</strong> Comum</div></div>
     </div>
 
     <div class="section">
       <h2 class="section-title">Características</h2>
       <div class="ability-grid">
-        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Coven de Bruxas</div><span class="toggle-icon">▼</span></div><div class="ability-body">As três bruxas agem independentemente (ação, bônus, reação e movimento próprios). Todo dano sofrido por uma é subtraído dos PV do coven. <strong>Se o coven chegar a 0 PV, todas morrem.</strong></div></div>
-        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Formas de Pesadelo</div><span class="toggle-icon">▼</span></div><div class="ability-body">Bella assume a forma de um <em>crocodilo Enorme</em>, Offalia de um <em>elefante Enorme</em>, e Morgantha se envolve num <em>manto de sombras rodopiantes</em>.</div></div>
-        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Resistência à Magia</div><span class="toggle-icon">▼</span></div><div class="ability-body"><em>Vantagem</em> em testes de resistência contra magias e efeitos mágicos.</div></div>
-        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Investida</div><span class="ability-tag tag-offalia">Offalia</span><span class="toggle-icon">▼</span></div><div class="ability-body">Se Offalia se mover ao menos 6 m em linha reta em direção a um alvo e o acertar com <em>chifrada</em> no mesmo turno, o alvo sofre <span class="dmg">11 (2d10) perfurante</span> adicional e faz <em>Força</em> <span class="cd">CD 18</span> ou é empurrado 3 m e cai.</div></div>
+        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Regeneração</div><span class="toggle-icon">▼</span></div><div class="ability-body">Recupera <em>20 PV</em> no início do turno. <span class="dmg">Necrótico</span> ou dano de <span class="dmg">arma prateada</span> desativam no próximo turno.</div></div>
+        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Audição e Olfato Aguçados</div><span class="toggle-icon">▼</span></div><div class="ability-body"><em>Vantagem</em> em testes de Percepção baseados em audição ou olfato.</div></div>
       </div>
     </div>
 
     <div class="section">
       <h2 class="section-title">Ações</h2>
       <div class="ability-grid">
-        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Mordida</div><span class="ability-tag tag-bella">Bella · +10 · 1,5 m</span><span class="toggle-icon">▼</span></div><div class="ability-body">Acerto: <span class="dmg">16 (2d10+5) perfurante</span> e o alvo fica <strong>agarrado</strong> (escapar <span class="cd">CD 17</span>). Enquanto agarrado, fica restrito e Bella não pode morder outro alvo.</div></div>
-        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Cauda</div><span class="ability-tag tag-bella">Bella · +10 · 3 m</span><span class="toggle-icon">▼</span></div><div class="ability-body">Contra alvo não agarrado por ela. Acerto: <span class="dmg">14 (2d8+5) contundente</span>. <em>Força</em> <span class="cd">CD 17</span> ou <strong>caído</strong>.</div></div>
-        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Chifrada</div><span class="ability-tag tag-offalia">Offalia · +10 · 1,5 m</span><span class="toggle-icon">▼</span></div><div class="ability-body">Acerto: <span class="dmg">14 (2d8+5) perfurante</span>.</div></div>
-        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Olho Aterrador</div><span class="ability-tag tag-morgantha">Morgantha · CD 17</span><span class="toggle-icon">▼</span></div><div class="ability-body">Usa <em>olho aterrador</em> (CD 17). Um alvo que passe no teste fica <strong>atordoado leve</strong> até o fim de seu próximo turno (pode mover-se OU agir, não ambos; sem bônus/reação).</div></div>
+        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Ataque Múltiplo</div><span class="toggle-icon">▼</span></div><div class="ability-body">Um ataque com as <em>garras</em> e um com a <em>mordida</em>. Pode substituir a mordida por <em>Engolir</em> se já tiver um alvo restrito com a mordida.</div></div>
+        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Garras</div><span class="ability-tag">+10 · 3 m</span><span class="toggle-icon">▼</span></div><div class="ability-body">Acerto: <span class="dmg">14 (2d8+5) cortante</span>. O alvo faz <em>Destreza</em> <span class="cd">CD 18</span> ou é <strong>empurrado 1,5 m</strong> ou <strong>agarrado</strong> (escolha de Kiril).</div></div>
+        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Mordida</div><span class="ability-tag">+10 · 3 m</span><span class="toggle-icon">▼</span></div><div class="ability-body">Acerto: <span class="dmg">18 (2d12+5) perfurante</span>. Alvo Grande ou menor fica <strong>agarrado</strong> (escapar <span class="cd">CD 18</span>) e restrito; Kiril não pode morder outro alvo.</div></div>
+        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Engolir</div><span class="toggle-icon">▼</span></div><div class="ability-body">Uma mordida contra criatura Média ou menor restrita pela mordida. Se acertar, o alvo é <strong>engolido</strong> (cego, restrito, cobertura total, <span class="dmg">7 (2d6) ácido</span> no início de cada turno de Kiril). Se Kiril sofrer 20+ de dano num turno, faz <em>Constituição</em> <span class="cd">CD 20</span> ao fim do turno ou <strong>regurgita</strong> os engolidos (caídos a até 3 m).</div></div>
       </div>
     </div>
 
     <div class="section">
       <h2 class="section-title">Ações Bônus</h2>
       <div class="ability-grid">
-        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Golpe de Cauda</div><span class="ability-tag tag-bella">Bella · cone 3 m · DES CD 18</span><span class="toggle-icon">▼</span></div><div class="ability-body">Cone de 3 m. <em>Destreza</em> <span class="cd">CD 18</span>: <span class="dmg">9 (2d8) contundente</span> e <strong>caído</strong> em falha; sucesso metade e sem cair.</div></div>
-        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Névoa Alucinógena</div><span class="ability-tag tag-bella">Bella · cone 9 m · CON CD 17</span><span class="toggle-icon">▼</span></div><div class="ability-body">Cone de 9 m de névoa perolada. <em>Constituição</em> <span class="cd">CD 17</span> ou <strong>atordoado leve</strong> até o início do próximo turno de Bella.</div></div>
-        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Pisão</div><span class="ability-tag tag-offalia">Offalia · raio 1,5 m · DES CD 18</span><span class="toggle-icon">▼</span></div><div class="ability-body">Criaturas a até 1,5 m fazem <em>Destreza</em> <span class="cd">CD 18</span>: <span class="dmg">11 (2d10) contundente</span> em falha, metade em sucesso.</div></div>
-        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Trombeta do Diabo</div><span class="ability-tag tag-offalia">Offalia · raio 18 m · SAB CD 17</span><span class="toggle-icon">▼</span></div><div class="ability-body">Cada humanoide a até 18 m faz <em>Sabedoria</em> <span class="cd">CD 17</span> ou subtrai <span class="dmg">1d4</span> de sua próxima jogada de ataque, teste ou TR.</div></div>
-        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Anel Enervante</div><span class="ability-tag tag-morgantha">Morgantha · raio 3 m · CON CD 16</span><span class="toggle-icon">▼</span></div><div class="ability-body">Tentáculos de escuridão tocam cada criatura a até 3 m. <em>Constituição</em> <span class="cd">CD 16</span> ou <span class="dmg">9 (2d8) necrótico</span> e <strong>lenta</strong> até o fim de seu próximo turno.</div></div>
-        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Infligir Pesadelos</div><span class="ability-tag tag-morgantha">Morgantha · 9 m · SAB CD 17</span><span class="toggle-icon">▼</span></div><div class="ability-body">Uma criatura a até 9 m faz <em>Sabedoria</em> <span class="cd">CD 17</span> ou fica <strong>atordoada</strong> até sofrer dano ou outra criatura acordá-la. Sofre <span class="dmg">9 (2d8) psíquico</span> ao fim do turno se ainda atordoada.</div></div>
+        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Miasma Corrompido</div><span class="ability-tag">6 m · SAB CD 18</span><span class="toggle-icon">▼</span></div><div class="ability-body">Exala uma névoa necrótica. Cada criatura a até 6 m faz <em>Sabedoria</em> <span class="cd">CD 18</span>: <span class="dmg">9 (2d8) necrótico</span> em falha, metade em sucesso.</div></div>
+        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Raio das Sombras</div><span class="ability-tag">Linha 30 m × 1,5 m · DES CD 18</span><span class="toggle-icon">▼</span></div><div class="ability-body">Um raio de sombras irrompe da bocarra. <em>Destreza</em> <span class="cd">CD 18</span>: <span class="dmg">14 (4d6) necrótico</span> em falha, metade em sucesso. Alvo agarrado pela mordida <em>falha automaticamente</em>.</div></div>
       </div>
     </div>
 
     <div class="section">
-      <h2 class="section-title">Reações <span style="font-size:0.7em;color:var(--text-muted);text-transform:none;font-style:italic;margin-left:8px">1 por bruxa</span></h2>
+      <h2 class="section-title">Reações <span style="font-size:0.7em;color:var(--text-muted);text-transform:none;font-style:italic;margin-left:8px">até 3/rodada · 1/turno</span></h2>
       <div class="ability-grid">
-        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Chicotada de Cauda</div><span class="ability-tag tag-bella">Bella</span><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> sofre dano de criatura a até 3 m.<br><strong>Efeito:</strong> faz um ataque de <em>cauda</em> contra o atacante.</div></div>
-        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Presas</div><span class="ability-tag tag-offalia">Offalia</span><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> sofre dano de ataque corpo a corpo.<br><strong>Efeito:</strong> faz uma <em>chifrada</em> contra o atacante.</div></div>
-        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Passo Sombrio</div><span class="ability-tag tag-morgantha">Morgantha</span><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> sofre dano de criatura visível.<br><strong>Efeito:</strong> sofre <em>metade</em> do dano e teletransporta-se até 9 m.</div></div>
-        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Repreensão da Matrona</div><span class="ability-tag tag-morgantha">Morgantha · 18 m · DES CD 17</span><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> sofre dano de criatura visível a até 18 m.<br><strong>Efeito:</strong> a criatura faz <em>Destreza</em> <span class="cd">CD 17</span> ou <span class="dmg">11 (2d10) necrótico</span>.</div></div>
-        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Absorver Elementos</div><span class="ability-tag tag-any">Qualquer</span><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> sofre dano de ácido, frio, fogo, elétrico ou trovejante.<br><strong>Efeito:</strong> a bruxa conjura <em>absorver elementos</em>.</div></div>
+        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Indomável</div><span class="toggle-icon">▼</span></div><div class="ability-body">Repete um TR contra um efeito/condição ativo.</div></div>
+        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Salto</div><span class="ability-tag">9 m · FOR CD 18</span><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> uma criatura se move a até 9 m.<br><strong>Efeito:</strong> salta em direção a ela sem provocar AoO. Cada criatura num raio de 1,5 m faz <em>Força</em> <span class="cd">CD 18</span> ou fica <strong>caída</strong>.</div></div>
+        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Devorar</div><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> uma criatura entra em seu alcance pela 1ª vez no turno.<br><strong>Efeito:</strong> ataca com a mordida (se não estiver mordendo outra). Se errar, essa criatura tem vantagem no próximo ataque contra Kiril.</div></div>
+        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Imobilizar</div><span class="ability-tag">FOR CD 18</span><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> um ataque de criatura ao alcance erra Kiril.<br><strong>Efeito:</strong> a criatura faz <em>Força</em> <span class="cd">CD 18</span> ou fica <strong>caída</strong> e é empurrada 6 m ou agarrada (escolha de Kiril).</div></div>
       </div>
     </div>
   </div>
 
   <div class="notes-section">
     <h3>◆ Notas do Mestre</h3>
-    <textarea class="notes-area" id="notesArea" placeholder="Anote aqui: iniciativa de cada bruxa, quem está concentrando em quê, recarga do Relâmpago, quem foi morta, alvos enfeitiçados/atordoados..."></textarea>
+    <textarea class="notes-area" id="notesArea" placeholder="Anote aqui: níveis de corrupção licantrópica dos PJs, quem está engolido, forma atual, status do colar de prata, presença de Bianca e da matilha..."></textarea>
   </div>
 
   <footer>
-    Coven Bonegrinder — sincronizado em tempo real entre os dispositivos do Mestre.
+    Kiril Stoyanovich — sincronizado em tempo real entre os dispositivos do Mestre.
     <span class="footer-credit">Statblock adaptado de <a href="https://www.strahdreloaded.com/" target="_blank" rel="noopener">Curse of Strahd: Reloaded</a>, de DragnaCarta (conteúdo de fã da WotC).</span>
   </footer>
 
@@ -440,7 +410,10 @@
 <script src="../../assets/js/efeitos.js"></script>
 <script src="../../assets/js/master_state.js"></script>
 <script>
-const FORMAS = { 1: { nd: '14' }, 2: { nd: '15' } };
+const FORMAS = {
+  1: { nd: '18', ndSem: '16', pb: '+5', hp: 448, media: 304, dados: '32d10 + 128' },
+  2: { nd: '18', ndSem: '17', pb: '+6', hp: 464, media: 304, dados: '29d12 + 116' },
+};
 function switchPhase(num) { switchPhaseSilent(num); saveState(true); }
 function switchPhaseSilent(num) {
   const f = FORMAS[num] || FORMAS[1];
@@ -450,6 +423,19 @@ function switchPhaseSilent(num) {
   document.getElementById(`phase-${num}`).classList.add('active');
   document.body.dataset.fase = num;
   document.getElementById('ndHeader').textContent = f.nd;
+  document.getElementById('ndSem').textContent = f.ndSem;
+  document.getElementById('pbHeader').textContent = f.pb;
+  document.getElementById('hpMediaMax').textContent = f.hp;
+  document.getElementById('hpMedia').textContent = f.media;
+  document.getElementById('hpDados').textContent = f.dados;
+}
+function aplicarPVForma() {
+  const f = FORMAS[document.querySelector('.phase-tab.active').dataset.phase] || FORMAS[1];
+  hpMax.value = f.hp; hpCurrent.value = f.hp; updateHPBar(); saveState(true); showToast(`✓ PV no máximo (${f.hp})`);
+}
+function aplicarMediaForma() {
+  const f = FORMAS[document.querySelector('.phase-tab.active').dataset.phase] || FORMAS[1];
+  hpMax.value = f.media; hpCurrent.value = f.media; updateHPBar(); saveState(true); showToast(`✓ PV na média (${f.media})`);
 }
 
 const hpCurrent = document.getElementById('hpCurrent');
@@ -472,7 +458,6 @@ function adjustHP(delta) {
   saveState(true);
 }
 function resetHP() { hpCurrent.value = hpMax.value; updateHPBar(); saveState(true); }
-function setMedia() { hpMax.value = 210; hpCurrent.value = 210; updateHPBar(); saveState(true); showToast('✓ PV na média (210)'); }
 hpCurrent.addEventListener('input', () => { updateHPBar(); saveState(true); });
 hpMax.addEventListener('input', () => { updateHPBar(); saveState(true); });
 function toggleReact(el) { el.classList.toggle('used'); saveState(true); }
@@ -486,8 +471,8 @@ function adjustRound(delta) {
 function resetRound() { const el = document.getElementById('roundCounter'); if (el) el.textContent = 1; saveState(true); }
 function toggleAbility(header) { header.parentElement.classList.toggle('open'); }
 
-const STORAGE_KEY = 'bonegrinder_ficha_v1';
-const MS_CHAVE = 'vilao:bonegrinder';
+const STORAGE_KEY = 'kiril_ficha_v1';
+const MS_CHAVE = 'vilao:kiril';
 let _msAplicando = false;
 function _setSyncStatus(txt, cor) { const el = document.getElementById('syncStatus'); if (el) { el.textContent = txt; el.style.color = cor || 'var(--gold-dim)'; } }
 function getState() {
@@ -504,7 +489,7 @@ function getState() {
 }
 function applyState(s) {
   if (!s) return;
-  hpCurrent.value = s.hpCurrent ?? 308; hpMax.value = s.hpMax ?? 308; updateHPBar();
+  hpCurrent.value = s.hpCurrent ?? 448; hpMax.value = s.hpMax ?? 448; updateHPBar();
   if (s.ca) s.ca.forEach(c => { const inp = document.querySelector(`.ca-input[data-phase="${c.phase}"]`); if (inp) inp.value = c.val; });
   switchPhaseSilent(parseInt(s.activePhase) || 1);
   (s.reactions || []).forEach((u, i) => { const d = document.querySelectorAll('.react-dot')[i]; if (d) d.classList.toggle('used', u); });
@@ -541,8 +526,8 @@ async function loadState() {
 function resetAll() {
   if (!confirm('Resetar tudo? (HP, forma, reações, condições, notas)')) return;
   localStorage.removeItem(STORAGE_KEY);
-  hpCurrent.value = 308; hpMax.value = 308;
-  document.querySelectorAll('.ca-input').forEach(i => i.value = 17);
+  hpCurrent.value = 448; hpMax.value = 448;
+  document.querySelectorAll('.ca-input').forEach(i => i.value = i.dataset.phase === '1' ? 16 : 17);
   updateHPBar();
   document.querySelectorAll('.react-dot').forEach(d => d.classList.remove('used'));
   document.querySelectorAll('.condition-row .chip').forEach(c => c.classList.remove('active'));
@@ -554,7 +539,7 @@ function resetAll() {
 function exportJSON() {
   const blob = new Blob([JSON.stringify(getState(), null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob); const a = document.createElement('a');
-  a.href = url; a.download = `bonegrinder_combate_${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(url);
+  a.href = url; a.download = `kiril_combate_${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(url);
   showToast('✓ Exportado');
 }
 function importJSON(evt) {
