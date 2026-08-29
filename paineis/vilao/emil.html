@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a0608">
+<link rel="icon" type="image/svg+xml" href="../../assets/img/favicon.svg">
+<title>Emil Toranescu — Ficha de Combate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-deep:        #0a0608;
+    --bg-card:        #191115;
+    --bg-card-2:      #221820;
+    --bg-card-3:      #2c2029;
+    --blood:          #9b1f1f;
+    --blood-dark:     #5a0e0e;
+    --blood-bright:   #d13731;
+    --gold:           #cbac67;
+    --gold-bright:    #f0d089;
+    --gold-dim:       #8a7340;
+    --bone:           #efe6cf;
+    --bone-dim:       #c2b795;
+    --shadow:         #050203;
+    --text-body:      #ddd2b2;
+    --text-muted:     #948767;
+    --border:         #4a3a2a;
+    --border-soft:    rgba(203,172,103,0.16);
+    --radius:         10px;
+    /* Accent dinâmico por forma — sobrescrito em body[data-fase] */
+    --accent:         #cbac67;
+    --accent-bright:  #f0d089;
+    --accent-glow:    rgba(203,172,103,0.35);
+    --accent-soft:    rgba(203,172,103,0.10);
+  }
+  /* ===== TEMAS POR FORMA ===== */
+  body[data-fase="1"] { --accent:#b0894a; --accent-bright:#e0be7c; --accent-glow:rgba(176,137,74,0.38); --accent-soft:rgba(176,137,74,0.12); }
+  body[data-fase="2"] { --accent:#8fa2b8; --accent-bright:#c4d3e4; --accent-glow:rgba(143,162,184,0.38); --accent-soft:rgba(143,162,184,0.12); }
+  body[data-fase="3"] { --accent:#b5643c; --accent-bright:#e59366; --accent-glow:rgba(181,100,60,0.40); --accent-soft:rgba(181,100,60,0.13); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body {
+    background: var(--bg-deep);
+    color: var(--text-body);
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 16px;
+    line-height: 1.48;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+  body {
+    background:
+      radial-gradient(ellipse at 50% -10%, var(--accent-soft), transparent 55%),
+      radial-gradient(ellipse at 18% 4%, rgba(155,31,31,0.16), transparent 48%),
+      radial-gradient(ellipse at 84% 96%, rgba(203,172,103,0.06), transparent 50%),
+      var(--bg-deep);
+    background-attachment: fixed;
+    transition: background 0.6s ease;
+  }
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    pointer-events: none;
+    opacity: 0.3;
+    z-index: 1;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.05 0 0 0 0 0.05 0 0 0 0.3 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    mix-blend-mode: overlay;
+  }
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px 24px 60px;
+    position: relative;
+    z-index: 2;
+  }
+  .top-bar {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(10,6,8,0.96);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border);
+    margin: -20px -24px 16px;
+    padding: 12px 24px;
+  }
+  .top-bar-inner {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    max-width: 1400px; margin: 0 auto;
+  }
+  .brand {
+    font-family: 'Cinzel', serif; font-weight: 700; font-size: 1rem;
+    letter-spacing: 0.18em; color: var(--bone); text-transform: uppercase;
+  }
+  .brand-sub {
+    font-family: 'IM Fell English', serif; font-style: italic;
+    font-size: 11px; color: var(--gold-dim); letter-spacing: 0.15em;
+  }
+  .save-controls { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+  header {
+    text-align: center; padding: 26px 16px 26px; margin-bottom: 18px;
+    position: relative; border-radius: var(--radius);
+    background:
+      radial-gradient(ellipse at 50% 0%, var(--accent-soft), transparent 70%),
+      linear-gradient(180deg, rgba(20,10,14,0.85), rgba(10,6,8,0.4));
+    border: 1px solid var(--border);
+    box-shadow: inset 0 1px 0 rgba(240,208,137,0.06), 0 10px 40px rgba(0,0,0,0.5);
+    overflow: hidden;
+  }
+  header::before {
+    content: ''; position: absolute; inset: 0; pointer-events: none;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    height: 2px; top: 0; opacity: 0.55;
+  }
+  header::after {
+    content: '✦'; position: absolute; bottom: -11px; left: 50%;
+    transform: translateX(-50%); background: var(--bg-deep);
+    padding: 0 14px; color: var(--accent); font-size: 18px;
+    text-shadow: 0 0 12px var(--accent-glow);
+  }
+  .crest {
+    font-size: clamp(2rem, 6vw, 3rem); line-height: 1;
+    margin-bottom: 6px; filter: drop-shadow(0 0 14px var(--accent-glow));
+    animation: crestPulse 4s ease-in-out infinite;
+  }
+  @keyframes crestPulse { 0%,100%{opacity:.85;transform:scale(1)} 50%{opacity:1;transform:scale(1.05)} }
+  .eyebrow {
+    font-family: 'Cinzel', serif; font-size: 0.62rem; font-weight: 700;
+    letter-spacing: 0.42em; color: var(--accent-bright);
+    text-transform: uppercase; margin-bottom: 8px; opacity: 0.85;
+  }
+  h1 {
+    font-family: 'Cinzel', serif; font-weight: 900;
+    font-size: clamp(2rem, 5vw, 3.1rem); letter-spacing: 0.09em;
+    line-height: 1.02;
+    background: linear-gradient(180deg, var(--bone) 30%, var(--accent-bright));
+    -webkit-background-clip: text; background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 34px var(--accent-glow);
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.6));
+  }
+  .subtitle {
+    font-style: italic; font-size: 1rem; color: var(--gold);
+    margin-top: 10px; letter-spacing: 0.03em; line-height: 1.5;
+    max-width: 780px; margin-left: auto; margin-right: auto;
+  }
+  .subtitle strong { color: var(--bone); font-style: normal; }
+  .combat-bar {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px;
+  }
+  @media (max-width: 880px) { .combat-bar { grid-template-columns: 1fr; } }
+  .panel {
+    background: linear-gradient(180deg, var(--bg-card), rgba(10,6,8,0.5));
+    border: 1px solid var(--border);
+    padding: 10px 14px; border-radius: 2px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
+  }
+  .panel-title {
+    font-family: 'Cinzel', serif; font-size: 10px;
+    letter-spacing: 0.2em; color: var(--gold);
+    text-transform: uppercase; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 6px;
+    border-bottom: 1px solid var(--border-soft); padding-bottom: 6px;
+  }
+  .hp-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .hp-input {
+    background: var(--shadow); border: 1px solid var(--blood-dark);
+    color: var(--bone); font-family: 'Cinzel', serif;
+    font-size: 1rem; padding: 4px 8px; width: 70px;
+    text-align: center; border-radius: 2px; outline: none;
+  }
+  .hp-input:focus { border-color: var(--gold); }
+  .hp-bar-container {
+    flex: 1; min-width: 120px; height: 18px;
+    background: var(--shadow); border: 1px solid var(--border);
+    position: relative; overflow: hidden;
+  }
+  .hp-bar {
+    height: 100%; background: linear-gradient(90deg, var(--blood-dark), var(--blood));
+    transition: width 0.4s ease;
+    box-shadow: inset 0 0 8px rgba(0,0,0,0.5);
+  }
+  .hp-label {
+    position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'Cinzel', serif; font-size: 10px;
+    color: var(--bone); letter-spacing: 0.1em;
+    text-shadow: 0 0 4px black;
+  }
+  .btn {
+    background: transparent; border: 1px solid var(--gold-dim);
+    color: var(--gold); padding: 4px 10px;
+    font-family: 'Cinzel', serif; font-size: 10px;
+    letter-spacing: 0.1em; cursor: pointer;
+    transition: all 0.15s; border-radius: 2px; text-transform: uppercase;
+  }
+  .btn:hover { background: var(--blood-dark); color: var(--bone); border-color: var(--blood); }
+  .btn.gold:hover { background: var(--gold-dim); color: var(--shadow); border-color: var(--gold); }
+  .react-row { display: flex; align-items: center; gap: 10px; }
+  .react-dot {
+    width: 22px; height: 22px; border: 2px solid var(--blood);
+    border-radius: 50%; cursor: pointer; background: transparent; position: relative;
+  }
+  .react-dot.used { background: var(--blood); }
+  .react-dot.used::after {
+    content: '✗'; position: absolute; inset: 0;
+    display: flex; align-items: center; justify-content: center;
+    color: var(--bone); font-size: 12px;
+  }
+  .condition-row {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin-bottom: 14px; align-items: center;
+  }
+  .cond-label {
+    font-family: 'Cinzel', serif; font-size: 10px; color: var(--gold);
+    letter-spacing: 0.18em; text-transform: uppercase; margin-right: 4px;
+  }
+  .chip {
+    padding: 5px 12px;
+    background: linear-gradient(180deg, rgba(0,0,0,0.2), rgba(26,18,22,0.7));
+    border: 1px solid var(--border);
+    color: var(--text-muted); font-family: 'Cinzel', serif; font-weight: 600;
+    font-size: 10px; letter-spacing: 0.1em; cursor: pointer;
+    border-radius: 14px; user-select: none; transition: all 0.15s;
+    min-height: 26px; display: inline-flex; align-items: center;
+  }
+  .chip:hover { border-color: var(--gold-dim); color: var(--bone-dim); transform: translateY(-1px); }
+  .chip.active {
+    background: linear-gradient(180deg, var(--blood), var(--blood-dark));
+    border-color: var(--blood-bright); color: var(--bone);
+    box-shadow: 0 0 8px rgba(139,26,26,0.4);
+  }
+  .chip.buff.active {
+    background: linear-gradient(180deg, #3a6a3a, #1e3a1e);
+    border-color: #6ab06a; box-shadow: 0 0 8px rgba(80,180,80,0.35);
+  }
+  .phase-tabs {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 10px; margin-bottom: 16px;
+  }
+  .phase-tab {
+    background: linear-gradient(180deg, rgba(26,18,22,0.6), rgba(10,6,8,0.6));
+    border: 1px solid var(--border);
+    padding: 13px 12px 15px; cursor: pointer; text-align: center;
+    border-radius: var(--radius); transition: all 0.25s;
+    position: relative; overflow: hidden;
+  }
+  .phase-tab::before {
+    content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 3px;
+    background: var(--accent); transform: scaleX(0);
+    transition: transform 0.3s ease; opacity: 0.9;
+  }
+  .phase-tab:hover { border-color: var(--gold-dim); transform: translateY(-2px); }
+  .phase-tab.active {
+    background: linear-gradient(180deg, var(--accent-soft), rgba(10,6,8,0.55));
+    border-color: var(--accent);
+    box-shadow: 0 0 22px var(--accent-glow), inset 0 1px 0 rgba(255,255,255,0.06);
+  }
+  .phase-tab.active::before { transform: scaleX(1); }
+  .phase-tab.active .phase-num  { color: var(--accent-bright); }
+  .phase-tab.active .phase-name { color: var(--bone); text-shadow: 0 0 12px var(--accent-glow); }
+  .phase-icon {
+    font-size: 1.5rem; line-height: 1; margin-bottom: 4px;
+    display: block; filter: grayscale(0.4); transition: filter 0.25s, transform 0.25s;
+  }
+  .phase-tab.active .phase-icon { filter: grayscale(0) drop-shadow(0 0 10px var(--accent-glow)); transform: scale(1.12); }
+  .phase-num {
+    font-family: 'IM Fell English', serif; font-size: 0.72rem;
+    color: var(--gold-dim); letter-spacing: 0.18em; font-style: italic;
+  }
+  .phase-name {
+    font-family: 'Cinzel', serif; font-weight: 700;
+    font-size: clamp(0.9rem, 1.7vw, 1.12rem);
+    color: var(--text-body); letter-spacing: 0.1em; text-transform: uppercase;
+    margin-top: 2px;
+  }
+  .phase-tagline {
+    font-style: italic; font-size: 0.8rem;
+    color: var(--text-muted); margin-top: 2px;
+  }
+  .stats-bar {
+    display: grid; grid-template-columns: repeat(6, 1fr);
+    gap: 8px; margin-bottom: 14px;
+    background: linear-gradient(180deg, rgba(26,18,22,0.7), rgba(13,8,11,0.7));
+    padding: 12px 10px;
+    border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: inset 0 1px 0 rgba(232,200,122,0.05);
+  }
+  .stat {
+    text-align: center;
+    padding: 9px 4px 7px;
+    background: linear-gradient(180deg, rgba(0,0,0,0.3), transparent);
+    border: 1px solid rgba(74,58,42,0.6);
+    border-radius: 8px;
+    transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+  }
+  .stat:hover {
+    border-color: var(--accent); transform: translateY(-2px);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.4), 0 0 12px var(--accent-glow);
+  }
+  .stat-label {
+    font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.22em; color: var(--gold-bright);
+    text-shadow: 0 0 8px rgba(232,200,122,0.2);
+  }
+  .stat-value {
+    font-family: 'IM Fell English', serif; font-size: 1.75rem;
+    color: var(--bone); line-height: 1.05; font-weight: 600;
+    margin-top: 3px;
+  }
+  .stat-mod {
+    font-family: 'Cinzel', serif; font-weight: 700;
+    font-size: 0.95rem; color: var(--accent-bright);
+    background: rgba(0,0,0,0.35);
+    border: 1px solid var(--accent);
+    border-radius: 12px; padding: 1px 9px;
+    display: inline-block; margin-top: 6px;
+    box-shadow: 0 0 10px var(--accent-glow);
+  }
+  .info-grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 6px; margin-bottom: 12px;
+  }
+  .info-card {
+    background: linear-gradient(180deg, var(--bg-card), rgba(10,6,8,0.5));
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    padding: 8px 12px; border-radius: 6px;
+    transition: border-color 0.2s, transform 0.15s;
+  }
+  .info-card:hover { transform: translateY(-1px); border-left-color: var(--accent-bright); }
+  .info-card .label {
+    font-family: 'Cinzel', serif; font-size: 9px;
+    letter-spacing: 0.15em; color: var(--gold); text-transform: uppercase;
+  }
+  .info-card .value {
+    font-family: 'IM Fell English', serif; font-size: 1.08rem; color: var(--bone);
+    margin-top: 1px;
+  }
+  .meta-row {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;
+  }
+  @media (max-width: 720px) { .meta-row { grid-template-columns: 1fr; } }
+  .meta-box {
+    background: linear-gradient(180deg, var(--bg-card), rgba(10,6,8,0.4));
+    border: 1px solid var(--border);
+    padding: 10px 14px; border-radius: 8px;
+  }
+  .meta-title {
+    font-family: 'Cinzel', serif; font-size: 9px; color: var(--accent-bright);
+    letter-spacing: 0.2em; text-transform: uppercase;
+    margin-bottom: 6px; padding-bottom: 5px;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .meta-content { font-size: 0.95rem; color: var(--text-body); line-height: 1.55; }
+  .meta-content strong { color: var(--bone); font-weight: 600; }
+  .section { margin-bottom: 18px; }
+  .section-title {
+    font-family: 'Cinzel', serif; font-weight: 700;
+    font-size: 1.02rem; color: var(--blood-bright);
+    letter-spacing: 0.14em; text-transform: uppercase;
+    margin-bottom: 10px; padding-bottom: 7px;
+    border-bottom: 1px solid var(--blood-dark);
+    display: flex; align-items: center; gap: 10px;
+    position: relative;
+  }
+  .section-title::before {
+    content: ''; width: 7px; height: 7px;
+    background: var(--blood); transform: rotate(45deg);
+    box-shadow: 0 0 8px var(--blood-bright); flex-shrink: 0;
+  }
+  .section-title::after {
+    content: ''; position: absolute; left: 0; bottom: -1px; width: 60px; height: 1px;
+    background: linear-gradient(90deg, var(--blood-bright), transparent);
+  }
+  .ability-grid { display: grid; grid-template-columns: 1fr; gap: 7px; }
+  .ability {
+    background: linear-gradient(180deg, var(--bg-card), rgba(10,6,8,0.35));
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--gold-dim); border-radius: 8px;
+    transition: border-left-color 0.15s, background 0.15s, box-shadow 0.2s, transform 0.15s, opacity 0.2s;
+    overflow: hidden;
+  }
+  .ability:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.35); }
+  .ability.open { box-shadow: 0 6px 22px rgba(0,0,0,0.45); }
+  .ability.attack   { border-left-color: var(--blood-bright); }
+  .ability.bonus    { border-left-color: #c08a3e; }
+  .ability.reaction { border-left-color: #5f8bb8; }
+  /* Ataques só disponíveis em forma de lobo/híbrida */
+  body[data-fera="0"] .ability.fera-only { opacity: 0.4; }
+  body[data-fera="0"] .ability.fera-only .ability-name { text-decoration: line-through; text-decoration-color: var(--blood-dark); }
+  .ability-header {
+    padding: 10px 14px; cursor: pointer;
+    display: flex; align-items: center; gap: 10px;
+    flex-wrap: wrap; user-select: none;
+  }
+  .ability-header:hover { background: rgba(255,255,255,0.03); }
+  .ability-header::before {
+    content: ''; width: 8px; height: 8px; border-radius: 50%;
+    background: var(--gold-dim); flex-shrink: 0;
+    box-shadow: 0 0 8px currentColor;
+  }
+  .ability.attack   .ability-header::before { background: var(--blood-bright); color: var(--blood-bright); }
+  .ability.bonus    .ability-header::before { background: #c08a3e; color: #c08a3e; }
+  .ability.reaction .ability-header::before { background: #5f8bb8; color: #5f8bb8; }
+  .ability-name {
+    font-family: 'Cinzel', serif; font-weight: 600;
+    font-size: 1rem; color: var(--bone); letter-spacing: 0.04em;
+  }
+  .ability-tag {
+    font-family: 'IM Fell English', serif; font-style: italic;
+    font-size: 0.82rem; color: var(--gold); letter-spacing: 0.03em;
+    background: var(--accent-soft); border: 1px solid var(--border-soft);
+    padding: 1px 8px; border-radius: 10px;
+  }
+  .toggle-icon {
+    margin-left: auto; color: var(--gold-dim);
+    font-size: 0.72rem; transition: transform 0.2s;
+  }
+  .ability.open .toggle-icon { transform: rotate(180deg); color: var(--gold); }
+  .ability-body {
+    padding: 2px 16px 12px 34px; font-size: 0.98rem;
+    color: var(--text-body); line-height: 1.58; display: none;
+  }
+  .ability.open .ability-body { display: block; }
+  .ability-body strong { color: var(--bone); font-weight: 600; }
+  .ability-body em { color: var(--gold-bright); font-style: normal; font-weight: 500; }
+  .desc-flavor {
+    font-style: italic; color: var(--bone-dim);
+    border-left: 2px solid var(--accent);
+    padding: 4px 0 4px 12px; margin: 4px 0 10px; font-size: 0.92rem;
+    background: linear-gradient(90deg, var(--accent-soft), transparent);
+    border-radius: 0 4px 4px 0;
+  }
+  .dmg {
+    display: inline-block; padding: 1px 8px;
+    background: linear-gradient(180deg, rgba(155,31,31,0.28), rgba(90,14,14,0.28));
+    border: 1px solid var(--blood); color: #ffd9d0; border-radius: 5px;
+    font-family: 'IM Fell English', serif; font-size: 0.9rem; margin: 0 2px;
+    font-weight: 600; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+  }
+  .cd {
+    display: inline-block; padding: 1px 8px;
+    background: rgba(203,172,103,0.16); border: 1px solid var(--gold-dim);
+    color: var(--gold-bright); border-radius: 5px;
+    font-family: 'IM Fell English', serif; font-size: 0.9rem; margin: 0 2px;
+    font-weight: 600;
+  }
+  /* Tracker de usos em habilidades limitadas */
+  .ability-usage {
+    display: inline-flex; align-items: center; gap: 4px;
+    margin-left: auto;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid var(--border);
+    padding: 3px 8px; border-radius: 12px;
+    font-family: 'Cinzel', serif; font-size: 10px;
+    letter-spacing: 0.5px; color: var(--gold);
+  }
+  .ability-usage-dots { display: inline-flex; gap: 3px; }
+  .ability-usage-dot {
+    width: 11px; height: 11px;
+    border: 1.5px solid var(--gold);
+    border-radius: 50%; cursor: pointer;
+    background: radial-gradient(circle, rgba(232,200,122,0.18), rgba(0,0,0,0.4));
+    transition: transform 0.12s, background 0.12s;
+  }
+  .ability-usage-dot:hover { transform: scale(1.2); border-color: var(--gold-bright); }
+  .ability-usage-dot.gasto {
+    background: radial-gradient(circle, var(--blood-bright), var(--blood-dark));
+    border-color: var(--blood-dark);
+  }
+  .ability-usage-period { font-style: italic; color: var(--gold-dim); font-size: 9px; text-transform: uppercase; }
+  .ability-usage-reset {
+    background: transparent; border: 1px solid var(--gold-dim);
+    color: var(--gold-dim); padding: 1px 6px; border-radius: 3px;
+    font-family: 'Cinzel', serif; font-size: 9px;
+    cursor: pointer; transition: all 0.15s; margin-left: 4px;
+  }
+  .ability-usage-reset:hover { border-color: var(--gold); color: var(--gold); }
+  .ability.tem-usos .ability-header { padding-right: 6px; }
+  .ability.tudo-gasto { opacity: 0.55; }
+  .ability.tudo-gasto .ability-name { text-decoration: line-through; text-decoration-color: var(--blood); }
+  .legend {
+    display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 10px;
+    font-family: 'Cinzel', serif; font-size: 9px;
+    letter-spacing: 0.12em; color: var(--text-muted); text-transform: uppercase;
+  }
+  .legend-item { display: flex; align-items: center; gap: 5px; }
+  .legend-swatch { width: 12px; height: 3px; display: inline-block; }
+  .forma-aviso {
+    display: none;
+    font-family: 'Cormorant Garamond', serif; font-size: 0.95rem;
+    color: var(--bone-dim); font-style: italic;
+    background: linear-gradient(90deg, var(--accent-soft), transparent);
+    border-left: 3px solid var(--accent); border-radius: 0 6px 6px 0;
+    padding: 8px 12px; margin-bottom: 10px;
+  }
+  body[data-fera="0"] .forma-aviso { display: block; }
+  .notes-section {
+    margin-top: 18px; background: var(--bg-card);
+    border: 1px solid var(--border); padding: 10px 14px; border-radius: 2px;
+  }
+  .notes-section h3 {
+    font-family: 'Cinzel', serif; font-size: 0.78rem;
+    color: var(--gold); letter-spacing: 0.2em;
+    margin-bottom: 6px; text-transform: uppercase;
+  }
+  .notes-area {
+    width: 100%; min-height: 70px; background: var(--shadow);
+    border: 1px solid var(--border); color: var(--text-body);
+    font-family: 'Cormorant Garamond', serif; font-size: 0.92rem;
+    padding: 8px 10px; border-radius: 2px; resize: vertical;
+    outline: none; line-height: 1.45;
+  }
+  .notes-area:focus { border-color: var(--gold); }
+  footer {
+    margin-top: 24px; padding-top: 12px;
+    border-top: 1px solid var(--border); text-align: center;
+    color: var(--text-muted); font-family: 'IM Fell English', serif;
+    font-style: italic; font-size: 0.85rem;
+  }
+  .toast {
+    position: fixed; top: 16px; right: 16px;
+    background: var(--bg-card-3); border: 1px solid var(--gold);
+    color: var(--bone); padding: 10px 16px;
+    font-family: 'Cinzel', serif; font-size: 0.85rem;
+    letter-spacing: 0.1em; border-radius: 2px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+    z-index: 200; opacity: 0; transform: translateY(-10px);
+    transition: all 0.3s; pointer-events: none;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .round-tracker { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .round-display {
+    display: flex; align-items: baseline; gap: 6px;
+    background: rgba(0,0,0,0.35); border: 1px solid var(--accent);
+    border-radius: 8px; padding: 4px 14px;
+    box-shadow: 0 0 14px var(--accent-glow);
+  }
+  .round-num {
+    font-family: 'IM Fell English', serif; font-size: 1.6rem;
+    color: var(--accent-bright); line-height: 1; font-weight: 600;
+    min-width: 24px; text-align: center;
+  }
+  .round-lbl {
+    font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.2em;
+    color: var(--gold-dim); text-transform: uppercase;
+  }
+  /* Destaque especial (Colar de Espinheiros de Prata) */
+  .special-callout {
+    background:
+      radial-gradient(ellipse at 0% 0%, rgba(196,211,228,0.12), transparent 60%),
+      linear-gradient(180deg, var(--bg-card-2), rgba(10,6,8,0.5));
+    border: 1px solid #5f7488;
+    border-left: 4px solid #b8c4d0;
+    border-radius: 10px; padding: 14px 16px; margin-bottom: 14px;
+  }
+  .special-callout .sc-title {
+    font-family: 'Cinzel', serif; font-weight: 700; font-size: 1rem;
+    color: #d6e0ea; letter-spacing: 0.06em; margin-bottom: 8px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .special-callout .sc-body { font-size: 0.95rem; color: var(--text-body); line-height: 1.6; }
+  .special-callout .sc-body strong { color: var(--bone); }
+  .special-callout .sc-body em { color: #d6e0ea; font-style: normal; font-weight: 500; }
+  .special-callout ul { margin: 6px 0 6px 20px; }
+  .special-callout li { margin-bottom: 3px; }
+  @media (max-width: 720px) {
+    .container { padding: 12px 12px 50px; }
+    .top-bar { margin: -12px -12px 12px; padding: 10px 12px; }
+    .stats-bar { grid-template-columns: repeat(3, 1fr); }
+    .phase-tabs { grid-template-columns: 1fr; }
+  }
+  @media print {
+    body { background: white; color: black; }
+    .top-bar, .notes-section, .combat-bar, .condition-row, .save-controls { display: none; }
+    .ability-body { display: block !important; }
+    .ability.fera-only { opacity: 1 !important; }
+  }
+</style>
+<link rel="stylesheet" href="../../assets/css/ui.css">
+</head>
+<body data-ambiente="brasas">
+
+<div class="toast" id="toast"></div>
+
+<div class="container">
+
+  <div class="top-bar">
+    <div class="top-bar-inner">
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <a href="index.html" class="btn" style="text-decoration:none">← Vilões</a>
+        <div>
+          <div class="brand">Emil Toranescu</div>
+          <div class="brand-sub">Ficha de Combate · Lobisomem · <span id="syncStatus" style="color:var(--gold-dim)">○ local</span></div>
+        </div>
+      </div>
+      <div class="save-controls">
+        <button class="btn gold" onclick="saveState()">💾 Salvar</button>
+        <button class="btn" onclick="loadState()">↺ Carregar</button>
+        <button class="btn" onclick="exportJSON()">↓ Exportar</button>
+        <label class="btn" style="cursor:pointer;">
+          ↑ Importar
+          <input type="file" id="importInput" accept=".json" style="display:none" onchange="importJSON(event)">
+        </label>
+        <button class="btn" onclick="resetAll()">⟲ Resetar</button>
+      </div>
+    </div>
+  </div>
+
+  <header>
+    <div class="crest">🐺</div>
+    <div class="eyebrow">Lobisomem de Barovia · Protetor</div>
+    <h1>Emil Toranescu</h1>
+    <div class="subtitle">Humano Médio (metamorfoseador) · Neutro e Bom · <strong>ND 3</strong> (700 XP) — 2 sem Regeneração · Bônus de Proficiência <strong>+2</strong></div>
+  </header>
+
+  <!-- HP + REACTIONS + ROUND + REGEN -->
+  <div class="combat-bar">
+    <div class="panel">
+      <div class="panel-title">◆ Pontos de Vida</div>
+      <div class="hp-row">
+        <input type="number" id="hpCurrent" class="hp-input" value="97" min="0">
+        <span style="color:var(--gold-dim)">/</span>
+        <input type="number" id="hpMax" class="hp-input" value="97" min="1">
+        <div class="hp-bar-container">
+          <div class="hp-bar" id="hpBar" style="width:100%"></div>
+          <div class="hp-label" id="hpLabel">100%</div>
+        </div>
+      </div>
+      <div style="margin-top:4px;font-size:0.82rem;color:var(--text-muted);font-style:italic">
+        Média <strong style="color:var(--gold);font-style:normal">97</strong> · <strong style="color:var(--bone);font-style:normal">15d8 + 30</strong>
+      </div>
+      <div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap">
+        <button class="btn" onclick="adjustHP(-10)">−10</button>
+        <button class="btn" onclick="adjustHP(-5)">−5</button>
+        <button class="btn" onclick="adjustHP(-1)">−1</button>
+        <button class="btn" onclick="adjustHP(1)">+1</button>
+        <button class="btn" onclick="adjustHP(10)">+10 Regen</button>
+        <button class="btn" onclick="resetHP()">Reset</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">◆ Regeneração</div>
+      <div style="font-size:0.9rem;color:var(--text-body);line-height:1.45">
+        Recupera <strong style="color:var(--gold)">10 PV</strong> no início do turno. <span class="dmg">Necrótico</span> ou <span class="dmg">arma prateada</span> (contundente/perfurante/cortante) bloqueiam no próximo turno — marque <em style="color:var(--gold);font-style:normal">Regen Bloqueada</em> abaixo.<br>
+        <strong>Só morre</strong> se começar o turno com 0 PV e não puder regenerar.
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">◆ Reação da Rodada (1 por rodada)</div>
+      <div class="react-row">
+        <div class="react-dot" onclick="toggleReact(this)"></div>
+        <button class="btn" onclick="resetReactions()">Nova Rodada</button>
+      </div>
+      <div style="margin-top:8px;font-size:0.85rem;color:var(--text-muted);font-style:italic;line-height:1.35">
+        Sem reações especiais — apenas ataques de oportunidade e reações padrão.
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">◆ Rodada de Combate</div>
+      <div class="round-tracker">
+        <button class="btn" onclick="adjustRound(-1)">−</button>
+        <div class="round-display">
+          <span class="round-num" id="roundCounter">1</span>
+          <span class="round-lbl">Rodada</span>
+        </div>
+        <button class="btn gold" onclick="adjustRound(1)">Próxima ▸</button>
+        <button class="btn" onclick="resetRound()">⟲ Zerar</button>
+      </div>
+      <div style="margin-top:8px;font-size:0.82rem;color:var(--text-muted);font-style:italic;line-height:1.35">
+        Avançar a rodada <strong style="color:var(--gold);font-weight:600">recupera a reação</strong> e a <strong style="color:var(--gold);font-weight:600">Regeneração (+10 PV)</strong> se não estiver bloqueada.
+      </div>
+    </div>
+  </div>
+
+  <!-- CONDITIONS -->
+  <div class="condition-row">
+    <span class="cond-label">Condições:</span>
+    <div class="chip buff" onclick="this.classList.toggle('active');saveState(true)">🐾 Táticas de Matilha (aliado adj.)</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">✦ Regen Bloqueada</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">⛓ Colar de Prata</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">↓ Caído</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">⊘ Agarrado</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">◈ Atordoado</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">😱 Amedrontado</div>
+  </div>
+
+  <!-- FORM TABS -->
+  <div class="phase-tabs">
+    <div class="phase-tab active" data-phase="1" onclick="switchPhase(1)">
+      <span class="phase-icon">🧍</span>
+      <div class="phase-num">~ Forma Verdadeira ~</div>
+      <div class="phase-name">Humanoide</div>
+      <div class="phase-tagline">CA 11 · fala · sem garras</div>
+    </div>
+    <div class="phase-tab" data-phase="2" onclick="switchPhase(2)">
+      <span class="phase-icon">🐺</span>
+      <div class="phase-num">~ Forma Bestial ~</div>
+      <div class="phase-name">Lobo</div>
+      <div class="phase-tagline">CA 12 · 12 m · não fala</div>
+    </div>
+    <div class="phase-tab" data-phase="3" onclick="switchPhase(3)">
+      <span class="phase-icon">🐾</span>
+      <div class="phase-num">~ Forma Híbrida ~</div>
+      <div class="phase-name">Híbrida</div>
+      <div class="phase-tagline">CA 12 · fala · garras</div>
+    </div>
+  </div>
+
+  <!-- STATS (compartilhados entre formas) -->
+  <div class="stats-bar">
+    <div class="stat"><div class="stat-label">FOR</div><div class="stat-value">16</div><div class="stat-mod">+3</div></div>
+    <div class="stat"><div class="stat-label">DES</div><div class="stat-value">13</div><div class="stat-mod">+1</div></div>
+    <div class="stat"><div class="stat-label">CON</div><div class="stat-value">14</div><div class="stat-mod">+2</div></div>
+    <div class="stat"><div class="stat-label">INT</div><div class="stat-value">10</div><div class="stat-mod">+0</div></div>
+    <div class="stat"><div class="stat-label">SAB</div><div class="stat-value">11</div><div class="stat-mod">+0</div></div>
+    <div class="stat"><div class="stat-label">CAR</div><div class="stat-value">10</div><div class="stat-mod">+0</div></div>
+  </div>
+  <div class="info-grid">
+    <div class="info-card"><div class="label">Classe Armadura</div><div class="value"><span id="caAtual">11</span> <span id="caNota" style="font-size:0.72rem;color:var(--text-muted)"></span></div></div>
+    <div class="info-card"><div class="label">Deslocamento</div><div class="value"><span id="deslocAtual">9 m</span></div></div>
+    <div class="info-card"><div class="label">Bônus Prof.</div><div class="value">+2</div></div>
+    <div class="info-card"><div class="label">Visão no Escuro</div><div class="value">Sim</div></div>
+    <div class="info-card"><div class="label">Perc. Passiva</div><div class="value">14</div></div>
+    <div class="info-card"><div class="label">Forma Atual</div><div class="value" style="color:var(--accent-bright)"><span id="formaAtual">Humanoide</span></div></div>
+  </div>
+  <div class="meta-row">
+    <div class="meta-box">
+      <div class="meta-title">Testes de Resistência & Perícias</div>
+      <div class="meta-content"><strong>Resistência:</strong> For +5<br><strong>Perícias:</strong> Percepção +4 · Furtividade +3</div>
+    </div>
+    <div class="meta-box">
+      <div class="meta-title">Sentidos & Idiomas</div>
+      <div class="meta-content"><strong>Sentidos:</strong> visão no escuro, Percepção passiva 14<br><strong>Idiomas:</strong> Comum <span id="falaNota" style="color:var(--text-muted);font-style:italic"></span></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">Características</h2>
+    <div class="ability-grid">
+      <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Audição e Olfato Aguçados</div><span class="toggle-icon">▼</span></div><div class="ability-body">Emil possui <em>vantagem</em> em testes de Percepção baseados em audição ou olfato.</div></div>
+      <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Táticas de Matilha</div><span class="toggle-icon">▼</span></div><div class="ability-body">Possui <em>vantagem</em> em jogadas de ataque contra uma criatura caso pelo menos um aliado esteja a até <strong>1,5 m</strong> dela e o aliado não esteja incapacitado. (Marque o chip <strong>Táticas de Matilha</strong> acima como lembrete.)</div></div>
+      <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Regeneração</div><span class="toggle-icon">▼</span></div><div class="ability-body">Recupera <em>10 PV</em> no início do turno. Se sofrer <span class="dmg">dano necrótico</span> ou dano contundente, perfurante ou cortante de uma <span class="dmg">arma prateada</span>, não regenera no próximo turno. <strong>Só morre</strong> se começar o turno com 0 PV e não puder regenerar.</div></div>
+    </div>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item"><span class="legend-swatch" style="background:var(--blood)"></span>Ação</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#c08a3e"></span>Bônus</div>
+    <div class="legend-item"><span class="legend-swatch" style="background:#5f8bb8"></span>Reação</div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">Ações</h2>
+    <div class="forma-aviso">🧍 Em forma <strong>humanoide</strong>, Emil não possui ataques naturais (Mordida e Garras). Use <em>Mudar de Forma</em> (ação bônus) para assumir a forma de lobo ou híbrida.</div>
+    <div class="ability-grid">
+      <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Ataque Múltiplo</div><span class="toggle-icon">▼</span></div><div class="ability-body">Dois ataques corpo a corpo, mas <em>apenas um</em> deles pode ser Mordida.</div></div>
+      <div class="ability attack fera-only"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Mordida</div><span class="ability-tag">Lobo/Híbrida · +5 · 1,5 m</span><span class="toggle-icon">▼</span></div><div class="ability-body">
+        Ataque corpo a corpo. Acerto: <span class="dmg">7 (1d8+3) perfurante</span>.<br>
+        Em vez de causar dano, pode <strong>agarrar</strong> (<span class="cd">CD 11</span> para escapar).<br>
+        Se o alvo for humanoide, deve passar em <em>Constituição</em> <span class="cd">CD 13</span> ou contrai <strong>licantropia de lobisomem</strong>.
+      </div></div>
+      <div class="ability attack fera-only"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Garras</div><span class="ability-tag">Lobo/Híbrida · +5 · 1,5 m</span><span class="toggle-icon">▼</span></div><div class="ability-body">
+        Ataque corpo a corpo. Acerto: <span class="dmg">8 (2d4+3) cortante</span>.<br>
+        O alvo deve passar em <em>Força</em> <span class="cd">CD 13</span> ou ficará <strong>caído</strong>.
+      </div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">Ação Bônus</h2>
+    <div class="ability-grid">
+      <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Mudar de Forma</div><span class="toggle-icon">▼</span></div><div class="ability-body">
+        Emil transforma-se em <strong>lobo</strong>, <strong>forma híbrida</strong> ou volta à <strong>forma humanoide</strong> (troque de aba acima). Suas estatísticas permanecem iguais, exceto pela <em>CA</em>. Equipamentos vestidos ou carregados fundem-se à nova forma. Ele retorna à forma verdadeira quando morre.<br>
+        <em>Bloqueado</em> enquanto usar o <strong>Colar de Espinheiros de Prata</strong>.
+      </div></div>
+    </div>
+  </div>
+
+  <!-- COLAR DE ESPINHEIROS DE PRATA -->
+  <div class="section">
+    <h2 class="section-title">⛓️ Colar de Espinheiros de Prata</h2>
+    <div class="special-callout">
+      <div class="sc-title">⛓️ Grilhão de Prata para Licantropos</div>
+      <div class="sc-body">
+        Enquanto usado por um licantropo, o interior do colar libera pequenos espinhos de prata sempre que o usuário tenta se transformar, causando <span class="dmg">1 perfurante</span> e <strong>impedindo a transformação</strong>.<br>
+        Além disso, um licantropo usando o colar <strong>não pode regenerar</strong>.<br><br>
+        Cada colar tem uma fechadura mágica com um pequeno buraco de chave. Pode ser aberta com:
+        <ul>
+          <li><em>Força</em> <span class="cd">CD 25</span></li>
+          <li><em>Destreza</em> <span class="cd">CD 25</span> com Ferramentas de Ladrão</li>
+        </ul>
+        Cada tentativa de abrir <strong>sem antes destrancá-lo</strong> exige um teste de <em>Destreza</em>.<br>
+        <strong>Falha:</strong> <span class="dmg">31 (7d8) perfurante</span> ao personagem que tenta abrir.<br>
+        <strong>Independentemente do resultado</strong>, o portador também sofre <span class="dmg">31 (7d8) perfurante</span> — grandes espinhos surgem no interior e perfuram seu pescoço.<br><br>
+        <em>Dissipar Magia</em> e <em>Arrombar</em> não funcionam no colar.
+      </div>
+    </div>
+  </div>
+
+  <!-- NOTES -->
+  <div class="notes-section">
+    <h3>◆ Notas do Mestre</h3>
+    <textarea class="notes-area" id="notesArea" placeholder="Anote aqui: forma atual, aliados de matilha por perto, alvos infectados por licantropia, status do colar de prata, momento da fuga..."></textarea>
+  </div>
+
+  <footer>
+    Emil Toranescu — sincronizado em tempo real entre os dispositivos do Mestre.
+  </footer>
+
+</div>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="../../assets/js/supabase.js"></script>
+<script src="../../assets/js/auth.js"></script>
+<script src="../../assets/js/efeitos.js"></script>
+<script src="../../assets/js/master_state.js"></script>
+<script>
+/* ============================================================
+   FORMAS
+   ============================================================ */
+const FORMAS = {
+  1: { nome: 'Humanoide', ca: '11', caNota: '', desloc: '9 m', fera: false, fala: '' },
+  2: { nome: 'Lobo', ca: '12', caNota: '(armadura natural)', desloc: '12 m', fera: true, fala: '— não fala nesta forma' },
+  3: { nome: 'Híbrida', ca: '12', caNota: '(armadura natural)', desloc: '9 m', fera: true, fala: '' },
+};
+
+/* ============================================================
+   TRACKER DE USOS EM HABILIDADES LIMITADAS
+   ============================================================ */
+const PALAVRAS_NUM = {
+  'uma':1,'um':1,'duas':2,'dois':2,'três':3,'tres':3,'quatro':4,'cinco':5,
+  'seis':6,'sete':7,'oito':8,'nove':9,'dez':10
+};
+function palavraNum(s) {
+  if (!s) return null;
+  const n = parseInt(s, 10);
+  if (Number.isFinite(n)) return n;
+  return PALAVRAS_NUM[s.toLowerCase()] ?? null;
+}
+function normPeriodo(raw) {
+  const t = (raw || '').toLowerCase().replace(/\s+/g, ' ').trim();
+  if (/curto descanso|descanso curto|short rest/.test(t)) return 'curto descanso';
+  if (/longo descanso|descanso longo|long rest/.test(t)) return 'longo descanso';
+  if (/\bdescanso\b|\brest\b/.test(t)) return 'descanso';
+  if (/\bdia\b|\bday\b/.test(t)) return 'dia';
+  if (/rodada|round/.test(t)) return 'rodada';
+  if (/turno|turn/.test(t)) return 'turno';
+  if (/encontro|combate/.test(t)) return 'encontro';
+  if (/hora|hour/.test(t)) return 'hora';
+  return t || 'uso';
+}
+const PERIODO_PAT = '(?:curto\\s+descanso|descanso\\s+curto|longo\\s+descanso|descanso\\s+longo|short\\s+rest|long\\s+rest|descanso|rest|dia|day|rodada|round|turno|turn|encontro|combate|hora|hour)';
+const USOS_REGEXES = [
+  { re: new RegExp('(\\d+)\\s*/\\s*(' + PERIODO_PAT + ')', 'i'),
+    parse: m => ({ max: +m[1], periodo: normPeriodo(m[2]) }) },
+  { re: new RegExp('(\\d+)\\s+(?:vez(?:es)?\\s+)?por\\s+(' + PERIODO_PAT + ')', 'i'),
+    parse: m => ({ max: +m[1], periodo: normPeriodo(m[2]) }) },
+  { re: new RegExp('\\b(uma|um|duas|dois|tr[êe]s|quatro|cinco|seis|sete|oito|nove|dez)\\s+vez(?:es)?\\s+por\\s+(' + PERIODO_PAT + ')', 'i'),
+    parse: m => ({ max: palavraNum(m[1]) || 1, periodo: normPeriodo(m[2]) }) },
+  { re: new RegExp('\\((\\d+)\\s*/\\s*(' + PERIODO_PAT + ')\\)', 'i'),
+    parse: m => ({ max: +m[1], periodo: normPeriodo(m[2]) }) },
+];
+function detectarUsos(textoCompleto) {
+  for (const {re, parse} of USOS_REGEXES) {
+    const m = textoCompleto.match(re);
+    if (m) {
+      const r = parse(m);
+      if (r && r.max >= 1 && r.max <= 12) return r;
+    }
+  }
+  return null;
+}
+function parseOverrideUsos(str) {
+  if (!str) return null;
+  const m = str.match(/(\d+)\s*\/\s*(.+)/);
+  if (!m) return null;
+  return { max: +m[1], periodo: normPeriodo(m[2]) };
+}
+const NOMES_NAO_LIMITADOS = /^(multiataque|ataque m[úu]ltiplo|golpe desarmado|mordida|garra|garras|cauda|sopro|cuspe)\b/i;
+
+function aplicarTrackersHabilidades() {
+  document.querySelectorAll('.ability').forEach(ab => {
+    if (ab.dataset.usosInjetado) return;
+    const header = ab.querySelector('.ability-header');
+    const nome = (ab.querySelector('.ability-name')?.textContent || '').trim();
+    const corpo = ab.querySelector('.ability-body')?.textContent || '';
+    const tag = ab.querySelector('.ability-tag')?.textContent || '';
+
+    let usos = parseOverrideUsos(ab.dataset.usos);
+    if (!usos) usos = detectarUsos(tag) || detectarUsos(nome);
+    if (!usos && !NOMES_NAO_LIMITADOS.test(nome)) usos = detectarUsos(corpo);
+    if (!usos || usos.max < 1 || usos.max > 12) return;
+
+    ab.classList.add('tem-usos');
+    ab.dataset.usosInjetado = '1';
+    ab.dataset.usosChave = `global::${nome.trim()}`;
+
+    const wrap = document.createElement('span');
+    wrap.className = 'ability-usage';
+    let pips = '';
+    for (let i = 0; i < usos.max; i++) {
+      pips += `<span class="ability-usage-dot" data-pip-idx="${i}" title="Clique para gastar/recuperar"></span>`;
+    }
+    wrap.innerHTML = `
+      <span class="ability-usage-dots">${pips}</span>
+      <span class="ability-usage-period">${usos.periodo}</span>
+      <button type="button" class="ability-usage-reset" title="Recuperar todos os usos">⟲</button>
+    `;
+    const toggle = header.querySelector('.toggle-icon');
+    if (toggle) header.insertBefore(wrap, toggle);
+    else header.appendChild(wrap);
+
+    wrap.addEventListener('click', e => e.stopPropagation());
+    wrap.querySelectorAll('.ability-usage-dot').forEach(dot => {
+      dot.addEventListener('click', e => {
+        e.stopPropagation();
+        toggleAbilityUsage(ab, +dot.dataset.pipIdx);
+      });
+    });
+    wrap.querySelector('.ability-usage-reset').addEventListener('click', e => {
+      e.stopPropagation();
+      resetAbilityUsage(ab);
+    });
+  });
+  aplicarEstadoUsosSalvo();
+}
+function toggleAbilityUsage(ab, idx) {
+  const dots = [...ab.querySelectorAll('.ability-usage-dot')];
+  const total = dots.length;
+  const eraGasto = dots[idx].classList.contains('gasto');
+  let novoGastos = eraGasto ? idx : idx + 1;
+  dots.forEach((d, i) => d.classList.toggle('gasto', i < novoGastos));
+  ab.classList.toggle('tudo-gasto', novoGastos >= total);
+  saveState(true);
+}
+function resetAbilityUsage(ab) {
+  ab.querySelectorAll('.ability-usage-dot').forEach(d => d.classList.remove('gasto'));
+  ab.classList.remove('tudo-gasto');
+  saveState(true);
+}
+function getEstadoUsos() {
+  const out = {};
+  document.querySelectorAll('.ability.tem-usos').forEach(ab => {
+    const k = ab.dataset.usosChave;
+    if (!k) return;
+    const dots = [...ab.querySelectorAll('.ability-usage-dot')];
+    out[k] = dots.filter(d => d.classList.contains('gasto')).length;
+  });
+  return out;
+}
+function aplicarEstadoUsosSalvo() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    const st = JSON.parse(raw);
+    const usos = st?.usos || {};
+    Object.entries(usos).forEach(([chave, gastos]) => {
+      const ab = document.querySelector(`.ability[data-usos-chave="${CSS.escape(chave)}"]`);
+      if (!ab) return;
+      const dots = [...ab.querySelectorAll('.ability-usage-dot')];
+      dots.forEach((d, i) => d.classList.toggle('gasto', i < gastos));
+      ab.classList.toggle('tudo-gasto', gastos >= dots.length && dots.length > 0);
+    });
+  } catch {}
+}
+
+/* ============================================================
+   FORMAS / HP / REAÇÕES / RODADA / NOTAS
+   ============================================================ */
+function switchPhase(num) {
+  switchPhaseSilent(num);
+  saveState(true);
+}
+function switchPhaseSilent(num) {
+  const f = FORMAS[num] || FORMAS[1];
+  document.querySelectorAll('.phase-tab').forEach(t => t.classList.remove('active'));
+  document.querySelector(`.phase-tab[data-phase="${num}"]`).classList.add('active');
+  document.body.dataset.fase = num;
+  document.body.dataset.fera = f.fera ? '1' : '0';
+  document.getElementById('caAtual').textContent = f.ca;
+  document.getElementById('caNota').textContent = f.caNota;
+  document.getElementById('deslocAtual').textContent = f.desloc;
+  document.getElementById('formaAtual').textContent = f.nome;
+  document.getElementById('falaNota').textContent = f.fala;
+}
+
+const hpCurrent = document.getElementById('hpCurrent');
+const hpMax = document.getElementById('hpMax');
+const hpBar = document.getElementById('hpBar');
+const hpLabel = document.getElementById('hpLabel');
+
+function updateHPBar() {
+  const cur = parseInt(hpCurrent.value) || 0;
+  const max = parseInt(hpMax.value) || 1;
+  const pct = Math.max(0, Math.min(100, (cur / max) * 100));
+  hpBar.style.width = pct + '%';
+  hpLabel.textContent = Math.round(pct) + '%';
+  if (pct > 50) hpBar.style.background = 'linear-gradient(90deg, var(--blood-dark), var(--blood))';
+  else if (pct > 25) hpBar.style.background = 'linear-gradient(90deg, #5a0e0e, #a82020)';
+  else hpBar.style.background = 'linear-gradient(90deg, #3a0808, #6a0e0e)';
+}
+function adjustHP(delta) {
+  const max = parseInt(hpMax.value) || 1;
+  let cur = parseInt(hpCurrent.value) || 0;
+  const antes = cur;
+  cur = Math.max(0, Math.min(max, cur + delta));
+  hpCurrent.value = cur;
+  updateHPBar();
+  const mudou = cur - antes;
+  if (window.FX && mudou !== 0) {
+    const alvo = document.querySelector('.combat-bar .panel') || hpCurrent;
+    if (mudou < 0) FX.dano(alvo, mudou); else FX.cura(alvo, mudou);
+    if (FX.contarInput) FX.contarInput(hpCurrent, antes, cur);
+  }
+  saveState(true);
+}
+function resetHP() {
+  hpCurrent.value = hpMax.value;
+  updateHPBar();
+  saveState(true);
+}
+hpCurrent.addEventListener('input', () => { updateHPBar(); saveState(true); });
+hpMax.addEventListener('input', () => { updateHPBar(); saveState(true); });
+
+function toggleReact(el) { el.classList.toggle('used'); saveState(true); }
+function resetReactions() {
+  document.querySelectorAll('.react-dot').forEach(d => d.classList.remove('used'));
+  saveState(true);
+}
+function adjustRound(delta) {
+  const el = document.getElementById('roundCounter');
+  if (!el) return;
+  let n = parseInt(el.textContent) || 1;
+  n = Math.max(1, n + delta);
+  el.textContent = n;
+  if (delta > 0) document.querySelectorAll('.react-dot').forEach(d => d.classList.remove('used'));
+  saveState(true);
+}
+function resetRound() {
+  const el = document.getElementById('roundCounter');
+  if (el) el.textContent = 1;
+  saveState(true);
+}
+function toggleAbility(header) {
+  header.parentElement.classList.toggle('open');
+}
+
+/* ============================================================
+   SAVE / LOAD STATE
+   ============================================================ */
+const STORAGE_KEY = 'emil_ficha_v1';
+const MS_CHAVE = 'vilao:emil';
+let _msAplicando = false;
+
+function _setSyncStatus(txt, cor) {
+  const el = document.getElementById('syncStatus');
+  if (el) { el.textContent = txt; el.style.color = cor || 'var(--gold-dim)'; }
+}
+
+function getState() {
+  return {
+    hpCurrent: hpCurrent.value,
+    hpMax: hpMax.value,
+    activePhase: document.querySelector('.phase-tab.active').dataset.phase,
+    reactions: Array.from(document.querySelectorAll('.react-dot')).map(d => d.classList.contains('used')),
+    conditions: Array.from(document.querySelectorAll('.condition-row .chip')).map(c => c.classList.contains('active')),
+    notes: document.getElementById('notesArea').value,
+    round: (document.getElementById('roundCounter')?.textContent) || '1',
+    openAbilities: Array.from(document.querySelectorAll('.ability.open')).map(a => a.querySelector('.ability-name').textContent),
+    usos: getEstadoUsos()
+  };
+}
+
+function applyState(s) {
+  if (!s) return;
+  hpCurrent.value = s.hpCurrent ?? 97;
+  hpMax.value = s.hpMax ?? 97;
+  updateHPBar();
+  switchPhaseSilent(parseInt(s.activePhase) || 1);
+  (s.reactions || []).forEach((u, i) => {
+    const d = document.querySelectorAll('.react-dot')[i];
+    if (d) d.classList.toggle('used', u);
+  });
+  (s.conditions || []).forEach((u, i) => {
+    const c = document.querySelectorAll('.condition-row .chip')[i];
+    if (c) c.classList.toggle('active', u);
+  });
+  document.getElementById('notesArea').value = s.notes || '';
+  const roundEl = document.getElementById('roundCounter');
+  if (roundEl) roundEl.textContent = s.round || '1';
+  if (s.openAbilities) {
+    s.openAbilities.forEach(name => {
+      document.querySelectorAll('.ability').forEach(a => {
+        if (a.querySelector('.ability-name').textContent === name) a.classList.add('open');
+      });
+    });
+  }
+  if (s.usos) {
+    Object.entries(s.usos).forEach(([chave, gastos]) => {
+      const ab = document.querySelector(`.ability[data-usos-chave="${CSS.escape(chave)}"]`);
+      if (!ab) return;
+      const dots = [...ab.querySelectorAll('.ability-usage-dot')];
+      dots.forEach((d, i) => d.classList.toggle('gasto', i < gastos));
+      ab.classList.toggle('tudo-gasto', gastos >= dots.length && dots.length > 0);
+    });
+  }
+}
+
+function saveState(silent = false) {
+  if (_msAplicando) return;
+  try {
+    const dados = getState();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+    if (window.MasterState) {
+      _setSyncStatus('⟳ sincronizando…', 'var(--gold-dim)');
+      window.MasterState.salvarDebounced(MS_CHAVE, dados, silent ? 600 : 0);
+      setTimeout(() => _setSyncStatus('● sincronizado', 'var(--gold)'), silent ? 800 : 200);
+    }
+    if (!silent) showToast('✓ Salvo');
+  } catch(e) { if (!silent) showToast('Erro ao salvar'); }
+}
+
+async function loadState() {
+  try {
+    let dados = null;
+    if (window.MasterState) {
+      dados = await window.MasterState.carregar(MS_CHAVE);
+    }
+    if (!dados) {
+      const local = localStorage.getItem(STORAGE_KEY);
+      if (local) dados = JSON.parse(local);
+    }
+    if (!dados) { showToast('Nada salvo'); return; }
+    _msAplicando = true;
+    applyState(dados);
+    _msAplicando = false;
+    _setSyncStatus(window.MasterState ? '● sincronizado' : '○ local', window.MasterState ? 'var(--gold)' : 'var(--gold-dim)');
+    showToast('✓ Carregado');
+  } catch(e) { _msAplicando = false; showToast('Erro ao carregar'); }
+}
+
+function resetAll() {
+  if (!confirm('Resetar tudo? (HP, forma, reações, condições, usos, notas)')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  hpCurrent.value = 97;
+  hpMax.value = 97;
+  updateHPBar();
+  document.querySelectorAll('.react-dot').forEach(d => d.classList.remove('used'));
+  document.querySelectorAll('.condition-row .chip').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.ability.open').forEach(a => a.classList.remove('open'));
+  document.querySelectorAll('.ability-usage-dot.gasto').forEach(d => d.classList.remove('gasto'));
+  document.querySelectorAll('.ability.tudo-gasto').forEach(a => a.classList.remove('tudo-gasto'));
+  document.getElementById('notesArea').value = '';
+  const roundEl = document.getElementById('roundCounter');
+  if (roundEl) roundEl.textContent = 1;
+  switchPhase(1);
+  showToast('✓ Resetado');
+}
+
+function exportJSON() {
+  const blob = new Blob([JSON.stringify(getState(), null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `emil_combate_${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✓ Exportado');
+}
+
+function importJSON(evt) {
+  const file = evt.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    try {
+      applyState(JSON.parse(e.target.result));
+      showToast('✓ Importado');
+      saveState(true);
+    } catch (err) { showToast('Arquivo inválido'); }
+  };
+  reader.readAsText(file);
+  evt.target.value = '';
+}
+
+let toastTimer;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+document.getElementById('notesArea').addEventListener('input', () => {
+  clearTimeout(window._notesTimer);
+  window._notesTimer = setTimeout(() => saveState(true), 600);
+});
+
+document.addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+    if (e.ctrlKey && e.key === 's') { e.preventDefault(); saveState(); }
+    return;
+  }
+  if (e.ctrlKey && e.key === 's') { e.preventDefault(); saveState(); return; }
+  if (e.key === '1') switchPhase(1);
+  if (e.key === '2') switchPhase(2);
+  if (e.key === '3') switchPhase(3);
+});
+
+/* ============================================================
+   INIT
+   ============================================================ */
+switchPhaseSilent(1);
+updateHPBar();
+aplicarTrackersHabilidades();
+
+(async function bootstrap() {
+  if (window.Auth) {
+    const u = await window.Auth.requerLogin('../login.html');
+    if (!u) return;
+    const ehMestre = await window.Auth.ehMestre();
+    if (!ehMestre) {
+      document.body.innerHTML = '<div style="padding:60px;text-align:center;color:var(--bone);font-family:Cinzel,serif"><h2>Acesso restrito ao Mestre.</h2><p style="margin-top:14px"><a href="../../index.html" style="color:var(--gold)">Voltar</a></p></div>';
+      return;
+    }
+  }
+  await loadState();
+  if (window.MasterState) {
+    window.MasterState.iniciarRealtime(MS_CHAVE, dados => {
+      if (!dados) return;
+      _msAplicando = true;
+      applyState(dados);
+      _msAplicando = false;
+      _setSyncStatus('● sincronizado', 'var(--gold)');
+    });
+  }
+})();
+</script>
+
+<script src="../../assets/js/ambiente.js"></script>
+<script src="../../assets/js/polish.js"></script>
+</body>
+</html>
