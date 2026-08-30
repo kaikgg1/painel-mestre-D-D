@@ -181,6 +181,57 @@
     guerreiro:        'warlord-helmet',  // Derick   - Guerreiro Renascido
     feiticeiro_draco: 'dragon-spiral',   // Felipe   - Feiticeiro de Linhagem Dracônica
     paladino_vinganca:'winged-sword',    // Guilherme- Paladino do Juramento de Vingança
+    // --- Itens mágicos (por tipo) — verificados: HTTP 200 ---
+    item_maravilhoso: 'gem-pendant',
+    pocao:            'potion-ball',
+    anel:             'ring',
+    cajado:           'wizard-staff',
+    varinha:          'crystal-wand',
+    bastao:           'winged-scepter',
+    pergaminho_item:  'scroll-unfurled',
+    arma_espada:      'broadsword',
+    arma_machado:     'battle-axe',
+    arma_maca:        'flanged-mace',
+    arma_arco:        'bow-arrow',
+    arma_adaga:       'plain-dagger',
+    arma_tridente:    'trident',
+    arma_martelo:     'thor-hammer',
+    arma_generica:    'war-pick',
+    armadura_escudo:  'round-shield',
+    armadura_placas:  'breastplate',
+    armadura_malha:   'chain-mail',
+    // --- Itens maravilhosos, por palavra-chave do nome (HTTP 200) ---
+    manto_item:       'cloak',
+    botas_item:       'boots',
+    robe_item:        'robe',
+    elmo_item:        'helmet',
+    livro_item:       'spell-book',
+    gema_item:        'gem-chain',
+    luvas_item:       'gloves',
+    olhos_item:       'eye-target',
+    pedra_item:       'rock',
+    po_item:          'dust-cloud',
+    talisma_item:     'necklace',
+    baralho_item:     'card-random',
+    bolsa_item:       'swap-bag',
+    corda_item:       'rope-coil',
+    flauta_item:      'flute',
+    garrafa_item:     'potion-ball',
+    cubo_item:        'cube',
+    ferradura_item:   'horseshoe',
+    trombeta_item:    'trumpet',
+    aljava_item:      'quiver',
+    braçadeira_item:  'bracers',
+    espelho_item:     'mirror-mirror',
+    bau_item:         'chest',
+    chave_item:       'key',
+    tambor_item:      'drum',
+    lira_item:        'lyre',
+    vela_item:        'candle-flame',
+    bola_item:        'crystal-ball',
+    // --- Seções do bloco de estatísticas (bestiário) ---
+    coroa:            'crown',          // Ações Lendárias
+    caverna:          'cave-entrance',  // Ações de Covil
   };
 
   const PREFIXO = 'game-icons:';

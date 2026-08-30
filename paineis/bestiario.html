@@ -322,6 +322,49 @@
   .secao-acoes-bloco .traco:hover { border-left-color: var(--blood-bright); }
   .secao-acoes-bloco .traco b { color: #e8968c; }
 
+  /* --- Demais seções do bloco de estatísticas --- */
+  .secao-modal.bonus {
+    color: #e0a44f; border-left-color: #c08a3e;
+    background: linear-gradient(90deg, rgba(192,138,62,0.16), transparent 78%);
+  }
+  .secao-bonus-bloco .traco { border-left-color: rgba(192,138,62,0.5); }
+  .secao-bonus-bloco .traco:hover { border-left-color: #e0a44f; }
+  .secao-bonus-bloco .traco b { color: #e0a44f; }
+
+  .secao-modal.reacoes {
+    color: #7fb0e0; border-left-color: #5f8bb8;
+    background: linear-gradient(90deg, rgba(95,139,184,0.16), transparent 78%);
+  }
+  .secao-reacoes-bloco .traco { border-left-color: rgba(95,139,184,0.5); }
+  .secao-reacoes-bloco .traco:hover { border-left-color: #7fb0e0; }
+  .secao-reacoes-bloco .traco b { color: #7fb0e0; }
+
+  .secao-modal.lendaria {
+    color: var(--gold-light); border-left-color: var(--gold-bright);
+    background: linear-gradient(90deg, rgba(184,138,44,0.24), transparent 78%);
+    box-shadow: inset 0 0 18px rgba(212,168,67,0.10);
+  }
+  .secao-lendaria-bloco .traco {
+    border-left-color: rgba(184,138,44,0.55);
+    background: rgba(212,168,67,0.045);
+  }
+  .secao-lendaria-bloco .traco:hover { border-left-color: var(--gold-light); }
+  .secao-lendaria-bloco .traco b { color: var(--gold-light); }
+
+  .secao-modal.covil {
+    color: #b58ee0; border-left-color: #8b6fc4;
+    background: linear-gradient(90deg, rgba(139,111,196,0.18), transparent 78%);
+  }
+  .secao-covil-bloco .traco { border-left-color: rgba(139,111,196,0.5); }
+  .secao-covil-bloco .traco:hover { border-left-color: #b58ee0; }
+  .secao-covil-bloco .traco b { color: #b58ee0; }
+
+  /* preâmbulo (ex.: "pode realizar 3 ações lendárias…") — sem título em negrito */
+  .traco.preambulo {
+    font-style: italic; color: var(--parchment-dim);
+    background: transparent; border-left-style: dashed;
+  }
+
   /* ===== PV: alternar média / máximo ===== */
   .hp-toggle {
     display: inline-flex; align-items: center; gap: 7px; flex-wrap: wrap;
@@ -610,10 +653,29 @@ function abrirModal(nome) {
        </div>`
     : linha('Pontos de Vida', c.pv_dados ? `${media} (${c.pv_dados})` : String(media ?? ''));
 
-  const tracos = (c.tracos || []).filter(t => t && t.nome && t.nome !== '—')
-    .map(t => `<div class="traco"><b>${esc(t.nome)}</b>${esc(t.desc)}</div>`).join('');
-  const acoes = (c.acoes || [])
-    .map(t => `<div class="traco"><b>${esc(t.nome)}</b>${esc(t.desc)}</div>`).join('');
+  /* Cada seção do bloco de estatísticas. Entradas com nome "—" são preâmbulos
+     (ex.: "pode realizar 3 ações lendárias…") — saem sem o título em negrito. */
+  const listar = (arr) => (arr || [])
+    .filter(t => t && (t.nome || t.desc))
+    .map(t => t.nome && t.nome !== '—'
+      ? `<div class="traco"><b>${esc(t.nome)}</b>${esc(t.desc)}</div>`
+      : `<div class="traco preambulo">${esc(t.desc)}</div>`)
+    .join('');
+
+  const tracos    = listar(c.tracos);
+  const acoes     = listar(c.acoes);
+  const bonus     = listar(c.acoes_bonus);
+  const reacoes   = listar(c.reacoes);
+  const lendarias = listar(c.acoes_lendarias);
+  const covil     = listar(c.acoes_covil);
+
+  /** Monta uma seção só se houver conteúdo. */
+  const secao = (html, rotulo, classe, chaveIcone) => html
+    ? `<div class="secao-${classe}-bloco">
+         <div class="secao-modal ${classe}">${window.Icones ? Icones.html(chaveIcone) : ''}${rotulo}</div>
+         ${html}
+       </div>`
+    : '';
 
   document.getElementById('modal-corpo').innerHTML = `
     <div class="modal-topo">
@@ -656,10 +718,12 @@ function abrirModal(nome) {
       ${linha('Nível de Desafio', c.nd)}
     </div>
 
-    ${tracos ? `<div class="secao-modal carac">${window.Icones ? Icones.html('brilho') : ''}Características</div>${tracos}` : ''}
-    ${acoes  ? `<div class="secao-acoes-bloco">
-                  <div class="secao-modal acoes">${window.Icones ? Icones.html('ataque') : ''}Ações</div>${acoes}
-                </div>` : ''}`;
+    ${secao(tracos,    'Características',  'carac',    'brilho')}
+    ${secao(acoes,     'Ações',            'acoes',    'ataque')}
+    ${secao(bonus,     'Ações Bônus',      'bonus',    'raio')}
+    ${secao(reacoes,   'Reações',          'reacoes',  'escudo')}
+    ${secao(lendarias, 'Ações Lendárias',  'lendaria', 'coroa')}
+    ${secao(covil,     'Ações de Covil',   'covil',    'caverna')}`;
 
   // PV: alternar média / máximo
   document.querySelectorAll('#modal-corpo .hp-btn').forEach(btn => {

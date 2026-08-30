@@ -3933,8 +3933,14 @@ function renderCardCriatura(cr, i) {
   const hpAtual = cr.hp_atual ?? hpMax;
   const pct = hpMax > 0 ? Math.max(0, Math.min(100, Math.round(hpAtual / hpMax * 100))) : 0;
   const classeBar = pct <= 15 ? 'critico' : pct <= 35 ? 'baixo' : pct <= 65 ? 'medio' : '';
-  const tracos = (cr.tracos || []).map(t => `<li><strong>${escape(t.nome)}.</strong> ${escape(t.desc)}</li>`).join('');
-  const acoes = (cr.acoes || []).map(t => `<li><strong>${escape(t.nome)}.</strong> ${escape(t.desc)}</li>`).join('');
+  const listaCr = (arr) => (arr || [])
+    .map(t => `<li><strong>${escape(t.nome)}.</strong> ${escape(t.desc)}</li>`).join('');
+  const tracos    = listaCr(cr.tracos);
+  const acoes     = listaCr(cr.acoes);
+  const crBonus   = listaCr(cr.acoes_bonus);
+  const crReacoes = listaCr(cr.reacoes);
+  const crLend    = listaCr(cr.acoes_lendarias);
+  const crCovil   = listaCr(cr.acoes_covil);
   return `
     <div class="criatura-card" data-cr="${i}">
       <div class="criatura-head">
@@ -4002,6 +4008,10 @@ function renderCardCriatura(cr, i) {
 
       ${tracos ? `<div class="criatura-sec"><h4>Traços</h4><ul class="criatura-lista">${tracos}</ul></div>` : ''}
       ${acoes ? `<div class="criatura-sec"><h4>Ações</h4><ul class="criatura-lista">${acoes}</ul></div>` : ''}
+      ${crBonus ? `<div class="criatura-sec"><h4>Ações Bônus</h4><ul class="criatura-lista">${crBonus}</ul></div>` : ''}
+      ${crReacoes ? `<div class="criatura-sec"><h4>Reações</h4><ul class="criatura-lista">${crReacoes}</ul></div>` : ''}
+      ${crLend ? `<div class="criatura-sec"><h4>Ações Lendárias</h4><ul class="criatura-lista">${crLend}</ul></div>` : ''}
+      ${crCovil ? `<div class="criatura-sec"><h4>Ações de Covil</h4><ul class="criatura-lista">${crCovil}</ul></div>` : ''}
 
       <div class="criatura-sec">
         <h4>Notas</h4>
@@ -4250,6 +4260,10 @@ function adicionarMonstroObj(m) {
     nd: m.nd || '',
     tracos: (m.tracos || []).map(t => ({ ...t })),
     acoes: (m.acoes || []).map(t => ({ ...t })),
+    acoes_bonus: (m.acoes_bonus || []).map(t => ({ ...t })),
+    reacoes: (m.reacoes || []).map(t => ({ ...t })),
+    acoes_lendarias: (m.acoes_lendarias || []).map(t => ({ ...t })),
+    acoes_covil: (m.acoes_covil || []).map(t => ({ ...t })),
     notas: 'Fonte: Manual dos Monstros.',
   };
   _companionsAtuais().push(nova);

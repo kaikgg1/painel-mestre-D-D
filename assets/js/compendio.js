@@ -14,7 +14,15 @@
 
   const norm = s => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
   const esc = s => (s == null ? '' : String(s)).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  const titulo = s => (s || '').toLowerCase().replace(/\b\p{L}/gu, c => c.toUpperCase());
+  // "POÇÃO DE ESCALAR" -> "Poção de Escalar"
+  // Não usar \b aqui: em JS ele é ASCII, então "ç"/"ã" viram fronteira de palavra
+  // e o resultado sai "PoÇãO". Capitalizamos só depois de início/espaço/pontuação,
+  // e deixamos as preposições curtas em minúsculo.
+  const MINUSCULAS = new Set(['de','da','do','das','dos','e','em','na','no','nas','nos','a','o','as','os','com','para','por','ao','à']);
+  const titulo = s => (s || '').toLowerCase()
+    .replace(/(^|[\s\-–—'"(\[/])(\p{L})/gu, (m, sep, letra, i) =>
+      sep + letra.toUpperCase())
+    .replace(/\s(\p{L}+)/gu, (m, p) => MINUSCULAS.has(p.toLowerCase()) ? ' ' + p.toLowerCase() : m);
 
   // Ícones vetoriais (assets/js/icones.js). Degrada pra string vazia se a
   // página não carregou o módulo — nenhum emoji de sistema fica pra trás.
@@ -25,13 +33,69 @@
     monstros: { arquivo: 'monstros_data.json', titulo: 'Bestiário',     ico: 'bestiario', ph: 'Buscar criatura (nome, tipo)…' },
   };
 
-  // Tipo do item mágico -> chave semântica do mapa de ícones
-  const ICO_TIPO = {
-    'Poção': 'pocao', 'Anel': 'anel', 'Varinha': 'varinha',
-    'Cajado': 'cajado', 'Bastão': 'cajado', 'Arma': 'arma',
-    'Armadura': 'peitoral', 'Escudo': 'escudo', 'Manto': 'manto',
-    'Botas': 'bota', 'Pergaminho': 'pergaminho',
-  };
+  // Ícone do item a partir do TIPO COMPLETO (não só da 1ª palavra): assim
+  // "Arma (espada longa)" vira espada e "Armadura (escudo)" vira escudo,
+  // em vez de caírem num genérico. A ordem importa — o mais específico primeiro.
+  const REGRAS_ICONE = [
+    [/escudo/i,                          'armadura_escudo'],
+    [/armadura.*(malha|brunea)/i,        'armadura_malha'],
+    [/armadura/i,                        'armadura_placas'],
+    [/espada|cimitarra/i,                'arma_espada'],
+    [/machado|malho/i,                   'arma_machado'],
+    [/martelo/i,                         'arma_martelo'],
+    [/ma[çc]a/i,                         'arma_maca'],
+    [/arco|flecha|besta/i,               'arma_arco'],
+    [/adaga/i,                           'arma_adaga'],
+    [/tridente|azagaia|lan[çc]a/i,       'arma_tridente'],
+    [/arma/i,                            'arma_generica'],
+    [/po[çc][ãa]o/i,                     'pocao'],
+    [/anel/i,                            'anel'],
+    [/cajado/i,                          'cajado'],
+    [/varinha/i,                         'varinha'],
+    [/bast[ãa]o/i,                       'bastao'],
+    [/pergaminho/i,                      'pergaminho_item'],
+  ];
+  // "Item maravilhoso" cobre metade do catálogo (mantos, botas, elmos, gemas…),
+  // então quando o TIPO não diz nada, olhamos o NOME do item.
+  const REGRAS_NOME = [
+    [/^manto|^capa/i,        'manto_item'],
+    [/^botas?/i,             'botas_item'],
+    [/^robe/i,               'robe_item'],
+    [/^elmo|^chapéu/i,       'elmo_item'],
+    [/^manual|^tomo|^livro/i,'livro_item'],
+    [/^gema|^pedra d/i,      'gema_item'],
+    [/^luvas|^manoplas/i,    'luvas_item'],
+    [/^olhos|^lentes/i,      'olhos_item'],
+    [/^pedra/i,              'pedra_item'],
+    [/^pó\b|^po\b/i,         'po_item'],
+    [/^periapto|^talismã|^amuleto|^colar/i, 'talisma_item'],
+    [/^baralho|^cartas/i,    'baralho_item'],
+    [/^bolsa|^saco|^mochila/i, 'bolsa_item'],
+    [/^corda/i,              'corda_item'],
+    [/^flauta/i,             'flauta_item'],
+    [/^garrafa|^frasco|^cantil/i, 'garrafa_item'],
+    [/^cubo/i,               'cubo_item'],
+    [/^ferradura/i,          'ferradura_item'],
+    [/^trombeta|^corneta/i,  'trombeta_item'],
+    [/^aljava/i,             'aljava_item'],
+    [/^braçadeira|^bracelete/i, 'braçadeira_item'],
+    [/^espelho/i,            'espelho_item'],
+    [/^baú|^cofre/i,         'bau_item'],
+    [/^chave/i,              'chave_item'],
+    [/^tambor/i,             'tambor_item'],
+    [/^lira|^alaúde|^harpa/i,'lira_item'],
+    [/^vela/i,               'vela_item'],
+    [/^bola|^orbe|^esfera/i, 'bola_item'],
+    [/^brincos?|^broche/i,   'gema_item'],
+  ];
+
+  function chaveIconeItem(tipo, nome) {
+    const t = tipo || '';
+    for (const [re, chave] of REGRAS_ICONE) if (re.test(t)) return chave;
+    const n = nome || '';
+    for (const [re, chave] of REGRAS_NOME) if (re.test(n)) return chave;
+    return 'item_maravilhoso';   // genérico de último caso
+  }
   const RARIDADES = ['comum', 'incomum', 'raro', 'muito raro', 'lendário', 'artefato', 'variável'];
   const CORES_RAR = { comum: '#9aa0a6', incomum: '#4caf6a', raro: '#4a90d9', 'muito raro': '#9b59b6', 'lendário': '#d4a843', artefato: '#c0392b', 'variável': '#7f8c8d' };
 
@@ -209,7 +273,7 @@
 
   function itemHTML(it, idx) {
     const cor = CORES_RAR[it.raridade] || '#a89878';
-    const icone = ico(ICO_TIPO[it.tipo.split(' ')[0]] || 'brilho');
+    const icone = ico(chaveIconeItem(it.tipo, it.nome));
     return `<div class="cp-item" data-idx="${idx}">
       <div class="cp-thumb">${icone}</div>
       <div style="flex:1;min-width:0">
@@ -269,6 +333,10 @@
       ${linha('Idiomas', m.idiomas)}
       ${(m.tracos && m.tracos.length) ? `<div class="cp-sec">Traços</div>${blocos(m.tracos)}` : ''}
       ${(m.acoes && m.acoes.length) ? `<div class="cp-sec">Ações</div>${blocos(m.acoes)}` : ''}
+      ${(m.acoes_bonus && m.acoes_bonus.length) ? `<div class="cp-sec">Ações Bônus</div>${blocos(m.acoes_bonus)}` : ''}
+      ${(m.reacoes && m.reacoes.length) ? `<div class="cp-sec">Reações</div>${blocos(m.reacoes)}` : ''}
+      ${(m.acoes_lendarias && m.acoes_lendarias.length) ? `<div class="cp-sec">Ações Lendárias</div>${blocos(m.acoes_lendarias)}` : ''}
+      ${(m.acoes_covil && m.acoes_covil.length) ? `<div class="cp-sec">Ações de Covil</div>${blocos(m.acoes_covil)}` : ''}
       ${m.notas ? `<div class="cp-linha" style="margin-top:12px;font-style:italic;color:#8c7d5e">${esc(m.notas)}</div>` : ''}
     </div>`;
   }
