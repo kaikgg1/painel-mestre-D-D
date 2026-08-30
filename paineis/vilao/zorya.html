@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#0a0608">
+<link rel="icon" type="image/svg+xml" href="../../assets/img/favicon.svg">
+<title>Zorya — Ficha de Combate</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+<style>
+  :root {
+    --bg-deep:#0a0608; --bg-card:#191115; --bg-card-2:#221820; --bg-card-3:#2c2029;
+    --blood:#9b1f1f; --blood-dark:#5a0e0e; --blood-bright:#d13731;
+    --gold:#cbac67; --gold-bright:#f0d089; --gold-dim:#8a7340;
+    --bone:#efe6cf; --bone-dim:#c2b795; --shadow:#050203;
+    --text-body:#ddd2b2; --text-muted:#948767;
+    --border:#4a3a2a; --border-soft:rgba(203,172,103,0.16); --radius:10px;
+    --accent:#5f9ac4; --accent-bright:#9fcdea; --accent-glow:rgba(95,154,196,0.40); --accent-soft:rgba(95,154,196,0.12);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: var(--bg-deep); color: var(--text-body); font-family: 'Cormorant Garamond', serif; font-size: 16px; line-height: 1.48; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+  body { background: radial-gradient(ellipse at 50% -10%, var(--accent-soft), transparent 55%), radial-gradient(ellipse at 18% 4%, rgba(155,31,31,0.14), transparent 48%), radial-gradient(ellipse at 84% 96%, rgba(203,172,103,0.06), transparent 50%), var(--bg-deep); background-attachment: fixed; }
+  body::before { content: ''; position: fixed; inset: 0; pointer-events: none; opacity: 0.3; z-index: 1; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.05 0 0 0 0 0.05 0 0 0 0.3 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>"); mix-blend-mode: overlay; }
+  .container { max-width: 1000px; margin: 0 auto; padding: 20px 24px 60px; position: relative; z-index: 2; }
+  .top-bar { position: sticky; top: 0; z-index: 50; background: rgba(10,6,8,0.96); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); margin: -20px -24px 16px; padding: 12px 24px; }
+  .top-bar-inner { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; max-width: 1000px; margin: 0 auto; }
+  .brand { font-family: 'Cinzel', serif; font-weight: 700; font-size: 1rem; letter-spacing: 0.18em; color: var(--bone); text-transform: uppercase; }
+  .brand-sub { font-family: 'IM Fell English', serif; font-style: italic; font-size: 11px; color: var(--gold-dim); letter-spacing: 0.15em; }
+  .save-controls { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
+  header { text-align: center; padding: 26px 16px 26px; margin-bottom: 18px; position: relative; border-radius: var(--radius); background: radial-gradient(ellipse at 50% 0%, var(--accent-soft), transparent 70%), linear-gradient(180deg, rgba(20,10,14,0.85), rgba(10,6,8,0.4)); border: 1px solid var(--border); box-shadow: inset 0 1px 0 rgba(240,208,137,0.06), 0 10px 40px rgba(0,0,0,0.5); overflow: hidden; }
+  header::before { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, transparent, var(--accent), transparent); height: 2px; top: 0; opacity: 0.55; }
+  header::after { content: '✦'; position: absolute; bottom: -11px; left: 50%; transform: translateX(-50%); background: var(--bg-deep); padding: 0 14px; color: var(--accent); font-size: 18px; text-shadow: 0 0 12px var(--accent-glow); }
+  .crest { font-size: clamp(2.4rem, 6vw, 3.4rem); line-height: 1; margin-bottom: 6px; color: var(--accent-bright); filter: drop-shadow(0 0 14px var(--accent-glow)); display: inline-block; }
+  .eyebrow { font-family: 'Cinzel', serif; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.42em; color: var(--accent-bright); text-transform: uppercase; margin-bottom: 8px; opacity: 0.85; }
+  h1 { font-family: 'Cinzel', serif; font-weight: 900; font-size: clamp(2rem, 5vw, 3.1rem); letter-spacing: 0.09em; line-height: 1.02; background: linear-gradient(180deg, var(--bone) 30%, var(--accent-bright)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 34px var(--accent-glow); filter: drop-shadow(0 2px 2px rgba(0,0,0,0.6)); }
+  .subtitle { font-style: italic; font-size: 1rem; color: var(--gold); margin-top: 10px; letter-spacing: 0.03em; line-height: 1.5; max-width: 700px; margin-left: auto; margin-right: auto; }
+  .subtitle strong { color: var(--bone); font-style: normal; }
+  .combat-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+  @media (max-width: 880px) { .combat-bar { grid-template-columns: 1fr; } }
+  .panel { background: linear-gradient(180deg, var(--bg-card), rgba(10,6,8,0.5)); border: 1px solid var(--border); padding: 10px 14px; border-radius: 2px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.04); }
+  .panel-title { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.2em; color: var(--gold); text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid var(--border-soft); padding-bottom: 6px; }
+  .hp-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .hp-input { background: var(--shadow); border: 1px solid var(--blood-dark); color: var(--bone); font-family: 'Cinzel', serif; font-size: 1rem; padding: 4px 8px; width: 60px; text-align: center; border-radius: 2px; outline: none; }
+  .hp-input:focus { border-color: var(--gold); }
+  .hp-bar-container { flex: 1; min-width: 100px; height: 18px; background: var(--shadow); border: 1px solid var(--border); position: relative; overflow: hidden; }
+  .hp-bar { height: 100%; background: linear-gradient(90deg, var(--blood-dark), var(--blood)); transition: width 0.4s ease; box-shadow: inset 0 0 8px rgba(0,0,0,0.5); }
+  .hp-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Cinzel', serif; font-size: 10px; color: var(--bone); letter-spacing: 0.1em; text-shadow: 0 0 4px black; }
+  .btn { background: transparent; border: 1px solid var(--gold-dim); color: var(--gold); padding: 4px 10px; font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.1em; cursor: pointer; transition: all 0.15s; border-radius: 2px; text-transform: uppercase; }
+  .btn:hover { background: var(--blood-dark); color: var(--bone); border-color: var(--blood); }
+  .btn.gold:hover { background: var(--gold-dim); color: var(--shadow); border-color: var(--gold); }
+  .condition-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; align-items: center; }
+  .cond-label { font-family: 'Cinzel', serif; font-size: 10px; color: var(--gold); letter-spacing: 0.18em; text-transform: uppercase; margin-right: 4px; }
+  .chip { padding: 5px 12px; background: linear-gradient(180deg, rgba(0,0,0,0.2), rgba(26,18,22,0.7)); border: 1px solid var(--border); color: var(--text-muted); font-family: 'Cinzel', serif; font-weight: 600; font-size: 10px; letter-spacing: 0.1em; cursor: pointer; border-radius: 14px; user-select: none; transition: all 0.15s; min-height: 26px; display: inline-flex; align-items: center; }
+  .chip:hover { border-color: var(--gold-dim); color: var(--bone-dim); transform: translateY(-1px); }
+  .chip.active { background: linear-gradient(180deg, var(--blood), var(--blood-dark)); border-color: var(--blood-bright); color: var(--bone); box-shadow: 0 0 8px rgba(139,26,26,0.4); }
+  .stats-bar { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 14px; background: linear-gradient(180deg, rgba(26,18,22,0.7), rgba(13,8,11,0.7)); padding: 12px 10px; border: 1px solid var(--border); border-radius: var(--radius); box-shadow: inset 0 1px 0 rgba(232,200,122,0.05); }
+  .stat { text-align: center; padding: 9px 4px 7px; background: linear-gradient(180deg, rgba(0,0,0,0.3), transparent); border: 1px solid rgba(74,58,42,0.6); border-radius: 8px; transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s; }
+  .stat:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,0.4), 0 0 12px var(--accent-glow); }
+  .stat-label { font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; letter-spacing: 0.22em; color: var(--gold-bright); text-shadow: 0 0 8px rgba(232,200,122,0.2); }
+  .stat-value { font-family: 'IM Fell English', serif; font-size: 1.75rem; color: var(--bone); line-height: 1.05; font-weight: 600; margin-top: 3px; }
+  .stat-mod { font-family: 'Cinzel', serif; font-weight: 700; font-size: 0.95rem; color: var(--accent-bright); background: rgba(0,0,0,0.35); border: 1px solid var(--accent); border-radius: 12px; padding: 1px 9px; display: inline-block; margin-top: 6px; box-shadow: 0 0 10px var(--accent-glow); }
+  .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 6px; margin-bottom: 12px; }
+  .info-card { background: linear-gradient(180deg, var(--bg-card), rgba(10,6,8,0.5)); border: 1px solid var(--border); border-left: 3px solid var(--accent); padding: 8px 12px; border-radius: 6px; transition: border-color 0.2s, transform 0.15s; }
+  .info-card:hover { transform: translateY(-1px); border-left-color: var(--accent-bright); }
+  .info-card .label { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.15em; color: var(--gold); text-transform: uppercase; }
+  .info-card .value { font-family: 'IM Fell English', serif; font-size: 1.08rem; color: var(--bone); margin-top: 1px; }
+  .meta-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+  @media (max-width: 720px) { .meta-row { grid-template-columns: 1fr; } }
+  .meta-box { background: linear-gradient(180deg, var(--bg-card), rgba(10,6,8,0.4)); border: 1px solid var(--border); padding: 10px 14px; border-radius: 8px; }
+  .meta-title { font-family: 'Cinzel', serif; font-size: 9px; color: var(--accent-bright); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 6px; padding-bottom: 5px; border-bottom: 1px solid var(--border-soft); }
+  .meta-content { font-size: 0.95rem; color: var(--text-body); line-height: 1.55; }
+  .meta-content strong { color: var(--bone); font-weight: 600; }
+  .section { margin-bottom: 18px; }
+  .section-title { font-family: 'Cinzel', serif; font-weight: 700; font-size: 1.02rem; color: var(--blood-bright); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 10px; padding-bottom: 7px; border-bottom: 1px solid var(--blood-dark); display: flex; align-items: center; gap: 10px; position: relative; }
+  .section-title::before { content: ''; width: 7px; height: 7px; background: var(--blood); transform: rotate(45deg); box-shadow: 0 0 8px var(--blood-bright); flex-shrink: 0; }
+  .ability-grid { display: grid; grid-template-columns: 1fr; gap: 7px; }
+  .ability { background: linear-gradient(180deg, var(--bg-card), rgba(10,6,8,0.35)); border: 1px solid var(--border); border-left: 4px solid var(--gold-dim); border-radius: 8px; transition: border-left-color 0.15s, background 0.15s, box-shadow 0.2s, transform 0.15s; overflow: hidden; }
+  .ability:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.35); }
+  .ability.open { box-shadow: 0 6px 22px rgba(0,0,0,0.45); }
+  .ability.attack { border-left-color: var(--blood-bright); }
+  .ability.reaction { border-left-color: #5f8bb8; }
+  .ability-header { padding: 10px 14px; cursor: pointer; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; user-select: none; }
+  .ability-header:hover { background: rgba(255,255,255,0.03); }
+  .ability-header::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--gold-dim); flex-shrink: 0; box-shadow: 0 0 8px currentColor; }
+  .ability.attack .ability-header::before { background: var(--blood-bright); color: var(--blood-bright); }
+  .ability.reaction .ability-header::before { background: #5f8bb8; color: #5f8bb8; }
+  .ability-name { font-family: 'Cinzel', serif; font-weight: 600; font-size: 1rem; color: var(--bone); letter-spacing: 0.04em; }
+  .ability-tag { font-family: 'IM Fell English', serif; font-style: italic; font-size: 0.82rem; color: var(--gold); letter-spacing: 0.03em; background: var(--accent-soft); border: 1px solid var(--border-soft); padding: 1px 8px; border-radius: 10px; }
+  .toggle-icon { margin-left: auto; color: var(--gold-dim); font-size: 0.72rem; transition: transform 0.2s; }
+  .ability.open .toggle-icon { transform: rotate(180deg); color: var(--gold); }
+  .ability-body { padding: 2px 16px 12px 34px; font-size: 0.98rem; color: var(--text-body); line-height: 1.58; display: none; }
+  .ability.open .ability-body { display: block; }
+  .ability-body strong { color: var(--bone); font-weight: 600; }
+  .ability-body em { color: var(--gold-bright); font-style: normal; font-weight: 500; }
+  .dmg { display: inline-block; padding: 1px 8px; background: linear-gradient(180deg, rgba(155,31,31,0.28), rgba(90,14,14,0.28)); border: 1px solid var(--blood); color: #ffd9d0; border-radius: 5px; font-family: 'IM Fell English', serif; font-size: 0.9rem; margin: 0 2px; font-weight: 600; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
+  .cd { display: inline-block; padding: 1px 8px; background: rgba(203,172,103,0.16); border: 1px solid var(--gold-dim); color: var(--gold-bright); border-radius: 5px; font-family: 'IM Fell English', serif; font-size: 0.9rem; margin: 0 2px; font-weight: 600; }
+  .notes-section { margin-top: 18px; background: var(--bg-card); border: 1px solid var(--border); padding: 10px 14px; border-radius: 2px; }
+  .notes-section h3 { font-family: 'Cinzel', serif; font-size: 0.78rem; color: var(--gold); letter-spacing: 0.2em; margin-bottom: 6px; text-transform: uppercase; }
+  .notes-area { width: 100%; min-height: 70px; background: var(--shadow); border: 1px solid var(--border); color: var(--text-body); font-family: 'Cormorant Garamond', serif; font-size: 0.92rem; padding: 8px 10px; border-radius: 2px; resize: vertical; outline: none; line-height: 1.45; }
+  .notes-area:focus { border-color: var(--gold); }
+  footer { margin-top: 24px; padding-top: 12px; border-top: 1px solid var(--border); text-align: center; color: var(--text-muted); font-family: 'IM Fell English', serif; font-style: italic; font-size: 0.85rem; }
+  .footer-credit { display: block; margin-top: 6px; font-size: 0.78rem; }
+  .footer-credit a { color: var(--gold-dim); }
+  .toast { position: fixed; top: 16px; right: 16px; background: var(--bg-card-3); border: 1px solid var(--gold); color: var(--bone); padding: 10px 16px; font-family: 'Cinzel', serif; font-size: 0.85rem; letter-spacing: 0.1em; border-radius: 2px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); z-index: 200; opacity: 0; transform: translateY(-10px); transition: all 0.3s; pointer-events: none; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  @media (max-width: 720px) { .container { padding: 12px 12px 50px; } .top-bar { margin: -12px -12px 12px; padding: 10px 12px; } .stats-bar { grid-template-columns: repeat(3, 1fr); } }
+  @media print { body { background: white; color: black; } .top-bar, .notes-section, .combat-bar, .condition-row, .save-controls { display: none; } .ability-body { display: block !important; } }
+</style>
+<link rel="stylesheet" href="../../assets/css/ui.css">
+</head>
+<body data-ambiente="brasas">
+
+<div class="toast" id="toast"></div>
+
+<div class="container">
+
+  <div class="top-bar">
+    <div class="top-bar-inner">
+      <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+        <a href="index.html" class="btn" style="text-decoration:none">← Personagens</a>
+        <div>
+          <div class="brand">Zorya</div>
+          <div class="brand-sub">Ficha de Combate · Espírito Pseudodragão · <span id="syncStatus" style="color:var(--gold-dim)">○ local</span></div>
+        </div>
+      </div>
+      <div class="save-controls">
+        <button class="btn gold" onclick="saveState()">💾 Salvar</button>
+        <button class="btn" onclick="loadState()">↺ Carregar</button>
+        <button class="btn" onclick="resetAll()">⟲ Resetar</button>
+      </div>
+    </div>
+  </div>
+
+  <header>
+    <iconify-icon class="crest" icon="game-icons:dragonfly"></iconify-icon>
+    <div class="eyebrow">Espírito Guardião · Companheira Etérea</div>
+    <h1>Zorya</h1>
+    <div class="subtitle">Morto-vivo Miúdo · Neutro e Bom · <strong>ND 1/4</strong> · Aliada espiritual incorpórea</div>
+  </header>
+
+  <div class="combat-bar">
+    <div class="panel">
+      <div class="panel-title">◆ Pontos de Vida</div>
+      <div class="hp-row">
+        <input type="number" id="hpCurrent" class="hp-input" value="10" min="0">
+        <span style="color:var(--gold-dim)">/</span>
+        <input type="number" id="hpMax" class="hp-input" value="10" min="1">
+        <div class="hp-bar-container"><div class="hp-bar" id="hpBar" style="width:100%"></div><div class="hp-label" id="hpLabel">100%</div></div>
+      </div>
+      <div style="margin-top:4px;font-size:0.82rem;color:var(--text-muted);font-style:italic">Máx <strong style="color:var(--gold);font-style:normal">10</strong> · Média 7 · <strong style="color:var(--bone);font-style:normal">2d4 + 2</strong></div>
+      <div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap">
+        <button class="btn" onclick="adjustHP(-2)">−2</button>
+        <button class="btn" onclick="adjustHP(-1)">−1</button>
+        <button class="btn" onclick="adjustHP(1)">+1</button>
+        <button class="btn" onclick="setMedia()">Usar média (7)</button>
+        <button class="btn" onclick="resetHP()">Reset</button>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">◆ Escapada Etérea (1/dia)</div>
+      <div style="font-size:0.9rem;color:var(--text-body);line-height:1.45">
+        Se fosse cair a <strong style="color:var(--gold)">0 PV</strong>, fica com <strong>1 PV</strong> e foge para o Plano Etéreo, retornando ao Plano Material após <em>1 minuto</em>.
+      </div>
+    </div>
+  </div>
+
+  <div class="condition-row">
+    <span class="cond-label">Condições:</span>
+    <div class="chip active" onclick="this.classList.toggle('active');saveState(true)" style="opacity:1">🐲 Sopro Recarregado</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">🌫 Escapou para o Etéreo</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">💬 Telepatia Ativa</div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-bar">
+    <div class="stat"><div class="stat-label">FOR</div><div class="stat-value">1</div><div class="stat-mod">−5</div></div>
+    <div class="stat"><div class="stat-label">DES</div><div class="stat-value">15</div><div class="stat-mod">+2</div></div>
+    <div class="stat"><div class="stat-label">CON</div><div class="stat-value">13</div><div class="stat-mod">+1</div></div>
+    <div class="stat"><div class="stat-label">INT</div><div class="stat-value">10</div><div class="stat-mod">+0</div></div>
+    <div class="stat"><div class="stat-label">SAB</div><div class="stat-value">12</div><div class="stat-mod">+1</div></div>
+    <div class="stat"><div class="stat-label">CAR</div><div class="stat-value">10</div><div class="stat-mod">+0</div></div>
+  </div>
+  <div class="info-grid">
+    <div class="info-card"><div class="label">Classe Armadura</div><div class="value">13</div></div>
+    <div class="info-card"><div class="label">Deslocamento</div><div class="value">4,5 m · voo 18 m (pairar)</div></div>
+    <div class="info-card"><div class="label">Visão às Cegas</div><div class="value">3 m</div></div>
+    <div class="info-card"><div class="label">Visão no Escuro</div><div class="value">18 m</div></div>
+    <div class="info-card"><div class="label">Perc. Passiva</div><div class="value">13</div></div>
+    <div class="info-card"><div class="label">Nível de Desafio</div><div class="value" style="color:var(--accent-bright)">1/4</div></div>
+  </div>
+  <div class="meta-row">
+    <div class="meta-box"><div class="meta-title">Perícias & Imunidades</div><div class="meta-content"><strong>Perícias:</strong> Percepção +3 · Furtividade +4<br><strong>Imune a Dano:</strong> ácido, frio, fogo, elétrico, trovejante, veneno; contundente/perf./cort. de ataques não mágicos</div></div>
+    <div class="meta-box"><div class="meta-title">Imunidades a Condição & Idiomas</div><div class="meta-content"><strong>Imune:</strong> enfeitiçada, exaustão, amedrontada, agarrada, paralisada, petrificada, envenenada, caída, restrita<br><strong>Idiomas:</strong> entende Comum e Dracônico, mas não fala</div></div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">Características</h2>
+    <div class="ability-grid">
+      <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Sentidos Aguçados</div><span class="toggle-icon">▼</span></div><div class="ability-body"><em>Vantagem</em> em testes de Sabedoria (Percepção) que dependam de visão, audição ou olfato.</div></div>
+      <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Telepatia Limitada</div><span class="toggle-icon">▼</span></div><div class="ability-body">Pode comunicar ideias simples, emoções e imagens telepaticamente com qualquer criatura a até 30 m que entenda um idioma.</div></div>
+      <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Resistência à Magia</div><span class="toggle-icon">▼</span></div><div class="ability-body"><em>Vantagem</em> em testes de resistência contra magias e outros efeitos mágicos.</div></div>
+      <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Movimento Incorpóreo</div><span class="toggle-icon">▼</span></div><div class="ability-body">Move-se através de outras criaturas e objetos como se fossem terreno difícil. Sofre <span class="dmg">5 (1d10) força</span> se terminar o turno dentro de um objeto.</div></div>
+      <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Fogo Fantasma</div><span class="toggle-icon">▼</span></div><div class="ability-body">Qualquer dano que Zorya cause com seu <em>sopro</em> a criaturas incorpóreas ignora a imunidade a dano de frio.</div></div>
+      <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Escapada Etérea (1/dia)</div><span class="toggle-icon">▼</span></div><div class="ability-body">Se cairia a <strong>0 PV</strong>, fica com <strong>1 PV</strong> e foge para o Plano Etéreo, retornando ao Material após 1 minuto.</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">Ações</h2>
+    <div class="ability-grid">
+      <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Arma de Sopro (Recarga 5-6)</div><span class="ability-tag">Cone 3 m · CON CD 11</span><span class="toggle-icon">▼</span></div><div class="ability-body">Exala uma rajada gélida de fogo prateado num cone de 3 m. Cada criatura na área faz <em>Constituição</em> <span class="cd">CD 11</span>: <span class="dmg">5 (2d4) frio</span> em falha, metade em sucesso.</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2 class="section-title">Reações</h2>
+    <div class="ability-grid">
+      <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Passo Nebuloso</div><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> Zorya ou uma criatura a até 1,5 m dela é atingida (ou tem um ataque errado contra ela).<br><strong>Efeito:</strong> conjura <em>passo nebuloso</em>, podendo levar consigo até uma criatura voluntária a até 1,5 m. A criatura teletransportada sofre <strong>metade do dano</strong> do ataque que disparou a reação.</div></div>
+    </div>
+  </div>
+
+  <div class="notes-section">
+    <h3>◆ Notas do Mestre</h3>
+    <textarea class="notes-area" id="notesArea" placeholder="Anote aqui: quem Zorya acompanha, se já usou a Escapada Etérea hoje, recarga do sopro, mensagens telepáticas transmitidas..."></textarea>
+  </div>
+
+  <footer>
+    Zorya — sincronizada em tempo real entre os dispositivos do Mestre.
+    <span class="footer-credit">Statblock adaptado de <a href="https://www.strahdreloaded.com/" target="_blank" rel="noopener">Curse of Strahd: Reloaded</a>, de DragnaCarta (conteúdo de fã da WotC).</span>
+  </footer>
+
+</div>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="../../assets/js/supabase.js"></script>
+<script src="../../assets/js/auth.js"></script>
+<script src="../../assets/js/efeitos.js"></script>
+<script src="../../assets/js/master_state.js"></script>
+<script>
+const STORAGE_KEY = 'zorya_ficha_v1';
+const MS_CHAVE = 'vilao:zorya';
+const HP_MAX = 10, HP_MEDIA = 7;
+let _msAplicando = false;
+
+const hpCurrent = document.getElementById('hpCurrent');
+const hpMax = document.getElementById('hpMax');
+const hpBar = document.getElementById('hpBar');
+const hpLabel = document.getElementById('hpLabel');
+function updateHPBar() {
+  const cur = parseInt(hpCurrent.value) || 0, max = parseInt(hpMax.value) || 1;
+  const pct = Math.max(0, Math.min(100, (cur / max) * 100));
+  hpBar.style.width = pct + '%'; hpLabel.textContent = Math.round(pct) + '%';
+  if (pct > 50) hpBar.style.background = 'linear-gradient(90deg, var(--blood-dark), var(--blood))';
+  else if (pct > 25) hpBar.style.background = 'linear-gradient(90deg, #5a0e0e, #a82020)';
+  else hpBar.style.background = 'linear-gradient(90deg, #3a0808, #6a0e0e)';
+}
+function adjustHP(delta) {
+  const max = parseInt(hpMax.value) || 1; let cur = parseInt(hpCurrent.value) || 0; const antes = cur;
+  cur = Math.max(0, Math.min(max, cur + delta)); hpCurrent.value = cur; updateHPBar();
+  const mudou = cur - antes;
+  if (window.FX && mudou !== 0) { const alvo = document.querySelector('.combat-bar .panel') || hpCurrent; if (mudou < 0) FX.dano(alvo, mudou); else FX.cura(alvo, mudou); if (FX.contarInput) FX.contarInput(hpCurrent, antes, cur); }
+  saveState(true);
+}
+function resetHP() { hpCurrent.value = hpMax.value; updateHPBar(); saveState(true); }
+function setMedia() { hpMax.value = HP_MEDIA; hpCurrent.value = HP_MEDIA; updateHPBar(); saveState(true); showToast('✓ PV na média (7)'); }
+hpCurrent.addEventListener('input', () => { updateHPBar(); saveState(true); });
+hpMax.addEventListener('input', () => { updateHPBar(); saveState(true); });
+function toggleAbility(header) { header.parentElement.classList.toggle('open'); }
+
+function _setSyncStatus(txt, cor) { const el = document.getElementById('syncStatus'); if (el) { el.textContent = txt; el.style.color = cor || 'var(--gold-dim)'; } }
+function getState() {
+  return {
+    hpCurrent: hpCurrent.value, hpMax: hpMax.value,
+    conditions: Array.from(document.querySelectorAll('.condition-row .chip')).map(c => c.classList.contains('active')),
+    notes: document.getElementById('notesArea').value,
+    openAbilities: Array.from(document.querySelectorAll('.ability.open')).map(a => a.querySelector('.ability-name').textContent)
+  };
+}
+function applyState(s) {
+  if (!s) return;
+  hpCurrent.value = s.hpCurrent ?? HP_MAX; hpMax.value = s.hpMax ?? HP_MAX; updateHPBar();
+  (s.conditions || []).forEach((u, i) => { const c = document.querySelectorAll('.condition-row .chip')[i]; if (c) c.classList.toggle('active', u); });
+  document.getElementById('notesArea').value = s.notes || '';
+  if (s.openAbilities) s.openAbilities.forEach(name => document.querySelectorAll('.ability').forEach(a => { if (a.querySelector('.ability-name').textContent === name) a.classList.add('open'); }));
+}
+function saveState(silent = false) {
+  if (_msAplicando) return;
+  try {
+    const dados = getState();
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
+    if (window.MasterState) { _setSyncStatus('⟳ sincronizando…', 'var(--gold-dim)'); window.MasterState.salvarDebounced(MS_CHAVE, dados, silent ? 600 : 0); setTimeout(() => _setSyncStatus('● sincronizado', 'var(--gold)'), silent ? 800 : 200); }
+    if (!silent) showToast('✓ Salvo');
+  } catch(e) { if (!silent) showToast('Erro ao salvar'); }
+}
+async function loadState() {
+  try {
+    let dados = null;
+    if (window.MasterState) dados = await window.MasterState.carregar(MS_CHAVE);
+    if (!dados) { const local = localStorage.getItem(STORAGE_KEY); if (local) dados = JSON.parse(local); }
+    if (!dados) { showToast('Nada salvo'); return; }
+    _msAplicando = true; applyState(dados); _msAplicando = false;
+    _setSyncStatus(window.MasterState ? '● sincronizado' : '○ local', window.MasterState ? 'var(--gold)' : 'var(--gold-dim)');
+    showToast('✓ Carregado');
+  } catch(e) { _msAplicando = false; showToast('Erro ao carregar'); }
+}
+function resetAll() {
+  if (!confirm('Resetar tudo? (HP, condições, notas)')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  hpCurrent.value = HP_MAX; hpMax.value = HP_MAX;
+  updateHPBar();
+  document.querySelectorAll('.condition-row .chip').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.ability.open').forEach(a => a.classList.remove('open'));
+  document.getElementById('notesArea').value = '';
+  showToast('✓ Resetado');
+}
+let toastTimer;
+function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 1800); }
+document.getElementById('notesArea').addEventListener('input', () => { clearTimeout(window._notesTimer); window._notesTimer = setTimeout(() => saveState(true), 600); });
+document.addEventListener('keydown', (e) => { if (e.ctrlKey && e.key === 's') { e.preventDefault(); saveState(); } });
+
+updateHPBar();
+(async function bootstrap() {
+  if (window.Auth) {
+    const u = await window.Auth.requerLogin('../login.html'); if (!u) return;
+    const ehMestre = await window.Auth.ehMestre();
+    if (!ehMestre) { document.body.innerHTML = '<div style="padding:60px;text-align:center;color:var(--bone);font-family:Cinzel,serif"><h2>Acesso restrito ao Mestre.</h2><p style="margin-top:14px"><a href="../../index.html" style="color:var(--gold)">Voltar</a></p></div>'; return; }
+  }
+  await loadState();
+  if (window.MasterState) window.MasterState.iniciarRealtime(MS_CHAVE, dados => { if (!dados) return; _msAplicando = true; applyState(dados); _msAplicando = false; _setSyncStatus('● sincronizado', 'var(--gold)'); });
+})();
+</script>
+
+<script src="../../assets/js/ambiente.js"></script>
+<script src="../../assets/js/polish.js"></script>
+</body>
+</html>

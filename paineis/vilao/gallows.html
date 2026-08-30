@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0a0608">
 <link rel="icon" type="image/svg+xml" href="../../assets/img/favicon.svg">
-<title>Patrina — Ficha de Combate</title>
+<title>Orador da Forca — Ficha de Combate</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
@@ -18,10 +18,10 @@
     --bone:#efe6cf; --bone-dim:#c2b795; --shadow:#050203;
     --text-body:#ddd2b2; --text-muted:#948767;
     --border:#4a3a2a; --border-soft:rgba(203,172,103,0.16); --radius:10px;
-    --accent:#cbac67; --accent-bright:#f0d089; --accent-glow:rgba(203,172,103,0.35); --accent-soft:rgba(203,172,103,0.10);
+    --accent:#c9a83f; --accent-bright:#f0d078; --accent-glow:rgba(201,168,63,0.40); --accent-soft:rgba(201,168,63,0.12);
   }
-  body[data-fase="1"] { --accent:#c98a3f; --accent-bright:#f0c078; --accent-glow:rgba(201,138,63,0.42); --accent-soft:rgba(201,138,63,0.13); }
-  body[data-fase="2"] { --accent:#5f4a8a; --accent-bright:#a084c4; --accent-glow:rgba(95,74,138,0.46); --accent-soft:rgba(95,74,138,0.15); }
+  body[data-fase="1"] { --accent:#c9a83f; --accent-bright:#f0d078; --accent-glow:rgba(201,168,63,0.40); --accent-soft:rgba(201,168,63,0.12); }
+  body[data-fase="2"] { --accent:#8a1f2f; --accent-bright:#d1605f; --accent-glow:rgba(138,31,47,0.46); --accent-soft:rgba(138,31,47,0.15); }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { background: var(--bg-deep); color: var(--text-body); font-family: 'Cormorant Garamond', serif; font-size: 16px; line-height: 1.48; min-height: 100vh; -webkit-font-smoothing: antialiased; }
   body { background: radial-gradient(ellipse at 50% -10%, var(--accent-soft), transparent 55%), radial-gradient(ellipse at 18% 4%, rgba(155,31,31,0.16), transparent 48%), radial-gradient(ellipse at 84% 96%, rgba(203,172,103,0.06), transparent 50%), var(--bg-deep); background-attachment: fixed; transition: background 0.6s ease; }
@@ -37,8 +37,8 @@
   header::after { content: '✦'; position: absolute; bottom: -11px; left: 50%; transform: translateX(-50%); background: var(--bg-deep); padding: 0 14px; color: var(--accent); font-size: 18px; text-shadow: 0 0 12px var(--accent-glow); }
   .crest { font-size: clamp(2.4rem, 6vw, 3.4rem); line-height: 1; margin-bottom: 6px; color: var(--accent-bright); filter: drop-shadow(0 0 14px var(--accent-glow)); display: inline-block; }
   .eyebrow { font-family: 'Cinzel', serif; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.42em; color: var(--accent-bright); text-transform: uppercase; margin-bottom: 8px; opacity: 0.85; }
-  h1 { font-family: 'Cinzel', serif; font-weight: 900; font-size: clamp(2rem, 5vw, 3.1rem); letter-spacing: 0.08em; line-height: 1.02; background: linear-gradient(180deg, var(--bone) 30%, var(--accent-bright)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 34px var(--accent-glow); filter: drop-shadow(0 2px 2px rgba(0,0,0,0.6)); }
-  .subtitle { font-style: italic; font-size: 1rem; color: var(--gold); margin-top: 10px; letter-spacing: 0.03em; line-height: 1.5; max-width: 780px; margin-left: auto; margin-right: auto; }
+  h1 { font-family: 'Cinzel', serif; font-weight: 900; font-size: clamp(1.9rem, 5vw, 3rem); letter-spacing: 0.07em; line-height: 1.02; background: linear-gradient(180deg, var(--bone) 30%, var(--accent-bright)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 34px var(--accent-glow); filter: drop-shadow(0 2px 2px rgba(0,0,0,0.6)); }
+  .subtitle { font-style: italic; font-size: 1rem; color: var(--gold); margin-top: 10px; letter-spacing: 0.03em; line-height: 1.5; max-width: 800px; margin-left: auto; margin-right: auto; }
   .subtitle strong { color: var(--bone); font-style: normal; }
   .combat-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
   @media (max-width: 880px) { .combat-bar { grid-template-columns: 1fr; } }
@@ -86,8 +86,6 @@
   .info-card:hover { transform: translateY(-1px); border-left-color: var(--accent-bright); }
   .info-card .label { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.15em; color: var(--gold); text-transform: uppercase; }
   .info-card .value { font-family: 'IM Fell English', serif; font-size: 1.08rem; color: var(--bone); margin-top: 1px; }
-  .info-card .editable { background: transparent; border: none; border-bottom: 1px dashed var(--gold-dim); color: var(--bone); font-family: 'IM Fell English', serif; font-size: 1rem; width: 50px; text-align: center; outline: none; }
-  .info-card .editable:focus { border-bottom-color: var(--gold); color: var(--gold-bright); }
   .meta-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
   @media (max-width: 720px) { .meta-row { grid-template-columns: 1fr; } }
   .meta-box { background: linear-gradient(180deg, var(--bg-card), rgba(10,6,8,0.4)); border: 1px solid var(--border); padding: 10px 14px; border-radius: 8px; }
@@ -161,7 +159,7 @@
       <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
         <a href="index.html" class="btn" style="text-decoration:none">← Personagens</a>
         <div>
-          <div class="brand">Patrina</div>
+          <div class="brand">Orador da Forca</div>
           <div class="brand-sub">Ficha de Combate · 2 Formas · <span id="syncStatus" style="color:var(--gold-dim)">○ local</span></div>
         </div>
       </div>
@@ -176,40 +174,37 @@
   </div>
 
   <header>
-    <iconify-icon class="crest" icon="game-icons:sarcophagus"></iconify-icon>
-    <div class="eyebrow">Guardiã Vingativa do Templo do Âmbar · Irmã de Kasimir</div>
-    <h1>Patrina</h1>
-    <div class="subtitle">Morto-vivo Médio · Neutro e Mau · <strong>ND <span id="ndHeader">18</span></strong> (20.000 XP) · Bônus de Proficiência <strong>+6</strong></div>
+    <iconify-icon class="crest" icon="game-icons:ghost"></iconify-icon>
+    <div class="eyebrow">Vallaki · Espírito da Árvore da Forca</div>
+    <h1>Orador da Forca</h1>
+    <div class="subtitle">Morto-vivo Médio · Neutro e Mau · <strong>ND 11</strong> · Bônus de Proficiência <strong>+4</strong></div>
   </header>
 
   <div class="combat-bar">
     <div class="panel">
-      <div class="panel-title">◆ Pontos de Vida (variam por forma)</div>
+      <div class="panel-title">◆ Pontos de Vida (compartilhados entre formas)</div>
       <div class="hp-row">
-        <input type="number" id="hpCurrent" class="hp-input" value="352" min="0">
+        <input type="number" id="hpCurrent" class="hp-input" value="280" min="0">
         <span style="color:var(--gold-dim)">/</span>
-        <input type="number" id="hpMax" class="hp-input" value="352" min="1">
+        <input type="number" id="hpMax" class="hp-input" value="280" min="1">
         <div class="hp-bar-container"><div class="hp-bar" id="hpBar" style="width:100%"></div><div class="hp-label" id="hpLabel">100%</div></div>
       </div>
-      <div style="margin-top:4px;display:flex;align-items:center;gap:8px;flex-wrap:wrap">
-        <span style="font-size:0.82rem;color:var(--text-muted);font-style:italic">Máx <strong id="hpMediaMax" style="color:var(--gold);font-style:normal">352</strong> · Média <strong id="hpMedia" style="color:var(--bone);font-style:normal">219</strong> · <strong id="hpDados" style="color:var(--bone-dim);font-style:normal">38d8 + 48</strong></span>
-        <button class="btn" onclick="aplicarPVForma()">↺ PV máx</button>
-        <button class="btn" onclick="aplicarMediaForma()">Média</button>
-      </div>
+      <div style="margin-top:4px;font-size:0.82rem;color:var(--text-muted);font-style:italic">Máx <strong style="color:var(--gold);font-style:normal">280</strong> · Média 157 · <strong style="color:var(--bone);font-style:normal">35d8</strong></div>
       <div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap">
         <button class="btn" onclick="adjustHP(-20)">−20</button>
         <button class="btn" onclick="adjustHP(-10)">−10</button>
         <button class="btn" onclick="adjustHP(-5)">−5</button>
         <button class="btn" onclick="adjustHP(-1)">−1</button>
         <button class="btn" onclick="adjustHP(1)">+1</button>
+        <button class="btn" onclick="setMedia()">Usar média (157)</button>
         <button class="btn" onclick="resetHP()">Reset</button>
       </div>
     </div>
 
     <div class="panel">
-      <div class="panel-title">◆ Corporificação Sombria</div>
+      <div class="panel-title">◆ Ira do Traidor</div>
       <div style="font-size:0.9rem;color:var(--text-body);line-height:1.45">
-        A <strong style="color:var(--gold)">0 PV</strong>, todos os sarcófagos de âmbar a até 18 m dela expelem névoa sombria, que ela inala. Sua forma etérea vira carne pálida de morto-vivo: <em>Patrina, Semiliche</em>. A iniciativa não muda; dano excedente não transfere; <strong>não mantém condições</strong>. Usa imediatamente <em>Arma da Alma</em>.
+        A <strong style="color:var(--gold)">0 PV</strong>, os fogos-fátuos dourados se apagam, revelando cinco adagas de lâmina ondulada com cabos vermelhos, pretos e dourados: vira o <em>Vingador Ba'al Verzi</em>. Todos os efeitos ativos terminam. A iniciativa não muda; dano excedente não transfere; <strong>mantém as condições</strong>.
       </div>
     </div>
 
@@ -238,26 +233,26 @@
 
   <div class="condition-row">
     <span class="cond-label">Condições:</span>
-    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">☀ Sob Luz Solar (desvantagem)</div>
-    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">🗡 Portando a Espada Solar</div>
-    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">😍 Enfeitiçado (alvo, Fascinar Portador)</div>
-    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">📦 Sarcófago Ativo (alvo)</div>
-    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">🐌 Lento (alvo)</div>
-    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">↓ Caído (alvo)</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">🎯 Amaldiçoado (alvo)</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">😱 Amedrontado (alvo)</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">◈ Atordoado (alvo)</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">◈ Paralisado (alvo)</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">👁 Cego (alvo)</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">⊘ Agarrado (alvo)</div>
   </div>
 
   <div class="phase-tabs">
     <div class="phase-tab active" data-phase="1" onclick="switchPhase(1)">
-      <iconify-icon class="phase-icon" icon="game-icons:ghost-ally"></iconify-icon>
+      <iconify-icon class="phase-icon" icon="game-icons:lantern-flame"></iconify-icon>
       <div class="phase-num">~ Primeira Forma ~</div>
-      <div class="phase-name">Espectro Vingativo</div>
-      <div class="phase-tagline">Incorpórea · ND 18</div>
+      <div class="phase-name">Orador da Forca</div>
+      <div class="phase-tagline">Fogos-fátuos dourados · ND 11</div>
     </div>
     <div class="phase-tab" data-phase="2" onclick="switchPhase(2)">
-      <iconify-icon class="phase-icon" icon="game-icons:crystal-shine"></iconify-icon>
+      <iconify-icon class="phase-icon" icon="game-icons:crossed-bones"></iconify-icon>
       <div class="phase-num">~ Segunda Forma ~</div>
-      <div class="phase-name">Semiliche</div>
-      <div class="phase-tagline">Corpórea, arma da alma · ND 18</div>
+      <div class="phase-name">Vingador Ba'al Verzi</div>
+      <div class="phase-tagline">Adagas espectrais · ND 11</div>
     </div>
   </div>
 
@@ -267,53 +262,53 @@
     <div class="legend-item"><span class="legend-swatch" style="background:#5f8bb8"></span>Reação</div>
   </div>
 
-  <!-- FORMA 1: ESPECTRO VINGATIVO -->
+  <!-- FORMA 1: ORADOR DA FORCA -->
   <div class="phase-content active" id="phase-1">
     <div class="stats-bar">
-      <div class="stat"><div class="stat-label">FOR</div><div class="stat-value">6</div><div class="stat-mod">−2</div></div>
+      <div class="stat"><div class="stat-label">FOR</div><div class="stat-value">8</div><div class="stat-mod">−1</div></div>
       <div class="stat"><div class="stat-label">DES</div><div class="stat-value">16</div><div class="stat-mod">+3</div></div>
-      <div class="stat"><div class="stat-label">CON</div><div class="stat-value">16</div><div class="stat-mod">+3</div></div>
-      <div class="stat"><div class="stat-label">INT</div><div class="stat-value">21</div><div class="stat-mod">+5</div></div>
-      <div class="stat"><div class="stat-label">SAB</div><div class="stat-value">14</div><div class="stat-mod">+2</div></div>
-      <div class="stat"><div class="stat-label">CAR</div><div class="stat-value">16</div><div class="stat-mod">+3</div></div>
+      <div class="stat"><div class="stat-label">CON</div><div class="stat-value">10</div><div class="stat-mod">+0</div></div>
+      <div class="stat"><div class="stat-label">INT</div><div class="stat-value">10</div><div class="stat-mod">+0</div></div>
+      <div class="stat"><div class="stat-label">SAB</div><div class="stat-value">12</div><div class="stat-mod">+1</div></div>
+      <div class="stat"><div class="stat-label">CAR</div><div class="stat-value">18</div><div class="stat-mod">+4</div></div>
     </div>
     <div class="info-grid">
-      <div class="info-card"><div class="label">Classe Armadura</div><div class="value"><input type="number" class="editable ca-input" data-phase="1" value="13"></div></div>
-      <div class="info-card"><div class="label">Deslocamento</div><div class="value">1,5 m · voo 18 m (pairar)</div></div>
-      <div class="info-card"><div class="label">Bônus Prof.</div><div class="value">+6</div></div>
-      <div class="info-card"><div class="label">Visão no Escuro</div><div class="value">18 m</div></div>
-      <div class="info-card"><div class="label">Perc. Passiva</div><div class="value">18</div></div>
-      <div class="info-card"><div class="label">Nível de Desafio</div><div class="value" style="color:var(--accent-bright)">18 (20.000 XP)</div></div>
+      <div class="info-card"><div class="label">Classe Armadura</div><div class="value"><input type="number" class="editable ca-input" data-phase="1" value="13" style="background:transparent;border:none;border-bottom:1px dashed var(--gold-dim);color:var(--bone);font-family:'IM Fell English',serif;font-size:1rem;width:50px;text-align:center;outline:none"></div></div>
+      <div class="info-card"><div class="label">Deslocamento</div><div class="value">0 m · voo 12 m (pairar)</div></div>
+      <div class="info-card"><div class="label">Bônus Prof.</div><div class="value">+4</div></div>
+      <div class="info-card"><div class="label">Visão Verdadeira</div><div class="value">18 m</div></div>
+      <div class="info-card"><div class="label">Perc. Passiva</div><div class="value">15</div></div>
+      <div class="info-card"><div class="label">Nível de Desafio</div><div class="value" style="color:var(--accent-bright)">11</div></div>
     </div>
     <div class="meta-row">
-      <div class="meta-box"><div class="meta-title">Testes de Resistência & Perícias</div><div class="meta-content"><strong>Resistência:</strong> Con +9 · Int +11 · Sab +8 · Car +9<br><strong>Perícias:</strong> Arcanismo +17 · História +11 · Intuição +8 · Percepção +8</div></div>
-      <div class="meta-box"><div class="meta-title">Resistências, Imunidades & Idiomas</div><div class="meta-content"><strong>Resist.:</strong> ácido, frio, fogo; contund./perf./cort. de armas não mágicas<br><strong>Imune a Dano:</strong> necrótico, veneno · <strong>Imune a Condição:</strong> enfeitiçada, exaustão, agarrada, paralisada, petrificada, envenenada, caída, restrita, inconsciente<br><strong>Idiomas:</strong> Comum, Élfico, Abissal, Infernal, Dracônico, Silvestre</div></div>
+      <div class="meta-box"><div class="meta-title">Testes de Resistência & Perícias</div><div class="meta-content"><strong>Resistência:</strong> Des +7 · Sab +5 · Car +8<br><strong>Perícias:</strong> Percepção +5</div></div>
+      <div class="meta-box"><div class="meta-title">Imunidades, Sentidos & Idiomas</div><div class="meta-content"><strong>Imune a Dano:</strong> necrótico, veneno · <strong>Imune a Condição:</strong> enfeitiçado, exaustão, amedrontado, agarrado, paralisado, petrificado, envenenado, caído, restrito, atordoado<br><strong>Idiomas:</strong> Abissal, Comum</div></div>
     </div>
 
     <div class="section">
       <h2 class="section-title">Características</h2>
       <div class="ability-grid">
-        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Movimento Incorpóreo</div><span class="toggle-icon">▼</span></div><div class="ability-body">Move-se através de outras criaturas e objetos como se fossem terreno difícil. Sofre <span class="dmg">5 (1d10) força</span> se terminar o turno dentro de um objeto.</div></div>
-        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Sensibilidade à Luz Solar</div><span class="toggle-icon">▼</span></div><div class="ability-body">Sob luz solar, tem <em>desvantagem</em> em testes de habilidade e jogadas de ataque.</div></div>
-        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Corporificação Sombria</div><span class="ability-tag">Gatilho de 2ª forma</span><span class="toggle-icon">▼</span></div><div class="ability-body">A <strong>0 PV</strong>, sarcófagos de âmbar a até 18 m expelem tendrilhas de névoa sombria que ela inala; sua forma etérea vira carne pálida com olhos de âmbar afundados. Vira a <strong>Semiliche</strong>. Iniciativa não muda; dano excedente não transfere; <em>não</em> mantém condições. Usa imediatamente <em>Arma da Alma</em>.</div></div>
+        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Lutador de Curta Distância</div><span class="toggle-icon">▼</span></div><div class="ability-body">Não sofre <em>desvantagem</em> em ataques à distância por estar a até 1,5 m de uma criatura hostil.</div></div>
+        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Sentidos de Adivinhação</div><span class="toggle-icon">▼</span></div><div class="ability-body">Enxerga 18 m no Plano Etéreo quando está no Plano Material, e vice-versa.</div></div>
+        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Ira do Traidor</div><span class="ability-tag">Gatilho de 2ª forma</span><span class="toggle-icon">▼</span></div><div class="ability-body">A <strong>0 PV</strong>, os fogos-fátuos se apagam, revelando cinco adagas espectrais. Vira o <strong>Vingador Ba'al Verzi</strong>. Todos os efeitos ativos terminam. A iniciativa não muda; dano excedente não transfere; <em>mantém as condições</em>.</div></div>
       </div>
     </div>
 
     <div class="section">
       <h2 class="section-title">Ações</h2>
       <div class="ability-grid">
-        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Ataque Múltiplo</div><span class="toggle-icon">▼</span></div><div class="ability-body">Faz <strong>dois</strong> ataques, sendo apenas <em>um</em> deles um Tentáculo de Âmbar; e pode usar <em>Fascinar Portador</em> uma vez.</div></div>
-        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Tentáculo de Âmbar</div><span class="ability-tag">+11 · 4,5 m</span><span class="toggle-icon">▼</span></div><div class="ability-body">Contra alvo a até 4,5 m de uma parede da Sala de Âmbar. Acerto: <span class="dmg">19 (2d12+6) contundente</span>. O alvo faz <em>Força</em> <span class="cd">CD 19</span> ou fica <strong>agarrado</strong> (escapar <span class="cd">CD 19</span>) ou é empurrado 3 m (escolha de Patrina). Falha por 10+: também <strong>caído</strong>.</div></div>
-        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Toque Corruptor</div><span class="ability-tag">+11 · 1,5 m</span><span class="toggle-icon">▼</span></div><div class="ability-body">Acerto: <span class="dmg">16 (4d6+2) necrótico</span>.</div></div>
-        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Fascinar Portador</div><span class="ability-tag">CAR CD 19</span><span class="toggle-icon">▼</span></div><div class="ability-body">Força quem possui a Espada Solar a fazer <em>Carisma</em> <span class="cd">CD 19</span> ou ficar <strong>enfeitiçado</strong> por 1 min, tentando seguir os comandos de Patrina. Sofrer dano permite novo teste. Termina se deixar de possuir a espada.</div></div>
+        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Ataque Múltiplo</div><span class="toggle-icon">▼</span></div><div class="ability-body">Faz <strong>dois</strong> ataques.</div></div>
+        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Toque Presságio</div><span class="ability-tag">+8 · 1,5 m</span><span class="toggle-icon">▼</span></div><div class="ability-body">Acerto: <span class="dmg">15 (2d10+4) psíquico</span>. O alvo rola 1d4 e subtrai do próximo ataque ou TR que fizer até o início do próximo turno do Orador.</div></div>
+        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Fogo-Fátuo</div><span class="ability-tag">Distância · +8 · 9 m</span><span class="toggle-icon">▼</span></div><div class="ability-body">Acerto: <span class="dmg">13 (3d8) necrótico</span>.</div></div>
+        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Visões Mortais</div><span class="ability-tag">9 m · SAB CD 16</span><span class="toggle-icon">▼</span></div><div class="ability-body">Força uma criatura visível a até 9 m a fazer <em>Sabedoria</em> <span class="cd">CD 16</span>, inundando sua mente com imagens aterrorizantes de sua própria morte violenta. Falha: <strong>paralisada</strong> até o início do próximo turno do Orador.</div></div>
       </div>
     </div>
 
     <div class="section">
       <h2 class="section-title">Ações Bônus</h2>
       <div class="ability-grid">
-        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Animar Golens (1/dia)</div><span class="toggle-icon">▼</span></div><div class="ability-body">Convoca fragmentos de âmbar e os molda em <strong>dois construtos de âmbar</strong>. Cada construto age na iniciativa de Patrina, logo após ela.</div></div>
-        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Conjurar Sarcófagos</div><span class="ability-tag">9 m · DES CD 19</span><span class="toggle-icon">▼</span></div><div class="ability-body">Sarcófagos de âmbar ocos surgem em volta de cada criatura escolhida a até 1,5 m dela ou de um ponto visível a até 9 m. <em>Destreza</em> <span class="cd">CD 19</span> ou fica <strong>presa</strong> no sarcófago (CA 15, 15 PV, imune a veneno e psíquico).</div></div>
+        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Chicote de Almas</div><span class="ability-tag">1,5 m · FOR CD 16</span><span class="toggle-icon">▼</span></div><div class="ability-body">Correntes etéreas se lançam ao redor, forçando até 2 criaturas a até 1,5 m a fazer <em>Força</em> <span class="cd">CD 16</span>: <span class="dmg">9 (2d8) necrótico</span> e <strong>restrita</strong> até o início do próximo turno em falha; metade e sem restringir em sucesso.</div></div>
+        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Chama do Fogo-Fátuo</div><span class="ability-tag">9 m · raio 1,5 m · CON CD 16</span><span class="toggle-icon">▼</span></div><div class="ability-body">Um fogo-fátuo brilha num ponto a até 9 m. Cada criatura a até 1,5 m faz <em>Constituição</em> <span class="cd">CD 16</span>: <span class="dmg">14 (4d6) radiante</span> e <strong>cega</strong> até o início do próximo turno em falha; metade e sem cegar em sucesso.</div></div>
       </div>
     </div>
 
@@ -321,61 +316,62 @@
       <h2 class="section-title">Reações <span style="font-size:0.7em;color:var(--text-muted);text-transform:none;font-style:italic;margin-left:8px">até 3/rodada · 1/turno</span></h2>
       <div class="ability-grid">
         <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Indomável</div><span class="toggle-icon">▼</span></div><div class="ability-body">Repete um TR contra um efeito/condição ativo.</div></div>
-        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Contramagia (1/rodada)</div><span class="ability-tag">18 m</span><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> vê uma criatura a até 18 m conjurando uma magia.<br><strong>Efeito:</strong> conjura <em>contramagia</em> no 3º nível. O alvo pode gastar reação + espaço para fazer TR <span class="cd">CD 19</span> (−1 por nível gasto), reduzindo a CD; sucesso: a contramagia falha.</div></div>
-        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Andar Fantasmagórico</div><span class="ability-tag">18 m</span><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> criatura visível a até 18 m termina o turno.<br><strong>Efeito:</strong> move-se até seu deslocamento em direção/afastando dela sem provocar AoO.</div></div>
-        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Tentáculo de Âmbar (2/rodada)</div><span class="ability-tag">9 m</span><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> sofre dano de criatura visível a até 9 m.<br><strong>Efeito:</strong> ataca essa criatura com <em>Tentáculo de Âmbar</em>.</div></div>
+        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Revelação da Morte</div><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> sofre dano de criatura ao alcance.<br><strong>Efeito:</strong> ataca essa criatura com <em>Toque Presságio</em> ou <em>Fogo-Fátuo</em>.</div></div>
+        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Passo Fantasmagórico</div><span class="ability-tag">SAB CD 16</span><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> sofre dano.<br><strong>Efeito:</strong> teletransporta-se até 4,5 m. Cada criatura a até 1,5 m do novo local faz <em>Sabedoria</em> <span class="cd">CD 16</span> ou fica <strong>amedrontada</strong> até o fim de seu próximo turno.</div></div>
       </div>
     </div>
   </div>
 
-  <!-- FORMA 2: SEMILICHE -->
+  <!-- FORMA 2: VINGADOR BA'AL VERZI -->
   <div class="phase-content" id="phase-2">
     <div class="special-callout">
-      <div class="sc-title"><iconify-icon icon="game-icons:crystal-shine" style="color:var(--accent-bright)"></iconify-icon> Patrina, Semiliche</div>
-      <div class="sc-body">Forma corpórea alcançada pela <strong>Corporificação Sombria</strong> a 0 PV. Ganha a <strong>Espada das Sombras</strong> (Arma da Alma), que aparece em sua mão vazia se ela não estiver segurando a Espada Solar. <em>Mantém os PV atuais</em>.</div>
+      <div class="sc-title"><iconify-icon icon="game-icons:crossed-bones" style="color:var(--accent-bright)"></iconify-icon> Vingador Ba'al Verzi — segunda forma</div>
+      <div class="sc-body">Cinco adagas espectrais com lâminas onduladas e cabos vermelhos, pretos e dourados, reveladas ao apagar os fogos-fátuos a 0 PV. <em>Mantém os PV atuais</em> e as condições.</div>
     </div>
     <div class="stats-bar">
-      <div class="stat"><div class="stat-label">FOR</div><div class="stat-value">11</div><div class="stat-mod">+0</div></div>
+      <div class="stat"><div class="stat-label">FOR</div><div class="stat-value">8</div><div class="stat-mod">−1</div></div>
       <div class="stat"><div class="stat-label">DES</div><div class="stat-value">16</div><div class="stat-mod">+3</div></div>
-      <div class="stat"><div class="stat-label">CON</div><div class="stat-value">16</div><div class="stat-mod">+3</div></div>
-      <div class="stat"><div class="stat-label">INT</div><div class="stat-value">21</div><div class="stat-mod">+5</div></div>
-      <div class="stat"><div class="stat-label">SAB</div><div class="stat-value">14</div><div class="stat-mod">+2</div></div>
-      <div class="stat"><div class="stat-label">CAR</div><div class="stat-value">16</div><div class="stat-mod">+3</div></div>
+      <div class="stat"><div class="stat-label">CON</div><div class="stat-value">10</div><div class="stat-mod">+0</div></div>
+      <div class="stat"><div class="stat-label">INT</div><div class="stat-value">10</div><div class="stat-mod">+0</div></div>
+      <div class="stat"><div class="stat-label">SAB</div><div class="stat-value">12</div><div class="stat-mod">+1</div></div>
+      <div class="stat"><div class="stat-label">CAR</div><div class="stat-value">18</div><div class="stat-mod">+4</div></div>
     </div>
     <div class="info-grid">
-      <div class="info-card"><div class="label">Classe Armadura</div><div class="value"><input type="number" class="editable ca-input" data-phase="2" value="20"></div></div>
-      <div class="info-card"><div class="label">Deslocamento</div><div class="value">9 m</div></div>
-      <div class="info-card"><div class="label">Bônus Prof.</div><div class="value">+6</div></div>
-      <div class="info-card"><div class="label">Visão no Escuro</div><div class="value">18 m</div></div>
-      <div class="info-card"><div class="label">Perc. Passiva</div><div class="value">12</div></div>
-      <div class="info-card"><div class="label">Nível de Desafio</div><div class="value" style="color:var(--accent-bright)">18 (20.000 XP)</div></div>
+      <div class="info-card"><div class="label">Classe Armadura</div><div class="value"><input type="number" class="editable ca-input" data-phase="2" value="13" style="background:transparent;border:none;border-bottom:1px dashed var(--gold-dim);color:var(--bone);font-family:'IM Fell English',serif;font-size:1rem;width:50px;text-align:center;outline:none"></div></div>
+      <div class="info-card"><div class="label">Deslocamento</div><div class="value">0 m · voo 12 m (pairar)</div></div>
+      <div class="info-card"><div class="label">Bônus Prof.</div><div class="value">+4</div></div>
+      <div class="info-card"><div class="label">Visão Verdadeira</div><div class="value">18 m</div></div>
+      <div class="info-card"><div class="label">Perc. Passiva</div><div class="value">15</div></div>
+      <div class="info-card"><div class="label">Nível de Desafio</div><div class="value" style="color:var(--accent-bright)">11</div></div>
     </div>
     <div class="meta-row">
-      <div class="meta-box"><div class="meta-title">Testes de Resistência & Perícias</div><div class="meta-content"><strong>Resistência:</strong> Des +10 · Con +10 · Int +12 · Sab +9<br><strong>Perícias:</strong> Arcanismo +19 · História +12 · Intuição +9</div></div>
-      <div class="meta-box"><div class="meta-title">Resistências, Imunidades & Idiomas</div><div class="meta-content"><strong>Resist.:</strong> frio, elétrico · <strong>Imune a Dano:</strong> necrótico, veneno<br><strong>Imune a Condição:</strong> enfeitiçada, exaustão, amedrontada, paralisada, envenenada · <strong>Idiomas:</strong> Comum, Élfico, Abissal, Infernal, Dracônico, Silvestre</div></div>
+      <div class="meta-box"><div class="meta-title">Testes de Resistência & Perícias</div><div class="meta-content"><strong>Resistência:</strong> Des +7 · Sab +5 · Car +8<br><strong>Perícias:</strong> Percepção +5</div></div>
+      <div class="meta-box"><div class="meta-title">Imunidades, Sentidos & Idiomas</div><div class="meta-content"><strong>Imune a Dano:</strong> necrótico, veneno · <strong>Imune a Condição:</strong> enfeitiçado, exaustão, amedrontado, agarrado, paralisado, petrificado, envenenado, caído, restrito, atordoado<br><strong>Idiomas:</strong> Abissal, Comum</div></div>
     </div>
 
     <div class="section">
       <h2 class="section-title">Características</h2>
       <div class="ability-grid">
-        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Arma da Alma</div><span class="toggle-icon">▼</span></div><div class="ability-body">Se Patrina não estiver segurando a Espada Solar no início do turno, esta aparece magicamente em sua mão vazia como sua <strong>Espada das Sombras</strong>, uma lâmina de escuridão pura brotando do punho.</div></div>
+        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Lutador de Curta Distância</div><span class="toggle-icon">▼</span></div><div class="ability-body">Não sofre <em>desvantagem</em> em ataques à distância por estar a até 1,5 m de uma criatura hostil.</div></div>
+        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Sentidos de Adivinhação</div><span class="toggle-icon">▼</span></div><div class="ability-body">Enxerga 18 m no Plano Etéreo quando está no Plano Material, e vice-versa.</div></div>
+        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Movimento Incorpóreo</div><span class="toggle-icon">▼</span></div><div class="ability-body">Move-se através de outras criaturas e objetos como se fossem terreno difícil. Sofre <span class="dmg">5 (1d10) força</span> se terminar o turno dentro de um objeto.</div></div>
       </div>
     </div>
 
     <div class="section">
       <h2 class="section-title">Ações</h2>
       <div class="ability-grid">
-        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Ataque Múltiplo</div><span class="toggle-icon">▼</span></div><div class="ability-body">Faz <strong>quatro</strong> ataques com a Espada das Sombras. Pode substituir até um por <em>Drenar Vida</em>.</div></div>
-        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Espada das Sombras</div><span class="ability-tag">+10 · 1,5 m</span><span class="toggle-icon">▼</span></div><div class="ability-body">Acerto: <span class="dmg">12 (2d8+3) necrótico</span>.</div></div>
-        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Drenar Vida</div><span class="ability-tag">+12 · 1,5 m</span><span class="toggle-icon">▼</span></div><div class="ability-body">Acerto: <span class="dmg">8 (2d4+3) necrótico</span>. Se o alvo for uma criatura, seu <strong>máximo de PV</strong> diminui pelo dano sofrido, e Patrina recupera PV iguais ao dano causado.</div></div>
+        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Ataque Múltiplo</div><span class="toggle-icon">▼</span></div><div class="ability-body">Faz <strong>dois</strong> ataques.</div></div>
+        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Adaga Ba'al Verzi</div><span class="ability-tag">Distância · +8 · 9 m</span><span class="toggle-icon">▼</span></div><div class="ability-body">Acerto: <span class="dmg">7 (1d6+4) perfurante</span>. O alvo faz <em>Sabedoria</em> <span class="cd">CD 16</span>: <span class="dmg">14 (4d6) necrótico</span> e fica <strong>amaldiçoado</strong> (metade do deslocamento, não recupera PV) até o início do próximo turno do Vingador em falha; metade do necrótico e sem maldição em sucesso. Enquanto amaldiçoado, o Vingador tem <em>vantagem</em> em ataques contra o alvo.</div></div>
+        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Garra da Sepultura</div><span class="ability-tag">+8 · 1,5 m</span><span class="toggle-icon">▼</span></div><div class="ability-body">Acerto: <span class="dmg">18 (4d8) necrótico</span> e o alvo fica <strong>agarrado</strong> (até perder a concentração ou escapar com <em>Força</em> <span class="cd">CD 16</span>). Pode então mover-se até metade do deslocamento sem provocar AoO. Enquanto agarrado, o alvo fica <strong>restrito</strong> e sofre <span class="dmg">9 (2d8) necrótico</span> adicional no início de cada turno; não pode usar em outro alvo enquanto isso durar.</div></div>
       </div>
     </div>
 
     <div class="section">
       <h2 class="section-title">Ações Bônus</h2>
       <div class="ability-grid">
-        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Perdição Crepitante</div><span class="ability-tag">Cone 9 m · DES CD 19</span><span class="toggle-icon">▼</span></div><div class="ability-body">Raios crepitantes de relâmpago num cone de 9 m dos dedos de Patrina. <em>Destreza</em> <span class="cd">CD 19</span>: <span class="dmg">14 (4d6) elétrico</span> em falha, metade em sucesso. Falha por 5+: <strong>lento</strong> até o início do próximo turno de Patrina.</div></div>
-        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Explosão de Energia Negativa</div><span class="ability-tag">27 m · raio 1,5 m · CON CD 19</span><span class="toggle-icon">▼</span></div><div class="ability-body">Energia negativa ondula de Patrina ou de um ponto visível a até 27 m, numa esfera de 1,5 m. <em>Constituição</em> <span class="cd">CD 19</span>: <span class="dmg">14 (4d6) necrótico</span> em falha, metade em sucesso. Falha por 5+: também <strong>caída</strong>.</div></div>
+        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Almas Uivantes</div><span class="ability-tag">1,5 m · CON CD 16</span><span class="toggle-icon">▼</span></div><div class="ability-body">Um manto de espíritos gemendo envolve cada criatura a até 1,5 m. <em>Constituição</em> <span class="cd">CD 16</span>: <span class="dmg">9 (2d8) necrótico</span> e <strong>atordoada leve</strong> até o início do próximo turno em falha.</div></div>
+        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Lamento dos Renegados (Recarga 5-6)</div><span class="ability-tag">Raio 18 m · SAB CD 16</span><span class="toggle-icon">▼</span></div><div class="ability-body">Um grito enlouquecido e gorgolejante ecoa das almas dentro da capa. Cada criatura a até 18 m faz <em>Sabedoria</em> <span class="cd">CD 16</span> ou fica <strong>amedrontada</strong> até o início do próximo turno do Vingador.</div></div>
       </div>
     </div>
 
@@ -383,20 +379,20 @@
       <h2 class="section-title">Reações <span style="font-size:0.7em;color:var(--text-muted);text-transform:none;font-style:italic;margin-left:8px">até 3/rodada · 1/turno</span></h2>
       <div class="ability-grid">
         <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Indomável</div><span class="toggle-icon">▼</span></div><div class="ability-body">Repete um TR contra um efeito/condição ativo.</div></div>
-        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Aparar (1/rodada)</div><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> é atingida por um ataque corpo a corpo ou à distância enquanto segura a Espada Solar.<br><strong>Efeito:</strong> +6 à CA contra esse ataque, possivelmente causando erro.</div></div>
-        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Teleporte Vil (1/rodada)</div><span class="ability-tag">9 m</span><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> criatura visível a até 9 m termina o turno.<br><strong>Efeito:</strong> teletransporta-se até 9 m em direção ou afastando-se dela. Cada criatura a até 1,5 m do destino sofre <span class="dmg">10 (3d6) necrótico</span>.</div></div>
-        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Repreensão Fatal</div><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> é atingida por um ataque.<br><strong>Efeito:</strong> pronuncia uma palavra funesta, causando <span class="dmg">10 (3d6) necrótico</span> ao atacante. Depois teletransporta-se até 9 m para um espaço desocupado visível, com todo o equipamento.</div></div>
+        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Presságio Medonho</div><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> é alvo de um ataque ou magia que exija TR.<br><strong>Efeito:</strong> impõe desvantagem no ataque, ou dá vantagem a si mesmo no TR. Depois pode mover-se até metade do deslocamento sem provocar AoO.</div></div>
+        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Laço do Traidor</div><span class="ability-tag">SAB CD 16</span><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> é alvo de um ataque corpo a corpo.<br><strong>Efeito:</strong> manifesta um laço espectral no atacante; falha em <em>Sabedoria</em> <span class="cd">CD 16</span> faz o atacante usar sua reação (se tiver) para atacar outra criatura escolhida pelo Vingador em vez disso.</div></div>
+        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Ecos Assombrosos</div><span class="ability-tag">SAB CD 16</span><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> sofre dano de uma criatura.<br><strong>Efeito:</strong> a criatura faz <em>Sabedoria</em> <span class="cd">CD 16</span> ou sofre <span class="dmg">10 (4d4) psíquico</span> e tem desvantagem no próximo ataque ou teste até o início de seu próximo turno.</div></div>
       </div>
     </div>
   </div>
 
   <div class="notes-section">
     <h3>◆ Notas do Mestre</h3>
-    <textarea class="notes-area" id="notesArea" placeholder="Anote aqui: quem porta a Espada Solar, sarcófagos ativos e seus PV, forma atual, quem foi drenado (PV máx reduzido)..."></textarea>
+    <textarea class="notes-area" id="notesArea" placeholder="Anote aqui: alvos amaldiçoados, forma atual, recarga do Lamento dos Renegados, quem está agarrado pela Garra da Sepultura..."></textarea>
   </div>
 
   <footer>
-    Patrina — sincronizada em tempo real entre os dispositivos do Mestre.
+    Orador da Forca — sincronizado em tempo real entre os dispositivos do Mestre.
     <span class="footer-credit">Statblock adaptado de <a href="https://www.strahdreloaded.com/" target="_blank" rel="noopener">Curse of Strahd: Reloaded</a>, de DragnaCarta (conteúdo de fã da WotC).</span>
   </footer>
 
@@ -408,30 +404,14 @@
 <script src="../../assets/js/efeitos.js"></script>
 <script src="../../assets/js/master_state.js"></script>
 <script>
-const FORMAS = {
-  1: { nd: '18', hp: 352, media: 219, dados: '38d8 + 48' },
-  2: { nd: '18', hp: 385, media: 262, dados: '35d8 + 105' },
-};
+const FORMAS = { 1: { nd: '11' }, 2: { nd: '11' } };
 function switchPhase(num) { switchPhaseSilent(num); saveState(true); }
 function switchPhaseSilent(num) {
-  const f = FORMAS[num] || FORMAS[1];
   document.querySelectorAll('.phase-tab').forEach(t => t.classList.remove('active'));
   document.querySelectorAll('.phase-content').forEach(c => c.classList.remove('active'));
   document.querySelector(`.phase-tab[data-phase="${num}"]`).classList.add('active');
   document.getElementById(`phase-${num}`).classList.add('active');
   document.body.dataset.fase = num;
-  document.getElementById('ndHeader').textContent = f.nd;
-  document.getElementById('hpMediaMax').textContent = f.hp;
-  document.getElementById('hpMedia').textContent = f.media;
-  document.getElementById('hpDados').textContent = f.dados;
-}
-function aplicarPVForma() {
-  const f = FORMAS[document.querySelector('.phase-tab.active').dataset.phase] || FORMAS[1];
-  hpMax.value = f.hp; hpCurrent.value = f.hp; updateHPBar(); saveState(true); showToast(`✓ PV no máximo (${f.hp})`);
-}
-function aplicarMediaForma() {
-  const f = FORMAS[document.querySelector('.phase-tab.active').dataset.phase] || FORMAS[1];
-  hpMax.value = f.media; hpCurrent.value = f.media; updateHPBar(); saveState(true); showToast(`✓ PV na média (${f.media})`);
 }
 
 const hpCurrent = document.getElementById('hpCurrent');
@@ -454,6 +434,7 @@ function adjustHP(delta) {
   saveState(true);
 }
 function resetHP() { hpCurrent.value = hpMax.value; updateHPBar(); saveState(true); }
+function setMedia() { hpMax.value = 157; hpCurrent.value = 157; updateHPBar(); saveState(true); showToast('✓ PV na média (157)'); }
 hpCurrent.addEventListener('input', () => { updateHPBar(); saveState(true); });
 hpMax.addEventListener('input', () => { updateHPBar(); saveState(true); });
 function toggleReact(el) { el.classList.toggle('used'); saveState(true); }
@@ -467,8 +448,8 @@ function adjustRound(delta) {
 function resetRound() { const el = document.getElementById('roundCounter'); if (el) el.textContent = 1; saveState(true); }
 function toggleAbility(header) { header.parentElement.classList.toggle('open'); }
 
-const STORAGE_KEY = 'patrina_ficha_v1';
-const MS_CHAVE = 'vilao:patrina';
+const STORAGE_KEY = 'gallows_ficha_v1';
+const MS_CHAVE = 'vilao:gallows';
 let _msAplicando = false;
 function _setSyncStatus(txt, cor) { const el = document.getElementById('syncStatus'); if (el) { el.textContent = txt; el.style.color = cor || 'var(--gold-dim)'; } }
 function getState() {
@@ -485,7 +466,7 @@ function getState() {
 }
 function applyState(s) {
   if (!s) return;
-  hpCurrent.value = s.hpCurrent ?? 352; hpMax.value = s.hpMax ?? 352; updateHPBar();
+  hpCurrent.value = s.hpCurrent ?? 280; hpMax.value = s.hpMax ?? 280; updateHPBar();
   if (s.ca) s.ca.forEach(c => { const inp = document.querySelector(`.ca-input[data-phase="${c.phase}"]`); if (inp) inp.value = c.val; });
   switchPhaseSilent(parseInt(s.activePhase) || 1);
   (s.reactions || []).forEach((u, i) => { const d = document.querySelectorAll('.react-dot')[i]; if (d) d.classList.toggle('used', u); });
@@ -522,8 +503,8 @@ async function loadState() {
 function resetAll() {
   if (!confirm('Resetar tudo? (HP, forma, reações, condições, notas)')) return;
   localStorage.removeItem(STORAGE_KEY);
-  hpCurrent.value = 352; hpMax.value = 352;
-  document.querySelectorAll('.ca-input').forEach(i => i.value = i.dataset.phase === '1' ? 13 : 20);
+  hpCurrent.value = 280; hpMax.value = 280;
+  document.querySelectorAll('.ca-input').forEach(i => i.value = 13);
   updateHPBar();
   document.querySelectorAll('.react-dot').forEach(d => d.classList.remove('used'));
   document.querySelectorAll('.condition-row .chip').forEach(c => c.classList.remove('active'));
@@ -535,7 +516,7 @@ function resetAll() {
 function exportJSON() {
   const blob = new Blob([JSON.stringify(getState(), null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob); const a = document.createElement('a');
-  a.href = url; a.download = `patrina_combate_${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(url);
+  a.href = url; a.download = `gallows_combate_${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(url);
   showToast('✓ Exportado');
 }
 function importJSON(evt) {

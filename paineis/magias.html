@@ -3,18 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Grimório completo de magias de D&D 5e em PT-BR (361 magias do Livro do Jogador) com filtros por classe, nível, escola, ritual e concentração.">
 <meta name="theme-color" content="#0a0608">
-<meta property="og:title" content="Grimório de Magias — D&D 5e">
-<meta property="og:description" content="361 magias do PHB em PT-BR com busca e filtros.">
-<meta property="og:type" content="website">
+<meta name="description" content="Compêndio de Magias D&D 5e em PT-BR — 361 magias do Livro do Jogador com filtros por nível, escola e classe.">
 <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
-<title>Grimório de Magias — D&D 5e</title>
+<title>Compêndio de Magias — D&D 5e</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,700;1,400&display=swap');
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
-
   :root {
     --bg-deep: #0a0608;
     --bg-mid: #150a0c;
@@ -29,948 +25,254 @@
     --parchment-dim: #a89878;
     --shadow: #050304;
     --text-dim: #8c7d5e;
+    --borda: rgba(139,105,20,0.35);
+    --borda-forte: rgba(184,138,44,0.7);
 
-    --c-abj: #1e3a6e;
-    --c-con: #1e4d2e;
-    --c-div: #3a3a5a;
-    --c-enc: #5a1e3a;
-    --c-evo: #6b3010;
-    --c-ilu: #3a1e6e;
-    --c-nec: #2a1a3a;
-    --c-tra: #1a4a4a;
-
-    --c-abj-bright: #4a6fa8;
-    --c-con-bright: #4a8a5a;
-    --c-div-bright: #6a6a90;
-    --c-enc-bright: #9a4a72;
-    --c-evo-bright: #b8602a;
-    --c-ilu-bright: #6a4aa8;
-    --c-nec-bright: #5a3a70;
-    --c-tra-bright: #4a8a8a;
-
-    --radius-sm: 3px;
-    --radius-md: 6px;
-    --radius-lg: 10px;
+    /* Cores por escola (texto) */
+    --e-abju: #6f9ede;
+    --e-conj: #d9b24c;
+    --e-adiv: #b98ee0;
+    --e-enca: #e07fb4;
+    --e-evoc: #e0743f;
+    --e-ilus: #8b7fe0;
+    --e-necr: #5fbf8a;
+    --e-tran: #4fc0b8;
   }
-
   html, body {
-    min-height: 100vh;
-    background-color: var(--bg-deep);
-    background-image: radial-gradient(ellipse at top, #1e1018 0%, #0d0810 50%, #050304 100%);
+    min-height: 100vh; min-height: 100dvh;
+    background: var(--bg-deep);
+    background-image: radial-gradient(ellipse at top, #2a1518 0%, #150a0c 42%, #050304 100%);
+    background-attachment: fixed;
     font-family: 'EB Garamond', Georgia, serif;
     color: var(--parchment);
   }
-
   body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.5) 100%);
-    z-index: 0;
+    content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.5) 100%);
   }
 
   /* ===== HEADER ===== */
   .site-header {
-    position: sticky;
-    top: 0;
-    z-index: 50;
-    background: linear-gradient(180deg, rgba(15,8,10,0.96) 0%, rgba(10,6,8,0.92) 100%);
+    position: sticky; top: 0; z-index: 40;
+    background: linear-gradient(180deg, rgba(15,8,10,0.97), rgba(10,6,8,0.93));
     backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--gold);
-    padding: 12px 24px;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.7);
-  }
-  .site-header::after {
-    content: '';
-    position: absolute;
-    inset: auto 0 -1px 0;
-    height: 1px;
-    background: linear-gradient(to right, transparent, var(--gold-bright), transparent);
-    opacity: 0.6;
+    padding: 10px 18px; display: flex; align-items: center; gap: 14px;
   }
   .back-btn {
-    text-decoration: none;
-    color: var(--parchment-dim);
-    font-family: 'Cinzel', serif;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    padding: 7px 14px;
-    border: 1px solid var(--gold);
-    border-radius: var(--radius-sm);
-    transition: all 0.2s;
-    white-space: nowrap;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
+    text-decoration: none; color: var(--parchment-dim); font-family: 'Cinzel', serif;
+    font-size: 11px; font-weight: 600; letter-spacing: 1.4px; text-transform: uppercase;
+    padding: 8px 14px; border: 1px solid var(--gold); border-radius: 4px;
+    transition: .2s; white-space: nowrap;
   }
-  .back-btn:hover { background: var(--gold); color: var(--shadow); transform: translateX(-2px); }
+  .back-btn:hover { background: var(--gold); color: var(--shadow); }
   .header-title {
-    font-family: 'Cinzel Decorative', serif;
-    font-size: clamp(15px, 2.8vw, 24px);
-    font-weight: 700;
-    color: var(--gold-bright);
-    letter-spacing: 2px;
-    text-shadow: 0 0 24px rgba(184,138,44,0.35), 1px 1px 2px var(--shadow);
-    flex: 1;
-    text-align: center;
-    line-height: 1.1;
+    font-family: 'Cinzel', serif; font-size: 14px; font-weight: 700;
+    color: var(--gold-bright); letter-spacing: 2px; flex: 1; text-transform: uppercase;
   }
-  .header-title::before, .header-title::after {
-    content: '✦';
-    display: inline-block;
-    color: var(--blood-bright);
-    opacity: 0.7;
-    margin: 0 12px;
-    font-size: 0.7em;
-    vertical-align: middle;
-  }
-  .spell-count {
-    font-family: 'Cinzel', serif;
-    font-size: 11px;
-    color: var(--text-dim);
-    letter-spacing: 1px;
-    white-space: nowrap;
-    min-width: 90px;
-    text-align: right;
-  }
-  .spell-count strong { color: var(--gold-bright); font-weight: 700; }
-  .auth-slot { display: flex; align-items: center; gap: 8px; font-family: 'Cinzel', serif; font-size: 11px; }
-  .auth-slot .auth-nome { color: var(--parchment-dim); letter-spacing: 1px; }
-  .auth-slot .auth-btn {
-    padding: 6px 12px;
-    background: transparent;
-    border: 1px solid var(--gold);
-    color: var(--parchment-dim);
-    border-radius: 2px;
-    font-family: 'Cinzel', serif; font-size: 10px;
-    font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
-    text-decoration: none; cursor: pointer; transition: all 0.2s;
-  }
-  .auth-slot .auth-btn:hover { background: var(--gold); color: var(--shadow); }
-  @media (max-width: 600px) {
-    .auth-slot .auth-nome { display: none; }
-  }
+  #auth-slot { margin-left: auto; }
 
-  /* ===== TOOLBAR (busca + botão filtros mobile) ===== */
-  .toolbar {
-    position: relative;
-    z-index: 2;
-    max-width: 1400px;
-    margin: 18px auto 0;
-    padding: 0 20px;
-    display: flex;
-    gap: 10px;
-    align-items: center;
-  }
-  .filter-toggle-btn {
-    display: none;
-    align-items: center;
-    gap: 6px;
-    padding: 11px 16px;
-    background: linear-gradient(180deg, rgba(139,105,20,0.18), rgba(107,16,16,0.18));
-    border: 1px solid var(--gold);
-    color: var(--gold-bright);
-    border-radius: var(--radius-sm);
-    font-family: 'Cinzel', serif;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
-    min-height: 44px;
-  }
-  .filter-toggle-btn:hover { background: var(--gold); color: var(--shadow); }
-  .filter-toggle-btn[aria-expanded="true"] { background: var(--gold); color: var(--shadow); }
-  .filter-toggle-btn .badge {
-    background: var(--blood-bright);
-    color: var(--parchment);
-    border-radius: 10px;
-    padding: 1px 7px;
-    font-size: 10px;
-    font-weight: 700;
-    min-width: 18px;
-    text-align: center;
-  }
+  main { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 26px 18px 80px; }
 
-  /* ===== FILTROS ===== */
-  .filters-bar {
-    position: relative;
-    z-index: 1;
-    max-width: 1400px;
-    margin: 10px auto 0;
-    padding: 16px 20px;
-    background: linear-gradient(180deg, rgba(26,16,24,0.6) 0%, rgba(20,12,18,0.4) 100%);
-    border: 1px solid rgba(139,105,20,0.25);
-    border-radius: var(--radius-md);
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    box-shadow: inset 0 1px 0 rgba(212,168,67,0.05);
+  /* ===== HERO ===== */
+  .hero { margin-bottom: 22px; }
+  .hero h1 {
+    font-family: 'Cinzel Decorative', 'Cinzel', serif; font-weight: 900;
+    font-size: clamp(26px, 5vw, 44px); color: var(--gold-light);
+    letter-spacing: 1px; line-height: 1.1; margin-bottom: 10px;
+    text-shadow: 0 0 30px rgba(212,168,67,0.25);
   }
+  .hero p { font-size: 16px; color: var(--parchment-dim); line-height: 1.55; max-width: 760px; }
+  .hero p strong { color: var(--parchment); font-weight: 600; }
 
-  .search-row {
-    display: flex;
-    gap: 10px;
-    align-items: center;
+  /* ===== PAINEL DE FILTROS ===== */
+  .filtros {
+    background: linear-gradient(180deg, rgba(26,16,24,0.85), rgba(10,6,8,0.6));
+    border: 1px solid var(--borda); border-radius: 12px;
+    padding: 16px 18px; margin-bottom: 26px;
   }
-  .search-input {
-    flex: 1;
-    background: rgba(255,255,255,0.04);
-    border: 1px solid var(--gold);
-    border-radius: var(--radius-sm);
-    color: var(--parchment);
-    font-family: 'EB Garamond', serif;
-    font-size: 15px;
-    padding: 10px 14px;
-    outline: none;
-    transition: all 0.2s;
-    min-height: 42px;
+  .busca-wrap { position: relative; margin-bottom: 14px; }
+  .busca-wrap .lupa {
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    color: var(--text-dim); font-size: 17px; pointer-events: none;
   }
-  .search-input::placeholder { color: var(--text-dim); font-style: italic; }
-  .search-input:focus { border-color: var(--gold-bright); background: rgba(255,255,255,0.07); box-shadow: 0 0 0 3px rgba(184,138,44,0.12); }
+  #busca {
+    width: 100%; padding: 13px 14px 13px 42px; font-size: 16px;
+    border-radius: 9px; background: rgba(0,0,0,0.4);
+    border: 1px solid var(--borda); color: var(--parchment);
+    font-family: inherit; transition: .18s;
+  }
+  #busca::placeholder { color: var(--text-dim); }
+  #busca:focus { outline: none; border-color: var(--gold-bright); box-shadow: 0 0 0 3px rgba(184,138,44,0.16); }
 
-  .sort-select {
-    background: rgba(255,255,255,0.04);
-    border: 1px solid var(--gold);
-    border-radius: var(--radius-sm);
-    color: var(--parchment);
-    font-family: 'Cinzel', serif;
-    font-size: 11px;
-    padding: 10px 12px;
-    outline: none;
-    cursor: pointer;
-    letter-spacing: 0.5px;
-    min-height: 42px;
-  }
-  .sort-select option { background: #1a1018; }
-
-  .filter-row {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 8px;
-    align-items: center;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-    padding-bottom: 4px;
-    /* fade nas pontas para indicar scroll horizontal */
-    mask-image: linear-gradient(to right, transparent 0, black 12px, black calc(100% - 12px), transparent 100%);
-    -webkit-mask-image: linear-gradient(to right, transparent 0, black 12px, black calc(100% - 12px), transparent 100%);
-  }
-  .filter-row .pills { flex-shrink: 0; }
-  .filter-label {
-    font-family: 'Cinzel', serif;
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--gold-light);
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    white-space: nowrap;
-    min-width: 64px;
-    text-shadow: 0 1px 2px var(--shadow), 0 0 12px rgba(212,168,67,0.25);
-  }
-  .pills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
+  .linha-filtro { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; margin-bottom: 9px; }
+  .linha-label {
+    font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; letter-spacing: 1.2px;
+    color: var(--parchment-dim); text-transform: uppercase; min-width: 56px;
   }
   .pill {
-    padding: 6px 12px;
-    border: 1px solid var(--text-dim);
-    border-radius: 18px;
-    font-family: 'Cinzel', serif;
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--text-dim);
-    background: rgba(0,0,0,0.2);
-    cursor: pointer;
-    transition: all 0.15s;
-    user-select: none;
-    letter-spacing: 0.5px;
-    white-space: nowrap;
-    min-height: 30px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    font-family: 'EB Garamond', serif; font-size: 14px;
+    padding: 5px 14px; border-radius: 20px; cursor: pointer;
+    background: rgba(255,255,255,0.04); border: 1px solid var(--borda);
+    color: var(--parchment-dim); transition: .15s; user-select: none;
   }
-  .pill:hover { border-color: var(--gold-bright); color: var(--parchment); background: rgba(139,105,20,0.12); }
-  .pill.active {
-    background: var(--gold);
-    border-color: var(--gold-bright);
-    color: var(--shadow);
-    font-weight: 700;
-    box-shadow: 0 0 10px rgba(184,138,44,0.25);
+  .pill:hover { border-color: var(--gold-bright); color: var(--parchment); }
+  .pill.on {
+    background: rgba(184,138,44,0.16); border-color: var(--gold-light);
+    color: var(--gold-light); font-weight: 600;
+    box-shadow: 0 0 12px rgba(184,138,44,0.2);
   }
-  .pill.escola-pill.active { color: var(--parchment); box-shadow: 0 0 12px rgba(0,0,0,0.4) inset, 0 0 10px rgba(184,138,44,0.25); }
+  .pill.on.fav { background: rgba(212,168,67,0.2); }
 
-  .toggle-pill {
-    padding: 6px 14px;
-    border: 1px solid var(--text-dim);
-    border-radius: 18px;
-    font-family: 'Cinzel', serif;
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--text-dim);
-    background: rgba(0,0,0,0.2);
-    cursor: pointer;
-    transition: all 0.15s;
-    user-select: none;
-    letter-spacing: 0.5px;
-    min-height: 30px;
+  .filtros-rodape {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    margin-top: 14px; padding-top: 13px; border-top: 1px solid var(--borda);
   }
-  .toggle-pill:hover { border-color: var(--gold-bright); color: var(--parchment); }
-  .toggle-pill.active { background: var(--blood); border-color: var(--blood-bright); color: var(--parchment); box-shadow: 0 0 10px rgba(139,29,29,0.4); }
-
-  .clear-btn {
-    padding: 6px 14px;
-    background: transparent;
-    border: 1px solid var(--blood);
-    border-radius: 18px;
-    font-family: 'Cinzel', serif;
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--parchment-dim);
-    cursor: pointer;
-    transition: all 0.15s;
-    letter-spacing: 0.5px;
-    min-height: 30px;
-    white-space: nowrap;
+  .contador { font-size: 14px; color: var(--parchment-dim); }
+  .contador strong { color: var(--gold-light); font-weight: 700; }
+  .limpar {
+    margin-left: auto; background: none; border: none; cursor: pointer;
+    color: var(--gold-light); font-family: 'EB Garamond', serif; font-size: 14px;
+    text-decoration: underline; text-underline-offset: 3px; padding: 4px;
   }
-  .clear-btn:hover { background: var(--blood); color: var(--parchment); border-color: var(--blood-bright); }
+  .limpar:hover { color: var(--parchment); }
 
-  .divider {
-    width: 100%;
-    height: 1px;
-    background: linear-gradient(to right, transparent, var(--gold), transparent);
-    margin: 4px 0;
-    opacity: 0.35;
+  /* ===== SEÇÕES POR NÍVEL ===== */
+  .secao { margin-bottom: 34px; }
+  .secao-titulo {
+    font-family: 'Cinzel Decorative', 'Cinzel', serif; font-weight: 700;
+    font-size: clamp(19px, 3vw, 26px); color: var(--gold-light);
+    letter-spacing: .5px; margin-bottom: 14px; padding-bottom: 8px;
+    border-bottom: 1px solid var(--borda);
+  }
+  .grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(310px, 1fr)); gap: 10px;
   }
 
-  /* ===== CHIPS DE FILTROS ATIVOS ===== */
-  .active-filters {
-    position: relative;
-    z-index: 1;
-    max-width: 1400px;
-    margin: 12px auto 0;
-    padding: 0 20px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    align-items: center;
-    min-height: 0;
+  /* ===== CARD ===== */
+  .card {
+    display: flex; align-items: center; gap: 10px;
+    background: linear-gradient(180deg, rgba(34,21,32,0.7), rgba(16,10,14,0.7));
+    border: 1px solid var(--borda); border-radius: 9px;
+    padding: 12px 14px; cursor: pointer; transition: .16s; text-align: left;
+    font-family: inherit; width: 100%;
   }
-  .active-filters:empty { display: none; }
-  .active-filters .af-label {
-    font-family: 'Cinzel', serif;
-    font-size: 10px;
-    color: var(--text-dim);
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    margin-right: 4px;
+  .card:hover {
+    border-color: var(--borda-forte); transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.45);
   }
-  .af-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 6px 4px 10px;
-    background: rgba(139,105,20,0.18);
-    border: 1px solid rgba(184,138,44,0.5);
-    border-radius: 14px;
-    font-family: 'Cinzel', serif;
-    font-size: 10px;
-    color: var(--parchment);
-    letter-spacing: 0.3px;
+  .card:focus-visible { outline: 2px solid var(--gold-light); outline-offset: 2px; }
+  .card-info { flex: 1; min-width: 0; }
+  .card-nome {
+    font-family: 'Cinzel', serif; font-weight: 600; font-size: 15.5px;
+    color: var(--parchment); line-height: 1.25; margin-bottom: 2px;
   }
-  .af-chip .af-x {
-    background: transparent;
-    border: none;
-    color: var(--parchment-dim);
-    cursor: pointer;
-    font-size: 13px;
-    line-height: 1;
-    padding: 2px 4px;
-    border-radius: 50%;
-    transition: all 0.15s;
+  .card-meta { font-size: 13px; color: var(--text-dim); font-style: italic; }
+  .card-dir { display: flex; align-items: center; gap: 7px; flex-shrink: 0; }
+  .card-marca { font-size: 12px; color: var(--gold); cursor: help; }
+  .card-escola {
+    font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700;
+    letter-spacing: .6px; text-transform: uppercase;
   }
-  .af-chip .af-x:hover { background: var(--blood); color: var(--parchment); }
-  .af-clear-all {
-    background: transparent;
-    border: 1px dashed var(--blood);
-    color: var(--parchment-dim);
-    padding: 3px 10px;
-    border-radius: 14px;
-    font-family: 'Cinzel', serif;
-    font-size: 10px;
-    cursor: pointer;
-    letter-spacing: 0.5px;
-    transition: all 0.15s;
-  }
-  .af-clear-all:hover { background: var(--blood); color: var(--parchment); border-style: solid; }
+  .card-fav { font-size: 15px; color: var(--gold-light); }
 
-  /* ===== GRID DE MAGIAS ===== */
-  .spells-wrapper {
-    position: relative;
-    z-index: 1;
-    max-width: 1400px;
-    margin: 16px auto 60px;
-    padding: 0 20px;
+  .vazio {
+    text-align: center; padding: 60px 20px; color: var(--text-dim);
+    font-style: italic; font-size: 17px;
   }
-
-  .spells-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 16px;
-  }
-
-  /* ===== CARD DE MAGIA ===== */
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(8px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-  .spell-card {
-    background: linear-gradient(160deg, var(--bg-card) 0%, var(--bg-card-soft) 100%);
-    border: 1px solid rgba(139,105,20,0.4);
-    border-radius: var(--radius-md);
-    padding: 14px 14px 12px;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-    min-height: 138px;
-    animation: fadeUp 0.35s ease-out both;
-  }
-  .spell-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 4px;
-    background: linear-gradient(to right, transparent, var(--escola-cor, var(--gold)) 20%, var(--escola-cor, var(--gold)) 80%, transparent);
-    opacity: 0.85;
-  }
-  .spell-card::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse at top right, rgba(184,138,44,0.06), transparent 60%);
-    pointer-events: none;
-    opacity: 0;
-    transition: opacity 0.25s;
-  }
-  .spell-card:hover {
-    border-color: var(--gold-bright);
-    transform: translateY(-3px);
-    box-shadow: 0 8px 26px rgba(0,0,0,0.7), 0 0 0 1px rgba(184,138,44,0.15);
-  }
-  .spell-card:hover::after { opacity: 1; }
-
-  .card-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 8px;
-    gap: 8px;
-  }
-  .nivel-badge {
-    font-family: 'Cinzel', serif;
-    font-size: 10px;
-    font-weight: 700;
-    color: var(--gold-bright);
-    letter-spacing: 0.6px;
-    background: linear-gradient(180deg, rgba(139,105,20,0.28), rgba(139,105,20,0.15));
-    border: 1px solid rgba(184,138,44,0.5);
-    padding: 3px 9px;
-    border-radius: 12px;
-    text-transform: uppercase;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.04);
-  }
-  .card-icons {
-    display: flex;
-    gap: 4px;
-    font-size: 12px;
-    align-items: center;
-  }
-  .icon-tag {
-    font-size: 9px;
-    padding: 2px 6px;
-    border-radius: var(--radius-sm);
-    font-family: 'Cinzel', serif;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    font-weight: 600;
-  }
-  .icon-ritual { background: rgba(107,16,16,0.3); color: #c47a5a; border: 1px solid rgba(107,16,16,0.5); }
-  .icon-conc { background: rgba(58,26,90,0.3); color: #9a7aca; border: 1px solid rgba(90,42,120,0.5); }
-
-  /* Botão de favorita (estrela) — fica no card-icons */
-  .fav-btn {
-    background: transparent;
-    border: none;
-    cursor: pointer;
-    padding: 2px 6px;
-    font-size: 16px;
-    line-height: 1;
-    color: rgba(168,152,120,0.4);
-    transition: color 0.15s, transform 0.15s;
-    border-radius: 4px;
-    min-width: 28px;
-    min-height: 28px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-  .fav-btn:hover { color: var(--gold-bright); transform: scale(1.15); }
-  .fav-btn[aria-pressed="true"] { color: var(--gold-bright); text-shadow: 0 0 8px rgba(212,168,67,0.6); }
-  .fav-btn:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 1px; }
-  @media (max-width: 600px) {
-    .fav-btn { font-size: 20px; padding: 6px 10px; min-width: 44px; min-height: 44px; }
-  }
-
-  /* Botão estrela no modal */
-  .modal-fav {
-    position: absolute;
-    top: 14px;
-    right: 50px;
-    background: transparent;
-    border: 1px solid var(--gold);
-    color: var(--parchment-dim);
-    cursor: pointer;
-    padding: 6px 10px;
-    border-radius: 3px;
-    font-family: 'Cinzel', serif;
-    font-size: 11px;
-    letter-spacing: 0.5px;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-  .modal-fav:hover { border-color: var(--gold-bright); color: var(--gold-bright); }
-  .modal-fav[aria-pressed="true"] {
-    background: var(--gold);
-    color: var(--shadow);
-    border-color: var(--gold-bright);
-  }
-
-  /* Filtro "Só Favoritas" */
-  .toggle-pill.fav-toggle[aria-pressed="true"] {
-    background: var(--gold);
-    border-color: var(--gold-bright);
-    color: var(--shadow);
-  }
-
-  .spell-nome {
-    font-family: 'Cinzel', serif;
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--parchment);
-    letter-spacing: 0.5px;
-    line-height: 1.25;
-    margin-bottom: 8px;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.4);
-  }
-  .spell-card:hover .spell-nome { color: var(--gold-light); }
-
-  .escola-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-family: 'Cinzel', serif;
-    font-size: 9px;
-    font-weight: 700;
-    letter-spacing: 0.8px;
-    text-transform: uppercase;
-    padding: 3px 9px;
-    border-radius: var(--radius-sm);
-    background: var(--escola-cor, rgba(139,105,20,0.3));
-    color: var(--parchment);
-    margin-bottom: 8px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.3) inset, 0 1px 0 rgba(255,255,255,0.04);
-    align-self: flex-start;
-  }
-
-  .classes-row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    margin-top: auto;
-    padding-top: 8px;
-    border-top: 1px dashed rgba(139,105,20,0.18);
-  }
-  .class-tag {
-    font-family: 'Cinzel', serif;
-    font-size: 9px;
-    color: var(--parchment-dim);
-    border: 1px solid rgba(140,125,94,0.35);
-    background: rgba(0,0,0,0.2);
-    padding: 2px 7px;
-    border-radius: var(--radius-sm);
-    letter-spacing: 0.3px;
-    text-transform: uppercase;
-    font-weight: 600;
-  }
-
-  /* ===== LOADING / EMPTY ===== */
-  .state-box {
-    text-align: center;
-    padding: 80px 20px;
-    color: var(--text-dim);
-    background: radial-gradient(ellipse at center, rgba(139,105,20,0.06), transparent 70%);
-    border: 1px dashed rgba(139,105,20,0.2);
-    border-radius: var(--radius-md);
-  }
-  .state-box .state-icon {
-    font-size: 56px;
-    margin-bottom: 18px;
-    filter: drop-shadow(0 0 12px rgba(184,138,44,0.3));
-    display: inline-block;
-    animation: floatY 3s ease-in-out infinite;
-  }
-  @keyframes floatY {
-    0%,100% { transform: translateY(0); }
-    50% { transform: translateY(-6px); }
-  }
-  .state-box h3 {
-    font-family: 'Cinzel Decorative', serif;
-    font-size: 20px;
-    color: var(--gold-bright);
-    margin-bottom: 10px;
-    letter-spacing: 1px;
-    text-shadow: 0 0 18px rgba(184,138,44,0.2);
-  }
-  .state-box p { font-style: italic; font-size: 14px; color: var(--parchment-dim); }
-
-  .loading-dots::after {
-    content: '';
-    animation: dots 1.5s infinite;
-  }
-  @keyframes dots {
-    0%,20% { content: '.'; }
-    40%,60% { content: '..'; }
-    80%,100% { content: '...'; }
-  }
-
-  /* ===== BACK TO TOP ===== */
-  .back-to-top {
-    position: fixed;
-    bottom: 24px;
-    right: 24px;
-    z-index: 80;
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    background: linear-gradient(180deg, var(--gold) 0%, var(--gold-bright) 100%);
-    border: 2px solid var(--gold-bright);
-    color: var(--shadow);
-    font-size: 22px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 6px 20px rgba(0,0,0,0.6), 0 0 0 4px rgba(184,138,44,0.15);
-    opacity: 0;
-    transform: translateY(20px);
-    pointer-events: none;
-    transition: opacity 0.25s, transform 0.25s, box-shadow 0.2s;
-  }
-  .back-to-top.visible {
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
-  }
-  .back-to-top:hover { box-shadow: 0 8px 28px rgba(0,0,0,0.7), 0 0 0 6px rgba(184,138,44,0.25); }
 
   /* ===== MODAL ===== */
-  @keyframes modalIn {
-    from { opacity: 0; transform: scale(0.96) translateY(8px); }
-    to { opacity: 1; transform: scale(1) translateY(0); }
+  .modal-ov {
+    position: fixed; inset: 0; z-index: 200; display: none;
+    background: rgba(5,3,4,0.85); backdrop-filter: blur(5px);
+    padding: 4vh 3vw; overflow-y: auto;
   }
-  .modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 200;
-    background: rgba(0,0,0,0.82);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-  }
-  .modal-overlay.open { display: flex; animation: fadeUp 0.2s ease-out; }
-
+  .modal-ov.open { display: flex; }
   .modal {
-    background: linear-gradient(160deg, #1f1416 0%, #160c10 100%);
-    border: 2px solid var(--gold);
-    border-radius: var(--radius-md);
-    max-width: 720px;
-    width: 100%;
-    max-height: 85vh;
-    max-height: 85dvh;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    -webkit-overflow-scrolling: touch;
-    box-shadow: 0 0 0 1px var(--blood-bright) inset, 0 24px 70px rgba(0,0,0,0.85), 0 0 60px rgba(139,29,29,0.15);
-    position: relative;
-    animation: modalIn 0.22s ease-out;
+    margin: auto; width: 100%; max-width: 660px;
+    background: linear-gradient(165deg, #1c1119, #120b10);
+    border: 1px solid var(--borda-forte); border-radius: 14px;
+    box-shadow: 0 20px 70px rgba(0,0,0,0.85);
+    padding: 26px 28px; position: relative;
+    animation: sobe .22s ease;
   }
-  .modal::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 4px;
-    background: linear-gradient(to right, transparent, var(--gold-bright), transparent);
-    border-radius: var(--radius-md) var(--radius-md) 0 0;
-    pointer-events: none;
+  @keyframes sobe { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  .modal-x {
+    position: absolute; top: 14px; right: 16px;
+    background: none; border: none; color: var(--parchment-dim);
+    font-size: 27px; cursor: pointer; line-height: 1; padding: 2px 8px;
   }
-  /* parágrafos da descrição com espaçamento legível */
-  .desc-text p { margin: 0 0 10px; }
-  .desc-text p:last-child { margin-bottom: 0; }
+  .modal-x:hover { color: var(--gold-light); }
+  .modal-topo { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 4px; padding-right: 34px; }
+  .modal-topo h2 {
+    flex: 1; font-family: 'Cinzel Decorative', 'Cinzel', serif; font-weight: 700;
+    font-size: clamp(22px, 4vw, 31px); color: var(--gold-light); line-height: 1.12;
+  }
+  .modal-icone { font-size: 30px; flex-shrink: 0; filter: drop-shadow(0 0 10px currentColor); }
+  .modal-sub { font-style: italic; font-size: 16px; color: var(--parchment-dim); margin-bottom: 16px; }
+  .modal-linha { height: 1px; background: linear-gradient(90deg, var(--gold-bright), transparent); margin-bottom: 16px; }
 
-  .modal-header {
-    padding: 22px 22px 14px;
-    border-bottom: 1px solid var(--blood);
-    position: sticky;
-    top: 0;
-    background: linear-gradient(180deg, #1f1416 0%, #1a1014 100%);
-    z-index: 1;
+  .modal-props { display: grid; grid-template-columns: 1fr 1fr; gap: 9px 22px; margin-bottom: 16px; }
+  .prop-nome {
+    font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700;
+    letter-spacing: .8px; color: var(--blood-bright); text-transform: uppercase;
+    display: block; margin-bottom: 1px;
   }
-  .modal-close {
-    position: absolute;
-    top: 14px; right: 14px;
-    background: transparent;
-    border: none;
-    color: var(--text-dim);
-    font-size: 20px;
-    cursor: pointer;
-    line-height: 1;
-    transition: color 0.15s;
-    padding: 4px;
-  }
-  .modal-close:hover { color: var(--parchment); }
-  .modal-title {
-    font-family: 'Cinzel Decorative', serif;
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--gold-bright);
-    letter-spacing: 1px;
-    margin-bottom: 6px;
-    padding-right: 28px;
-  }
-  .modal-meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    align-items: center;
-    margin-top: 8px;
-  }
-  .meta-badge {
-    font-family: 'Cinzel', serif;
-    font-size: 10px;
-    font-weight: 600;
-    padding: 3px 10px;
-    border-radius: 2px;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-  }
-  .meta-nivel { background: rgba(139,105,20,0.25); border: 1px solid rgba(184,138,44,0.4); color: var(--gold-bright); }
-  .meta-escola { color: var(--parchment); }
-  .meta-ritual { background: rgba(107,16,16,0.3); border: 1px solid var(--blood); color: #c47a5a; }
-  .meta-conc { background: rgba(58,26,90,0.3); border: 1px solid #5a3a8a; color: #9a7aca; }
+  .prop-valor { font-size: 15.5px; color: var(--parchment); }
 
-  .modal-body { padding: 16px 20px 24px; }
-
-  .info-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 18px;
-  }
-  @media (min-width: 720px) {
-    .info-grid { grid-template-columns: repeat(4, 1fr); gap: 12px; }
-  }
-  .info-item {
-    font-size: 13px;
-    padding: 8px 10px;
-    background: rgba(139,105,20,0.06);
-    border: 1px solid rgba(139,105,20,0.18);
-    border-radius: var(--radius-sm);
-  }
-  .info-key {
-    font-family: 'Cinzel', serif;
-    font-size: 9px;
-    font-weight: 700;
-    color: var(--gold);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 3px;
-  }
-  .info-val { color: var(--parchment); line-height: 1.4; font-size: 13px; }
-
-  .desc-title {
-    font-family: 'Cinzel', serif;
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--gold);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 6px;
-    padding-bottom: 4px;
-    border-bottom: 1px solid var(--blood);
-  }
-  .desc-text {
-    font-size: 14px;
-    line-height: 1.7;
-    color: var(--parchment);
-    margin-bottom: 14px;
-    white-space: normal;
-    word-wrap: break-word;
-    overflow-wrap: break-word;
+  .modal-classes { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 16px; }
+  .classe-tag {
+    font-family: 'Cinzel', serif; font-size: 11.5px; font-weight: 600;
+    padding: 4px 13px; border-radius: 20px;
+    background: rgba(184,138,44,0.13); border: 1px solid var(--borda);
+    color: var(--gold-light);
   }
 
-  .classes-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin-top: 4px;
+  .modal-desc { font-size: 16px; line-height: 1.62; color: var(--parchment); white-space: pre-wrap; }
+  .modal-desc p { margin-bottom: 11px; }
+  .modal-extra {
+    margin-top: 15px; padding-top: 14px; border-top: 1px solid var(--borda);
+    font-size: 15.5px; line-height: 1.6;
   }
-  .class-badge {
-    font-family: 'Cinzel', serif;
-    font-size: 10px;
-    padding: 3px 10px;
-    border: 1px solid rgba(139,105,20,0.4);
-    border-radius: 2px;
-    color: var(--parchment-dim);
-    background: rgba(139,105,20,0.1);
+  .modal-extra .rot {
+    font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700;
+    letter-spacing: .8px; color: var(--gold-bright); text-transform: uppercase;
+    display: block; margin-bottom: 3px;
   }
-
-  .api-source {
-    font-family: 'Cinzel', serif;
-    font-size: 9px;
-    color: var(--text-dim);
-    text-align: right;
-    margin-top: 12px;
-    opacity: 0.5;
-    letter-spacing: 0.5px;
+  .modal-acoes { display: flex; gap: 10px; margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--borda); }
+  .btn-fav {
+    background: none; border: 1px solid var(--gold); color: var(--gold-light);
+    font-family: 'Cinzel', serif; font-size: 12px; font-weight: 600; letter-spacing: .8px;
+    padding: 9px 18px; border-radius: 6px; cursor: pointer; transition: .16s;
   }
+  .btn-fav:hover { background: var(--gold); color: var(--shadow); }
+  .btn-fav.on { background: rgba(212,168,67,0.18); border-color: var(--gold-light); }
 
-  /* ===== SCROLLBAR ===== */
-  ::-webkit-scrollbar { width: 6px; }
-  ::-webkit-scrollbar-track { background: var(--bg-deep); }
-  ::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 3px; }
-
-  /* ===== RESPONSIVO ===== */
-  /* Desktop largo — cards mais densos */
-  @media (min-width: 1400px) {
-    .spells-grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 16px; }
+  /* ===== TOPO ===== */
+  #ao-topo {
+    position: fixed; right: 22px; bottom: 22px; z-index: 60;
+    width: 46px; height: 46px; border-radius: 50%;
+    background: rgba(26,16,24,0.92); border: 1px solid var(--gold);
+    color: var(--gold-light); font-size: 19px; cursor: pointer;
+    display: none; align-items: center; justify-content: center;
+    transition: .18s;
   }
+  #ao-topo.visible { display: flex; }
+  #ao-topo:hover { background: var(--gold); color: var(--shadow); }
 
-  /* Tablet — ajusta densidade dos cards */
-  @media (max-width: 1024px) {
-    .spells-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
-    .toolbar { padding: 0 16px; }
-    .filters-bar { margin-left: 16px; margin-right: 16px; padding: 14px 16px; max-width: calc(100% - 32px); }
-    .active-filters { padding: 0 16px; }
-    .spells-wrapper { padding: 0 16px; }
+  @media (max-width: 720px) {
+    main { padding: 18px 12px 70px; }
+    .filtros { padding: 13px 12px; }
+    .linha-filtro { gap: 7px; }
+    .linha-label { min-width: 100%; margin-bottom: 2px; }
+    .pill { font-size: 13px; padding: 5px 11px; }
+    .grid { grid-template-columns: 1fr; }
+    .modal { padding: 22px 18px; }
+    .modal-props { grid-template-columns: 1fr; gap: 8px; }
   }
-
-  /* Tablet/Mobile médio (768) */
-  @media (max-width: 768px) {
-    .header-title::before, .header-title::after { display: none; }
-    .header-title { letter-spacing: 1.5px; }
-  }
-
-  /* Mobile — drawer de filtros + coluna única */
-  @media (max-width: 600px) {
-    .site-header { padding: 10px 14px; gap: 10px; }
-    .toolbar { padding: 0 14px; flex-wrap: wrap; }
-    .filters-bar {
-      margin: 0 14px;
-      max-width: calc(100% - 28px);
-      padding: 14px;
-      max-height: 0;
-      overflow: hidden;
-      padding-top: 0;
-      padding-bottom: 0;
-      border-color: transparent;
-      transition: max-height 0.3s ease, padding 0.3s ease, border-color 0.3s ease, margin-top 0.3s ease;
-      margin-top: 0;
-    }
-    .filters-bar.open {
-      max-height: 800px;
-      padding: 14px;
-      border-color: rgba(139,105,20,0.25);
-      margin-top: 10px;
-    }
-    .filter-toggle-btn { display: inline-flex; }
-    .active-filters { padding: 0 14px; margin-top: 10px; }
-    .spells-wrapper { padding: 0 14px; }
-    .spells-grid { grid-template-columns: 1fr; gap: 12px; }
-    .info-grid { grid-template-columns: 1fr 1fr; gap: 8px; }
-    .spell-count { display: none; }
-    .pill, .toggle-pill, .clear-btn { padding: 10px 14px; font-size: 11px; min-height: 40px; }
-    .filter-label { font-size: 10px; min-width: auto; margin-right: 2px; }
-    .sort-select, .search-input { padding: 12px 14px; min-height: 46px; }
-    .filter-row { gap: 6px; padding-bottom: 6px; }
-    .pills { flex-wrap: nowrap; gap: 5px; }
-    .back-btn { padding: 10px 14px; min-height: 40px; }
-    .search-row { flex-wrap: wrap; }
-    .search-input { width: 100%; min-width: 0; flex-basis: 100%; }
-    .sort-select { flex: 1; }
-    .clear-btn { flex: 0 0 auto; }
-    .back-to-top { bottom: 16px; right: 16px; width: 44px; height: 44px; }
-    .modal {
-      width: 100%;
-      max-width: 100vw;
-      max-height: 100vh;
-      max-height: 100dvh;
-      border-radius: 0;
-      border-left: none;
-      border-right: none;
-      padding-bottom: env(safe-area-inset-bottom);
-      box-sizing: border-box;
-    }
-    .modal-overlay { padding: 0; }
-    .modal-header { padding: 16px 16px 12px; }
-    .modal-body { padding: 14px 16px calc(24px + env(safe-area-inset-bottom)); overflow-x: hidden; }
-    .modal-title { font-size: 19px; line-height: 1.2; padding-right: 90px; }
-    .modal-meta { gap: 4px; margin-top: 6px; }
-    .meta-badge { font-size: 9px; padding: 3px 7px; }
-    .desc-text { font-size: 14px; line-height: 1.65; }
-    .desc-text p { margin: 0 0 10px; }
-    .modal-fav { padding: 6px 10px; font-size: 10px; top: 12px; right: 46px; }
-  }
-
-  /* Ultra pequeno */
-  @media (max-width: 380px) {
-    .header-title { font-size: 14px; letter-spacing: 1px; }
-    .back-btn { padding: 8px 10px; font-size: 10px; }
-    .info-grid { grid-template-columns: 1fr; }
-    .spell-nome { font-size: 15px; }
-  }
-
-  /* Foco visível */
-  .pill:focus-visible, .toggle-pill:focus-visible, .clear-btn:focus-visible,
-  .back-btn:focus-visible, .sort-select:focus-visible, .search-input:focus-visible,
-  .spell-card:focus-visible, .modal-close:focus-visible, .filter-toggle-btn:focus-visible,
-  .back-to-top:focus-visible, .af-x:focus-visible, .af-clear-all:focus-visible {
-    outline: 2px solid var(--gold-bright);
-    outline-offset: 2px;
-  }
-
   @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { animation: none !important; transition: none !important; }
-    .spell-card { animation: none !important; }
+    * { animation: none !important; transition: none !important; }
+    .card:hover { transform: none; }
   }
 </style>
 <link rel="stylesheet" href="../assets/css/ui.css">
@@ -978,129 +280,86 @@
 <body data-ambiente="fagulhas">
 
 <header class="site-header">
-  <a href="../index.html" class="back-btn">← Voltar</a>
-  <div class="header-title">Grimório de Magias</div>
-  <div class="spell-count" id="count">Carregando...</div>
-  <div class="auth-slot" id="auth-slot" aria-label="Status de login"></div>
+  <a href="../index.html" class="back-btn">← Início</a>
+  <div class="header-title">Compêndio de Magias</div>
+  <div id="auth-slot"></div>
 </header>
 
-<!-- Toolbar: busca + ordem + botão drawer (mobile) + limpar -->
-<div class="toolbar" role="search">
-  <input type="search" class="search-input" id="busca" placeholder="🔍  Buscar magia pelo nome..." aria-label="Buscar magia pelo nome">
-  <button type="button" class="filter-toggle-btn" id="filter-toggle" aria-expanded="false" aria-controls="filters-bar" aria-label="Mostrar ou ocultar filtros">
-    <span aria-hidden="true">⚙</span> Filtros <span class="badge" id="filter-toggle-badge" aria-hidden="true" style="display:none">0</span>
-  </button>
-  <select class="sort-select" id="ordem" aria-label="Ordenar magias por">
-    <option value="nome-az">Nome A → Z</option>
-    <option value="nome-za">Nome Z → A</option>
-    <option value="nivel-asc">Nível ↑</option>
-    <option value="nivel-desc">Nível ↓</option>
-    <option value="escola">Escola</option>
-  </select>
-  <button class="clear-btn" onclick="limparFiltros()" aria-label="Limpar todos os filtros">✕ Limpar</button>
-</div>
+<main>
+  <div class="hero">
+    <h1>Compêndio de Magias D&amp;D 5e</h1>
+    <p><strong id="total-magias">361</strong> magias do Livro do Jogador (2014), em português, com filtros por nível, escola e classe.</p>
+  </div>
 
-<div class="filters-bar" id="filters-bar">
-  <!-- Nível -->
-  <div class="filter-row">
-    <span class="filter-label">Nível</span>
-    <div class="pills" id="pills-nivel">
-      <span class="pill active" data-nivel="all">Todos</span>
-      <span class="pill" data-nivel="0">Truque</span>
-      <span class="pill" data-nivel="1">1</span>
-      <span class="pill" data-nivel="2">2</span>
-      <span class="pill" data-nivel="3">3</span>
-      <span class="pill" data-nivel="4">4</span>
-      <span class="pill" data-nivel="5">5</span>
-      <span class="pill" data-nivel="6">6</span>
-      <span class="pill" data-nivel="7">7</span>
-      <span class="pill" data-nivel="8">8</span>
-      <span class="pill" data-nivel="9">9</span>
+  <section class="filtros" aria-label="Filtros de busca">
+    <div class="busca-wrap">
+      <span class="lupa" aria-hidden="true">🔍</span>
+      <input type="search" id="busca" placeholder="Buscar magias pelo nome..." autocomplete="off" aria-label="Buscar magias pelo nome">
     </div>
-  </div>
 
-  <!-- Escola -->
-  <div class="filter-row">
-    <span class="filter-label">Escola</span>
-    <div class="pills" id="pills-escola">
-      <span class="pill escola-pill active" data-escola="all">Todas</span>
-      <span class="pill escola-pill" data-escola="Abjuração" style="--escola-cor:var(--c-abj)">Abjuração</span>
-      <span class="pill escola-pill" data-escola="Conjuração" style="--escola-cor:var(--c-con)">Conjuração</span>
-      <span class="pill escola-pill" data-escola="Adivinhação" style="--escola-cor:var(--c-div)">Adivinhação</span>
-      <span class="pill escola-pill" data-escola="Encantamento" style="--escola-cor:var(--c-enc)">Encantamento</span>
-      <span class="pill escola-pill" data-escola="Evocação" style="--escola-cor:var(--c-evo)">Evocação</span>
-      <span class="pill escola-pill" data-escola="Ilusão" style="--escola-cor:var(--c-ilu)">Ilusão</span>
-      <span class="pill escola-pill" data-escola="Necromancia" style="--escola-cor:var(--c-nec)">Necromancia</span>
-      <span class="pill escola-pill" data-escola="Transmutação" style="--escola-cor:var(--c-tra)">Transmutação</span>
+    <div class="linha-filtro">
+      <span class="linha-label">Nível:</span>
+      <div class="pill" data-filtro="nivel" data-valor="0" role="button" tabindex="0">Truque</div>
+      <div class="pill" data-filtro="nivel" data-valor="1" role="button" tabindex="0">1º</div>
+      <div class="pill" data-filtro="nivel" data-valor="2" role="button" tabindex="0">2º</div>
+      <div class="pill" data-filtro="nivel" data-valor="3" role="button" tabindex="0">3º</div>
+      <div class="pill" data-filtro="nivel" data-valor="4" role="button" tabindex="0">4º</div>
+      <div class="pill" data-filtro="nivel" data-valor="5" role="button" tabindex="0">5º</div>
+      <div class="pill" data-filtro="nivel" data-valor="6" role="button" tabindex="0">6º</div>
+      <div class="pill" data-filtro="nivel" data-valor="7" role="button" tabindex="0">7º</div>
+      <div class="pill" data-filtro="nivel" data-valor="8" role="button" tabindex="0">8º</div>
+      <div class="pill" data-filtro="nivel" data-valor="9" role="button" tabindex="0">9º</div>
     </div>
-  </div>
 
-  <!-- Classe -->
-  <div class="filter-row">
-    <span class="filter-label">Classe</span>
-    <div class="pills" id="pills-classe">
-      <span class="pill active" data-classe="all">Todas</span>
-      <span class="pill" data-classe="Bardo">Bardo</span>
-      <span class="pill" data-classe="Clérigo">Clérigo</span>
-      <span class="pill" data-classe="Druida">Druida</span>
-      <span class="pill" data-classe="Guerreiro">Guerreiro</span>
-      <span class="pill" data-classe="Paladino">Paladino</span>
-      <span class="pill" data-classe="Patrulheiro">Patrulheiro</span>
-      <span class="pill" data-classe="Ladino">Ladino</span>
-      <span class="pill" data-classe="Feiticeiro">Feiticeiro</span>
-      <span class="pill" data-classe="Bruxo">Bruxo</span>
-      <span class="pill" data-classe="Mago">Mago</span>
+    <div class="linha-filtro">
+      <span class="linha-label">Escola:</span>
+      <div class="pill" data-filtro="escola" data-valor="Abjuração" role="button" tabindex="0">Abjuração</div>
+      <div class="pill" data-filtro="escola" data-valor="Conjuração" role="button" tabindex="0">Conjuração</div>
+      <div class="pill" data-filtro="escola" data-valor="Adivinhação" role="button" tabindex="0">Adivinhação</div>
+      <div class="pill" data-filtro="escola" data-valor="Encantamento" role="button" tabindex="0">Encantamento</div>
+      <div class="pill" data-filtro="escola" data-valor="Evocação" role="button" tabindex="0">Evocação</div>
+      <div class="pill" data-filtro="escola" data-valor="Ilusão" role="button" tabindex="0">Ilusão</div>
+      <div class="pill" data-filtro="escola" data-valor="Necromancia" role="button" tabindex="0">Necromancia</div>
+      <div class="pill" data-filtro="escola" data-valor="Transmutação" role="button" tabindex="0">Transmutação</div>
     </div>
-  </div>
 
-  <!-- Extras -->
-  <div class="filter-row">
-    <span class="filter-label">Extra</span>
-    <button type="button" class="toggle-pill fav-toggle" id="toggle-fav" onclick="toggleExtra('fav')" aria-pressed="false" aria-label="Mostrar apenas magias favoritas">★ Favoritas <span id="fav-count" aria-hidden="true"></span></button>
-    <button type="button" class="toggle-pill" id="toggle-ritual" onclick="toggleExtra('ritual')" aria-pressed="false">Ritual</button>
-    <button type="button" class="toggle-pill" id="toggle-conc" onclick="toggleExtra('conc')" aria-pressed="false">Concentração</button>
-  </div>
-</div>
-
-<!-- Chips de filtros ativos (preenchido por JS) -->
-<div class="active-filters" id="active-filters" aria-live="polite"></div>
-
-<main class="spells-wrapper">
-  <div id="grid" class="spells-grid" role="list" aria-label="Lista de magias filtradas">
-    <div class="state-box" style="grid-column:1/-1">
-      <div class="state-icon" aria-hidden="true">📖</div>
-      <h3>Carregando o grimório<span class="loading-dots" aria-hidden="true"></span></h3>
-      <p>Buscando as magias dos planos de existência</p>
+    <div class="linha-filtro">
+      <span class="linha-label">Classe:</span>
+      <div class="pill" data-filtro="classe" data-valor="Bardo" role="button" tabindex="0">Bardo</div>
+      <div class="pill" data-filtro="classe" data-valor="Clérigo" role="button" tabindex="0">Clérigo</div>
+      <div class="pill" data-filtro="classe" data-valor="Druida" role="button" tabindex="0">Druida</div>
+      <div class="pill" data-filtro="classe" data-valor="Paladino" role="button" tabindex="0">Paladino</div>
+      <div class="pill" data-filtro="classe" data-valor="Patrulheiro" role="button" tabindex="0">Patrulheiro</div>
+      <div class="pill" data-filtro="classe" data-valor="Feiticeiro" role="button" tabindex="0">Feiticeiro</div>
+      <div class="pill" data-filtro="classe" data-valor="Bruxo" role="button" tabindex="0">Bruxo</div>
+      <div class="pill" data-filtro="classe" data-valor="Mago" role="button" tabindex="0">Mago</div>
     </div>
-  </div>
+
+    <div class="linha-filtro">
+      <span class="linha-label"></span>
+      <div class="pill" data-filtro="concentracao" data-valor="1" role="button" tabindex="0">© Concentração</div>
+      <div class="pill" data-filtro="ritual" data-valor="1" role="button" tabindex="0">® Ritual</div>
+      <div class="pill fav" data-filtro="fav" data-valor="1" role="button" tabindex="0">★ Favoritas <span id="fav-count"></span></div>
+    </div>
+
+    <div class="filtros-rodape">
+      <span class="contador"><strong id="cont-visiveis">0</strong> de <span id="cont-total">0</span> magias</span>
+      <button class="limpar" id="btn-limpar" type="button">Limpar filtros</button>
+    </div>
+  </section>
+
+  <div id="resultado"></div>
 </main>
 
-<!-- Modal -->
-<div class="modal-overlay" id="modal-overlay" onclick="fecharModal(event)" role="dialog" aria-modal="true" aria-labelledby="m-nome" aria-hidden="true">
+<button id="ao-topo" type="button" aria-label="Voltar ao topo">↑</button>
+
+<!-- MODAL -->
+<div class="modal-ov" id="modal-ov" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
   <div class="modal" id="modal">
-    <div class="modal-header">
-      <button class="modal-close" onclick="fecharModal()" aria-label="Fechar detalhes da magia">✕</button>
-      <button class="modal-fav" id="m-fav" type="button" aria-pressed="false">☆ Favoritar</button>
-      <div class="modal-title" id="m-nome">—</div>
-      <div class="modal-meta" id="m-meta"></div>
-    </div>
-    <div class="modal-body">
-      <div class="info-grid" id="m-info"></div>
-      <div class="desc-title">Descrição</div>
-      <div class="desc-text" id="m-desc"></div>
-      <div id="m-maior-nivel-wrap" style="display:none">
-        <div class="desc-title">Em Níveis Superiores</div>
-        <div class="desc-text" id="m-maior-nivel"></div>
-      </div>
-      <div class="desc-title">Classes</div>
-      <div class="classes-list" id="m-classes"></div>
-      <div class="api-source" id="m-fonte"></div>
-    </div>
+    <button class="modal-x" id="modal-x" type="button" aria-label="Fechar">×</button>
+    <div id="modal-corpo"></div>
   </div>
 </div>
-
-<!-- Back to top -->
-<button type="button" class="back-to-top" id="back-to-top" aria-label="Voltar ao topo" title="Voltar ao topo">↑</button>
 
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script src="../assets/js/supabase.js"></script>
@@ -1108,20 +367,37 @@
 <script src="../assets/js/efeitos.js"></script>
 <script src="../assets/js/favoritas.js"></script>
 <script>
+/* ===================== DADOS ===================== */
+let MAGIAS = [];
+
+const ESCOLA_ABREV = {
+  'Abjuração': 'Abju', 'Conjuração': 'Conj', 'Adivinhação': 'Adiv', 'Encantamento': 'Enca',
+  'Evocação': 'Evoc', 'Ilusão': 'Ilus', 'Necromancia': 'Necr', 'Transmutação': 'Tran'
+};
 const ESCOLA_COR = {
-  'Abjuração':'var(--c-abj)','Conjuração':'var(--c-con)','Adivinhação':'var(--c-div)',
-  'Encantamento':'var(--c-enc)','Evocação':'var(--c-evo)','Ilusão':'var(--c-ilu)',
-  'Necromancia':'var(--c-nec)','Transmutação':'var(--c-tra)'
+  'Abjuração': 'var(--e-abju)', 'Conjuração': 'var(--e-conj)', 'Adivinhação': 'var(--e-adiv)',
+  'Encantamento': 'var(--e-enca)', 'Evocação': 'var(--e-evoc)', 'Ilusão': 'var(--e-ilus)',
+  'Necromancia': 'var(--e-necr)', 'Transmutação': 'var(--e-tran)'
+};
+const ESCOLA_ICONE = {
+  'Abjuração': 'game-icons:magic-shield', 'Conjuração': 'game-icons:magic-palm',
+  'Adivinhação': 'game-icons:crystal-ball', 'Encantamento': 'game-icons:enlightenment',
+  'Evocação': 'game-icons:fire-ray', 'Ilusão': 'game-icons:ghost',
+  'Necromancia': 'game-icons:crossed-bones', 'Transmutação': 'game-icons:crystal-shine'
 };
 
-/* ===== ESTADO ===== */
-let todasMagias = [];
-let fonte = '';
-const filtros = { texto:'', niveis:new Set(), escolas:new Set(), classes:new Set(), ritual:null, conc:null, fav:null, ordem:'nome-az' };
+const filtros = { busca: '', nivel: new Set(), escola: new Set(), classe: new Set(),
+                  concentracao: false, ritual: false, fav: false };
 
-/* ===== FAVORITAS (via wrapper Fav: 100% Supabase) ===== */
-function ehFavorita(nome)     { return window.Fav ? window.Fav.tem(nome) : false; }
-async function toggleFavorita(nome) {
+/* ===================== UTIL ===================== */
+const norm = s => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+const esc  = s => (s == null ? '' : String(s)).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+const nomeNivel = n => n === 0 ? 'Truques' : `Magias de ${n}º Nível`;
+const rotuloNivel = n => n === 0 ? 'Truque' : `${n}º nível`;
+
+/* ===================== FAVORITAS ===================== */
+function ehFavorita(nome) { return window.Fav ? window.Fav.tem(nome) : false; }
+async function alternarFavorita(nome) {
   if (!window.Fav) return false;
   const novo = await window.Fav.alternar(nome);
   atualizarContadorFav();
@@ -1131,428 +407,232 @@ function atualizarContadorFav() {
   const el = document.getElementById('fav-count');
   if (el && window.Fav) {
     const n = window.Fav.tamanho();
-    el.textContent = n ? ` (${n})` : '';
+    el.textContent = n ? `(${n})` : '';
   }
 }
 
-/* ===== FETCH ===== */
-async function carregarMagias() {
-  try {
-    const res = await fetch('../data/magias_data.json');
-    if (!res.ok) throw new Error('not found');
-    todasMagias = await res.json();
-    fonte = 'Grimório PHB (PT-BR)';
-    renderizar();
-  } catch(e) {
-    mostrarErro();
+/* ===================== FILTRAGEM ===================== */
+function passaFiltro(m) {
+  if (filtros.busca) {
+    if (!norm(m.nome).includes(filtros.busca)) return false;
   }
+  if (filtros.nivel.size && !filtros.nivel.has(m.nivel)) return false;
+  if (filtros.escola.size && !filtros.escola.has(m.escola)) return false;
+  if (filtros.classe.size) {
+    const temClasse = (m.classes || []).some(c => filtros.classe.has(c));
+    if (!temClasse) return false;
+  }
+  if (filtros.concentracao && !m.concentracao) return false;
+  if (filtros.ritual && !m.ritual) return false;
+  if (filtros.fav && !ehFavorita(m.nome)) return false;
+  return true;
 }
 
-/* ===== FILTROS E SORT ===== */
-function filtrar() {
-  return todasMagias.filter(m => {
-    if (filtros.texto && !m.nome.toLowerCase().includes(filtros.texto.toLowerCase())) return false;
-    if (filtros.niveis.size && !filtros.niveis.has(m.nivel)) return false;
-    if (filtros.escolas.size && !filtros.escolas.has(m.escola)) return false;
-    if (filtros.classes.size && !m.classes.some(c => filtros.classes.has(c))) return false;
-    if (filtros.ritual !== null && m.ritual !== filtros.ritual) return false;
-    if (filtros.conc !== null && m.concentracao !== filtros.conc) return false;
-    if (filtros.fav === true && !ehFavorita(m.nome)) return false;
-    return true;
-  }).sort((a, b) => {
-    switch(filtros.ordem) {
-      case 'nome-za': return b.nome.localeCompare(a.nome, 'pt');
-      case 'nivel-asc': return a.nivel - b.nivel || a.nome.localeCompare(b.nome, 'pt');
-      case 'nivel-desc': return b.nivel - a.nivel || a.nome.localeCompare(b.nome, 'pt');
-      case 'escola': return (a.escola||'').localeCompare(b.escola||'', 'pt') || a.nome.localeCompare(b.nome, 'pt');
-      default: return a.nome.localeCompare(b.nome, 'pt');
-    }
-  });
-}
+/* ===================== RENDER ===================== */
+function render() {
+  const alvo = document.getElementById('resultado');
+  const visiveis = MAGIAS.filter(passaFiltro);
 
-/* ===== RENDER ===== */
-function renderizar() {
-  const lista = filtrar();
-  const grid = document.getElementById('grid');
+  document.getElementById('cont-visiveis').textContent = visiveis.length;
+  document.getElementById('cont-total').textContent = MAGIAS.length;
 
-  renderChipsFiltros();
-  document.getElementById('count').innerHTML = `<strong>${lista.length}</strong> de ${todasMagias.length}`;
-
-  if (lista.length === 0) {
-    grid.innerHTML = `<div class="state-box" style="grid-column:1/-1">
-      <div class="state-icon">🔮</div>
-      <h3>Nenhuma magia encontrada</h3>
-      <p>Tente outros filtros ou limpe a busca</p>
-    </div>`;
+  if (!visiveis.length) {
+    alvo.innerHTML = `<div class="vazio">Nenhuma magia encontrada com esses filtros.</div>`;
     return;
   }
 
-  grid.innerHTML = '';
-  const frag = document.createDocumentFragment();
-  lista.forEach(m => frag.appendChild(criarCard(m)));
-  grid.appendChild(frag);
+  // agrupa por nível
+  const porNivel = new Map();
+  for (const m of visiveis) {
+    if (!porNivel.has(m.nivel)) porNivel.set(m.nivel, []);
+    porNivel.get(m.nivel).push(m);
+  }
+
+  const niveis = [...porNivel.keys()].sort((a, b) => a - b);
+  let html = '';
+  for (const nv of niveis) {
+    const lista = porNivel.get(nv).sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+    html += `<section class="secao">
+      <h2 class="secao-titulo">${nomeNivel(nv)}</h2>
+      <div class="grid">${lista.map(cardHTML).join('')}</div>
+    </section>`;
+  }
+  alvo.innerHTML = html;
 }
 
-function criarCard(m) {
-  const cor = ESCOLA_COR[m.escola] || 'var(--gold)';
-  const card = document.createElement('div');
-  card.className = 'spell-card';
-  card.style.setProperty('--escola-cor', cor);
-  card.setAttribute('role', 'listitem');
-  card.setAttribute('tabindex', '0');
-  card.setAttribute('aria-label', `${m.nome}, ${m.nivel === 0 ? 'truque' : 'nível ' + m.nivel} de ${m.escola}`);
-
-  const nivelLabel = m.nivel === 0 ? 'Truque' : `Nível ${m.nivel}`;
-  const ritualTag = m.ritual ? `<span class="icon-tag icon-ritual">Ritual</span>` : '';
-  const concTag = m.concentracao ? `<span class="icon-tag icon-conc">Conc.</span>` : '';
-  const classesHtml = m.classes.slice(0,5).map(c => `<span class="class-tag">${c}</span>`).join('') +
-    (m.classes.length > 5 ? `<span class="class-tag">+${m.classes.length-5}</span>` : '');
-
-  const fav = ehFavorita(m.nome);
-  const favBtnHtml = `<button type="button" class="fav-btn" aria-pressed="${fav}" aria-label="${fav ? 'Remover ' + m.nome + ' das favoritas' : 'Marcar ' + m.nome + ' como favorita'}" title="Favoritar">${fav ? '★' : '☆'}</button>`;
-  card.innerHTML = `
-    <div class="card-top">
-      <span class="nivel-badge">${nivelLabel}</span>
-      <div class="card-icons">${ritualTag}${concTag}${favBtnHtml}</div>
+function cardHTML(m) {
+  const cor = ESCOLA_COR[m.escola] || 'var(--parchment-dim)';
+  const abrev = ESCOLA_ABREV[m.escola] || m.escola;
+  const marcas = [];
+  if (m.concentracao) marcas.push('<span class="card-marca" title="Concentração">©</span>');
+  if (m.ritual)       marcas.push('<span class="card-marca" title="Ritual">®</span>');
+  const fav = ehFavorita(m.nome) ? '<span class="card-fav" aria-label="Favorita">★</span>' : '';
+  return `<button class="card" type="button" data-nome="${esc(m.nome)}">
+    <div class="card-info">
+      <div class="card-nome">${esc(m.nome)}</div>
+      <div class="card-meta">${rotuloNivel(m.nivel)} · ${esc(m.escola)}</div>
     </div>
-    <div class="spell-nome">${m.nome}</div>
-    <span class="escola-badge" style="background:${cor}">${m.escola}</span>
-    <div class="classes-row">${classesHtml}</div>`;
-
-  // Estrela: alterna favorita sem abrir o modal
-  const favBtn = card.querySelector('.fav-btn');
-  favBtn.addEventListener('click', async e => {
-    e.stopPropagation();
-    favBtn.disabled = true;
-    const novoEstado = await toggleFavorita(m.nome);
-    favBtn.setAttribute('aria-pressed', novoEstado);
-    favBtn.setAttribute('aria-label', (novoEstado ? 'Remover ' : 'Marcar ') + m.nome + (novoEstado ? ' das favoritas' : ' como favorita'));
-    favBtn.textContent = novoEstado ? '★' : '☆';
-    favBtn.disabled = false;
-    if (window.FX) FX.favorito(favBtn, novoEstado);
-    // Se o filtro "Só favoritas" estiver ativo e desfavoritou, re-renderiza
-    if (filtros.fav === true && !novoEstado) renderizar();
-  });
-
-  card.onclick = () => abrirModal(m);
-  card.onkeydown = e => { if ((e.key === 'Enter' || e.key === ' ') && e.target === card) { e.preventDefault(); abrirModal(m); } };
-  return card;
+    <div class="card-dir">
+      ${fav}${marcas.join('')}
+      <span class="card-escola" style="color:${cor}">${abrev}</span>
+    </div>
+  </button>`;
 }
 
-/* ===== HELPERS ===== */
-function escapeHtml(s) {
-  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-function renderizarParagrafos(texto) {
-  if (!texto) return '<p>—</p>';
-  return texto.split(/\n\n+/).map(p => `<p>${escapeHtml(p.trim()).replace(/\n/g, '<br>')}</p>`).join('');
-}
+/* ===================== MODAL ===================== */
+function abrirModal(nome) {
+  const m = MAGIAS.find(x => x.nome === nome);
+  if (!m) return;
+  const cor = ESCOLA_COR[m.escola] || 'var(--gold-light)';
+  const icone = ESCOLA_ICONE[m.escola] || 'game-icons:spell-book';
+  const favOn = ehFavorita(m.nome);
 
-/* ===== MODAL ===== */
-function abrirModal(m) {
-  const cor = ESCOLA_COR[m.escola] || 'var(--gold)';
-  document.getElementById('m-nome').textContent = m.nome;
+  const compTxt = m.material
+    ? `${esc(m.componentes)} <span style="color:var(--text-dim);font-style:italic">(${esc(m.material)})</span>`
+    : esc(m.componentes);
 
-  const nivelLabel = m.nivel === 0 ? 'Truque' : `Nível ${m.nivel}`;
-  let metaHtml = `<span class="meta-badge meta-nivel">${nivelLabel}</span>`;
-  metaHtml += `<span class="meta-badge meta-escola" style="background:${cor}">${m.escola}</span>`;
-  if (m.ritual) metaHtml += `<span class="meta-badge meta-ritual">Ritual</span>`;
-  if (m.concentracao) metaHtml += `<span class="meta-badge meta-conc">Concentração</span>`;
-  document.getElementById('m-meta').innerHTML = metaHtml;
+  let sub = m.nivel === 0
+    ? `Truque de ${m.escola.toLowerCase()}`
+    : `${m.nivel}º nível · ${m.escola.toLowerCase()}`;
+  if (m.concentracao) sub += ' · concentração';
+  if (m.ritual)       sub += ' · ritual';
 
-  const comps = m.componentes + (m.material ? ` (${m.material})` : '');
-  document.getElementById('m-info').innerHTML = `
-    <div class="info-item"><div class="info-key">Tempo de Conjuração</div><div class="info-val">${m.tempoCast}</div></div>
-    <div class="info-item"><div class="info-key">Alcance</div><div class="info-val">${m.alcance}</div></div>
-    <div class="info-item"><div class="info-key">Componentes</div><div class="info-val">${comps || '—'}</div></div>
-    <div class="info-item"><div class="info-key">Duração</div><div class="info-val">${m.duracao}</div></div>`;
+  const descHTML = String(m.descricao || '')
+    .split(/\n{2,}/).map(p => `<p>${esc(p.trim())}</p>`).join('');
 
-  document.getElementById('m-desc').innerHTML = renderizarParagrafos(m.descricao);
+  document.getElementById('modal-corpo').innerHTML = `
+    <div class="modal-topo">
+      <h2 id="modal-titulo">${esc(m.nome)}</h2>
+      <iconify-icon class="modal-icone" icon="${icone}" style="color:${cor}"></iconify-icon>
+    </div>
+    <div class="modal-sub">${esc(sub)}</div>
+    <div class="modal-linha"></div>
 
-  const maiorWrap = document.getElementById('m-maior-nivel-wrap');
-  if (m.maiorNivel) {
-    document.getElementById('m-maior-nivel').innerHTML = renderizarParagrafos(m.maiorNivel);
-    maiorWrap.style.display = 'block';
-  } else { maiorWrap.style.display = 'none'; }
+    <div class="modal-props">
+      <div><span class="prop-nome">Tempo de Conjuração</span><span class="prop-valor">${esc(m.tempoCast)}</span></div>
+      <div><span class="prop-nome">Alcance</span><span class="prop-valor">${esc(m.alcance)}</span></div>
+      <div><span class="prop-nome">Componentes</span><span class="prop-valor">${compTxt}</span></div>
+      <div><span class="prop-nome">Duração</span><span class="prop-valor">${esc(m.duracao)}</span></div>
+    </div>
 
-  document.getElementById('m-classes').innerHTML = m.classes.length
-    ? m.classes.map(c => `<span class="class-badge">${c}</span>`).join('')
-    : '<span style="color:var(--text-dim);font-style:italic">Não especificado</span>';
+    <div class="modal-classes">
+      ${(m.classes || []).map(c => `<span class="classe-tag">${esc(c)}</span>`).join('')}
+    </div>
 
-  document.getElementById('m-fonte').textContent = `Fonte: ${fonte}`;
+    <div class="modal-desc">${descHTML}</div>
 
-  // Sincroniza botão de favorita no modal
-  const mFav = document.getElementById('m-fav');
-  function atualizarMFav() {
-    const fav = ehFavorita(m.nome);
-    mFav.textContent = fav ? '★ Favoritada' : '☆ Favoritar';
-    mFav.setAttribute('aria-pressed', fav);
-  }
-  atualizarMFav();
-  mFav.onclick = async () => {
-    mFav.disabled = true;
-    await toggleFavorita(m.nome);
-    atualizarMFav();
-    // Atualiza a estrela do card correspondente, se visível
-    const cardFav = document.querySelector(`.spell-card[aria-label^="${m.nome.replace(/"/g, '\\"')},"] .fav-btn`);
-    if (cardFav) {
-      const novo = ehFavorita(m.nome);
-      cardFav.setAttribute('aria-pressed', novo);
-      cardFav.textContent = novo ? '★' : '☆';
-    }
-    mFav.disabled = false;
+    ${m.maiorNivel ? `<div class="modal-extra">
+      <span class="rot">Em Níveis Superiores</span>${esc(m.maiorNivel)}
+    </div>` : ''}
+
+    <div class="modal-acoes">
+      <button class="btn-fav ${favOn ? 'on' : ''}" id="btn-fav-modal" type="button">
+        ${favOn ? '★ Favorita' : '☆ Favoritar'}
+      </button>
+    </div>`;
+
+  const btn = document.getElementById('btn-fav-modal');
+  btn.onclick = async () => {
+    const novo = await alternarFavorita(m.nome);
+    btn.classList.toggle('on', novo);
+    btn.textContent = novo ? '★ Favorita' : '☆ Favoritar';
+    if (window.FX) FX.favorito(btn, novo);
+    render();
   };
 
-  const overlay = document.getElementById('modal-overlay');
-  overlay.classList.add('open');
-  overlay.setAttribute('aria-hidden', 'false');
+  const ov = document.getElementById('modal-ov');
+  ov.classList.add('open');
   document.body.style.overflow = 'hidden';
-  ultimoFocado = document.activeElement;
-  setTimeout(() => document.querySelector('.modal-close')?.focus(), 50);
+  document.getElementById('modal-x').focus();
 }
 
-let ultimoFocado = null;
-function fecharModal(e) {
-  if (e && e.target !== document.getElementById('modal-overlay')) return;
-  const overlay = document.getElementById('modal-overlay');
-  overlay.classList.remove('open');
-  overlay.setAttribute('aria-hidden', 'true');
+function fecharModal() {
+  document.getElementById('modal-ov').classList.remove('open');
   document.body.style.overflow = '';
-  if (ultimoFocado && document.contains(ultimoFocado)) ultimoFocado.focus();
 }
 
-document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && document.getElementById('modal-overlay').classList.contains('open')) {
-    fecharModal();
-  }
-});
-
-/* ===== CHIPS DE FILTROS ATIVOS ===== */
-function nivelLabel(n) { return n === 0 ? 'Truque' : `Nível ${n}`; }
-
-function renderChipsFiltros() {
-  const wrap = document.getElementById('active-filters');
-  const partes = [];
-
-  if (filtros.texto) partes.push({ tipo:'texto', label:`"${filtros.texto}"`, valor:null });
-  filtros.niveis.forEach(v => partes.push({ tipo:'nivel', label:nivelLabel(v), valor:v }));
-  filtros.escolas.forEach(v => partes.push({ tipo:'escola', label:v, valor:v }));
-  filtros.classes.forEach(v => partes.push({ tipo:'classe', label:v, valor:v }));
-  if (filtros.ritual === true) partes.push({ tipo:'ritual', label:'Ritual', valor:null });
-  if (filtros.conc === true) partes.push({ tipo:'conc', label:'Concentração', valor:null });
-  if (filtros.fav === true) partes.push({ tipo:'fav', label:'★ Favoritas', valor:null });
-
-  // badge no botão drawer
-  const badge = document.getElementById('filter-toggle-badge');
-  if (badge) {
-    const n = partes.length;
-    badge.textContent = n;
-    badge.style.display = n > 0 ? 'inline-block' : 'none';
-  }
-
-  if (!partes.length) { wrap.innerHTML = ''; return; }
-
-  let html = `<span class="af-label">Ativos:</span>`;
-  partes.forEach(p => {
-    const dataAttr = p.valor != null ? `data-valor="${escapeHtml(String(p.valor))}"` : '';
-    html += `<span class="af-chip">${escapeHtml(p.label)}<button type="button" class="af-x" data-tipo="${p.tipo}" ${dataAttr} aria-label="Remover filtro ${escapeHtml(p.label)}">✕</button></span>`;
-  });
-  html += `<button type="button" class="af-clear-all" onclick="limparFiltros()">Limpar tudo</button>`;
-  wrap.innerHTML = html;
-
-  wrap.querySelectorAll('.af-x').forEach(b => {
-    b.addEventListener('click', e => {
-      const t = b.dataset.tipo;
-      const v = b.dataset.valor;
-      removerFiltro(t, v);
-    });
-  });
-}
-
-function removerFiltro(tipo, valor) {
-  switch (tipo) {
-    case 'texto':
-      filtros.texto = '';
-      document.getElementById('busca').value = '';
-      break;
-    case 'nivel': {
-      filtros.niveis.delete(Number(valor));
-      const sel = filtros.niveis.size === 0 ? 'all' : String([...filtros.niveis][0]);
-      document.querySelectorAll('#pills-nivel .pill').forEach(p => p.classList.toggle('active', p.dataset.nivel === sel));
-      break;
-    }
-    case 'escola': {
-      filtros.escolas.delete(valor);
-      const pill = document.querySelector(`#pills-escola .pill[data-escola="${CSS.escape(valor)}"]`);
-      if (pill) pill.classList.remove('active');
-      if (filtros.escolas.size === 0) document.querySelector('#pills-escola [data-escola="all"]').classList.add('active');
-      break;
-    }
-    case 'classe': {
-      filtros.classes.delete(valor);
-      const pill = document.querySelector(`#pills-classe .pill[data-classe="${CSS.escape(valor)}"]`);
-      if (pill) pill.classList.remove('active');
-      if (filtros.classes.size === 0) document.querySelector('#pills-classe [data-classe="all"]').classList.add('active');
-      break;
-    }
-    case 'ritual':
-    case 'conc':
-    case 'fav': {
-      filtros[tipo] = null;
-      const el = document.getElementById(`toggle-${tipo}`);
-      if (el) { el.classList.remove('active'); el.setAttribute('aria-pressed','false'); }
-      break;
-    }
-  }
-  renderizar();
-}
-
-function mostrarErro() {
-  document.getElementById('grid').innerHTML = `<div class="state-box" style="grid-column:1/-1">
-    <div class="state-icon">⚠️</div>
-    <h3>Não foi possível carregar as magias</h3>
-    <p>O arquivo magias_data.json não foi encontrado. Execute node parse_magias.js primeiro.</p>
-  </div>`;
-  document.getElementById('count').textContent = 'Erro';
-}
-
-function limparFiltros() {
-  filtros.texto = ''; filtros.niveis.clear(); filtros.escolas.clear(); filtros.classes.clear();
-  filtros.ritual = null; filtros.conc = null; filtros.fav = null;
-  document.getElementById('busca').value = '';
-  document.getElementById('ordem').value = 'nome-az';
-  filtros.ordem = 'nome-az';
-  document.querySelectorAll('.pill').forEach(p => {
-    p.classList.toggle('active', p.dataset.nivel === 'all' || p.dataset.escola === 'all' || p.dataset.classe === 'all');
-  });
-  ['ritual','conc','fav'].forEach(t => {
-    const el = document.getElementById(`toggle-${t}`);
-    el.classList.remove('active');
-    el.setAttribute('aria-pressed', 'false');
-  });
-  renderizar();
-}
-
-function toggleExtra(tipo) {
-  const el = document.getElementById(`toggle-${tipo}`);
-  const chave = tipo === 'conc' ? 'conc' : tipo;
-  filtros[chave] = filtros[chave] === true ? null : true;
-  const ativo = filtros[chave] === true;
-  el.classList.toggle('active', ativo);
-  el.setAttribute('aria-pressed', String(ativo));
-  renderizar();
-}
-
-/* ===== EVENT LISTENERS ===== */
+/* ===================== EVENTOS ===================== */
 document.getElementById('busca').addEventListener('input', e => {
-  filtros.texto = e.target.value;
-  renderizar();
+  filtros.busca = norm(e.target.value.trim());
+  render();
 });
 
-document.getElementById('ordem').addEventListener('change', e => {
-  filtros.ordem = e.target.value;
-  renderizar();
-});
-
-// Pills de nível (single select)
-document.getElementById('pills-nivel').addEventListener('click', e => {
-  const pill = e.target.closest('.pill');
-  if (!pill) return;
-  document.querySelectorAll('#pills-nivel .pill').forEach(p => p.classList.remove('active'));
-  pill.classList.add('active');
-  const val = pill.dataset.nivel;
-  filtros.niveis.clear();
-  if (val !== 'all') filtros.niveis.add(Number(val));
-  renderizar();
-});
-
-// Pills de escola (multi-select)
-document.getElementById('pills-escola').addEventListener('click', e => {
-  const pill = e.target.closest('.pill');
-  if (!pill) return;
-  const val = pill.dataset.escola;
-  if (val === 'all') {
-    filtros.escolas.clear();
-    document.querySelectorAll('#pills-escola .pill').forEach(p => p.classList.remove('active'));
-    pill.classList.add('active');
-  } else {
-    document.querySelector('#pills-escola [data-escola="all"]').classList.remove('active');
-    pill.classList.toggle('active');
-    if (pill.classList.contains('active')) filtros.escolas.add(val);
-    else filtros.escolas.delete(val);
-    if (filtros.escolas.size === 0) document.querySelector('#pills-escola [data-escola="all"]').classList.add('active');
-  }
-  renderizar();
-});
-
-// Pills de classe (multi-select)
-document.getElementById('pills-classe').addEventListener('click', e => {
-  const pill = e.target.closest('.pill');
-  if (!pill) return;
-  const val = pill.dataset.classe;
-  if (val === 'all') {
-    filtros.classes.clear();
-    document.querySelectorAll('#pills-classe .pill').forEach(p => p.classList.remove('active'));
-    pill.classList.add('active');
-  } else {
-    document.querySelector('#pills-classe [data-classe="all"]').classList.remove('active');
-    pill.classList.toggle('active');
-    if (pill.classList.contains('active')) filtros.classes.add(val);
-    else filtros.classes.delete(val);
-    if (filtros.classes.size === 0) document.querySelector('#pills-classe [data-classe="all"]').classList.add('active');
-  }
-  renderizar();
-});
-
-/* ===== DRAWER DE FILTROS (mobile) ===== */
-(function setupFilterDrawer() {
-  const btn = document.getElementById('filter-toggle');
-  const bar = document.getElementById('filters-bar');
-  if (!btn || !bar) return;
-  btn.addEventListener('click', () => {
-    const aberto = bar.classList.toggle('open');
-    btn.setAttribute('aria-expanded', String(aberto));
-  });
-})();
-
-/* ===== BACK TO TOP ===== */
-(function setupBackToTop() {
-  const btn = document.getElementById('back-to-top');
-  if (!btn) return;
-  const onScroll = () => {
-    btn.classList.toggle('visible', window.scrollY > 400);
-  };
-  window.addEventListener('scroll', onScroll, { passive: true });
-  btn.addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    document.getElementById('busca')?.focus({ preventScroll: true });
-  });
-})();
-
-/* ===== ATALHOS DE TECLADO ===== */
-document.addEventListener('keydown', e => {
-  if (e.key === '/' && !e.ctrlKey && !e.metaKey) {
-    const ativo = document.activeElement;
-    const ehInput = ativo && /input|textarea|select/i.test(ativo.tagName);
-    const modalAberto = document.getElementById('modal-overlay')?.classList.contains('open');
-    if (!ehInput && !modalAberto) {
-      e.preventDefault();
-      document.getElementById('busca')?.focus();
+document.querySelectorAll('.pill').forEach(pill => {
+  const acionar = () => {
+    const tipo = pill.dataset.filtro;
+    const valor = pill.dataset.valor;
+    if (tipo === 'nivel' || tipo === 'escola' || tipo === 'classe') {
+      const chave = tipo === 'nivel' ? parseInt(valor, 10) : valor;
+      const conj = filtros[tipo];
+      if (conj.has(chave)) conj.delete(chave); else conj.add(chave);
+      pill.classList.toggle('on', conj.has(chave));
+    } else {
+      filtros[tipo] = !filtros[tipo];
+      pill.classList.toggle('on', filtros[tipo]);
     }
+    render();
+  };
+  pill.addEventListener('click', acionar);
+  pill.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); acionar(); }
+  });
+});
+
+document.getElementById('btn-limpar').addEventListener('click', () => {
+  filtros.busca = '';
+  filtros.nivel.clear(); filtros.escola.clear(); filtros.classe.clear();
+  filtros.concentracao = false; filtros.ritual = false; filtros.fav = false;
+  document.getElementById('busca').value = '';
+  document.querySelectorAll('.pill').forEach(p => p.classList.remove('on'));
+  render();
+});
+
+document.getElementById('resultado').addEventListener('click', e => {
+  const card = e.target.closest('.card');
+  if (card) abrirModal(card.dataset.nome);
+});
+
+document.getElementById('modal-x').addEventListener('click', fecharModal);
+document.getElementById('modal-ov').addEventListener('click', e => {
+  if (e.target.id === 'modal-ov') fecharModal();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') fecharModal();
+  if (e.key === '/' && document.activeElement.tagName !== 'INPUT') {
+    e.preventDefault();
+    document.getElementById('busca').focus();
   }
 });
 
-/* ===== INIT ===== */
+/* ao topo */
+const btnTopo = document.getElementById('ao-topo');
+window.addEventListener('scroll', () => {
+  btnTopo.classList.toggle('visible', window.scrollY > 400);
+}, { passive: true });
+btnTopo.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+/* ===================== CARGA ===================== */
+async function carregarMagias() {
+  const alvo = document.getElementById('resultado');
+  alvo.innerHTML = `<div class="vazio">Carregando magias…</div>`;
+  try {
+    const r = await fetch('../data/magias_data.json');
+    MAGIAS = await r.json();
+    document.getElementById('total-magias').textContent = MAGIAS.length;
+    render();
+  } catch (err) {
+    alvo.innerHTML = `<div class="vazio">Não foi possível carregar as magias.</div>`;
+    console.error('[magias]', err);
+  }
+}
+
+/* ===================== INIT ===================== */
 (async () => {
-  // Gate: requer login antes de qualquer coisa
   const u = await window.Auth.requerLogin('login.html');
-  if (!u) return;  // já redirecionou
-  // Header de auth
+  if (!u) return;
   await window.Auth.renderHeader('#auth-slot');
-  // Carrega favoritas (decide modo banco vs local internamente)
   if (window.Fav) await window.Fav.carregar();
   atualizarContadorFav();
-  // Carrega magias
   carregarMagias();
 })();
 </script>

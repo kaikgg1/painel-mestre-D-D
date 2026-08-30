@@ -5069,6 +5069,13 @@ async function salvar(e) {
       if (max > 0 || atual > 0) slots[n] = { max, atual };
     }
     payload.slots_magia = slots;
+  } else {
+    // Tab Combate não está aberta — não reenvia slots_magia.
+    // `payload` começou como cópia de charAtivo (pra preservar outras abas),
+    // então sem este delete o auto-save de QUALQUER outro campo (ex: Notas,
+    // Identidade) reescreveria slots_magia com o valor local desatualizado,
+    // podendo desfazer um Descanso Longo aplicado pelo Mestre nesse meio-tempo.
+    delete payload.slots_magia;
   }
 
   // Salvaguardas + Perícias + Magia (só se tab Combate aberta — usa marker hidden)
@@ -5099,6 +5106,17 @@ async function salvar(e) {
     set('magias_conhecidas',  num('magias_conhecidas'));
     set('cd_resistencia',     num('cd_resistencia'));
     set('bonus_atq_magia',    num('bonus_atq_magia'));
+  } else {
+    // Tab Combate não está aberta — mesmo caso do slots_magia acima:
+    // não reenvia esses campos com a cópia local (possivelmente desatualizada)
+    // de charAtivo, pra não sobrescrever uma mudança feita pelo Mestre/outro
+    // aparelho nesse meio-tempo.
+    delete payload.salvaguardas;
+    delete payload.pericias;
+    delete payload.truques_conhecidos;
+    delete payload.magias_conhecidas;
+    delete payload.cd_resistencia;
+    delete payload.bonus_atq_magia;
   }
 
   // Características adicionais (aba Habilidades)
@@ -5126,6 +5144,16 @@ async function salvar(e) {
     const v = num('inspiracao');
     payload.inspiracao = v ?? 0;
   }
+
+  // Campos com save dedicado próprio (salvarRecursos, salvarFeaturesPersonalizadas,
+  // salvarCompanions, salvarFavoritosBestiario) — nunca reenviar pela cópia local
+  // de charAtivo aqui, senão qualquer autosave de outra aba reenvia a versão
+  // desatualizada e desfaz uma mudança feita pelo Mestre/outro aparelho nesse
+  // meio-tempo (mesma causa raiz do bug de slots_magia não resetar no Descanso Longo).
+  delete payload.recursos_usados;
+  delete payload.features_personalizadas;
+  delete payload.companions;
+  delete payload.bestiario_favoritos;
 
   // Remove campos que não vão pro UPDATE
   delete payload.id;

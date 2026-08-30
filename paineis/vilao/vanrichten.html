@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0a0608">
 <link rel="icon" type="image/svg+xml" href="../../assets/img/favicon.svg">
-<title>Izek Strazni — Ficha de Combate</title>
+<title>Dr. Rudolph van Richten — Ficha de Combate</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
@@ -18,17 +18,15 @@
     --bone:#efe6cf; --bone-dim:#c2b795; --shadow:#050203;
     --text-body:#ddd2b2; --text-muted:#948767;
     --border:#4a3a2a; --border-soft:rgba(203,172,103,0.16); --radius:10px;
-    --accent:#cbac67; --accent-bright:#f0d089; --accent-glow:rgba(203,172,103,0.35); --accent-soft:rgba(203,172,103,0.10);
+    --accent:#6f7a4e; --accent-bright:#a3b47f; --accent-glow:rgba(111,122,78,0.38); --accent-soft:rgba(111,122,78,0.12);
   }
-  body[data-fase="1"] { --accent:#c97a2f; --accent-bright:#eba95f; --accent-glow:rgba(201,122,47,0.42); --accent-soft:rgba(201,122,47,0.13); }
-  body[data-fase="2"] { --accent:#d1402f; --accent-bright:#f2705a; --accent-glow:rgba(209,64,47,0.44); --accent-soft:rgba(209,64,47,0.14); }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { background: var(--bg-deep); color: var(--text-body); font-family: 'Cormorant Garamond', serif; font-size: 16px; line-height: 1.48; min-height: 100vh; -webkit-font-smoothing: antialiased; }
-  body { background: radial-gradient(ellipse at 50% -10%, var(--accent-soft), transparent 55%), radial-gradient(ellipse at 18% 4%, rgba(155,31,31,0.16), transparent 48%), radial-gradient(ellipse at 84% 96%, rgba(203,172,103,0.06), transparent 50%), var(--bg-deep); background-attachment: fixed; transition: background 0.6s ease; }
+  body { background: radial-gradient(ellipse at 50% -10%, var(--accent-soft), transparent 55%), radial-gradient(ellipse at 18% 4%, rgba(155,31,31,0.16), transparent 48%), radial-gradient(ellipse at 84% 96%, rgba(203,172,103,0.06), transparent 50%), var(--bg-deep); background-attachment: fixed; }
   body::before { content: ''; position: fixed; inset: 0; pointer-events: none; opacity: 0.3; z-index: 1; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.05 0 0 0 0 0.05 0 0 0 0.3 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>"); mix-blend-mode: overlay; }
-  .container { max-width: 1200px; margin: 0 auto; padding: 20px 24px 60px; position: relative; z-index: 2; }
+  .container { max-width: 1100px; margin: 0 auto; padding: 20px 24px 60px; position: relative; z-index: 2; }
   .top-bar { position: sticky; top: 0; z-index: 50; background: rgba(10,6,8,0.96); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); margin: -20px -24px 16px; padding: 12px 24px; }
-  .top-bar-inner { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; max-width: 1200px; margin: 0 auto; }
+  .top-bar-inner { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; max-width: 1100px; margin: 0 auto; }
   .brand { font-family: 'Cinzel', serif; font-weight: 700; font-size: 1rem; letter-spacing: 0.18em; color: var(--bone); text-transform: uppercase; }
   .brand-sub { font-family: 'IM Fell English', serif; font-style: italic; font-size: 11px; color: var(--gold-dim); letter-spacing: 0.15em; }
   .save-controls { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
@@ -37,7 +35,7 @@
   header::after { content: '✦'; position: absolute; bottom: -11px; left: 50%; transform: translateX(-50%); background: var(--bg-deep); padding: 0 14px; color: var(--accent); font-size: 18px; text-shadow: 0 0 12px var(--accent-glow); }
   .crest { font-size: clamp(2.4rem, 6vw, 3.4rem); line-height: 1; margin-bottom: 6px; color: var(--accent-bright); filter: drop-shadow(0 0 14px var(--accent-glow)); display: inline-block; }
   .eyebrow { font-family: 'Cinzel', serif; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.42em; color: var(--accent-bright); text-transform: uppercase; margin-bottom: 8px; opacity: 0.85; }
-  h1 { font-family: 'Cinzel', serif; font-weight: 900; font-size: clamp(2rem, 5vw, 3.1rem); letter-spacing: 0.08em; line-height: 1.02; background: linear-gradient(180deg, var(--bone) 30%, var(--accent-bright)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 34px var(--accent-glow); filter: drop-shadow(0 2px 2px rgba(0,0,0,0.6)); }
+  h1 { font-family: 'Cinzel', serif; font-weight: 900; font-size: clamp(1.9rem, 4.8vw, 2.9rem); letter-spacing: 0.07em; line-height: 1.02; background: linear-gradient(180deg, var(--bone) 30%, var(--accent-bright)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 34px var(--accent-glow); filter: drop-shadow(0 2px 2px rgba(0,0,0,0.6)); }
   .subtitle { font-style: italic; font-size: 1rem; color: var(--gold); margin-top: 10px; letter-spacing: 0.03em; line-height: 1.5; max-width: 780px; margin-left: auto; margin-right: auto; }
   .subtitle strong { color: var(--bone); font-style: normal; }
   .combat-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
@@ -62,19 +60,6 @@
   .chip { padding: 5px 12px; background: linear-gradient(180deg, rgba(0,0,0,0.2), rgba(26,18,22,0.7)); border: 1px solid var(--border); color: var(--text-muted); font-family: 'Cinzel', serif; font-weight: 600; font-size: 10px; letter-spacing: 0.1em; cursor: pointer; border-radius: 14px; user-select: none; transition: all 0.15s; min-height: 26px; display: inline-flex; align-items: center; }
   .chip:hover { border-color: var(--gold-dim); color: var(--bone-dim); transform: translateY(-1px); }
   .chip.active { background: linear-gradient(180deg, var(--blood), var(--blood-dark)); border-color: var(--blood-bright); color: var(--bone); box-shadow: 0 0 8px rgba(139,26,26,0.4); }
-  .phase-tabs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 16px; }
-  .phase-tab { background: linear-gradient(180deg, rgba(26,18,22,0.6), rgba(10,6,8,0.6)); border: 1px solid var(--border); padding: 13px 12px 15px; cursor: pointer; text-align: center; border-radius: var(--radius); transition: all 0.25s; position: relative; overflow: hidden; }
-  .phase-tab::before { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 3px; background: var(--accent); transform: scaleX(0); transition: transform 0.3s ease; opacity: 0.9; }
-  .phase-tab:hover { border-color: var(--gold-dim); transform: translateY(-2px); }
-  .phase-tab.active { background: linear-gradient(180deg, var(--accent-soft), rgba(10,6,8,0.55)); border-color: var(--accent); box-shadow: 0 0 22px var(--accent-glow), inset 0 1px 0 rgba(255,255,255,0.06); }
-  .phase-tab.active::before { transform: scaleX(1); }
-  .phase-tab.active .phase-num { color: var(--accent-bright); }
-  .phase-tab.active .phase-name { color: var(--bone); text-shadow: 0 0 12px var(--accent-glow); }
-  .phase-icon { font-size: 1.6rem; line-height: 1; margin-bottom: 4px; display: block; color: var(--text-muted); transition: color 0.25s, transform 0.25s; }
-  .phase-tab.active .phase-icon { color: var(--accent-bright); transform: scale(1.12); filter: drop-shadow(0 0 10px var(--accent-glow)); }
-  .phase-num { font-family: 'IM Fell English', serif; font-size: 0.72rem; color: var(--gold-dim); letter-spacing: 0.16em; font-style: italic; }
-  .phase-name { font-family: 'Cinzel', serif; font-weight: 700; font-size: clamp(0.85rem, 1.6vw, 1.08rem); color: var(--text-body); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 2px; }
-  .phase-tagline { font-style: italic; font-size: 0.78rem; color: var(--text-muted); margin-top: 2px; }
   .stats-bar { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 14px; background: linear-gradient(180deg, rgba(26,18,22,0.7), rgba(13,8,11,0.7)); padding: 12px 10px; border: 1px solid var(--border); border-radius: var(--radius); box-shadow: inset 0 1px 0 rgba(232,200,122,0.05); }
   .stat { text-align: center; padding: 9px 4px 7px; background: linear-gradient(180deg, rgba(0,0,0,0.3), transparent); border: 1px solid rgba(74,58,42,0.6); border-radius: 8px; transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s; }
   .stat:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,0.4), 0 0 12px var(--accent-glow); }
@@ -94,13 +79,13 @@
   .meta-title { font-family: 'Cinzel', serif; font-size: 9px; color: var(--accent-bright); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 6px; padding-bottom: 5px; border-bottom: 1px solid var(--border-soft); }
   .meta-content { font-size: 0.95rem; color: var(--text-body); line-height: 1.55; }
   .meta-content strong { color: var(--bone); font-weight: 600; }
-  .phase-content { display: none; }
-  .phase-content.active { display: block; animation: fadeIn 0.3s ease; }
-  @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
   .section { margin-bottom: 18px; }
   .section-title { font-family: 'Cinzel', serif; font-weight: 700; font-size: 1.02rem; color: var(--blood-bright); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 10px; padding-bottom: 7px; border-bottom: 1px solid var(--blood-dark); display: flex; align-items: center; gap: 10px; position: relative; }
   .section-title::before { content: ''; width: 7px; height: 7px; background: var(--blood); transform: rotate(45deg); box-shadow: 0 0 8px var(--blood-bright); flex-shrink: 0; }
   .section-title::after { content: ''; position: absolute; left: 0; bottom: -1px; width: 60px; height: 1px; background: linear-gradient(90deg, var(--blood-bright), transparent); }
+  .section-title.lore { color: var(--accent-bright); border-bottom-color: var(--accent); }
+  .section-title.lore::before { background: var(--accent); box-shadow: 0 0 8px var(--accent-glow); }
+  .section-title.lore::after { background: linear-gradient(90deg, var(--accent), transparent); }
   .special-callout { background: radial-gradient(ellipse at 0% 0%, var(--accent-soft), transparent 60%), linear-gradient(180deg, var(--bg-card-2), rgba(10,6,8,0.5)); border: 1px solid var(--accent); border-left: 4px solid var(--accent-bright); border-radius: 10px; padding: 14px 16px; margin-bottom: 14px; }
   .special-callout .sc-title { font-family: 'Cinzel', serif; font-weight: 700; font-size: 1rem; color: var(--accent-bright); letter-spacing: 0.06em; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
   .special-callout .sc-body { font-size: 0.95rem; color: var(--text-body); line-height: 1.55; }
@@ -113,12 +98,14 @@
   .ability.attack { border-left-color: var(--blood-bright); }
   .ability.bonus { border-left-color: #c08a3e; }
   .ability.reaction { border-left-color: #5f8bb8; }
+  .ability.lore { border-left-color: var(--accent); }
   .ability-header { padding: 10px 14px; cursor: pointer; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; user-select: none; }
   .ability-header:hover { background: rgba(255,255,255,0.03); }
   .ability-header::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--gold-dim); flex-shrink: 0; box-shadow: 0 0 8px currentColor; }
   .ability.attack .ability-header::before { background: var(--blood-bright); color: var(--blood-bright); }
   .ability.bonus .ability-header::before { background: #c08a3e; color: #c08a3e; }
   .ability.reaction .ability-header::before { background: #5f8bb8; color: #5f8bb8; }
+  .ability.lore .ability-header::before { background: var(--accent); color: var(--accent); }
   .ability-name { font-family: 'Cinzel', serif; font-weight: 600; font-size: 1rem; color: var(--bone); letter-spacing: 0.04em; }
   .ability-tag { font-family: 'IM Fell English', serif; font-style: italic; font-size: 0.82rem; color: var(--gold); letter-spacing: 0.03em; background: var(--accent-soft); border: 1px solid var(--border-soft); padding: 1px 8px; border-radius: 10px; }
   .toggle-icon { margin-left: auto; color: var(--gold-dim); font-size: 0.72rem; transition: transform 0.2s; }
@@ -129,9 +116,8 @@
   .ability-body em { color: var(--gold-bright); font-style: normal; font-weight: 500; }
   .dmg { display: inline-block; padding: 1px 8px; background: linear-gradient(180deg, rgba(155,31,31,0.28), rgba(90,14,14,0.28)); border: 1px solid var(--blood); color: #ffd9d0; border-radius: 5px; font-family: 'IM Fell English', serif; font-size: 0.9rem; margin: 0 2px; font-weight: 600; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
   .cd { display: inline-block; padding: 1px 8px; background: rgba(203,172,103,0.16); border: 1px solid var(--gold-dim); color: var(--gold-bright); border-radius: 5px; font-family: 'IM Fell English', serif; font-size: 0.9rem; margin: 0 2px; font-weight: 600; }
-  .legend { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 10px; font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.12em; color: var(--text-muted); text-transform: uppercase; }
-  .legend-item { display: flex; align-items: center; gap: 5px; }
-  .legend-swatch { width: 12px; height: 3px; display: inline-block; }
+  .insp-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .insp-tag { font-family: 'Cinzel', serif; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; color: var(--accent-bright); background: var(--accent-soft); border: 1px solid var(--border-soft); padding: 4px 10px; border-radius: 12px; }
   .notes-section { margin-top: 18px; background: var(--bg-card); border: 1px solid var(--border); padding: 10px 14px; border-radius: 2px; }
   .notes-section h3 { font-family: 'Cinzel', serif; font-size: 0.78rem; color: var(--gold); letter-spacing: 0.2em; margin-bottom: 6px; text-transform: uppercase; }
   .notes-area { width: 100%; min-height: 70px; background: var(--shadow); border: 1px solid var(--border); color: var(--text-body); font-family: 'Cormorant Garamond', serif; font-size: 0.92rem; padding: 8px 10px; border-radius: 2px; resize: vertical; outline: none; line-height: 1.45; }
@@ -145,8 +131,8 @@
   .round-display { display: flex; align-items: baseline; gap: 6px; background: rgba(0,0,0,0.35); border: 1px solid var(--accent); border-radius: 8px; padding: 4px 14px; box-shadow: 0 0 14px var(--accent-glow); }
   .round-num { font-family: 'IM Fell English', serif; font-size: 1.6rem; color: var(--accent-bright); line-height: 1; font-weight: 600; min-width: 24px; text-align: center; }
   .round-lbl { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.2em; color: var(--gold-dim); text-transform: uppercase; }
-  @media (max-width: 720px) { .container { padding: 12px 12px 50px; } .top-bar { margin: -12px -12px 12px; padding: 10px 12px; } .stats-bar { grid-template-columns: repeat(3, 1fr); } .phase-tabs { grid-template-columns: 1fr; } }
-  @media print { body { background: white; color: black; } .top-bar, .notes-section, .combat-bar, .condition-row, .save-controls { display: none; } .phase-content { display: block !important; page-break-after: always; } .ability-body { display: block !important; } }
+  @media (max-width: 720px) { .container { padding: 12px 12px 50px; } .top-bar { margin: -12px -12px 12px; padding: 10px 12px; } .stats-bar { grid-template-columns: repeat(3, 1fr); } }
+  @media print { body { background: white; color: black; } .top-bar, .notes-section, .combat-bar, .condition-row, .save-controls { display: none; } .ability-body { display: block !important; } }
 </style>
 <link rel="stylesheet" href="../../assets/css/ui.css">
 </head>
@@ -161,8 +147,8 @@
       <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap">
         <a href="index.html" class="btn" style="text-decoration:none">← Personagens</a>
         <div>
-          <div class="brand">Izek Strazni</div>
-          <div class="brand-sub">Ficha de Combate · 2 Formas · <span id="syncStatus" style="color:var(--gold-dim)">○ local</span></div>
+          <div class="brand">Dr. Rudolph van Richten</div>
+          <div class="brand-sub">Ficha de Combate · Caçador de Vampiros · <span id="syncStatus" style="color:var(--gold-dim)">○ local</span></div>
         </div>
       </div>
       <div class="save-controls">
@@ -176,49 +162,51 @@
   </div>
 
   <header>
-    <iconify-icon class="crest" icon="game-icons:fire-punch"></iconify-icon>
-    <div class="eyebrow">Capitão da Guarda de Vallaki · O Braço Demoníaco</div>
-    <h1>Izek Strazni</h1>
-    <div class="subtitle">Humanoide Médio · Neutro e Mau · <strong>ND <span id="ndHeader">6</span></strong> (ou 5 se envenenado) · Bônus de Proficiência <strong>+3</strong></div>
+    <iconify-icon class="crest" icon="game-icons:wolf-trap"></iconify-icon>
+    <div class="eyebrow">O Célebre Caçador de Vampiros · Disfarçado como "Rictavio"</div>
+    <h1>Dr. Rudolph van Richten</h1>
+    <div class="subtitle">Humanoide Médio (humano) · Leal e Bom · <strong>ND 5</strong> (1.800 XP) · Bônus de Proficiência <strong>+3</strong></div>
   </header>
+
+  <div class="special-callout">
+    <div class="sc-title"><iconify-icon icon="game-icons:fedora" style="color:var(--accent-bright)"></iconify-icon> Disfarce: Rictavio</div>
+    <div class="sc-body">Van Richten se disfarça como <strong>Rictavio</strong>, um mestre de cerimônias de carnaval extravagante e irreverente, ocasionalmente narcisista. Numa luta, Rictavio tentaria <em>conversar para sair da encrenca</em>, fugindo se o combate for inevitável — mas pode intervir para defender um inocente, tentando preservar sua identidade secreta.</div>
+  </div>
 
   <div class="combat-bar">
     <div class="panel">
-      <div class="panel-title">◆ Pontos de Vida (compartilhados entre formas)</div>
+      <div class="panel-title">◆ Pontos de Vida</div>
       <div class="hp-row">
-        <input type="number" id="hpCurrent" class="hp-input" value="146" min="0">
+        <input type="number" id="hpCurrent" class="hp-input" value="126" min="0">
         <span style="color:var(--gold-dim)">/</span>
-        <input type="number" id="hpMax" class="hp-input" value="146" min="1">
+        <input type="number" id="hpMax" class="hp-input" value="126" min="1">
         <div class="hp-bar-container"><div class="hp-bar" id="hpBar" style="width:100%"></div><div class="hp-label" id="hpLabel">100%</div></div>
       </div>
-      <div style="margin-top:4px;font-size:0.82rem;color:var(--text-muted);font-style:italic">Máx <strong style="color:var(--gold);font-style:normal">146</strong> · Média 100 · <strong style="color:var(--bone);font-style:normal">13d8 + 42</strong></div>
+      <div style="margin-top:4px;font-size:0.82rem;color:var(--text-muted);font-style:italic">Máx <strong style="color:var(--gold);font-style:normal">126</strong> · Média 77 · <strong style="color:var(--bone);font-style:normal">14d8 + 14</strong></div>
       <div style="margin-top:6px;display:flex;gap:4px;flex-wrap:wrap">
-        <button class="btn" onclick="adjustHP(-20)">−20</button>
         <button class="btn" onclick="adjustHP(-10)">−10</button>
         <button class="btn" onclick="adjustHP(-5)">−5</button>
         <button class="btn" onclick="adjustHP(-1)">−1</button>
         <button class="btn" onclick="adjustHP(1)">+1</button>
-        <button class="btn" onclick="setMedia()">Usar média (100)</button>
+        <button class="btn" onclick="setMedia()">Usar média (77)</button>
         <button class="btn" onclick="resetHP()">Reset</button>
       </div>
     </div>
 
     <div class="panel">
-      <div class="panel-title">◆ Segunda Fase</div>
+      <div class="panel-title">◆ Equipamento Especial</div>
       <div style="font-size:0.9rem;color:var(--text-body);line-height:1.45">
-        A <strong style="color:var(--gold)">0 PV</strong>, o braço demoníaco de Izek explode em chamas e ele vira a <em>2ª forma</em> (imune a fogo). A iniciativa não muda; dano excedente não transfere; <strong>mantém as condições</strong>. Troque de aba.
+        <em style="color:var(--gold);font-style:normal">Amuleto de proteção contra detecção e localização</em>, <em style="color:var(--gold);font-style:normal">pulseira de encantos</em>, <em style="color:var(--gold);font-style:normal">chapéu de disfarce</em>, <em style="color:var(--gold);font-style:normal">lente lúcida</em>, e <em style="color:var(--gold);font-style:normal">anel de proteção mental</em>.
       </div>
     </div>
 
     <div class="panel">
-      <div class="panel-title">◆ Reações da Rodada (até 3 · 1 por turno)</div>
+      <div class="panel-title">◆ Reação da Rodada (1 por rodada)</div>
       <div class="react-row">
-        <div class="react-dot" onclick="toggleReact(this)"></div>
-        <div class="react-dot" onclick="toggleReact(this)"></div>
         <div class="react-dot" onclick="toggleReact(this)"></div>
         <button class="btn" onclick="resetReactions()">Nova Rodada</button>
       </div>
-      <div style="margin-top:8px;font-size:0.82rem;color:var(--text-muted);font-style:italic;line-height:1.35">Se perder reações, perde apenas <em style="color:var(--gold);font-style:normal">1</em> em vez de todas.</div>
+      <div style="margin-top:8px;font-size:0.85rem;color:var(--text-muted);font-style:italic;line-height:1.35">Opções: <em style="color:var(--gold);font-style:normal">Pulseira de Encantos</em> ou <em style="color:var(--gold);font-style:normal">Esquiva Sobrenatural</em>.</div>
     </div>
 
     <div class="panel">
@@ -229,159 +217,100 @@
         <button class="btn gold" onclick="adjustRound(1)">Próxima ▸</button>
         <button class="btn" onclick="resetRound()">⟲ Zerar</button>
       </div>
-      <div style="margin-top:8px;font-size:0.82rem;color:var(--text-muted);font-style:italic;line-height:1.35">Avançar a rodada <strong style="color:var(--gold);font-weight:600">recupera as reações</strong>.</div>
+      <div style="margin-top:8px;font-size:0.82rem;color:var(--text-muted);font-style:italic;line-height:1.35">Avançar a rodada <strong style="color:var(--gold);font-weight:600">recupera a reação</strong>.</div>
     </div>
   </div>
 
   <div class="condition-row">
     <span class="cond-label">Condições:</span>
-    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">☠ Envenenado (ND 5)</div>
-    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">🔥 Em Chamas (alvo)</div>
-    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">◈ Atordoado (alvo)</div>
-    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">👁 Cego (alvo)</div>
-    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">↓ Caído (alvo)</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">🎯 Vantagem (Luta Perspicaz)</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">🎭 Disfarçado (Rictavio)</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">🐺 Sneak Attack Disponível</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">👁 Ajudando um Aliado</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">↓ Caído</div>
   </div>
 
-  <div class="phase-tabs">
-    <div class="phase-tab active" data-phase="1" onclick="switchPhase(1)">
-      <iconify-icon class="phase-icon" icon="game-icons:war-axe"></iconify-icon>
-      <div class="phase-num">~ Primeira Forma ~</div>
-      <div class="phase-name">O Capitão</div>
-      <div class="phase-tagline">Machado prateado · ND 6</div>
-    </div>
-    <div class="phase-tab" data-phase="2" onclick="switchPhase(2)">
-      <iconify-icon class="phase-icon" icon="game-icons:fire-punch"></iconify-icon>
-      <div class="phase-num">~ Segunda Forma ~</div>
-      <div class="phase-name">O Braço Ardente</div>
-      <div class="phase-tagline">Fúria flamejante · ND 6</div>
-    </div>
+  <!-- STATS -->
+  <div class="stats-bar">
+    <div class="stat"><div class="stat-label">FOR</div><div class="stat-value">9</div><div class="stat-mod">−1</div></div>
+    <div class="stat"><div class="stat-label">DES</div><div class="stat-value">14</div><div class="stat-mod">+2</div></div>
+    <div class="stat"><div class="stat-label">CON</div><div class="stat-value">13</div><div class="stat-mod">+1</div></div>
+    <div class="stat"><div class="stat-label">INT</div><div class="stat-value">19</div><div class="stat-mod">+4</div></div>
+    <div class="stat"><div class="stat-label">SAB</div><div class="stat-value">18</div><div class="stat-mod">+4</div></div>
+    <div class="stat"><div class="stat-label">CAR</div><div class="stat-value">16</div><div class="stat-mod">+3</div></div>
+  </div>
+  <div class="info-grid">
+    <div class="info-card"><div class="label">Classe Armadura</div><div class="value"><input type="number" class="editable ca-input" value="13"> <span style="font-size:0.72rem;color:var(--text-muted)">(couro)</span></div></div>
+    <div class="info-card"><div class="label">Deslocamento</div><div class="value">9 m</div></div>
+    <div class="info-card"><div class="label">Bônus Prof.</div><div class="value">+3</div></div>
+    <div class="info-card"><div class="label">Perc. Passiva</div><div class="value">17</div></div>
+    <div class="info-card"><div class="label">CD Charme</div><div class="value">15</div></div>
+    <div class="info-card"><div class="label">Nível de Desafio</div><div class="value" style="color:var(--accent-bright)">5 (1.800 XP)</div></div>
+  </div>
+  <div class="meta-row">
+    <div class="meta-box"><div class="meta-title">Testes de Resistência & Perícias</div><div class="meta-content"><strong>Resistência:</strong> Con +4 · Sab +7<br><strong>Perícias:</strong> Arcanismo +10 · Intuição +7 · Medicina +10 · Percepção +7 · Religião +7 · Prestidigitação +5</div></div>
+    <div class="meta-box"><div class="meta-title">Sentidos & Idiomas</div><div class="meta-content"><strong>Sentidos:</strong> PP 17 · <strong>Idiomas:</strong> Abissal, Comum, Élfico, Infernal</div></div>
   </div>
 
-  <div class="legend">
-    <div class="legend-item"><span class="legend-swatch" style="background:var(--blood)"></span>Ação</div>
-    <div class="legend-item"><span class="legend-swatch" style="background:#c08a3e"></span>Bônus</div>
-    <div class="legend-item"><span class="legend-swatch" style="background:#5f8bb8"></span>Reação</div>
-  </div>
-
-  <!-- FORMA 1 -->
-  <div class="phase-content active" id="phase-1">
-    <div class="stats-bar">
-      <div class="stat"><div class="stat-label">FOR</div><div class="stat-value">20</div><div class="stat-mod">+5</div></div>
-      <div class="stat"><div class="stat-label">DES</div><div class="stat-value">15</div><div class="stat-mod">+2</div></div>
-      <div class="stat"><div class="stat-label">CON</div><div class="stat-value">18</div><div class="stat-mod">+4</div></div>
-      <div class="stat"><div class="stat-label">INT</div><div class="stat-value">10</div><div class="stat-mod">+0</div></div>
-      <div class="stat"><div class="stat-label">SAB</div><div class="stat-value">9</div><div class="stat-mod">−1</div></div>
-      <div class="stat"><div class="stat-label">CAR</div><div class="stat-value">15</div><div class="stat-mod">+2</div></div>
-    </div>
-    <div class="info-grid">
-      <div class="info-card"><div class="label">Classe Armadura</div><div class="value"><input type="number" class="editable ca-input" data-phase="1" value="14"> <span style="font-size:0.72rem;color:var(--text-muted)">(couro batido)</span></div></div>
-      <div class="info-card"><div class="label">Deslocamento</div><div class="value">9 m</div></div>
-      <div class="info-card"><div class="label">Bônus Prof.</div><div class="value">+3</div></div>
-      <div class="info-card"><div class="label">Perc. Passiva</div><div class="value">12</div></div>
-      <div class="info-card"><div class="label">Nível de Desafio</div><div class="value" style="color:var(--accent-bright)">6 (2.300 XP)</div></div>
-    </div>
-    <div class="meta-row">
-      <div class="meta-box"><div class="meta-title">Testes de Resistência & Perícias</div><div class="meta-content"><strong>Resistência:</strong> For +8 · Con +7<br><strong>Perícias:</strong> Atletismo +8 · Intimidação +5 · Percepção +2</div></div>
-      <div class="meta-box"><div class="meta-title">Resistências & Idiomas</div><div class="meta-content"><strong>Resist. a Dano:</strong> fogo<br><strong>Idiomas:</strong> Comum</div></div>
-    </div>
-
-    <div class="section">
-      <h2 class="section-title">Características</h2>
-      <div class="ability-grid">
-        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Lutador de Curta Distância</div><span class="toggle-icon">▼</span></div><div class="ability-body">Não sofre <em>desvantagem</em> em ataques à distância por estar a até 1,5 m de uma criatura hostil.</div></div>
-        <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Segunda Fase</div><span class="ability-tag">Gatilho de 2ª forma</span><span class="toggle-icon">▼</span></div><div class="ability-body">A <strong>0 PV</strong>, suas estatísticas viram as da <strong>2ª forma</strong>. A iniciativa não muda. O dano excedente não transfere, mas <em>mantém as condições</em>.</div></div>
-      </div>
-    </div>
-
-    <div class="section">
-      <h2 class="section-title">Ações</h2>
-      <div class="ability-grid">
-        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Ataque Múltiplo</div><span class="toggle-icon">▼</span></div><div class="ability-body">Dois ataques.</div></div>
-        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Machado Prateado</div><span class="ability-tag">+8 · 1,5 m</span><span class="toggle-icon">▼</span></div><div class="ability-body">Acerto: <span class="dmg">10 (1d10+5) cortante</span>; empurra o alvo até 1,5 m.</div></div>
-        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Arremesso de Chama</div><span class="ability-tag">Distância · +5 · 18 m</span><span class="toggle-icon">▼</span></div><div class="ability-body">Acerto: <span class="dmg">7 (2d6) fogo</span>.</div></div>
-      </div>
-    </div>
-
-    <div class="section">
-      <h2 class="section-title">Ações Bônus</h2>
-      <div class="ability-grid">
-        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Rodopio Cortante</div><span class="ability-tag">DES CD 16</span><span class="toggle-icon">▼</span></div><div class="ability-body"><em>Destreza</em> <span class="cd">CD 16</span> ou <span class="dmg">5 (2d4) cortante</span> e <strong>caído</strong>; sucesso = metade e sem cair.</div></div>
-        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Saraivada de Chamas</div><span class="ability-tag">18 m · DES CD 13 · raio 3 m</span><span class="toggle-icon">▼</span></div><div class="ability-body">Ponto a até 18 m; cada criatura a até 3 m faz <em>Destreza</em> <span class="cd">CD 13</span> ou <span class="dmg">7 (2d6) fogo</span>.</div></div>
-      </div>
-    </div>
-
-    <div class="section">
-      <h2 class="section-title">Reações <span style="font-size:0.7em;color:var(--text-muted);text-transform:none;font-style:italic;margin-left:8px">até 3/rodada · 1/turno</span></h2>
-      <div class="ability-grid">
-        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Indomável</div><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> —.<br><strong>Efeito:</strong> repete um TR contra uma condição/efeito ativo.</div></div>
-        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Recuo Forçado</div><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> sofre dano corpo a corpo.<br><strong>Efeito:</strong> empurra o atacante e move-se 4,5 m sem provocar ataques de oportunidade.</div></div>
-        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Golpe Vingativo</div><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> sofre dano.<br><strong>Efeito:</strong> move-se 4,5 m em direção ao atacante e faz um ataque de <em>machado</em>.</div></div>
-      </div>
+  <!-- DOSSIÊ -->
+  <div class="section">
+    <h2 class="section-title lore"><iconify-icon icon="game-icons:drama-masks" style="color:var(--accent-bright)"></iconify-icon> Dossiê de Interpretação</h2>
+    <div class="ability-grid">
+      <div class="ability lore"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Ressonância</div><span class="toggle-icon">▼</span></div><div class="ability-body">Deve inspirar <em>gratidão</em> por seu conhecimento (compartilhado de bom grado), <em>conforto</em> com sua confiança e experiência, e <em>leve irritação</em> com sua paranoia e franqueza.</div></div>
+      <div class="ability lore"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Emoções</div><span class="toggle-icon">▼</span></div><div class="ability-body">Geralmente se sente <strong>desconfiado, precavido, pensativo, preocupado, nostálgico, satisfeito, curioso, culpado e envergonhado</strong>.</div></div>
+      <div class="ability lore"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Motivações</div><span class="toggle-icon">▼</span></div><div class="ability-body">Quer <em>manter Arabelle a salvo</em>, evitar ser detectado por Strahd, ajudar os inimigos de Strahd, e redimir-se pela morte de Erasmus e pelo massacre dos Radanavich.</div></div>
+      <div class="ability lore"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Persona</div><span class="toggle-icon">▼</span></div><div class="ability-body">Para o mundo, um caçador de monstros <strong>implacável e endurecido pela batalha</strong>. Para quem confia, é um <em>mentor compassivo</em> com padrões extremamente altos, uma forte veia paranoica e temperamento ocasional. Só ele sabe a profundidade da culpa, vergonha e autodesprezo que sente pelas mortes do filho e da esposa, e pelo massacre da caravana vistani dos Radanavich.</div></div>
+      <div class="ability lore"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Moral</div><span class="toggle-icon">▼</span></div><div class="ability-body">Numa luta, tenta <em>enganar ou manobrar</em> o inimigo, recuando quando necessário para garantir o terreno mais vantajoso.</div></div>
+      <div class="ability lore"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Relacionamentos</div><span class="toggle-icon">▼</span></div><div class="ability-body">Mentor da caçadora vistani <strong>Ezmerelda d'Avenir</strong>, pai do falecido Erasmus (preso no Plano Etéreo, com quem não pode se comunicar), antigo dono do macaco Piccolo (agora com Gadof Blinsky), assassino da família de Arturi Radanavich, e antigo aliado da rebelião de Doru contra o Castelo Ravenloft.</div></div>
+      <div class="ability lore"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Inspirações</div><span class="toggle-icon">▼</span></div><div class="ability-body">Referências para interpretar Van Richten:
+        <div class="insp-row"><span class="insp-tag">Olho-Tonto Moody · Harry Potter</span><span class="insp-tag">Geralt de Rívia · The Witcher</span><span class="insp-tag">Mike Ehrmantraut · Breaking Bad</span></div>
+      </div></div>
     </div>
   </div>
 
-  <!-- FORMA 2 -->
-  <div class="phase-content" id="phase-2">
-    <div class="special-callout">
-      <div class="sc-title"><iconify-icon icon="game-icons:fire-punch" style="color:var(--accent-bright)"></iconify-icon> O Braço Ardente — segunda forma</div>
-      <div class="sc-body">Alcançada a 0 PV. Izek agora é <strong>imune a fogo</strong> e ataca com socos flamejantes e ondas de fogo. <em>Mantém os PV atuais</em> (o dano excedente não transferiu) e as condições anteriores.</div>
+  <div class="section">
+    <h2 class="section-title">Características</h2>
+    <div class="ability-grid">
+      <div class="ability"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Ataque Furtivo</div><span class="ability-tag">1/turno</span><span class="toggle-icon">▼</span></div><div class="ability-body">Uma vez por turno, causa <span class="dmg">17 (5d6) de dano</span> extra a uma criatura atingida se tiver <em>vantagem</em> no ataque. Não precisa de vantagem se o alvo for morto-vivo, ou se um aliado estiver a até 1,5 m do alvo (sem incapacitado) e ele não tiver desvantagem.</div></div>
     </div>
-    <div class="stats-bar">
-      <div class="stat"><div class="stat-label">FOR</div><div class="stat-value">20</div><div class="stat-mod">+5</div></div>
-      <div class="stat"><div class="stat-label">DES</div><div class="stat-value">15</div><div class="stat-mod">+2</div></div>
-      <div class="stat"><div class="stat-label">CON</div><div class="stat-value">18</div><div class="stat-mod">+4</div></div>
-      <div class="stat"><div class="stat-label">INT</div><div class="stat-value">10</div><div class="stat-mod">+0</div></div>
-      <div class="stat"><div class="stat-label">SAB</div><div class="stat-value">9</div><div class="stat-mod">−1</div></div>
-      <div class="stat"><div class="stat-label">CAR</div><div class="stat-value">15</div><div class="stat-mod">+2</div></div>
-    </div>
-    <div class="info-grid">
-      <div class="info-card"><div class="label">Classe Armadura</div><div class="value"><input type="number" class="editable ca-input" data-phase="2" value="14"> <span style="font-size:0.72rem;color:var(--text-muted)">(couro batido)</span></div></div>
-      <div class="info-card"><div class="label">Deslocamento</div><div class="value">9 m</div></div>
-      <div class="info-card"><div class="label">Bônus Prof.</div><div class="value">+3</div></div>
-      <div class="info-card"><div class="label">Perc. Passiva</div><div class="value">12</div></div>
-      <div class="info-card"><div class="label">Nível de Desafio</div><div class="value" style="color:var(--accent-bright)">6 (2.300 XP)</div></div>
-    </div>
-    <div class="meta-row">
-      <div class="meta-box"><div class="meta-title">Testes de Resistência & Perícias</div><div class="meta-content"><strong>Resistência:</strong> For +8 · Con +7<br><strong>Perícias:</strong> Atletismo +8 · Intimidação +5 · Percepção +2</div></div>
-      <div class="meta-box"><div class="meta-title">Imunidades & Idiomas</div><div class="meta-content"><strong>Imune a Dano:</strong> fogo<br><strong>Idiomas:</strong> Comum</div></div>
-    </div>
+  </div>
 
-    <div class="section">
-      <h2 class="section-title">Ações</h2>
-      <div class="ability-grid">
-        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Ataque Múltiplo</div><span class="toggle-icon">▼</span></div><div class="ability-body">Dois ataques corpo a corpo.</div></div>
-        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Machado Prateado</div><span class="ability-tag">+8 · 1,5 m</span><span class="toggle-icon">▼</span></div><div class="ability-body">Acerto: <span class="dmg">9 (1d8+5) cortante</span> + <span class="dmg">2 (1d4) fogo</span>.</div></div>
-        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Soco Ardente</div><span class="ability-tag">+8 · 1,5 m</span><span class="toggle-icon">▼</span></div><div class="ability-body">Acerto: <span class="dmg">7 (1d4+5) contundente</span> + <span class="dmg">2 (1d4) fogo</span>; empurra até 1,5 m. <strong>Crítico:</strong> <em>Constituição</em> <span class="cd">CD 16</span> ou atordoado leve até o início do próximo turno de Izek.</div></div>
-        <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Onda Flamejante</div><span class="ability-tag">Linha 18 m × 1,5 m · DES CD 13</span><span class="toggle-icon">▼</span></div><div class="ability-body"><em>Destreza</em> <span class="cd">CD 13</span> ou <span class="dmg">11 (2d10) fogo</span>. Inflama objetos inflamáveis não segurados.</div></div>
-      </div>
+  <div class="section">
+    <h2 class="section-title">Ações</h2>
+    <div class="ability-grid">
+      <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Ataque Múltiplo</div><span class="toggle-icon">▼</span></div><div class="ability-body">Faz <strong>dois</strong> ataques com sua bengala-espada prateada ou besta prateada.</div></div>
+      <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Bengala-Espada Prateada</div><span class="ability-tag">+5 · 1,5 m</span><span class="toggle-icon">▼</span></div><div class="ability-body">Acerto: <span class="dmg">5 (1d6+2) perfurante</span>.</div></div>
+      <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Besta Prateada</div><span class="ability-tag">Distância · +5 · 24/96 m</span><span class="toggle-icon">▼</span></div><div class="ability-body">Acerto: <span class="dmg">6 (1d8+2) perfurante</span>.</div></div>
+      <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Pulseira de Encantos</div><span class="ability-tag">SAB · CD 15</span><span class="toggle-icon">▼</span></div><div class="ability-body">Usa a pulseira para conjurar uma das magias abaixo (Sabedoria, CD 15):<br><strong>1/dia cada:</strong> cegueira/surdez, guarda contra a morte, liberdade de movimento</div></div>
+      <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Chapéu de Disfarce</div><span class="toggle-icon">▼</span></div><div class="ability-body">Conjura <em>disfarce próprio</em>.</div></div>
+      <div class="ability attack"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Lente Lúcida</div><span class="ability-tag">1/dia cada</span><span class="toggle-icon">▼</span></div><div class="ability-body">Conjura <em>detectar magia</em> ou <em>detectar bem e mal</em> (1/dia cada).</div></div>
     </div>
+  </div>
 
-    <div class="section">
-      <h2 class="section-title">Ações Bônus</h2>
-      <div class="ability-grid">
-        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Explosão de Chamas</div><span class="ability-tag">1,5 m · DES CD 13</span><span class="toggle-icon">▼</span></div><div class="ability-body">Criaturas a até 1,5 m fazem <em>Destreza</em> <span class="cd">CD 13</span> ou <span class="dmg">7 (2d6) fogo</span>.</div></div>
-        <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Estouro Explosivo</div><span class="ability-tag">27 m · DES CD 13 · raio 1,5 m</span><span class="toggle-icon">▼</span></div><div class="ability-body">Ponto a até 27 m, esfera de 1,5 m. <em>Destreza</em> <span class="cd">CD 13</span> ou <span class="dmg">7 (2d6) fogo</span> e <strong>caído</strong>; sucesso = metade. O fogo contorna cantos e inflama objetos não segurados.</div></div>
-      </div>
+  <div class="section">
+    <h2 class="section-title">Ações Bônus</h2>
+    <div class="ability-grid">
+      <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Ação Ardilosa</div><span class="toggle-icon">▼</span></div><div class="ability-body">Realiza a ação <strong>Disparada</strong>, <strong>Desengajar</strong> ou <strong>Esconder-se</strong>.</div></div>
+      <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Mestre das Táticas (Ajudar)</div><span class="toggle-icon">▼</span></div><div class="ability-body">Usa a ação <strong>Ajudar</strong> para auxiliar o ataque de um aliado contra uma criatura a até 9 m que possa ver ou ouvir.</div></div>
+      <div class="ability bonus"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Luta Perspicaz</div><span class="ability-tag">Intuição vs. Enganação</span><span class="toggle-icon">▼</span></div><div class="ability-body">Faz um teste de <em>Sabedoria (Intuição)</em> contra a <em>Carisma (Enganação)</em> de uma criatura visível não incapacitada. Em sucesso, tem <strong>vantagem</strong> para atacá-la e ela tem <strong>desvantagem</strong> para atacá-lo, por 1 minuto (ou até usar de novo contra outro alvo).</div></div>
     </div>
+  </div>
 
-    <div class="section">
-      <h2 class="section-title">Reações <span style="font-size:0.7em;color:var(--text-muted);text-transform:none;font-style:italic;margin-left:8px">até 3/rodada · 1/turno</span></h2>
-      <div class="ability-grid">
-        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Indomável</div><span class="toggle-icon">▼</span></div><div class="ability-body">Repete um TR contra uma condição/efeito ativo.</div></div>
-        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Perseguição Ardente</div><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> sofre dano.<br><strong>Efeito:</strong> move-se 9 m sem provocar AoO e faz um ataque de <em>soco ardente</em>.</div></div>
-        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Faíscas de Cinza</div><span class="ability-tag">CON CD 13</span><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> sofre dano corpo a corpo.<br><strong>Efeito:</strong> o atacante faz <em>Constituição</em> <span class="cd">CD 13</span> ou <span class="dmg">2 (1d4) fogo</span> e fica <strong>cego</strong> até o fim de seu próximo turno.</div></div>
-        <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Queimadura Retaliatória (1/rodada)</div><span class="ability-tag">CON CD 13</span><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> sofre dano de arma <em>metálica</em> corpo a corpo.<br><strong>Efeito:</strong> a arma fica em brasa: quem a segura sofre <span class="dmg">4 (1d8) fogo</span> imediatamente e faz <em>Constituição</em> <span class="cd">CD 13</span> ou <strong>solta a arma</strong>. Se não puder soltar, tem desvantagem em ataques e testes até o início do próximo turno de Izek.</div></div>
-      </div>
+  <div class="section">
+    <h2 class="section-title">Reações</h2>
+    <div class="ability-grid">
+      <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Pulseira de Encantos</div><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> uma criatura hostil o ataca ou termina o turno.<br><strong>Efeito:</strong> conjura uma magia usando a pulseira.</div></div>
+      <div class="ability reaction"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Esquiva Sobrenatural</div><span class="toggle-icon">▼</span></div><div class="ability-body"><strong>Gatilho:</strong> um atacante o acerta com um ataque.<br><strong>Efeito:</strong> reduz o dano à metade (arredondado para baixo).</div></div>
     </div>
   </div>
 
   <div class="notes-section">
     <h3>◆ Notas do Mestre</h3>
-    <textarea class="notes-area" id="notesArea" placeholder="Anote aqui: se Izek está envenenado (ND 5), alvos em chamas, momento da mudança de forma, presença de Ireena (obsessão dele)..."></textarea>
+    <textarea class="notes-area" id="notesArea" placeholder="Anote aqui: se está disfarçado como Rictavio, itens mágicos usados hoje, alvo da Luta Perspicaz, laço com Arabelle, relação com o grupo..."></textarea>
   </div>
 
   <footer>
-    Izek Strazni — sincronizado em tempo real entre os dispositivos do Mestre.
+    Dr. Rudolph van Richten — sincronizado em tempo real entre os dispositivos do Mestre.
     <span class="footer-credit">Statblock adaptado de <a href="https://www.strahdreloaded.com/" target="_blank" rel="noopener">Curse of Strahd: Reloaded</a>, de DragnaCarta (conteúdo de fã da WotC).</span>
   </footer>
 
@@ -393,17 +322,10 @@
 <script src="../../assets/js/efeitos.js"></script>
 <script src="../../assets/js/master_state.js"></script>
 <script>
-const FORMAS = { 1: { nd: '6' }, 2: { nd: '6' } };
-function switchPhase(num) { switchPhaseSilent(num); saveState(true); }
-function switchPhaseSilent(num) {
-  const f = FORMAS[num] || FORMAS[1];
-  document.querySelectorAll('.phase-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.phase-content').forEach(c => c.classList.remove('active'));
-  document.querySelector(`.phase-tab[data-phase="${num}"]`).classList.add('active');
-  document.getElementById(`phase-${num}`).classList.add('active');
-  document.body.dataset.fase = num;
-  document.getElementById('ndHeader').textContent = f.nd;
-}
+const STORAGE_KEY = 'vanrichten_ficha_v1';
+const MS_CHAVE = 'vilao:vanrichten';
+const HP_MAX = 126, HP_MEDIA = 77, CA_PADRAO = 13;
+let _msAplicando = false;
 
 const hpCurrent = document.getElementById('hpCurrent');
 const hpMax = document.getElementById('hpMax');
@@ -425,7 +347,7 @@ function adjustHP(delta) {
   saveState(true);
 }
 function resetHP() { hpCurrent.value = hpMax.value; updateHPBar(); saveState(true); }
-function setMedia() { hpMax.value = 100; hpCurrent.value = 100; updateHPBar(); saveState(true); showToast('✓ PV na média (100)'); }
+function setMedia() { hpMax.value = HP_MEDIA; hpCurrent.value = HP_MEDIA; updateHPBar(); saveState(true); showToast('✓ PV na média (77)'); }
 hpCurrent.addEventListener('input', () => { updateHPBar(); saveState(true); });
 hpMax.addEventListener('input', () => { updateHPBar(); saveState(true); });
 function toggleReact(el) { el.classList.toggle('used'); saveState(true); }
@@ -439,37 +361,27 @@ function adjustRound(delta) {
 function resetRound() { const el = document.getElementById('roundCounter'); if (el) el.textContent = 1; saveState(true); }
 function toggleAbility(header) { header.parentElement.classList.toggle('open'); }
 
-const STORAGE_KEY = 'izek_ficha_v1';
-const MS_CHAVE = 'vilao:izek';
-let _msAplicando = false;
 function _setSyncStatus(txt, cor) { const el = document.getElementById('syncStatus'); if (el) { el.textContent = txt; el.style.color = cor || 'var(--gold-dim)'; } }
 function getState() {
   return {
     hpCurrent: hpCurrent.value, hpMax: hpMax.value,
-    ca: Array.from(document.querySelectorAll('.ca-input')).map(i => ({ phase: i.dataset.phase, val: i.value })),
-    activePhase: document.querySelector('.phase-tab.active').dataset.phase,
+    ca: document.querySelector('.ca-input')?.value,
     reactions: Array.from(document.querySelectorAll('.react-dot')).map(d => d.classList.contains('used')),
     conditions: Array.from(document.querySelectorAll('.condition-row .chip')).map(c => c.classList.contains('active')),
     notes: document.getElementById('notesArea').value,
     round: (document.getElementById('roundCounter')?.textContent) || '1',
-    openAbilities: Array.from(document.querySelectorAll('.ability.open')).map(a => { const p = a.closest('.phase-content'); return `${p ? p.id : 'global'}::${a.querySelector('.ability-name').textContent}`; })
+    openAbilities: Array.from(document.querySelectorAll('.ability.open')).map(a => a.querySelector('.ability-name').textContent)
   };
 }
 function applyState(s) {
   if (!s) return;
-  hpCurrent.value = s.hpCurrent ?? 146; hpMax.value = s.hpMax ?? 146; updateHPBar();
-  if (s.ca) s.ca.forEach(c => { const inp = document.querySelector(`.ca-input[data-phase="${c.phase}"]`); if (inp) inp.value = c.val; });
-  switchPhaseSilent(parseInt(s.activePhase) || 1);
+  hpCurrent.value = s.hpCurrent ?? HP_MAX; hpMax.value = s.hpMax ?? HP_MAX; updateHPBar();
+  const caInp = document.querySelector('.ca-input'); if (caInp && s.ca != null) caInp.value = s.ca;
   (s.reactions || []).forEach((u, i) => { const d = document.querySelectorAll('.react-dot')[i]; if (d) d.classList.toggle('used', u); });
   (s.conditions || []).forEach((u, i) => { const c = document.querySelectorAll('.condition-row .chip')[i]; if (c) c.classList.toggle('active', u); });
   document.getElementById('notesArea').value = s.notes || '';
   const roundEl = document.getElementById('roundCounter'); if (roundEl) roundEl.textContent = s.round || '1';
-  if (s.openAbilities) s.openAbilities.forEach(key => {
-    const [phase, name] = key.split('::');
-    const container = phase === 'global' ? document : document.getElementById(phase);
-    if (!container) return;
-    container.querySelectorAll('.ability').forEach(a => { if (a.querySelector('.ability-name').textContent === name) a.classList.add('open'); });
-  });
+  if (s.openAbilities) s.openAbilities.forEach(name => document.querySelectorAll('.ability').forEach(a => { if (a.querySelector('.ability-name').textContent === name) a.classList.add('open'); }));
 }
 function saveState(silent = false) {
   if (_msAplicando) return;
@@ -492,22 +404,22 @@ async function loadState() {
   } catch(e) { _msAplicando = false; showToast('Erro ao carregar'); }
 }
 function resetAll() {
-  if (!confirm('Resetar tudo? (HP, forma, reações, condições, notas)')) return;
+  if (!confirm('Resetar tudo? (HP, reações, condições, notas)')) return;
   localStorage.removeItem(STORAGE_KEY);
-  hpCurrent.value = 146; hpMax.value = 146;
-  document.querySelectorAll('.ca-input').forEach(i => i.value = 14);
+  hpCurrent.value = HP_MAX; hpMax.value = HP_MAX;
+  const caInp = document.querySelector('.ca-input'); if (caInp) caInp.value = CA_PADRAO;
   updateHPBar();
   document.querySelectorAll('.react-dot').forEach(d => d.classList.remove('used'));
   document.querySelectorAll('.condition-row .chip').forEach(c => c.classList.remove('active'));
   document.querySelectorAll('.ability.open').forEach(a => a.classList.remove('open'));
   document.getElementById('notesArea').value = '';
   const roundEl = document.getElementById('roundCounter'); if (roundEl) roundEl.textContent = 1;
-  switchPhase(1); showToast('✓ Resetado');
+  showToast('✓ Resetado');
 }
 function exportJSON() {
   const blob = new Blob([JSON.stringify(getState(), null, 2)], { type: 'application/json' });
   const url = URL.createObjectURL(blob); const a = document.createElement('a');
-  a.href = url; a.download = `izek_combate_${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(url);
+  a.href = url; a.download = `vanrichten_combate_${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(url);
   showToast('✓ Exportado');
 }
 function importJSON(evt) {
@@ -518,16 +430,10 @@ function importJSON(evt) {
 }
 let toastTimer;
 function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 1800); }
-document.querySelectorAll('.ca-input').forEach(inp => inp.addEventListener('input', () => saveState(true)));
+document.querySelector('.ca-input')?.addEventListener('input', () => saveState(true));
 document.getElementById('notesArea').addEventListener('input', () => { clearTimeout(window._notesTimer); window._notesTimer = setTimeout(() => saveState(true), 600); });
-document.addEventListener('keydown', (e) => {
-  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') { if (e.ctrlKey && e.key === 's') { e.preventDefault(); saveState(); } return; }
-  if (e.ctrlKey && e.key === 's') { e.preventDefault(); saveState(); return; }
-  if (e.key === '1') switchPhase(1);
-  if (e.key === '2') switchPhase(2);
-});
+document.addEventListener('keydown', (e) => { if (e.ctrlKey && e.key === 's') { e.preventDefault(); saveState(); } });
 
-switchPhaseSilent(1);
 updateHPBar();
 (async function bootstrap() {
   if (window.Auth) {

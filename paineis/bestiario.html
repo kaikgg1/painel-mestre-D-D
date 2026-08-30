@@ -3,42 +3,652 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Bestiário completo de D&D 5e em PT-BR — 358 criaturas do Manual dos Monstros com fichas e imagens.">
+<meta name="description" content="Bestiário completo de D&D 5e em PT-BR — 358 criaturas do Manual dos Monstros com fichas, filtros e imagens.">
 <meta name="theme-color" content="#0a0608">
 <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
-<link rel="stylesheet" href="../assets/css/ui.css">
 <title>Bestiário — D&D 5e</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,700;1,400&display=swap');
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { min-height: 100vh; min-height: 100dvh; background: #0a0608;
-    background-image: radial-gradient(ellipse at top, #2a1518 0%, #150a0c 40%, #050304 100%);
-    font-family: 'EB Garamond', Georgia, serif; color: #d4c5a0; }
-  .site-header { position: sticky; top: 0; z-index: 30;
-    background: linear-gradient(180deg, rgba(15,8,10,0.96), rgba(10,6,8,0.92)); backdrop-filter: blur(10px);
-    border-bottom: 1px solid #8B6914; padding: 12px 20px; display: flex; align-items: center; gap: 14px; }
-  .back-btn { text-decoration: none; color: #a89878; font-family: 'Cinzel', serif; font-size: 11px; font-weight: 600;
-    letter-spacing: 1.5px; text-transform: uppercase; padding: 8px 14px; border: 1px solid #8B6914; border-radius: 3px; transition: .2s; white-space: nowrap; }
-  .back-btn:hover { background: #8B6914; color: #050304; }
-  .header-title { font-family: 'Cinzel Decorative', serif; font-size: clamp(18px, 3vw, 26px); font-weight: 700;
-    color: #b88a2c; letter-spacing: 2px; text-shadow: 0 0 24px rgba(184,138,44,0.35); flex: 1; text-align: center; }
-  main { position: relative; z-index: 1; max-width: 960px; margin: 22px auto; padding: 0 16px 40px;
-    display: flex; flex-direction: column; min-height: calc(100vh - 120px); }
-  #cp { flex: 1; display: flex; flex-direction: column; }
+  :root {
+    --bg-deep: #0a0608;
+    --bg-card: #1a1018;
+    --gold: #8B6914;
+    --gold-bright: #b88a2c;
+    --gold-light: #d4a843;
+    --blood: #6b1010;
+    --blood-bright: #8b1d1d;
+    --parchment: #d4c5a0;
+    --parchment-dim: #a89878;
+    --shadow: #050304;
+    --text-dim: #8c7d5e;
+    --borda: rgba(139,105,20,0.35);
+    --borda-forte: rgba(184,138,44,0.7);
+  }
+  html, body {
+    min-height: 100vh; min-height: 100dvh;
+    background: var(--bg-deep);
+    background-image: radial-gradient(ellipse at top, #2a1518 0%, #150a0c 42%, #050304 100%);
+    background-attachment: fixed;
+    font-family: 'EB Garamond', Georgia, serif;
+    color: var(--parchment);
+  }
+  body::before {
+    content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.5) 100%);
+  }
+
+  .site-header {
+    position: sticky; top: 0; z-index: 40;
+    background: linear-gradient(180deg, rgba(15,8,10,0.97), rgba(10,6,8,0.93));
+    backdrop-filter: blur(10px); border-bottom: 1px solid var(--gold);
+    padding: 10px 18px; display: flex; align-items: center; gap: 14px;
+  }
+  .back-btn {
+    text-decoration: none; color: var(--parchment-dim); font-family: 'Cinzel', serif;
+    font-size: 11px; font-weight: 600; letter-spacing: 1.4px; text-transform: uppercase;
+    padding: 8px 14px; border: 1px solid var(--gold); border-radius: 4px;
+    transition: .2s; white-space: nowrap;
+  }
+  .back-btn:hover { background: var(--gold); color: var(--shadow); }
+  .header-title {
+    font-family: 'Cinzel', serif; font-size: 14px; font-weight: 700;
+    color: var(--gold-bright); letter-spacing: 2px; flex: 1; text-transform: uppercase;
+  }
+
+  main { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 26px 18px 80px; }
+
+  .hero { margin-bottom: 22px; }
+  .hero h1 {
+    font-family: 'Cinzel Decorative', 'Cinzel', serif; font-weight: 900;
+    font-size: clamp(26px, 5vw, 44px); color: var(--gold-light);
+    letter-spacing: 1px; line-height: 1.1; margin-bottom: 10px;
+    text-shadow: 0 0 30px rgba(212,168,67,0.25);
+  }
+  .hero p { font-size: 16px; color: var(--parchment-dim); line-height: 1.55; max-width: 760px; }
+  .hero p strong { color: var(--parchment); font-weight: 600; }
+
+  /* FILTROS */
+  .filtros {
+    background: linear-gradient(180deg, rgba(26,16,24,0.85), rgba(10,6,8,0.6));
+    border: 1px solid var(--borda); border-radius: 12px;
+    padding: 16px 18px; margin-bottom: 22px;
+  }
+  .busca-wrap { position: relative; margin-bottom: 14px; }
+  .busca-wrap .lupa {
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    color: var(--text-dim); font-size: 17px; pointer-events: none;
+  }
+  #busca {
+    width: 100%; padding: 13px 14px 13px 42px; font-size: 16px;
+    border-radius: 9px; background: rgba(0,0,0,0.4);
+    border: 1px solid var(--borda); color: var(--parchment);
+    font-family: inherit; transition: .18s;
+  }
+  #busca::placeholder { color: var(--text-dim); }
+  #busca:focus { outline: none; border-color: var(--gold-bright); box-shadow: 0 0 0 3px rgba(184,138,44,0.16); }
+
+  .linha-filtro { display: flex; align-items: baseline; gap: 9px; flex-wrap: wrap; margin-bottom: 9px; }
+  .linha-label {
+    font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; letter-spacing: 1.2px;
+    color: var(--parchment-dim); text-transform: uppercase; min-width: 64px;
+  }
+  .pill {
+    font-family: 'EB Garamond', serif; font-size: 14px;
+    padding: 5px 13px; border-radius: 20px; cursor: pointer;
+    background: rgba(255,255,255,0.04); border: 1px solid var(--borda);
+    color: var(--parchment-dim); transition: .15s; user-select: none;
+  }
+  .pill:hover { border-color: var(--gold-bright); color: var(--parchment); }
+  .pill.on {
+    background: rgba(184,138,44,0.16); border-color: var(--gold-light);
+    color: var(--gold-light); font-weight: 600; box-shadow: 0 0 12px rgba(184,138,44,0.2);
+  }
+  .nd-range { display: flex; align-items: center; gap: 8px; }
+  .nd-range select {
+    background: rgba(0,0,0,0.4); border: 1px solid var(--borda); color: var(--parchment);
+    font-family: inherit; font-size: 14px; padding: 5px 10px; border-radius: 7px; cursor: pointer;
+  }
+  .nd-range select:focus { outline: none; border-color: var(--gold-bright); }
+
+  .filtros-rodape {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    margin-top: 14px; padding-top: 13px; border-top: 1px solid var(--borda);
+  }
+  .contador { font-size: 14px; color: var(--parchment-dim); }
+  .contador strong { color: var(--gold-light); font-weight: 700; }
+  .limpar {
+    margin-left: auto; background: none; border: none; cursor: pointer;
+    color: var(--gold-light); font-family: 'EB Garamond', serif; font-size: 14px;
+    text-decoration: underline; text-underline-offset: 3px; padding: 4px;
+  }
+  .limpar:hover { color: var(--parchment); }
+
+  /* ÍNDICE A-Z */
+  .indice { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 26px; }
+  .indice a {
+    font-family: 'Cinzel', serif; font-size: 13px; font-weight: 600;
+    width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;
+    border-radius: 6px; text-decoration: none; color: var(--parchment-dim);
+    border: 1px solid var(--borda); transition: .15s;
+  }
+  .indice a:hover { background: var(--gold); color: var(--shadow); border-color: var(--gold-light); }
+  .indice a.off { opacity: .28; pointer-events: none; }
+
+  /* SEÇÕES */
+  .secao { margin-bottom: 32px; scroll-margin-top: 70px; }
+  .secao-titulo {
+    font-family: 'Cinzel Decorative', 'Cinzel', serif; font-weight: 700;
+    font-size: clamp(20px, 3vw, 28px); color: var(--gold-light);
+    margin-bottom: 13px; padding-bottom: 8px; border-bottom: 1px solid var(--borda);
+  }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 10px; }
+
+  /* CARD */
+  .card {
+    display: flex; align-items: center; gap: 12px;
+    background: linear-gradient(180deg, rgba(34,21,32,0.7), rgba(16,10,14,0.7));
+    border: 1px solid var(--borda); border-radius: 9px;
+    padding: 10px 13px; cursor: pointer; transition: .16s; text-align: left;
+    font-family: inherit; width: 100%;
+  }
+  .card:hover {
+    border-color: var(--borda-forte); transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.45);
+  }
+  .card:focus-visible { outline: 2px solid var(--gold-light); outline-offset: 2px; }
+  .thumb {
+    flex-shrink: 0; width: 42px; height: 42px; border-radius: 50%;
+    overflow: hidden; background: rgba(0,0,0,0.4);
+    border: 1px solid var(--borda); display: flex; align-items: center; justify-content: center;
+    font-size: 19px; color: var(--text-dim);
+  }
+  .thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .card-info { flex: 1; min-width: 0; }
+  .card-nome {
+    font-family: 'Cinzel', serif; font-weight: 600; font-size: 15px;
+    color: var(--parchment); line-height: 1.25; margin-bottom: 2px;
+  }
+  .card-meta { font-size: 12.5px; color: var(--text-dim); font-style: italic; }
+  .card-nd {
+    font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700;
+    color: var(--gold-light); flex-shrink: 0; letter-spacing: .5px;
+  }
+
+  .vazio { text-align: center; padding: 60px 20px; color: var(--text-dim); font-style: italic; font-size: 17px; }
+
+  /* MODAL */
+  .modal-ov {
+    position: fixed; inset: 0; z-index: 200; display: none;
+    background: rgba(5,3,4,0.85); backdrop-filter: blur(5px);
+    padding: 4vh 3vw; overflow-y: auto;
+  }
+  .modal-ov.open { display: flex; }
+  .modal {
+    margin: auto; width: 100%; max-width: 720px;
+    background: linear-gradient(165deg, #1c1119, #120b10);
+    border: 1px solid var(--borda-forte); border-radius: 14px;
+    box-shadow: 0 20px 70px rgba(0,0,0,0.85);
+    padding: 26px 28px; position: relative; animation: sobe .22s ease;
+  }
+  @keyframes sobe { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  .modal-x {
+    position: absolute; top: 14px; right: 16px; background: none; border: none;
+    color: var(--parchment-dim); font-size: 27px; cursor: pointer; line-height: 1; padding: 2px 8px;
+  }
+  .modal-x:hover { color: var(--gold-light); }
+  .modal-topo { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 14px; padding-right: 34px; }
+  .modal-thumb {
+    flex-shrink: 0; width: 78px; height: 78px; border-radius: 50%;
+    overflow: hidden; border: 2px solid var(--gold); background: rgba(0,0,0,.4);
+    display: flex; align-items: center; justify-content: center; font-size: 30px;
+  }
+  .modal-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .modal-titulo-wrap { flex: 1; min-width: 0; }
+  .modal-topo h2 {
+    font-family: 'Cinzel Decorative', 'Cinzel', serif; font-weight: 700;
+    font-size: clamp(21px, 4vw, 30px); color: var(--gold-light); line-height: 1.12; margin-bottom: 4px;
+  }
+  .modal-sub { font-style: italic; font-size: 15px; color: var(--parchment-dim); }
+
+  .modal-img-grande {
+    width: 100%; border-radius: 10px; border: 1px solid var(--borda);
+    margin-bottom: 16px; display: block;
+  }
+
+  .modal-desc {
+    font-size: 15.5px; line-height: 1.62; color: var(--parchment-dim);
+    font-style: italic; margin-bottom: 16px; padding-bottom: 14px;
+    border-bottom: 1px solid var(--borda);
+  }
+
+  .stat-linha { margin-bottom: 5px; font-size: 15.5px; }
+  .stat-rot {
+    font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700;
+    letter-spacing: .7px; color: var(--blood-bright); text-transform: uppercase;
+    margin-right: 7px;
+  }
+  .bloco-stats { margin-bottom: 16px; }
+
+  .atributos {
+    display: grid; grid-template-columns: repeat(6, 1fr); gap: 7px;
+    margin: 16px 0; padding: 13px 10px;
+    background: rgba(0,0,0,0.28); border: 1px solid var(--borda); border-radius: 10px;
+  }
+  .atr { text-align: center; }
+  .atr-nome {
+    font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700;
+    letter-spacing: 1px; color: var(--gold-bright); margin-bottom: 3px;
+  }
+  .atr-val { font-size: 20px; color: var(--parchment); line-height: 1.1; }
+  .atr-mod { font-size: 13px; color: var(--text-dim); }
+
+  .secao-modal {
+    font-family: 'Cinzel', serif; font-size: 14px; font-weight: 700;
+    letter-spacing: 1.2px; color: var(--gold-light); text-transform: uppercase;
+    margin: 20px 0 10px; padding-bottom: 6px; border-bottom: 1px solid var(--blood);
+  }
+  .traco { margin-bottom: 11px; font-size: 15.5px; line-height: 1.58; }
+  .traco b { color: var(--parchment); font-style: italic; }
+
+  #ao-topo {
+    position: fixed; right: 22px; bottom: 22px; z-index: 60;
+    width: 46px; height: 46px; border-radius: 50%;
+    background: rgba(26,16,24,0.92); border: 1px solid var(--gold);
+    color: var(--gold-light); font-size: 19px; cursor: pointer;
+    display: none; align-items: center; justify-content: center; transition: .18s;
+  }
+  #ao-topo.visible { display: flex; }
+  #ao-topo:hover { background: var(--gold); color: var(--shadow); }
+
+  @media (max-width: 720px) {
+    main { padding: 18px 12px 70px; }
+    .filtros { padding: 13px 12px; }
+    .linha-label { min-width: 100%; margin-bottom: 2px; }
+    .pill { font-size: 13px; padding: 5px 11px; }
+    .grid { grid-template-columns: 1fr; }
+    .modal { padding: 22px 17px; }
+    .atributos { grid-template-columns: repeat(3, 1fr); }
+    .modal-topo { gap: 11px; }
+    .modal-thumb { width: 58px; height: 58px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+    .card:hover { transform: none; }
+  }
 </style>
+<link rel="stylesheet" href="../assets/css/ui.css">
 </head>
 <body data-ambiente="brasas">
+
 <header class="site-header">
   <a href="../index.html" class="back-btn">← Início</a>
-  <div class="header-title">🐉 Bestiário</div>
-  <span style="width:70px"></span>
+  <div class="header-title">Bestiário</div>
 </header>
-<main><div id="cp"></div></main>
 
-<script src="../assets/js/compendio.js"></script>
+<main>
+  <div class="hero">
+    <h1>Bestiário D&amp;D 5e</h1>
+    <p><strong id="total-criaturas">358</strong> criaturas do Manual dos Monstros (2014), em português, com filtros por tipo, tamanho e nível de desafio.</p>
+  </div>
+
+  <section class="filtros" aria-label="Filtros de busca">
+    <div class="busca-wrap">
+      <span class="lupa" aria-hidden="true">🔍</span>
+      <input type="search" id="busca" placeholder="Buscar criaturas pelo nome..." autocomplete="off" aria-label="Buscar criaturas pelo nome">
+    </div>
+
+    <div class="linha-filtro" id="linha-tipo">
+      <span class="linha-label">Tipo:</span>
+    </div>
+
+    <div class="linha-filtro" id="linha-tamanho">
+      <span class="linha-label">Tamanho:</span>
+    </div>
+
+    <div class="linha-filtro">
+      <span class="linha-label">Desafio:</span>
+      <div class="nd-range">
+        <select id="nd-min" aria-label="Nível de desafio mínimo"></select>
+        <span style="color:var(--text-dim)">até</span>
+        <select id="nd-max" aria-label="Nível de desafio máximo"></select>
+      </div>
+    </div>
+
+    <div class="filtros-rodape">
+      <span class="contador"><strong id="cont-visiveis">0</strong> de <span id="cont-total">0</span> criaturas</span>
+      <button class="limpar" id="btn-limpar" type="button">Limpar filtros</button>
+    </div>
+  </section>
+
+  <nav class="indice" id="indice" aria-label="Índice alfabético"></nav>
+
+  <div id="resultado"></div>
+</main>
+
+<button id="ao-topo" type="button" aria-label="Voltar ao topo">↑</button>
+
+<div class="modal-ov" id="modal-ov" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+  <div class="modal">
+    <button class="modal-x" id="modal-x" type="button" aria-label="Fechar">×</button>
+    <div id="modal-corpo"></div>
+  </div>
+</div>
+
 <script>
-  Compendio.base = '../data/';
-  Compendio.inline(document.getElementById('cp'), 'monstros');
+/* ===================== DADOS ===================== */
+let CRIATURAS = [];
+
+const ORDEM_ND = ['0','1/8','1/4','1/2','1','2','3','4','5','6','7','8','9','10','11','12',
+                  '13','14','15','16','17','18','19','20','21','22','23','24','25','26',
+                  '27','28','29','30'];
+
+const ICONE_TIPO = {
+  'Aberração': '👁', 'Besta': '🐾', 'Celestial': '✨', 'Constructo': '⚙',
+  'Corruptor': '😈', 'Dragão': '🐉', 'Elemental': '🌪', 'Enxame': '🦟',
+  'Fada': '🍄', 'Gigante': '🗿', 'Humanoide': '🧍', 'Limo': '🟢',
+  'Monstruosidade': '🦂', 'Morto-vivo': '💀', 'Planta': '🌿'
+};
+
+const filtros = { busca: '', tipo: new Set(), tamanho: new Set(), ndMin: null, ndMax: null };
+
+/* ===================== UTIL ===================== */
+const norm = s => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+const esc  = s => (s == null ? '' : String(s)).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c]));
+
+/** "GOLEM DE FERRO" -> "Golem de Ferro" */
+function tituloBonito(s) {
+  const minusc = new Set(['de','da','do','dos','das','e','a','o','com','na','no','à','ao']);
+  return (s || '').toLowerCase().split(/\s+/).map((p, i) =>
+    (i > 0 && minusc.has(p)) ? p : p.replace(/^\p{L}/u, c => c.toUpperCase())
+  ).join(' ');
+}
+
+/** Extrai {tipo, tamanho} de "Corruptor Grande (diabo), leal e mau" */
+function parseTipo(t) {
+  const m = /^\s*([\p{L}\-]+)\s+([\p{L}]+)/u.exec(t || '');
+  if (!m) return { tipo: '', tamanho: '' };
+  const tipo = m[1].replace(/^\p{L}/u, c => c.toUpperCase());
+  let tam = m[2].toLowerCase();
+  // normaliza gênero: média->médio, miúda->miúdo, pequena->pequeno
+  const mapa = { 'media':'Médio','médio':'Médio','média':'Médio',
+                 'miuda':'Miúdo','miúda':'Miúdo','miúdo':'Miúdo','miudo':'Miúdo',
+                 'pequena':'Pequeno','pequeno':'Pequeno',
+                 'grande':'Grande','enorme':'Enorme','descomunal':'Descomunal' };
+  tam = mapa[norm(tam)] || mapa[tam] || '';
+  return { tipo, tamanho: tam };
+}
+
+/** "5 (1.800 XP)" -> "5" */
+function parseND(nd) {
+  const m = /^\s*([\d/]+)/.exec(nd || '');
+  return m ? m[1] : null;
+}
+const indiceND = nd => ORDEM_ND.indexOf(nd);
+const modificador = v => { const m = Math.floor((v - 10) / 2); return m >= 0 ? `+${m}` : `${m}`; };
+
+/* ===================== FILTRAGEM ===================== */
+function passaFiltro(c) {
+  if (filtros.busca && !norm(c.nome).includes(filtros.busca)) return false;
+  if (filtros.tipo.size && !filtros.tipo.has(c._tipo)) return false;
+  if (filtros.tamanho.size && !filtros.tamanho.has(c._tamanho)) return false;
+  if (filtros.ndMin != null || filtros.ndMax != null) {
+    const i = indiceND(c._nd);
+    if (i < 0) return false;
+    if (filtros.ndMin != null && i < filtros.ndMin) return false;
+    if (filtros.ndMax != null && i > filtros.ndMax) return false;
+  }
+  return true;
+}
+
+/* ===================== RENDER ===================== */
+function render() {
+  const alvo = document.getElementById('resultado');
+  const visiveis = CRIATURAS.filter(passaFiltro);
+
+  document.getElementById('cont-visiveis').textContent = visiveis.length;
+  document.getElementById('cont-total').textContent = CRIATURAS.length;
+
+  if (!visiveis.length) {
+    alvo.innerHTML = `<div class="vazio">Nenhuma criatura encontrada com esses filtros.</div>`;
+    renderIndice(new Set());
+    return;
+  }
+
+  const porLetra = new Map();
+  for (const c of visiveis) {
+    const L = (norm(c.nome)[0] || '#').toUpperCase();
+    if (!porLetra.has(L)) porLetra.set(L, []);
+    porLetra.get(L).push(c);
+  }
+
+  const letras = [...porLetra.keys()].sort();
+  renderIndice(new Set(letras));
+
+  let html = '';
+  for (const L of letras) {
+    const lista = porLetra.get(L).sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+    html += `<section class="secao" id="letra-${L}">
+      <h2 class="secao-titulo">${L}</h2>
+      <div class="grid">${lista.map(cardHTML).join('')}</div>
+    </section>`;
+  }
+  alvo.innerHTML = html;
+}
+
+function renderIndice(ativas) {
+  const alfabeto = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  document.getElementById('indice').innerHTML = alfabeto.map(L =>
+    `<a href="#letra-${L}" class="${ativas.has(L) ? '' : 'off'}">${L}</a>`
+  ).join('');
+}
+
+function cardHTML(c) {
+  const img = c.imagem
+    ? `<img src="${esc(c.imagem)}" alt="" loading="lazy" onerror="this.parentElement.textContent='${ICONE_TIPO[c._tipo] || '🐲'}'">`
+    : (ICONE_TIPO[c._tipo] || '🐲');
+  const meta = [c._tipo, c._tamanho].filter(Boolean).join(' · ');
+  return `<button class="card" type="button" data-nome="${esc(c.nome)}">
+    <div class="thumb">${img}</div>
+    <div class="card-info">
+      <div class="card-nome">${esc(tituloBonito(c.nome))}</div>
+      <div class="card-meta">${esc(meta)}</div>
+    </div>
+    <span class="card-nd">ND ${esc(c._nd || '—')}</span>
+  </button>`;
+}
+
+/* ===================== MODAL ===================== */
+function abrirModal(nome) {
+  const c = CRIATURAS.find(x => x.nome === nome);
+  if (!c) return;
+  const a = c.atributos || {};
+
+  const linha = (rot, val) => val
+    ? `<div class="stat-linha"><span class="stat-rot">${rot}</span>${esc(val)}</div>` : '';
+
+  const imgTopo = c.imagem
+    ? `<img src="${esc(c.imagem)}" alt="" onerror="this.parentElement.textContent='${ICONE_TIPO[c._tipo] || '🐲'}'">`
+    : (ICONE_TIPO[c._tipo] || '🐲');
+
+  const caTxt = [c.ca, c.ca_extra].filter(Boolean).join(' ');
+  const pvTxt = c.pv_dados ? `${c.hp_max} (${c.pv_dados})` : String(c.hp_max ?? '');
+
+  const tracos = (c.tracos || []).filter(t => t && t.nome && t.nome !== '—')
+    .map(t => `<div class="traco"><b>${esc(t.nome)}.</b> ${esc(t.desc)}</div>`).join('');
+  const acoes = (c.acoes || [])
+    .map(t => `<div class="traco"><b>${esc(t.nome)}.</b> ${esc(t.desc)}</div>`).join('');
+
+  document.getElementById('modal-corpo').innerHTML = `
+    <div class="modal-topo">
+      <div class="modal-thumb">${imgTopo}</div>
+      <div class="modal-titulo-wrap">
+        <h2 id="modal-titulo">${esc(tituloBonito(c.nome))}</h2>
+        <div class="modal-sub">${esc(c.tipo || '')}</div>
+      </div>
+    </div>
+
+    ${c.descricao ? `<div class="modal-desc">${esc(c.descricao)}</div>` : ''}
+
+    <div class="bloco-stats">
+      ${linha('Classe de Armadura', caTxt)}
+      ${linha('Pontos de Vida', pvTxt)}
+      ${linha('Deslocamento', c.deslocamento)}
+    </div>
+
+    <div class="atributos">
+      ${['for','dex','con','int','sab','car'].map((k, i) => {
+        const rot = ['FOR','DES','CON','INT','SAB','CAR'][i];
+        const v = a[k] ?? 10;
+        return `<div class="atr">
+          <div class="atr-nome">${rot}</div>
+          <div class="atr-val">${v}</div>
+          <div class="atr-mod">(${modificador(v)})</div>
+        </div>`;
+      }).join('')}
+    </div>
+
+    <div class="bloco-stats">
+      ${linha('Salvaguardas', c.salvaguardas)}
+      ${linha('Perícias', c.pericias)}
+      ${linha('Resistências', c.resistencias)}
+      ${linha('Vulnerabilidades', c.vulnerabilidades)}
+      ${linha('Imunidades', c.imunidades)}
+      ${linha('Sentidos', c.sentidos)}
+      ${linha('Idiomas', c.idiomas)}
+      ${linha('Nível de Desafio', c.nd)}
+    </div>
+
+    ${tracos ? `<div class="secao-modal">Características</div>${tracos}` : ''}
+    ${acoes  ? `<div class="secao-modal">Ações</div>${acoes}` : ''}`;
+
+  const ov = document.getElementById('modal-ov');
+  ov.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('modal-x').focus();
+}
+
+function fecharModal() {
+  document.getElementById('modal-ov').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+/* ===================== FILTROS DINÂMICOS ===================== */
+function montarFiltros() {
+  const tipos = [...new Set(CRIATURAS.map(c => c._tipo).filter(Boolean))].sort();
+  const tams  = ['Miúdo','Pequeno','Médio','Grande','Enorme','Descomunal']
+                .filter(t => CRIATURAS.some(c => c._tamanho === t));
+
+  const linhaTipo = document.getElementById('linha-tipo');
+  tipos.forEach(t => {
+    const el = document.createElement('div');
+    el.className = 'pill'; el.dataset.filtro = 'tipo'; el.dataset.valor = t;
+    el.setAttribute('role', 'button'); el.tabIndex = 0;
+    el.textContent = `${ICONE_TIPO[t] || ''} ${t}`.trim();
+    linhaTipo.appendChild(el);
+  });
+
+  const linhaTam = document.getElementById('linha-tamanho');
+  tams.forEach(t => {
+    const el = document.createElement('div');
+    el.className = 'pill'; el.dataset.filtro = 'tamanho'; el.dataset.valor = t;
+    el.setAttribute('role', 'button'); el.tabIndex = 0;
+    el.textContent = t;
+    linhaTam.appendChild(el);
+  });
+
+  // selects de ND
+  const presentes = ORDEM_ND.filter(nd => CRIATURAS.some(c => c._nd === nd));
+  const min = document.getElementById('nd-min'), max = document.getElementById('nd-max');
+  min.innerHTML = `<option value="">Mín</option>` +
+    presentes.map(nd => `<option value="${indiceND(nd)}">${nd}</option>`).join('');
+  max.innerHTML = `<option value="">Máx</option>` +
+    presentes.map(nd => `<option value="${indiceND(nd)}">${nd}</option>`).join('');
+
+  ligarPills();
+}
+
+function ligarPills() {
+  document.querySelectorAll('.pill').forEach(pill => {
+    if (pill._ligado) return;
+    pill._ligado = true;
+    const acionar = () => {
+      const tipo = pill.dataset.filtro, valor = pill.dataset.valor;
+      const conj = filtros[tipo];
+      if (conj.has(valor)) conj.delete(valor); else conj.add(valor);
+      pill.classList.toggle('on', conj.has(valor));
+      render();
+    };
+    pill.addEventListener('click', acionar);
+    pill.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); acionar(); }
+    });
+  });
+}
+
+/* ===================== EVENTOS ===================== */
+document.getElementById('busca').addEventListener('input', e => {
+  filtros.busca = norm(e.target.value.trim());
+  render();
+});
+document.getElementById('nd-min').addEventListener('change', e => {
+  filtros.ndMin = e.target.value === '' ? null : parseInt(e.target.value, 10);
+  render();
+});
+document.getElementById('nd-max').addEventListener('change', e => {
+  filtros.ndMax = e.target.value === '' ? null : parseInt(e.target.value, 10);
+  render();
+});
+document.getElementById('btn-limpar').addEventListener('click', () => {
+  filtros.busca = ''; filtros.tipo.clear(); filtros.tamanho.clear();
+  filtros.ndMin = null; filtros.ndMax = null;
+  document.getElementById('busca').value = '';
+  document.getElementById('nd-min').value = '';
+  document.getElementById('nd-max').value = '';
+  document.querySelectorAll('.pill').forEach(p => p.classList.remove('on'));
+  render();
+});
+document.getElementById('resultado').addEventListener('click', e => {
+  const card = e.target.closest('.card');
+  if (card) abrirModal(card.dataset.nome);
+});
+document.getElementById('modal-x').addEventListener('click', fecharModal);
+document.getElementById('modal-ov').addEventListener('click', e => {
+  if (e.target.id === 'modal-ov') fecharModal();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') fecharModal();
+  if (e.key === '/' && document.activeElement.tagName !== 'INPUT') {
+    e.preventDefault(); document.getElementById('busca').focus();
+  }
+});
+
+const btnTopo = document.getElementById('ao-topo');
+window.addEventListener('scroll', () => {
+  btnTopo.classList.toggle('visible', window.scrollY > 400);
+}, { passive: true });
+btnTopo.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+/* ===================== CARGA ===================== */
+(async () => {
+  const alvo = document.getElementById('resultado');
+  alvo.innerHTML = `<div class="vazio">Carregando bestiário…</div>`;
+  try {
+    const r = await fetch('../data/monstros_data.json');
+    const dados = await r.json();
+    CRIATURAS = dados.map(c => {
+      const { tipo, tamanho } = parseTipo(c.tipo);
+      return { ...c, _tipo: tipo, _tamanho: tamanho, _nd: parseND(c.nd) };
+    });
+    document.getElementById('total-criaturas').textContent = CRIATURAS.length;
+    montarFiltros();
+    render();
+  } catch (err) {
+    alvo.innerHTML = `<div class="vazio">Não foi possível carregar o bestiário.</div>`;
+    console.error('[bestiario]', err);
+  }
+})();
 </script>
 <script src="../assets/js/ambiente.js"></script>
 <script src="../assets/js/polish.js"></script>
