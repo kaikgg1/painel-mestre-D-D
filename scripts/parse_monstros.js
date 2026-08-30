@@ -4,6 +4,24 @@
 const fs = require('fs');
 const path = require('path');
 
+
+// --- TRAVA DE SEGURANÇA ---------------------------------------------------
+// Rodar este script SOBRESCREVE data/monstros_data.json, descartando:
+//   • as descrições (campo `descricao`) extraídas do Manual dos Monstros;
+//   • o mapeamento correto de imagens (assets/img/monstros/mm_<slug>.jpg);
+//   • correções manuais de OCR (ND do Hobgoblin Capitão, sentidos do Ankheg,
+//     dano do Elemental do Fogo) e de ações/imunidades de dezenas de criaturas.
+// Se realmente quiser regenerar do zero, rode com:  FORCAR=1 node <script>
+if (!process.env.FORCAR) {
+  console.error('');
+  console.error('ABORTADO: este script sobrescreveria data/monstros_data.json,');
+  console.error('descartando descricoes, o mapeamento correto de imagens e');
+  console.error('correcoes manuais de OCR. Rode com FORCAR=1 se tiver certeza.');
+  console.error('');
+  process.exit(1);
+}
+// --------------------------------------------------------------------------
+
 const TXT = path.join(__dirname, '..', 'docs', 'ManualMonstros.txt');
 const OUT = path.join(__dirname, '..', 'data', 'monstros_data.json');
 

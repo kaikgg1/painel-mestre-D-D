@@ -1,9 +1,35 @@
 // casar_imagens_monstros.js
-// Casa as imagens da Monster Gallery (assets/img/monstros/pag_NNN.jpg) com os
-// monstros do bestiário (data/monstros_data.json) e grava o campo `imagem`.
-// Uso: node scripts/casar_imagens_monstros.js
+// ⚠️ APOSENTADO — NÃO EXECUTE. Mantido apenas como referência histórica.
+//
+// Este script casava nomes por SUBSTRING/lista de termos, o que produziu um
+// mapeamento errado: `pag_080.jpg` acabou em 22 monstros (tudo que continha
+// "GIGANTE" no nome — Sapo Gigante, Águia Gigante, Gigante da Colina...),
+// `pag_016.jpg` em Homem-Urso + todos os Ursos, etc.
+//
+// O campo `imagem` de data/monstros_data.json foi refeito recortando a
+// ILUSTRAÇÃO da página correta de docs/D&D 5E - Manual dos Monstros .pdf
+// (arquivos assets/img/monstros/mm_<slug>.jpg). Rodar este script de novo
+// SOBRESCREVE esse trabalho e traz o bug de volta.
 const fs = require('fs');
 const path = require('path');
+
+
+// --- TRAVA DE SEGURANÇA ---------------------------------------------------
+// Rodar este script SOBRESCREVE data/monstros_data.json, descartando:
+//   • as descrições (campo `descricao`) extraídas do Manual dos Monstros;
+//   • o mapeamento correto de imagens (assets/img/monstros/mm_<slug>.jpg);
+//   • correções manuais de OCR (ND do Hobgoblin Capitão, sentidos do Ankheg,
+//     dano do Elemental do Fogo) e de ações/imunidades de dezenas de criaturas.
+// Se realmente quiser regenerar do zero, rode com:  FORCAR=1 node <script>
+if (!process.env.FORCAR) {
+  console.error('');
+  console.error('ABORTADO: este script sobrescreveria data/monstros_data.json,');
+  console.error('descartando descricoes, o mapeamento correto de imagens e');
+  console.error('correcoes manuais de OCR. Rode com FORCAR=1 se tiver certeza.');
+  console.error('');
+  process.exit(1);
+}
+// --------------------------------------------------------------------------
 
 const BEST = path.join(__dirname, '..', 'data', 'monstros_data.json');
 const LIDOS = path.join(__dirname, '..', 'data', 'galeria_nomes.txt');
