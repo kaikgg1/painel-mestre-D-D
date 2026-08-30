@@ -619,6 +619,7 @@
   }
 </style>
 <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+<script src="../../assets/js/icones.js"></script>
 <link rel="stylesheet" href="../../assets/css/ui.css">
 </head>
 <body data-ambiente="brasas">
@@ -637,7 +638,7 @@
         </div>
       </div>
       <div class="save-controls">
-        <button class="btn gold" onclick="saveState()">💾 Salvar</button>
+        <button class="btn gold" onclick="saveState()"><span data-ico="salvar"></span> Salvar</button>
         <button class="btn" onclick="loadState()">↺ Carregar</button>
         <button class="btn" onclick="exportJSON()">↓ Exportar</button>
         <label class="btn" style="cursor:pointer;">
@@ -723,12 +724,12 @@
   <!-- CONDITIONS -->
   <div class="condition-row">
     <span class="cond-label">Condições:</span>
-    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">☀ Sob Luz Solar</div>
-    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">🌊 Água Corrente</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)"><span data-ico="luz_solar"></span> Sob Luz Solar</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)"><span data-ico="agua_corrente"></span> Água Corrente</div>
     <div class="chip" onclick="this.classList.toggle('active');saveState(true)">✦ Regen Bloqueada</div>
     <div class="chip" onclick="this.classList.toggle('active');saveState(true)">◉ Concentrando</div>
-    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">♥ Enfeitiçada</div>
-    <div class="chip" onclick="this.classList.toggle('active');saveState(true)">😱 Amedrontada</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)"><span data-ico="enfeiticado"></span> Enfeitiçada</div>
+    <div class="chip" onclick="this.classList.toggle('active');saveState(true)"><span data-ico="amedrontado"></span> Amedrontada</div>
     <div class="chip" onclick="this.classList.toggle('active');saveState(true)">⊘ Agarrada</div>
     <div class="chip" onclick="this.classList.toggle('active');saveState(true)">↓ Caída</div>
     <div class="chip" onclick="this.classList.toggle('active');saveState(true)">◈ Paralisada</div>
@@ -736,7 +737,7 @@
 
   <!-- DOSSIÊ / INTERPRETAÇÃO -->
   <div class="section">
-    <h2 class="section-title lore">🎭 Dossiê de Interpretação</h2>
+    <h2 class="section-title lore"><span data-ico="dossie"></span> Dossiê de Interpretação</h2>
     <div class="ability-grid">
       <div class="ability lore"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Ressonância</div><span class="toggle-icon">▼</span></div><div class="ability-body">Deve provocar <em>fascínio</em> com seus elogios e charme, <em>desconfiança</em> por suas tentativas disfarçadas de descobrir os segredos dos personagens, e <em>repulsa</em> por sua apatia diante do sofrimento do povo de Baróvia.</div></div>
       <div class="ability lore"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Emoções</div><span class="toggle-icon">▼</span></div><div class="ability-body">Geralmente se sente <strong>calma, divertida, satisfeita ou intrigada</strong>.</div></div>
@@ -862,7 +863,7 @@
   <!-- ============================= FORMA 2: A ABOMINAÇÃO ============================= -->
   <div class="phase-content" id="phase-2">
     <div class="special-callout">
-      <div class="sc-title">🦇 Abominação Vampírica — segunda forma</div>
+      <div class="sc-title"><span data-ico="morcego"></span> Abominação Vampírica — segunda forma</div>
       <div class="sc-body">Ativada pela <strong>Mudança de Pele</strong> ao chegar a 0 PV na primeira forma. Comece com <em>PV cheios (82)</em> — clique em <strong>Reset</strong> nos PV. Mantém os mesmos <strong>atributos, resistências e características básicas</strong> (Regeneração, Escalada de Aranha, Hipersensibilidade à Luz Solar, Agarradora Rápida). <em>Mantém também as condições</em> que possuía na forma anterior.</div>
     </div>
     <div class="stats-bar">

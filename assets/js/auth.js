@@ -7,7 +7,7 @@
 //   await Auth.entrarPorNome(nome)        → {ok:true, user} | {ok:false, erro}
 //   await Auth.sair()                     → void
 //   Auth.requerLogin('login.html')        → redirect se não logado
-//   Auth.renderHeader('#auth-slot')       → insere "👤 Sabrina [Sair]" ou "[Entrar]"
+//   Auth.renderHeader('#auth-slot')       → insere "[ícone] Sabrina [Sair]" ou "[Entrar]"
 
 (function () {
   const SENHA_PADRAO = 'mesa-dnd-5e';   // mesma do seed (003_seed_jogadores.sql)
@@ -74,7 +74,8 @@
 
     if (profile) {
       const mestre = await ehMestre();
-      const icon = mestre ? '👑' : '👤';
+      // Ícone vetorial (assets/js/icones.js); some se a página não carregou o módulo.
+      const icon = window.Icones ? window.Icones.html(mestre ? 'mestre' : 'jogador') : '';
       const tag  = mestre ? ' <span style="color:var(--gold-bright);font-size:9px;letter-spacing:1.5px">MESTRE</span>' : '';
       slot.innerHTML = `
         <span class="auth-nome" aria-label="Logado como ${profile.nome}">${icon} ${profile.nome}${tag}</span>

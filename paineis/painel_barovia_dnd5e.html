@@ -757,8 +757,31 @@
     input, textarea, [contenteditable] { background: transparent !important; border: none !important; color: #222 !important; }
     .spell-list { border: 1px solid #ccc !important; min-height: 40px !important; }
   }
+
+  /* ===== ÍCONES VETORIAIS (assets/js/icones.js) ===== */
+  .toolbar button, .toolbar .back-link {
+    display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  }
+  .toolbar iconify-icon { font-size: 15px; }
+  .card-actions button iconify-icon { font-size: 14px; vertical-align: -2px; margin-right: 5px; }
+  .magia-prep-vazio iconify-icon { font-size: 15px; vertical-align: -2px; color: var(--blood-bright); }
+  .grid-vazio iconify-icon { font-size: 30px; color: var(--gold-bright); display: block; margin: 0 auto 10px; }
+
+  /* Moedas: a COR é a informação, então continua um círculo CSS (não vira ícone) */
+  .moeda-box-mestre .m-ic.moeda-dot {
+    width: 15px; height: 15px; border-radius: 50%;
+    border: 1px solid rgba(0,0,0,0.45);
+    box-shadow: inset 0 1px 2px rgba(255,255,255,0.5), 0 1px 2px rgba(0,0,0,0.5);
+  }
+  .moeda-dot--pl { background: linear-gradient(160deg, #eef4ff, #8fb0cf); }
+  .moeda-dot--po { background: linear-gradient(160deg, #ffe6a0, #c9a24a); }
+  .moeda-dot--pe { background: linear-gradient(160deg, #bdf0c4, #4c9a5f); }
+  .moeda-dot--pp { background: linear-gradient(160deg, #f6f6f6, #a8adb5); }
+  .moeda-dot--pc { background: linear-gradient(160deg, #e2a97b, #8a4b22); }
 </style>
 <link rel="stylesheet" href="../assets/css/ui.css">
+<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+<script src="../assets/js/icones.js"></script>
 </head>
 <body data-ambiente="brasas">
 
@@ -770,10 +793,10 @@
 <nav class="toolbar" aria-label="Ações do painel">
   <a href="../index.html" class="back-link" aria-label="Voltar à tela inicial">← Voltar</a>
   <button onclick="adicionarCard()" id="btn-adicionar" style="display:none" aria-label="Adicionar novo personagem"><span aria-hidden="true">⚜</span> Adicionar</button>
-  <button onclick="descansoLongo()" id="btn-descanso-global" style="display:none" aria-label="Aplicar descanso longo a todos"><span aria-hidden="true">🌙</span> Descanso Longo</button>
-  <button type="button" onclick="abrirNotasMestre({ chave: 'barovia', titulo: 'Maldição de Strahd' })" id="btn-notas-mestre" style="display:none" aria-label="Abrir anotações do mestre"><span aria-hidden="true">📒</span> Anotações</button>
-  <a href="vilao/index.html" id="link-vilao" class="back-link" style="display:none;text-decoration:none" aria-label="Abrir fichas de vilão"><span aria-hidden="true">🧛</span> Vilões</a>
-  <button onclick="window.print()" aria-label="Imprimir painel"><span aria-hidden="true">🖨</span> Imprimir</button>
+  <button onclick="descansoLongo()" id="btn-descanso-global" style="display:none" aria-label="Aplicar descanso longo a todos"><span data-ico="noite" aria-hidden="true"></span> Descanso Longo</button>
+  <button type="button" onclick="abrirNotasMestre({ chave: 'barovia', titulo: 'Maldição de Strahd' })" id="btn-notas-mestre" style="display:none" aria-label="Abrir anotações do mestre"><span data-ico="notas" aria-hidden="true"></span> Anotações</button>
+  <a href="vilao/index.html" id="link-vilao" class="back-link" style="display:none;text-decoration:none" aria-label="Abrir fichas de vilão"><span data-ico="vampiro" aria-hidden="true"></span> Vilões</a>
+  <button onclick="window.print()" aria-label="Imprimir painel"><span data-ico="imprimir" aria-hidden="true"></span> Imprimir</button>
   <span class="auth-slot" id="auth-slot" aria-label="Status de login" style="margin-left:auto;display:flex;gap:8px;align-items:center;font-family:'Cinzel',serif;font-size:11px"></span>
 </nav>
 
@@ -823,6 +846,9 @@ const PERSONAGENS_INICIAIS = [
   { jogador: 'Jogador 3', nome: 'Thorin', raca: 'Anão', classe: 'Clérigo', nivel: 5, hpAtual: 38, hpMax: 40, ca: 18 },
   { jogador: 'Jogador 4', nome: 'Pippin', raca: 'Halfling', classe: 'Ladino', nivel: 5, hpAtual: 30, hpMax: 33, ca: 15 }
 ];
+
+// Ícone vetorial inline (assets/js/icones.js); vazio se o módulo não carregou.
+const ico = (k, o) => (window.Icones ? window.Icones.html(k, o) : '');
 
 const CAMPANHA = 'barovia';
 let estado = { personagens: [] };
@@ -974,9 +1000,9 @@ function render() {
   const grid = document.getElementById('grid');
   grid.innerHTML = '';
   if (!estado.personagens.length) {
-    grid.innerHTML = `<div style="padding:50px 20px;text-align:center;color:var(--parchment-dim);font-style:italic;grid-column:1/-1;background:rgba(0,0,0,0.25);border:1px dashed var(--blood);border-radius:6px">
+    grid.innerHTML = `<div class="grid-vazio" style="padding:50px 20px;text-align:center;color:var(--parchment-dim);font-style:italic;grid-column:1/-1;background:rgba(0,0,0,0.25);border:1px dashed var(--blood);border-radius:6px">
       ${ehMestre
-        ? '🧛 Nenhum personagem ativo em Barovia ainda.<br><br>Os jogadores precisam abrir <strong>Minha Ficha</strong>, vincular à campanha "Maldição de Strahd" e marcar como ★ Ativo.<br><br>Você também pode criar NPCs com o botão <strong>⚜ Adicionar</strong>.'
+        ? ico('vampiro') + 'Nenhum personagem ativo em Barovia ainda.<br><br>Os jogadores precisam abrir <strong>Minha Ficha</strong>, vincular à campanha "Maldição de Strahd" e marcar como ★ Ativo.<br><br>Você também pode criar NPCs com o botão <strong>⚜ Adicionar</strong>.'
         : 'Nenhum personagem na campanha. Clique em <strong>⚜ Adicionar</strong>.'}
     </div>`;
   } else {
@@ -1277,14 +1303,14 @@ function criarCard(p) {
       moedasSection.innerHTML = `<div class="section-title">Bolsa</div>`;
       const moedasGrid = document.createElement('div');
       moedasGrid.className = 'moedas-grid';
-      const ICONES = { pl:'🔷', po:'🟡', pe:'🟢', pp:'⚪', pc:'🟫' };
+      // A cor identifica a moeda -> ponto colorido em CSS (ícone perderia a cor)
       const NOMES  = { pl:'Platina', po:'Ouro', pe:'Eletro', pp:'Prata', pc:'Cobre' };
       ['pl','po','pe','pp','pc'].forEach(k => {
         const v = +p.moedas[k] || 0;
         const box = document.createElement('div');
         box.className = 'moeda-box-mestre' + (v === 0 ? ' zero' : '');
         box.title = `${NOMES[k]}: ${v}`;
-        box.innerHTML = `<span class="m-ic" aria-hidden="true">${ICONES[k]}</span><span class="m-val">${v}</span><span class="m-tag">${k.toUpperCase()}</span>`;
+        box.innerHTML = `<span class="m-ic moeda-dot moeda-dot--${k}" aria-hidden="true"></span><span class="m-val">${v}</span><span class="m-tag">${k.toUpperCase()}</span>`;
         moedasGrid.appendChild(box);
       });
       moedasSection.appendChild(moedasGrid);
@@ -1302,7 +1328,7 @@ function criarCard(p) {
     card.appendChild(magiasSection);
     function pintarMagias(magias) {
       if (magias === null) {
-        wrap.innerHTML = `<span class="magia-prep-vazio" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">⚠ Erro ao carregar magias.<button type="button" class="back-link" style="padding:4px 10px;font-size:10px" data-retry-magias="${p.id}">Tentar de novo</button></span>`;
+        wrap.innerHTML = `<span class="magia-prep-vazio" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">${ico('aviso')} Erro ao carregar magias.<button type="button" class="back-link" style="padding:4px 10px;font-size:10px" data-retry-magias="${p.id}">Tentar de novo</button></span>`;
         wrap.querySelector('[data-retry-magias]')?.addEventListener('click', () => {
           wrap.innerHTML = `<span class="magia-prep-vazio">Carregando…</span>`;
           carregarMagiasPreparadasMestre(p.id).then(pintarMagias);
@@ -1350,13 +1376,13 @@ function criarCard(p) {
 
   const salvarBtn = document.createElement('button');
   salvarBtn.className = 'save-card';
-  salvarBtn.textContent = '💾 Salvar';
+  salvarBtn.innerHTML = ico('salvar') + 'Salvar';
   salvarBtn.onclick = () => {
     salvar(p);
     salvarBtn.textContent = '✓ Salvo';
     salvarBtn.classList.add('saved');
     setTimeout(() => {
-      salvarBtn.textContent = '💾 Salvar';
+      salvarBtn.innerHTML = ico('salvar') + 'Salvar';
       salvarBtn.classList.remove('saved');
     }, 1800);
     toast(`${p.nome} salvo!`);
@@ -1369,17 +1395,17 @@ function criarCard(p) {
     descBtn.className = 'save-card';
     descBtn.style.borderColor = 'var(--blood)';
     descBtn.style.color = 'var(--parchment-dim)';
-    descBtn.textContent = '🌙 Desc. Longo';
+    descBtn.innerHTML = ico('noite') + 'Desc. Longo';
     descBtn.onclick = async () => {
       const ok = await window.Confirmar.perguntar({
-        titulo: '🌙 Descanso Longo',
+        titulo: 'Descanso Longo',
         mensagem: `Aplicar descanso longo em ${p.nome}?`,
         confirmar: 'Descansar'
       });
       if (!ok) return;
       aplicarDescansoLongo(p);
       rerenderCard(p);
-      toast(`🌙 ${p.nome} descansou`);
+      toast(`${p.nome} descansou`);
     };
   }
 
@@ -1407,7 +1433,7 @@ function criarCard(p) {
   if (ehMestre) {
     periciasBtn = document.createElement('button');
     periciasBtn.className = 'save-card';
-    periciasBtn.textContent = '🎯 Perícias';
+    periciasBtn.innerHTML = ico('alvo') + 'Perícias';
     periciasBtn.title = 'Dar/tirar bônus de perícia';
     periciasBtn.onclick = () => {
       if (window.AjustePericias) window.AjustePericias.abrir(p.id, p.nome);
@@ -1459,16 +1485,16 @@ function aplicarDescansoLongo(p) {
 }
 
 async function descansoLongo() {
-  if (!ehMestre) { toast('⚠ Apenas o Mestre pode aplicar descanso longo'); return; }
+  if (!ehMestre) { toast('Apenas o Mestre pode aplicar descanso longo'); return; }
   const ok = await window.Confirmar.perguntar({
-    titulo: '🌙 Descanso Longo — Todos',
+    titulo: 'Descanso Longo — Todos',
     mensagem: 'Aplicar a TODOS os personagens:\n\n• PV ao máximo\n• Slots cheios\n• Recursos resetados\n• Exaustão −1\n• Dado de vida recupera metade do nível',
     confirmar: 'Descansar'
   });
   if (!ok) return;
   for (const p of estado.personagens) aplicarDescansoLongo(p);
   render();
-  toast('🌙 Descanso longo concluído pra todos');
+  toast('Descanso longo concluído pra todos');
 }
 
 

@@ -7,6 +7,10 @@
 // Dependências: window.sb, window.Auth.
 
 (function () {
+  // Ícones vetoriais (assets/js/icones.js). Degrada pra string vazia se a
+  // página não carregou o módulo — nunca sobra emoji de sistema.
+  const ico = (chave, opts) => (window.Icones ? window.Icones.html(chave, opts) : '');
+
   // Data local em formato YYYY-MM-DD (evita bug do toISOString() em fusos atrasados)
   function hojeLocal() {
     const d = new Date();
@@ -24,14 +28,15 @@
 
   // TODAS as categorias possíveis — usadas pra renderização de notas antigas
   // (mesmo que filtradas no formulário do contexto atual).
+  // `ico` = chave semântica do mapa de ícones (assets/js/icones.js)
   const CATEGORIAS = [
-    { id: 'historia',    label: 'História',    icon: '📜', cor: '#b88a2c' },
-    { id: 'equipamento', label: 'Equipamento', icon: '⚔',  cor: '#8a8a4a' },
-    { id: 'npc',         label: 'NPC',         icon: '👤', cor: '#6a6a90' },
-    { id: 'segredo',     label: 'Segredo',     icon: '🔒', cor: '#8b1a1a' },
-    { id: 'decisao',     label: 'Decisão',     icon: '⚖',  cor: '#4a8a8a' },
-    { id: 'loot',        label: 'Loot',        icon: '💰', cor: '#c9a961' },
-    { id: 'outro',       label: 'Outro',       icon: '✦',  cor: '#8c7d5e' },
+    { id: 'historia',    label: 'História',    ico: 'pergaminho', cor: '#b88a2c' },
+    { id: 'equipamento', label: 'Equipamento', ico: 'ataque',     cor: '#8a8a4a' },
+    { id: 'npc',         label: 'NPC',         ico: 'humanoide',  cor: '#6a6a90' },
+    { id: 'segredo',     label: 'Segredo',     ico: 'cadeado',    cor: '#8b1a1a' },
+    { id: 'decisao',     label: 'Decisão',     ico: 'balanca',    cor: '#4a8a8a' },
+    { id: 'loot',        label: 'Loot',        ico: 'moedas',     cor: '#c9a961' },
+    { id: 'outro',       label: 'Outro',       ico: 'brilho',     cor: '#8c7d5e' },
   ];
   const POR_ID = Object.fromEntries(CATEGORIAS.map(c => [c.id, c]));
 
@@ -46,9 +51,10 @@
 
   // Templates: estrutura sugerida ao escolher certas categorias.
   // Só preenche se o textarea estiver totalmente vazio (não atrapalha quem digita).
+  // Sem emoji: as linhas terminadas em ":" já viram cabeçalho de seção no render.
   const TEMPLATES = {
-    npc: '🎭 Características:\n\n📜 História:\n\n🎯 Objetivos:\n',
-    equipamento: '📋 Descrição:\n\n⚙ Mecânica/efeito:\n\n📍 Localização:\n',
+    npc: 'Características:\n\nHistória:\n\nObjetivos:\n',
+    equipamento: 'Descrição:\n\nMecânica/efeito:\n\nLocalização:\n',
     historia: '',
     loot: '',
     decisao: '',
@@ -302,15 +308,38 @@
     box-shadow: 0 0 0 3px rgba(184,138,44,0.12);
   }
   .mn-form select, .mn-form input[type="date"] {
-    background: rgba(0,0,0,0.4);
+    background-color: rgba(0,0,0,0.4);
     border: 1px solid rgba(139,105,20,0.4);
     color: #d4c5a0;
     font-family: 'Cinzel', serif; font-size: 12px; font-weight: 600;
-    padding: 8px 10px; border-radius: 5px; outline: none;
-    min-height: 38px;
-    transition: border-color 0.15s;
+    letter-spacing: 0.5px;
+    padding: 9px 12px; border-radius: 6px; outline: none;
+    min-height: 42px;
+    transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
   }
-  .mn-form select:focus, .mn-form input[type="date"]:focus { border-color: #b88a2c; }
+  /* O caret dourado e o padding-right vêm de assets/css/ui.css */
+  .mn-form select:hover, .mn-form input[type="date"]:hover {
+    border-color: #b88a2c;
+    background-color: rgba(0,0,0,0.55);
+  }
+  .mn-form select:focus, .mn-form select:focus-visible,
+  .mn-form input[type="date"]:focus {
+    border-color: #d4a843;
+    box-shadow: 0 0 0 3px rgba(184,138,44,0.18);
+  }
+  @media (max-width: 600px) {
+    .mn-form select, .mn-form input[type="date"] { min-height: 46px; font-size: 16px; }
+  }
+
+  /* ===== Ícones vetoriais ===== */
+  .mn-title iconify-icon { color: #d4a843; font-size: 22px; }
+  .mn-cat-pill iconify-icon,
+  .mn-entry-cat iconify-icon,
+  .mn-entry-data iconify-icon,
+  .mn-pj-nome iconify-icon { vertical-align: -2px; }
+  .mn-entry-cat iconify-icon { font-size: 12px; }
+  .mn-entry-actions iconify-icon { font-size: 15px; vertical-align: -2px; }
+  .mn-empty .ic iconify-icon { font-size: 38px; }
   .mn-form input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(0.7) sepia(1) hue-rotate(15deg);
     cursor: pointer;
@@ -514,7 +543,7 @@
     overlay.innerHTML = `
       <div class="mn-modal" role="dialog" aria-modal="true" aria-labelledby="mn-title">
         <div class="mn-header">
-          <div class="mn-title" id="mn-title"><span aria-hidden="true">📒</span> Anotações do Mestre</div>
+          <div class="mn-title" id="mn-title">${ico('notas')} Anotações do Mestre</div>
           <button type="button" class="mn-close" id="mn-close-btn" aria-label="Fechar anotações">Fechar ✕</button>
         </div>
         <div class="mn-body">
@@ -579,7 +608,7 @@
       cats.forEach(c => {
         const opt = document.createElement('option');
         opt.value = c.id;
-        opt.textContent = `${c.icon} ${c.label}`;
+        opt.textContent = c.label;
         sel.appendChild(opt);
       });
       // Se o valor que tava selecionado ainda existe na nova lista, mantém
@@ -602,7 +631,7 @@
         const b = document.createElement('button');
         b.type = 'button';
         b.className = 'mn-cat-pill' + (_filtroCat === c.id ? ' ativo' : '');
-        b.textContent = `${c.icon} ${c.label}`;
+        b.innerHTML = ico(c.ico) + ' ' + escapeHtml(c.label);
         b.dataset.cat = c.id;
         b.style.setProperty('--cat-cor', c.cor);
         b.addEventListener('click', () => filtrarCat(c.id));
@@ -753,7 +782,7 @@
     const campHtml = `
       <button type="button" class="mn-pj mn-campanha${_modoCampanha ? ' ativo' : ''}">
         <span class="mn-pj-info">
-          <span class="mn-pj-nome">📜 ${escapeHtml(_campanha.titulo)}</span>
+          <span class="mn-pj-nome">${ico('campanha')} ${escapeHtml(_campanha.titulo)}</span>
           <span class="mn-pj-sub">Anotações da campanha</span>
         </span>
         <span class="count">${nCamp}</span>
@@ -761,7 +790,7 @@
 
     let pjHtml;
     if (!_pjs.length) {
-      pjHtml = '<div class="mn-empty" style="padding:16px"><span class="ic">📭</span><div>Nenhum personagem cadastrado.</div></div>';
+      pjHtml = '<div class="mn-empty" style="padding:16px"><span class="ic">'+ico('caixa')+'</span><div>Nenhum personagem cadastrado.</div></div>';
     } else {
       pjHtml = _pjs.map(p => {
         const n = contagens[p.id] || 0;
@@ -828,10 +857,10 @@
     const wrap = document.getElementById('mn-timeline');
     if (!wrap) return;
     if (!_modoCampanha && !_pjSelId) {
-      wrap.innerHTML = '<div class="mn-empty"><span class="ic">👆</span><div>Selecione um jogador ou a campanha para ver as anotações.</div></div>';
+      wrap.innerHTML = '<div class="mn-empty"><span class="ic">'+ico('clique')+'</span><div>Selecione um jogador ou a campanha para ver as anotações.</div></div>';
       return;
     }
-    wrap.innerHTML = '<div class="mn-empty"><span class="ic">⏳</span><div>Carregando…</div></div>';
+    wrap.innerHTML = '<div class="mn-empty"><span class="ic">'+ico('tempo')+'</span><div>Carregando…</div></div>';
     const notas = _modoCampanha
       ? await carregarNotasCampanha(_campanha.chave)
       : await carregarNotas(_pjSelId);
@@ -842,7 +871,7 @@
 
     const escopo = _modoCampanha ? 'esta campanha' : 'este jogador';
     if (!lista.length) {
-      wrap.innerHTML = `<div class="mn-empty"><span class="ic">📝</span><div>${_filtroCat ? 'Nenhuma anotação nesta categoria.' : `Ainda não há anotações para ${escopo}.`}<br><span style="font-size:12px;opacity:0.7">Use o formulário acima para adicionar a primeira.</span></div></div>`;
+      wrap.innerHTML = `<div class="mn-empty"><span class="ic">${ico('notas')}</span><div>${_filtroCat ? 'Nenhuma anotação nesta categoria.' : `Ainda não há anotações para ${escopo}.`}<br><span style="font-size:12px;opacity:0.7">Use o formulário acima para adicionar a primeira.</span></div></div>`;
       return;
     }
     wrap.innerHTML = '';
@@ -854,11 +883,11 @@
       const dataFmt = fmtData(n.data_ref);
       div.innerHTML = `
         <div class="mn-entry-head">
-          <span class="mn-entry-cat" style="background:${cat.cor}">${cat.icon} ${cat.label}</span>
-          <span class="mn-entry-data">📅 ${dataFmt}</span>
+          <span class="mn-entry-cat" style="background:${cat.cor}">${ico(cat.ico)} ${cat.label}</span>
+          <span class="mn-entry-data">${ico('calendario')} ${dataFmt}</span>
           <span class="mn-entry-actions">
-            <button type="button" data-act="edit" title="Editar">✎</button>
-            <button type="button" data-act="del" title="Apagar">🗑</button>
+            <button type="button" data-act="edit" title="Editar" aria-label="Editar anotação">${ico('editar')}</button>
+            <button type="button" data-act="del" title="Apagar" aria-label="Apagar anotação">${ico('lixeira')}</button>
           </span>
         </div>
         ${n.titulo ? `<div class="mn-entry-titulo"></div>` : ''}
@@ -1005,7 +1034,7 @@
     montar();
     // Atualiza título do modal pra refletir a campanha atual
     const t = document.getElementById('mn-title');
-    if (t) t.innerHTML = `<span aria-hidden="true">📒</span> Anotações — ${escapeHtml(_campanha.titulo)}`;
+    if (t) t.innerHTML = ico('notas') + ` Anotações — ${escapeHtml(_campanha.titulo)}`;
 
     document.getElementById('mn-overlay').classList.add('open');
     document.body.style.overflow = 'hidden';

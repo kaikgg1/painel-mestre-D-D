@@ -223,24 +223,78 @@
   .acesso-restrito.show { display: block; }
   .villain-grid.hidden { display: none; }
 
-  .filtro-bar {
-    display: flex; gap: 8px; justify-content: center; flex-wrap: wrap;
-    margin-bottom: 26px;
+  /* ===== PAINEL DE FILTROS (mesma linguagem visual do Bestiário/Magias) ===== */
+  .filtros {
+    background: linear-gradient(180deg, rgba(26,16,24,0.85), rgba(10,6,8,0.6));
+    border: 1px solid rgba(184,138,44,0.28); border-radius: 12px;
+    padding: 16px 18px; margin-bottom: 26px;
   }
-  .filtro-btn {
-    font-family: 'Cinzel', serif; font-size: 11px; font-weight: 600;
-    letter-spacing: 1px; text-transform: uppercase;
-    padding: 8px 16px; border-radius: 20px; cursor: pointer;
-    background: transparent; color: var(--parchment-dim);
-    border: 1px solid var(--gold); transition: all 0.2s;
+  .busca-wrap { position: relative; margin-bottom: 14px; }
+  .busca-wrap .lupa {
+    position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+    color: var(--text-dim); font-size: 17px; pointer-events: none;
+    display: flex; align-items: center; line-height: 1;
   }
-  .filtro-btn:hover { color: var(--gold-light); border-color: var(--gold-bright); }
-  .filtro-btn.active {
-    background: linear-gradient(180deg, var(--gold), var(--gold-bright));
-    color: var(--shadow); border-color: var(--gold-bright);
-    box-shadow: 0 0 14px rgba(184,138,44,0.35);
+  #busca {
+    width: 100%; padding: 13px 14px 13px 42px; font-size: 16px;
+    border-radius: 9px; background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(184,138,44,0.28); color: var(--parchment);
+    font-family: inherit; transition: 0.18s;
   }
+  #busca::placeholder { color: var(--text-dim); }
+  #busca:focus { outline: none; border-color: var(--gold-bright); box-shadow: 0 0 0 3px rgba(184,138,44,0.16); }
+
+  .linha-filtro { display: flex; align-items: center; gap: 9px; flex-wrap: wrap; margin-bottom: 9px; }
+  .linha-label {
+    font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; letter-spacing: 1.2px;
+    color: var(--parchment-dim); text-transform: uppercase; min-width: 76px;
+  }
+  .pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-family: 'EB Garamond', serif; font-size: 14px;
+    padding: 6px 13px; border-radius: 20px; cursor: pointer;
+    background: rgba(255,255,255,0.04); border: 1px solid rgba(184,138,44,0.28);
+    color: var(--parchment-dim); transition: 0.15s; user-select: none;
+  }
+  .pill iconify-icon { font-size: 15px; line-height: 1; }
+  .pill:hover { border-color: var(--gold-bright); color: var(--parchment); }
+  .pill:focus-visible { outline: 2px solid var(--gold-light); outline-offset: 2px; }
+  .pill.on {
+    background: rgba(184,138,44,0.16); border-color: var(--gold-light);
+    color: var(--gold-light); font-weight: 600; box-shadow: 0 0 12px rgba(184,138,44,0.2);
+  }
+
+  .filtros-rodape {
+    display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+    margin-top: 14px; padding-top: 13px; border-top: 1px solid rgba(184,138,44,0.28);
+  }
+  .contador { font-size: 14px; color: var(--parchment-dim); }
+  .contador strong { color: var(--gold-light); font-weight: 700; }
+  .limpar {
+    margin-left: auto; background: none; border: none; cursor: pointer;
+    color: var(--gold-light); font-family: 'EB Garamond', serif; font-size: 14px;
+    text-decoration: underline; text-underline-offset: 3px; padding: 4px;
+  }
+  .limpar:hover { color: var(--parchment); }
+  .limpar:focus-visible { outline: 2px solid var(--gold-light); outline-offset: 2px; }
+
+  .vazio {
+    text-align: center; padding: 60px 20px; color: var(--text-dim);
+    font-style: italic; font-size: 17px;
+  }
+  .vazio[hidden] { display: none; }
+  .vazio .vazio-ico { font-size: 46px; color: var(--gold); opacity: 0.55; margin-bottom: 14px; }
+  .vazio .limpar { margin: 12px auto 0; display: inline-block; }
+
   .villain-card.oculto, .add-card.oculto { display: none; }
+
+  @media (max-width: 720px) {
+    .filtros { padding: 13px 12px; }
+    .linha-label { min-width: 100%; margin-bottom: 2px; }
+    .pill { font-size: 13px; padding: 7px 12px; }
+    .filtros-rodape { gap: 10px; }
+    .limpar { font-size: 15px; padding: 6px 4px; }
+  }
 
   @media (max-width: 600px) {
     .site-header { padding: 10px 14px; gap: 12px; }
@@ -251,6 +305,7 @@
   }
 </style>
 <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+<script src="../../assets/js/icones.js"></script>
 <link rel="stylesheet" href="../../assets/css/ui.css">
 </head>
 <body data-ambiente="brasas">
@@ -262,7 +317,7 @@
 </header>
 
 <div class="acesso-restrito" id="restrito">
-  <h2>🔒 Acesso restrito ao Mestre</h2>
+  <h2><span data-ico="cadeado" aria-hidden="true"></span> Acesso restrito ao Mestre</h2>
   <p>Esta página é só para quem conduz a aventura.</p>
   <p style="margin-top:16px"><a href="../login.html" class="back-btn" style="display:inline-block">Entrar como Mestre</a></p>
 </div>
@@ -274,11 +329,45 @@
     <hr>
   </div>
 
-  <div class="filtro-bar" role="tablist" aria-label="Filtrar personagens">
-    <button class="filtro-btn active" data-filtro="todos" onclick="filtrar(this)">Todos</button>
-    <button class="filtro-btn" data-filtro="vilao" onclick="filtrar(this)">⚔ Vilões</button>
-    <button class="filtro-btn" data-filtro="npc" onclick="filtrar(this)">🕊 Aliados & NPCs</button>
-  </div>
+  <section class="filtros" aria-label="Filtros de personagens">
+    <div class="busca-wrap">
+      <span class="lupa" data-ico="buscar" aria-hidden="true"></span>
+      <input type="search" id="busca" placeholder="Buscar por nome ou título (ex.: Strahd, Vallaki)..."
+             autocomplete="off" aria-label="Buscar personagem pelo nome ou título">
+    </div>
+
+    <div class="linha-filtro" role="group" aria-label="Filtrar por categoria">
+      <span class="linha-label">Categoria:</span>
+      <button type="button" class="pill on" data-filtro="cat" data-valor="todos" aria-pressed="true"><span data-ico="personagens" aria-hidden="true"></span>Todos</button>
+      <button type="button" class="pill" data-filtro="cat" data-valor="vilao" aria-pressed="false"><span data-ico="vilao" aria-hidden="true"></span>Vilões</button>
+      <button type="button" class="pill" data-filtro="cat" data-valor="npc" aria-pressed="false"><span data-ico="aliado" aria-hidden="true"></span>Aliados &amp; NPCs</button>
+    </div>
+
+    <div class="linha-filtro" role="group" aria-label="Filtrar por tipo de ficha">
+      <span class="linha-label">Ficha:</span>
+      <button type="button" class="pill" data-filtro="ficha" data-valor="combate" aria-pressed="false"><span data-ico="ataque" aria-hidden="true"></span>Com bloco de combate</button>
+      <button type="button" class="pill" data-filtro="ficha" data-valor="sugerido" aria-pressed="false"><span data-ico="notas" aria-hidden="true"></span>Bloco sugerido</button>
+      <button type="button" class="pill" data-filtro="ficha" data-valor="lore" aria-pressed="false"><span data-ico="grimorio" aria-hidden="true"></span>Só lore</button>
+    </div>
+
+    <div class="linha-filtro" role="group" aria-label="Filtrar por nível de desafio">
+      <span class="linha-label">Desafio:</span>
+      <button type="button" class="pill" data-filtro="nd" data-valor="0-4" aria-pressed="false"><span data-ico="alvo" aria-hidden="true"></span>ND até 4</button>
+      <button type="button" class="pill" data-filtro="nd" data-valor="5-10" aria-pressed="false"><span data-ico="alvo" aria-hidden="true"></span>ND 5–10</button>
+      <button type="button" class="pill" data-filtro="nd" data-valor="11-15" aria-pressed="false"><span data-ico="alvo" aria-hidden="true"></span>ND 11–15</button>
+      <button type="button" class="pill" data-filtro="nd" data-valor="16+" aria-pressed="false"><span data-ico="alvo" aria-hidden="true"></span>ND 16+</button>
+    </div>
+
+    <div class="linha-filtro" role="group" aria-label="Outros filtros">
+      <span class="linha-label">Extras:</span>
+      <button type="button" class="pill" data-filtro="formas" data-valor="multi" aria-pressed="false"><span data-ico="metamorfo" aria-hidden="true"></span>Múltiplas formas</button>
+    </div>
+
+    <div class="filtros-rodape">
+      <span class="contador" aria-live="polite"><strong id="cont-visiveis">0</strong> de <span id="cont-total">0</span> personagens</span>
+      <button class="limpar" id="btn-limpar" type="button">Limpar filtros</button>
+    </div>
+  </section>
 
   <div class="villain-grid">
 
@@ -1089,6 +1178,12 @@
     </div>
 
   </div>
+
+  <div class="vazio" id="vazio" hidden>
+    <div class="vazio-ico" data-ico="oculto" aria-hidden="true"></div>
+    <p>Nenhum personagem encontrado com esses filtros.</p>
+    <button class="limpar" id="btn-limpar-vazio" type="button">Limpar filtros</button>
+  </div>
 </main>
 
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
@@ -1107,17 +1202,145 @@
     document.getElementById('main-content').style.display = 'block';
   })();
 
-  function filtrar(btn) {
-    const cat = btn.dataset.filtro;
-    document.querySelectorAll('.filtro-btn').forEach(b => b.classList.toggle('active', b === btn));
-    document.querySelectorAll('.villain-card').forEach(card => {
-      const mostra = (cat === 'todos') || (card.dataset.cat === cat);
-      card.classList.toggle('oculto', !mostra);
-    });
-    // o placeholder só aparece em "todos"
-    const add = document.querySelector('.add-card');
-    if (add) add.classList.toggle('oculto', cat !== 'todos');
+  /* ===================== FILTROS DO HUB DE PERSONAGENS ===================== */
+
+  // Normalização sem acento / sem caixa — mesmo idioma do bestiário e das magias.
+  const norm = s => (s || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
+  const filtros = { busca: '', cat: 'todos', ficha: new Set(), nd: new Set(), formas: false };
+
+  // Tags que apontam para um bloco de status já existente (do livro / de outra ficha),
+  // em vez de um bloco de combate próprio com PV.
+  const BLOCO_EMPRESTADO = /^(sugestao|expert sidekick|vampire spawn|vampiro nascido|mago\b|sacerdote\b|veterano\b|espiao\b|nobre\b|plebeu\b|capanga\b|fantasma\b)/;
+
+  /** Lê o ND numérico das meta-tags. Aceita "ND 7", "ND 1/4", "ND 5–6", "ND 8/10". */
+  function ndDe(tags) {
+    for (const t of tags) {
+      const m = t.match(/^ND\s+(.+)$/i);
+      if (!m) continue;
+      const bruto = m[1].trim();
+      const frac = bruto.match(/^1\s*\/\s*(2|4|8)$/);   // só 1/2, 1/4 e 1/8 são frações de ND
+      if (frac) return 1 / Number(frac[1]);
+      const primeiro = bruto.split(/[–—\/-]/)[0].trim(); // faixas: usa o piso ("ND 14–19" -> 14)
+      const n = parseFloat(primeiro.replace(',', '.'));
+      if (!isNaN(n)) return n;
+    }
+    return null;
   }
+
+  const faixaND = nd =>
+    nd == null ? null : nd <= 4 ? '0-4' : nd <= 10 ? '5-10' : nd <= 15 ? '11-15' : '16+';
+
+  /** Classifica a ficha: bloco de combate próprio, bloco sugerido ou só lore. */
+  function fichaDe(card, tags) {
+    if (card.dataset.ficha) return card.dataset.ficha;            // override manual, se houver
+    if (tags.some(t => /^PV\b/i.test(t))) return 'combate';        // tem PV = statblock próprio
+    if (tags.some(t => BLOCO_EMPRESTADO.test(norm(t)))) return 'sugerido';
+    return 'lore';
+  }
+
+  /** Quantidade de formas/fases declarada nas meta-tags ("3 Formas", "2 Fases"). */
+  function formasDe(tags) {
+    for (const t of tags) {
+      const m = t.match(/^(\d+)\s+(formas?|fases?)$/i);
+      if (m) return Number(m[1]);
+    }
+    return 1;
+  }
+
+  const texto = el => (el ? el.textContent : '');
+
+  // Índice montado uma única vez a partir do que os cards realmente têm.
+  const CARDS = [...document.querySelectorAll('.villain-card')].map(el => {
+    const tags = [...el.querySelectorAll('.meta-tag')].map(t => t.textContent.trim());
+    return {
+      el,
+      cat: el.dataset.cat || '',
+      busca: norm(texto(el.querySelector('.vil-nome')) + ' ' + texto(el.querySelector('.vil-titulo'))),
+      ficha: fichaDe(el, tags),
+      faixa: faixaND(ndDe(tags)),
+      formas: formasDe(tags),
+    };
+  });
+
+  const semFiltros = () =>
+    !filtros.busca && filtros.cat === 'todos' && !filtros.ficha.size && !filtros.nd.size && !filtros.formas;
+
+  function aplicarFiltros() {
+    let visiveis = 0;
+    CARDS.forEach(c => {
+      let ok = true;
+      if (filtros.cat !== 'todos' && c.cat !== filtros.cat) ok = false;
+      if (ok && filtros.busca && !c.busca.includes(filtros.busca)) ok = false;
+      if (ok && filtros.ficha.size && !filtros.ficha.has(c.ficha)) ok = false;
+      if (ok && filtros.nd.size && !(c.faixa && filtros.nd.has(c.faixa))) ok = false;
+      if (ok && filtros.formas && c.formas < 2) ok = false;
+      c.el.classList.toggle('oculto', !ok);
+      if (ok) visiveis++;
+    });
+
+    // o placeholder só aparece quando nenhum filtro está ativo
+    const add = document.querySelector('.add-card');
+    if (add) add.classList.toggle('oculto', !semFiltros());
+
+    document.getElementById('cont-visiveis').textContent = visiveis;
+    document.getElementById('cont-total').textContent = CARDS.length;
+    document.getElementById('vazio').hidden = visiveis > 0;
+  }
+
+  function limparFiltros() {
+    filtros.busca = '';
+    filtros.cat = 'todos';
+    filtros.ficha.clear();
+    filtros.nd.clear();
+    filtros.formas = false;
+    document.getElementById('busca').value = '';
+    document.querySelectorAll('.pill').forEach(p => {
+      const ligado = p.dataset.filtro === 'cat' && p.dataset.valor === 'todos';
+      p.classList.toggle('on', ligado);
+      p.setAttribute('aria-pressed', String(ligado));
+    });
+    aplicarFiltros();
+  }
+
+  document.querySelectorAll('.pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      const tipo = pill.dataset.filtro, valor = pill.dataset.valor;
+
+      if (tipo === 'cat') {
+        // categoria é escolha única
+        filtros.cat = valor;
+        document.querySelectorAll('.pill[data-filtro="cat"]').forEach(p => {
+          const ligado = p === pill;
+          p.classList.toggle('on', ligado);
+          p.setAttribute('aria-pressed', String(ligado));
+        });
+      } else if (tipo === 'formas') {
+        filtros.formas = !filtros.formas;
+        pill.classList.toggle('on', filtros.formas);
+        pill.setAttribute('aria-pressed', String(filtros.formas));
+      } else {
+        // ficha e nd são múltipla escolha (nenhum marcado = todos)
+        const conj = filtros[tipo];
+        if (conj.has(valor)) conj.delete(valor); else conj.add(valor);
+        pill.classList.toggle('on', conj.has(valor));
+        pill.setAttribute('aria-pressed', String(conj.has(valor)));
+      }
+      aplicarFiltros();
+    });
+  });
+
+  document.getElementById('busca').addEventListener('input', e => {
+    filtros.busca = norm(e.target.value.trim());
+    aplicarFiltros();
+  });
+  document.getElementById('btn-limpar').addEventListener('click', limparFiltros);
+  document.getElementById('btn-limpar-vazio').addEventListener('click', () => {
+    limparFiltros();
+    document.getElementById('busca').focus();
+  });
+
+  aplicarFiltros();
 </script>
 
 <script src="../../assets/js/ambiente.js"></script>

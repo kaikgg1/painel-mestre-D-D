@@ -7,6 +7,9 @@
 // Dependências: window.sb, window.Auth (mestre).
 
 (function () {
+  // Ícones vetoriais (assets/js/icones.js). Degrada pra vazio se ausente.
+  const ico = (chave, opts) => (window.Icones ? window.Icones.html(chave, opts) : '');
+
   // MESMAS chaves usadas na ficha (ficha.html → const PERICIAS)
   const PERICIAS = [
     ['acrobacia','Acrobacia','DES'],
@@ -109,6 +112,8 @@
     background: rgba(0,0,0,0.2); flex-shrink: 0;
   }
   .ap-status { font-size: 11px; color: #8c7d5e; font-style: italic; }
+  .ap-title iconify-icon { vertical-align: -2px; color: #d4a843; }
+  .ap-status iconify-icon { vertical-align: -2px; color: #c4302b; }
   .ap-salvar {
     background: linear-gradient(180deg, #b88a2c, #6a4f0e);
     border: 1px solid #d4a843; color: #1a1014;
@@ -139,7 +144,7 @@
     ov.innerHTML = `
       <div class="ap-modal" role="dialog" aria-modal="true" aria-labelledby="ap-title">
         <div class="ap-header">
-          <div class="ap-title" id="ap-title">🎯 Ajustar Perícias<small id="ap-sub"></small></div>
+          <div class="ap-title" id="ap-title">${ico('alvo')} Ajustar Perícias<small id="ap-sub"></small></div>
           <button type="button" class="ap-close" id="ap-close">Fechar ✕</button>
         </div>
         <div class="ap-body">
@@ -173,6 +178,14 @@
       if (!novo) delete _pericias[k].bonus;
       atualizarLinha(k);
     });
+  }
+
+  // Mensagem de status com ícone opcional (texto entra por textContent = sem XSS).
+  function setStatus(msg, chave) {
+    const el = document.getElementById('ap-status');
+    if (!el) return;
+    el.textContent = msg;
+    if (chave) el.insertAdjacentHTML('afterbegin', ico(chave) + ' ');
   }
 
   function classeVal(v) { return v > 0 ? 'pos' : v < 0 ? 'neg' : 'zero'; }
@@ -218,7 +231,7 @@
     // Busca perícias atuais
     const { data, error } = await window.sb.from('characters')
       .select('pericias').eq('id', characterId).maybeSingle();
-    if (error) { document.getElementById('ap-status').textContent = '⚠ Erro ao carregar'; return; }
+    if (error) { setStatus('Erro ao carregar', 'aviso'); return; }
     // Cópia profunda pra editar sem afetar o original até salvar
     _pericias = JSON.parse(JSON.stringify(data?.pericias || {}));
     document.getElementById('ap-status').textContent = '';
@@ -241,7 +254,7 @@
     // jogador possa ter mudado enquanto o modal estava aberto).
     const { data, error: errLoad } = await window.sb.from('characters')
       .select('pericias').eq('id', _charId).maybeSingle();
-    if (errLoad) { btn.disabled = false; status.textContent = '⚠ ' + errLoad.message; return; }
+    if (errLoad) { btn.disabled = false; setStatus(errLoad.message, 'aviso'); return; }
     const atual = JSON.parse(JSON.stringify(data?.pericias || {}));
 
     // Aplica só os bônus que defini, mantendo prof/exp do banco
@@ -259,7 +272,7 @@
     const { error } = await window.sb.from('characters')
       .update({ pericias: atual }).eq('id', _charId);
     btn.disabled = false;
-    if (error) { status.textContent = '⚠ ' + error.message; return; }
+    if (error) { setStatus(error.message, 'aviso'); return; }
     status.textContent = '✓ Salvo!';
     setTimeout(fechar, 700);
   }

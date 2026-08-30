@@ -84,3 +84,103 @@ select optgroup {
   }
   select option { font-size: 16px; padding: 12px; }
 }
+
+/* ===================================================================== *
+ * BLOCO ADITIVO — refinamento das caixas de opções (dropdowns).
+ * Continua usando o <select> NATIVO (acessível, navegável por teclado e
+ * com o popup correto no celular); só melhora a casca visual. Nada aqui
+ * define cor de fundo/borda própria — as cores de cada tela continuam
+ * mandando, exatamente como no bloco acima.
+ * ===================================================================== */
+
+select {
+  /* Alinha com os <input> irmãos: mesma métrica de texto e canto arredondado */
+  font-family: inherit;
+  line-height: 1.35;
+  max-width: 100%;
+  border-radius: 6px;
+  /* Não deixa o texto encostar na borda quando a tela não define padding */
+  padding-left: 12px;
+  /* O popup nativo já é escuro (color-scheme: dark, acima) */
+  text-shadow: none;
+}
+
+/* Alvo de toque confortável mesmo sem CSS da tela */
+select:not([size]):not([multiple]) { min-height: 42px; }
+
+/* Estado pressionado / aberto: seta clara + leve realce, igual ao hover */
+select:active {
+  border-color: var(--gold-light, #d4a843) !important;
+}
+
+/* Foco por teclado: anel dourado espesso (o :focus simples já vem acima,
+   este reforça o contraste de quem navega por Tab) */
+select:focus-visible {
+  border-color: var(--gold-light, #d4a843) !important;
+  box-shadow: 0 0 0 3px rgba(212, 168, 67, 0.28) !important;
+}
+
+/* Alto contraste do SO: mantém um contorno visível */
+@media (forced-colors: active) {
+  select:focus-visible { outline: 2px solid Highlight; outline-offset: 2px; }
+}
+
+/* Listas múltiplas / com size não têm popup: desfaz seta e padding extra */
+select[multiple],
+select[size]:not([size="1"]) {
+  background-image: none !important;
+  padding-right: 12px !important;
+  cursor: default;
+  min-height: 0;
+}
+select[multiple] option,
+select[size]:not([size="1"]) option { padding: 8px 10px; }
+
+/* Opção desabilitada legível, mas claramente inativa */
+select option:disabled { color: #6a5a3a; font-style: italic; }
+
+/* Respeita quem pediu menos movimento */
+@media (prefers-reduced-motion: reduce) {
+  select { transition: none; }
+}
+
+/* ============================================================
+   ADITIVO — acabamento dos <select> (continuam NATIVOS).
+   Só camadas de fundo/foco: não mexe em background-color, borda
+   nem raio definidos por cada tela, então não conflita com elas.
+   ============================================================ */
+
+/* Camada de brilho por cima do fundo de cada tela + a seta.
+   Ordem das camadas: 1) seta  2) verniz vertical. */
+select {
+  background-image:
+    url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23b88a2c' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, rgba(255,255,255,0.055) 0%, rgba(255,255,255,0) 55%, rgba(0,0,0,0.16) 100%) !important;
+  background-repeat: no-repeat, no-repeat !important;
+  background-position: right 12px center, center !important;
+  background-size: 14px 14px, 100% 100% !important;
+  font-family: inherit;
+}
+select:hover {
+  background-image:
+    url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23d4a843' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, rgba(212,168,67,0.10) 0%, rgba(255,255,255,0) 60%, rgba(0,0,0,0.16) 100%) !important;
+}
+select:focus,
+select:focus-visible {
+  background-image:
+    url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23d4a843' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"),
+    linear-gradient(180deg, rgba(212,168,67,0.13) 0%, rgba(255,255,255,0) 60%, rgba(0,0,0,0.16) 100%) !important;
+}
+select:disabled {
+  background-image:
+    url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236b5a34' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") !important;
+  background-position: right 12px center !important;
+  background-size: 14px 14px !important;
+}
+
+/* Mobile: reposiciona as DUAS camadas (a regra acima já usa 2 valores) */
+@media (max-width: 600px) {
+  select { background-position: right 14px center, center !important; }
+  select:disabled { background-position: right 14px center !important; }
+}

@@ -10,6 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
 <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+<script src="../../assets/js/icones.js"></script>
 <style>
   :root {
     --bg-deep:#0a0608; --bg-card:#191115; --bg-card-2:#221820; --bg-card-3:#2c2029;
@@ -79,6 +80,14 @@
   .toast { position: fixed; top: 16px; right: 16px; background: var(--bg-card-3); border: 1px solid var(--gold); color: var(--bone); padding: 10px 16px; font-family: 'Cinzel', serif; font-size: 0.85rem; letter-spacing: 0.1em; border-radius: 2px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); z-index: 200; opacity: 0; transform: translateY(-10px); transition: all 0.3s; pointer-events: none; }
   .toast.show { opacity: 1; transform: translateY(0); }
   @media (max-width: 720px) { .container { padding: 12px 12px 50px; } .top-bar { margin: -12px -12px 12px; padding: 10px 12px; } }
+
+  .lnk-bloco {
+    color: var(--accent-bright); text-decoration: none;
+    border-bottom: 1px dashed var(--accent); padding-bottom: 1px;
+    font-weight: 600; transition: .15s;
+  }
+  .lnk-bloco:hover { color: var(--bone); border-bottom-style: solid; }
+  .lnk-bloco::after { content: ' ↗'; font-size: .8em; opacity: .75; }
 </style>
 <link rel="stylesheet" href="../../assets/css/ui.css">
 </head>
@@ -98,7 +107,7 @@
         </div>
       </div>
       <div class="save-controls">
-        <button class="btn gold" onclick="saveState()">💾 Salvar</button>
+        <button class="btn gold" onclick="saveState()"><span data-ico="salvar"></span> Salvar</button>
         <button class="btn" onclick="loadState()">↺ Carregar</button>
         <button class="btn" onclick="resetAll()">⟲ Resetar</button>
       </div>
@@ -136,7 +145,7 @@
   <div class="section">
     <h2 class="section-title" style="color:var(--blood-bright);border-bottom-color:var(--blood-dark)"><iconify-icon icon="game-icons:shield-echoes" style="color:var(--blood-bright)"></iconify-icon> Em Combate</h2>
     <div class="ability-grid">
-      <div class="ability combat"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Renegado Vampírico (Vampire Spawn)</div><span class="toggle-icon">▼</span></div><div class="ability-body">O texto do guia deixa implícito que Doru é um <strong>Renegado Vampírico</strong> (Vampire Spawn, Monster Manual) — a mesma criatura usada para Escher e Sasha. Ele raramente luta a sério; na maioria das cenas, tenta fugir ou se conter.</div></div>
+      <div class="ability combat"><div class="ability-header" onclick="toggleAbility(this)"><div class="ability-name">Renegado Vampírico (Vampire Spawn)</div><span class="toggle-icon">▼</span></div><div class="ability-body">O texto do guia deixa implícito que Doru é um <strong><a href="../bestiario.html#CRIA%20VAMP%C3%8DRICA" class="lnk-bloco" title="Abrir Renegado Vampírico no bestiário">Renegado Vampírico</a></strong> (Vampire Spawn, Monster Manual) — a mesma criatura usada para Escher e Sasha. Ele raramente luta a sério; na maioria das cenas, tenta fugir ou se conter.</div></div>
     </div>
   </div>
 

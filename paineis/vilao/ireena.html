@@ -10,6 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
 <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+<script src="../../assets/js/icones.js"></script>
 <style>
   :root {
     --bg-deep:#0a0608; --bg-card:#191115; --bg-card-2:#221820; --bg-card-3:#2c2029;
@@ -79,6 +80,14 @@
   .toast { position: fixed; top: 16px; right: 16px; background: var(--bg-card-3); border: 1px solid var(--gold); color: var(--bone); padding: 10px 16px; font-family: 'Cinzel', serif; font-size: 0.85rem; letter-spacing: 0.1em; border-radius: 2px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); z-index: 200; opacity: 0; transform: translateY(-10px); transition: all 0.3s; pointer-events: none; }
   .toast.show { opacity: 1; transform: translateY(0); }
   @media (max-width: 720px) { .container { padding: 12px 12px 50px; } .top-bar { margin: -12px -12px 12px; padding: 10px 12px; } }
+
+  .lnk-bloco {
+    color: var(--accent-bright); text-decoration: none;
+    border-bottom: 1px dashed var(--accent); padding-bottom: 1px;
+    font-weight: 600; transition: .15s;
+  }
+  .lnk-bloco:hover { color: var(--bone); border-bottom-style: solid; }
+  .lnk-bloco::after { content: ' ↗'; font-size: .8em; opacity: .75; }
 </style>
 <link rel="stylesheet" href="../../assets/css/ui.css">
 </head>
@@ -98,7 +107,7 @@
         </div>
       </div>
       <div class="save-controls">
-        <button class="btn gold" onclick="saveState()">💾 Salvar</button>
+        <button class="btn gold" onclick="saveState()"><span data-ico="salvar"></span> Salvar</button>
         <button class="btn" onclick="loadState()">↺ Carregar</button>
         <button class="btn" onclick="resetAll()">⟲ Resetar</button>
       </div>
@@ -121,7 +130,7 @@
 
   <div class="special-callout">
     <div class="sc-title"><iconify-icon icon="game-icons:level-four"></iconify-icon> Ireena se Junta ao Grupo</div>
-    <div class="sc-body">Ireena tem as estatísticas de uma <strong>Expert Sidekick (Tasha's Cauldron of Everything, p. 142)</strong>, usando o bloco-base de <strong>Nobre</strong>, e carrega uma besta leve (+3 para acertar, alcance 24/96 m, um alvo. <em>Acerto:</em> 5 (1d8+1) perfurante). Também possui o talento <strong>Curador (Livro do Jogador, p. 167)</strong> e começa com dois <em>kits de cura</em>.<br><br>
+    <div class="sc-body">Ireena tem as estatísticas de uma <strong>Expert Sidekick (Tasha's Cauldron of Everything, p. 142)</strong>, usando o bloco-base de <strong><a href="../bestiario.html#NOBRE" class="lnk-bloco" title="Abrir Nobre no bestiário">Nobre</a></strong>, e carrega uma besta leve (+3 para acertar, alcance 24/96 m, um alvo. <em>Acerto:</em> 5 (1d8+1) perfurante). Também possui o talento <strong>Curador (Livro do Jogador, p. 167)</strong> e começa com dois <em>kits de cura</em>.<br><br>
     O nível inicial de Ireena é igual ao nível médio do grupo quando ela se junta a eles. Começa com proficiências adicionais em História, Investigação, Medicina, Percepção e Furtividade, e proficiência em Testes de Resistência de Destreza. Ao entrar no grupo no 3º nível, tem 25 (5d8) pontos de vida.<br><br>
     Ireena também sobe de nível junto com o grupo (esteja presente ou não), terminando a aventura no 10º nível: <strong>3º nível</strong> — perícia especializada em Intuição e Medicina; <strong>4º nível</strong> — Destreza +2 (14); <strong>8º nível</strong> — Destreza +2 (16); <strong>10º nível</strong> — Destreza +2 (18).<br><br>
     <em>Nenhum servo de Strahd — por mais inteligente que seja, e muito menos o próprio Strahd — jamais ataca Ireena.</em></div>

@@ -16,9 +16,21 @@
   const esc = s => (s == null ? '' : String(s)).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const titulo = s => (s || '').toLowerCase().replace(/\b\p{L}/gu, c => c.toUpperCase());
 
+  // Ícones vetoriais (assets/js/icones.js). Degrada pra string vazia se a
+  // página não carregou o módulo — nenhum emoji de sistema fica pra trás.
+  const ico = (chave, opts) => (window.Icones ? window.Icones.html(chave, opts) : '');
+
   const CFG = {
-    itens:    { arquivo: 'itens_data.json',    titulo: '📜 Itens Mágicos', ph: 'Buscar item (nome, tipo)…' },
-    monstros: { arquivo: 'monstros_data.json', titulo: '🐉 Bestiário',      ph: 'Buscar criatura (nome, tipo)…' },
+    itens:    { arquivo: 'itens_data.json',    titulo: 'Itens Mágicos', ico: 'itens',     ph: 'Buscar item (nome, tipo)…' },
+    monstros: { arquivo: 'monstros_data.json', titulo: 'Bestiário',     ico: 'bestiario', ph: 'Buscar criatura (nome, tipo)…' },
+  };
+
+  // Tipo do item mágico -> chave semântica do mapa de ícones
+  const ICO_TIPO = {
+    'Poção': 'pocao', 'Anel': 'anel', 'Varinha': 'varinha',
+    'Cajado': 'cajado', 'Bastão': 'cajado', 'Arma': 'arma',
+    'Armadura': 'peitoral', 'Escudo': 'escudo', 'Manto': 'manto',
+    'Botas': 'bota', 'Pergaminho': 'pergaminho',
   };
   const RARIDADES = ['comum', 'incomum', 'raro', 'muito raro', 'lendário', 'artefato', 'variável'];
   const CORES_RAR = { comum: '#9aa0a6', incomum: '#4caf6a', raro: '#4a90d9', 'muito raro': '#9b59b6', 'lendário': '#d4a843', artefato: '#c0392b', 'variável': '#7f8c8d' };
@@ -29,7 +41,7 @@
   .cp-modal { margin: auto; width: 100%; max-width: 920px; max-height: 94vh; display: flex; flex-direction: column;
     background: linear-gradient(160deg, #1a1018, #120b10); border: 2px solid #8B6914; border-radius: 12px; box-shadow: 0 12px 50px rgba(0,0,0,0.8); overflow: hidden; }
   .cp-head { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-bottom: 1px solid rgba(139,105,20,0.5); }
-  .cp-head h2 { margin: 0; font-family: 'Cinzel','Cinzel Decorative',serif; font-size: 19px; color: #b88a2c; letter-spacing: 1px; flex: 1; }
+  .cp-head h2 { margin: 0; font-family: 'Cinzel','Cinzel Decorative',serif; font-size: 19px; color: #b88a2c; letter-spacing: 1px; flex: 1; display: flex; align-items: center; gap: 8px; }
   .cp-x { background: none; border: none; color: #a89878; font-size: 26px; cursor: pointer; line-height: 1; padding: 2px 8px; }
   .cp-x:hover { color: #d4a843; }
   /* host (modal-body ou container inline) */
@@ -45,8 +57,10 @@
   .cp-lista { display: grid; gap: 8px; }
   .cp-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; cursor: pointer; background: rgba(255,255,255,0.03); border: 1px solid rgba(139,105,20,0.3); border-radius: 8px; transition: .15s; }
   .cp-item:hover { border-color: #b88a2c; background: rgba(184,138,44,0.08); transform: translateX(2px); }
-  .cp-thumb { flex-shrink: 0; width: 48px; height: 48px; border-radius: 6px; overflow: hidden; background: rgba(0,0,0,.35); display: flex; align-items: center; justify-content: center; font-size: 20px; border: 1px solid rgba(139,105,20,.3); }
-  .cp-thumb img { width: 100%; height: 100%; object-fit: cover; }
+  .cp-thumb { position: relative; flex-shrink: 0; width: 48px; height: 48px; border-radius: 6px; overflow: hidden; background: rgba(0,0,0,.35); display: flex; align-items: center; justify-content: center; font-size: 22px; color: #b88a2c; border: 1px solid rgba(139,105,20,.3); }
+  /* A imagem cobre o ícone; se falhar (onerror -> remove) o ícone reaparece. */
+  .cp-thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .cp-item-meta iconify-icon { vertical-align: -2px; margin-right: 2px; color: #b88a2c; }
   .cp-item-nome { font-family: 'Cinzel',serif; font-weight: 700; color: #d4a843; font-size: 15px; }
   .cp-item-meta { font-size: 12px; color: #a89878; font-style: italic; }
   .cp-tag { display: inline-block; font-family: 'Cinzel',serif; font-size: 9px; font-weight: 700; text-transform: uppercase; padding: 2px 7px; border-radius: 4px; margin-left: 6px; }
@@ -68,6 +82,31 @@
   .cp-bloco b { color: #d4a843; }
   .cp-desc { font-size: 15px; line-height: 1.65; white-space: pre-wrap; }
   @media (max-width: 600px) { .cp-modal { max-height: 96vh; } .cp-ficha .cp-img { float: none; width: 100%; max-width: 100%; margin: 0 0 12px; } }
+
+  /* --- Responsivo (mobile) --------------------------------------------
+     O compêndio é usado tanto em página cheia (itens_magicos.html) quanto
+     em modal dentro dos painéis; estes ajustes valem para os dois. */
+  @media (max-width: 720px) {
+    .cp-ov { padding: 0; }
+    .cp-modal { max-width: 100%; max-height: 100vh; border-radius: 0; border-width: 0 0 1px 0; }
+    .cp-head { padding: 12px 14px; }
+    .cp-head h2 { font-size: 16px; }
+    .cp-busca input { font-size: 16px; padding: 12px 14px; }  /* >=16px evita zoom no iOS */
+    .cp-chips { gap: 5px; }
+    .cp-chip { padding: 7px 12px; font-size: 11px; }          /* alvo de toque maior */
+    .cp-item { padding: 12px 10px; gap: 10px; }
+    .cp-thumb { width: 54px; height: 54px; }                  /* miniatura maior no toque */
+    .cp-item-nome { font-size: 16px; }
+    .cp-stats { grid-template-columns: repeat(3, 1fr); }
+    .cp-ficha h3 { font-size: 20px; }
+    .cp-voltar { padding: 10px 16px; font-size: 12px; }
+  }
+  @media (max-width: 420px) {
+    .cp-stats { grid-template-columns: repeat(2, 1fr); }
+    .cp-thumb { width: 46px; height: 46px; }
+  }
+  /* imagens nunca estouram o container */
+  .cp-ficha img, .cp-item img { max-width: 100%; height: auto; }
   `;
 
   let _cssInjetado = false;
@@ -103,7 +142,7 @@
     const corpo = _root.querySelector('.cp-corpo');
     corpo.innerHTML = '<div class="cp-dica">Carregando…</div>';
     const dados = await carregar(tipo);
-    if (!dados) { corpo.innerHTML = '<div class="cp-vazio">⚠ Não foi possível carregar.</div>'; return; }
+    if (!dados) { corpo.innerHTML = `<div class="cp-vazio">${ico('aviso')} Não foi possível carregar.</div>`; return; }
     renderLista('');
     setTimeout(() => inp.focus(), 60);
   }
@@ -123,7 +162,7 @@
       montarUI(_ov.querySelector('.cp-modal-body'));
     }
     _root = _ov.querySelector('.cp-modal-body');
-    _ov.querySelector('.cp-titulo').textContent = CFG[tipo].titulo;
+    _ov.querySelector('.cp-titulo').innerHTML = ico(CFG[tipo].ico) + '<span>' + esc(CFG[tipo].titulo) + '</span>';
     _ov.classList.add('open');
     document.body.style.overflow = 'hidden';
     await popular(tipo);
@@ -170,9 +209,9 @@
 
   function itemHTML(it, idx) {
     const cor = CORES_RAR[it.raridade] || '#a89878';
-    const icon = { Poção: '🧪', Anel: '💍', Varinha: '🪄', Cajado: '🪄', Bastão: '🦯', Arma: '⚔️', Armadura: '🛡️', Escudo: '🛡️', Manto: '🧥', Botas: '🥾', Pergaminho: '📜' }[it.tipo.split(' ')[0]] || '✨';
+    const icone = ico(ICO_TIPO[it.tipo.split(' ')[0]] || 'brilho');
     return `<div class="cp-item" data-idx="${idx}">
-      <div class="cp-thumb">${icon}</div>
+      <div class="cp-thumb">${icone}</div>
       <div style="flex:1;min-width:0">
         <div class="cp-item-nome">${esc(titulo(it.nome))}<span class="cp-tag" style="background:${cor}22;color:${cor};border:1px solid ${cor}66">${esc(it.raridade)}</span></div>
         <div class="cp-item-meta">${esc(it.tipo)}${it.sintonia ? ' · requer sintonização' : ''}</div>
@@ -180,10 +219,10 @@
   }
   function monstroHTML(m, idx) {
     return `<div class="cp-item" data-idx="${idx}">
-      <div class="cp-thumb">${m.imagem ? `<img src="${esc(m.imagem)}" alt="" loading="lazy" onerror="this.parentElement.textContent='🐲'">` : '🐲'}</div>
+      <div class="cp-thumb">${ico('dragao')}${m.imagem ? `<img src="${esc(m.imagem)}" alt="" loading="lazy" onerror="this.remove()">` : ''}</div>
       <div style="flex:1;min-width:0">
         <div class="cp-item-nome">${esc(titulo(m.nome))}</div>
-        <div class="cp-item-meta">${esc(m.tipo || '')} · 🛡️${m.ca} ❤️${m.hp_max} ⚔${esc(m.nd || '—')}</div>
+        <div class="cp-item-meta">${esc(m.tipo || '')} · ${ico('escudo', { titulo: 'Classe de Armadura' })}${m.ca} ${ico('vida', { titulo: 'Pontos de vida' })}${m.hp_max} ${ico('ataque', { titulo: 'Nível de desafio' })}${esc(m.nd || '—')}</div>
       </div></div>`;
   }
 

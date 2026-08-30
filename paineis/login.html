@@ -398,10 +398,16 @@
     position: relative;
     overflow: hidden;
   }
+  /* Espadas cruzadas (game-icons) como máscara — herda a cor do botão */
   .btn-entrar::after {
-    content: '⚔';
+    content: '';
+    display: inline-block;
+    width: 17px; height: 17px;
     margin-left: 10px;
-    font-size: 16px;
+    vertical-align: -3px;
+    background-color: currentColor;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22 width%3D%221em%22 height%3D%221em%22 viewBox%3D%220 0 512 512%22%3E%3Cpath fill%3D%22currentColor%22 d%3D%22M19.75 14.438c59.538 112.29 142.51 202.35 232.28 292.718l3.626 3.75l.063-.062c21.827 21.93 44.04 43.923 66.405 66.25c-18.856 14.813-38.974 28.2-59.938 40.312l28.532 28.53l68.717-68.717c42.337 27.636 76.286 63.646 104.094 105.81l28.064-28.06c-42.47-27.493-79.74-60.206-106.03-103.876l68.936-68.938l-28.53-28.53c-11.115 21.853-24.413 42.015-39.47 60.593c-43.852-43.8-86.462-85.842-130.125-125.47c-.224-.203-.432-.422-.656-.625C183.624 122.75 108.515 63.91 19.75 14.437zm471.875 0c-83.038 46.28-154.122 100.78-221.97 161.156l22.814 21.562l56.81-56.812l13.22 13.187l-56.438 56.44l24.594 23.186c61.802-66.92 117.6-136.92 160.97-218.72zm-329.53 125.906l200.56 200.53a403 403 0 0 1-13.405 13.032L148.875 153.53zm-76.69 113.28l-28.5 28.532l68.907 68.906c-26.29 43.673-63.53 76.414-106 103.907l28.063 28.06c27.807-42.164 61.758-78.174 104.094-105.81l68.718 68.717l28.53-28.53c-20.962-12.113-41.08-25.5-59.937-40.313c17.865-17.83 35.61-35.433 53.157-52.97l-24.843-25.655l-55.47 55.467c-4.565-4.238-9.014-8.62-13.374-13.062l55.844-55.844l-24.53-25.374c-18.28 17.856-36.602 36.06-55.158 54.594c-15.068-18.587-28.38-38.758-39.5-60.625z%22%2F%3E%3C%2Fsvg%3E") center / contain no-repeat;
+            mask: url("data:image/svg+xml,%3Csvg xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22 width%3D%221em%22 height%3D%221em%22 viewBox%3D%220 0 512 512%22%3E%3Cpath fill%3D%22currentColor%22 d%3D%22M19.75 14.438c59.538 112.29 142.51 202.35 232.28 292.718l3.626 3.75l.063-.062c21.827 21.93 44.04 43.923 66.405 66.25c-18.856 14.813-38.974 28.2-59.938 40.312l28.532 28.53l68.717-68.717c42.337 27.636 76.286 63.646 104.094 105.81l28.064-28.06c-42.47-27.493-79.74-60.206-106.03-103.876l68.936-68.938l-28.53-28.53c-11.115 21.853-24.413 42.015-39.47 60.593c-43.852-43.8-86.462-85.842-130.125-125.47c-.224-.203-.432-.422-.656-.625C183.624 122.75 108.515 63.91 19.75 14.437zm471.875 0c-83.038 46.28-154.122 100.78-221.97 161.156l22.814 21.562l56.81-56.812l13.22 13.187l-56.438 56.44l24.594 23.186c61.802-66.92 117.6-136.92 160.97-218.72zm-329.53 125.906l200.56 200.53a403 403 0 0 1-13.405 13.032L148.875 153.53zm-76.69 113.28l-28.5 28.532l68.907 68.906c-26.29 43.673-63.53 76.414-106 103.907l28.063 28.06c27.807-42.164 61.758-78.174 104.094-105.81l68.718 68.717l28.53-28.53c-20.962-12.113-41.08-25.5-59.937-40.313c17.865-17.83 35.61-35.433 53.157-52.97l-24.843-25.655l-55.47 55.467c-4.565-4.238-9.014-8.62-13.374-13.062l55.844-55.844l-24.53-25.374c-18.28 17.856-36.602 36.06-55.158 54.594c-15.068-18.587-28.38-38.758-39.5-60.625z%22%2F%3E%3C%2Fsvg%3E") center / contain no-repeat;
   }
   .btn-entrar:hover:not(:disabled) {
     background: linear-gradient(to bottom, var(--gold-bright), var(--gold));
@@ -414,7 +420,7 @@
     color: var(--text-dim, #8c7d5e);
     border-color: rgba(139,105,20,0.3);
   }
-  .btn-entrar:disabled::after { content: ''; }
+  .btn-entrar:disabled::after { display: none; }
 
   .erro {
     padding: 12px 16px;
@@ -458,14 +464,26 @@
   @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after { animation: none !important; transition: none !important; }
   }
+
+  /* ====== ÍCONES VETORIAIS (assets/js/icones.js) ====== */
+  .crest { color: var(--gold-bright); }
+  .feature-ic { color: var(--gold-bright); }
+  .pj-avatar { color: var(--gold-bright); }
+  .pj-card.selecionado .pj-avatar { color: var(--gold-light); }
+  .mestre-avatar { color: var(--blood-bright); }
+  .mestre-card.selecionado .mestre-avatar { color: var(--gold-light); }
+  .senha-label { display: flex; align-items: center; gap: 7px; }
+  .senha-label iconify-icon { font-size: 14px; }
 </style>
 <link rel="stylesheet" href="../assets/css/ui.css">
+<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+<script src="../assets/js/icones.js"></script>
 </head>
 <body data-ambiente="fagulhas">
 
 <div class="wrap">
   <header class="topo">
-    <span class="crest" aria-hidden="true">⚔️</span>
+    <span class="crest" aria-hidden="true" data-ico="campanha"></span>
     <h1 class="titulo">Painel do Mestre</h1>
     <p class="subtitulo">D&amp;D 5ª Edição · Crônicas em tempo real</p>
 
@@ -473,21 +491,21 @@
       <h2>Sua mesa, sempre à mão</h2>
       <div class="feature-list">
         <div class="feature">
-          <span class="feature-ic" aria-hidden="true">📜</span>
+          <span class="feature-ic" aria-hidden="true" data-ico="ficha"></span>
           <div class="feature-texto">
             <h3>Ficha completa</h3>
             <p>Atributos, perícias, salvaguardas e equipamento — tudo do Livro do Jogador.</p>
           </div>
         </div>
         <div class="feature">
-          <span class="feature-ic" aria-hidden="true">📖</span>
+          <span class="feature-ic" aria-hidden="true" data-ico="grimorio"></span>
           <div class="feature-texto">
             <h3>Grimório com 361 magias</h3>
             <p>Em PT-BR, com filtros e favoritas vinculadas ao seu personagem.</p>
           </div>
         </div>
         <div class="feature">
-          <span class="feature-ic" aria-hidden="true">⚡</span>
+          <span class="feature-ic" aria-hidden="true" data-ico="raio"></span>
           <div class="feature-texto">
             <h3>Tempo real</h3>
             <p>O Mestre vê as fichas atualizando enquanto você joga — sem refresh.</p>
@@ -506,17 +524,17 @@
         <span class="grupo-label">Aventureiros</span>
         <div class="jogadores" role="radiogroup" aria-label="Selecionar jogador">
           <button type="button" class="pj-card" data-nome="Sabrina123" role="radio" aria-checked="false">
-            <div class="pj-avatar" aria-hidden="true">🧝‍♀️</div>
+            <div class="pj-avatar" aria-hidden="true" data-ico="elfa"></div>
             <div class="pj-nome">Sabrina</div>
             <div class="pj-tag">Jogadora</div>
           </button>
           <button type="button" class="pj-card" data-nome="Derik123" role="radio" aria-checked="false">
-            <div class="pj-avatar" aria-hidden="true">⚔️</div>
+            <div class="pj-avatar" aria-hidden="true" data-ico="ataque"></div>
             <div class="pj-nome">Derick</div>
             <div class="pj-tag">Jogador</div>
           </button>
           <button type="button" class="pj-card" data-nome="Felipe123" role="radio" aria-checked="false">
-            <div class="pj-avatar" aria-hidden="true">🏹</div>
+            <div class="pj-avatar" aria-hidden="true" data-ico="arqueiro"></div>
             <div class="pj-nome">Felipe</div>
             <div class="pj-tag">Jogador</div>
           </button>
@@ -526,7 +544,7 @@
       <div class="grupo" style="margin-top:6px">
         <span class="grupo-label">Narrador</span>
         <button type="button" class="mestre-card" data-nome="Mestre123" role="radio" aria-checked="false">
-          <div class="mestre-avatar" aria-hidden="true">👑</div>
+          <div class="mestre-avatar" aria-hidden="true" data-ico="mestre"></div>
           <div class="info">
             <div class="info-nome">Mestre</div>
             <div class="info-desc">Quem conduz a aventura</div>
@@ -538,7 +556,7 @@
 
       <!-- Campo de senha (só aparece para Mestre) -->
       <div class="senha-bloco" id="senha-bloco" hidden>
-        <label for="senha-mestre" class="senha-label">🔒 Senha do Mestre</label>
+        <label for="senha-mestre" class="senha-label"><span data-ico="cadeado" aria-hidden="true"></span> Senha do Mestre</label>
         <input type="password" id="senha-mestre" class="senha-input" placeholder="Digite a senha" autocomplete="off" inputmode="text">
       </div>
 

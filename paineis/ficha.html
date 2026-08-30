@@ -7,6 +7,9 @@
 <meta name="theme-color" content="#0a0608">
 <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
 <title>Minha Ficha — D&D 5e</title>
+<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+<script src="../assets/js/icones.js"></script>
+<script src="../assets/js/lightbox.js"></script>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,700;1,400&display=swap');
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -1926,6 +1929,94 @@
     /* Tabs ainda navegáveis (já estão grandes) */
     .tab { min-height: 44px; padding: 12px 14px; }
   }
+
+  /* ============================================================
+     ÍCONES VETORIAIS (Iconify + game-icons via assets/js/icones.js)
+     Substituem os emoji do sistema. Herdam `currentColor` e o
+     `font-size` do container, então basta dar cor/tamanho ao pai.
+     ============================================================ */
+  iconify-icon {
+    display: inline-block;
+    vertical-align: -0.135em;
+    line-height: 1;
+  }
+
+  /* Cores por contexto (o tamanho já vem do font-size de cada container) */
+  .aviso-visibilidade .icone       { color: var(--erro); }
+  .aviso-visibilidade.ok .icone    { color: var(--ok); }
+  .hp-icone                        { color: var(--blood-bright); }
+  .stat-hero .stat-icone           { color: var(--gold-light); }
+  .stat-mini .ic                   { color: var(--gold-bright); }
+  .slots-info .ic                  { color: var(--gold-bright); }
+  .bloco-icone                     { color: var(--gold-light); }
+  .rc-icone                        { color: var(--gold-light); }
+  .insp-icone                      { color: var(--gold-light); }
+  .criatura-img-ph                 { color: var(--gold); }
+  .bm-thumb-vazio                  { color: var(--gold-bright); }
+  .retrato-placeholder iconify-icon { font-size: 40px; color: var(--gold); opacity: 0.7; }
+  .btn-lock-toggle iconify-icon,
+  .lock-banner iconify-icon        { color: var(--gold-light); }
+  .lock-banner iconify-icon        { vertical-align: -0.18em; }
+  .status-msg iconify-icon         { opacity: 0.8; }
+  .hp-btn iconify-icon             { vertical-align: -0.15em; }
+  .bm-item-stats iconify-icon      { color: var(--gold); }
+  .cc-box label iconify-icon       { color: var(--gold-bright); }
+  .criatura-del iconify-icon,
+  .criatura-img-edit iconify-icon,
+  .cc-rolar iconify-icon           { vertical-align: -0.14em; }
+  .bm-titulo iconify-icon,
+  .fei-titulo iconify-icon,
+  #modal-titulo iconify-icon       { color: var(--gold-light); }
+
+  /* ============================================================
+     BOLINHAS DE COR (moedas) — mantêm o código de cor que os
+     emoji quadrados faziam; um ícone vetorial perderia a cor.
+     ============================================================ */
+  .dot {
+    display: inline-block; width: 16px; height: 16px;
+    border-radius: 50%; vertical-align: middle;
+    border: 1px solid rgba(0,0,0,0.55);
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.45), 0 1px 3px rgba(0,0,0,0.5);
+  }
+  .dot--pc { background: linear-gradient(160deg, #c98a52, #8a4f22); }  /* cobre  */
+  .dot--pp { background: linear-gradient(160deg, #eef1f4, #9aa3ac); }  /* prata  */
+  .dot--pe { background: linear-gradient(160deg, #a8d8b0, #4e8c5c); }  /* electro */
+  .dot--po { background: linear-gradient(160deg, #f5d97a, #b8860b); }  /* ouro   */
+  .dot--pl { background: linear-gradient(160deg, #cfe6f5, #7fa8c9); }  /* platina */
+  .moeda-ic .dot { width: 18px; height: 18px; }
+
+  /* ============================================================
+     DROPDOWNS — refinamento sobre a base de assets/css/ui.css.
+     Continuam sendo <select> NATIVOS (acessíveis, teclado e popup
+     nativo no mobile de graça); aqui só harmonizamos a moldura
+     com os demais campos da ficha.
+     ============================================================ */
+  .char-bar select,
+  .campo select,
+  .stat-mini select,
+  .aliados-add select {
+    border-radius: 6px;
+    border: 1px solid rgba(139,105,20,0.55);
+    background-color: rgba(0,0,0,0.28);
+    color: var(--parchment);
+    letter-spacing: 0.3px;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.45);
+  }
+  .char-bar select:hover,
+  .campo select:hover,
+  .stat-mini select:hover,
+  .aliados-add select:hover {
+    background-color: rgba(139,105,20,0.12);
+  }
+  .char-bar select:focus-visible,
+  .campo select:focus-visible,
+  .stat-mini select:focus-visible,
+  .aliados-add select:focus-visible {
+    background-color: rgba(139,105,20,0.14);
+  }
+  /* O select de subclasse desabilitado não deve parecer clicável */
+  .campo select:disabled { background-color: rgba(0,0,0,0.35); }
+  /* Travado (modo somente leitura) já é tratado por .tab-content select */
 </style>
 <link rel="stylesheet" href="../assets/css/ui.css">
 </head>
@@ -1956,6 +2047,10 @@
 <script>
 const $ = sel => document.querySelector(sel);
 const $$ = sel => document.querySelectorAll(sel);
+
+// Atalho pros ícones vetoriais (assets/js/icones.js). Devolve '' se o módulo
+// não carregou, então a ficha nunca quebra por causa de um ícone.
+const ico = (chave, opts) => (window.Icones ? window.Icones.html(chave, opts) : '');
 
 const RACAS = ['','Anão','Elfo','Halfling','Humano','Draconato','Gnomo','Meio-Elfo','Meio-Orc','Tiefling'];
 const CLASSES = ['','Bárbaro','Bardo','Bruxo','Clérigo','Druida','Feiticeiro','Guerreiro','Ladino','Mago','Monge','Paladino','Patrulheiro'];
@@ -2171,7 +2266,7 @@ function aplicarExterno(novo, avisar) {
             charAtivo = pend;
             chars = chars.map(c => c.id === charAtivo.id ? charAtivo : c);
             render();
-            if (avisarPend) toast('✏ Ficha atualizada pelo Mestre');
+            if (avisarPend) toast('Ficha atualizada pelo Mestre', 'editar');
           }
         }, 300);
       });
@@ -2182,7 +2277,7 @@ function aplicarExterno(novo, avisar) {
   charAtivo = novo;
   chars = chars.map(c => c.id === charAtivo.id ? charAtivo : c);
   render();
-  if (avisar) toast('✏ Ficha atualizada pelo Mestre');
+  if (avisar) toast('Ficha atualizada pelo Mestre', 'editar');
 }
 
 function configurarToastExterno() {
@@ -2191,10 +2286,22 @@ function configurarToastExterno() {
 }
 
 let _toastTimer = null;
-function toast(msg) {
+// toast('texto')            -> só texto (como antes)
+// toast('texto', 'editar')  -> ícone vetorial + texto
+// O texto continua entrando como nó de texto (nunca como HTML), então
+// nada aqui abre brecha de injeção.
+function toast(msg, chaveIcone) {
   const el = document.getElementById('toast-auto');
   if (!el) return;
-  el.textContent = msg;
+  el.textContent = '';
+  const marcado = chaveIcone ? ico(chaveIcone) : '';
+  if (marcado) {
+    const span = document.createElement('span');
+    span.innerHTML = marcado;
+    el.appendChild(span);
+    el.appendChild(document.createTextNode(' '));
+  }
+  el.appendChild(document.createTextNode(msg));
   el.classList.add('show');
   if (_toastTimer) clearTimeout(_toastTimer);
   _toastTimer = setTimeout(() => el.classList.remove('show'), 2600);
@@ -2302,7 +2409,7 @@ function render() {
     if (!temCampanha) problemas.push('vincule a uma <strong>Campanha</strong> (aba Identidade)');
     if (!ehAtivo)     problemas.push('marque como <strong>★ Ativo</strong> (botão no topo)');
     aviso = `<div class="aviso-visibilidade">
-      <span class="icone" aria-hidden="true">⚠</span>
+      <span class="icone">${ico('aviso')}</span>
       <span>Esta ficha <strong>não aparece pro Mestre</strong>. Para mostrar: ${problemas.join(' e ')}.</span>
     </div>`;
   }
@@ -2316,7 +2423,7 @@ function render() {
       </select>
       <div class="char-bar-acoes">
         <button class="btn-lock-toggle no-lock" type="button" id="btn-lock-toggle" aria-pressed="false" aria-label="Alternar modo edição">
-          <span id="lock-toggle-label">🔒 Editar</span>
+          <span id="lock-toggle-label">${ico('cadeado')} Editar</span>
         </button>
         <button class="estrela-ativo ${c.is_active?'ativo':''} no-lock" id="btn-ativo" type="button" aria-pressed="${!!c.is_active}" title="Marcar como personagem ativo (visível ao Mestre)">
           <span aria-hidden="true">${c.is_active?'★':'☆'}</span>
@@ -2327,7 +2434,7 @@ function render() {
       </div>
     </div>
 
-    <div class="lock-banner" aria-live="polite">🔒 Ficha bloqueada para evitar edições acidentais — clique em <strong>Editar</strong> para desbloquear.</div>
+    <div class="lock-banner" aria-live="polite">${ico('cadeado')} Ficha bloqueada para evitar edições acidentais — clique em <strong>Editar</strong> para desbloquear.</div>
 
     <div class="tabs-wrap" id="tabs-wrap">
       <div class="tabs" role="tablist" id="tabs">
@@ -2344,7 +2451,7 @@ function render() {
     <form class="tab-content" id="ficha-form" novalidate>
       ${renderTab(c, atrs)}
       <div class="acoes">
-        <span class="status-msg" id="status" aria-live="polite">💾 Auto-save ativo · suas alterações salvam sozinhas</span>
+        <span class="status-msg" id="status" aria-live="polite">${ico('salvar')} Auto-save ativo · suas alterações salvam sozinhas</span>
         <!-- Botão "Salvar agora" removido: auto-save cuida de tudo. O submit ainda é disparado programaticamente. -->
       </div>
     </form>
@@ -2438,6 +2545,16 @@ function renderIdentidade(c, atrs) {
   `;
 }
 
+// Ícone de PV por faixa de porcentagem. A COR carrega o mesmo aviso que os
+// emoji antigos de PV davam, agora em vetor e igual em todo SO.
+function iconeVida(pct) {
+  if (pct <= 0)  return ico('caveira', { cor: '#8a8a8a' });
+  if (pct <= 25) return ico('vida',    { cor: '#c23b3b' });
+  if (pct <= 50) return ico('vida',    { cor: '#d98a3c' });
+  if (pct <= 75) return ico('coracao', { cor: '#d4a843' });
+  return ico('coracao', { cor: '#8fc28f' });
+}
+
 function renderCombate(c) {
   const slots = c.slots_magia || {};
   const salv = c.salvaguardas || {};
@@ -2445,7 +2562,7 @@ function renderCombate(c) {
   const hpAtual = c.hp_atual ?? 10;
   const hpMax = c.hp_max ?? 10;
   const pct = hpMax > 0 ? Math.max(0, Math.min(100, Math.round((hpAtual / hpMax) * 100))) : 0;
-  const icone = pct <= 0 ? '💀' : pct <= 25 ? '🩸' : pct <= 50 ? '🧡' : pct <= 75 ? '❤️' : '💖';
+  const icone = iconeVida(pct);
   const classeBar = pct <= 15 ? 'critico' : pct <= 35 ? 'baixo' : pct <= 65 ? 'medio' : '';
   return `
     <div class="combate-hero">
@@ -2468,9 +2585,9 @@ function renderCombate(c) {
         <div class="hp-aplicar">
           <div class="hp-aplicar-titulo">Aplicar Dano ou Cura</div>
           <div class="hp-aplicar-linha">
-            <button type="button" class="hp-btn dano" data-aplicar="dano" aria-label="Aplicar dano">🩸 Dano</button>
+            <button type="button" class="hp-btn dano" data-aplicar="dano" aria-label="Aplicar dano">${ico('dano')} Dano</button>
             <input type="text" inputmode="numeric" id="hp-aplicar-input" value="" placeholder="0" aria-label="Quantidade">
-            <button type="button" class="hp-btn cura" data-aplicar="cura" aria-label="Aplicar cura">✨ Cura</button>
+            <button type="button" class="hp-btn cura" data-aplicar="cura" aria-label="Aplicar cura">${ico('cura')} Cura</button>
           </div>
           <div class="hp-quick" aria-label="Atalhos rápidos">
             <button type="button" class="q-dano" data-quick="-20">-20</button>
@@ -2486,13 +2603,13 @@ function renderCombate(c) {
       </div>
 
       <div class="stat-hero">
-        <div class="stat-icone" aria-hidden="true">🛡️</div>
+        <div class="stat-icone">${ico('escudo')}</div>
         <div class="stat-titulo">Classe de Armadura</div>
         <input name="ca" type="text" inputmode="numeric" value="${c.ca ?? 10}" data-validar="int" aria-label="CA">
       </div>
 
       <div class="stat-hero">
-        <div class="stat-icone" aria-hidden="true">⚡</div>
+        <div class="stat-icone">${ico('iniciativa')}</div>
         <div class="stat-titulo">Iniciativa</div>
         <input name="iniciativa_bonus" type="text" inputmode="numeric" value="${c.iniciativa_bonus ?? 0}" data-validar="int" aria-label="Iniciativa (bônus)">
       </div>
@@ -2500,13 +2617,13 @@ function renderCombate(c) {
 
     <div class="stats-mini">
       <div class="stat-mini">
-        <span class="ic" aria-hidden="true">👣</span>
+        <span class="ic">${ico('pegadas')}</span>
         <label>Deslocamento</label>
         <input name="deslocamento" type="text" inputmode="decimal" value="${c.deslocamento ?? 9}" data-validar="num" data-min="0">
         <span class="ajuda-mini">metros · aceita decimal</span>
       </div>
       <div class="stat-mini">
-        <span class="ic" aria-hidden="true">🎲</span>
+        <span class="ic">${ico('dado')}</span>
         <label>Dado de Vida</label>
         ${(() => {
           const dv = dadoVidaDaClasse(c.classe) || c.dado_vida_tipo || 8;
@@ -2516,12 +2633,12 @@ function renderCombate(c) {
         })()}
       </div>
       <div class="stat-mini">
-        <span class="ic" aria-hidden="true">⏳</span>
+        <span class="ic">${ico('tempo')}</span>
         <label>DV Restantes</label>
         <input name="dado_vida_atual" type="text" inputmode="numeric" value="${c.dado_vida_atual ?? 1}" data-validar="int" data-min="0">
       </div>
       <div class="stat-mini">
-        <span class="ic" aria-hidden="true">😵</span>
+        <span class="ic">${ico('atordoado')}</span>
         <label>Exaustão</label>
         <input name="exaustao" type="text" inputmode="numeric" value="${c.exaustao ?? 0}" data-validar="int" data-min="0" data-max="6">
         <span class="ajuda-mini">0 a 6</span>
@@ -2597,14 +2714,14 @@ function renderSlotsMagia(c, slots) {
 
   // Classe sem slots (Bárbaro, Guerreiro, Ladino, Monge sem subclasse mágica)
   if (!slotsClasse) {
-    return `<div class="slots-vazio">⚔️ ${c.classe || 'Classe'} não recebe espaços de magia pelas regras padrão.<br><span style="font-size:11px">(Subclasses Cavaleiro Místico e Trapaceiro Arcano podem ter — registre em "Características Adicionais".)</span></div>`;
+    return `<div class="slots-vazio">${ico('ataque')} ${c.classe || 'Classe'} não recebe espaços de magia pelas regras padrão.<br><span style="font-size:11px">(Subclasses Cavaleiro Místico e Trapaceiro Arcano podem ter — registre em "Características Adicionais".)</span></div>`;
   }
 
   const cabecalho = tipo === 'pact'
-    ? `<div class="slots-info"><span class="ic">🔮</span><div>Bruxo usa <strong>Magia do Pacto</strong>: todos os slots são do mesmo nível e recuperam em <strong>descanso curto</strong>.</div></div>`
+    ? `<div class="slots-info"><span class="ic">${ico('adivinhacao')}</span><div>Bruxo usa <strong>Magia do Pacto</strong>: todos os slots são do mesmo nível e recuperam em <strong>descanso curto</strong>.</div></div>`
     : tipo === 'third'
-    ? `<div class="slots-info"><span class="ic">📜</span><div>1/3 conjurador (<strong>${escape(c.subclasse)}</strong>) · Nível <strong>${c.nivel||1}</strong>. Slots calculados pela subclasse, recuperam em <strong>descanso longo</strong>.</div></div>`
-    : `<div class="slots-info"><span class="ic">📜</span><div>Espaços calculados automaticamente: <strong>${c.classe}</strong> · Nível <strong>${c.nivel||1}</strong>. Recuperam em <strong>descanso longo</strong>.</div></div>`;
+    ? `<div class="slots-info"><span class="ic">${ico('pergaminho')}</span><div>1/3 conjurador (<strong>${escape(c.subclasse)}</strong>) · Nível <strong>${c.nivel||1}</strong>. Slots calculados pela subclasse, recuperam em <strong>descanso longo</strong>.</div></div>`
+    : `<div class="slots-info"><span class="ic">${ico('pergaminho')}</span><div>Espaços calculados automaticamente: <strong>${c.classe}</strong> · Nível <strong>${c.nivel||1}</strong>. Recuperam em <strong>descanso longo</strong>.</div></div>`;
 
   const niveisComSlots = Object.entries(slotsClasse).filter(([nv, max]) => max > 0);
   if (!niveisComSlots.length) {
@@ -2648,12 +2765,12 @@ function renderSlotsMagia(c, slots) {
 const _max1 = v => Math.max(1, v);
 const RECURSOS_POR_CLASSE = {
   barbaro: (nv) => [
-    { id: 'furia', nome: 'Fúria', icone: '🔥',
+    { id: 'furia', nome: 'Fúria', icone: ico('fogo'),
       max: nv >= 17 ? 6 : nv >= 12 ? 5 : nv >= 6 ? 4 : nv >= 3 ? 3 : 2,
       periodo: 'descanso longo', dica: 'Ação bônus · Dano de fúria: ' + (nv >= 16 ? '+4' : nv >= 9 ? '+3' : '+2') }
   ],
   bardo: (nv, a) => [
-    { id: 'inspiracao_bardica', nome: 'Inspiração Bárdica', icone: '🎵',
+    { id: 'inspiracao_bardica', nome: 'Inspiração Bárdica', icone: ico('musica'),
       max: _max1(mod(a.car)),
       periodo: nv >= 5 ? 'descanso curto' : 'descanso longo',
       dica: 'Dado: ' + (nv >= 15 ? 'd12' : nv >= 10 ? 'd10' : nv >= 5 ? 'd8' : 'd6') + ' · Ação bônus' }
@@ -2662,7 +2779,7 @@ const RECURSOS_POR_CLASSE = {
     const r = [];
     const slotsPacto = nv >= 11 ? 3 : nv >= 2 ? 2 : 1;
     const nivelSlot = nv >= 9 ? 5 : nv >= 7 ? 4 : nv >= 5 ? 3 : nv >= 3 ? 2 : 1;
-    r.push({ id: 'magias_pacto', nome: 'Magias do Pacto', icone: '🔮',
+    r.push({ id: 'magias_pacto', nome: 'Magias do Pacto', icone: ico('adivinhacao'),
       max: slotsPacto, periodo: 'descanso curto',
       dica: `Slots de nível ${nivelSlot}` });
     if (nv >= 11) r.push({ id: 'arcano_6', nome: 'Arcano Místico 6°', icone: '◆', max: 1, periodo: 'descanso longo' });
@@ -2672,38 +2789,38 @@ const RECURSOS_POR_CLASSE = {
     return r;
   },
   clerigo: (nv) => [
-    { id: 'canalizar_divindade', nome: 'Canalizar Divindade', icone: '✨',
+    { id: 'canalizar_divindade', nome: 'Canalizar Divindade', icone: ico('brilho'),
       max: nv >= 18 ? 3 : nv >= 6 ? 2 : 1, periodo: 'descanso curto',
       dica: 'Expulsar Mortos-Vivos + opção do domínio' }
   ],
   druida: (nv) => [
-    { id: 'forma_selvagem', nome: 'Forma Selvagem', icone: '🐺',
+    { id: 'forma_selvagem', nome: 'Forma Selvagem', icone: ico('lobo'),
       max: nv >= 20 ? 99 : 2, periodo: 'descanso curto',
       dica: nv >= 20 ? 'Ilimitada (Arquidruida)' : `CR ${nv >= 8 ? '1' : nv >= 4 ? '1/2' : '1/4'}` }
   ],
   feiticeiro: (nv) => [
-    { id: 'pontos_feiticaria', nome: 'Pontos de Feitiçaria', icone: '✨',
+    { id: 'pontos_feiticaria', nome: 'Pontos de Feitiçaria', icone: ico('brilho'),
       max: nv, periodo: 'descanso longo',
       dica: 'Converte ⇄ slots · Custos: slot 1°=2pt, 2°=3, 3°=5, 4°=6, 5°=7' }
   ],
   guerreiro: (nv) => {
     const r = [
-      { id: 'retomar_folego', nome: 'Retomar o Fôlego', icone: '💨', max: 1, periodo: 'descanso curto',
+      { id: 'retomar_folego', nome: 'Retomar o Fôlego', icone: ico('folego'), max: 1, periodo: 'descanso curto',
         dica: `Cura 1d10 + ${nv} PV (ação bônus)` },
-      { id: 'surto_acao', nome: 'Surto de Ação', icone: '⚡',
+      { id: 'surto_acao', nome: 'Surto de Ação', icone: ico('raio'),
         max: nv >= 17 ? 2 : 1, periodo: 'descanso curto', dica: 'Ação adicional no turno' },
     ];
-    if (nv >= 9) r.push({ id: 'indomavel', nome: 'Indomável', icone: '🛡',
+    if (nv >= 9) r.push({ id: 'indomavel', nome: 'Indomável', icone: ico('escudo'),
       max: nv >= 17 ? 3 : nv >= 13 ? 2 : 1, periodo: 'descanso longo',
       dica: 'Re-rola teste de resistência falhado' });
     return r;
   },
   ladino: (nv) => [
-    { id: 'golpe_sorte', nome: 'Golpe de Sorte', icone: '🍀', max: 1, periodo: 'descanso curto',
+    { id: 'golpe_sorte', nome: 'Golpe de Sorte', icone: ico('sorte'), max: 1, periodo: 'descanso curto',
       dica: 'Falha → sucesso (ou sucesso inimigo → falha)', visivel: nv >= 20 }
   ].filter(r => r.visivel !== false),
   mago: (nv) => [
-    { id: 'recuperacao_arcana', nome: 'Recuperação Arcana', icone: '🔮',
+    { id: 'recuperacao_arcana', nome: 'Recuperação Arcana', icone: ico('adivinhacao'),
       max: 1, periodo: 'descanso longo',
       dica: `Recupera slots: soma ≤ ${Math.ceil(nv/2)}, nenhum acima do 5°` }
   ],
@@ -2716,13 +2833,13 @@ const RECURSOS_POR_CLASSE = {
   },
   paladino: (nv, a) => {
     const r = [
-      { id: 'cura_maos', nome: 'Cura pelas Mãos', icone: '💚', max: nv * 5, periodo: 'descanso longo',
+      { id: 'cura_maos', nome: 'Cura pelas Mãos', icone: ico('cura'), max: nv * 5, periodo: 'descanso longo',
         dica: 'Pool de PV · Distribua como quiser entre toques', step: 1 },
-      { id: 'sentido_divino', nome: 'Sentido Divino', icone: '👁',
+      { id: 'sentido_divino', nome: 'Sentido Divino', icone: ico('olho'),
         max: 1 + Math.max(0, mod(a.car)), periodo: 'descanso longo',
         dica: 'Detecta celestiais/mortos-vivos/corruptos em 18m' },
     ];
-    if (nv >= 14) r.push({ id: 'toque_purificador', nome: 'Toque Purificador', icone: '✨',
+    if (nv >= 14) r.push({ id: 'toque_purificador', nome: 'Toque Purificador', icone: ico('brilho'),
       max: _max1(mod(a.car)), periodo: 'descanso longo', dica: 'Termina 1 efeito mágico' });
     return r;
   },
@@ -2901,7 +3018,7 @@ async function alternarPipRecurso(pip) {
     charAtivo.recursos_usados = rec;
     pips.forEach((p, i) => p.classList.toggle('gasto', i < antes));
     if (frac) frac.innerHTML = `<strong>${max - antes}</strong>/${max}`;
-    if (typeof toast === 'function') toast('⚠ Falha ao salvar — tente novamente');
+    if (typeof toast === 'function') toast('Falha ao salvar — tente novamente', 'aviso');
     console.warn('[recursos] rollback:', e);
   } finally {
     _lockRecurso.delete(id);
@@ -2954,7 +3071,7 @@ async function ajustarRecurso(id, delta) {
         grupo.querySelectorAll('.rc-pip').forEach((p, i) => p.classList.toggle('gasto', i < antes));
       }
     }
-    if (typeof toast === 'function') toast('⚠ Falha ao salvar — tente novamente');
+    if (typeof toast === 'function') toast('Falha ao salvar — tente novamente', 'aviso');
     console.warn('[recursos] rollback:', e);
   } finally {
     _lockRecurso.delete(id);
@@ -3180,7 +3297,7 @@ async function popularHabilidades(classe, nivel, subclasse) {
   if (!db) {
     wrap.innerHTML = `
       <div class="item-vazio" style="text-align:center;padding:20px">
-        ⚠ Não foi possível carregar as habilidades.
+        ${ico('aviso')} Não foi possível carregar as habilidades.
         <button type="button" class="btn no-lock" style="display:block;margin:12px auto 0" onclick="popularHabilidades('${escape(classe)}', ${+nivel||1}, '${escape(subclasse||'')}')">Tentar de novo</button>
       </div>`;
     return;
@@ -3485,7 +3602,7 @@ async function carregarMagiasPreparadas() {
         ${m.maiorNivel ? `<div class="magia-maior"><strong>Em Níveis Superiores.</strong> ${escape(m.maiorNivel)}</div>` : ''}
         ${m.nivel > 0 ? `<div class="magia-conjurar-bar">
           <button type="button" class="btn-conjurar" data-conjurar-nv="${m.nivel}" data-conjurar-nome="${escape(m.nome)}">
-            <span aria-hidden="true">✨</span> Conjurar
+            ${ico('conjurar')} Conjurar
           </button>
         </div>` : `<div class="magia-conjurar-bar"><span class="magia-truque-info">Truque — sem custo de slot</span></div>`}
       </div>
@@ -3541,7 +3658,7 @@ function abrirModalConjurar(nomeMagia, nivelMin) {
   overlay.className = 'modal-overlay';
   overlay.innerHTML = `
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
-      <h3 id="modal-titulo">✨ Conjurar <em>${escape(nomeMagia)}</em></h3>
+      <h3 id="modal-titulo">${ico('conjurar')} Conjurar <em>${escape(nomeMagia)}</em></h3>
       <p style="font-size:12px;color:var(--text-dim);margin-bottom:14px">
         Magia de <strong>${nivelMin}° nível</strong>. Escolha em qual espaço gastar:
       </p>
@@ -3594,7 +3711,7 @@ function abrirModalConjurar(nomeMagia, nivelMin) {
 function mostrarToastConjurar(nome, nv) {
   const t = document.createElement('div');
   t.className = 'toast-conjurar';
-  t.innerHTML = `✨ <strong>${escape(nome)}</strong> conjurada · slot de nível ${nv} gasto`;
+  t.innerHTML = `${ico('brilho')} <strong>${escape(nome)}</strong> conjurada · slot de nível ${nv} gasto`;
   document.body.appendChild(t);
   setTimeout(() => t.classList.add('show'), 10);
   setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 2500);
@@ -3604,17 +3721,19 @@ function renderEquipamento(c) {
   const inv = c.inventario || { moedas:{po:0,pp:0,pe:0,pc:0,pl:0}, armas:[], armaduras:[], itens:[] };
   const m = inv.moedas || {};
   // Ícones por moeda
-  const moedaIcones = { pc:'🟫', pp:'⚪', pe:'🟢', po:'🟡', pl:'🔷' };
+  // Bolinha colorida por moeda: a COR é a informação, então vira CSS (.dot),
+  // não ícone vetorial (que seria monocromático).
+  const moedaDot = cod => `<span class="dot dot--${cod}"></span>`;
 
   return `
     <div class="bloco-equip">
       <div class="bloco-equip-head">
-        <span class="bloco-icone" aria-hidden="true">💰</span>
+        <span class="bloco-icone">${ico('moedas')}</span>
         <h3 class="bloco-titulo">Moedas</h3>
       </div>
       <div class="moedas">
         ${window.PHB.MOEDAS.map(md => `<div class="moeda-box">
-          <div class="moeda-ic" aria-hidden="true">${moedaIcones[md.codigo] || '🪙'}</div>
+          <div class="moeda-ic" aria-hidden="true">${moedaDot(md.codigo)}</div>
           <label>${md.abrev}</label>
           <input type="text" inputmode="numeric" name="moeda_${md.codigo}" value="${m[md.codigo] ?? 0}" data-validar="int" data-min="0" aria-label="${md.nome}">
         </div>`).join('')}
@@ -3624,7 +3743,7 @@ function renderEquipamento(c) {
 
     <div class="bloco-equip">
       <div class="bloco-equip-head">
-        <span class="bloco-icone" aria-hidden="true">⚔️</span>
+        <span class="bloco-icone">${ico('ataque')}</span>
         <h3 class="bloco-titulo">Armas</h3>
         <span class="contador-bloco">${inv.armas?.length || 0}</span>
       </div>
@@ -3641,7 +3760,7 @@ function renderEquipamento(c) {
 
     <div class="bloco-equip">
       <div class="bloco-equip-head">
-        <span class="bloco-icone" aria-hidden="true">🛡️</span>
+        <span class="bloco-icone">${ico('escudo')}</span>
         <h3 class="bloco-titulo">Armaduras</h3>
         <span class="contador-bloco">${inv.armaduras?.length || 0}</span>
       </div>
@@ -3658,7 +3777,7 @@ function renderEquipamento(c) {
 
     <div class="bloco-equip">
       <div class="bloco-equip-head">
-        <span class="bloco-icone" aria-hidden="true">🎒</span>
+        <span class="bloco-icone">${ico('mochila')}</span>
         <h3 class="bloco-titulo">Itens e Equipamento</h3>
         <span class="contador-bloco">${inv.itens?.length || 0}</span>
       </div>
@@ -3793,17 +3912,17 @@ function renderAliados(c) {
         </p>
       </div>
       <div class="aliados-add no-lock">
-        <button type="button" class="btn primary no-lock" id="btn-buscar-monstro">🔍 Buscar no Bestiário</button>
+        <button type="button" class="btn primary no-lock" id="btn-buscar-monstro">${ico('buscar')} Buscar no Bestiário</button>
         <select id="aliado-template" class="no-lock" aria-label="Adicionar criatura favorita ou em branco">
           <option value="novo">+ Em branco</option>
-          ${favLista().map(n => `<option value="fav:${escape(n)}">⭐ ${escape(tituloBonito(n))}</option>`).join('')}
+          ${favLista().map(n => `<option value="fav:${escape(n)}">★ ${escape(tituloBonito(n))}</option>`).join('')}
         </select>
         <button type="button" class="btn no-lock" id="btn-add-aliado">+ Adicionar</button>
       </div>
     </div>
-    ${favLista().length ? '' : `<p style="color:var(--text-dim);font-style:italic;font-size:11px;margin:0 0 12px">⭐ Dica: favorite criaturas no <strong>🔍 Buscar no Bestiário</strong> (estrela) para elas aparecerem aqui como atalho rápido.</p>`}
+    ${favLista().length ? '' : `<p style="color:var(--text-dim);font-style:italic;font-size:11px;margin:0 0 12px">★ Dica: favorite criaturas no <strong>${ico('buscar')} Buscar no Bestiário</strong> (estrela) para elas aparecerem aqui como atalho rápido.</p>`}
     <div id="aliados-wrap">
-      ${lista.length ? cards : `<div class="item-vazio">Nenhuma criatura ainda. Use <strong>🔍 Buscar no Bestiário</strong> ou escolha um favorito acima.</div>`}
+      ${lista.length ? cards : `<div class="item-vazio">Nenhuma criatura ainda. Use <strong>${ico('buscar')} Buscar no Bestiário</strong> ou escolha um favorito acima.</div>`}
     </div>
   `;
 }
@@ -3821,29 +3940,29 @@ function renderCardCriatura(cr, i) {
       <div class="criatura-head">
         <div class="criatura-img-wrap">
           <div class="criatura-img no-lock ${cr.imagem ? 'tem' : ''}" data-cr-img="${i}" role="button" tabindex="0" title="${cr.imagem ? 'Clique para ampliar' : 'Adicionar imagem (URL)'}" aria-label="Imagem da criatura">
-            ${cr.imagem ? `<img src="${escape(cr.imagem)}" alt="${escape(cr.nome||'')}" onerror="this.parentElement.classList.add('erro')">` : '<span class="criatura-img-ph">🖼️</span>'}
+            ${cr.imagem ? `<img src="${escape(cr.imagem)}" alt="${escape(cr.nome||'')}" onerror="this.parentElement.classList.add('erro')">` : `<span class="criatura-img-ph">${ico('retrato')}</span>`}
           </div>
-          <button type="button" class="criatura-img-edit no-lock" data-cr-img-edit="${i}" title="Trocar/remover imagem (URL)" aria-label="Editar imagem">✎</button>
+          <button type="button" class="criatura-img-edit no-lock" data-cr-img-edit="${i}" title="Trocar/remover imagem (URL)" aria-label="Editar imagem">${ico('editar')}</button>
         </div>
         <div class="criatura-id">
           <input class="criatura-nome" data-cr-campo="nome" data-cr="${i}" value="${escape(cr.nome||'')}" placeholder="Nome" aria-label="Nome da criatura">
           <input class="criatura-tipo" data-cr-campo="tipo" data-cr="${i}" value="${escape(cr.tipo||'')}" placeholder="Tipo (ex.: Besta Média)" aria-label="Tipo">
         </div>
-        <button type="button" class="criatura-del no-lock" data-cr-del="${i}" title="Remover criatura" aria-label="Remover criatura">🗑</button>
+        <button type="button" class="criatura-del no-lock" data-cr-del="${i}" title="Remover criatura" aria-label="Remover criatura">${ico('lixeira')}</button>
       </div>
 
       <div class="criatura-combate">
         <div class="cc-box">
-          <label>🛡️ CA</label>
+          <label>${ico('escudo')} CA</label>
           <input class="cc-num" data-cr-campo="ca" data-cr="${i}" inputmode="numeric" value="${cr.ca ?? 10}">
         </div>
         <div class="cc-box cc-hp">
-          <label>❤️ PV ${cr.pv_dados ? `<span class="cc-dados" title="Dados de Vida — clique 🎲 pra rolar">(${escape(cr.pv_dados)})</span>` : ''}</label>
+          <label>${ico('vida')} PV ${cr.pv_dados ? `<span class="cc-dados" title="Dados de Vida — clique no dado pra rolar">(${escape(cr.pv_dados)})</span>` : ''}</label>
           <div class="cc-hp-row">
             <input class="cc-num" data-cr-campo="hp_atual" data-cr="${i}" inputmode="numeric" value="${hpAtual}" aria-label="PV atual">
             <span>/</span>
             <input class="cc-num" data-cr-campo="hp_max" data-cr="${i}" inputmode="numeric" value="${hpMax}" aria-label="PV máximo">
-            ${cr.pv_dados ? `<button type="button" class="cc-rolar no-lock" data-cr-rolar="${i}" title="Rolar ${escape(cr.pv_dados)} para definir o PV máximo">🎲</button>` : ''}
+            ${cr.pv_dados ? `<button type="button" class="cc-rolar no-lock" data-cr-rolar="${i}" title="Rolar ${escape(cr.pv_dados)} para definir o PV máximo" aria-label="Rolar dados de vida">${ico('dado')}</button>` : ''}
           </div>
           <input type="hidden" data-cr-campo="pv_dados" data-cr="${i}" value="${escape(cr.pv_dados||'')}">
           <div class="cc-hpbar"><div class="cc-hpfill ${classeBar}" style="width:${pct}%"></div></div>
@@ -3855,11 +3974,11 @@ function renderCardCriatura(cr, i) {
           </div>
         </div>
         <div class="cc-box">
-          <label>👣 Desloc.</label>
+          <label>${ico('pegadas')} Desloc.</label>
           <input class="cc-txt" data-cr-campo="deslocamento" data-cr="${i}" value="${escape(cr.deslocamento||'')}" placeholder="9 m">
         </div>
         <div class="cc-box">
-          <label>⚔ ND</label>
+          <label>${ico('ataque')} ND</label>
           <input class="cc-txt" data-cr-campo="nd" data-cr="${i}" value="${escape(cr.nd||'')}" placeholder="—">
         </div>
       </div>
@@ -3998,7 +4117,7 @@ function abrirBuscadorMonstros() {
     ov.innerHTML = `
       <div class="bm-modal" role="dialog" aria-modal="true" aria-labelledby="bm-titulo">
         <div class="bm-header">
-          <div class="bm-titulo" id="bm-titulo">🔍 Bestiário — Manual dos Monstros</div>
+          <div class="bm-titulo" id="bm-titulo">${ico('buscar')} Bestiário — Manual dos Monstros</div>
           <button type="button" class="bm-close" id="bm-close">Fechar ✕</button>
         </div>
         <div class="bm-search">
@@ -4044,7 +4163,7 @@ function abrirBuscadorMonstros() {
       </div>
     </div>`).join('');
   carregarBestiario().then(b => {
-    if (!b) { result.innerHTML = '<div class="bm-vazio">⚠ Não foi possível carregar o bestiário.</div>'; return; }
+    if (!b) { result.innerHTML = `<div class="bm-vazio">${ico('aviso')} Não foi possível carregar o bestiário.</div>`; return; }
     renderResultadosMonstros(document.getElementById('bm-input').value);
     setTimeout(() => document.getElementById('bm-input')?.focus(), 60);
   });
@@ -4065,7 +4184,7 @@ function itemMonstroHTML(m) {
   const fav = favTem(m.nome);
   const thumb = m.imagem
     ? `<div class="bm-thumb"><img src="${escape(m.imagem)}" alt="" loading="lazy" onerror="this.parentElement.style.display='none'"></div>`
-    : `<div class="bm-thumb bm-thumb-vazio">🐲</div>`;
+    : `<div class="bm-thumb bm-thumb-vazio">${ico('dragao')}</div>`;
   return `
     <div class="bm-item">
       <button type="button" class="bm-fav ${fav ? 'on' : ''}" data-fav-monstro="${idx}" aria-pressed="${fav}" title="${fav ? 'Remover dos favoritos' : 'Favoritar'}">${fav ? '★' : '☆'}</button>
@@ -4073,7 +4192,7 @@ function itemMonstroHTML(m) {
       <div class="bm-item-info">
         <div class="bm-item-nome">${escape(tituloBonito(m.nome))}</div>
         <div class="bm-item-meta">${escape(m.tipo || '')}</div>
-        <div class="bm-item-stats">🛡️ CA ${m.ca} · ❤️ ${m.hp_max} PV · ⚔ ${escape(m.nd || 'ND —')}</div>
+        <div class="bm-item-stats">${ico('escudo')} CA ${m.ca} · ${ico('vida')} ${m.hp_max} PV · ${ico('ataque')} ${escape(m.nd || 'ND —')}</div>
       </div>
       <button type="button" class="bm-add no-lock" data-add-monstro="${idx}" title="Adicionar à ficha">+ Adicionar</button>
     </div>`;
@@ -4089,7 +4208,7 @@ function renderResultadosMonstros(termo) {
     const favs = _bestiario.filter(m => favTem(m.nome));
     let html = '';
     if (favs.length) {
-      html += `<div class="bm-secao">⭐ Favoritos</div>` + favs.map(itemMonstroHTML).join('');
+      html += `<div class="bm-secao">★ Favoritos</div>` + favs.map(itemMonstroHTML).join('');
       html += `<div class="bm-secao">Todas as criaturas</div>`;
     }
     html += `<div class="bm-dica">${_bestiario.length} criaturas. Digite para filtrar pelo nome.</div>`;
@@ -4168,7 +4287,7 @@ function conectarListenersAliados() {
       const bestiario = await carregarBestiario();
       btnAdd.disabled = false;
       const m = bestiario && bestiario.find(x => x.nome === nome);
-      if (!m) { toast('⚠ Criatura não encontrada no bestiário'); return; }
+      if (!m) { toast('Criatura não encontrada no bestiário', 'aviso'); return; }
       adicionarMonstroObj(m);
       render();
       destacarUltimaCriatura();
@@ -4236,7 +4355,7 @@ function conectarListenersAliados() {
       const cr = _companionsAtuais()[i];
       if (!cr || !cr.pv_dados) return;
       const novoHp = rolarDadosVida(cr.pv_dados);
-      if (novoHp == null) { toast('⚠ Fórmula de dados inválida'); return; }
+      if (novoHp == null) { toast('Fórmula de dados inválida', 'aviso'); return; }
       cr.hp_max = novoHp;
       cr.hp_atual = novoHp;
       const inpMax = document.querySelector(`input[data-cr-campo="hp_max"][data-cr="${i}"]`);
@@ -4245,7 +4364,7 @@ function conectarListenersAliados() {
         if (inpAtu) inpAtu.value = novoHp;
         atualizarBarraHpCriatura(i);
         agendarSalvarCompanions();
-        toast(`🎲 ${cr.nome}: ${cr.pv_dados} = ${novoHp} PV`);
+        toast(`${cr.nome}: ${cr.pv_dados} = ${novoHp} PV`, 'dado');
       };
       // Animação de rolagem no campo de PV máx, depois assenta
       if (window.FX && inpMax && inpMax.tagName === 'INPUT') {
@@ -4338,7 +4457,7 @@ function renderRoleplay(c) {
     <div class="insp-wrap">
       <button type="button" class="insp-btn" id="insp-menos" aria-label="Diminuir inspiração">−</button>
       <div class="insp-display">
-        <span class="insp-icone" aria-hidden="true">⭐</span>
+        <span class="insp-icone">${ico('inspiracao')}</span>
         <input type="text" inputmode="numeric" name="inspiracao" id="insp-input" value="${insp}" data-validar="int" data-min="0">
       </div>
       <button type="button" class="insp-btn" id="insp-mais" aria-label="Aumentar inspiração">+</button>
@@ -4350,20 +4469,20 @@ function renderRoleplay(c) {
     <h3>Retrato do Personagem</h3>
     <div class="retrato-wrap">
       <div class="retrato-preview" id="retrato-preview">
-        ${imgUrl ? `<img src="${escape(imgUrl)}" alt="Retrato de ${escape(c.nome||'')}" onerror="this.outerHTML='<div class=\\'retrato-placeholder\\' style=\\'color:#e88a8a\\'>⚠ não carregou</div>'">` :
-        `<div class="retrato-placeholder">🎭<br><span>Sem imagem</span></div>`}
+        ${imgUrl ? `<img src="${escape(imgUrl)}" alt="Retrato de ${escape(c.nome||'')}" data-lb data-lb-nome="${escape(c.nome||'Retrato')}" title="Clique para ampliar" onerror="this.outerHTML='<div class=\\'retrato-placeholder\\' style=\\'color:#e88a8a\\'>⚠ não carregou</div>'">` :
+        `<div class="retrato-placeholder">${ico('retrato')}<br><span>Sem imagem</span></div>`}
       </div>
       <div class="retrato-controles">
         <div class="campo">
           <label for="input-arquivo" class="btn-upload" id="lbl-upload">
-            <span aria-hidden="true">📁</span> Escolher imagem
+            ${ico('arquivo')} Escolher imagem
           </label>
           <input type="file" id="input-arquivo" accept="image/png,image/jpeg,image/webp,image/gif" style="display:none">
           <input name="imagem_url" type="hidden" id="input-imagem" value="${escape(imgUrl)}">
           <span class="ajuda">PNG, JPEG, WebP ou GIF · até 3 MB</span>
           <span class="upload-status" id="upload-status"></span>
         </div>
-        ${imgUrl ? `<button type="button" class="btn danger" id="btn-remover-img" style="align-self:flex-start;margin-top:8px">🗑 Remover imagem</button>` : ''}
+        ${imgUrl ? `<button type="button" class="btn danger" id="btn-remover-img" style="align-self:flex-start;margin-top:8px">${ico('lixeira')} Remover imagem</button>` : ''}
       </div>
     </div>
 
@@ -4463,7 +4582,7 @@ function atualizarLockLabel() {
   const btn = document.getElementById('btn-lock-toggle');
   if (!lbl || !btn) return;
   const unlock = document.body.classList.contains('modo-unlock');
-  lbl.textContent = unlock ? '🔓 Travar' : '🔒 Editar';
+  lbl.innerHTML = unlock ? ico('cadeado_aberto') + ' Travar' : ico('cadeado') + ' Editar';
   btn.setAttribute('aria-pressed', String(unlock));
   btn.title = unlock ? 'Travar a ficha (modo somente leitura)' : 'Liberar edição da ficha';
 }
@@ -4658,7 +4777,7 @@ function conectarListeners() {
       fill.className = 'hp-fill' + (pct <= 15 ? ' critico' : pct <= 35 ? ' baixo' : pct <= 65 ? ' medio' : '');
     }
     if (pctEl) pctEl.textContent = pct + '%';
-    if (icEl) icEl.textContent = pct <= 0 ? '💀' : pct <= 25 ? '🩸' : pct <= 50 ? '🧡' : pct <= 75 ? '❤️' : '💖';
+    if (icEl) icEl.innerHTML = iconeVida(pct);
   };
   if (hpAtual && hpMax) {
     hpAtual.addEventListener('input', atualizarBarraHP);
@@ -4759,7 +4878,7 @@ function conectarListeners() {
       if (url) {
         prev.innerHTML = `<img src="${url.replace(/"/g, '&quot;')}" alt="Retrato" onerror="this.outerHTML='<div class=\\'retrato-placeholder\\' style=\\'color:#e88a8a\\'>⚠ não carregou</div>'">`;
       } else {
-        prev.innerHTML = '<div class="retrato-placeholder">🎭<br><span>Sem imagem</span></div>';
+        prev.innerHTML = `<div class="retrato-placeholder">${ico('retrato')}<br><span>Sem imagem</span></div>`;
       }
     }
 
@@ -5193,7 +5312,7 @@ async function salvar(e) {
     status.className = 'status-msg ok';
     status.textContent = '✓ Salvo  ·  ' + new Date().toLocaleTimeString('pt-BR');
     if (window.FX) FX.salvo(status);
-    setTimeout(() => { if (status.classList.contains('ok')) status.textContent = '💾 Auto-save ativo'; }, 2500);
+    setTimeout(() => { if (status.classList.contains('ok')) status.innerHTML = ico('salvar') + ' Auto-save ativo'; }, 2500);
   }
   if (btn) btn.disabled = false;
 }
