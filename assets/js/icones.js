@@ -178,9 +178,22 @@
     ceu_noturno:      'night-sky',
     // --- Classes/subclasses dos jogadores da mesa (verificados: HTTP 200) ---
     clerigo_morte:    'scythe',          // Sabrina  - Clériga do Domínio da Morte
-    guerreiro:        'warlord-helmet',  // Derick   - Guerreiro Renascido
+    guerreiro:        'warlord-helmet',  // Derick   - Guerreiro Renascido (genérico de Guerreiro também)
     feiticeiro_draco: 'dragon-spiral',   // Felipe   - Feiticeiro de Linhagem Dracônica
     paladino_vinganca:'winged-sword',    // Guilherme- Paladino do Juramento de Vingança
+    // --- Classes genéricas (tema visual por classe no painel do mestre) ---
+    mago:             'spell-book',
+    feiticeiro:       'fire-ray',
+    bruxo:            'pentagram-rose',
+    bardo:            'lyre',
+    clerigo:          'holy-symbol',
+    druida:           'acorn',
+    monge:            'fist',
+    ladino:           'hooded-figure',
+    barbaro:          'axe-swing',
+    artifice:         'cog',
+    paladino:         'winged-sword',
+    patrulheiro:      'bow-arrow',
     // --- Itens mágicos (por tipo) — verificados: HTTP 200 ---
     item_maravilhoso: 'gem-pendant',
     pocao:            'potion-ball',

@@ -167,27 +167,52 @@
     background:
       linear-gradient(to bottom, var(--bg-card), var(--bg-card-soft) 50%, var(--bg-card)),
       var(--bg-card);
-    border: 2px solid var(--gold);
+    border: 2px solid var(--tema-cor, var(--gold));
     border-radius: 3px;
     padding: 16px 14px 24px;
     position: relative;
+    z-index: 0; /* contém o watermark de classe dentro deste card */
     box-shadow:
       0 0 0 1px var(--blood-dark) inset,
       0 6px 20px rgba(0,0,0,0.7),
       inset 0 0 30px rgba(0,0,0,0.5);
+    transition: border-color 0.2s;
   }
 
   /* Decoração de cantos góticos */
   .card::before, .card::after {
     content: '✠';
     position: absolute;
-    color: var(--blood);
+    color: var(--tema-cor, var(--blood));
     font-size: 16px;
     opacity: 0.7;
     text-shadow: 0 0 4px rgba(0,0,0,0.8);
   }
   .card::before { top: 4px; left: 8px; }
   .card::after { top: 4px; right: 8px; }
+
+  /* ===== TEMA VISUAL POR CLASSE ===== */
+  .class-watermark {
+    position: absolute;
+    z-index: -1;
+    right: -14px;
+    bottom: -14px;
+    font-size: 130px;
+    line-height: 1;
+    color: var(--tema-cor, var(--gold));
+    opacity: 0.08;
+    pointer-events: none;
+    transform: rotate(-6deg);
+  }
+  .class-badge {
+    display: inline-flex;
+    vertical-align: -3px;
+    margin-right: 5px;
+    color: var(--tema-cor, var(--gold-bright));
+    font-size: 13px;
+  }
+  .char-header { border-bottom-color: var(--tema-cor, var(--blood)); }
+  .section-title { border-bottom-color: var(--tema-cor, var(--blood)); }
 
   /* ===== CABEÇALHO DO CARD ===== */
   .char-header {
@@ -460,33 +485,86 @@
   }
   .slot-status-m strong { color: var(--gold-bright); font-size: 11px; }
 
-  /* ===== MAGIAS PREPARADAS (Mestre — do spell_lists) ===== */
-  .magias-prep-mestre {
-    display: flex; flex-wrap: wrap; gap: 4px;
-    min-height: 24px; padding: 4px 0;
+  /* ===== MAGIAS PREPARADAS (Mestre — do spell_lists), agrupadas por nível ===== */
+  .magias-prep-mestre { padding: 2px 0; }
+  .magia-prep-grupo + .magia-prep-grupo { margin-top: 7px; }
+  .magia-prep-grupo-titulo {
+    font-family: 'Cinzel', serif;
+    font-size: 9.5px; font-weight: 700;
+    color: var(--tema-cor, var(--gold));
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin-bottom: 4px;
+    opacity: 0.9;
   }
+  .magia-prep-grupo-tags { display: flex; flex-wrap: wrap; gap: 4px; }
   .magia-prep-tag {
-    display: inline-flex; align-items: center; gap: 5px;
+    display: inline-flex; align-items: center;
     background: rgba(184, 138, 44, 0.15);
     border: 1px solid rgba(139, 105, 20, 0.4);
     border-radius: 10px;
-    padding: 2px 8px;
+    padding: 2px 9px;
     font-size: 11px;
     color: var(--parchment);
-  }
-  .magia-prep-tag .nv {
-    font-family: 'Cinzel', serif;
-    font-size: 9px; font-weight: 700;
-    color: var(--gold-bright);
-    background: rgba(0,0,0,0.4);
-    border-radius: 8px;
-    padding: 1px 5px;
-    letter-spacing: 0.5px;
   }
   .magia-prep-vazio {
     font-size: 11px; color: var(--text-dim);
     font-style: italic; padding: 4px 0;
   }
+
+  /* ===== EQUIPAMENTO (Mestre — editável, sincroniza com a ficha) ===== */
+  .equip-grupo + .equip-grupo { margin-top: 9px; }
+  .equip-grupo-titulo {
+    font-family: 'Cinzel', serif;
+    font-size: 9.5px; font-weight: 700;
+    color: var(--tema-cor, var(--gold));
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    margin-bottom: 4px;
+    opacity: 0.9;
+  }
+  .equip-tags { display: flex; flex-wrap: wrap; gap: 4px; min-height: 4px; }
+  .equip-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(139, 105, 20, 0.4);
+    border-radius: 10px;
+    padding: 2px 6px 2px 9px;
+    font-size: 11px;
+    color: var(--parchment);
+  }
+  .equip-tag .equip-tag-extra { color: var(--text-dim); font-size: 10px; }
+  .equip-tag .equip-rm {
+    background: none; border: none; cursor: pointer;
+    color: var(--text-dim); font-size: 12px; line-height: 1;
+    padding: 2px 3px; border-radius: 50%;
+  }
+  .equip-tag .equip-rm:hover { color: var(--blood-bright); background: rgba(139,29,29,0.2); }
+  .equip-vazio { font-size: 11px; color: var(--text-dim); font-style: italic; }
+  .equip-add { display: flex; gap: 4px; margin-top: 5px; }
+  .equip-add input {
+    flex: 1; min-width: 0;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(139, 105, 20, 0.4);
+    border-radius: 2px;
+    color: var(--parchment);
+    font-size: 11px;
+    padding: 4px 6px;
+    font-family: 'EB Garamond', serif;
+  }
+  .equip-add input.equip-add-extra { flex: 0 0 52px; }
+  .equip-add input::placeholder { color: var(--text-dim); opacity: 0.6; }
+  .equip-add button {
+    background: rgba(184,138,44,0.15);
+    border: 1px solid var(--gold);
+    color: var(--gold-bright);
+    border-radius: 2px;
+    padding: 0 10px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 700;
+  }
+  .equip-add button:hover { background: var(--gold); color: var(--shadow); }
 
   /* ===== MOEDAS (visão do mestre — somente leitura) ===== */
   .moedas-grid {
@@ -709,6 +787,11 @@
 
     .spell-list { min-height: 70px; font-size: 14px; padding: 10px; }
 
+    .class-watermark { font-size: 90px; }
+    .magia-prep-tag { font-size: 12px; padding: 4px 10px; }
+    .equip-tag { font-size: 12px; padding: 4px 8px 4px 10px; }
+    .equip-add input, .equip-add button { min-height: 34px; }
+
     .card-actions { gap: 6px; flex-wrap: wrap; }
     .card-actions button { padding: 10px 12px; min-height: 40px; font-size: 11px; flex: 1; }
 
@@ -750,6 +833,8 @@
       font-size: 10pt !important;
     }
     .card::before, .card::after { display: none !important; }
+    .class-watermark { display: none !important; }
+    .class-badge { display: none !important; }
     .char-name { color: #6b1010 !important; text-shadow: none !important; font-size: 14pt !important; }
     .player-name, .race-class { color: #444 !important; }
     .stat-label, .section-title { color: #6a4f0e !important; }
@@ -782,6 +867,7 @@
 <link rel="stylesheet" href="../assets/css/ui.css">
 <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
 <script src="../assets/js/icones.js"></script>
+<script src="../assets/js/classes_tema.js"></script>
 </head>
 <body data-ambiente="brasas">
 
@@ -896,7 +982,8 @@ function criarPersonagem(base = {}) {
     falhas: 0,
     slots: {1:{atual:0,max:0},2:{atual:0,max:0},3:{atual:0,max:0},4:{atual:0,max:0},5:{atual:0,max:0},6:{atual:0,max:0},7:{atual:0,max:0},8:{atual:0,max:0},9:{atual:0,max:0}},
     magias: '',
-    condicoes: []
+    condicoes: [],
+    inventario: { moedas:{po:0,pp:0,pe:0,pc:0,pl:0}, armas:[], armaduras:[], itens:[] }
   };
 }
 
@@ -1050,6 +1137,127 @@ function _aplicarRerender(id) {
   requestAnimationFrame(() => requestAnimationFrame(() => { novo.style.minHeight = ''; }));
 }
 
+// Aplica cor + ícone de fundo temáticos da classe do personagem no card.
+// Some silenciosamente se a classe não for reconhecida (mantém o tema padrão dourado/sangue).
+function aplicarTemaClasse(card, p) {
+  const tema = window.ClasseTema ? window.ClasseTema.obter(p.classe) : null;
+
+  card.querySelector('.class-watermark')?.remove();
+  const badgeAntigo = card.querySelector('.class-badge');
+  if (badgeAntigo) badgeAntigo.remove();
+
+  if (!tema) {
+    card.style.removeProperty('--tema-cor');
+    return;
+  }
+  card.style.setProperty('--tema-cor', tema.cor);
+
+  const wm = document.createElement('div');
+  wm.className = 'class-watermark';
+  wm.setAttribute('aria-hidden', 'true');
+  wm.innerHTML = ico(tema.icone, { cor: tema.cor });
+  card.appendChild(wm);
+
+  const raceClass = card.querySelector('.race-class');
+  if (raceClass) {
+    const badge = document.createElement('span');
+    badge.className = 'class-badge';
+    badge.innerHTML = ico(tema.icone, { titulo: tema.chave });
+    raceClass.prepend(badge);
+  }
+}
+
+// Equipamento: mesmo formato de dados que a ficha do jogador (c.inventario),
+// então o que o mestre edita aqui aparece direto na ficha (e vice-versa).
+const GRUPOS_EQUIP = [
+  { tipo: 'armas', titulo: 'Armas', vazio: 'Nenhuma arma.',
+    campos: [{ chave: 'nome', placeholder: 'Nome' }, { chave: 'dano', placeholder: 'Dano', extra: true }] },
+  { tipo: 'armaduras', titulo: 'Armaduras', vazio: 'Nenhuma armadura.',
+    campos: [{ chave: 'nome', placeholder: 'Nome' }, { chave: 'ca', placeholder: 'CA', extra: true }] },
+  { tipo: 'itens', titulo: 'Itens', vazio: 'Nenhum item.',
+    campos: [{ chave: 'nome', placeholder: 'Nome' }, { chave: 'qtd', placeholder: 'Qtd', extra: true }] },
+];
+
+function criarSecaoEquipamento(p) {
+  if (!p.inventario) p.inventario = { moedas: {}, armas: [], armaduras: [], itens: [] };
+  ['armas', 'armaduras', 'itens'].forEach(t => { if (!Array.isArray(p.inventario[t])) p.inventario[t] = []; });
+
+  const section = document.createElement('div');
+  section.className = 'section';
+  section.innerHTML = `<div class="section-title">Equipamento</div>`;
+
+  GRUPOS_EQUIP.forEach(g => {
+    const grupo = document.createElement('div');
+    grupo.className = 'equip-grupo';
+    grupo.innerHTML = `<div class="equip-grupo-titulo">${g.titulo}</div><div class="equip-tags"></div>`;
+    const tagsBox = grupo.querySelector('.equip-tags');
+    const extraCampo = g.campos.find(c => c.extra);
+
+    const repintar = () => {
+      const lista = p.inventario[g.tipo];
+      tagsBox.innerHTML = '';
+      if (!lista.length) {
+        tagsBox.innerHTML = `<span class="equip-vazio">${g.vazio}</span>`;
+        return;
+      }
+      lista.forEach((item, idx) => {
+        const extraVal = extraCampo ? item[extraCampo.chave] : null;
+        const tag = document.createElement('span');
+        tag.className = 'equip-tag';
+        tag.innerHTML = `${escapeHtml(item.nome || '?')}${extraVal ? ` <span class="equip-tag-extra">(${escapeHtml(String(extraVal))})</span>` : ''}`;
+        const rm = document.createElement('button');
+        rm.type = 'button';
+        rm.className = 'equip-rm';
+        rm.setAttribute('aria-label', `Remover ${item.nome || 'item'}`);
+        rm.textContent = '✕';
+        rm.onclick = () => {
+          p.inventario[g.tipo].splice(idx, 1);
+          salvar(p);
+          repintar();
+        };
+        tag.appendChild(rm);
+        tagsBox.appendChild(tag);
+      });
+    };
+    repintar();
+
+    const addRow = document.createElement('div');
+    addRow.className = 'equip-add';
+    const inputs = g.campos.map(c => {
+      const inp = document.createElement('input');
+      inp.type = 'text';
+      inp.placeholder = c.placeholder;
+      if (c.extra) inp.className = 'equip-add-extra';
+      return inp;
+    });
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.textContent = '+';
+    btn.setAttribute('aria-label', `Adicionar em ${g.titulo}`);
+    const adicionar = () => {
+      const nome = inputs[0].value.trim();
+      if (!nome) { inputs[0].focus(); return; }
+      const novo = { nome };
+      g.campos.slice(1).forEach((c, i) => { novo[c.chave] = inputs[i + 1].value.trim(); });
+      p.inventario[g.tipo].push(novo);
+      salvar(p);
+      inputs.forEach(i => i.value = '');
+      inputs[0].focus();
+      repintar();
+    };
+    btn.onclick = adicionar;
+    inputs.forEach(inp => {
+      inp.onkeydown = (e) => { if (e.key === 'Enter') { e.preventDefault(); adicionar(); } };
+      addRow.appendChild(inp);
+    });
+    addRow.appendChild(btn);
+    grupo.appendChild(addRow);
+    section.appendChild(grupo);
+  });
+
+  return section;
+}
+
 function criarCard(p) {
   const card = document.createElement('article');
   card.className = 'card';
@@ -1096,11 +1304,13 @@ function criarCard(p) {
       const field = el.dataset.field;
       p[field] = field === 'nivel' ? (parseInt(el.textContent) || 1) : (el.textContent.trim() || '?');
       salvar(p);
+      if (field === 'classe') aplicarTemaClasse(card, p);
     };
     el.onblur = () => {
       const field = el.dataset.field;
       p[field] = field === 'nivel' ? (parseInt(el.textContent) || 1) : (el.textContent.trim() || '?');
       salvar(p);
+      if (field === 'classe') aplicarTemaClasse(card, p);
     };
   });
 
@@ -1109,6 +1319,9 @@ function criarCard(p) {
   header.appendChild(jogador);
   header.appendChild(raceClass);
   card.appendChild(header);
+
+  // ===== TEMA VISUAL POR CLASSE (cor + ícone de fundo) =====
+  aplicarTemaClasse(card, p);
 
   // ===== STATS PRINCIPAIS =====
   const stats = document.createElement('div');
@@ -1339,15 +1552,27 @@ function criarCard(p) {
         wrap.innerHTML = `<span class="magia-prep-vazio">Nenhuma magia favoritada pelo jogador.</span>`;
         return;
       }
-      wrap.innerHTML = magias.map(m => {
-        const nv = m.nivel === 0 ? 'TRU' : `${m.nivel}°`;
-        return `<span class="magia-prep-tag" title="${escapeHtml(m.escola || '')}">
-          <span class="nv">${nv}</span>${escapeHtml(m.nome)}
-        </span>`;
+      // Agrupa por nível (0 = Truques) — já vem ordenado por carregarMagiasPreparadasMestre
+      const grupos = new Map();
+      magias.forEach(m => {
+        const nv = m.nivel || 0;
+        if (!grupos.has(nv)) grupos.set(nv, []);
+        grupos.get(nv).push(m);
+      });
+      wrap.innerHTML = [...grupos.entries()].map(([nv, lista]) => {
+        const rotulo = nv === 0 ? 'Truques' : `${nv}° Nível`;
+        const tags = lista.map(m => `<span class="magia-prep-tag" title="${escapeHtml(m.escola || '')}">${escapeHtml(m.nome)}</span>`).join('');
+        return `<div class="magia-prep-grupo">
+          <div class="magia-prep-grupo-titulo">${rotulo}</div>
+          <div class="magia-prep-grupo-tags">${tags}</div>
+        </div>`;
       }).join('');
     }
     carregarMagiasPreparadasMestre(p.id).then(pintarMagias);
   }
+
+  // ===== EQUIPAMENTO (editável — some com o mesmo campo p.inventario da ficha) =====
+  card.appendChild(criarSecaoEquipamento(p));
 
   // ===== CONDIÇÕES =====
   const condSection = document.createElement('div');

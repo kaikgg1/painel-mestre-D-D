@@ -28,6 +28,7 @@
 //   slots           → slots_magia  (jsonb)
 //   magias          → magias_preparadas
 //   condicoes       → condicoes (text[])
+//   inventario      → inventario (jsonb — moedas/armas/armaduras/itens, mesmo formato da ficha)
 
 (function () {
   const DEBOUNCE_MS = 400;
@@ -61,6 +62,7 @@
     isActive: 'is_active',
     recursosUsados: 'recursos_usados',
     dadoVidaAtual: 'dado_vida_atual',
+    inventario: 'inventario',
   };
 
   function uiToDb(uiObj) {
@@ -112,6 +114,8 @@
       moedas: (row.inventario && row.inventario.moedas)
               ? { ...{ pc:0, pp:0, pe:0, po:0, pl:0 }, ...row.inventario.moedas }
               : { pc:0, pp:0, pe:0, po:0, pl:0 },
+      // Inventário completo (armas/armaduras/itens) — mesmo formato usado pela ficha do jogador
+      inventario: row.inventario || { moedas: {}, armas: [], armaduras: [], itens: [] },
       // Originais pra exibição (não vão pro UI_TO_DB; só pra leitura)
       _subclasse: row.subclasse || '',
     };
