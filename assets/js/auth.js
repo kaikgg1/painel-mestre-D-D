@@ -14,9 +14,10 @@
   const DOMINIO     = '@mesa.local';
 
   const JOGADORES = [
-    { nome: 'Sabrina123', email: 'sabrina123' + DOMINIO },
-    { nome: 'Derik123',   email: 'derik123'   + DOMINIO },
-    { nome: 'Felipe123',  email: 'felipe123'  + DOMINIO },
+    { nome: 'Sabrina123',   email: 'sabrina123'   + DOMINIO },
+    { nome: 'Derik123',     email: 'derik123'     + DOMINIO },
+    { nome: 'Felipe123',    email: 'felipe123'    + DOMINIO },
+    { nome: 'Guilherme123', email: 'guilherme123' + DOMINIO },
   ];
 
   function emailDoNome(nome) {

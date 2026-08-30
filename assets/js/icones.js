@@ -176,6 +176,11 @@
     sombras:          'shadow-follower',
     gelo:             'zigzag-leaf',
     ceu_noturno:      'night-sky',
+    // --- Classes/subclasses dos jogadores da mesa (verificados: HTTP 200) ---
+    clerigo_morte:    'scythe',          // Sabrina  - Clériga do Domínio da Morte
+    guerreiro:        'warlord-helmet',  // Derick   - Guerreiro Renascido
+    feiticeiro_draco: 'dragon-spiral',   // Felipe   - Feiticeiro de Linhagem Dracônica
+    paladino_vinganca:'winged-sword',    // Guilherme- Paladino do Juramento de Vingança
   };
 
   const PREFIXO = 'game-icons:';
