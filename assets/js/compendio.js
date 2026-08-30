@@ -275,7 +275,7 @@
     const cor = CORES_RAR[it.raridade] || '#a89878';
     const icone = ico(chaveIconeItem(it.tipo, it.nome));
     return `<div class="cp-item" data-idx="${idx}">
-      <div class="cp-thumb">${icone}</div>
+      <div class="cp-thumb">${icone}${it.imagem ? `<img src="${esc(it.imagem)}" alt="" loading="lazy" onerror="this.remove()">` : ''}</div>
       <div style="flex:1;min-width:0">
         <div class="cp-item-nome">${esc(titulo(it.nome))}<span class="cp-tag" style="background:${cor}22;color:${cor};border:1px solid ${cor}66">${esc(it.raridade)}</span></div>
         <div class="cp-item-meta">${esc(it.tipo)}${it.sintonia ? ' · requer sintonização' : ''}</div>
@@ -302,6 +302,7 @@
   function fichaItem(it) {
     const cor = CORES_RAR[it.raridade] || '#a89878';
     return `<div class="cp-ficha">
+      ${it.imagem ? `<img class="cp-img" src="${esc(it.imagem)}" alt="" onerror="this.style.display='none'">` : ''}
       <h3>${esc(titulo(it.nome))}</h3>
       <div class="cp-sub">${esc(it.tipo)}, <b style="color:${cor}">${esc(it.raridade)}</b>${it.sintonia ? ` · requer sintonização${it.sintonia_detalhe ? ' ' + esc(it.sintonia_detalhe) : ''}` : ''}</div>
       <div class="cp-desc">${esc(it.descricao)}</div></div>`;
