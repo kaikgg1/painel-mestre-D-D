@@ -264,9 +264,19 @@
   }
 
   .modal-desc {
-    font-size: 15.5px; line-height: 1.62; color: var(--parchment-dim);
-    font-style: italic; margin-bottom: 16px; padding-bottom: 14px;
+    font-size: 16.5px; line-height: 1.8; color: #c3b192;
+    font-style: italic; letter-spacing: .1px;
+    margin-bottom: 18px; padding-bottom: 16px;
     border-bottom: 1px solid var(--borda);
+    text-wrap: pretty;
+  }
+  .modal-desc::first-letter {
+    font-family: 'Cinzel Decorative', serif;
+    font-style: normal; font-weight: 700;
+    font-size: 2.7em; line-height: .78;
+    float: left; margin: 3px 7px 0 0;
+    color: var(--gold-light);
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.7);
   }
 
   /* ===== BLOCO DE ESTATÍSTICAS — réplica do stat block do livro (pergaminho) ===== */
@@ -375,6 +385,8 @@
     .atributos { grid-template-columns: repeat(3, 1fr); }
     .modal-topo { gap: 11px; }
     .modal-thumb { width: 58px; height: 58px; }
+    .modal-desc { font-size: 15px; }
+    .modal-desc::first-letter { font-size: 2.2em; margin-right: 5px; }
   }
   @media (prefers-reduced-motion: reduce) {
     * { animation: none !important; transition: none !important; }
