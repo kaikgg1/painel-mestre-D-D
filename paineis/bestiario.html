@@ -269,120 +269,90 @@
     border-bottom: 1px solid var(--borda);
   }
 
-  .stat-linha { margin-bottom: 5px; font-size: 15.5px; }
-  .stat-rot {
-    font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700;
-    letter-spacing: .7px; color: var(--blood-bright); text-transform: uppercase;
-    margin-right: 7px;
+  /* ===== BLOCO DE ESTATÍSTICAS — réplica do stat block do livro (pergaminho) ===== */
+  .statblock {
+    --sb-bg: #fbf1da;
+    --sb-bg-alt: #f2e1b8;
+    --sb-text: #241708;
+    --sb-label: #7a2315;
+    --sb-rule: rgba(122,35,21,0.55);
+    --sb-border: #a9825a;
+    background: var(--sb-bg);
+    color: var(--sb-text);
+    border: 1px solid var(--sb-border);
+    border-radius: 6px;
+    padding: 16px 18px 6px;
+    margin-bottom: 20px;
+    box-shadow: 0 3px 14px rgba(0,0,0,0.35);
+    font-family: 'EB Garamond', Georgia, serif;
   }
-  .bloco-stats { margin-bottom: 16px; }
+  .sb-divisor {
+    border: none; height: 2px; margin: 10px 0;
+    background: linear-gradient(to right, var(--sb-rule), rgba(122,35,21,0.08) 92%);
+  }
+  .stat-linha { margin-bottom: 4px; font-size: 15px; line-height: 1.5; }
+  .stat-rot {
+    font-weight: 700; color: var(--sb-label);
+    margin-right: 5px;
+  }
 
   .atributos {
-    display: grid; grid-template-columns: repeat(6, 1fr); gap: 7px;
-    margin: 16px 0; padding: 13px 10px;
-    background: rgba(0,0,0,0.28); border: 1px solid var(--borda); border-radius: 10px;
+    display: grid; grid-template-columns: repeat(6, 1fr); gap: 4px;
+    margin: 2px 0 4px;
   }
   .atr { text-align: center; }
   .atr-nome {
-    font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700;
-    letter-spacing: 1px; color: var(--gold-bright); margin-bottom: 3px;
+    font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700;
+    letter-spacing: .5px; color: var(--sb-label); margin-bottom: 1px;
   }
-  .atr-val { font-size: 20px; color: var(--parchment); line-height: 1.1; }
-  .atr-mod { font-size: 13px; color: var(--text-dim); }
+  .atr-val { font-size: 15px; color: var(--sb-text); line-height: 1.2; }
+  .atr-mod { font-size: 15px; color: var(--sb-text); display: inline; }
 
-  /* ===== SEÇÕES DESTACADAS (características / ações) ===== */
+  /* ===== CABEÇALHOS DE SEÇÃO (Ações, Ações Lendárias…) — texto corrido, sem caixa ===== */
   .secao-modal {
-    display: flex; align-items: center; gap: 9px;
-    font-family: 'Cinzel', serif; font-size: 14px; font-weight: 700;
-    letter-spacing: 1.4px; text-transform: uppercase;
-    margin: 22px 0 12px; padding: 8px 12px;
-    border-radius: 8px; border-left: 4px solid;
+    display: flex; align-items: center; gap: 6px;
+    font-family: 'Cinzel', serif; font-size: 16px; font-weight: 700;
+    letter-spacing: .5px;
+    color: var(--sb-label);
+    margin: 14px 0 4px; padding-bottom: 3px;
+    border-bottom: 2px solid var(--sb-rule);
   }
-  .secao-modal iconify-icon { font-size: 17px; }
-  .secao-modal.carac {
-    color: var(--gold-light); border-left-color: var(--gold-light);
-    background: linear-gradient(90deg, rgba(212,168,67,0.14), transparent 78%);
-  }
-  .secao-modal.acoes {
-    color: #e8837a; border-left-color: var(--blood-bright);
-    background: linear-gradient(90deg, rgba(139,29,29,0.22), transparent 78%);
-  }
+  .secao-modal iconify-icon { font-size: 15px; opacity: .75; }
+
+  /* Traços/ações no estilo do livro: "Nome. " em negrito-itálico seguido do texto corrido */
   .traco {
-    margin-bottom: 10px; font-size: 15.5px; line-height: 1.58;
-    padding: 9px 13px; border-radius: 7px;
-    background: rgba(255,255,255,0.022);
-    border-left: 2px solid rgba(139,105,20,0.4);
+    margin-bottom: 9px; font-size: 15px; line-height: 1.5;
   }
-  .traco:hover { background: rgba(255,255,255,0.045); border-left-color: var(--gold); }
   .traco b {
-    color: var(--gold-light); font-style: italic; font-weight: 700;
-    display: block; margin-bottom: 2px; font-size: 15px;
+    color: var(--sb-text); font-style: italic; font-weight: 700;
   }
-  .secao-acoes-bloco .traco { border-left-color: rgba(139,29,29,0.55); }
-  .secao-acoes-bloco .traco:hover { border-left-color: var(--blood-bright); }
-  .secao-acoes-bloco .traco b { color: #e8968c; }
+  .secao-carac-bloco, .secao-acoes-bloco, .secao-bonus-bloco,
+  .secao-reacoes-bloco, .secao-lendaria-bloco, .secao-covil-bloco {
+    margin-bottom: 4px;
+  }
 
-  /* --- Demais seções do bloco de estatísticas --- */
-  .secao-modal.bonus {
-    color: #e0a44f; border-left-color: #c08a3e;
-    background: linear-gradient(90deg, rgba(192,138,62,0.16), transparent 78%);
-  }
-  .secao-bonus-bloco .traco { border-left-color: rgba(192,138,62,0.5); }
-  .secao-bonus-bloco .traco:hover { border-left-color: #e0a44f; }
-  .secao-bonus-bloco .traco b { color: #e0a44f; }
-
-  .secao-modal.reacoes {
-    color: #7fb0e0; border-left-color: #5f8bb8;
-    background: linear-gradient(90deg, rgba(95,139,184,0.16), transparent 78%);
-  }
-  .secao-reacoes-bloco .traco { border-left-color: rgba(95,139,184,0.5); }
-  .secao-reacoes-bloco .traco:hover { border-left-color: #7fb0e0; }
-  .secao-reacoes-bloco .traco b { color: #7fb0e0; }
-
-  .secao-modal.lendaria {
-    color: var(--gold-light); border-left-color: var(--gold-bright);
-    background: linear-gradient(90deg, rgba(184,138,44,0.24), transparent 78%);
-    box-shadow: inset 0 0 18px rgba(212,168,67,0.10);
-  }
-  .secao-lendaria-bloco .traco {
-    border-left-color: rgba(184,138,44,0.55);
-    background: rgba(212,168,67,0.045);
-  }
-  .secao-lendaria-bloco .traco:hover { border-left-color: var(--gold-light); }
-  .secao-lendaria-bloco .traco b { color: var(--gold-light); }
-
-  .secao-modal.covil {
-    color: #b58ee0; border-left-color: #8b6fc4;
-    background: linear-gradient(90deg, rgba(139,111,196,0.18), transparent 78%);
-  }
-  .secao-covil-bloco .traco { border-left-color: rgba(139,111,196,0.5); }
-  .secao-covil-bloco .traco:hover { border-left-color: #b58ee0; }
-  .secao-covil-bloco .traco b { color: #b58ee0; }
-
-  /* preâmbulo (ex.: "pode realizar 3 ações lendárias…") — sem título em negrito */
-  .traco.preambulo {
-    font-style: italic; color: var(--parchment-dim);
-    background: transparent; border-left-style: dashed;
-  }
+  /* preâmbulo (ex.: "pode realizar 3 ações lendárias…") — itálico, sem nome em negrito */
+  .traco.preambulo { font-style: italic; }
 
   /* ===== PV: alternar média / máximo ===== */
   .hp-toggle {
-    display: inline-flex; align-items: center; gap: 7px; flex-wrap: wrap;
-    margin-left: 2px;
+    display: inline-flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    margin-left: 4px;
   }
   .hp-btn {
-    font-family: 'Cinzel', serif; font-size: 10.5px; font-weight: 700;
-    letter-spacing: .7px; text-transform: uppercase;
-    padding: 3px 10px; border-radius: 20px; cursor: pointer;
-    background: rgba(255,255,255,0.04); border: 1px solid var(--borda);
-    color: var(--text-dim); transition: .15s;
+    font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700;
+    letter-spacing: .5px; text-transform: uppercase;
+    padding: 2px 9px; border-radius: 20px; cursor: pointer;
+    background: rgba(122,35,21,0.06); border: 1px solid var(--sb-border);
+    color: var(--sb-label); opacity: .55; transition: .15s;
   }
-  .hp-btn:hover { border-color: var(--gold-bright); color: var(--parchment); }
-  .hp-btn.on {
-    background: rgba(184,138,44,0.18); border-color: var(--gold-light);
-    color: var(--gold-light);
+  .hp-btn:hover { opacity: .85; }
+  .hp-btn.on { background: rgba(122,35,21,0.14); opacity: 1; }
+  .hp-valor { font-variant-numeric: tabular-nums; font-weight: 700; }
+
+  @media (max-width: 480px) {
+    .statblock { padding: 13px 14px 4px; }
   }
-  .hp-valor { font-variant-numeric: tabular-nums; }
 
 
   #ao-topo {
@@ -658,7 +628,7 @@ function abrirModal(nome) {
   const listar = (arr) => (arr || [])
     .filter(t => t && (t.nome || t.desc))
     .map(t => t.nome && t.nome !== '—'
-      ? `<div class="traco"><b>${esc(t.nome)}</b>${esc(t.desc)}</div>`
+      ? `<div class="traco"><b>${esc(t.nome)}.</b> ${esc(t.desc)}</div>`
       : `<div class="traco preambulo">${esc(t.desc)}</div>`)
     .join('');
 
@@ -689,41 +659,47 @@ function abrirModal(nome) {
 
     ${c.descricao ? `<div class="modal-desc">${esc(c.descricao)}</div>` : ''}
 
-    <div class="bloco-stats">
-      ${linha('Classe de Armadura', caTxt)}
-      ${pvBloco}
-      ${linha('Deslocamento', c.deslocamento)}
-    </div>
+    <div class="statblock">
+      <div class="bloco-stats">
+        ${linha('Classe de Armadura', caTxt)}
+        ${pvBloco}
+        ${linha('Deslocamento', c.deslocamento)}
+      </div>
 
-    <div class="atributos">
-      ${['for','dex','con','int','sab','car'].map((k, i) => {
-        const rot = ['FOR','DES','CON','INT','SAB','CAR'][i];
-        const v = a[k] ?? 10;
-        return `<div class="atr">
-          <div class="atr-nome">${rot}</div>
-          <div class="atr-val">${v}</div>
-          <div class="atr-mod">(${modificador(v)})</div>
-        </div>`;
-      }).join('')}
-    </div>
+      <hr class="sb-divisor">
 
-    <div class="bloco-stats">
-      ${linha('Salvaguardas', c.salvaguardas)}
-      ${linha('Perícias', c.pericias)}
-      ${linha('Resistências', c.resistencias)}
-      ${linha('Vulnerabilidades', c.vulnerabilidades)}
-      ${linha('Imunidades', c.imunidades)}
-      ${linha('Sentidos', c.sentidos)}
-      ${linha('Idiomas', c.idiomas)}
-      ${linha('Nível de Desafio', c.nd)}
-    </div>
+      <div class="atributos">
+        ${['for','dex','con','int','sab','car'].map((k, i) => {
+          const rot = ['FOR','DES','CON','INT','SAB','CAR'][i];
+          const v = a[k] ?? 10;
+          return `<div class="atr">
+            <div class="atr-nome">${rot}</div>
+            <div class="atr-val">${v} <span class="atr-mod">(${modificador(v)})</span></div>
+          </div>`;
+        }).join('')}
+      </div>
 
-    ${secao(tracos,    'Características',  'carac',    'brilho')}
-    ${secao(acoes,     'Ações',            'acoes',    'ataque')}
-    ${secao(bonus,     'Ações Bônus',      'bonus',    'raio')}
-    ${secao(reacoes,   'Reações',          'reacoes',  'escudo')}
-    ${secao(lendarias, 'Ações Lendárias',  'lendaria', 'coroa')}
-    ${secao(covil,     'Ações de Covil',   'covil',    'caverna')}`;
+      <hr class="sb-divisor">
+
+      <div class="bloco-stats">
+        ${linha('Salvaguardas', c.salvaguardas)}
+        ${linha('Perícias', c.pericias)}
+        ${linha('Resistências', c.resistencias)}
+        ${linha('Vulnerabilidades', c.vulnerabilidades)}
+        ${linha('Imunidades', c.imunidades)}
+        ${linha('Sentidos', c.sentidos)}
+        ${linha('Idiomas', c.idiomas)}
+        ${linha('Nível de Desafio', c.nd)}
+      </div>
+
+      ${(tracos || acoes || bonus || reacoes || lendarias || covil) ? `<hr class="sb-divisor">` : ''}
+      ${secao(tracos,    'Características',  'carac',    'brilho')}
+      ${secao(acoes,     'Ações',            'acoes',    'ataque')}
+      ${secao(bonus,     'Ações Bônus',      'bonus',    'raio')}
+      ${secao(reacoes,   'Reações',          'reacoes',  'escudo')}
+      ${secao(lendarias, 'Ações Lendárias',  'lendaria', 'coroa')}
+      ${secao(covil,     'Ações de Covil',   'covil',    'caverna')}
+    </div>`;
 
   // PV: alternar média / máximo
   document.querySelectorAll('#modal-corpo .hp-btn').forEach(btn => {
