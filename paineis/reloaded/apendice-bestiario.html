@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1c1c1e">
+<link rel="icon" type="image/svg+xml" href="../../assets/img/favicon.svg">
+<title>Bestiário — Curse of Strahd: Reloaded</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+* { box-sizing:border-box; }
+:root {
+  --bg:#1c1c1e; --bg-sidebar:#1a1a1c; --bg-hover:#252528; --bg-card:#232325;
+  --border:#333336;
+  --gold:#e0a542; --gold-dim:#b8863a;
+  --active:#a78bfa; --active-dim:#8a6fd8;
+  --text:#dcdcdd; --text-dim:#9a9a9d; --text-faint:#6e6e72;
+  --title:#f2f1ee;
+}
+* { scrollbar-color: #48484c var(--bg-sidebar); scrollbar-width: thin; }
+html, body { margin:0; min-height:100vh; background:var(--bg);
+  font-family:'Inter', system-ui, -apple-system, sans-serif; color:var(--text); }
+a { color:var(--gold); text-decoration:none; }
+a:hover { text-decoration:underline; }
+
+.layout { display:flex; min-height:100vh; align-items:stretch; }
+
+/* ---------- barra lateral esquerda ---------- */
+.sidebar-left { width:290px; flex:0 0 290px; background:var(--bg-sidebar);
+  border-right:1px solid var(--border); padding:22px 18px 40px;
+  position:sticky; top:0; height:100vh; overflow-y:auto; }
+.brand { font-size:19px; font-weight:800; color:var(--gold); line-height:1.25;
+  margin-bottom:14px; text-decoration:none; display:block; }
+.brand:hover { text-decoration:none; opacity:.9; }
+.search-box { position:relative; margin-bottom:16px; }
+.search-box input { width:100%; padding:8px 10px 8px 30px; border-radius:6px;
+  border:1px solid var(--border); background:var(--bg-card); color:var(--text);
+  font-family:inherit; font-size:13px; }
+.search-box input::placeholder { color:var(--text-faint); }
+.search-box input:focus { outline:none; border-color:var(--gold-dim); }
+.search-box .ico { position:absolute; left:9px; top:50%; transform:translateY(-50%);
+  color:var(--text-faint); font-size:13px; pointer-events:none; }
+.tree { font-size:14px; }
+.tree details { margin-bottom:1px; }
+.tree summary { list-style:none; cursor:pointer; padding:6px 8px; border-radius:6px;
+  color:var(--text); display:flex; align-items:center; gap:6px; user-select:none; }
+.tree summary::-webkit-details-marker { display:none; }
+.tree summary:hover { background:var(--bg-hover); }
+.tree summary .chev { display:inline-block; font-size:10px; color:var(--text-faint);
+  transition:transform .15s; width:10px; }
+.tree details[open] > summary .chev { transform:rotate(90deg); }
+.tree .leaf-list { padding-left:20px; margin-top:1px; }
+.tree .leaf { display:block; padding:6px 8px; border-radius:6px; font-size:13.5px;
+  color:var(--text-dim); }
+.tree .leaf:hover { background:var(--bg-hover); color:var(--text); text-decoration:none; }
+.tree .leaf.active { color:var(--active); font-weight:600; background:rgba(167,139,250,.1); }
+.tree .leaf.locked { color:var(--text-faint); cursor:default; font-style:italic; }
+.tree .leaf.locked:hover { background:none; }
+.tree .no-match { display:none; }
+.sidebar-left.filtering .tree .leaf { display:none; }
+.sidebar-left.filtering .tree .leaf.match { display:block; }
+.sidebar-left.filtering .tree details { display:none; }
+.sidebar-left.filtering .tree details.has-match { display:block; }
+.sidebar-left.filtering .tree details.has-match > summary .chev { transform:rotate(90deg); }
+
+/* ---------- coluna central ---------- */
+main.article { flex:1 1 auto; min-width:0; max-width:760px; margin:0 auto;
+  padding:48px 40px 100px; line-height:1.7; font-size:16.5px; }
+.page-title { font-size:clamp(28px,4vw,38px); font-weight:800; color:var(--title);
+  margin:0 0 28px; letter-spacing:-.3px; }
+main.article h1 { color:var(--gold); font-size:26px; font-weight:700;
+  margin:36px 0 14px; scroll-margin-top:24px; letter-spacing:-.2px; }
+main.article h1:first-child { margin-top:0; }
+main.article h2 { color:var(--gold); font-size:21px; font-weight:700;
+  margin:30px 0 12px; scroll-margin-top:24px; }
+main.article h3 { color:var(--title); font-size:18px; font-weight:700;
+  margin:24px 0 10px; scroll-margin-top:24px; }
+main.article h4 { color:var(--text-dim); font-size:14px; font-weight:700;
+  text-transform:uppercase; letter-spacing:.5px; margin:20px 0 8px; scroll-margin-top:24px; }
+main.article p { margin:0 0 15px; color:var(--text); }
+main.article ul { margin:0 0 15px; padding-left:24px; }
+main.article li { margin-bottom:6px; }
+main.article a { border-bottom:1px solid rgba(224,165,66,.35); }
+main.article a:hover { border-bottom-color:var(--gold); text-decoration:none; }
+main.article em { color:var(--text); font-style:italic; }
+main.article strong { color:var(--title); font-weight:700; }
+main.article hr { border:0; border-top:1px solid var(--border); margin:20px 0; }
+.link-pending { color:var(--text-faint); font-style:italic; border-bottom:1px dotted var(--text-faint); cursor:default; }
+.reloaded-img { max-width:100%; border-radius:8px; border:1px solid var(--border); margin:16px 0; display:block; }
+
+span.citation { font-style:italic; color:var(--text-dim); }
+span.highlight { color:var(--gold); font-weight:600; }
+span.credit { font-size:12px; color:var(--text-faint); display:block; margin-top:4px; }
+
+div.description { background:var(--bg-card); border-left:3px solid var(--active-dim);
+  border-radius:0 8px 8px 0; padding:16px 20px; margin:18px 0; font-style:italic; color:var(--text); }
+div.description p:last-child { margin-bottom:0; }
+
+.callout { border:1px solid var(--border); border-left:4px solid var(--gold-dim);
+  border-radius:0 8px 8px 0; background:rgba(224,165,66,.06); margin:18px 0; padding:14px 18px; }
+.callout-title { font-weight:700; color:var(--gold); font-size:13px; letter-spacing:.3px;
+  text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+.callout-icon { font-size:14px; }
+.callout-body p:last-child { margin-bottom:0; }
+.callout-body { font-size:16px; }
+.callout-warning { border-left-color:#e2645a; background:rgba(226,100,90,.08); }
+.callout-warning .callout-title { color:#f08078; }
+.callout-combat { border-left-color:#e2645a; background:rgba(226,100,90,.1); }
+.callout-combat .callout-title { color:#f08078; }
+.callout-lore, .callout-abstract { border-left-color:#5f9bd8; background:rgba(95,155,216,.08); }
+.callout-lore .callout-title, .callout-abstract .callout-title { color:#7fb4e8; }
+.callout-profile { border-left-color:var(--active-dim); background:rgba(167,139,250,.08); }
+.callout-profile .callout-title { color:var(--active); }
+.callout-item { border-left-color:#4fb86a; background:rgba(79,184,106,.08); }
+.callout-item .callout-title { color:#6fce88; }
+.callout-design { border-left-color:var(--text-faint); background:rgba(158,158,162,.06); }
+.callout-design .callout-title { color:var(--text-dim); }
+.callout-tip { border-left-color:var(--gold); }
+
+.table-wrap { overflow-x:auto; margin:18px 0; }
+table.md-table { border-collapse:collapse; width:100%; font-size:15px; }
+table.md-table th, table.md-table td { border:1px solid var(--border); padding:8px 11px; text-align:left; }
+table.md-table th { background:var(--bg-card); color:var(--gold); font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; }
+
+div.statblock { background:var(--bg-card); border:1px solid var(--border);
+  border-left:3px solid var(--active-dim); border-radius:8px; padding:18px 22px; margin:20px 0; }
+div.statblock h2 { color:var(--title); font-size:20px; font-weight:800; margin:0 0 2px; }
+div.statblock > em:first-of-type { display:block; font-style:italic; color:var(--text-dim); margin-bottom:10px; }
+div.statblock hr { border-top:1px solid var(--border); margin:11px 0; }
+div.statblock h3 { color:var(--gold); font-size:14px; font-weight:700;
+  text-transform:uppercase; letter-spacing:.5px; margin:16px 0 7px; }
+div.statblock p { margin:0 0 9px; font-size:15px; }
+div.statblock table.ability-table { width:100%; border-collapse:collapse; margin:9px 0; }
+div.statblock table.ability-table th, div.statblock table.ability-table td {
+  border:1px solid var(--border); text-align:center; padding:6px 4px; font-size:14px; }
+div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-weight:700; }
+
+/* ---------- coluna direita: sumario ---------- */
+.sidebar-right { width:250px; flex:0 0 250px; padding:48px 20px 40px 0;
+  position:sticky; top:0; height:100vh; overflow-y:auto; }
+.toc-label { font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+  color:var(--text-faint); margin-bottom:12px; }
+.toc-list { font-size:13px; }
+.toc-list a { display:block; padding:4px 0; color:var(--text-dim); border-bottom:none;
+  line-height:1.4; }
+.toc-list a:hover { color:var(--text); text-decoration:none; }
+.toc-lvl-1 { padding-left:0; font-weight:600; }
+.toc-lvl-2 { padding-left:12px; }
+.toc-lvl-3 { padding-left:24px; }
+.toc-lvl-4 { padding-left:36px; font-size:12px; }
+
+/* ---------- pagina indice ---------- */
+.idx-intro { margin-bottom:8px; }
+.idx-intro h1 { font-size:clamp(26px,4vw,36px); font-weight:800; color:var(--gold); margin-bottom:10px; }
+.idx-intro p { color:var(--text-dim); font-size:15px; max-width:640px; }
+.idx-section { margin:34px 0; }
+.idx-section-title { font-size:13px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+  color:var(--text-dim); border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:14px; }
+.idx-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:12px; }
+.idx-card { display:block; background:var(--bg-card); border:1px solid var(--border);
+  border-radius:8px; padding:14px 16px; font-weight:600; font-size:14.5px; color:var(--text);
+  transition:border-color .15s, transform .15s; }
+.idx-card:hover { border-color:var(--gold-dim); transform:translateY(-2px); text-decoration:none; }
+.idx-card.locked { opacity:.45; cursor:default; border-style:dashed; }
+.idx-card.locked:hover { transform:none; }
+.idx-badge { display:block; margin-top:5px; font-size:10px; letter-spacing:.5px; text-transform:uppercase; color:var(--text-faint); font-weight:400; }
+
+/* ---------- mobile ---------- */
+.mobile-topbar { display:none; }
+@media (max-width:1100px) {
+  .sidebar-right { display:none; }
+}
+@media (max-width:860px) {
+  .layout { flex-direction:column; }
+  .mobile-topbar { display:flex; align-items:center; gap:12px; position:sticky; top:0; z-index:40;
+    background:var(--bg-sidebar); border-bottom:1px solid var(--border); padding:12px 16px; }
+  .mobile-topbar .brand { margin:0; font-size:15px; flex:1; }
+  .mobile-topbar button { background:none; border:1px solid var(--border); color:var(--text);
+    border-radius:6px; padding:6px 10px; font-family:inherit; font-size:13px; }
+  .sidebar-left { position:fixed; left:0; top:49px; bottom:0; z-index:39; transform:translateX(-100%);
+    transition:transform .2s; width:82vw; max-width:320px; box-shadow:8px 0 30px rgba(0,0,0,.5); }
+  .sidebar-left.open { transform:translateX(0); }
+  main.article { padding:28px 18px 70px; max-width:100%; }
+}
+</style>
+</head>
+<body>
+<div class="mobile-topbar">
+  <button aria-label="Abrir menu">☰</button>
+  <a class="brand" href="index.html">Curse of Strahd: Reloaded</a>
+</div>
+<div class="layout">
+  <aside class="sidebar-left">
+    <a class="brand" href="index.html">Curse of Strahd:<br>Reloaded</a>
+    <div class="search-box"><span class="ico">🔍</span><input type="text" placeholder="Buscar página..." aria-label="Buscar página"></div>
+    <nav class="tree"><details><summary><span class="chev">▸</span>Introdução</summary><div class="leaf-list"><a class="leaf" href="introducao-usando-este-guia.html">Usando Este Guia</a><a class="leaf" href="introducao-guia-do-mestre.html">Guia do Mestre</a><a class="leaf" href="introducao-changelog.html">Changelog</a></div></details><details><summary><span class="chev">▸</span>Capítulo 1 — Iniciando a Campanha</summary><div class="leaf-list"><a class="leaf" href="cap1-sessao-zero.html">Sessão Zero</a><a class="leaf" href="cap1-criacao-de-personagem.html">Criação de Personagem</a></div></details><details><summary><span class="chev">▸</span>Capítulo 2 — A Terra de Barovia</summary><div class="leaf-list"><a class="leaf" href="cap2-lore-de-barovia.html">Lore de Barovia</a><a class="leaf" href="cap2-historia-de-barovia.html">História de Barovia</a><a class="leaf" href="cap2-strahd-von-zarovich.html">Strahd von Zarovich</a></div></details><details><summary><span class="chev">▸</span>Capítulo 3 — Conduzindo o Jogo</summary><div class="leaf-list"><a class="leaf" href="cap3-resumo-da-aventura.html">Resumo da Aventura</a><a class="leaf" href="cap3-conduzindo-a-aventura.html">Conduzindo a Aventura</a></div></details><details><summary><span class="chev">▸</span>Ato I — Adentrando as Névoas</summary><div class="leaf-list"><a class="leaf" href="ato1-resumo.html">Resumo do Ato I</a><a class="leaf" href="arco-a-fuga-da-death-house.html">Arco A — Fuga da Death House</a><a class="leaf" href="arco-b-bem-vindo-a-barovia.html">Arco B — Bem-vindo a Barovia</a><a class="leaf" href="arco-c-adentrando-o-vale.html">Arco C — Adentrando o Vale</a></div></details><details><summary><span class="chev">▸</span>Ato II — A Cidade Sombria</summary><div class="leaf-list"><a class="leaf" href="ato2-resumo.html">Resumo do Ato II</a><a class="leaf" href="arco-d-a-festa-de-st-andral.html">Arco D — A Festa de St. Andral</a><a class="leaf" href="arco-e-a-vistana-desaparecida.html">Arco E — A Vistana Desaparecida</a><a class="leaf" href="arco-f-o-desejo-de-lady-wachter.html">Arco F — O Desejo de Lady Wachter</a><a class="leaf" href="arco-g-os-irmaos-strazni.html">Arco G — Os Irmãos Strazni</a><a class="leaf" href="arco-h-a-alma-perdida.html">Arco H — A Alma Perdida</a><a class="leaf" href="arco-i-as-muralhas-de-krezk.html">Arco I — As Muralhas de Krezk</a></div></details><details><summary><span class="chev">▸</span>Ato III — A Terra Partida</summary><div class="leaf-list"><a class="leaf" href="ato3-resumo.html">Resumo do Ato III</a><a class="leaf" href="arco-j-a-gema-roubada.html">Arco J — A Gema Roubada</a><a class="leaf" href="arco-k-a-abadia-decaida.html">Arco K — A Abadia Decaída</a><a class="leaf" href="arco-l-o-covil-dos-lobos.html">Arco L — O Covil dos Lobos</a><a class="leaf" href="arco-m-a-mansao-do-dragao.html">Arco M — A Mansão do Dragão</a><a class="leaf" href="arco-o-jantar-com-o-diabo.html">Arco O — Jantar com o Diabo</a><a class="leaf" href="arco-p-o-assalto-a-ravenloft.html">Arco P — O Assalto a Ravenloft</a><a class="leaf" href="arco-q-um-farol-reluzente.html">Arco Q — Um Farol Reluzente</a></div></details><details><summary><span class="chev">▸</span>Ato IV — Segredos do Ancião</summary><div class="leaf-list"><a class="leaf" href="ato4-resumo.html">Resumo do Ato IV</a><a class="leaf" href="arco-r-provacoes-da-montanha.html">Arco R — Provações da Montanha</a><a class="leaf" href="arco-s-uma-espada-de-luz-solar.html">Arco S — Uma Espada de Luz Solar</a><a class="leaf" href="arco-t-os-tres-fanes.html">Arco T — Os Três Fanes</a><a class="leaf" href="arco-u-sonhos-da-alvorada.html">Arco U — Sonhos da Alvorada</a><a class="leaf" href="ato4-epilogo.html">Epílogo</a></div></details><details open><summary><span class="chev">▸</span>Apêndices</summary><div class="leaf-list"><a class="leaf" href="apendice-fragmentos-de-ambar.html">Fragmentos de Âmbar</a><a class="leaf active" href="apendice-bestiario.html">Bestiário</a><a class="leaf" href="apendice-glossario.html">Glossário</a><a class="leaf" href="apendice-npcs.html">Personagens Não Jogadores</a></div></details></nav>
+    <div style="margin-top:18px"><a href="../painel_barovia_dnd5e.html" style="font-size:12px;color:var(--text-faint)">← Voltar ao Painel</a></div>
+  </aside>
+  <main class="article">
+    <div class="page-title">Bestiário</div>
+<h3 id="objeto-animado-maior">Objeto Animado Maior</h3>
+<div style="clear: both; padding-top: 0.8rem;"></div>
+<div class="statblock">
+<h2>Objeto Animado Maior</h2>
+<em>Construto Grande, não alinhado</em>
+<hr>
+<strong>Classe de Armadura</strong> 15
+<br>
+<strong>Pontos de Vida</strong> 20
+<br>
+<strong>Deslocamento</strong> 0 m, voo 9 m (pairando)
+<hr>
+<table class="ability-table">
+  <thead>
+    <tr>
+      <th>FOR</th>
+      <th>DES</th>
+      <th>CON</th>
+      <th>INT</th>
+      <th>SAB</th>
+      <th>CAR</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>18 (+4)</td>
+      <td>8 (-1)</td>
+      <td>10 (+0)</td>
+      <td>3 (-4)</td>
+      <td>3 (-4)</td>
+      <td>1 (-5)</td>
+    </tr>
+  </tbody>
+</table>
+<hr>
+<strong>Imunidades a Dano</strong> veneno, psíquico<br>
+<strong>Sentidos</strong> visão às cegas 9 m, Percepção passiva 6<br>
+<strong>Idiomas</strong> —<br>
+<strong>Nível de Desafio</strong> 2<br>
+<strong>Bônus de Proficiência</strong> +4
+<h3>Ações</h3>
+<p><strong><em>Ataque Múltiplo.</em></strong> O objeto faz dois ataques de <strong><em>pancada</em></strong>.
+<p><strong><em>Pancada.</em></strong> <em>Ataque com Arma Corpo a Corpo:</em> +8 para acertar, um alvo, alcance 1,5 m. <em>Acerto:</em> 15 (2d10 + 4) de dano de concussão e o alvo deve ser bem-sucedido em um teste de resistência de Força CD 16 ou é empurrado até 3 metros (escolha de Varushka). Se o alvo então entrar em contato com uma superfície dura ou um objeto pesado, ele sofre 1d6 de dano de concussão para cada 1,5 metro que deixou de percorrer e fica agarrado pelo objeto (CD para escapar 16).</p>
+</div>
+<h3 id="objeto-animado-menor">Objeto Animado Menor</h3>
+<div style="clear: both; padding-top: 0.8rem;"></div>
+<div class="statblock">
+<h2>Objeto Animado Menor</h2>
+<em>Construto Pequeno ou Médio, não alinhado</em>
+<hr>
+<strong>Classe de Armadura</strong> 15
+<br>
+<strong>Pontos de Vida</strong> 10
+<br>
+<strong>Deslocamento</strong> 0 m, voo 9 m (pairando)
+<hr>
+<table class="ability-table">
+  <thead>
+    <tr>
+      <th>FOR</th>
+      <th>DES</th>
+      <th>CON</th>
+      <th>INT</th>
+      <th>SAB</th>
+      <th>CAR</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>10 (+0)</td>
+      <td>16 (+3)</td>
+      <td>10 (+0)</td>
+      <td>3 (-4)</td>
+      <td>3 (-4)</td>
+      <td>1 (-5)</td>
+    </tr>
+  </tbody>
+</table>
+<hr>
+<strong>Imunidades a Dano</strong> veneno, psíquico<br>
+<strong>Sentidos</strong> visão às cegas 9 m, Percepção passiva 6<br>
+<strong>Idiomas</strong> —<br>
+<strong>Nível de Desafio</strong> 2<br>
+<strong>Bônus de Proficiência</strong> +4
+<h3>Ações</h3>
+<p><strong><em>Ataque Múltiplo.</em></strong> O objeto faz dois ataques de <strong><em>pancada</em></strong>.
+<p><strong><em>Pancada.</em></strong> <em>Ataque com Arma Corpo a Corpo:</em> +6 para acertar, um alvo, alcance 1,5 m. <em>Acerto:</em> 8 (1d10 + 3) de dano de concussão e o alvo deve ser bem-sucedido em um teste de resistência de Força CD 14 ou cai caído.</p>
+</div>
+<h3 id="gárgula-do-castelo">Gárgula do Castelo</h3>
+<div style="clear: both; padding-top: 0.8rem;"></div>
+<div class="statblock">
+<h2>Gárgula</h2>
+<em>Elemental Médio, caótico e mau</em>
+<hr>
+<strong>Classe de Armadura</strong> 15 (armadura natural)
+<br>
+<strong>Pontos de Vida</strong> 37 (5d8 + 15)
+<br>
+<strong>Deslocamento</strong> 4,5 m, voo 9 m
+<hr>
+<table class="ability-table">
+  <thead>
+    <tr>
+      <th>FOR</th>
+      <th>DES</th>
+      <th>CON</th>
+      <th>INT</th>
+      <th>SAB</th>
+      <th>CAR</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td data-label="FOR">16 (+3)</td>
+      <td data-label="DES">8 (-1)</td>
+      <td data-label="CON">16 (+3)</td>
+      <td data-label="INT">6 (-2)</td>
+      <td data-label="SAB">11 (+0)</td>
+      <td data-label="CAR">7 (-2)</td>
+    </tr>
+  </tbody>
+</table>
+<hr>
+<strong>Resistências a Dano</strong> perfurante e cortante de ataques não mágicos que não sejam de adamante<br>
+<strong>Vulnerabilidades a Dano</strong> trovejante<br>
+<strong>Imunidades a Dano</strong> veneno<br>
+<strong>Imunidades a Condições</strong> exaustão, petrificado, envenenado<br>
+<strong>Sentidos</strong> visão no escuro 18 m, Percepção passiva 10<br>
+<strong>Idiomas</strong> Terrano<br>
+<strong>Nível de Desafio</strong> 2<br>
+<strong>Bônus de Proficiência</strong> +2<br>
+<hr>
+<p><strong><em>Aparência Falsa.</em></strong> Enquanto a gárgula permanece imóvel, ela é indistinguível de uma estátua inanimada.</p>
+<p><strong><em>Mudança Ardente.</em></strong> Se a gárgula sofrer dano de fogo, ela passa a brilhar de calor até o final do próximo turno dela. Enquanto brilha, suas <strong><em>garras</em></strong> causam 1d4 de dano de fogo adicional quando acertam. Enquanto brilha, a gárgula adquire vulnerabilidade a dano de frio e para de brilhar imediatamente se sofrer dano de frio.</p>
+<p><strong><em>Mudança Gélida.</em></strong> Se a gárgula sofrer dano de frio, ela se cobre de gelo até o final do próximo turno dela. Enquanto está congelada, suas <strong><em>garras</em></strong> causam 1d4 de dano de frio adicional quando acertam. Enquanto está congelada, a gárgula adquire vulnerabilidade a dano de fogo e seu gelo se desfaz se ela sofrer dano de fogo.</p>
+<p><strong><em>Corpo de Pedra.</em></strong> Se a gárgula sofrer dano de frio enquanto brilha, dano de fogo enquanto está congelada, dano de concussão de um acerto crítico ou dano da magia <em>estilhaçar</em> (<em>shatter</em>) ou de magia semelhante, as asas da gárgula se partem, fazendo com que ela perca seu deslocamento de voo.</p>
+<p><strong><em>Agarrador.</em></strong> A gárgula tem vantagem em jogadas de ataque feitas contra uma criatura que ela tenha agarrado.</p>
+<h3>Ações</h3>
+<p><strong><em>Ataque Múltiplo.</em></strong> A gárgula faz dois ataques: um com sua mordida e um com suas garras.</p>
+<p><strong><em>Mordida.</em></strong> <em>Ataque com Arma Corpo a Corpo:</em> +5 para acertar, alcance 1,5 m, um alvo. <em>Acerto:</em> 6 (1d6 + 3) de dano perfurante.</p>
+<p><strong><em>Garras.</em></strong> <em>Ataque com Arma Corpo a Corpo:</em> +5 para acertar, alcance 1,5 m, um alvo. <em>Acerto:</em> 6 (1d6 + 3) de dano cortante. Em vez de causar dano, a gárgula pode agarrar o alvo (CD para escapar 13).</p>
+</div>
+<h3 id="druida-agressor">Druida Agressor</h3>
+<div style="clear: both; padding-top: 0.8rem;"></div>
+<div class="statblock">
+    <h2>Druida Agressor</h2>
+    <em>Humano Médio, neutro e mau</em>
+    <hr>
+    <strong>Classe de Armadura</strong> 11 (16 com <em>pele de carvalho</em>)
+    <br>
+    <strong>Pontos de Vida</strong> 55 (10d8 + 10)
+    <br>
+    <strong>Deslocamento</strong> 9 m
+    <hr>
+    <table class="ability-table">
+        <thead>
+            <tr>
+                <th>FOR</th>
+                <th>DES</th>
+                <th>CON</th>
+                <th>INT</th>
+                <th>SAB</th>
+                <th>CAR</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>10 (+0)</td>
+                <td>12 (+1)</td>
+                <td>13 (+1)</td>
+                <td>12 (+1)</td>
+                <td>15 (+2)</td>
+                <td>11 (+0)</td>
+            </tr>
+        </tbody>
+    </table>
+    <hr>
+    <strong>Perícias</strong> Medicina +4, Natureza +3, Percepção +4<br>
+    <strong>Sentidos</strong> Percepção passiva 14<br>
+    <strong>Idiomas</strong> Druídico e Comum<br>
+    <strong>Nível de Desafio</strong> 2<br>
+    <strong>Bônus de Proficiência</strong> +2
+    <hr>
+    <p><strong><em>Conjuração.</em></strong> O druida é um conjurador de 4º nível. Sua habilidade de conjuração é Sabedoria (CD 12 para resistir às magias, +4 para acertar com ataques mágicos). Ele tem as seguintes magias de druida preparadas:</p>
+    <ul>
+        <li>Truques (à vontade): produzir chamas (produce flame), shillelagh, chicote de espinhos (thorn whip)</li>
+        <li>1º círculo (4 espaços): fogo das fadas (faerie fire), passos largos (longstrider), falar com animais (speak with animals), onda trovejante (thunderwave)</li>
+        <li>2º círculo (3 espaços): pele de carvalho (barkskin), visão no escuro (darkvision)</li>
+    </ul>
+    <h3>Ações</h3>
+    <p><strong><em>Ataque Múltiplo.</em></strong> O druida faz dois ataques com seu <em>bordão.</em></p>
+    <p><strong><em>Bordão.</em></strong> <em>Ataque com Arma Corpo a Corpo:</em> +2 para acertar (+4 para acertar com <em>shillelagh</em>), alcance 1,5 m, um alvo. <em>Acerto:</em> 3 (1d6) de dano de concussão, 4 (1d8) de dano de concussão se empunhado com as duas mãos, ou 6 (1d8 + 2) de dano de concussão com <em>shillelagh</em>.</p>
+    <h3>Ações Bônus</h3>
+    <p><strong><em>Velocidade da Víbora.</em></strong> O druida conjura uma magia que conhece com tempo de conjuração de 1 ação. (O druida não pode conjurar outra magia no mesmo turno, exceto um truque com tempo de conjuração de 1 ação.)</p>
+    <h3>Reações</h3>
+    <p><strong><em>Dádiva de Gulthias.</em></strong> Em resposta a ser atacado por uma criatura que ele possa ver, o druida conjura <em>pele de carvalho</em>, desde que tenha um espaço de magia de 2º círculo disponível. (A magia não exige concentração quando conjurada dessa forma.)</p>
+</div>
+<h3 id="druida-naturalista">Druida Naturalista</h3>
+<div style="clear: both; padding-top: 0.8rem;"></div>
+<div class="statblock">
+    <h2>Druida Naturalista</h2>
+    <em>Humano Médio, neutro e mau</em>
+    <hr>
+    <strong>Classe de Armadura</strong> 11 (16 com <em>pele de carvalho</em>)
+    <br>
+    <strong>Pontos de Vida</strong> 55 (10d8 + 10)
+    <br>
+    <strong>Deslocamento</strong> 9 m
+    <hr>
+    <table class="ability-table">
+        <thead>
+            <tr>
+                <th>FOR</th>
+                <th>DES</th>
+                <th>CON</th>
+                <th>INT</th>
+                <th>SAB</th>
+                <th>CAR</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>10 (+0)</td>
+                <td>12 (+1)</td>
+                <td>13 (+1)</td>
+                <td>12 (+1)</td>
+                <td>15 (+2)</td>
+                <td>11 (+0)</td>
+            </tr>
+        </tbody>
+    </table>
+    <hr>
+    <strong>Perícias</strong> Medicina +4, Natureza +3, Percepção +4<br>
+    <strong>Sentidos</strong> Percepção passiva 14<br>
+    <strong>Idiomas</strong> Druídico e Comum<br>
+    <strong>Nível de Desafio</strong> 2<br>
+    <strong>Bônus de Proficiência</strong> +2
+    <hr>
+    <p><strong><em>Conjuração.</em></strong> O druida é um conjurador de 4º nível. Sua habilidade de conjuração é Sabedoria (CD 12 para resistir às magias, +4 para acertar com ataques mágicos). Ele tem as seguintes magias de druida preparadas:</p>
+    <ul>
+        <li>Truques (à vontade): lufada (gust), infestação (infestation), produzir chamas</li>
+        <li>1º círculo (4 espaços): enredar (entangle), nuvem de neblina (fog cloud), falar com animais, onda trovejante</li>
+        <li>2º círculo (3 espaços): pele de carvalho, raio de luar (moonbeam)</li>
+    </ul>
+    <h3>Ações</h3>
+    <p><strong><em>Bordão.</em></strong> <em>Ataque com Arma Corpo a Corpo:</em> +2 para acertar, alcance 1,5 m, um alvo. <em>Acerto:</em> 3 (1d6) de dano de concussão, ou 4 (1d8) de dano de concussão se empunhado com as duas mãos.</p>
+    <h3>Ações Bônus</h3>
+    <p><strong><em>Velocidade da Víbora.</em></strong> O druida conjura uma magia que conhece com tempo de conjuração de 1 ação. (O druida não pode conjurar outra magia no mesmo turno, exceto um truque com tempo de conjuração de 1 ação.)</p>
+    <h3>Reações</h3>
+    <p><strong><em>Dádiva de Gulthias.</em></strong> Em resposta a ser atacado por uma criatura que ele possa ver, o druida conjura <em>pele de carvalho</em>, desde que tenha um espaço de magia de 2º círculo disponível. (A magia não exige concentração quando conjurada dessa forma.)</p>
+</div>
+<h3 id="praga-galho-ancião-elder-twig-blight">Praga-Galho Ancião (<em>Elder Twig Blight</em>)</h3>
+<div style="clear: both; padding-top: 0.8rem;"></div>
+<div class="statblock">
+    <h2>Praga-Galho Ancião</h2>
+    <em>Planta Média, neutra e má</em>
+    <hr>
+    <strong>Classe de Armadura</strong> 14
+    <br>
+    <strong>Pontos de Vida</strong> 66 (12d8 + 12)
+    <br>
+    <strong>Deslocamento</strong> 9 m
+    <hr>
+    <table class="ability-table">
+        <thead>
+            <tr>
+                <th>FOR</th>
+                <th>DES</th>
+                <th>CON</th>
+                <th>INT</th>
+                <th>SAB</th>
+                <th>CAR</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>8 (-1)</td>
+                <td>15 (+2)</td>
+                <td>12 (+1)</td>
+                <td>4 (-3)</td>
+                <td>8 (-1)</td>
+                <td>3 (-4)</td>
+            </tr>
+        </tbody>
+    </table>
+    <hr>
+    <strong>Perícias</strong> Furtividade +3<br>
+    <strong>Vulnerabilidades a Dano</strong> fogo<br>
+    <strong>Imunidades a Condições</strong> cego, surdo<br>
+    <strong>Sentidos</strong> visão às cegas 18 m (cego além desse raio), Percepção passiva 9<br>
+    <strong>Idiomas</strong> entende Comum e Druídico, mas não sabe falar<br>
+    <strong>Nível de Desafio</strong> 1<br>
+    <strong>Bônus de Proficiência</strong> +2
+    <hr>
+    <p><strong><em>Aparência Falsa.</em></strong> Enquanto a praga permanece imóvel, ela é indistinguível de uma muda de árvore morta.</p>
+    <h3>Ações</h3>
+    <p><strong><em>Ataque Múltiplo.</em></strong> A praga-galho faz um ataque com suas <em>garras</em> e até um ataque com suas <em>raízes</em>.</p>
+    <p><strong><em>Garras.</em></strong> <em>Ataque com Arma Corpo a Corpo:</em> +4 para acertar, alcance 1,5 m, um alvo. <em>Acerto:</em> 5 (1d6 + 2) de dano perfurante e o alvo fica agarrado (CD para escapar 9).</p>
+    <p><strong><em>Raiz.</em></strong> <em>Ataque com Arma Corpo a Corpo:</em> +4 para acertar, alcance 1,5 m, uma criatura agarrada pela praga, incapacitada ou impedida. <em>Acerto:</em> 4 (1d4 + 2) de dano perfurante mais 5 (2d4) de dano necrótico. O máximo de pontos de vida do alvo é reduzido em um valor igual ao dano necrótico sofrido, e a praga recupera pontos de vida iguais a esse valor. A redução dura até o alvo terminar um descanso longo. O alvo morre se esse efeito reduzir seu máximo de pontos de vida a 0.</p>
+</div>
+<h3 id="gárgula">Gárgula</h3>
+<div style="clear: both; padding-top: 0.8rem;"></div>
+<div class="statblock">
+<h2>Gárgula</h2>
+<em>Elemental Médio, caótico e mau</em>
+<hr>
+<strong>Classe de Armadura</strong> 15 (armadura natural)
+<br>
+<strong>Pontos de Vida</strong> 37 (5d8 + 15)
+<br>
+<strong>Deslocamento</strong> 4,5 m, voo 9 m
+<hr>
+<table class="ability-table">
+  <thead>
+    <tr>
+      <th>FOR</th>
+      <th>DES</th>
+      <th>CON</th>
+      <th>INT</th>
+      <th>SAB</th>
+      <th>CAR</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td data-label="FOR">16 (+3)</td>
+      <td data-label="DES">8 (-1)</td>
+      <td data-label="CON">16 (+3)</td>
+      <td data-label="INT">6 (-2)</td>
+      <td data-label="SAB">11 (+0)</td>
+      <td data-label="CAR">7 (-2)</td>
+    </tr>
+  </tbody>
+</table>
+<hr>
+<strong>Resistências a Dano</strong> perfurante e cortante de ataques não mágicos que não sejam de adamante<br>
+<strong>Vulnerabilidades a Dano</strong> trovejante<br>
+<strong>Imunidades a Dano</strong> veneno<br>
+<strong>Imunidades a Condições</strong> exaustão, petrificado, envenenado<br>
+<strong>Sentidos</strong> visão no escuro 18 m, Percepção passiva 10<br>
+<strong>Idiomas</strong> Terrano<br>
+<strong>Nível de Desafio</strong> 2<br>
+<strong>Bônus de Proficiência</strong> +2<br>
+<hr>
+<p><strong><em>Aparência Falsa.</em></strong> Enquanto a gárgula permanece imóvel, ela é indistinguível de uma estátua inanimada.</p>
+<p><strong><em>Mudança Ardente.</em></strong> Se a gárgula sofrer dano de fogo, ela passa a brilhar de calor até o final do próximo turno dela. Enquanto brilha, suas <strong><em>garras</em></strong> causam 1d4 de dano de fogo adicional quando acertam. Enquanto brilha, a gárgula adquire vulnerabilidade a dano de frio e para de brilhar imediatamente se sofrer dano de frio.</p>
+<p><strong><em>Mudança Gélida.</em></strong>Se a gárgula sofrer dano de frio, ela se cobre de gelo até o final do próximo turno dela. Enquanto está congelada, suas <strong><em>garras</em></strong> causam 1d4 de dano de frio adicional quando acertam. Enquanto está congelada, a gárgula adquire vulnerabilidade a dano de fogo e seu gelo se desfaz se ela sofrer dano de fogo.</p>
+<p><strong><em>Corpo de Pedra.</em></strong> Se a gárgula sofrer dano de frio enquanto brilha, dano de fogo enquanto está congelada, dano de concussão de um acerto crítico ou dano da magia <em>estilhaçar</em> ou de magia semelhante, as asas da gárgula se partem, fazendo com que ela perca seu deslocamento de voo.</p>
+<p><strong><em>Agarrador.</em></strong> A gárgula tem vantagem em jogadas de ataque feitas contra uma criatura que ela tenha agarrado.</p>
+<h3>Ações</h3>
+<p><strong><em>Ataque Múltiplo.</em></strong> A gárgula faz dois ataques: um com sua mordida e um com suas garras.</p>
+<p><strong><em>Mordida.</em></strong> <em>Ataque com Arma Corpo a Corpo:</em> +5 para acertar, alcance 1,5 m, um alvo. <em>Acerto:</em> 6 (1d6 + 3) de dano perfurante.</p>
+<p><strong><em>Garras.</em></strong> <em>Ataque com Arma Corpo a Corpo:</em> +5 para acertar, alcance 1,5 m, um alvo. <em>Acerto:</em> 6 (1d6 + 3) de dano cortante. Em vez de causar dano, a gárgula pode agarrar o alvo (CD para escapar 13).</p>
+</div>
+<h3 id="praga-de-ratos">Praga de Ratos</h3>
+<div style="clear: both; padding-top: 0.8rem;"></div>
+<div class="statblock">
+<h2>Praga de Ratos</h2>
+<em>Enxame Grande de bestas Minúsculas, caótico e mau</em>
+<hr>
+<strong>Classe de Armadura</strong> 10
+<br>
+<strong>Pontos de Vida</strong> 49 (14d8 - 14)
+<br>
+<strong>Deslocamento</strong> 9 m
+<hr>
+<table class="ability-table">
+  <thead>
+    <tr>
+      <th>FOR</th>
+      <th>DES</th>
+      <th>CON</th>
+      <th>INT</th>
+      <th>SAB</th>
+      <th>CAR</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>16 (+3)</td>
+      <td>11 (+0)</td>
+      <td>14 (+2)</td>
+      <td>2 (-4)</td>
+      <td>10 (+0)</td>
+      <td>3 (-4)</td>
+    </tr>
+  </tbody>
+</table>
+<hr>
+<strong>Resistências a Dano</strong> Concussão, Perfurante, Cortante<br>
+<strong>Imunidades a Condições</strong> Enfeitiçado, Amedrontado, Agarrado, Paralisado, Petrificado, Caído, Impedido, Atordoado<br>
+<strong>Sentidos</strong> Visão no escuro 9 m, Percepção passiva 10<br>
+<strong>Idiomas</strong> —<br>
+<strong>Nível de Desafio</strong> 2<br>
+<strong>Bônus de Proficiência</strong> +2<br>
+<hr>
+<p><strong><em>Enxame.</em></strong> O enxame pode ocupar o espaço de outra criatura e vice-versa, e pode se mover por qualquer abertura grande o bastante para um rato Minúsculo. O enxame não pode recuperar pontos de vida nem ganhar pontos de vida temporários.</p>
+<p><strong><em>Faro Aguçado.</em></strong> O enxame tem vantagem em testes de Sabedoria (Percepção) que dependam do olfato.</p>
+<p><strong><em>Maré de Vermes.</em></strong> Um inimigo que começar seu turno no espaço do enxame deve ser bem-sucedido em um teste de resistência de Força CD 13 ou fica agarrado (CD para escapar 13). Enquanto agarrada dessa forma, a criatura fica caída, cega e impedida, e não consegue respirar. (Uma criatura que não consegue respirar dessa forma pode prender a respiração conforme descrito no <span class="citation">Player’s Handbook</span>.)</p>
+<h3>Ações</h3>
+<p><strong><em>Ataque Múltiplo.</em></strong> O enxame faz dois ataques.</p>
+<p><strong><em>Mordidas.</em></strong> <em>Ataque com Arma Corpo a Corpo:</em> +5 para acertar, alcance 0 m, cada criatura no espaço do enxame. <em>Acerto:</em> 14 (4d6) de dano perfurante, ou 7 (2d6) de dano perfurante se o enxame estiver com metade ou menos de seus pontos de vida.</p>
+</div>
+<h3 id="tríade-espinho-raiz-rootspike-triad">Tríade Espinho-Raiz (<em>Rootspike Triad</em>)</h3>
+<div style="clear: both; padding-top: 0.8rem;"></div>
+<div class="statblock">
+<h2>Tríade Espinho-Raiz</h2>
+<em>Trio Grande de criaturas Médias, neutro e mau</em>
+<hr>
+<strong>Classe de Armadura</strong> 16 (armadura natural)<br>
+<strong>Pontos de Vida</strong> 120 (16d10 + 32)<br>
+<strong>Deslocamento</strong> 9 m<br>
+<hr>
+<table class="ability-table">
+  <thead>
+    <tr>
+      <th>FOR</th>
+      <th>DES</th>
+      <th>CON</th>
+      <th>INT</th>
+      <th>SAB</th>
+      <th>CAR</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>10 (+0)</td>
+      <td>12 (+1)</td>
+      <td>13 (+1)</td>
+      <td>12 (+1)</td>
+      <td>20 (+5)</td>
+      <td>15 (+2)</td>
+    </tr>
+  </tbody>
+</table>
+<hr>
+<strong>Testes de Resistência</strong> Sab +8, Car +4<br>
+<strong>Perícias</strong> Percepção +8, Natureza +4<br>
+<strong>Sentidos</strong> visão às cegas 90 m (cego além desse raio), Percepção passiva 13<br>
+<strong>Idiomas</strong> entende Comum, mas não sabe falar; telepatia em até 18 m<br>
+<strong>Nível de Desafio</strong> 5<br>
+<strong>Bônus de Proficiência</strong> +3
+<hr>
+<h3>Ações</h3>
+<p><strong><em>Ataque Múltiplo.</em></strong> A tríade conjura <em>chicote de espinhos</em> ou <em>produzir chamas</em> duas vezes.</p>
+<p><strong><em>Chicote de Espinhos.</em></strong> A tríade conjura <em>chicote de espinhos</em> (+8 para acertar), causando 10 (3d6) de dano perfurante quando acerta.</p>
+<p><strong><em>Produzir Chamas.</em></strong> A tríade conjura <em>produzir chamas</em> (+8 para acertar), causando 13 (3d8) de dano de fogo quando acerta.</p>
+<p><strong><em>Onda Trovejante.</em></strong> A tríade conjura <em>onda trovejante</em> (CD 16) em um cubo de 6 metros. Uma criatura que falhar no teste de resistência sofre 18 (4d8) de dano trovejante em vez do normal.</p>
+<p><strong><em>Definhar (3/dia).</em></strong> A tríade conjura <em>definhar</em> (<em>blight</em>) (CD 16).</p>
+<p><strong><em>Muralha de Fogo (1/dia, exige concentração).</em></strong> A tríade conjura <em>muralha de fogo</em> (<em>wall of fire</em>) (CD 16).</p>
+<p><strong><em>Ira da Natureza (1/dia, exige concentração).</em></strong> A tríade conjura <em>ira da natureza</em> (<em>wrath of nature</em>) (CD 16).</p>
+<hr>
+</div>
+<h3 id="enxame-de-pragas-galho">Enxame de Pragas-Galho</h3>
+<div style="clear: both; padding-top: 0.8rem;"></div>
+<div class="statblock">
+    <h2>Enxame de Pragas-Galho</h2>
+    <em>Planta Grande, neutra e má</em>
+    <hr>
+    <strong>Classe de Armadura</strong> 13
+    <br>
+    <strong>Pontos de Vida</strong> 66 (12d8 + 12)
+    <br>
+    <strong>Deslocamento</strong> 6 m
+    <hr>
+    <table class="ability-table">
+        <thead>
+            <tr>
+                <th>FOR</th>
+                <th>DES</th>
+                <th>CON</th>
+                <th>INT</th>
+                <th>SAB</th>
+                <th>CAR</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>12 (+1)</td>
+                <td>13 (+1)</td>
+                <td>12 (+1)</td>
+                <td>4 (-3)</td>
+                <td>8 (-1)</td>
+                <td>3 (-4)</td>
+            </tr>
+        </tbody>
+    </table>
+    <hr>
+    <strong>Perícias</strong> Furtividade +3<br>
+    <strong>Vulnerabilidades a Dano</strong> fogo<br>
+    <strong>Imunidades a Condições</strong> cego, surdo<br>
+    <strong>Sentidos</strong> visão às cegas 18 m (cego além desse raio), Percepção passiva 9<br>
+    <strong>Idiomas</strong> entende Comum e Druídico, mas não sabe falar<br>
+    <strong>Nível de Desafio</strong> 1<br>
+    <strong>Bônus de Proficiência</strong> +2
+    <hr>
+    <p><strong><em>Aparência Falsa.</em></strong> Enquanto o enxame permanece imóvel, ele é indistinguível de um matagal de arbustos mortos.</p>
+    <p><strong><em>Enxame.</em></strong> O enxame pode ocupar o espaço de outra criatura e vice-versa, e pode se mover por qualquer abertura grande o bastante para uma planta Pequena. O enxame não pode recuperar pontos de vida nem ganhar pontos de vida temporários.</p>
+    <h3>Ações</h3>
+    <p><strong><em>Garras.</em></strong> <em>Ataque com Arma Corpo a Corpo:</em> +3 para acertar, alcance 1,5 m, até dois alvos no espaço do enxame. <em>Acerto:</em> 10 (4d4) de dano perfurante, ou 5 (2d4) de dano perfurante se o enxame estiver com metade ou menos de seus pontos de vida.</p>
+</div>
+<h3 id="lobisomem">Lobisomem</h3>
+<div style="clear: both; padding-top: 0.8rem;"></div>
+<div class="statblock">
+<h2>Lobisomem</h2>
+<em>Humanoide Médio (humano, metamorfo), caótico e mau</em>
+<hr>
+<strong>Classe de Armadura</strong> 11 na forma humanoide, 12 (armadura natural) na forma de lobo ou híbrida
+<br>
+<strong>Pontos de Vida</strong> 84 (13d8 + 26)
+<br>
+<strong>Deslocamento</strong> 9 m (12 m na forma de lobo)
+<hr>
+<table class="ability-table">
+  <thead>
+    <tr>
+      <th>FOR</th>
+      <th>DES</th>
+      <th>CON</th>
+      <th>INT</th>
+      <th>SAB</th>
+      <th>CAR</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td data-label="FOR">16 (+3)</td>
+      <td data-label="DES">13 (+1)</td>
+      <td data-label="CON">14 (+2)</td>
+      <td data-label="INT">10 (+0)</td>
+      <td data-label="SAB">11 (+0)</td>
+      <td data-label="CAR">10 (+0)</td>
+    </tr>
+  </tbody>
+</table>
+<hr>
+<strong>Testes de Resistência</strong> For +5<br>
+<strong>Perícias</strong> Percepção +4, Furtividade +3<br>
+<strong>Sentidos</strong> visão no escuro 18 m, Percepção passiva 14<br>
+<strong>Idiomas</strong> Comum (não consegue falar na forma de lobo)<br>
+<strong>Nível de Desafio</strong> 3, ou 2 sem sua regeneração<br>
+<strong>Bônus de Proficiência.</strong> +2<br>
+<hr>
+<p><strong><em>Audição e Faro Aguçados.</em></strong> O lobisomem tem vantagem em testes de Sabedoria (Percepção) que dependam da audição ou do olfato.</p>
+<p><strong><em>Táticas de Matilha.</em></strong> O lobisomem tem vantagem em uma jogada de ataque contra uma criatura se pelo menos um aliado do lobisomem estiver a até 1,5 metro da criatura e esse aliado não estiver incapacitado.</p>
+<p><strong><em>Regeneração.</em></strong> O lobisomem recupera 10 pontos de vida no início do turno dele. Se o lobisomem sofrer dano necrótico ou dano de concussão, perfurante ou cortante de uma arma prateada, essa característica não funciona no início do próximo turno dele. O lobisomem só morre se começar seu turno com 0 pontos de vida e não se regenerar.</p>
+<h3>Ações</h3>
+<p><strong><em>Ataque Múltiplo.</em></strong> O lobisomem faz dois ataques: dois com sua lança (forma humanoide) ou um com sua mordida e um com suas garras (forma de lobo ou híbrida).</p>
+<p><strong><em>Mordida (Apenas na Forma de Lobo ou Híbrida).</em></strong> Ataque com Arma Corpo a Corpo: +5 para acertar, alcance 1,5 m, um alvo. Acerto: 7 (1d8 + 3) de dano perfurante. Em vez de causar dano, o lobisomem pode agarrar o alvo (CD para escapar 11). Além disso, se o alvo for um humanoide, ele deve ser bem-sucedido em um teste de resistência de Constituição CD 13 ou é amaldiçoado com a licantropia de lobisomem.</p>
+<p><strong><em>Garras (Apenas na Forma de Lobo ou Híbrida).</em></strong> Ataque com Arma Corpo a Corpo: +5 para acertar, alcance 1,5 m, uma criatura. Acerto: 8 (2d4 + 3) de dano cortante. Se o alvo for uma criatura, ela deve ser bem-sucedida em um teste de resistência de Força CD 13 ou cai caída.</p>
+<p><strong><em>Lança (Apenas na Forma Humanoide).</em></strong> Ataque com Arma Corpo a Corpo ou à Distância: +5 para acertar, alcance 1,5 m ou distância 6/18 m, uma criatura. Acerto: 6 (1d6 + 3) de dano perfurante, ou 7 (1d8 + 3) de dano perfurante se empunhada com as duas mãos para fazer um ataque corpo a corpo.</p>
+<h3>Ações Bônus</h3>
+<p><strong><em>Metamorfose.</em></strong> O lobisomem se transforma em um híbrido de lobo e humanoide, ou em um lobo, ou volta à sua forma verdadeira, que é humanoide. Suas estatísticas, exceto sua CA, são as mesmas em cada forma. Todo equipamento que ele esteja vestindo ou carregando se funde à nova forma. Ele retorna à sua forma verdadeira se morrer.</p>
+</div>
+<h3 id="lobisomem-brigão">Lobisomem Brigão</h3>
+<div style="clear: both; padding-top: 0.8rem;"></div>
+<div class="statblock">
+<h2>Lobisomem Brigão</h2>
+<em>Humanoide Médio, caótico e mau</em>
+<hr>
+<strong>Classe de Armadura</strong> 14 na forma humanoide, 15 (armadura natural) na forma de lobo ou híbrida
+<br>
+<strong>Pontos de Vida</strong> 142 (20d8 + 60)
+<br>
+<strong>Deslocamento</strong> 9 m (12 m na forma de lobo)
+<hr>
+<table class="ability-table">
+  <thead>
+    <tr>
+      <th>FOR</th>
+      <th>DES</th>
+      <th>CON</th>
+      <th>INT</th>
+      <th>SAB</th>
+      <th>CAR</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>17 (+3)</td>
+      <td>13 (+1)</td>
+      <td>16 (+3)</td>
+      <td>10 (+0)</td>
+      <td>11 (+0)</td>
+      <td>12 (+1)</td>
+    </tr>
+  </tbody>
+</table>
+<hr>
+<strong>Testes de Resistência</strong> For +6, Con +6<br>
+<strong>Perícias</strong> Atletismo +6, Intimidação +4, Percepção +6, Furtividade +4<br>
+<strong>Sentidos</strong> visão no escuro 18 m, Percepção passiva 16<br>
+<strong>Idiomas</strong> Comum (não consegue falar na forma de lobo)<br>
+<strong>Nível de Desafio</strong> 7, ou 6 sem sua regeneração<br>
+<strong>Bônus de Proficiência</strong> +3<br>
+<hr>
+<p><strong><em>Audição e Faro Aguçados.</em></strong> O lobisomem tem vantagem em testes de Sabedoria (Percepção) que dependam da audição ou do olfato.</p>
+<p><strong><em>Táticas de Matilha.</em></strong> O lobisomem tem vantagem em uma jogada de ataque contra uma criatura se pelo menos um aliado do lobisomem estiver a até 1,5 metro da criatura e esse aliado não estiver incapacitado.</p>
+<p><strong><em>Regeneração.</em></strong> O lobisomem recupera 10 pontos de vida no início do turno dele. Se o lobisomem sofrer dano necrótico ou dano de concussão, perfurante ou cortante de uma arma prateada, essa característica não funciona no início do próximo turno dele. O lobisomem só morre se começar seu turno com 0 pontos de vida e não se regenerar.</p>
+<p><strong><em>Brutamontes.</em></strong> Uma arma corpo a corpo causa um dado extra de dano quando o lobisomem acerta com ela (já incluído no ataque).</p>
+<p><strong><em>Defesa sem Armadura.</em></strong> Enquanto o lobisomem não estiver usando armadura, sua CA inclui seu modificador de Constituição.</p>
+<h3>Ações</h3>
+<p><strong><em>Ataque Múltiplo.</em></strong> O lobisomem faz dois ataques com sua lança (forma humanoide) ou um ataque com sua mordida e dois ataques com suas garras (forma de lobo ou híbrida). Ele pode substituir um ataque de garras por um arremesso.</p>
+<p><strong><em>Mordida (Apenas na Forma de Lobo ou Híbrida).</em></strong> Ataque com Arma Corpo a Corpo: +6 para acertar, alcance 1,5 m, um alvo. Acerto: 14 (2d10 + 3) de dano perfurante, e o alvo deve ser bem-sucedido em um teste de resistência de Força CD 14 ou cai caído. Além disso, se o alvo for um humanoide, ele deve ser bem-sucedido em um teste de resistência de Constituição CD 14 ou é amaldiçoado com a licantropia de lobisomem.</p>
+<p><strong><em>Garras (Apenas na Forma de Lobo ou Híbrida).</em></strong> Ataque com Arma Corpo a Corpo: +6 para acertar, alcance 1,5 m, uma criatura. Acerto: 12 (2d8 + 3) de dano cortante. Se o alvo for uma criatura, ela deve ser bem-sucedida em um teste de resistência de Força CD 14 ou fica agarrada.</p>
+<p><strong><em>Lança (Apenas na Forma Humanoide).</em></strong> Ataque com Arma Corpo a Corpo ou à Distância: +6 para acertar, alcance 1,5 m ou distância 6/18 m, uma criatura. Acerto: 10 (2d6 + 3) de dano perfurante, ou 12 (2d8 + 3) de dano perfurante se empunhada com as duas mãos para fazer um ataque corpo a corpo.</p>
+<p><strong><em>Arremesso.</em></strong> O lobisomem força uma criatura que esteja agarrando a ser bem-sucedida em um teste de resistência de Força CD 14. Se falhar, a criatura é arremessada 3 metros e cai caída. Se o alvo não puder percorrer a distância inteira, ele sofre 1d6 de dano de concussão adicional para cada 1,5 metro que deixou de percorrer.</p>
+<h3>Ações Bônus</h3>
+<p><strong><em>Metamorfose.</em></strong> O lobisomem se transforma em um híbrido de lobo e humanoide, ou em um lobo, ou volta à sua forma verdadeira, que é humanoide. Suas estatísticas, exceto sua CA, são as mesmas em cada forma. Todo equipamento que ele esteja vestindo ou carregando se funde à nova forma. Ele retorna à sua forma verdadeira se morrer.</p>
+<p><strong><em>Aperto Esmagador.</em></strong> O lobisomem força uma criatura que esteja agarrando a ser bem-sucedida em um teste de resistência de Constituição CD 14. A criatura sofre 10 (3d6) de dano de concussão se falhar, e metade desse dano se passar. Uma criatura que falhar no teste de resistência por 5 ou mais também fica aturdida até o final do próximo turno dela. (A criatura pode se mover ou realizar uma ação no seu turno, não ambos. Ela também não pode realizar uma ação bônus nem uma reação.)
+</div>
+<h3 id="comandante-corpo-ancião-wight-commander">Comandante Corpo Ancião (<em>Wight Commander</em>)</h3>
+<div style="clear: both; padding-top: 0.8rem;"></div>
+<div class="statblock">
+<h2>Comandante Corpo Ancião</h2>
+<em>Morto-vivo Médio, neutro e mau</em>
+<hr>
+<strong>Classe de Armadura</strong> 14 (couro batido)
+<br>
+<strong>Pontos de Vida</strong> 142 (19d8 + 57)
+<br>
+<strong>Deslocamento</strong> 9 m
+<hr>
+<table class="ability-table">
+  <thead>
+    <tr>
+      <th>FOR</th>
+      <th>DES</th>
+      <th>CON</th>
+      <th>INT</th>
+      <th>SAB</th>
+      <th>CAR</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>18 (+4)</td>
+      <td>14 (+2)</td>
+      <td>16 (+3)</td>
+      <td>10 (+0)</td>
+      <td>13 (+1)</td>
+      <td>15 (+2)</td>
+    </tr>
+  </tbody>
+</table>
+<hr>
+<strong>Testes de Resistência</strong> Con +6, Car +5<br>
+<strong>Perícias</strong> Atletismo +7, Percepção +4, Furtividade +5<br>
+<strong>Resistências a Dano</strong> Necrótico; Concussão, Perfurante e Cortante de Ataques Não Mágicos que não sejam Prateados<br>
+<strong>Imunidades a Dano</strong> Veneno<br>
+<strong>Imunidades a Condições</strong> Exaustão, Envenenado<br>
+<strong>Sentidos</strong> Visão no escuro 18 m, Percepção passiva 14<br>
+<strong>Idiomas</strong> Os idiomas que conhecia em vida<br>
+<strong>Nível de Desafio</strong> 10, ou 6 se os jogadores tiverem armas mágicas ou prateadas<br>
+<strong>Bônus de Proficiência</strong> +3<br>
+<hr>
+<p><strong><em>Sensibilidade à Luz do Sol.</em></strong> Sob a luz do sol, o corpo ancião tem desvantagem em jogadas de ataque, bem como em testes de Sabedoria (Percepção) que dependam da visão.</p>
+<p><strong><em>Frio da Sepultura.</em></strong> Qualquer criatura que não seja morta-viva e que comece seu turno a até 1,5 metro do comandante corpo ancião deve fazer um teste de resistência de Constituição CD 14. Se falhar, a criatura sofre 7 (2d6) de dano de frio.</p>
+<h3>Ações</h3>
+<p><strong><em>Ataque Múltiplo.</em></strong> O comandante corpo ancião faz dois ataques.</p>
+<p><strong><em>Drenar Vida.</em></strong> <em>Ataque com Arma Corpo a Corpo:</em> +7 para acertar, alcance 1,5 m, uma criatura. <em>Acerto:</em> 10 (2d6 + 3) de dano necrótico e o alvo fica agarrado (CD para escapar 15). O comandante corpo ancião e todos os mortos-vivos não hostis a até 3 metros dele recuperam pontos de vida iguais à metade do dano necrótico causado. Além disso, o alvo deve ser bem-sucedido em um teste de resistência de Constituição CD 14 ou tem seu máximo de pontos de vida reduzido em um valor igual ao dano sofrido. Essa redução dura até o alvo terminar um descanso longo. O alvo morre se esse efeito reduzir seu máximo de pontos de vida a 0. </p>
+<p><strong><em>Espada Longa.</em></strong> <em>Ataque com Arma Corpo a Corpo:</em> +7 para acertar, alcance 1,5 m, um alvo. <em>Acerto:</em> 13 (2d8 + 4) de dano cortante, ou 15 (2d10 + 4) de dano cortante se empunhada com as duas mãos.</p>
+<p><strong><em>Arco Longo.</em></strong> <em>Ataque com Arma à Distância:</em> +5 para acertar, distância 45/180 m, um alvo. <em>Acerto:</em> 11 (2d8 + 2) de dano perfurante.</p>
+</div>
+<h3 id="zumbi">Zumbi</h3>
+<div style="clear: both; padding-top: 0.8rem;"></div>
+<div class="statblock">
+  <h2>Zumbi</h2>
+  <em>Morto-vivo Médio, neutro e mau</em>
+  <hr>
+  <strong>Classe de Armadura</strong> 8  
+  <br>
+  <strong>Pontos de Vida</strong> 22 (3d8 + 9)  
+  <br>
+  <strong>Deslocamento</strong> 6 m  
+  <hr>
+  <table class="ability-table">
+    <thead>
+      <tr>
+        <th>FOR</th><th>DES</th><th>CON</th><th>INT</th><th>SAB</th><th>CAR</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td data-label="FOR">13 (+1)</td>
+        <td data-label="DES">6 (–2)</td>
+        <td data-label="CON">16 (+3)</td>
+        <td data-label="INT">3 (–4)</td>
+        <td data-label="SAB">6 (–2)</td>
+        <td data-label="CAR">5 (–3)</td>
+      </tr>
+    </tbody>
+  </table>
+  <hr>
+  <strong>Testes de Resistência</strong> Sab +0  <br>
+  <strong>Imunidades a Dano</strong> Veneno  <br>
+  <strong>Imunidades a Condições</strong> Envenenado  <br>
+  <strong>Sentidos</strong> visão no escuro 18 m, Percepção passiva 8  <br>
+  <strong>Idiomas</strong> entende os idiomas que conhecia em vida, mas não consegue falar  <br>
+  <strong>Nível de Desafio</strong> 1/4
+  <hr>
+  <p><strong><em>Fortitude Morta-Viva.</em></strong> Se o dano reduzir o zumbi a 0 pontos de vida, o zumbi cai a 1 ponto de vida em vez disso. O zumbi não pode usar essa habilidade se o dano for radiante ou vier de um acerto crítico, se o dano sofrido for 15 ou mais, ou se ele tinha apenas 1 ponto de vida restante.</p>
+  <h3>Ações</h3>
+  <p><strong><em>Pancada.</em></strong> <em>Ataque com Arma Corpo a Corpo:</em> +3 para acertar, alcance 1,5 m, um alvo. <em>Acerto:</em> 4 (1d6 + 1) de dano de concussão.</p>
+</div>
+<h3 id="zumbi-propagador-de-praga">Zumbi Propagador de Praga</h3>
+<div style="clear: both; padding-top: 0.8rem;"></div>
+<div class="statblock">
+  <h2>Zumbi, Propagador de Praga</h2>
+  <em>Morto-vivo Médio</em>
+  <hr>
+  <strong>Classe de Armadura</strong> 10 
+  <br>
+  <strong>Pontos de Vida</strong> 78 (12d8 + 24)
+  <br>
+  <strong>Deslocamento</strong> 9 m  
+  <hr>
+  <table class="ability-table">
+    <thead>
+      <tr>
+        <th>FOR</th><th>DES</th><th>CON</th><th>INT</th><th>SAB</th><th>CAR</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td data-label="FOR">16 (+3)</td>
+        <td data-label="DES">10 (+0)</td>
+        <td data-label="CON">15 (+2)</td>
+        <td data-label="INT">3 (–4)</td>
+        <td data-label="SAB">5 (–3)</td>
+        <td data-label="CAR">5 (–3)</td>
+      </tr>
+    </tbody>
+  </table>
+  <hr>
+  <strong>Resistências a Dano</strong> Necrótico<br>
+  <strong>Imunidades a Dano</strong> Veneno  <br>
+  <strong>Imunidades a Condições</strong> Enfeitiçado, Exaustão, Envenenado  <br>
+  <strong>Sentidos</strong> Visão no escuro 18 m, Percepção passiva 7  <br>
+  <strong>Idiomas</strong> entende os idiomas que conhecia em vida, mas não consegue falar  <br>
+  <strong>Nível de Desafio</strong> 4<br>
+  <strong>Bônus de Proficiência</strong> +2  
+  <hr>
+  <p><strong><em>Fortitude Morta-Viva.</em></strong> Se o dano reduzir o zumbi a 0 pontos de vida, ele deve fazer um teste de resistência de Constituição com CD igual a 5 + o dano sofrido, a menos que o dano seja radiante ou venha de um acerto crítico. Se passar, o zumbi cai a 1 ponto de vida em vez disso.</p>
+  <p><strong><em>Natureza Incomum.</em></strong> O zumbi não precisa de ar, comida, bebida ou sono.</p>
+  <p><strong><em>Aura Viral.</em></strong> Qualquer criatura que comece seu turno a até 3 metros do propagador de praga deve fazer um teste de resistência de Constituição CD 12. Se falhar, a criatura fica envenenada e não pode recuperar pontos de vida até o final do próximo turno dela. Se passar, a criatura fica imune à Aura Viral desse propagador de praga por 24 horas.</p>
+  <h3>Ações</h3>
+  <p><strong><em>Ataque Múltiplo.</em></strong> O propagador de praga faz dois ataques de Pancada.</p>
+  <p><strong><em>Pancada.</em></strong> <em>Ataque com Arma Corpo a Corpo:</em> +5 para acertar, alcance 1,5 m, um alvo. <em>Acerto:</em> 6 (1d6 + 3) de dano de concussão mais 9 (2d8) de dano necrótico.</p>
+  <p><strong><em>Miasma Virulento (1/Dia).</em></strong> O propagador de praga libera um gás tóxico em uma esfera de 9 metros de raio centrada em si mesmo. Cada criatura naquela área deve fazer um teste de resistência de Constituição CD 12, sofrendo 14 (4d6) de dano de veneno se falhar, ou metade disso se passar. Um Humanoide reduzido a 0 pontos de vida por esse dano morre e se ergue como um zumbi (veja seu bloco de estatísticas no Monster Manual) 1 minuto depois. O zumbi age imediatamente após o propagador de praga na ordem de iniciativa.</p>
+</div>
+  </main>
+  <aside class="sidebar-right"><div class="toc-label">Nesta página</div><div class="toc-list"><a class="toc-lvl-3" href="#objeto-animado-maior">Objeto Animado Maior</a><a class="toc-lvl-3" href="#objeto-animado-menor">Objeto Animado Menor</a><a class="toc-lvl-3" href="#gárgula-do-castelo">Gárgula do Castelo</a><a class="toc-lvl-3" href="#druida-agressor">Druida Agressor</a><a class="toc-lvl-3" href="#druida-naturalista">Druida Naturalista</a><a class="toc-lvl-3" href="#praga-galho-ancião-elder-twig-blight">Praga-Galho Ancião (Elder Twig Blight)</a><a class="toc-lvl-3" href="#gárgula">Gárgula</a><a class="toc-lvl-3" href="#praga-de-ratos">Praga de Ratos</a><a class="toc-lvl-3" href="#tríade-espinho-raiz-rootspike-triad">Tríade Espinho-Raiz (Rootspike Triad)</a><a class="toc-lvl-3" href="#enxame-de-pragas-galho">Enxame de Pragas-Galho</a><a class="toc-lvl-3" href="#lobisomem">Lobisomem</a><a class="toc-lvl-3" href="#lobisomem-brigão">Lobisomem Brigão</a><a class="toc-lvl-3" href="#comandante-corpo-ancião-wight-commander">Comandante Corpo Ancião (Wight Commander)</a><a class="toc-lvl-3" href="#zumbi">Zumbi</a><a class="toc-lvl-3" href="#zumbi-propagador-de-praga">Zumbi Propagador de Praga</a></div></aside>
+</div>
+<script>
+document.querySelectorAll('.search-box input').forEach(function(inp){
+  inp.addEventListener('input', function(){
+    var q = inp.value.trim().toLowerCase();
+    var sidebar = inp.closest('.sidebar-left');
+    if (!q) { sidebar.classList.remove('filtering'); return; }
+    sidebar.classList.add('filtering');
+    sidebar.querySelectorAll('.tree .leaf').forEach(function(a){
+      var hit = a.textContent.toLowerCase().indexOf(q) !== -1;
+      a.classList.toggle('match', hit);
+    });
+    sidebar.querySelectorAll('.tree > details').forEach(function(d){
+      var hasMatch = d.querySelector('.leaf.match');
+      d.classList.toggle('has-match', !!hasMatch);
+    });
+  });
+});
+var mobileBtn = document.querySelector('.mobile-topbar button');
+if (mobileBtn) {
+  mobileBtn.addEventListener('click', function(){
+    document.querySelector('.sidebar-left').classList.toggle('open');
+  });
+}
+</script>
+</body>
+</html>

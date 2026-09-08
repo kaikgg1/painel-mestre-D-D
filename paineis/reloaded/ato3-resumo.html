@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1c1c1e">
+<link rel="icon" type="image/svg+xml" href="../../assets/img/favicon.svg">
+<title>Resumo do Ato III — Curse of Strahd: Reloaded</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+* { box-sizing:border-box; }
+:root {
+  --bg:#1c1c1e; --bg-sidebar:#1a1a1c; --bg-hover:#252528; --bg-card:#232325;
+  --border:#333336;
+  --gold:#e0a542; --gold-dim:#b8863a;
+  --active:#a78bfa; --active-dim:#8a6fd8;
+  --text:#dcdcdd; --text-dim:#9a9a9d; --text-faint:#6e6e72;
+  --title:#f2f1ee;
+}
+* { scrollbar-color: #48484c var(--bg-sidebar); scrollbar-width: thin; }
+html, body { margin:0; min-height:100vh; background:var(--bg);
+  font-family:'Inter', system-ui, -apple-system, sans-serif; color:var(--text); }
+a { color:var(--gold); text-decoration:none; }
+a:hover { text-decoration:underline; }
+
+.layout { display:flex; min-height:100vh; align-items:stretch; }
+
+/* ---------- barra lateral esquerda ---------- */
+.sidebar-left { width:290px; flex:0 0 290px; background:var(--bg-sidebar);
+  border-right:1px solid var(--border); padding:22px 18px 40px;
+  position:sticky; top:0; height:100vh; overflow-y:auto; }
+.brand { font-size:19px; font-weight:800; color:var(--gold); line-height:1.25;
+  margin-bottom:14px; text-decoration:none; display:block; }
+.brand:hover { text-decoration:none; opacity:.9; }
+.search-box { position:relative; margin-bottom:16px; }
+.search-box input { width:100%; padding:8px 10px 8px 30px; border-radius:6px;
+  border:1px solid var(--border); background:var(--bg-card); color:var(--text);
+  font-family:inherit; font-size:13px; }
+.search-box input::placeholder { color:var(--text-faint); }
+.search-box input:focus { outline:none; border-color:var(--gold-dim); }
+.search-box .ico { position:absolute; left:9px; top:50%; transform:translateY(-50%);
+  color:var(--text-faint); font-size:13px; pointer-events:none; }
+.tree { font-size:14px; }
+.tree details { margin-bottom:1px; }
+.tree summary { list-style:none; cursor:pointer; padding:6px 8px; border-radius:6px;
+  color:var(--text); display:flex; align-items:center; gap:6px; user-select:none; }
+.tree summary::-webkit-details-marker { display:none; }
+.tree summary:hover { background:var(--bg-hover); }
+.tree summary .chev { display:inline-block; font-size:10px; color:var(--text-faint);
+  transition:transform .15s; width:10px; }
+.tree details[open] > summary .chev { transform:rotate(90deg); }
+.tree .leaf-list { padding-left:20px; margin-top:1px; }
+.tree .leaf { display:block; padding:6px 8px; border-radius:6px; font-size:13.5px;
+  color:var(--text-dim); }
+.tree .leaf:hover { background:var(--bg-hover); color:var(--text); text-decoration:none; }
+.tree .leaf.active { color:var(--active); font-weight:600; background:rgba(167,139,250,.1); }
+.tree .leaf.locked { color:var(--text-faint); cursor:default; font-style:italic; }
+.tree .leaf.locked:hover { background:none; }
+.tree .no-match { display:none; }
+.sidebar-left.filtering .tree .leaf { display:none; }
+.sidebar-left.filtering .tree .leaf.match { display:block; }
+.sidebar-left.filtering .tree details { display:none; }
+.sidebar-left.filtering .tree details.has-match { display:block; }
+.sidebar-left.filtering .tree details.has-match > summary .chev { transform:rotate(90deg); }
+
+/* ---------- coluna central ---------- */
+main.article { flex:1 1 auto; min-width:0; max-width:760px; margin:0 auto;
+  padding:48px 40px 100px; line-height:1.7; font-size:16.5px; }
+.page-title { font-size:clamp(28px,4vw,38px); font-weight:800; color:var(--title);
+  margin:0 0 28px; letter-spacing:-.3px; }
+main.article h1 { color:var(--gold); font-size:26px; font-weight:700;
+  margin:36px 0 14px; scroll-margin-top:24px; letter-spacing:-.2px; }
+main.article h1:first-child { margin-top:0; }
+main.article h2 { color:var(--gold); font-size:21px; font-weight:700;
+  margin:30px 0 12px; scroll-margin-top:24px; }
+main.article h3 { color:var(--title); font-size:18px; font-weight:700;
+  margin:24px 0 10px; scroll-margin-top:24px; }
+main.article h4 { color:var(--text-dim); font-size:14px; font-weight:700;
+  text-transform:uppercase; letter-spacing:.5px; margin:20px 0 8px; scroll-margin-top:24px; }
+main.article p { margin:0 0 15px; color:var(--text); }
+main.article ul { margin:0 0 15px; padding-left:24px; }
+main.article li { margin-bottom:6px; }
+main.article a { border-bottom:1px solid rgba(224,165,66,.35); }
+main.article a:hover { border-bottom-color:var(--gold); text-decoration:none; }
+main.article em { color:var(--text); font-style:italic; }
+main.article strong { color:var(--title); font-weight:700; }
+main.article hr { border:0; border-top:1px solid var(--border); margin:20px 0; }
+.link-pending { color:var(--text-faint); font-style:italic; border-bottom:1px dotted var(--text-faint); cursor:default; }
+.reloaded-img { max-width:100%; border-radius:8px; border:1px solid var(--border); margin:16px 0; display:block; }
+
+span.citation { font-style:italic; color:var(--text-dim); }
+span.highlight { color:var(--gold); font-weight:600; }
+span.credit { font-size:12px; color:var(--text-faint); display:block; margin-top:4px; }
+
+div.description { background:var(--bg-card); border-left:3px solid var(--active-dim);
+  border-radius:0 8px 8px 0; padding:16px 20px; margin:18px 0; font-style:italic; color:var(--text); }
+div.description p:last-child { margin-bottom:0; }
+
+.callout { border:1px solid var(--border); border-left:4px solid var(--gold-dim);
+  border-radius:0 8px 8px 0; background:rgba(224,165,66,.06); margin:18px 0; padding:14px 18px; }
+.callout-title { font-weight:700; color:var(--gold); font-size:13px; letter-spacing:.3px;
+  text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+.callout-icon { font-size:14px; }
+.callout-body p:last-child { margin-bottom:0; }
+.callout-body { font-size:16px; }
+.callout-warning { border-left-color:#e2645a; background:rgba(226,100,90,.08); }
+.callout-warning .callout-title { color:#f08078; }
+.callout-combat { border-left-color:#e2645a; background:rgba(226,100,90,.1); }
+.callout-combat .callout-title { color:#f08078; }
+.callout-lore, .callout-abstract { border-left-color:#5f9bd8; background:rgba(95,155,216,.08); }
+.callout-lore .callout-title, .callout-abstract .callout-title { color:#7fb4e8; }
+.callout-profile { border-left-color:var(--active-dim); background:rgba(167,139,250,.08); }
+.callout-profile .callout-title { color:var(--active); }
+.callout-item { border-left-color:#4fb86a; background:rgba(79,184,106,.08); }
+.callout-item .callout-title { color:#6fce88; }
+.callout-design { border-left-color:var(--text-faint); background:rgba(158,158,162,.06); }
+.callout-design .callout-title { color:var(--text-dim); }
+.callout-tip { border-left-color:var(--gold); }
+
+.table-wrap { overflow-x:auto; margin:18px 0; }
+table.md-table { border-collapse:collapse; width:100%; font-size:15px; }
+table.md-table th, table.md-table td { border:1px solid var(--border); padding:8px 11px; text-align:left; }
+table.md-table th { background:var(--bg-card); color:var(--gold); font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; }
+
+div.statblock { background:var(--bg-card); border:1px solid var(--border);
+  border-left:3px solid var(--active-dim); border-radius:8px; padding:18px 22px; margin:20px 0; }
+div.statblock h2 { color:var(--title); font-size:20px; font-weight:800; margin:0 0 2px; }
+div.statblock > em:first-of-type { display:block; font-style:italic; color:var(--text-dim); margin-bottom:10px; }
+div.statblock hr { border-top:1px solid var(--border); margin:11px 0; }
+div.statblock h3 { color:var(--gold); font-size:14px; font-weight:700;
+  text-transform:uppercase; letter-spacing:.5px; margin:16px 0 7px; }
+div.statblock p { margin:0 0 9px; font-size:15px; }
+div.statblock table.ability-table { width:100%; border-collapse:collapse; margin:9px 0; }
+div.statblock table.ability-table th, div.statblock table.ability-table td {
+  border:1px solid var(--border); text-align:center; padding:6px 4px; font-size:14px; }
+div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-weight:700; }
+
+/* ---------- coluna direita: sumario ---------- */
+.sidebar-right { width:250px; flex:0 0 250px; padding:48px 20px 40px 0;
+  position:sticky; top:0; height:100vh; overflow-y:auto; }
+.toc-label { font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+  color:var(--text-faint); margin-bottom:12px; }
+.toc-list { font-size:13px; }
+.toc-list a { display:block; padding:4px 0; color:var(--text-dim); border-bottom:none;
+  line-height:1.4; }
+.toc-list a:hover { color:var(--text); text-decoration:none; }
+.toc-lvl-1 { padding-left:0; font-weight:600; }
+.toc-lvl-2 { padding-left:12px; }
+.toc-lvl-3 { padding-left:24px; }
+.toc-lvl-4 { padding-left:36px; font-size:12px; }
+
+/* ---------- pagina indice ---------- */
+.idx-intro { margin-bottom:8px; }
+.idx-intro h1 { font-size:clamp(26px,4vw,36px); font-weight:800; color:var(--gold); margin-bottom:10px; }
+.idx-intro p { color:var(--text-dim); font-size:15px; max-width:640px; }
+.idx-section { margin:34px 0; }
+.idx-section-title { font-size:13px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+  color:var(--text-dim); border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:14px; }
+.idx-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:12px; }
+.idx-card { display:block; background:var(--bg-card); border:1px solid var(--border);
+  border-radius:8px; padding:14px 16px; font-weight:600; font-size:14.5px; color:var(--text);
+  transition:border-color .15s, transform .15s; }
+.idx-card:hover { border-color:var(--gold-dim); transform:translateY(-2px); text-decoration:none; }
+.idx-card.locked { opacity:.45; cursor:default; border-style:dashed; }
+.idx-card.locked:hover { transform:none; }
+.idx-badge { display:block; margin-top:5px; font-size:10px; letter-spacing:.5px; text-transform:uppercase; color:var(--text-faint); font-weight:400; }
+
+/* ---------- mobile ---------- */
+.mobile-topbar { display:none; }
+@media (max-width:1100px) {
+  .sidebar-right { display:none; }
+}
+@media (max-width:860px) {
+  .layout { flex-direction:column; }
+  .mobile-topbar { display:flex; align-items:center; gap:12px; position:sticky; top:0; z-index:40;
+    background:var(--bg-sidebar); border-bottom:1px solid var(--border); padding:12px 16px; }
+  .mobile-topbar .brand { margin:0; font-size:15px; flex:1; }
+  .mobile-topbar button { background:none; border:1px solid var(--border); color:var(--text);
+    border-radius:6px; padding:6px 10px; font-family:inherit; font-size:13px; }
+  .sidebar-left { position:fixed; left:0; top:49px; bottom:0; z-index:39; transform:translateX(-100%);
+    transition:transform .2s; width:82vw; max-width:320px; box-shadow:8px 0 30px rgba(0,0,0,.5); }
+  .sidebar-left.open { transform:translateX(0); }
+  main.article { padding:28px 18px 70px; max-width:100%; }
+}
+</style>
+</head>
+<body>
+<div class="mobile-topbar">
+  <button aria-label="Abrir menu">☰</button>
+  <a class="brand" href="index.html">Curse of Strahd: Reloaded</a>
+</div>
+<div class="layout">
+  <aside class="sidebar-left">
+    <a class="brand" href="index.html">Curse of Strahd:<br>Reloaded</a>
+    <div class="search-box"><span class="ico">🔍</span><input type="text" placeholder="Buscar página..." aria-label="Buscar página"></div>
+    <nav class="tree"><details><summary><span class="chev">▸</span>Introdução</summary><div class="leaf-list"><a class="leaf" href="introducao-usando-este-guia.html">Usando Este Guia</a><a class="leaf" href="introducao-guia-do-mestre.html">Guia do Mestre</a><a class="leaf" href="introducao-changelog.html">Changelog</a></div></details><details><summary><span class="chev">▸</span>Capítulo 1 — Iniciando a Campanha</summary><div class="leaf-list"><a class="leaf" href="cap1-sessao-zero.html">Sessão Zero</a><a class="leaf" href="cap1-criacao-de-personagem.html">Criação de Personagem</a></div></details><details><summary><span class="chev">▸</span>Capítulo 2 — A Terra de Barovia</summary><div class="leaf-list"><a class="leaf" href="cap2-lore-de-barovia.html">Lore de Barovia</a><a class="leaf" href="cap2-historia-de-barovia.html">História de Barovia</a><a class="leaf" href="cap2-strahd-von-zarovich.html">Strahd von Zarovich</a></div></details><details><summary><span class="chev">▸</span>Capítulo 3 — Conduzindo o Jogo</summary><div class="leaf-list"><a class="leaf" href="cap3-resumo-da-aventura.html">Resumo da Aventura</a><a class="leaf" href="cap3-conduzindo-a-aventura.html">Conduzindo a Aventura</a></div></details><details><summary><span class="chev">▸</span>Ato I — Adentrando as Névoas</summary><div class="leaf-list"><a class="leaf" href="ato1-resumo.html">Resumo do Ato I</a><a class="leaf" href="arco-a-fuga-da-death-house.html">Arco A — Fuga da Death House</a><a class="leaf" href="arco-b-bem-vindo-a-barovia.html">Arco B — Bem-vindo a Barovia</a><a class="leaf" href="arco-c-adentrando-o-vale.html">Arco C — Adentrando o Vale</a></div></details><details><summary><span class="chev">▸</span>Ato II — A Cidade Sombria</summary><div class="leaf-list"><a class="leaf" href="ato2-resumo.html">Resumo do Ato II</a><a class="leaf" href="arco-d-a-festa-de-st-andral.html">Arco D — A Festa de St. Andral</a><a class="leaf" href="arco-e-a-vistana-desaparecida.html">Arco E — A Vistana Desaparecida</a><a class="leaf" href="arco-f-o-desejo-de-lady-wachter.html">Arco F — O Desejo de Lady Wachter</a><a class="leaf" href="arco-g-os-irmaos-strazni.html">Arco G — Os Irmãos Strazni</a><a class="leaf" href="arco-h-a-alma-perdida.html">Arco H — A Alma Perdida</a><a class="leaf" href="arco-i-as-muralhas-de-krezk.html">Arco I — As Muralhas de Krezk</a></div></details><details open><summary><span class="chev">▸</span>Ato III — A Terra Partida</summary><div class="leaf-list"><a class="leaf active" href="ato3-resumo.html">Resumo do Ato III</a><a class="leaf" href="arco-j-a-gema-roubada.html">Arco J — A Gema Roubada</a><a class="leaf" href="arco-k-a-abadia-decaida.html">Arco K — A Abadia Decaída</a><a class="leaf" href="arco-l-o-covil-dos-lobos.html">Arco L — O Covil dos Lobos</a><a class="leaf" href="arco-m-a-mansao-do-dragao.html">Arco M — A Mansão do Dragão</a><a class="leaf" href="arco-o-jantar-com-o-diabo.html">Arco O — Jantar com o Diabo</a><a class="leaf" href="arco-p-o-assalto-a-ravenloft.html">Arco P — O Assalto a Ravenloft</a><a class="leaf" href="arco-q-um-farol-reluzente.html">Arco Q — Um Farol Reluzente</a></div></details><details><summary><span class="chev">▸</span>Ato IV — Segredos do Ancião</summary><div class="leaf-list"><a class="leaf" href="ato4-resumo.html">Resumo do Ato IV</a><a class="leaf" href="arco-r-provacoes-da-montanha.html">Arco R — Provações da Montanha</a><a class="leaf" href="arco-s-uma-espada-de-luz-solar.html">Arco S — Uma Espada de Luz Solar</a><a class="leaf" href="arco-t-os-tres-fanes.html">Arco T — Os Três Fanes</a><a class="leaf" href="arco-u-sonhos-da-alvorada.html">Arco U — Sonhos da Alvorada</a><a class="leaf" href="ato4-epilogo.html">Epílogo</a></div></details><details><summary><span class="chev">▸</span>Apêndices</summary><div class="leaf-list"><a class="leaf" href="apendice-fragmentos-de-ambar.html">Fragmentos de Âmbar</a><a class="leaf" href="apendice-bestiario.html">Bestiário</a><a class="leaf" href="apendice-glossario.html">Glossário</a><a class="leaf" href="apendice-npcs.html">Personagens Não Jogadores</a></div></details></nav>
+    <div style="margin-top:18px"><a href="../painel_barovia_dnd5e.html" style="font-size:12px;color:var(--text-faint)">← Voltar ao Painel</a></div>
+  </aside>
+  <main class="article">
+    <div class="page-title">Resumo do Ato III</div>
+<p>Neste ato, que começa na manhã seguinte à primeira lua cheia dos jogadores em Vallaki, os jogadores recebem um par de convites.</p>
+<p>O primeiro, um apelo de Urwin Martikov, pede que os jogadores viajem até a vinícola Wizard of Wines, a oeste, para investigar uma misteriosa escassez de vinho em <a href="arco-j-a-gema-roubada.html">Arc J - A Gema Roubada</a>.</p>
+<p>O segundo, uma carta do próprio Strahd von Zarovich, convida os jogadores a jantar no Castelo Ravenloft com ele e sua corte, na noite anterior à lua nova, em <a href="arco-o-jantar-com-o-diabo.html">Arc O - Jantar com o Diabo</a>.</p>
+<p>Caso os jogadores aceitem a missão dos Martikov em <a href="arco-j-a-gema-roubada.html">Arc J - A Gema Roubada</a>, eles ganham dois companheiros para a jornada: Muriel Vinshaw, uma <strong>corvo-licantropo</strong> agente dos Keepers of the Feather; e Ireena Kolyana, que pede para se juntar aos jogadores permanentemente na luta contra Strahd. Os jogadores devem resgatar a vinícola dos <strong>druidas</strong> do Povo da Floresta que a conquistaram e, uma vez feito isso, recuperar uma gema encantada em Yester Hill, ao sul, antes que a Wizard of Wines caia em ruínas.</p>
+<p>Enquanto isso, à medida que os jogadores exploram outras pistas pela metade ocidental da Baróvia, podem recrutar a caçadora de monstros vistani Ezmerelda d'Avenir em <a href="arco-k-a-abadia-decaida.html">Arc K - A Abadia Caída</a>, investigar a alcateia de lobisomens em <a href="arco-l-o-covil-dos-lobos.html">Arc L - O Covil dos Lobos</a>, e desvendar os mistérios de Argynvostholt em <a href="arco-m-a-mansao-do-dragao.html">Arc M - A Mansão do Dragão</a>.</p>
+<p>No processo, eles obterão múltiplos motivos para viajar até o Castelo Ravenloft: recuperar o <em>Ícone de Ravenloft</em> para purificar a corrupção do Abade em <a href="arco-k-a-abadia-decaida.html">Arc K - A Abadia Caída</a>; resgatar o <strong>lobisomem</strong> Emil Toranescu em troca do <em>Símbolo Sagrado de Ravenkind</em> em <a href="arco-l-o-covil-dos-lobos.html">Arc L - O Covil dos Lobos</a>; e roubar o crânio do dragão Argynvost para trazer esperança à terra mais uma vez em <a href="arco-m-a-mansao-do-dragao.html">Arc M - A Mansão do Dragão</a>.</p>
+<p>Na última noite antes da lua nova, os jogadores podem jantar com Strahd von Zarovich e os membros de sua corte em <a href="arco-o-jantar-com-o-diabo.html">Arc O - Jantar com o Diabo</a>. Lá, descobrirão que Strahd estará ausente do castelo na noite seguinte, criando a oportunidade perfeita para se infiltrar no castelo em <a href="arco-p-o-assalto-a-ravenloft.html">Arc P - O Assalto a Ravenloft</a>. Uma vez feito isso, os jogadores devem então retornar ao vale ocidental para purificar a alma do Abade, derrotar o <strong>lobisomem</strong> Kiril Stoyanovich e reacender o farol de Argynvostholt.</p>
+<p>Este ato termina ao anoitecer da primeira noite após os jogadores se infiltrarem no Castelo Ravenloft em <a href="arco-p-o-assalto-a-ravenloft.html">Arc P - O Assalto a Ravenloft</a>. Contudo, os jogadores ainda podem concluir arcos pendentes deste ato mesmo depois que o Ato IV começar — supondo, é claro, que esses arcos ainda sejam possíveis de completar.</p>
+<h1 id="marcos">Marcos</h1>
+<p>Os jogadores começam este ato no 5º nível e devem terminá-lo no 8º nível, ganhando XP de marco ao realizar com sucesso qualquer um dos seguintes feitos:</p>
+<ul><li>derrotar os druidas que ocupam a vinícola Wizard of Wines (2.000 XP)</li><li>recuperar a gema roubada de Yester Hill (2.500 XP)</li><li>recrutar Ezmerelda d'Avenir na Abadia de St. Markovia (1.000 XP)</li><li>negociar com Zuleika Toranescu no Covil dos Lobisomens (1.500 XP)</li><li>libertar Ilya e Zuleika do covil (250 XP)</li><li>receber a missão de Argynvost em Argynvostholt (2.500 XP)</li><li>dar descanso ao fantasma de Varushka e encontrar seu esconderijo oculto no Castelo Ravenloft (500 XP)</li><li>retornar do Castelo Ravenloft após o jantar com Strahd (3.500 XP)</li><li>roubar o crânio de Argynvost do <strong>Salão dos Ossos</strong> de Ravenloft (4.000 XP)</li><li>recuperar o <em>Ícone de Ravenloft</em> das catacumbas de Ravenloft (250 XP)</li><li>obter a <em>Lança da Caçadora</em> da cripta do Rei Dostron (250 XP)</li><li>resgatar Emil Toranescu das masmorras de Ravenloft (250 XP)</li><li>resgatar Gertruda do quarto principal do Castelo Ravenloft (250 XP)</li><li>saquear o tesouro oculto de Strahd no Castelo Ravenloft (250 XP)</li><li>derrotar o Abade (2.000 XP)</li><li>redimir o Abade após derrotá-lo (500 XP)</li><li>derrotar Kiril Stoyanovich (2.000 XP)</li><li>acender o farol de Argynvostholt (3.000 XP)</li></ul>
+<h1 id="linha-do-tempo">Linha do Tempo</h1>
+<p>As missões do Ato III tornam-se disponíveis e são resolvidas conforme a tabela abaixo. (🟢 indica um dia em que a missão permanece disponível, 🔶 indica um dia em que ocorre um evento significativo, 🟥 indica o prazo final de uma missão, e ❌ indica um dia em que a missão está indisponível.)</p>
+<div class="table-wrap"><table class="md-table"><thead><tr><th>Arco \ Dia de Neyavr</th><th>9</th><th>10</th><th>11</th><th>12</th><th>13</th><th>14</th><th>15</th><th>16</th></tr></thead><tbody><tr><td>J: A Gema Roubada</td><td>🔶</td><td>🟢</td><td>🟢</td><td>🟢</td><td>🟢</td><td>🟢</td><td>🟢</td><td>🟢</td></tr><tr><td>K: A Abadia Caída</td><td>—</td><td>🔶</td><td>🟢</td><td>🟢</td><td>🟢</td><td>🟢</td><td>🟢</td><td>🟢</td></tr><tr><td>L: O Covil dos Lobos</td><td>—</td><td>—</td><td>🟢</td><td>🟢</td><td>🟢</td><td>🟢</td><td>🟢</td><td>🟢</td></tr><tr><td>M: A Mansão do Dragão</td><td>🟢</td><td>🟢</td><td>🟢</td><td>🟢</td><td>🟢</td><td>🟢</td><td>🟢</td><td>🟢</td></tr><tr><td>N: Contos de Vallaki</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td></tr><tr><td>O: Jantar com o Diabo</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>🔶</td><td>❌</td><td>❌</td></tr><tr><td>P: O Assalto a Ravenloft</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>🔶</td><td>❌</td></tr><tr><td>Q: Um Farol Reluzente</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td><td>🔶</td></tr></tbody></table></div>
+<p>O caminho mais comum ao longo do Ato III é o seguinte:</p>
+<ul><li><strong>Neyavr 9.</strong> Os jogadores recebem o pedido de Urwin Martikov para concluir <a href="arco-j-a-gema-roubada.html">Arc J - A Gema Roubada</a> (🔶).</li><li><strong>Neyavr 10.</strong> Os jogadores viajam até a vinícola Wizard of Wines e derrotam ali os druidas do Povo da Floresta em <a href="arco-j-a-gema-roubada.html">Arc J - A Gema Roubada</a>.</li><li><strong>Neyavr 11.</strong> Os jogadores viajam até Yester Hill ao amanhecer e interrompem o ritual para invocar a <strong>praga arbórea</strong> Wintersplinter em <a href="arco-j-a-gema-roubada.html">Arc J - A Gema Roubada</a>. Os jogadores então encontram Ezmerelda d'Avenir na vila de Krezk e conduzem uma sessão espírita na Abadia de St. Markovia em <a href="arco-k-a-abadia-decaida.html">Arc K - A Abadia Caída</a>, depois vigiam o covil dos lobisomens ao anoitecer em <a href="arco-l-o-covil-dos-lobos.html">Arc L - O Covil dos Lobos</a>.</li><li><strong>Neyavr 12.</strong> Os jogadores investigam Argynvostholt em <a href="arco-m-a-mansao-do-dragao.html">Arc M - A Mansão do Dragão</a>.</li><li><strong>Neyavr 13.</strong> Os jogadores passam um dia de descanso.</li><li><strong>Neyavr 14.</strong> Os jogadores jantam com Strahd ao anoitecer em <a href="arco-o-jantar-com-o-diabo.html">Arc O - Jantar com o Diabo</a> (🔶).</li><li><strong>Neyavr 15 (Lua Nova).</strong> Os jogadores se infiltram no Castelo Ravenloft ao anoitecer, depois escapam pelo braseiro de teletransporte em <a href="arco-p-o-assalto-a-ravenloft.html">Arc P - O Assalto a Ravenloft</a> (🔶).</li><li><strong>Neyavr 16.</strong> Os jogadores acendem o farol de Argynvostholt e derrotam o lobisomem Kiril Stoyanovich em <a href="arco-q-um-farol-reluzente.html">Arc Q - Um Farol Reluzente</a> (🔶).</li></ul>
+<p>Alternativamente, jogadores particularmente ágeis podem seguir, em vez disso, o seguinte caminho ao longo do Ato III:</p>
+<ul><li><strong>Neyavr 9.</strong> Os jogadores recebem o pedido de Urwin Martikov para concluir <a href="arco-j-a-gema-roubada.html">Arc J - A Gema Roubada</a> (🔶), depois investigam Argynvostholt em <a href="arco-m-a-mansao-do-dragao.html">Arc M - A Mansão do Dragão</a>.</li><li><strong>Neyavr 10.</strong> Os jogadores viajam até a vinícola Wizard of Wines e derrotam ali os druidas do Povo da Floresta em <a href="arco-j-a-gema-roubada.html">Arc J - A Gema Roubada</a>.</li><li><strong>Neyavr 11.</strong> Os jogadores viajam até Yester Hill ao amanhecer e interrompem o ritual para invocar a <strong>praga arbórea</strong> Wintersplinter em <a href="arco-j-a-gema-roubada.html">Arc J - A Gema Roubada</a>. Os jogadores então encontram Ezmerelda d'Avenir e conduzem uma sessão espírita em <a href="arco-k-a-abadia-decaida.html">Arc K - A Abadia Caída</a>, e vigiam o covil dos lobisomens em <a href="arco-l-o-covil-dos-lobos.html">Arc L - O Covil dos Lobos</a>.</li><li><strong>Neyavr 12.</strong> Os jogadores passam um dia de descanso.</li><li><strong>Neyavr 13.</strong> Os jogadores passam um dia de descanso.</li><li><strong>Neyavr 14.</strong> Os jogadores passam um dia de descanso, depois jantam com Strahd ao anoitecer em <a href="arco-o-jantar-com-o-diabo.html">Arc O - Jantar com o Diabo</a> (🔶).</li><li><strong>Neyavr 15 (Lua Nova).</strong> Os jogadores se infiltram no Castelo Ravenloft ao anoitecer, depois escapam pelo braseiro de teletransporte em <a href="arco-p-o-assalto-a-ravenloft.html">Arc P - O Assalto a Ravenloft</a> (🔶).</li><li><strong>Neyavr 16.</strong> Os jogadores acendem o farol de Argynvostholt e derrotam o lobisomem Kiril Stoyanovich em <a href="arco-q-um-farol-reluzente.html">Arc Q - Um Farol Reluzente</a> (🔶).</li></ul>
+  </main>
+  <aside class="sidebar-right"><div class="toc-label">Nesta página</div><div class="toc-list"><a class="toc-lvl-1" href="#marcos">Marcos</a><a class="toc-lvl-1" href="#linha-do-tempo">Linha do Tempo</a></div></aside>
+</div>
+<script>
+document.querySelectorAll('.search-box input').forEach(function(inp){
+  inp.addEventListener('input', function(){
+    var q = inp.value.trim().toLowerCase();
+    var sidebar = inp.closest('.sidebar-left');
+    if (!q) { sidebar.classList.remove('filtering'); return; }
+    sidebar.classList.add('filtering');
+    sidebar.querySelectorAll('.tree .leaf').forEach(function(a){
+      var hit = a.textContent.toLowerCase().indexOf(q) !== -1;
+      a.classList.toggle('match', hit);
+    });
+    sidebar.querySelectorAll('.tree > details').forEach(function(d){
+      var hasMatch = d.querySelector('.leaf.match');
+      d.classList.toggle('has-match', !!hasMatch);
+    });
+  });
+});
+var mobileBtn = document.querySelector('.mobile-topbar button');
+if (mobileBtn) {
+  mobileBtn.addEventListener('click', function(){
+    document.querySelector('.sidebar-left').classList.toggle('open');
+  });
+}
+</script>
+</body>
+</html>

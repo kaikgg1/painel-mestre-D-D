@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1c1c1e">
+<link rel="icon" type="image/svg+xml" href="../../assets/img/favicon.svg">
+<title>Arco L — O Covil dos Lobos — Curse of Strahd: Reloaded</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+* { box-sizing:border-box; }
+:root {
+  --bg:#1c1c1e; --bg-sidebar:#1a1a1c; --bg-hover:#252528; --bg-card:#232325;
+  --border:#333336;
+  --gold:#e0a542; --gold-dim:#b8863a;
+  --active:#a78bfa; --active-dim:#8a6fd8;
+  --text:#dcdcdd; --text-dim:#9a9a9d; --text-faint:#6e6e72;
+  --title:#f2f1ee;
+}
+* { scrollbar-color: #48484c var(--bg-sidebar); scrollbar-width: thin; }
+html, body { margin:0; min-height:100vh; background:var(--bg);
+  font-family:'Inter', system-ui, -apple-system, sans-serif; color:var(--text); }
+a { color:var(--gold); text-decoration:none; }
+a:hover { text-decoration:underline; }
+
+.layout { display:flex; min-height:100vh; align-items:stretch; }
+
+/* ---------- barra lateral esquerda ---------- */
+.sidebar-left { width:290px; flex:0 0 290px; background:var(--bg-sidebar);
+  border-right:1px solid var(--border); padding:22px 18px 40px;
+  position:sticky; top:0; height:100vh; overflow-y:auto; }
+.brand { font-size:19px; font-weight:800; color:var(--gold); line-height:1.25;
+  margin-bottom:14px; text-decoration:none; display:block; }
+.brand:hover { text-decoration:none; opacity:.9; }
+.search-box { position:relative; margin-bottom:16px; }
+.search-box input { width:100%; padding:8px 10px 8px 30px; border-radius:6px;
+  border:1px solid var(--border); background:var(--bg-card); color:var(--text);
+  font-family:inherit; font-size:13px; }
+.search-box input::placeholder { color:var(--text-faint); }
+.search-box input:focus { outline:none; border-color:var(--gold-dim); }
+.search-box .ico { position:absolute; left:9px; top:50%; transform:translateY(-50%);
+  color:var(--text-faint); font-size:13px; pointer-events:none; }
+.tree { font-size:14px; }
+.tree details { margin-bottom:1px; }
+.tree summary { list-style:none; cursor:pointer; padding:6px 8px; border-radius:6px;
+  color:var(--text); display:flex; align-items:center; gap:6px; user-select:none; }
+.tree summary::-webkit-details-marker { display:none; }
+.tree summary:hover { background:var(--bg-hover); }
+.tree summary .chev { display:inline-block; font-size:10px; color:var(--text-faint);
+  transition:transform .15s; width:10px; }
+.tree details[open] > summary .chev { transform:rotate(90deg); }
+.tree .leaf-list { padding-left:20px; margin-top:1px; }
+.tree .leaf { display:block; padding:6px 8px; border-radius:6px; font-size:13.5px;
+  color:var(--text-dim); }
+.tree .leaf:hover { background:var(--bg-hover); color:var(--text); text-decoration:none; }
+.tree .leaf.active { color:var(--active); font-weight:600; background:rgba(167,139,250,.1); }
+.tree .leaf.locked { color:var(--text-faint); cursor:default; font-style:italic; }
+.tree .leaf.locked:hover { background:none; }
+.tree .no-match { display:none; }
+.sidebar-left.filtering .tree .leaf { display:none; }
+.sidebar-left.filtering .tree .leaf.match { display:block; }
+.sidebar-left.filtering .tree details { display:none; }
+.sidebar-left.filtering .tree details.has-match { display:block; }
+.sidebar-left.filtering .tree details.has-match > summary .chev { transform:rotate(90deg); }
+
+/* ---------- coluna central ---------- */
+main.article { flex:1 1 auto; min-width:0; max-width:760px; margin:0 auto;
+  padding:48px 40px 100px; line-height:1.7; font-size:16.5px; }
+.page-title { font-size:clamp(28px,4vw,38px); font-weight:800; color:var(--title);
+  margin:0 0 28px; letter-spacing:-.3px; }
+main.article h1 { color:var(--gold); font-size:26px; font-weight:700;
+  margin:36px 0 14px; scroll-margin-top:24px; letter-spacing:-.2px; }
+main.article h1:first-child { margin-top:0; }
+main.article h2 { color:var(--gold); font-size:21px; font-weight:700;
+  margin:30px 0 12px; scroll-margin-top:24px; }
+main.article h3 { color:var(--title); font-size:18px; font-weight:700;
+  margin:24px 0 10px; scroll-margin-top:24px; }
+main.article h4 { color:var(--text-dim); font-size:14px; font-weight:700;
+  text-transform:uppercase; letter-spacing:.5px; margin:20px 0 8px; scroll-margin-top:24px; }
+main.article p { margin:0 0 15px; color:var(--text); }
+main.article ul { margin:0 0 15px; padding-left:24px; }
+main.article li { margin-bottom:6px; }
+main.article a { border-bottom:1px solid rgba(224,165,66,.35); }
+main.article a:hover { border-bottom-color:var(--gold); text-decoration:none; }
+main.article em { color:var(--text); font-style:italic; }
+main.article strong { color:var(--title); font-weight:700; }
+main.article hr { border:0; border-top:1px solid var(--border); margin:20px 0; }
+.link-pending { color:var(--text-faint); font-style:italic; border-bottom:1px dotted var(--text-faint); cursor:default; }
+.reloaded-img { max-width:100%; border-radius:8px; border:1px solid var(--border); margin:16px 0; display:block; }
+
+span.citation { font-style:italic; color:var(--text-dim); }
+span.highlight { color:var(--gold); font-weight:600; }
+span.credit { font-size:12px; color:var(--text-faint); display:block; margin-top:4px; }
+
+div.description { background:var(--bg-card); border-left:3px solid var(--active-dim);
+  border-radius:0 8px 8px 0; padding:16px 20px; margin:18px 0; font-style:italic; color:var(--text); }
+div.description p:last-child { margin-bottom:0; }
+
+.callout { border:1px solid var(--border); border-left:4px solid var(--gold-dim);
+  border-radius:0 8px 8px 0; background:rgba(224,165,66,.06); margin:18px 0; padding:14px 18px; }
+.callout-title { font-weight:700; color:var(--gold); font-size:13px; letter-spacing:.3px;
+  text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+.callout-icon { font-size:14px; }
+.callout-body p:last-child { margin-bottom:0; }
+.callout-body { font-size:16px; }
+.callout-warning { border-left-color:#e2645a; background:rgba(226,100,90,.08); }
+.callout-warning .callout-title { color:#f08078; }
+.callout-combat { border-left-color:#e2645a; background:rgba(226,100,90,.1); }
+.callout-combat .callout-title { color:#f08078; }
+.callout-lore, .callout-abstract { border-left-color:#5f9bd8; background:rgba(95,155,216,.08); }
+.callout-lore .callout-title, .callout-abstract .callout-title { color:#7fb4e8; }
+.callout-profile { border-left-color:var(--active-dim); background:rgba(167,139,250,.08); }
+.callout-profile .callout-title { color:var(--active); }
+.callout-item { border-left-color:#4fb86a; background:rgba(79,184,106,.08); }
+.callout-item .callout-title { color:#6fce88; }
+.callout-design { border-left-color:var(--text-faint); background:rgba(158,158,162,.06); }
+.callout-design .callout-title { color:var(--text-dim); }
+.callout-tip { border-left-color:var(--gold); }
+
+.table-wrap { overflow-x:auto; margin:18px 0; }
+table.md-table { border-collapse:collapse; width:100%; font-size:15px; }
+table.md-table th, table.md-table td { border:1px solid var(--border); padding:8px 11px; text-align:left; }
+table.md-table th { background:var(--bg-card); color:var(--gold); font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; }
+
+div.statblock { background:var(--bg-card); border:1px solid var(--border);
+  border-left:3px solid var(--active-dim); border-radius:8px; padding:18px 22px; margin:20px 0; }
+div.statblock h2 { color:var(--title); font-size:20px; font-weight:800; margin:0 0 2px; }
+div.statblock > em:first-of-type { display:block; font-style:italic; color:var(--text-dim); margin-bottom:10px; }
+div.statblock hr { border-top:1px solid var(--border); margin:11px 0; }
+div.statblock h3 { color:var(--gold); font-size:14px; font-weight:700;
+  text-transform:uppercase; letter-spacing:.5px; margin:16px 0 7px; }
+div.statblock p { margin:0 0 9px; font-size:15px; }
+div.statblock table.ability-table { width:100%; border-collapse:collapse; margin:9px 0; }
+div.statblock table.ability-table th, div.statblock table.ability-table td {
+  border:1px solid var(--border); text-align:center; padding:6px 4px; font-size:14px; }
+div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-weight:700; }
+
+/* ---------- coluna direita: sumario ---------- */
+.sidebar-right { width:250px; flex:0 0 250px; padding:48px 20px 40px 0;
+  position:sticky; top:0; height:100vh; overflow-y:auto; }
+.toc-label { font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+  color:var(--text-faint); margin-bottom:12px; }
+.toc-list { font-size:13px; }
+.toc-list a { display:block; padding:4px 0; color:var(--text-dim); border-bottom:none;
+  line-height:1.4; }
+.toc-list a:hover { color:var(--text); text-decoration:none; }
+.toc-lvl-1 { padding-left:0; font-weight:600; }
+.toc-lvl-2 { padding-left:12px; }
+.toc-lvl-3 { padding-left:24px; }
+.toc-lvl-4 { padding-left:36px; font-size:12px; }
+
+/* ---------- pagina indice ---------- */
+.idx-intro { margin-bottom:8px; }
+.idx-intro h1 { font-size:clamp(26px,4vw,36px); font-weight:800; color:var(--gold); margin-bottom:10px; }
+.idx-intro p { color:var(--text-dim); font-size:15px; max-width:640px; }
+.idx-section { margin:34px 0; }
+.idx-section-title { font-size:13px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+  color:var(--text-dim); border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:14px; }
+.idx-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:12px; }
+.idx-card { display:block; background:var(--bg-card); border:1px solid var(--border);
+  border-radius:8px; padding:14px 16px; font-weight:600; font-size:14.5px; color:var(--text);
+  transition:border-color .15s, transform .15s; }
+.idx-card:hover { border-color:var(--gold-dim); transform:translateY(-2px); text-decoration:none; }
+.idx-card.locked { opacity:.45; cursor:default; border-style:dashed; }
+.idx-card.locked:hover { transform:none; }
+.idx-badge { display:block; margin-top:5px; font-size:10px; letter-spacing:.5px; text-transform:uppercase; color:var(--text-faint); font-weight:400; }
+
+/* ---------- mobile ---------- */
+.mobile-topbar { display:none; }
+@media (max-width:1100px) {
+  .sidebar-right { display:none; }
+}
+@media (max-width:860px) {
+  .layout { flex-direction:column; }
+  .mobile-topbar { display:flex; align-items:center; gap:12px; position:sticky; top:0; z-index:40;
+    background:var(--bg-sidebar); border-bottom:1px solid var(--border); padding:12px 16px; }
+  .mobile-topbar .brand { margin:0; font-size:15px; flex:1; }
+  .mobile-topbar button { background:none; border:1px solid var(--border); color:var(--text);
+    border-radius:6px; padding:6px 10px; font-family:inherit; font-size:13px; }
+  .sidebar-left { position:fixed; left:0; top:49px; bottom:0; z-index:39; transform:translateX(-100%);
+    transition:transform .2s; width:82vw; max-width:320px; box-shadow:8px 0 30px rgba(0,0,0,.5); }
+  .sidebar-left.open { transform:translateX(0); }
+  main.article { padding:28px 18px 70px; max-width:100%; }
+}
+</style>
+</head>
+<body>
+<div class="mobile-topbar">
+  <button aria-label="Abrir menu">☰</button>
+  <a class="brand" href="index.html">Curse of Strahd: Reloaded</a>
+</div>
+<div class="layout">
+  <aside class="sidebar-left">
+    <a class="brand" href="index.html">Curse of Strahd:<br>Reloaded</a>
+    <div class="search-box"><span class="ico">🔍</span><input type="text" placeholder="Buscar página..." aria-label="Buscar página"></div>
+    <nav class="tree"><details><summary><span class="chev">▸</span>Introdução</summary><div class="leaf-list"><a class="leaf" href="introducao-usando-este-guia.html">Usando Este Guia</a><a class="leaf" href="introducao-guia-do-mestre.html">Guia do Mestre</a><a class="leaf" href="introducao-changelog.html">Changelog</a></div></details><details><summary><span class="chev">▸</span>Capítulo 1 — Iniciando a Campanha</summary><div class="leaf-list"><a class="leaf" href="cap1-sessao-zero.html">Sessão Zero</a><a class="leaf" href="cap1-criacao-de-personagem.html">Criação de Personagem</a></div></details><details><summary><span class="chev">▸</span>Capítulo 2 — A Terra de Barovia</summary><div class="leaf-list"><a class="leaf" href="cap2-lore-de-barovia.html">Lore de Barovia</a><a class="leaf" href="cap2-historia-de-barovia.html">História de Barovia</a><a class="leaf" href="cap2-strahd-von-zarovich.html">Strahd von Zarovich</a></div></details><details><summary><span class="chev">▸</span>Capítulo 3 — Conduzindo o Jogo</summary><div class="leaf-list"><a class="leaf" href="cap3-resumo-da-aventura.html">Resumo da Aventura</a><a class="leaf" href="cap3-conduzindo-a-aventura.html">Conduzindo a Aventura</a></div></details><details><summary><span class="chev">▸</span>Ato I — Adentrando as Névoas</summary><div class="leaf-list"><a class="leaf" href="ato1-resumo.html">Resumo do Ato I</a><a class="leaf" href="arco-a-fuga-da-death-house.html">Arco A — Fuga da Death House</a><a class="leaf" href="arco-b-bem-vindo-a-barovia.html">Arco B — Bem-vindo a Barovia</a><a class="leaf" href="arco-c-adentrando-o-vale.html">Arco C — Adentrando o Vale</a></div></details><details><summary><span class="chev">▸</span>Ato II — A Cidade Sombria</summary><div class="leaf-list"><a class="leaf" href="ato2-resumo.html">Resumo do Ato II</a><a class="leaf" href="arco-d-a-festa-de-st-andral.html">Arco D — A Festa de St. Andral</a><a class="leaf" href="arco-e-a-vistana-desaparecida.html">Arco E — A Vistana Desaparecida</a><a class="leaf" href="arco-f-o-desejo-de-lady-wachter.html">Arco F — O Desejo de Lady Wachter</a><a class="leaf" href="arco-g-os-irmaos-strazni.html">Arco G — Os Irmãos Strazni</a><a class="leaf" href="arco-h-a-alma-perdida.html">Arco H — A Alma Perdida</a><a class="leaf" href="arco-i-as-muralhas-de-krezk.html">Arco I — As Muralhas de Krezk</a></div></details><details open><summary><span class="chev">▸</span>Ato III — A Terra Partida</summary><div class="leaf-list"><a class="leaf" href="ato3-resumo.html">Resumo do Ato III</a><a class="leaf" href="arco-j-a-gema-roubada.html">Arco J — A Gema Roubada</a><a class="leaf" href="arco-k-a-abadia-decaida.html">Arco K — A Abadia Decaída</a><a class="leaf active" href="arco-l-o-covil-dos-lobos.html">Arco L — O Covil dos Lobos</a><a class="leaf" href="arco-m-a-mansao-do-dragao.html">Arco M — A Mansão do Dragão</a><a class="leaf" href="arco-o-jantar-com-o-diabo.html">Arco O — Jantar com o Diabo</a><a class="leaf" href="arco-p-o-assalto-a-ravenloft.html">Arco P — O Assalto a Ravenloft</a><a class="leaf" href="arco-q-um-farol-reluzente.html">Arco Q — Um Farol Reluzente</a></div></details><details><summary><span class="chev">▸</span>Ato IV — Segredos do Ancião</summary><div class="leaf-list"><a class="leaf" href="ato4-resumo.html">Resumo do Ato IV</a><a class="leaf" href="arco-r-provacoes-da-montanha.html">Arco R — Provações da Montanha</a><a class="leaf" href="arco-s-uma-espada-de-luz-solar.html">Arco S — Uma Espada de Luz Solar</a><a class="leaf" href="arco-t-os-tres-fanes.html">Arco T — Os Três Fanes</a><a class="leaf" href="arco-u-sonhos-da-alvorada.html">Arco U — Sonhos da Alvorada</a><a class="leaf" href="ato4-epilogo.html">Epílogo</a></div></details><details><summary><span class="chev">▸</span>Apêndices</summary><div class="leaf-list"><a class="leaf" href="apendice-fragmentos-de-ambar.html">Fragmentos de Âmbar</a><a class="leaf" href="apendice-bestiario.html">Bestiário</a><a class="leaf" href="apendice-glossario.html">Glossário</a><a class="leaf" href="apendice-npcs.html">Personagens Não Jogadores</a></div></details></nav>
+    <div style="margin-top:18px"><a href="../painel_barovia_dnd5e.html" style="font-size:12px;color:var(--text-faint)">← Voltar ao Painel</a></div>
+  </aside>
+  <main class="article">
+    <div class="page-title">Arco L — O Covil dos Lobos</div>
+<p>_Uma aventura para cinco personagens de 6º nível._</p>
+<p>Neste arco, os jogadores devem localizar o covil da alcateia de lobisomens de Barovia, que guarda o <em>Holy Symbol of Ravenkind</em>, tal como profetizado por Madam Eva. Se os jogadores já tiverem descoberto o paradeiro de Ilya, o filho do Barão Dmitri Krezkov, em <strong><em>Arco I: As Muralhas de Krezk</em></strong>, o Barão Krezkov também lhes pede que o resgatem das garras dos lobisomens, prometendo santuário e auxílio caso o façam.</p>
+<p>Com a ajuda de Ezmerelda d’Avenir, os jogadores podem rastrear o covil dos lobisomens até um rochedo silencioso na margem noroeste do Lago Baratok. Durante uma vigília noturna na orla da Svalich Wood, os jogadores devem esperar até que a alcateia saia para caçar, para então se esgueirarem para dentro do covil e driblarem ou derrotarem quaisquer guardas remanescentes antes de avançar até o santuário de Mother Night.</p>
+<p>Lá, os jogadores conhecem Zuleika Toranescu—uma clériga <strong>lobisomem</strong> de Mother Night e irmã mais velha do Barão Dmitri Krezkov. Zuleika é a companheira de Emil Toranescu: o antigo líder da alcateia de <strong>lobisomens</strong> que Kiril Stoyanovich depôs quando Strahd despertou de seu sono. Zuleika concorda em suspender a proteção de Mother Night sobre o santuário e permitir que os jogadores recuperem o <em>Holy Symbol of Ravenkind</em> e conquistem a liberdade de Ilya, desde que também a libertem e prometam resgatar Emil das masmorras do Castelo Ravenloft.</p>
+<h1 id="l1-encontrando-o-covil">L1. Encontrando o Covil</h1>
+<p>Recrutada para a causa dos jogadores em <a href="arco-k-a-abadia-decaida.html">Arco K - A Abadia Decaída</a>, Ezmerelda d’Avenir oferece sua perícia como caçadora de monstros para localizar o covil dos lobos. (Depois de rastrear Ilya Krezkov e a alcateia de lobisomens ao longo dos últimos dias, Ezmerelda suspeita fortemente que Ilya esteja cativo dentro do covil.) Ao se juntar aos jogadores, Ezmerelda lhes pede que a ajudem a investigar o covil dos lobisomens no dia seguinte.</p>
+<p>Antes de conduzir os jogadores até o covil, Ezmerelda propõe o seguinte plano:</p>
+<ul><li>Primeiro, ela levará os jogadores até sua carroça no Lago Baratok para recolher alguns suprimentos—especificamente, um <em>pergaminho de magia de imagem maior</em> (<em>major image</em>) (caso precisem de uma distração), um <em>pergaminho de magia de remover maldição</em> (<em>remove curse</em>) (caso algum deles seja mordido), uma luneta (para vigiar) e 10 virotes de besta prateados (para reabastecer suas aljavas).</li><li>Segundo, ela e os jogadores montarão acampamento na depressão e esperarão o cair da noite, quando a alcateia de lobisomens deixa o covil para caçar.</li><li>Terceiro, assim que a alcateia de lobisomens tiver partido, ela e os jogadores se infiltrarão no covil dos lobisomens para resgatar Ilya do cativeiro.</li></ul>
+<div class="callout callout-abstract"><div class="callout-title"><span class="callout-icon">📖</span><strong>Roubando Ez</strong></div><div class="callout-body"><p>Se os jogadores roubaram a carroça de Ezmerelda em <a href="arco-e-a-vistana-desaparecida.html">Arco E - A Vistana Desaparecida</a>, ela fica irritada com a audácia deles até que seus pertences sejam devolvidos. Embora possa guardar um pequeno rancor caso os jogadores se desculpem de forma insuficiente pelo furto, ela os perdoa de bom grado se eles afirmarem honestamente que agiram com as melhores das intenções.</p></div></div>
+<h1 id="l2-lago-baratok">L2. Lago Baratok</h1>
+<p>Se os jogadores concordarem em acompanhar Ezmerelda até o Lago Baratok para recolher alguns suprimentos de sua carroça, a área é tal como descrita em <a href="arco-e-a-vistana-desaparecida.html">Arco E - A Vistana Desaparecida</a>.</p>
+<p>Quando os jogadores chegam, Ezmerelda entra na carroça pelo alçapão escondido em seu ventre. Pouco depois, ela informa aos jogadores—com um tom de choque na voz—que alguém esteve dentro da carroça e roubou vários de seus pertences, incluindo os dois pergaminhos de magia, uma lira e três frascos de perfume.</p>
+<p>Cada jogador com Percepção passiva 12 ou mais nota então o som tênue de música vindo do lado oposto da torre. Um jogador também pode fazer um teste de Sabedoria (Sobrevivência) CD 14 para identificar um conjunto de pegadas humanoides recentes que levam da carroça até a origem da música—deixadas há não mais de uma hora.</p>
+<p>Conforme os jogadores se aproximam da origem da música, eles conseguem ouvir as três estrofes a seguir de um lamento assombroso.</p>
+<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>O Lamento de Bianca</strong></div><div class="callout-body"><p>A canção de Bianca pode ser cantada na melodia de <em>Lament of Orpheus</em>, do videogame <em>Hades</em>.</p></div></div>
+<div class="description" style="text-align: center;">
+<p>Ouçam, ó estrelas, meu clamor,
+<br>Por sentir seus braços em mim.
+<br>
+<br>Perdida sob o mar de estrelas,
+<br>Sua luz aguarda, a me assombrar
+<br>Trazei seus sussurros para perto,
+<br>Que em sua sombra eu possa enxergar
+<br>
+<br>Atende, atende ao chamado.
+<br>Ooh.</p>
+</div>
+<p>A origem da música é Bianca, uma <strong>lobisomem</strong> em forma humana sentada na margem rochosa da estrada elevada. Quando os jogadores a veem pela primeira vez, leia:</p>
+<div class="description">
+<p>Uma mulher está sentada sozinha na margem rochosa, vestida com peles de animais finamente costuradas e embalando uma lira nos braços. Seus cabelos, de um branco pálido e lustroso, caem em cascata sobre os ombros, e seus olhos permanecem fechados enquanto ela dedilha as cordas da lira. Um refrão assombroso escapa de seus lábios enquanto seu corpo balança suavemente, e sua canção prossegue sem qualquer reconhecimento da aproximação de vocês.</p>
+</div>
+<p>Se os jogadores se aproximarem, poderão ver os dois pergaminhos de magia roubados e os três frascos de perfume apoiados sobre uma pedra ao lado dela. Um dos frascos foi aberto, mas parece, de resto, intocado.</p>
+<p>Se os jogadores permitirem que Bianca termine, sua canção se encerra assim:</p>
+<div class="description" style="text-align: center;">
+<p>Perto o bastante, seu olho de âmbar reluz
+<br>Meus pés traem o melhor de mim
+<br>Uma trilha de prata que vagueia em meus sonhos
+<br>Seu olhar sombrio há de me guiar
+<br>
+<br>Sempre adiante.
+<br>
+<br>Corro
+<br>Salto
+<br>Ainda assim ele foge
+<br>Mas agora o céu nos envolve
+<br>Estamos voando
+<br>Caindo
+<br>
+<br>Não olhe para baixo
+<br>Não olhe para baixo
+<br>Não olhe para baixo
+<br>Não olhe para baixo
+<br>Não olhe para baixo</p>
+</div>
+<p>Quer os jogadores a interrompam, quer a deixem terminar, Bianca os cumprimenta com alguma surpresa e cordialidade e pergunta se eles são os donos da carroça ao lado da torre.</p>
+<p><img class="reloaded-img" src="img/Bianca%20Stoyanovich.png" alt="Bianca Stoyanovich.png" loading="lazy"> <span class="credit">"Bianca Stoyanovich" por Caleb Cleveland. Apoie-o no <a href="https://patreon.com/calebisdrawing/">Patreon!</a></span></p>
+<div class="callout callout-profile"><div class="callout-title"><span class="callout-icon">👤</span><strong>Perfil: Bianca Stoyanovich</strong></div><div class="callout-body"><p><strong>Informações de Interpretação</strong> <strong><em>Ressonância.</em></strong> Quando os jogadores a conhecem, Bianca deve inspirar compaixão por sua ansiedade e incerteza, e afeto por seu bom ânimo diante de um dilema angustiante.</p>
+<p><strong><em>Emoções.</em></strong> Bianca sente com mais frequência melancolia, alegria, diversão, contemplação, curiosidade, desespero ou ansiedade.</p>
+<p><strong><em>Motivações.</em></strong> Bianca quer manter Kiril seguro, feliz e são, ao mesmo tempo em que protege a alcateia e os barovianos inocentes da fúria, da fome e das ambições dele.</p>
+<p><strong><em>Inspirações.</em></strong> Ao interpretar Bianca, canalize Yennefer de Vengerberg (<em>The Witcher</em>), Vampira (<em>X-Men</em>) e a Princesa Amidala (<em>Star Wars</em>).</p>
+<p><strong>Informações do Personagem</strong> <strong><em>Persona.</em></strong> Para o mundo, Bianca é uma mulher entusiasmada, ainda que surpreendentemente refinada. Para aqueles em quem confia, Bianca é ansiosa e desesperada para trazer Kiril de volta da beira da loucura. No fundo, Bianca se pergunta se não se arrepende de ter acompanhado Kiril como <strong>lobisomem</strong>.</p>
+<p><strong><em>Moral.</em></strong> Em uma luta, Bianca tentaria negociar ou fugir, mas lutaria com selvageria se encurralada.</p>
+<p><strong><em>Relações.</em></strong> Bianca é a companheira e esposa de Kiril, e a filha deserdada de uma família nobre de fora de Barovia.</p></div></div>
+<p>Se os jogadores se identificarem — ou identificarem Ezmerelda — como donos da carroça, Bianca se desculpa profusamente por ter roubado dela. "Eu não quis ser uma ladra," ela diz, envergonhada. "Eu só estava curiosa."</p>
+<p>Bianca pode compartilhar as seguintes informações, se perguntada:</p>
+<ul><li>Seu nome é Bianca. Ela é uma herborista que vive na floresta ali perto com seu marido, Kiril. (Isso é uma meia-verdade. Embora Bianca de fato entenda de ervas e saiba usá-las, um teste de Sabedoria (Intuição) CD 14 bem-sucedido indica que Bianca hesita ligeiramente ao se identificar como “herborista".) Se os jogadores perguntarem como ela se defende, Bianca saca com cuidado uma adaga de prata embainhada de sua bota de pele e lhes garante que sabe usá-la.</li><li>Ela viu a carroça de Ezmerelda e ficou curiosa sobre o que havia dentro. Em vez de abrir a porta, investigou melhor e encontrou o alçapão no fundo do veículo, pelo qual entrou para explorar o interior.</li><li>Ela levou a lira e o perfume porque lhe lembravam memórias de muito tempo atrás—"de antes de eu conhecer meu marido." Levou os pergaminhos porque sempre foi fascinada por livros, mas ficou decepcionada ao se ver incapaz de decifrá-los. (Isso é mentira. Um teste de Sabedoria (Intuição) CD 14 bem-sucedido revela que os olhos de Bianca se voltam de relance para os pergaminhos quando ela menciona sua incapacidade de decifrá-los.)</li><li>A canção que ela cantava se chama “O Lamento da Lunática", e fala de uma mulher que se apaixona pela lua e a persegue até despencar de um penhasco, acabando por cair para a morte. Depois de uma breve pausa, ela acrescenta, baixinho: "Vocês já se apaixonaram por alguém e se perguntaram se cometeram um erro?"</li></ul>
+<p>Se os jogadores perguntarem sobre o marido de Bianca, ela está disposta a compartilhar as seguintes informações:</p>
+<ul><li>Treze anos atrás, Bianca era filha de uma família rica. Ela abriu mão de sua herança, porém, ao se apaixonar por um lenhador jovem, robusto e vigoroso chamado Kiril Stoyanovich. Contra a vontade dos pais, fugiu de sua vida confortável para viver com ele em um chalé na floresta próxima.</li><li>Enquanto "o vampiro" dormia, as terras selvagens eram mais pacíficas—mas, desde que Strahd despertou, Kiril tem estado "assombrado—não por fantasma algum, mas pela própria fúria." (Se os jogadores perguntarem o que enfurece Kiril, Bianca responde de forma simples e sóbria: "Falta de poder. Ausência de controle.")</li><li>Bianca fica horrorizada se qualquer um dos jogadores sugerir—ainda que implicitamente—que Kiril possa tê-la ferido, jurando que ele "<em>jamais</em> tocaria em um fio de cabelo dela". Ela confessa, contudo, que ele parece estar "preso em um redemoinho de autodestruição, atacando a si mesmo e aos outros."</li><li>"A cada semana, essa . . . fúria parece devorar ainda mais dele," ela acrescenta em voz baixa. "Não sei quanto do homem com quem me casei ainda resta lá dentro."</li></ul>
+<p>Se os jogadores demonstrarem interesse em fazê-lo, Bianca pede o conselho deles, perguntando o que fariam no lugar dela. Embora não esteja disposta a abandonar Kiril, ela agradece qualquer conselho que possam lhe dar, e o faz com sinceridade. (Bianca não está disposta a levar os jogadores para conhecer Kiril, mas garante que os procurará caso não consiga aplacar a raiva dele sozinha.)</p>
+<p>Bianca fica feliz em devolver o perfume e os pergaminhos, mas pede, em um apelo sentido e melancólico, que a deixem ficar com a lira. “Faz tanto tempo que não consigo tocar música de verdade," ela implora. Se os jogadores permitirem, ela fica profundamente grata. (Se Ezmerelda estiver com o grupo, ela espera que os jogadores respondam. Se os jogadores pedirem que ela decida, Ezmerelda não se importa em abrir mão da lira, a menos que o grupo tenha demonstrado relutância em confiar em Bianca.)</p>
+<p>Quer permitam que ela fique com a lira ou não, Bianca se despede e parte pela trilha ao norte, afastando-se do lago e sumindo entre as árvores pouco depois.</p>
+<div class="callout callout-abstract"><div class="callout-title"><span class="callout-icon">📖</span><strong>O Segredo de Bianca</strong></div><div class="callout-body"><p>Se jogadores desconfiados concluírem que Bianca é uma ameaça, ela pode ser persuadida a revelar sua verdadeira natureza de <strong>lobisomem</strong> com um teste de Carisma (Intimidação) CD 15 bem-sucedido, desde que os jogadores lhe deem garantias suficientes de que estará a salvo ao fazê-lo.</p>
+<p>Se os jogadores atacarem Bianca, ela implora por misericórdia e lhes garante honestamente que não pretende lhes fazer mal. Se recusada, ela tenta fugir, primeiro em sua forma humanoide e depois em sua forma de <strong>lobo</strong>, assim que alcança a linha das árvores.</p>
+<p>Jogadores que convencerem Bianca a revelar sua verdadeira natureza licantrópica podem convencê-la a compartilhar as seguintes informações sobre o covil dos lobisomens com um teste de Carisma (Intimidação) CD 20 bem-sucedido:</p>
+<ul><li>A alcateia é liderada por Kiril, seu marido e um lobisomem poderoso, que tomou o poder quando o antigo líder se afastou.</li><li>Os prisioneiros são mantidos no santuário de Mother Night, que fica ao fundo da caverna.</li><li>Quando a alcateia sai para caçar, Bianca e Skennis, o antigo líder da alcateia, ficam para trás. (Bianca tem pouca vontade de ver Kiril transformado depois de seus acordos com a "bruxa do pântano" de Berez.)</li><li>Além disso, quatro lobisomens também permanecem para guardar o covil, revezando a vigília em duplas. (Os quatro lobisomens, Azianka, Davanka, Kobal e Radovan, foram infectados recentemente por Kiril e o obedecem servilmente.)</li><li>Embora todos os outros lobisomens estejam na caçada, cerca de meia dúzia de lobos ainda permanece no covil.</li></ul>
+<p>Jogadores que demonstrarem simpatia e compaixão pelos problemas conjugais de Bianca, compartilharem suas próprias experiências com uma situação semelhante e obtiverem sucesso em um teste de Carisma (Persuasão) CD 20 podem convencê-la a compartilhar as informações de <strong>A Queda de Bianca</strong>, abaixo. (Bianca não conhece as informações a respeito de Ezmerelda, Ludmilla ou do que Kiril fez em Berez.) Jogadores que, em seguida, obtiverem sucesso em um teste adicional de Carisma (Persuasão) CD 15 também podem convencer Bianca a guiá-los até o santuário de Mother Night quando entrarem no covil.</p></div></div>
+<div class="callout callout-lore"><div class="callout-title"><span class="callout-icon">📜</span><strong>A Queda de Bianca</strong></div><div class="callout-body"><p>Treze anos atrás, Bianca—uma <strong>nobre</strong> de vinte e um anos—apaixonou-se por um lenhador jovem, robusto e vigoroso chamado Kiril Stoyanovich. Contra a vontade dos pais, ela fugiu de sua vida de privilégio e riqueza e se tornou esposa de Kiril, vivendo com ele em um chalé pequeno e humilde na floresta próxima. Eram pobres, mas felizes—ou assim Bianca pensava.</p>
+<p>Onze anos atrás, Kiril foi mordido por um <strong>lobisomem</strong> renegado—um desertor da alcateia de lobisomens de Barovia—e infectado com a maldição da licantropia. Bianca, desesperada para atravessar o manto de culpa e autodesprezo de Kiril, rastreou-o na noite de sua transformação e permitiu que ele a mordesse, espalhando a maldição também a ela.</p>
+<p>Não muito depois, os dois foram encontrados por Skennis, o envelhecido líder da alcateia de lobisomens de Barovia, que havia levado a alcateia para além das Brumas. A convite de Skennis, Bianca e Kiril retornaram com a alcateia a Barovia, onde Emil e Zuleika Toranescu—um casal de lobisomens natos—tentaram lhes ensinar a controlar a maldição.</p>
+<p>Bianca fez progressos lentos, porém constantes, e Zuleika elogiou seus esforços. Um Kiril ciumento e impaciente, contudo, achou o treinamento de Emil lento demais para seu gosto. Depois de descobrir com uma das bruxas de Baba Lysaga o segredo para dominar sua maldição, porém, Kiril matou e devorou em segredo um mercador que viajava pela estrada de Vallaki a Krezk.</p>
+<p>Daquele momento em diante, Kiril passou a controlar sua maldição com facilidade. Emil e Zuleika nutriram suas próprias suspeitas quanto a esse avanço acelerado, mas escolheram não levantá-las por medo de atiçar a divisão.</p>
+<p>Cinco anos atrás, quando Skennis abriu mão da liderança da alcateia de lobisomens, Emil era o herdeiro que ele escolhera para substituí-lo. Kiril, porém, ciumento e embriagado da própria sede de sangue e força, desafiou Emil para uma briga que decidiria o próximo líder. Emil venceu—mas por pouco.</p>
+<p>Enfurecido pela derrota, Kiril abriu um rastro sangrento pelas terras além das brumas. Ao fazê-lo, ganhou o apelido de “o Terror Negro"—assim chamado por seu pelo distintivo cor de carvão—e atraiu a atenção da então novata caçadora de monstros Ezmerelda d’Avenir. Ezmerelda rastreou Kiril até Barovia e tentou prendê-lo em uma armadilha, mas Kiril a ludibriou e devorou sua perna. Somente a chegada oportuna de Dmitri e Anna Krezkov salvou a vida de Ezmerelda, afugentando Kiril, que recuou para o covil dos lobisomens.</p>
+<p>Três meses atrás, quando Strahd despertou e Emil começou a falar em abandonar Barovia em busca de pastos mais verdes, Kiril viu uma porta de oportunidade se abrindo para ele. Ele retornou mais uma vez à aldeia de Berez, onde implorou a Baba Lysaga pelo favor de Strahd e pela força necessária para tomar o lugar de Emil.</p>
+<p>Vendo ali a chance de colocar a alcateia de lobisomens firmemente sob o domínio de Strahd, Lysaga concedeu a Kiril uma beberagem de bruxa que lhe conferiu uma transformação monstruosa, potencializando grotescamente sua maldição de lobisomem e elevando seu orgulho e sua sede de sangue a novos e apavorantes patamares. Com o auxílio de Ludmilla Vilisevic, uma das noivas vampíricas de Strahd, ela também conquistou para Kiril a lealdade de uma matilha de <strong>lobos atrozes</strong> de Strahd, que o ladearam em seu retorno ao covil.</p>
+<p>Ali, Kiril desafiou Emil mais uma vez pela liderança da alcateia—e, desta vez, Kiril venceu. A vitória, contudo, não saciou seu apetite. Em vez disso, Bianca o viu afundar cada vez mais em uma névoa de ciúme, fúria e paranoia. Ela teme por ele, por si mesma e por todo o povo de Barovia que possa cair vítima de sua loucura.</p>
+<p>Bianca conhece muito bem a verdadeira natureza dos pergaminhos de magia de Ezmerelda, e suspeita fortemente que a carroça pertença à tal “caçadora de monstros" Vistani de que se fala, vista matando lobos e mortos-vivos na floresta próxima. Embora tenha levado o perfume e a lira por nostalgia de sua vida antiga, levou os pergaminhos na esperança de que contivessem curas para a licantropia dela e de Kiril.</p>
+<p>Ao perceber, porém, que apenas um dos pergaminhos continha a magia <em>remover maldição</em>, ela cogitou brevemente usá-lo em si mesma, antes de finalmente desistir. Abandonar Kiril, ao menos por ora, não é um caminho que ela esteja disposta a trilhar.</p></div></div>
+<div class="callout callout-lore"><div class="callout-title"><span class="callout-icon">📜</span><strong>A Dispensa da Alcateia</strong></div><div class="callout-body"><p>Muito tempo atrás, antes de entrar em sua hibernação mais recente, há mais de um século, Strahd concedeu à alcateia de lobisomens de Barovia sua permissão permanente para deixar Barovia livremente através das Brumas. A alcateia mantém essa dispensa especial até hoje, sob a liderança de Kiril.</p></div></div>
+<p>Assim que tiver recolhido quaisquer materiais úteis de sua carroça, Ezmerelda avisa aos jogadores que eles precisarão vigiar o covil até que a alcateia parta para a noite, e então agir depressa para determinar se Ilya Krezkov está preso lá dentro. (Se os jogadores sugerirem um assalto direto, Ezmerelda comenta com ironia que desafiar uma alcateia de quase uma dúzia de lobisomens e metade a mais desse número em lobos comuns seria, na melhor das hipóteses, um esforço tolo, e na pior, suicídio.)</p>
+<h1 id="l3-svalich-woods">L3. Svalich Woods</h1>
+<p>Conforme o crepúsculo se aproxima, Ezmerelda pode conduzir os jogadores até uma depressão escura e silenciosa na Svalich Wood, a oeste do Lago Baratok. Leia:</p>
+<div class="description">
+<p>Ezmerelda conduz vocês até a borda de uma pequena depressão—uma cavidade natural no solo da floresta. Suas margens são emolduradas por árvores altíssimas, cujos troncos negros recortam vislumbres da margem rochosa do Lago Baratok. O Monte Baratok se ergue sobre a paisagem ao longe, seus penhascos e esporões rochosos de um cinza cortante contra as copas escurecidas.</p>
+<p>O chão no fundo da depressão está coberto por um véu fino de névoa sobre um manto de folhas caídas e musgo. Em seu lado norte, uma rede intrincada de raízes grandes e retorcidas forma uma estrutura arqueada, semelhante a uma caverna. </p>
+<p>O ar aqui é frio e úmido, carregando o cheiro terroso de solo molhado e folhas em decomposição. A depressão em si é silenciosa, salvo pelo farfalhar tênue das folhas e pelo bater distante da água contra a margem.</p>
+</div>
+<p>Ezmerelda avisa aos jogadores que eles podem permanecer escondidos dentro da depressão, usando-a como ponto de observação para vigiar o covil dos lobisomens. Se perguntada, ela aponta a entrada do covil, que fica ao longo da margem noroeste do lago e é tal como descrita em <span class="citation">Aproximando-se do Covil (p. 201)</span>.</p>
+<p>Ao descerem para a depressão, Ezmerelda pede aos jogadores que juntem lenha e gravetos. Assim que uma pequena fogueira estiver armada, ela tira da bolsa uma pequena pederneira com isqueiro de aço—um <em>acendedor furtivo</em> (veja abaixo)—e a usa para acender uma fogueira pequena, mas acolhedora, sob a caverna de raízes.</p>
+<p>A fogueira não produz fumaça, e sua luz não se estende além das bordas da depressão. Se perguntada sobre o motivo de acendê-la, Ezmerelda lembra aos jogadores que lobisomens enxergam no escuro. “Se tivermos o azar de eles nos encontrarem," ela observa, com um sorriso torto, “vamos querer anular todas as vantagens que eles possam ter." (Embora Ezmerelda possa conjurar a magia <em>visão no escuro</em> (<em>darkvision</em>), ela prefere evitar gastar espaços de magia sem necessidade, especialmente se puder precisar deles para enfrentar lobisomens, e ainda mais quando está acompanhada.)</p>
+<div class="callout callout-item"><div class="callout-title"><span class="callout-icon">✦</span><strong>Acendedor Furtivo</strong></div><div class="callout-body"><p><em>Item maravilhoso, incomum</em></p>
+<p>Este conjunto de pederneira e aço, finamente trabalhado, traz pequenas runas gravadas nas laterais de ambas as peças. Quando o conjunto é usado para inflamar um material combustível, a chama resultante emite luz plena em um raio de 3 metros, não emite penumbra e não produz fumaça. Enquanto estiver a até 9 metros de uma chama criada dessa forma, o usuário pode pronunciar uma palavra de comando para extinguir a chama instantaneamente.</p></div></div>
+<p>Ezmerelda sugere que o grupo mantenha uma pessoa posicionada na borda da depressão para vigiar a partida da alcateia. Se os jogadores não sugerirem isso, Ezmerelda propõe revezar turnos uma vez por hora para evitar o cansaço.</p>
+<h3 id="l3a-histórias-ao-redor-da-fogueira">L3a. Histórias ao Redor da Fogueira</h3>
+<p>Conforme a noite cai, Ezmerelda convida os jogadores e Ireena a contarem histórias sobre si mesmos, e se oferece para compartilhar a própria história em troca. “Afinal," ela diz, “se vamos trabalhar juntos, gostaria de saber ao lado de quem estou lutando."</p>
+<p>À escolha dos jogadores, Ezmerelda pode contar uma ou ambas as histórias a seguir quando chegar a vez dela: a história de como veio a conhecer o Dr. Rudolph van Richten, ou a história de como perdeu a perna.</p>
+<p><strong><em>Rudolph van Richten.</em></strong> Ezmerelda conta a história assim:</p>
+<div class="description">
+<p>"Foi há quase duas décadas que o vi pela primeira vez. Minha família viajava com o clã Radanavich—uma caravana Vistani—quando uma criança Radanavich adoeceu mortalmente. Os pais da criança a levaram a um médico local—um homem chamado Rudolph van Richten.</p>
+<p>"Van Richten fez tudo o que pôde para manter o menino vivo. Três dias depois, porém, ele faleceu—e seu pai, um dos líderes entre os Radanavich, culpou Van Richten pela morte do filho. Naquela noite, ajudado por outros quatro, ele invadiu a casa da família Van Richten e sequestrou o próprio filho de Van Richten em vingança.  Meus pais me acordaram à meia-noite, e partimos de imediato. Só mais tarde eu descobri que carga estávamos levando—e que meus próprios pais haviam ajudado a capturá-lo.</p>
+<p>"O próprio Van Richten, desesperado para resgatá-lo, rastreou nossa caravana e amarrou meus pais a uma árvore. Depois de arrancar deles o paradeiro do filho, porém, partiu sem derramar uma gota do sangue deles—um ato de misericórdia que nunca esqueci.</p>
+<p>"Dez anos mais tarde, fugi de casa, buscando seguir os passos de Van Richten. Encontrei um homem mudado—marcado e assombrado pelos anos que haviam passado. Sua bondade, contudo, jamais se apagara, e ele concordou em me aceitar como aprendiz. Passei dois anos com ele, aprendendo tudo o que pude sobre monstros e sobre como combatê-los, até que enfim seguimos caminhos separados."</p>
+</div>
+<p>Ao terminar sua história, a expressão de Ezmerelda se ensombrece. "Na noite em que deixei sua companhia, trocamos palavras duras—palavras que eu preferiria esquecer." Ela suspira. "Ainda assim, quando recebi sua última carta, vim imediatamente para Barovia, rezando para que ele não enfrentasse Zarovich sozinho."</p>
+<p>Se perguntada, Ezmerelda pode contar que os Radanavich venderam o filho de Van Richten—um menino chamado Erasmus, com quem Ezmerelda brincara brevemente de rodar arcos quando criança—a um vampiro cruel e odioso chamado Barão Metus. “Nunca soube o que foi feito dele depois disso," ela diz, com pesar. “O Dr. Van Richten nunca quis falar sobre isso."</p>
+<p><strong><em>O Terror Negro.</em></strong> Ezmerelda conta a história assim:</p>
+<div class="description">
+<p>"Fazia um ano que eu havia me separado do Dr. Van Richten, e eu sentia que monstro algum poderia me desafiar. Foi então que ouvi sussurros sobre uma besta conhecida como o Terror Negro—um lobisomem que era a ruína de várias aldeias na orla das florestas escuras de Darkon. Jurei rastreá-lo e pôr fim ao seu reinado de terror.</p>
+<p>"Foram muitas noites de investigação e pesquisa, mas finalmente avistei a besta na beira de um pântano sombrio, suas presas tingidas de vermelho com o sangue de sua última refeição. Meu coração disparou enquanto eu a via deslizar para dentro das brumas—não uma neblina comum, mas o véu que encobre os próprios mundos—e soube que, se falhasse em persegui-la, poderia ser forçada a recomeçar minha caçada do zero.</p>
+<p>"Em minha arrogância, achei que daria conta do que quer que houvesse do outro lado. Eu era uma Vistani—uma andarilha nata das Brumas—e aprendiz do próprio Rudolph van Richten. Avancei sem pensar duas vezes—e o Terror Negro me emboscou, saltando da penumbra com garras e dentes. Ele arrancou minha perna abaixo do joelho, meu sangue vivo manchando seu couro cor de carvão.</p>
+<p>"Naquele instante, soube que morreria, sozinha e impotente—até que Dmitri e Anna surgiram da mata, prata fria reluzindo em suas mãos. O lobisomem fugiu, e os Krezkov me levaram para sua casa, onde cuidaram de mim até que eu recobrasse a saúde. Quando me restabeleci, levaram-me a Vallaki e encomendaram ao fabricante de brinquedos local, um homem brilhante chamado Blinsky, uma perna nova para mim. Até hoje, esta perna me lembra da importância da cautela—e dos perigos do fervor desmedido."</p>
+</div>
+<p>Quando sua história termina, Ezmerelda contempla as chamas. "Devo aos Krezkov uma dívida que jamais poderei pagar," ela diz em voz baixa. "Mas encontrar Ilya e levá-lo de volta para casa, são e salvo—isso seria um começo."</p>
+<p>Ezmerelda não sabe ao certo se o Terror Negro ainda ronda Barovia. “Quase espero que sim," ela diz, um sorriso irônico nos lábios. Seu punho se fecha com mais força em torno da espada curta prateada. “Tenho um presente que gostaria de lhe dar."</p>
+<h1 id="l4-o-covil-dos-lobisomens">L4. O Covil dos Lobisomens</h1>
+<p>Uma hora depois do anoitecer, a maior parte da alcateia de lobisomens deixa o covil. Leia:</p>
+<div class="description">
+<p>A noite se agita quando várias formas grandes e escuras emergem de sob os rochedos da montanha. Uma delas se ergue acima das demais, seu corpo volumoso com facilidade o dobro do tamanho dos outros.</p>
+<p>A alcateia segue para o sul, depois para o oeste, trotando ao longo da margem do Lago Baratok até que seus membros somem entre as árvores escuras e cerradas da Svalich Wood.</p>
+</div>
+<div class="callout callout-lore"><div class="callout-title"><span class="callout-icon">📜</span><strong>Os Membros da Alcateia</strong></div><div class="callout-body"><p>Na ocasião em que os jogadores chegam pela primeira vez ao covil dos lobisomens, a alcateia é composta pelos seguintes lobisomens:</p>
+<ul><li>Kiril Stoyanovich, o líder da alcateia, e sua esposa, Bianca Stoyanovich</li><li>Seis membros veteranos da alcateia, antes leais a Emil Toranescu, que agora seguem Kiril por medo dele e de Strahd</li><li>Quatro lobisomens infectados por Kiril nas últimas dez semanas, que o seguem servilmente e que abraçaram a maldição canibalizando humanos inocentes, assim como ele fez.</li></ul>
+<p>Ao deixar Barovia, Kiril leva consigo para a caçada apenas os membros veteranos da alcateia, deixando para trás seus quatro lacaios sedentos de sangue para supervisionar e proteger o covil. Kiril não permite que os membros veteranos da alcateia comam tudo o que caçam, e já ameaçou desmembrá-los ou matá-los caso ousem tocar em algo além das sobras que ele deixa.</p></div></div>
+<p>Conforme os jogadores se aproximam, o exterior do covil é em grande parte tal como descrito em <span class="citation">Aproximando-se do Covil (p. 201)</span>. No entanto, acrescente o texto a seguir ao final daquela descrição:</p>
+<div class="description">
+<p>A carcaça de uma besta enorme jaz torta na base do penhasco, ao lado da boca da caverna—um alce descomunal, facilmente tão alto quanto dois homens em pé sobre os ombros um do outro. Boa parte da carne foi arrancada de seus ossos, e a garganta inteira foi rasgada fora.</p>
+</div>
+<p>Um teste de Sabedoria (Medicina) CD 12 bem-sucedido revela que a garganta do alce foi arrancada por um único par de mandíbulas descomunais, grandes o bastante para devorar inteiro o tronco de um humanoide.</p>
+<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>Iluminação Interna</strong></div><div class="callout-body"><p>Não há tochas ao longo das paredes da caverna. Em seu lugar, pequenos aglomerados de fungos amarelos luminescentes forram as paredes, cada aglomerado fornecendo penumbra em um raio de 1,5 metro.</p></div></div>
+<h2 id="l4a-boca-da-caverna-e-posto-de-guarda">L4a. Boca da Caverna e Posto de Guarda</h2>
+<p><span class="citation"><em>Esta área corresponde a Z1. Boca da Caverna (p. 203) e Z2. Posto de Guarda (p. 203).</em></span></p>
+<p>Esta área é em grande parte tal como descrita em <span class="citation">Z1. Boca da Caverna (p. 203)</span> e <span class="citation">Z2. Posto de Guarda (p. 203)</span>. No entanto, revise a descrição desta área para o seguinte:</p>
+<div class="description">
+<p>As mandíbulas abertas da cabeça de lobo formam um dossel de rocha de quatro metros e meio de altura sobre a boca da caverna, sustentado por pilares naturais de pedra. Dentro da caverna, o teto se eleva a seis metros de altura. Pequenos aglomerados de luz âmbar salpicam as paredes, lançando um brilho tênue pelo chão da caverna.</p>
+<p>Mais adiante, a caverna se divide à esquerda e à direita ao redor dela. Vocês conseguem ouvir o som tênue de água escorrendo, ecoando pela passagem da direita. Agachadas sobre uma saliência de um metro e meio de altura entre as duas bifurcações estão duas mulheres de aparência selvagem, vestindo roupas esfarrapadas e empunhando lanças.<p>
+<p>
+</div>
+<p>Azianka e Davanka estão entediadas, desatentas e irritadas por não terem sido autorizadas a acompanhar Kiril para além das Brumas, e no momento discutem se cabras ou alces têm gosto melhor. (Se os jogadores escutarem a conversa, Azianka e Davanka acabam concordando que homens têm gosto melhor do que cabras <em>ou</em> alces.)</p>
+<p>Azianka e Davanka são inquietas, e podem ser facilmente atraídas para longe da boca da caverna por uma ilusão, por um <strong>corvo-licantropo</strong> irritante em forma de corvo invocado pelo <em>apito dos Keepers</em> (<em>Keeper's whistle</em>), ou por qualquer outra distração inofensiva. (Se os jogadores usarem o <em>apito dos Keepers</em> para invocar um <strong>corvo-licantropo</strong> que os auxilie, um <strong>corvo-licantropo</strong> gregário e agitado chamado Stefan Zalenski surge dois minutos depois para ajudá-los.) A menos que sejam distraídas de outra forma, as mulheres voltam para a caverna assim que dez minutos se passam.</p>
+<p>Se os jogadores entrarem na boca da caverna enquanto Azianka e Davanka estiverem presentes, as duas exigem que eles se identifiquem, e em seguida lhes agradecem por trazerem “carne fresca" até a porta de casa. (Por causa da característica <strong><em>audição e olfato aguçados</em></strong> das lobisomens, criaturas invisíveis não conseguem se esconder delas a menos que também estejam protegidas por <em>passos sem rastro</em> (<em>pass without trace</em>) ou magia semelhante.) As duas <strong>lobisomens</strong> (tal como descritas no <a href="apendice-bestiario.html">Bestiário</a>) então jogam suas lanças de lado, assumem suas formas híbridas e atacam. Na contagem de iniciativa 20 do combate, ambas também uivam para dar o alarme, convocando os dois <strong>lobisomens brigões</strong> (<em>werewolf brawlers</em>) e os seis <strong>lobos</strong> de <a href="#l4d-cavernas-profundas">L4d. Cavernas Profundas</a>, que chegam após 1 rodada.</p>
+<p>Substitua o ataque de <strong><em>mordida</em></strong> dos lobos pelas seguintes opções de ação:</p>
+<ul><li><strong><em>Dilacerar.</em></strong> <em>Ataque com Arma Corpo a Corpo:</em> +4 para acertar, alcance 1,5 m, um alvo. <em>Acerto:</em> 7 (2d4 + 2) de dano perfurante. Em vez de causar dano, o lobo pode agarrar o alvo (CD para escapar 11).</li><li><strong><em>Garras.</em></strong> <em>Ataque com Arma Corpo a Corpo:</em> +4 para acertar, alcance 1,5 m, um alvo. <em>Acerto:</em> 6 (1d8 + 2) de dano cortante. Se o alvo for uma criatura, ele deve fazer um teste de resistência de Força CD 11. Em caso de falha, ele fica caído ou é empurrado 1,5 metro para longe (à escolha do lobo).</li></ul>
+<h2 id="l4b-nascente-subterrânea">L4b. Nascente Subterrânea</h2>
+<p><span class="citation"><em>Esta área corresponde a Z4. Nascente Subterrânea (p. 203).</em></span></p>
+<p>Esta área é em grande parte tal como descrita em <span class="citation">Z4. Nascente Subterrânea (p. 203)</span>. No entanto, a área é iluminada por tufos amarelos de fungos, e não por tochas.</p>
+<p>Além disso, se os jogadores se demorarem ou avançarem mais fundo nesta câmara, leia:</p>
+<div class="description">
+<p>Uma ondulação suave percorre a superfície do lago escuro.</p>
+</div>
+<p>Uma criatura que se aproxima do lago vê seu reflexo distorcido. Em vez do próprio reflexo, a criatura enxerga uma imagem monstruosa que espelha seus piores impulsos, ímpetos e desejos. Por exemplo:</p>
+<ul><li>Ezmerelda vê o próprio reflexo, mas com escleras negras e íris douradas, caninos predatórios e um pelo negro e oleoso cobrindo a pele, com um rosnado terrível que lhe rasga o rosto (literalmente) de orelha a orelha. (Essa imagem reflete o ódio de Ezmerelda pelos monstros e seu medo subconsciente de que sua natureza protetora se converta em crueldade e fanatismo.)</li><li>Ireena vê o próprio reflexo, mas com as órbitas oculares vazias e ensanguentadas; a carne pálida e acinzentada; os lábios costurados; correntes de névoa prendendo-lhe os pulsos; e seu próprio florete atravessando-lhe o estômago. (Essa imagem reflete a passividade de Ireena e seu medo subconsciente de que o autossacrifício seja sua única fuga de um destino terrível.)</li></ul>
+<h2 id="l4c-covil-dos-lobos">L4c. Covil dos Lobos</h2>
+<p><span class="citation"><em>Esta área corresponde a Z3. Covil dos Lobos (p. 203).</em></span></p>
+<p>Esta área é em grande parte tal como descrita em <span class="citation">Z3. Covil dos Lobos (p. 203)</span>. No entanto, acrescente o texto a seguir ao final da descrição da área:</p>
+<div class="description">
+<p>Um lobo velho e esquálido está enrolado junto ao fogo, com a cabeça virada para longe de vocês.</p>
+</div>
+<p>O lobo é Skennis, um <strong>lobisomem</strong> velho e cego com 36 pontos de vida, em forma de lobo. Não há outros <strong>lobos</strong> nesta caverna.</p>
+<div class="callout callout-lore"><div class="callout-title"><span class="callout-icon">📜</span><strong>Skennis</strong></div><div class="callout-body"><p>Skennis foi o líder da alcateia de lobisomens até que Emil o sucedeu, cinco anos atrás. A saúde de Skennis se deteriorou com a velhice, porém, roubando-lhe a visão e boa parte da mobilidade. Incapaz de caçar, Skennis passou a depender do restante da alcateia para se alimentar—até que Kiril tomou o poder, três meses atrás.</p>
+<p>Desde então, Kiril manteve Skennis confinado ao covil e proibiu os outros lobisomens de alimentá-lo (e a quaisquer outros lobos “fracos"), ainda tomado de ciúme e ressentimento por Skennis ter escolhido Emil, e não ele, como sucessor. Alguns membros compassivos da alcateia continuam a passar a Skennis sobras suficientes para mantê-lo vivo, mas não se sabe se a amargura, o rancor e os pequenos farrapos de esperança de Skennis lhe permitirão se agarrar à vida por muito mais tempo.</p></div></div>
+<p>Se um jogador se aproximar do lobo ou o examinar, leia:</p>
+<div class="description">
+<p>A respiração do lobo é rasa e lenta, lançando pequenos sopros de vapor no ar gelado. Seu pelo cinzento e sem brilho está emaranhado e sujo, e suas costelas são visíveis sob o couro fino.<p>
+</div>
+<p>Skennis não está dormindo, apenas cochilando. Os jogadores devem obter sucesso em um teste em grupo de Destreza (Furtividade) CD 14 para passar sem alertá-lo. Se o teste em grupo falhar, leia:</p>
+<div class="description">
+<p>A cabeça do velho lobo se ergue de súbito, revelando três cortes inchados que cruzam sua face, as bordas encrostadas de sangue seco. Seus olhos, de um branco leitoso e cegos, encaram o vazio à frente enquanto suas narinas se dilatam e suas orelhas cicatrizadas se contraem rapidamente ao farejar o ar frio. As orelhas se achatam contra o crânio, e ele solta um rosnado baixo e cauteloso.</p>
+</div>
+<p>O som alerta Skennis para a presença de intrusos, mas não para suas identidades ou posições. Os jogadores devem obter sucesso em um teste em grupo adicional de Destreza (Furtividade) CD 15 para sair da sala sem atrair a atenção ou a ira de Skennis. Do contrário, os jogadores podem acalmá-lo curando seus cortes ou lhe oferecendo comida, que ele aceita com um ganido suave e agradecido. (Os cortes foram feitos por Kiril, que “puniu" Skennis por tentar roubar uma bocada de carne de cabra na noite anterior.)</p>
+<p>Se os jogadores o tratarem com bondade—em vez de apenas tentarem apaziguá-lo—Skennis (permanecendo em forma de lobo) faz um gesto para que esperem, então segue por <a href="#l4d-cavernas-profundas">L4d. Cavernas Profundas</a>, sobe o túnel atrás de <span class="citation">Z6. Caverna de Kiril (p. 204)</span> e emerge no <span class="citation">Z8. Anel de Pedra (p. 205)</span>. Ao chegar lá, ele faz uma breve pausa e então late várias vezes em falso alarme, convocando os seis <strong>lobos</strong> de <a href="#l4d-cavernas-profundas">L4d. Cavernas Profundas</a>. (Os dois <strong>lobisomens brigões</strong> que estão lá são despertados pela agitação, mas continuam cochilando em sua caverna, reduzindo para 11 a CD de qualquer teste de Destreza (Furtividade) feito para evitar que percebam os jogadores.)</p>
+<p>Se os jogadores permanecerem na caverna de Skennis sem alimentá-lo, curá-lo, apaziguá-lo, incapacitá-lo ou se esconder dele, seu rosnado se intensifica até virar um grunhido retumbante. Uma rodada depois, ele solta um uivo agudo e penetrante que ecoa pelas paredes da caverna e vale afora.</p>
+<p>O uivo de Skennis alerta Ilya e Zuleika em <a href="#l4e-santuário-de-mother-night">L4e. Santuário de Mother Night</a>, os dois <strong>lobisomens brigões</strong> e os seis <strong>lobos</strong> em <a href="#l4d-cavernas-profundas">L4d. Cavernas Profundas</a>, Bianca no <strong>Z8. Anel de Pedra</strong>, e Azianka e Davanka (se ainda estiverem vivas e ao alcance da audição do covil). Os lobisomens brigões e os lobos chegam após uma rodada, e Azianka e Davanka chegam ao menos duas rodadas mais tarde.</p>
+<h2 id="l4d-cavernas-profundas">L4d. Cavernas Profundas</h2>
+<p><span class="citation"><em>Esta área corresponde a Z5. Cavernas Profundas (p. 203).</em></span></p>
+<p>Esta área é em grande parte tal como descrita em <span class="citation">Z5. Cavernas Profundas (p. 203)</span>. No entanto, substitua a expressão “iluminada por tochas" na descrição por “iluminada de amarelo". Além disso, jogadores que passem por esta área conseguem ver a luz bruxuleante de tochas vinda do <span class="citation">Z7. Santuário de Mother Night (p. 204)</span>.</p>
+<p>Bianca, Wensencia e Kellen não estão presentes quando os jogadores chegam. Em vez disso, a <span class="citation">Z5a. Caverna Sul (p. 203)</span> é ocupada por dois <strong>lobisomens brigões</strong> adormecidos em forma de lobo, chamados Kobal Mironovich e Radovan Lipsiege, enquanto a <span class="citation">Z5b. Caverna Norte (p. 203)</span> é ocupada por seis <strong>lobos</strong> alertas, leais a Strahd e a Kiril.</p>
+<p>Para atravessar esta área furtivamente sem perturbar os lobos, os jogadores devem obter sucesso em um teste de Destreza (Furtividade) CD 19, feito com desvantagem conforme descrito em <span class="citation">Z5. Cavernas Profundas (p. 203)</span>. Se ouvirem ou virem um possível intruso, os lobos começam a rosnar e a latir, acordando Kobal e Radovan. Os lobisomens e os lobos então se movem para investigar a origem da perturbação. Assim que encurralarem quaisquer intrusos, Kobal e Radovan assumem suas formas híbridas e atacam.</p>
+<div class="statblock">
+<h2>Lobisomem Brigão</h2>
+<em>Humanoide Médio, Caótico e Mau</em>
+<hr>
+<strong>Classe de Armadura</strong> 14 na forma humanoide, 15 (armadura natural) na forma de lobo ou híbrida
+<br>
+<strong>Pontos de Vida</strong> 142 (20d8 + 60)
+<br>
+<strong>Deslocamento</strong> 9 m (12 m na forma de lobo)
+<hr>
+<table class="ability-table">
+  <thead>
+    <tr>
+      <th>FOR</th>
+      <th>DES</th>
+      <th>CON</th>
+      <th>INT</th>
+      <th>SAB</th>
+      <th>CAR</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>17 (+3)</td>
+      <td>13 (+1)</td>
+      <td>16 (+3)</td>
+      <td>10 (+0)</td>
+      <td>11 (+0)</td>
+      <td>12 (+1)</td>
+    </tr>
+  </tbody>
+</table>
+<hr>
+<strong>Testes de Resistência</strong> For +6, Con +6<br>
+<strong>Perícias</strong> Atletismo +6, Intimidação +4, Percepção +6, Furtividade +4<br>
+<strong>Sentidos</strong> visão no escuro 18 m, Percepção passiva 16<br>
+<strong>Idiomas</strong> Comum (não consegue falar na forma de lobo)<br>
+<strong>Nível de Desafio</strong> 7, ou 6 sem sua regeneração<br>
+<strong>Bônus de Proficiência</strong> +3<br>
+<hr>
+<p><strong><em>Audição e Olfato Aguçados.</em></strong> O lobisomem tem vantagem em testes de Sabedoria (Percepção) que dependam de audição ou olfato.</p>
+<p><strong><em>Táticas de Matilha.</em></strong> O lobisomem tem vantagem em uma jogada de ataque contra uma criatura se ao menos um dos aliados do lobisomem estiver a 1,5 metro da criatura e esse aliado não estiver incapacitado.</p>
+<p><strong><em>Regeneração.</em></strong> O lobisomem recupera 10 pontos de vida no início de seu turno. Se o lobisomem sofrer dano necrótico ou dano de concussão, perfurante ou cortante causado por uma arma prateada, esta característica não funciona no início do próximo turno do lobisomem. O lobisomem só morre se começar seu turno com 0 pontos de vida e não se regenerar.</p>
+<p><strong><em>Brutamontes.</em></strong> Uma arma corpo a corpo causa um dado extra de seu dano quando o lobisomem acerta com ela (já incluído no ataque).</p>
+<p><strong><em>Defesa sem Armadura.</em></strong> Enquanto o lobisomem não estiver usando armadura, sua CA inclui seu modificador de Constituição.</p>
+<h3>Ações</h3>
+<p><strong><em>Ataque Múltiplo.</em></strong> O lobisomem faz dois ataques com sua lança (forma humanoide) ou um ataque com sua mordida e dois ataques com suas garras (forma de lobo ou híbrida). Ele pode substituir um ataque de garras por um arremesso.</p>
+<p><strong><em>Mordida (Apenas na Forma de Lobo ou Híbrida).</em></strong> Ataque com Arma Corpo a Corpo: +6 para acertar, alcance 1,5 m, um alvo. Acerto: 14 (2d10 + 3) de dano perfurante, e o alvo deve ser bem-sucedido em um teste de resistência de Força CD 14 ou fica caído. Além disso, se o alvo for um humanoide, ele deve ser bem-sucedido em um teste de resistência de Constituição CD 14 ou é amaldiçoado com a licantropia de lobisomem.</p>
+<p><strong><em>Garras (Apenas na Forma de Lobo ou Híbrida).</em></strong> Ataque com Arma Corpo a Corpo: +6 para acertar, alcance 1,5 m, uma criatura. Acerto: 12 (2d8 + 3) de dano cortante. Se o alvo for uma criatura, ele deve ser bem-sucedido em um teste de resistência de Força CD 14 ou fica agarrado.</p>
+<p><strong><em>Lança (Apenas na Forma Humanoide).</em></strong> Ataque com Arma Corpo a Corpo ou à Distância: +6 para acertar, alcance 1,5 m ou alcance 6/18 m, uma criatura. Acerto: 10 (2d6 + 3) de dano perfurante, ou 12 (2d8 + 3) de dano perfurante se usada com as duas mãos para fazer um ataque corpo a corpo.</p>
+<p><strong><em>Arremesso.</em></strong> O lobisomem força uma criatura que esteja agarrando a ser bem-sucedida em um teste de resistência de Força CD 14. Em caso de falha, a criatura é arremessada 3 metros e cai caída. Se o alvo não puder percorrer a distância inteira, ele sofre 1d6 de dano de concussão adicional para cada 1,5 metro não percorrido.</p>
+<h3>Ações Bônus</h3>
+<p><strong><em>Metamorfose.</em></strong> O lobisomem se transforma em um híbrido de lobo e humanoide ou em um lobo, ou retorna à sua forma verdadeira, que é humanoide. Suas estatísticas, exceto sua CA, são as mesmas em cada forma. Qualquer equipamento que ele esteja vestindo ou carregando se funde à nova forma. Ele reverte à sua forma verdadeira se morrer.</p>
+<p><strong><em>Aperto Esmagador.</em></strong> O lobisomem força uma criatura que esteja agarrando a ser bem-sucedida em um teste de resistência de Constituição CD 14. A criatura sofre 10 (3d6) de dano de concussão em caso de falha, e metade desse dano em caso de sucesso. Uma criatura que falhe no teste de resistência por 5 ou mais também fica aturdida (<em>dazed</em>) até o fim de seu próximo turno. (A criatura pode se mover ou realizar uma ação em seu turno, não ambos. Ela também não pode realizar uma ação bônus ou uma reação.)
+</div>
+<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>Cadê os Lobos?</strong></div><div class="callout-body"><p>Quando os jogadores se infiltram pela primeira vez no Covil dos Lobisomens, Bianca está sentada sozinha no <span class="citation">Z8. Anel de Pedra (p. 205)</span>, descendo à caverna principal apenas se Skennis der o alarme. Wensencia não existe mais como membro da alcateia de lobisomens, enquanto Kellen se tornou membro adulto da alcateia e integrante do grupo de ataque de Kiril.</p></div></div>
+<h2 id="l4e-santuário-de-mother-night">L4e. Santuário de Mother Night</h2>
+<p><span class="citation"><em>Esta área corresponde a Z7. Santuário de Mother Night (p. 204).</em></span></p>
+<p>Esta área é em grande parte tal como descrita em <span class="citation">Z7. Santuário de Mother Night</span>. No entanto, não há tocha nem fungos luminescentes dentro ou junto à alcova sul da câmara. Além disso, revise a descrição da área para o seguinte:</p>
+<div class="description">
+<p>Degraus toscamente talhados descem até uma caverna iluminada por tochas. Por uma pequena fenda no teto da câmara, um facho de luar ilumina uma estátua rudimentar de madeira encostada na parede ao fundo, com a forma grosseira de uma mulher com cabeça de lobo, envolta em guirlandas de trepadeiras e flores noturnas. Em seu pescoço pende um reluzente medalhão de platina em forma de sol radiante, com um grande rubi encravado no centro, e montes de ouro, prata e pedras preciosas se empilham em torno de sua base. Atrás da estátua, dois cadáveres infestados de larvas pendem de algemas de ferro fixadas na parede. Moedas de ouro foram cravadas nas órbitas vazias onde deveriam estar seus olhos.</p>
+<p>Duas jaulas de madeira ladeiam a estátua, com as tampas mantidas fechadas por pedras pesadas. Na jaula da esquerda, ajoelha-se um jovem de olhos fundos e roupas largas e esfarrapadas, com uma perna humana em decomposição estendida no chão diante da jaula. Na jaula da direita, uma mulher de olhos âmbar, vestindo roupas rasgadas, está sentada de pernas cruzadas, os fios grossos e emaranhados de seu cabelo presos atrás de uma bandana preta. Coleiras de prata em seus pescoços estão acorrentadas à parede atrás deles, e a faixa de cada coleira é entalhada com padrões de espinhos de aparência cruel.</p>
+</div>
+<p>O medalhão é o <em>Holy Symbol of Ravenkind</em>. O jovem é Ilya Krezkov, um <strong>lobisomem</strong> de treze anos com 36 pontos de vida. A mulher é Zuleika Toranescu, tia de Ilya e uma sacerdotisa <strong>lobisomem</strong> de Mother Night. Tanto Ilya quanto Zuleika estão passando fome e, por causa disso, têm três níveis de exaustão.</p>
+<p>Jogadores que viram o desenho que Ilya fez de Zuleika em <a href="arco-k-a-abadia-decaida.html#o-quarto-de-ilya">Arco K - A Abadia Decaída</a> a reconhecem como a mulher do retrato.</p>
+<p><img class="reloaded-img" src="img/Ilya%20Krezkov.png" alt="Ilya Krezkov.png" loading="lazy"></p>
+<p><img class="reloaded-img" src="img/Zuleika%20Toranscu.png" alt="Zuleika Toranscu.png" loading="lazy"></p>
+<p><span class="credit">"Ilya Krezkov" e "Zuleika Toranescu" por Caleb Cleveland. Apoie-o no <a href="https://patreon.com/calebisdrawing/">Patreon!</a></span></p>
+<div class="callout callout-lore"><div class="callout-title"><span class="callout-icon">📜</span><strong>Os Prisioneiros de Kiril</strong></div><div class="callout-body"><p><strong><em>Zuleika.</em></strong> Quando Kiril usurpou a posição de Emil como líder da alcateia de lobisomens, uma Zuleika enfurecida o atacou. Kiril, porém, a derrotou com facilidade e a trancou no santuário de Mother Night como punição. Kiril também tomou o símbolo sagrado de Zuleika—uma lua crescente entalhada em madeira, pendurada em um colar de cordão de couro—para impedi-la de invocar o poder de Mother Night e escapar.</p>
+<p>Embora Kiril tenha proibido os outros membros da alcateia de alimentá-la, Mother Night envia ratos a cada noite trazendo restos para Zuleika comer—não o bastante para impedi-la de passar fome, mas o suficiente para mantê-la longe da morte.</p>
+<p><strong><em>Ilya.</em></strong> Quando o surto de fúria de Ilya o deixou inconsciente e sozinho na Svalich Wood, Kiril e a alcateia de lobisomens sentiram nele o cheiro da maldição da licantropia e o arrastaram de volta ao Covil dos Lobisomens para interrogá-lo. Quando Ilya acordou, reconheceu de imediato Zuleika a partir do disfarce do Abade e a acusou de tê-lo colocado naquela situação.</p>
+<p>Ao descobrir que Ilya era sobrinho de Zuleika, Kiril tramou um plano cruel. Prendeu Ilya com uma coleira e o trancou em uma jaula, e começou a privá-lo de comida, como fizera com Skennis e Zuleika. Mais cedo ou mais tarde, Kiril sabia, Ilya não teria escolha senão consumir a carne humana deixada ao lado de sua jaula—e, quando estivesse pronto, matar e devorar um cativo humano, abraçando assim sua maldição do mesmo modo que Kiril fizera.</p></div></div>
+<div class="callout callout-item"><div class="callout-title"><span class="callout-icon">✦</span><strong>Coleira de Espinhos de Prata</strong></div><div class="callout-body"><p>Tanto Zuleika quanto Ilya usam <em>coleiras de espinhos de prata</em> (<em>silverthorn collars</em>), itens mágicos criados para Kiril por Baba Lysaga, a bruxa do pântano de Berez. Enquanto usada por um licantropo, a coleira impede que ele se regenere. Além disso, o interior de uma coleira de <em>espinhos de prata</em> projeta minúsculos espinhos de prata cada vez que o licantropo tenta se transformar, causando 1 de dano perfurante e impedindo a transformação.</p>
+<p>Cada coleira é trancada magicamente e possui um único e pequeno buraco de fechadura, cuja chave Kiril traz em um cordão ao redor do pescoço. Uma coleira trancada também pode ser aberta com um teste de Força CD 25 bem-sucedido ou com um teste de Destreza (Ferramentas de Ladrão) CD 25 bem-sucedido. No entanto, cada vez que uma criatura tenta abrir uma coleira sem antes destrancá-la, ou tenta arrombar a fechadura sem usar a chave correta, essa criatura deve fazer um teste de resistência de Destreza CD 17 ou sofre 7d8 de dano perfurante. Quer a criatura tenha sucesso ou falhe no teste de resistência, quem usa a coleira também sofre imediatamente 31 (7d8) de dano perfurante, à medida que a coleira projeta grandes espinhos que perfuram seu pescoço.</p>
+<p>As magias <em>dissipar magia</em> (<em>dispel magic</em>) e <em>destrancar</em> (<em>knock</em>) não têm efeito sobre nenhuma das coleiras. Além disso, se um prisioneiro se teletransportar usando a coleira, ela se teletransporta junto com ele.</p></div></div>
+<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>Coleiras e Antimagia</strong></div><div class="callout-body"><p>Uma _coleira de espinhos de prata_ é afetada normalmente pelo <span class="citation">Dreno de Magia de Khazan (p. 167)</span>, no <span class="citation">Capítulo 11: A Torre de Van Richten (p. 167)</span>. Se sua coleira for removida, Zuleika fica feliz em ajudar os jogadores a resgatar Emil do Castelo Ravenloft em <a href="arco-p-o-assalto-a-ravenloft.html">Arco P - O Assalto a Ravenloft</a>.</p></div></div>
+<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>As Correntes</strong></div><div class="callout-body"><p>As correntes que ligam as coleiras de Ilya e Zuleika à parede da caverna têm as estatísticas de uma <em>corrente (3 metros)</em>, conforme descrito no <span class="citation">Player's Handbook (p. 151)</span>, com CA 19.</p></div></div>
+<p>Quando os dois prisioneiros percebem os jogadores pela primeira vez, Ilya se encolhe contra o fundo de sua jaula, claramente aterrorizado, enquanto Zuleika observa em silêncio. Ilya exige saber quem são os jogadores e se eles são membros da alcateia de lobisomens.</p>
+<p>Se os jogadores se apresentarem e o tratarem com gentileza, Ilya está disposto a compartilhar as seguintes informações:</p>
+<ul><li>Ele é Ilya Krezkov, filho do burgomestre de Krezk. (Ezmerelda, se estiver presente, o reconhece e fica horrorizada ao ver seu estado atual.)</li><li>Ele foi sequestrado por um lobisomem e trazido para cá como prisioneiro. (Isso é uma meia-verdade. Um jogador que obtenha sucesso em um teste de Sabedoria (Intuição) CD 10 vê Ilya desviar brevemente o olhar para o lado e nota gotas de suor se formando em sua testa.)</li></ul>
+<p>Se os jogadores perguntarem sobre Zuleika, ela se apresenta como Zuleika Toranescu, embora peça aos jogadores que mantenham a voz baixa. “O líder da alcateia pode ter partido para sua caçada," ela sussurra com aspereza. “Mas outros ainda podem estar espreitando mais fundo no covil."</p>
+<p>Se os jogadores perguntarem por que ela e Ilya foram aprisionados, ela lhes conta com sinceridade que foram presos ali por Kiril Stoyanovich, “o líder desta alcateia". Se for reconhecida como irmã de Dmitri Krezkov, admite ser tia de Ilya. "Embora," ela observa secamente, com um olhar de esguelha para Ilya, “até pouco tempo atrás, eu não o visse havia um bom tempo."</p>
+<p>Se for identificada como lobisomem, Zuleika admite abertamente que é uma. Se sua humanidade for questionada por causa disso, ela inclina a cabeça e pergunta, com curiosidade: “Vocês me julgam por uma condição que eu não pedi, e que jamais usei com malícia?"</p>
+<p>Se Ilya for identificado como lobisomem, ele se encolhe e nega com veemência. (Enquanto o faz, Zuleika o observa com compaixão e pena.)</p>
+<p>Se lhe disserem que os jogadores foram enviados em nome de Dmitri e Anna Krezkov, Ilya pergunta ansiosamente se seus pais e sua irmã estão bem. Ele fica visivelmente aliviado ao saber que sua família ainda está viva; contudo, se lhe contarem sobre o estado de Kala, seu lábio inferior treme e ele começa a soluçar.</p>
+<h4 id="o-que-ilya-sabe">O Que Ilya Sabe</h4>
+<p>Se os jogadores tratarem Ilya com gentileza e obtiverem sucesso em um teste de Carisma (Persuasão) CD 10, eles podem convencê-lo a compartilhar as seguintes informações, que ele relata com um horror silencioso e com vergonha:</p>
+<ul><li>Três semanas atrás, uma mulher parecida com Zuleika o abordou no Santuário do Sol Branco, em Krezk. Ela se identificou como Zuleika Krezkova, sua tia há muito ausente, e lhe disse que seu pai era secretamente um <strong>lobisomem</strong>—e que a maldição dele havia passado também para Ilya. (Zuleika nega firmemente ter feito isso, e insiste que alguém imitou sua aparência para os próprios fins—uma afirmação em que Ilya passou a acreditar.)</li><li>“Zuleika" disse a Ilya que sua maldição era uma arma poderosa contra Strahd von Zarovich e os servos das trevas, mas o advertiu de que seus pais logo tentariam suprimir aquela “bênção" antes que ela pudesse se manifestar. Ela lhe disse para recusar quaisquer <em>poções de acônito</em> (<em>potions of wolfsbane</em>) que seus pais tentassem lhe dar, e então partiu de Krezk.</li><li>Ilya não acreditou nela, mas logo mudou de ideia quando seus pais revelaram a verdade sobre sua linhagem apenas alguns dias depois. Determinado a manter a família a salvo de Strahd e de seus lacaios, ele despejou em segredo a <em>poção de acônito</em> que seus pais lhe deram, antes que sua mãe o trancasse junto com o pai no porão secreto do chalé.</li><li>Ilya não se lembra do que aconteceu em seguida. Tudo o que sabe é que acordou em uma jaula no covil na manhã seguinte, com sangue manchando sua boca. Desde então, é assombrado pelo pensamento daqueles a quem possa ter ferido.</li></ul>
+<p>Ilya culpa a falsa “Zuleika" por sua situação atual, e culpa em certa medida seus pais por lhe esconderem a verdade, mas não culpa ninguém mais do que a si mesmo pelos ferimentos que possa ter causado. Ilya não culpa a verdadeira Zuleika por seu destino, e é profundamente grato a ela por suas palavras de conforto e por seus esforços para mantê-lo confortável.</p>
+<h3 id="o-que-zuleika-sabe">O Que Zuleika Sabe</h3>
+<p>Se for questionada, Zuleika pode compartilhar as seguintes informações:</p>
+<ul><li>Ela é uma descendente da linhagem Krezkov, que há muito é amaldiçoada com a licantropia lupina. Treze anos atrás, ela conheceu Emil Toranescu, outro <strong>lobisomem</strong> que a ensinou a ver a beleza em sua condição, e a dominar a fera interior através de meditação e oração. Quando sua família rejeitou seus esforços, ela fugiu de Krezk e passou a viver como esposa de Emil, como membro da alcateia de lobisomens de Barovia—e, à medida que seus esforços espirituais avançavam, como sacerdotisa de Mother Night, a patrona divina dos licantropos.</li><li>Até recentemente, a alcateia de lobisomens vagava livremente pelas Brumas em suas caçadas. Naqueles dias, a alcateia era um refúgio—uma família—para aqueles que haviam sido expulsos da sociedade por causa de sua maldição.</li><li>Um desses proscritos era Kiril Stoyanovich, um jovem <strong>lobisomem</strong> que se juntou à alcateia junto com sua esposa, Bianca. Enquanto Zuleika havia suportado anos de meditação para dominar sua maldição, no entanto, Kiril era impaciente e ávido para provar seu valor. “Existe uma forma de um lobisomem abraçar sua maldição de todo o coração," ela murmura, “sem sabedoria nem reservas. É algo sombrio e proibido, e exige que quem o carrega cometa o tabu supremo: matar um inocente—alguém que não lhe fez mal algum—e devorar sua carne."</li><li>Embora ela nunca tenha conseguido provar que Kiril fizera isso, seu progresso acelerado despertou suas suspeitas, e ela o observou com cautela enquanto ele se tornava cada vez mais imprudente, sanguinário e cruel, muitas vezes se afastando para caçar sozinho. Zuleika sentia pena de sua esposa, Bianca, que muitas vezes lutava para acalmar os humores sombrios e a fúria de Kiril. “Eu nunca perguntei de onde ela vinha," Zuleika diz suavemente. “Quando nos juntamos à alcateia, nascemos de novo, deixando para trás as cinzas de nossas antigas vidas. Mas sei que ela abriu mão de muito para estar conosco—e ainda mais para estar com ele."</li><li>Cinco anos atrás, o líder da alcateia—um velho <strong>lobisomem</strong> chamado Skennis—renunciou ao seu cargo. Embora Skennis tivesse escolhido Emil, marido de Zuleika, para sucedê-lo, Kiril desafiou Emil pelo controle da alcateia. Emil, no entanto, o derrotou rapidamente, e Kiril nutriu rancor contra Emil desde então.</li><li>Três meses atrás, logo após Strahd despertar de seu longo sono, Emil começou a discutir um plano para partir através das Brumas, antes que Strahd os aprisionasse ali para sempre. Não muito tempo depois, Kiril desapareceu da alcateia por sete dias inteiros. Quando retornou, estava flanqueado por seis <strong>lobos atrozes</strong> de Strahd—e sua força licantrópica havia se transformado e crescido, tornando-o uma força terrível a ser enfrentada. "Ele fedia ao pântano," Zuleika rosna, com o lábio se curvando, "e a uma bruxaria imunda e corrompida." (Se perguntada, Zuleika pode confirmar que suspeita que Baba Lysaga—a bruxa de Berez—esteve de alguma forma envolvida na transformação de Kiril, o que, em sua opinião, "o deixou mais maldição do que homem.")</li><li>Ao retornar, Kiril fez sua jogada pelo poder. “Ele espancou Emil quase até a morte," Zuleika murmura, “e ordenou aos lobos atrozes que o levassem para as masmorras do castelo, para ser punido por sua deslealdade." Quando Zuleika tentou detê-lo, Kiril a derrotou também, tomando seu símbolo sagrado e aprisionando-a em seu próprio santuário..</li></ul>
+<p>Se perguntada sobre as coleiras, ou se os jogadores oferecerem ou tentarem removê-las, Zuleika pode compartilhar as seguintes informações:</p>
+<ul><li>As coleiras exalam o fedor da bruxa do pântano, Baba Lysaga. Cada vez que ela tenta se transformar, elas formam espinhos mágicos de prata que perfuram seu pescoço, extinguindo sua força. Cada vez que ela ou Ilya tentam removê-las, as coleiras formam espinhos maiores, que se cravam fundo em seus pescoços e ameaçam arrancar suas gargantas.</li><li>Somente Kiril tem a chave de suas coleiras, que ele usa em um cordão ao redor do pescoço feito de tendões humanos curtidos, ao lado do símbolo sagrado de madeira de Zuleika. Ele nunca se separa deles nem os remove do pescoço.</li></ul>
+<p>Se perguntada sobre o santuário, os cadáveres, o tesouro, ou o <em>Símbolo Sagrado da Estirpe do Corvo</em> (<em>Holy Symbol of Ravenkind</em>), ou se os jogadores tentarem recuperar o tesouro ou o <em>Símbolo Sagrado</em>, Zuleika pode compartilhar o seguinte aviso:</p>
+<ul><li>Os lobisomens se autodenominam os Filhos de Mother Night, e lhe oferecem tesouros e presentes há muitas gerações. O tesouro, no entanto, é amaldiçoado: uma criatura que rouba de Mother Night perderá a vida no processo.</li><li>Quando Strahd despertou pela primeira vez, ele enviou dois <strong>vampiros servos</strong> para informar a alcateia sobre seu retorno. Quando esses servos tentaram recolher parte do “tesouro" da alcateia como um imposto para Strahd, a maldição os congelou e devorou sua força vital, apodrecendo seus corpos até que morressem de necrose. Emil então ordenou que seus cadáveres fossem aparafusados à parede atrás do santuário, como um aviso para aqueles que ousassem roubar de Mother Night. (“Apesar de todos os seus esforços," Zuleika observa com desdém, “Kiril tem sido completamente incapaz de removê-los. Até ele teme a ira de Mother Night, e com razão.")</li><li>Zuleika não sabe o que é o <em>Símbolo Sagrado da Estirpe do Corvo</em>—apenas que a estátua de Mother Night o usa há décadas.</li></ul>
+<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>A Maldição de Mother Night</strong></div><div class="callout-body"><p>Itens no tesouro de Mother Night, incluindo o <em>Símbolo Sagrado da Estirpe do Corvo</em> e a estátua de Mother Night, não podem ser movidos ou removidos sem permissão. Além disso, uma criatura que tente recuperar fisicamente um item do tesouro sem permissão deve realizar um teste de resistência de Sabedoria CD 25 ou ficará incapacitada até soltar o item. (Uma criatura que tente recuperar um item indiretamente, como usando uma ferramenta, uma magia, ou outra criatura para fazê-lo, é afetada da mesma forma. Nesse caso, o efeito não termina até que o item seja devolvido ao tesouro de Mother Night.)</p>
+<p>Enquanto incapacitada dessa forma, a criatura não pode mover nenhuma parte do corpo, exceto as mãos e o rosto, e não pode retirar a mão do tesouro, exceto soltando o item retirado. Além disso, a criatura deve realizar um teste de resistência de Constituição CD 25 ao final de cada turno em que permanecer incapacitada, sofrendo 8d8 de dano necrótico em caso de falha, ou metade desse valor em caso de sucesso.</p>
+<p>Um clérigo de Mother Night pode conceder a uma criatura permissão para retirar um item do santuário. Contudo, essa permissão não tem efeito se o clérigo estiver sendo manipulado ou coagido.</p></div></div>
+<p>Zuleika está disposta a conceder aos jogadores permissão para levar o <em>Símbolo Sagrado da Estirpe do Corvo</em>—e nenhum outro tesouro—se os jogadores fizerem um juramento a Mother Night de resgatar Emil das masmorras do Castelo Ravenloft e ajudá-lo a reconquistar sua posição de líder da alcateia de Kiril.</p>
+<p>Zuleika avisa aos jogadores que, caso não cumpram seu juramento até a primeira luz da lua após a próxima lua nova, sua vitalidade e força se esvairão a cada noite em que o juramento permanecer não cumprido. (Veja <strong>Juramento da Lua Nova</strong> abaixo para mais detalhes.)</p>
+<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>Juramento da Lua Nova</strong></div><div class="callout-body"><p>Zuleika só está disposta a permitir que os jogadores levem o <em>Símbolo Sagrado da Estirpe do Corvo</em> se todos eles, incluindo quaisquer companheiros NPCs, jurarem o Juramento da Lua Nova diante da estátua de Mother Night.</p>
+<p>A próxima lua nova ocorre em 15 de Neyavr—o sétimo dia após a última lua cheia. A cada vez que a lua nasce após a lua nova, começando ao anoitecer de 16 de Neyavr, cada jogador que fez o juramento sofre os seguintes efeitos: seus pontos de vida máximos são reduzidos em um sétimo de seu máximo original (arredondado para cima), e ganham um -1 cumulativo em testes de habilidade e testes de resistência. (Um personagem morre se esse efeito reduzir seu máximo de pontos de vida a 0. Essas reduções persistem até serem removidas por uma magia de <em>desejo</em> ou magia similar.)</p>
+<p>Um clérigo de Mother Night, incluindo Zuleika, pode usar sua ação para libertar um personagem de seu juramento e remover quaisquer penalidades que tenha sofrido por não cumpri-lo. (Zuleika não fará isso a menos que os jogadores libertem Emil do Castelo Ravenloft.) Essa ação não tem efeito se o clérigo estiver sendo manipulado ou coagido.</p></div></div>
+<p>Se os jogadores concordarem em fazer o juramento de Zuleika e recuperarem o <em>Símbolo Sagrado da Estirpe do Corvo</em>, ele foi revisado da seguinte forma:</p>
+<div class="callout callout-item"><div class="callout-title"><span class="callout-icon">✦</span><strong>Símbolo Sagrado da Estirpe do Corvo</strong></div><div class="callout-body"><p><em>Item maravilhoso, lendário (requer sintonia por uma criatura de alinhamento bom)</em></p>
+<p>O símbolo sagrado tem 5 cargas para as seguintes propriedades. Ele recupera 1d4 + 1 cargas diariamente ao amanhecer.</p>
+<p><strong>_Abraço do Amanhecer._</strong> Como reação, quando uma criatura que você possa ver a até 9 metros de você for reduzida a 0 pontos de vida, você pode gastar 2 cargas para fazer com que essa criatura caia para 1 ponto de vida em vez disso. Essa criatura ganha imunidade a todo dano até o início de seu próximo turno.</p>
+<p><strong>_Luz da Esperança._</strong> Como uma ação, você pode gastar 1 carga e escolher uma criatura que possa ver a até 9 metros de você. Todas as seguintes condições nessa criatura terminam: cego, enfeitiçado, surdo, amedrontado, paralisado, envenenado e atordoado.</p>
+<p><strong>_Bênção do Sol._</strong> Como uma ação, você pode gastar 2 cargas para fazer com que um poder sagrado irradie do símbolo em um raio de 9 metros por 1 minuto. Criaturas não hostis nesse raio causam 1d4 de dano radiante adicional quando acertam com um ataque de arma.</p>
+<p>Você também pode usar o símbolo sagrado como um foco de conjuração para suas magias de clérigo e paladino. Você ganha um bônus de +1 nas jogadas de ataque de magia e nas CDs de teste de resistência de suas magias de clérigo e paladino.</p></div></div>
+<h3 id="o-retorno-de-bianca">O Retorno de Bianca</h3>
+<p>No meio da conversa dos jogadores com Zuleika—antes que os jogadores descubram como libertar Ilya ou obter o <em>Símbolo Sagrado da Estirpe do Corvo</em>—Bianca Stoyanovich desce de <span class="citation">Z8. Anel de Pedra (p. 205)</span>, passa por <span class="citation">Z6. Caverna de Kiril (p. 204)</span>, e se aproxima de <span class="citation">Z7. Santuário de Mother Night (p. 204)</span>.</p>
+<p>Qualquer personagem com uma pontuação passiva de Sabedoria (Percepção) de 18 ou mais ouve Bianca passar pela cortina nos fundos da Caverna de Kiril. Personagens que agirem rapidamente podem se esconder da vista movendo-se ao longo da escada sul e obtendo sucesso em um teste de grupo de Destreza (Furtividade) CD 20. (Em caso de falha, Bianca os confronta no topo da escada sul, bloqueando sua fuga.)</p>
+<p>Se Bianca não perceber os jogadores, ela prossegue da seguinte forma, supondo que os jogadores escutem e não interrompam:</p>
+<ul><li>Ela desce até o santuário e lança um olhar hesitante para Zuleika e Ilya antes de se ajoelhar diante da estátua de Mother Night</li><li>Alguns momentos depois, Zuleika rosna: “Sem estômago para as caçadas de Kiril, Bianca?"</li><li>Bianca se vira para Zuleika e cospe: “Não preciso dos seus insultos. Ainda mais vindos de uma cadela numa jaula."</li><li>Zuleika observa Bianca com simpatia. “Posso estar enjaulada, mas ao menos meu espírito é livre."</li><li>Bianca rosna, se levanta e caminha em direção à jaula de Zuleika, usando sua característica de <strong><em>mudar de forma</em></strong> para assumir sua forma híbrida de pelagem branca. “Também não preciso da sua pena," ela rosna.</li><li>Zuleika faz uma careta. “Não é pena," ela diz. “Apenas as palavras de uma amiga."</li><li>Bianca mostra os dentes e rosna novamente. “Fiz minha escolha. Ele precisa de mim."</li><li>Zuleika segura as barras de sua jaula. “Ele fez sua escolha há muito tempo. Você ainda pode encontrar um caminho diferente."</li><li>Bianca avança em direção à jaula de Zuleika e enrola as garras nas barras, projetando o focinho entre elas. “Eu abri mão de <em>tudo</em> por ele. Você tem alguma ideia do que sacrifiquei para estar aqui?"</li><li>Zuleika encara Bianca sem hesitar. Ela então responde, suavemente, “E você?"</li><li>Bianca se congela, então retoma sua verdadeira forma humana. Ela então se afasta da jaula de Zuleika, faz uma pausa, e diz cansadamente, “Não importa. Nunca importou." Bianca então segue para <span class="citation">Z6. Caverna de Kiril (p. 204)</span>, onde usa sua característica de <strong><em>mudar de forma</em></strong> para assumir sua forma de lobo de pelagem branca, se enrola no chão, e olha vagamente através da caverna.</li></ul>
+<p>Se Bianca perceber e confrontar os jogadores, ou se os jogadores não fizerem esforço algum para se esconder ou escapar, ela exige, em um tom baixo e mortal, que eles deixem o covil imediatamente e nunca retornem. Se não o fizerem, ela ameaça quebrar o _cristal de alarme_ ao redor de seu pescoço, convocando Kiril e o restante da alcateia de volta a Barovia. “Quando Kiril retornar," ela avisa ofegante, “ele vai esfolar vocês vivos."</p>
+<div class="callout callout-item"><div class="callout-title"><span class="callout-icon">✦</span><strong>Cristal de Alarme</strong></div><div class="callout-body"><p>Bianca usa um _cristal de alarme_, que se assemelha a um pequeno enfeite de vidro cristalino amarelo-dourado frágil, em forma de presa de lobo. O cristal possui um vínculo mágico com Kiril, que sabe imediatamente se o cristal foi quebrado.</p></div></div>
+<p>Se os jogadores atacarem Bianca, ela imediatamente estilhaça o cristal. (Veja <strong>O Retorno de Kiril</strong> abaixo para mais informações sobre a chegada de Kiril.) Bianca também estilhaça o cristal se os jogadores não conseguirem distraí-la ou satisfazê-la dentro de um período razoável de tempo. Bianca assume sua forma de lobo e foge se os jogadores continuarem a atacar.</p>
+<p>Os jogadores podem convencer Bianca a recuar com um teste de Carisma (Intimidação) CD 20 bem-sucedido ou, se invocarem seu relacionamento conturbado com Kiril e a tratarem com gentileza, um teste de Carisma (Persuasão) CD 10 bem-sucedido. O teste de Carisma (Persuasão) é automaticamente bem-sucedido se os jogadores tiverem feito amizade com Bianca no Lago Baratok. Em ambos os casos, Bianca não toma nenhuma ação contra os jogadores enquanto eles concluem sua conversa com Ilya e Zuleika, embora ela silenciosamente chame Zuleika e os jogadores de “tolos" por sua desobediência à vontade de Kiril.</p>
+<p>Se perguntada sobre a origem de seu medo, Bianca estremece e diz apenas, “Ele sempre teve um temperamento explosivo. Mas está muito pior do que jamais esteve, e ele está muito mais forte agora do que antes. Se ele voltar e encontrar vocês aqui, vocês não têm ideia do que ele fará com vocês." (Bianca está confiante de que Kiril jamais a feriria. No entanto, ela teme o destino terrível dos jogadores se Kiril retornar e os encontrar, e prefere não ter tais horrores em sua consciência.)</p>
+<h2 id="l4f-o-retorno-de-kiril">L4f. O Retorno de Kiril</h2>
+<p>Se Bianca quebrar o _cristal de alarme_, a alcateia de lobisomens retorna ao covil após 10 minutos. A alcateia inclui dezoito <strong>lobos</strong>, oito <strong>lobisomens</strong>, e <a href="apendice-npcs.html#kiril-stoyanovich">Kiril Stoyanovich</a>.</p>
+<p>Se os jogadores permanecerem no covil, Kiril direciona os lobos e lobisomens para atacá-los, conforme descrito em <a href="arco-q-um-farol-reluzente.html#q5-ataque-da-matilha">Arco Q - Um Farol Reluzente</a>.</p>
+<p>Se os jogadores tiverem deixado o covil, mas não tiverem conseguido esconder seu rastro com magia (ex.: <em>passo sem rastro</em> (<em>pass without trace</em>) ou <em>porta dimensional</em> (<em>dimension door</em>)), Kiril e a alcateia os perseguem. Se os jogadores permanecerem fora dos muros de um assentamento, devem obter sucesso em um teste de grupo de Destreza (Furtividade) CD 19 para escapar da percepção da alcateia. Se a alcateia encontrar os jogadores, Kiril direciona os lobos e lobisomens para atacá-los, conforme descrito em <a href="arco-q-um-farol-reluzente.html#q5-ataque-da-matilha">Arco Q - Um Farol Reluzente</a>.</p>
+<p><strong><em>Marco.</em></strong> Encontrar Ilya e Zuleika completa um marco da história. Se os jogadores escaparem com sucesso do covil dos lobisomens após fazer um acordo com Zuleika, conceda a cada jogador 1.500 XP. Se os jogadores também libertarem Ilya e Zuleika do covil, conceda a cada jogador 250 XP adicionais.</p>
+  </main>
+  <aside class="sidebar-right"><div class="toc-label">Nesta página</div><div class="toc-list"><a class="toc-lvl-1" href="#l1-encontrando-o-covil">L1. Encontrando o Covil</a><a class="toc-lvl-1" href="#l2-lago-baratok">L2. Lago Baratok</a><a class="toc-lvl-1" href="#l3-svalich-woods">L3. Svalich Woods</a><a class="toc-lvl-3" href="#l3a-histórias-ao-redor-da-fogueira">L3a. Histórias ao Redor da Fogueira</a><a class="toc-lvl-1" href="#l4-o-covil-dos-lobisomens">L4. O Covil dos Lobisomens</a><a class="toc-lvl-2" href="#l4a-boca-da-caverna-e-posto-de-guarda">L4a. Boca da Caverna e Posto de Guarda</a><a class="toc-lvl-2" href="#l4b-nascente-subterrânea">L4b. Nascente Subterrânea</a><a class="toc-lvl-2" href="#l4c-covil-dos-lobos">L4c. Covil dos Lobos</a><a class="toc-lvl-2" href="#l4d-cavernas-profundas">L4d. Cavernas Profundas</a><a class="toc-lvl-2" href="#l4e-santuário-de-mother-night">L4e. Santuário de Mother Night</a><a class="toc-lvl-4" href="#o-que-ilya-sabe">O Que Ilya Sabe</a><a class="toc-lvl-3" href="#o-que-zuleika-sabe">O Que Zuleika Sabe</a><a class="toc-lvl-3" href="#o-retorno-de-bianca">O Retorno de Bianca</a><a class="toc-lvl-2" href="#l4f-o-retorno-de-kiril">L4f. O Retorno de Kiril</a></div></aside>
+</div>
+<script>
+document.querySelectorAll('.search-box input').forEach(function(inp){
+  inp.addEventListener('input', function(){
+    var q = inp.value.trim().toLowerCase();
+    var sidebar = inp.closest('.sidebar-left');
+    if (!q) { sidebar.classList.remove('filtering'); return; }
+    sidebar.classList.add('filtering');
+    sidebar.querySelectorAll('.tree .leaf').forEach(function(a){
+      var hit = a.textContent.toLowerCase().indexOf(q) !== -1;
+      a.classList.toggle('match', hit);
+    });
+    sidebar.querySelectorAll('.tree > details').forEach(function(d){
+      var hasMatch = d.querySelector('.leaf.match');
+      d.classList.toggle('has-match', !!hasMatch);
+    });
+  });
+});
+var mobileBtn = document.querySelector('.mobile-topbar button');
+if (mobileBtn) {
+  mobileBtn.addEventListener('click', function(){
+    document.querySelector('.sidebar-left').classList.toggle('open');
+  });
+}
+</script>
+</body>
+</html>

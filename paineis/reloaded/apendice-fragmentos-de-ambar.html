@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1c1c1e">
+<link rel="icon" type="image/svg+xml" href="../../assets/img/favicon.svg">
+<title>Fragmentos de Âmbar — Curse of Strahd: Reloaded</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+* { box-sizing:border-box; }
+:root {
+  --bg:#1c1c1e; --bg-sidebar:#1a1a1c; --bg-hover:#252528; --bg-card:#232325;
+  --border:#333336;
+  --gold:#e0a542; --gold-dim:#b8863a;
+  --active:#a78bfa; --active-dim:#8a6fd8;
+  --text:#dcdcdd; --text-dim:#9a9a9d; --text-faint:#6e6e72;
+  --title:#f2f1ee;
+}
+* { scrollbar-color: #48484c var(--bg-sidebar); scrollbar-width: thin; }
+html, body { margin:0; min-height:100vh; background:var(--bg);
+  font-family:'Inter', system-ui, -apple-system, sans-serif; color:var(--text); }
+a { color:var(--gold); text-decoration:none; }
+a:hover { text-decoration:underline; }
+
+.layout { display:flex; min-height:100vh; align-items:stretch; }
+
+/* ---------- barra lateral esquerda ---------- */
+.sidebar-left { width:290px; flex:0 0 290px; background:var(--bg-sidebar);
+  border-right:1px solid var(--border); padding:22px 18px 40px;
+  position:sticky; top:0; height:100vh; overflow-y:auto; }
+.brand { font-size:19px; font-weight:800; color:var(--gold); line-height:1.25;
+  margin-bottom:14px; text-decoration:none; display:block; }
+.brand:hover { text-decoration:none; opacity:.9; }
+.search-box { position:relative; margin-bottom:16px; }
+.search-box input { width:100%; padding:8px 10px 8px 30px; border-radius:6px;
+  border:1px solid var(--border); background:var(--bg-card); color:var(--text);
+  font-family:inherit; font-size:13px; }
+.search-box input::placeholder { color:var(--text-faint); }
+.search-box input:focus { outline:none; border-color:var(--gold-dim); }
+.search-box .ico { position:absolute; left:9px; top:50%; transform:translateY(-50%);
+  color:var(--text-faint); font-size:13px; pointer-events:none; }
+.tree { font-size:14px; }
+.tree details { margin-bottom:1px; }
+.tree summary { list-style:none; cursor:pointer; padding:6px 8px; border-radius:6px;
+  color:var(--text); display:flex; align-items:center; gap:6px; user-select:none; }
+.tree summary::-webkit-details-marker { display:none; }
+.tree summary:hover { background:var(--bg-hover); }
+.tree summary .chev { display:inline-block; font-size:10px; color:var(--text-faint);
+  transition:transform .15s; width:10px; }
+.tree details[open] > summary .chev { transform:rotate(90deg); }
+.tree .leaf-list { padding-left:20px; margin-top:1px; }
+.tree .leaf { display:block; padding:6px 8px; border-radius:6px; font-size:13.5px;
+  color:var(--text-dim); }
+.tree .leaf:hover { background:var(--bg-hover); color:var(--text); text-decoration:none; }
+.tree .leaf.active { color:var(--active); font-weight:600; background:rgba(167,139,250,.1); }
+.tree .leaf.locked { color:var(--text-faint); cursor:default; font-style:italic; }
+.tree .leaf.locked:hover { background:none; }
+.tree .no-match { display:none; }
+.sidebar-left.filtering .tree .leaf { display:none; }
+.sidebar-left.filtering .tree .leaf.match { display:block; }
+.sidebar-left.filtering .tree details { display:none; }
+.sidebar-left.filtering .tree details.has-match { display:block; }
+.sidebar-left.filtering .tree details.has-match > summary .chev { transform:rotate(90deg); }
+
+/* ---------- coluna central ---------- */
+main.article { flex:1 1 auto; min-width:0; max-width:760px; margin:0 auto;
+  padding:48px 40px 100px; line-height:1.7; font-size:16.5px; }
+.page-title { font-size:clamp(28px,4vw,38px); font-weight:800; color:var(--title);
+  margin:0 0 28px; letter-spacing:-.3px; }
+main.article h1 { color:var(--gold); font-size:26px; font-weight:700;
+  margin:36px 0 14px; scroll-margin-top:24px; letter-spacing:-.2px; }
+main.article h1:first-child { margin-top:0; }
+main.article h2 { color:var(--gold); font-size:21px; font-weight:700;
+  margin:30px 0 12px; scroll-margin-top:24px; }
+main.article h3 { color:var(--title); font-size:18px; font-weight:700;
+  margin:24px 0 10px; scroll-margin-top:24px; }
+main.article h4 { color:var(--text-dim); font-size:14px; font-weight:700;
+  text-transform:uppercase; letter-spacing:.5px; margin:20px 0 8px; scroll-margin-top:24px; }
+main.article p { margin:0 0 15px; color:var(--text); }
+main.article ul { margin:0 0 15px; padding-left:24px; }
+main.article li { margin-bottom:6px; }
+main.article a { border-bottom:1px solid rgba(224,165,66,.35); }
+main.article a:hover { border-bottom-color:var(--gold); text-decoration:none; }
+main.article em { color:var(--text); font-style:italic; }
+main.article strong { color:var(--title); font-weight:700; }
+main.article hr { border:0; border-top:1px solid var(--border); margin:20px 0; }
+.link-pending { color:var(--text-faint); font-style:italic; border-bottom:1px dotted var(--text-faint); cursor:default; }
+.reloaded-img { max-width:100%; border-radius:8px; border:1px solid var(--border); margin:16px 0; display:block; }
+
+span.citation { font-style:italic; color:var(--text-dim); }
+span.highlight { color:var(--gold); font-weight:600; }
+span.credit { font-size:12px; color:var(--text-faint); display:block; margin-top:4px; }
+
+div.description { background:var(--bg-card); border-left:3px solid var(--active-dim);
+  border-radius:0 8px 8px 0; padding:16px 20px; margin:18px 0; font-style:italic; color:var(--text); }
+div.description p:last-child { margin-bottom:0; }
+
+.callout { border:1px solid var(--border); border-left:4px solid var(--gold-dim);
+  border-radius:0 8px 8px 0; background:rgba(224,165,66,.06); margin:18px 0; padding:14px 18px; }
+.callout-title { font-weight:700; color:var(--gold); font-size:13px; letter-spacing:.3px;
+  text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+.callout-icon { font-size:14px; }
+.callout-body p:last-child { margin-bottom:0; }
+.callout-body { font-size:16px; }
+.callout-warning { border-left-color:#e2645a; background:rgba(226,100,90,.08); }
+.callout-warning .callout-title { color:#f08078; }
+.callout-combat { border-left-color:#e2645a; background:rgba(226,100,90,.1); }
+.callout-combat .callout-title { color:#f08078; }
+.callout-lore, .callout-abstract { border-left-color:#5f9bd8; background:rgba(95,155,216,.08); }
+.callout-lore .callout-title, .callout-abstract .callout-title { color:#7fb4e8; }
+.callout-profile { border-left-color:var(--active-dim); background:rgba(167,139,250,.08); }
+.callout-profile .callout-title { color:var(--active); }
+.callout-item { border-left-color:#4fb86a; background:rgba(79,184,106,.08); }
+.callout-item .callout-title { color:#6fce88; }
+.callout-design { border-left-color:var(--text-faint); background:rgba(158,158,162,.06); }
+.callout-design .callout-title { color:var(--text-dim); }
+.callout-tip { border-left-color:var(--gold); }
+
+.table-wrap { overflow-x:auto; margin:18px 0; }
+table.md-table { border-collapse:collapse; width:100%; font-size:15px; }
+table.md-table th, table.md-table td { border:1px solid var(--border); padding:8px 11px; text-align:left; }
+table.md-table th { background:var(--bg-card); color:var(--gold); font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; }
+
+div.statblock { background:var(--bg-card); border:1px solid var(--border);
+  border-left:3px solid var(--active-dim); border-radius:8px; padding:18px 22px; margin:20px 0; }
+div.statblock h2 { color:var(--title); font-size:20px; font-weight:800; margin:0 0 2px; }
+div.statblock > em:first-of-type { display:block; font-style:italic; color:var(--text-dim); margin-bottom:10px; }
+div.statblock hr { border-top:1px solid var(--border); margin:11px 0; }
+div.statblock h3 { color:var(--gold); font-size:14px; font-weight:700;
+  text-transform:uppercase; letter-spacing:.5px; margin:16px 0 7px; }
+div.statblock p { margin:0 0 9px; font-size:15px; }
+div.statblock table.ability-table { width:100%; border-collapse:collapse; margin:9px 0; }
+div.statblock table.ability-table th, div.statblock table.ability-table td {
+  border:1px solid var(--border); text-align:center; padding:6px 4px; font-size:14px; }
+div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-weight:700; }
+
+/* ---------- coluna direita: sumario ---------- */
+.sidebar-right { width:250px; flex:0 0 250px; padding:48px 20px 40px 0;
+  position:sticky; top:0; height:100vh; overflow-y:auto; }
+.toc-label { font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+  color:var(--text-faint); margin-bottom:12px; }
+.toc-list { font-size:13px; }
+.toc-list a { display:block; padding:4px 0; color:var(--text-dim); border-bottom:none;
+  line-height:1.4; }
+.toc-list a:hover { color:var(--text); text-decoration:none; }
+.toc-lvl-1 { padding-left:0; font-weight:600; }
+.toc-lvl-2 { padding-left:12px; }
+.toc-lvl-3 { padding-left:24px; }
+.toc-lvl-4 { padding-left:36px; font-size:12px; }
+
+/* ---------- pagina indice ---------- */
+.idx-intro { margin-bottom:8px; }
+.idx-intro h1 { font-size:clamp(26px,4vw,36px); font-weight:800; color:var(--gold); margin-bottom:10px; }
+.idx-intro p { color:var(--text-dim); font-size:15px; max-width:640px; }
+.idx-section { margin:34px 0; }
+.idx-section-title { font-size:13px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+  color:var(--text-dim); border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:14px; }
+.idx-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:12px; }
+.idx-card { display:block; background:var(--bg-card); border:1px solid var(--border);
+  border-radius:8px; padding:14px 16px; font-weight:600; font-size:14.5px; color:var(--text);
+  transition:border-color .15s, transform .15s; }
+.idx-card:hover { border-color:var(--gold-dim); transform:translateY(-2px); text-decoration:none; }
+.idx-card.locked { opacity:.45; cursor:default; border-style:dashed; }
+.idx-card.locked:hover { transform:none; }
+.idx-badge { display:block; margin-top:5px; font-size:10px; letter-spacing:.5px; text-transform:uppercase; color:var(--text-faint); font-weight:400; }
+
+/* ---------- mobile ---------- */
+.mobile-topbar { display:none; }
+@media (max-width:1100px) {
+  .sidebar-right { display:none; }
+}
+@media (max-width:860px) {
+  .layout { flex-direction:column; }
+  .mobile-topbar { display:flex; align-items:center; gap:12px; position:sticky; top:0; z-index:40;
+    background:var(--bg-sidebar); border-bottom:1px solid var(--border); padding:12px 16px; }
+  .mobile-topbar .brand { margin:0; font-size:15px; flex:1; }
+  .mobile-topbar button { background:none; border:1px solid var(--border); color:var(--text);
+    border-radius:6px; padding:6px 10px; font-family:inherit; font-size:13px; }
+  .sidebar-left { position:fixed; left:0; top:49px; bottom:0; z-index:39; transform:translateX(-100%);
+    transition:transform .2s; width:82vw; max-width:320px; box-shadow:8px 0 30px rgba(0,0,0,.5); }
+  .sidebar-left.open { transform:translateX(0); }
+  main.article { padding:28px 18px 70px; max-width:100%; }
+}
+</style>
+</head>
+<body>
+<div class="mobile-topbar">
+  <button aria-label="Abrir menu">☰</button>
+  <a class="brand" href="index.html">Curse of Strahd: Reloaded</a>
+</div>
+<div class="layout">
+  <aside class="sidebar-left">
+    <a class="brand" href="index.html">Curse of Strahd:<br>Reloaded</a>
+    <div class="search-box"><span class="ico">🔍</span><input type="text" placeholder="Buscar página..." aria-label="Buscar página"></div>
+    <nav class="tree"><details><summary><span class="chev">▸</span>Introdução</summary><div class="leaf-list"><a class="leaf" href="introducao-usando-este-guia.html">Usando Este Guia</a><a class="leaf" href="introducao-guia-do-mestre.html">Guia do Mestre</a><a class="leaf" href="introducao-changelog.html">Changelog</a></div></details><details><summary><span class="chev">▸</span>Capítulo 1 — Iniciando a Campanha</summary><div class="leaf-list"><a class="leaf" href="cap1-sessao-zero.html">Sessão Zero</a><a class="leaf" href="cap1-criacao-de-personagem.html">Criação de Personagem</a></div></details><details><summary><span class="chev">▸</span>Capítulo 2 — A Terra de Barovia</summary><div class="leaf-list"><a class="leaf" href="cap2-lore-de-barovia.html">Lore de Barovia</a><a class="leaf" href="cap2-historia-de-barovia.html">História de Barovia</a><a class="leaf" href="cap2-strahd-von-zarovich.html">Strahd von Zarovich</a></div></details><details><summary><span class="chev">▸</span>Capítulo 3 — Conduzindo o Jogo</summary><div class="leaf-list"><a class="leaf" href="cap3-resumo-da-aventura.html">Resumo da Aventura</a><a class="leaf" href="cap3-conduzindo-a-aventura.html">Conduzindo a Aventura</a></div></details><details><summary><span class="chev">▸</span>Ato I — Adentrando as Névoas</summary><div class="leaf-list"><a class="leaf" href="ato1-resumo.html">Resumo do Ato I</a><a class="leaf" href="arco-a-fuga-da-death-house.html">Arco A — Fuga da Death House</a><a class="leaf" href="arco-b-bem-vindo-a-barovia.html">Arco B — Bem-vindo a Barovia</a><a class="leaf" href="arco-c-adentrando-o-vale.html">Arco C — Adentrando o Vale</a></div></details><details><summary><span class="chev">▸</span>Ato II — A Cidade Sombria</summary><div class="leaf-list"><a class="leaf" href="ato2-resumo.html">Resumo do Ato II</a><a class="leaf" href="arco-d-a-festa-de-st-andral.html">Arco D — A Festa de St. Andral</a><a class="leaf" href="arco-e-a-vistana-desaparecida.html">Arco E — A Vistana Desaparecida</a><a class="leaf" href="arco-f-o-desejo-de-lady-wachter.html">Arco F — O Desejo de Lady Wachter</a><a class="leaf" href="arco-g-os-irmaos-strazni.html">Arco G — Os Irmãos Strazni</a><a class="leaf" href="arco-h-a-alma-perdida.html">Arco H — A Alma Perdida</a><a class="leaf" href="arco-i-as-muralhas-de-krezk.html">Arco I — As Muralhas de Krezk</a></div></details><details><summary><span class="chev">▸</span>Ato III — A Terra Partida</summary><div class="leaf-list"><a class="leaf" href="ato3-resumo.html">Resumo do Ato III</a><a class="leaf" href="arco-j-a-gema-roubada.html">Arco J — A Gema Roubada</a><a class="leaf" href="arco-k-a-abadia-decaida.html">Arco K — A Abadia Decaída</a><a class="leaf" href="arco-l-o-covil-dos-lobos.html">Arco L — O Covil dos Lobos</a><a class="leaf" href="arco-m-a-mansao-do-dragao.html">Arco M — A Mansão do Dragão</a><a class="leaf" href="arco-o-jantar-com-o-diabo.html">Arco O — Jantar com o Diabo</a><a class="leaf" href="arco-p-o-assalto-a-ravenloft.html">Arco P — O Assalto a Ravenloft</a><a class="leaf" href="arco-q-um-farol-reluzente.html">Arco Q — Um Farol Reluzente</a></div></details><details><summary><span class="chev">▸</span>Ato IV — Segredos do Ancião</summary><div class="leaf-list"><a class="leaf" href="ato4-resumo.html">Resumo do Ato IV</a><a class="leaf" href="arco-r-provacoes-da-montanha.html">Arco R — Provações da Montanha</a><a class="leaf" href="arco-s-uma-espada-de-luz-solar.html">Arco S — Uma Espada de Luz Solar</a><a class="leaf" href="arco-t-os-tres-fanes.html">Arco T — Os Três Fanes</a><a class="leaf" href="arco-u-sonhos-da-alvorada.html">Arco U — Sonhos da Alvorada</a><a class="leaf" href="ato4-epilogo.html">Epílogo</a></div></details><details open><summary><span class="chev">▸</span>Apêndices</summary><div class="leaf-list"><a class="leaf active" href="apendice-fragmentos-de-ambar.html">Fragmentos de Âmbar</a><a class="leaf" href="apendice-bestiario.html">Bestiário</a><a class="leaf" href="apendice-glossario.html">Glossário</a><a class="leaf" href="apendice-npcs.html">Personagens Não Jogadores</a></div></details></nav>
+    <div style="margin-top:18px"><a href="../painel_barovia_dnd5e.html" style="font-size:12px;color:var(--text-faint)">← Voltar ao Painel</a></div>
+  </aside>
+  <main class="article">
+    <div class="page-title">Fragmentos de Âmbar</div>
+<p>Ao longo da aventura, os jogadores terão a oportunidade de obter um ou mais <em>cacos de âmbar</em> — fragmentos dos sarcófagos de âmbar que aprisionam os vestígios do Templo de Âmbar.</p>
+<p>Embora não carreguem toda a essência dos vestígios, cada caco de âmbar carrega uma ligação psíquica com o sarcófago do qual veio. Através dessa ligação, um vestígio pode sussurrar para quem segura o caco, oferecendo promessas de poder em troca de uma descida à corrupção.</p>
+<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>Encontrando Cacos de Âmbar</strong></div><div class="callout-body"><p>Os jogadores têm a oportunidade de obter um caco de âmbar:</p>
+<ul><li>durante a <a href="cap1-criacao-de-personagem.html">Criação de Personagem</a></li><li>após derrotar Izek Strazni em <a href="arco-f-o-desejo-de-lady-wachter.html">Arco F - O Desejo de Lady Wachter</a> / <a href="arco-g-os-irmaos-strazni.html">Arco G - Os Irmãos Strazni</a> (veja <a href="#seriach-o-sussurrador-de-cães-infernais">Seriach, o Sussurrador de Cães Infernais</a>)</li><li>após saquear o tesouro do Castelo Ravenloft em <a href="arco-p-o-assalto-a-ravenloft.html">Arco P - O Assalto a Ravenloft</a> (veja <a href="#grande-taar-haak-o-destruidor-de-cinco-cabeças">Grande Taar Haak, o Destruidor de Cinco Cabeças</a>)</li><li>seguindo Scorilo se ele perder a disputa de fanfarronice em <a href="arco-r-provacoes-da-montanha.html">Arco R - As Provações da Montanha</a> (veja <a href="#zrin-hala-a-tempestade-uivante">Zrin-Hala, a Tempestade Uivante</a>)</li><li>após derrotar os bodaks em <a href="arco-r-provacoes-da-montanha.html">Arco R - As Provações da Montanha</a> (veja <a href="#sykane-o-devorador-de-almas">Sykane, o Devorador de Almas</a>)</li><li>dentro da <a href="arco-r-provacoes-da-montanha.html#a-caverna-de-adagas">Caverna das Adagas</a> (veja <a href="#yog-o-invencível">Yog, o Invencível</a>)</li><li>do <strong>nothic</strong> Meda em <a href="arco-s-uma-espada-de-luz-solar.html">Arco S - Uma Espada de Luz Solar</a> (veja <a href="#khirad-a-estrela-dos-segredos">Khirad, a Estrela dos Segredos</a>)</li></ul>
+<p>Você não deve, no entanto, adicionar cacos extras para os jogadores obterem.</p></div></div>
+<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>A Magia dos Cacos</strong></div><div class="callout-body"><p>Um jogador que examinar um caco de âmbar com a magia <em>detectar magia</em> (<em>detect magic</em>) percebe traços de magia de abjuração. Um jogador que tentar identificar um caco com a magia <em>identificar</em> (<em>identify</em>) descobre que ele já fez parte de uma estrutura maior destinada a conter ou aprisionar alguma entidade ou criatura, e que ainda retém alguma ligação arcana com o recipiente original.</p></div></div>
+<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>Por Que Âmbar?</strong></div><div class="callout-body"><p>Um jogador que for bem-sucedido num teste de Inteligência (Arcanismo) CD 15 se lembra de que o âmbar tem uma propriedade mágica única: é um "isolante" mágico, e não pode ser danificado ou atravessado por nenhum tipo de energia, seja mágica ou divina. Com um resultado de 20 ou mais, o jogador também se lembra de que energias mágicas só conseguem atravessar o âmbar muito lentamente, numa escala de anos a décadas.</p></div></div>
+<h1 id="estágio-um">Estágio Um</h1>
+<p>Neste estágio, o jogador é apenas um possuidor do caco de âmbar, provavelmente sem saber do verdadeiro poder que ele oferece.</p>
+<p>Na primeira vez em que o jogador é reduzido a 0 pontos de vida e cai inconsciente enquanto possui o caco, uma silhueta sombria aparece a ele numa visão e se oferece para ajudá-lo a escapar do espectro da morte e retornar à luta. A silhueta não menciona nenhum preço, e permanece em silêncio a menos que o jogador aceite sua oferta.</p>
+<p>Se o jogador aceitar, ele recupera todos os seus pontos de vida. O jogador então avança para o Estágio Dois da corrupção do caco. Se ele recusar, o vestígio não aparece a ele novamente, a menos que o jogador caia inconsciente numa situação particularmente terrível.</p>
+<h1 id="estágio-dois">Estágio Dois</h1>
+<p>Neste estágio, o jogador está ciente do poder antinatural do caco, mas é incapaz de contatar o vestígio para obter mais ajuda.</p>
+<p>Na primeira vez em que o jogador é reduzido à metade ou menos do seu total de pontos de vida enquanto está em combate, a voz da silhueta fala em sua mente. O vestígio se oferece para conceder ao jogador o poder de abater seus inimigos. Se o jogador recusar a oferta da voz, o vestígio não o contata novamente, a menos que o jogador seja reduzido à metade ou menos do seu total de pontos de vida enquanto luta contra um inimigo que ele particularmente odeia.</p>
+<p>Se o jogador aceitar, ele ganha uma quantidade de pontos de vida temporários igual a duas vezes seu bônus de proficiência no início de cada um dos seus turnos, por 1 minuto. Durante esse tempo, o jogador também pode conjurar uma magia específica uma vez como uma ação bônus, sem gastar um espaço de magia e sem componentes, conforme indicado na seção <strong>Corrupção de Âmbar</strong> abaixo. (O bônus de ataque da magia é +7, e a CD de resistência à magia é 15.)</p>
+<p>Ao conceder essas dádivas, a voz do vestígio convida o jogador a se comunicar com seu caco caso deseje obter o poder que busca. O jogador então avança para o Estágio Três da corrupção do caco.</p>
+<h1 id="estágio-três">Estágio Três</h1>
+<p>Neste estágio, o jogador provou do poder sobrenatural do caco e deseja buscá-lo ainda mais.</p>
+<p>O jogador consegue se comunicar com o vestígio meditando por 1 minuto enquanto concentra seus pensamentos no caco. A voz do vestígio então fala em sua mente, oferecendo-lhe uma dádiva permanente como um presente, e como uma amostra do poder total que ele pode obter caso viaje até o lar do vestígio no Templo de Âmbar.</p>
+<p>Se o jogador aceitar, ele ganha os seguintes efeitos:</p>
+<ul><li>Ele ganha uma dádiva específica, conforme indicado na seção <strong>Corrupção de Âmbar</strong> abaixo. </li><li>Ele pode continuar a conjurar a magia daquele vestígio uma vez por dia. Cada vez que o fizer, ganha um número de níveis de exaustão igual ao número de vezes que já conjurou a magia. Esse número só é reiniciado se o jogador passar três dias completos sem conjurar a magia do vestígio. (Por exemplo, se um jogador conjurar a magia <em>nuvem fétida</em> de Fekre dois dias seguidos, ele recebe um nível de exaustão no primeiro dia e dois níveis de exaustão no segundo dia. Se o jogador esperar três dias antes de conjurar a magia novamente, receberá apenas um nível de exaustão por isso; caso contrário, receberá três níveis adicionais de exaustão.)</li><li>Ele sofre uma condição específica, conforme indicado na mesma seção abaixo. A condição é incurável sem a ajuda de uma magia de <em>restauração maior</em> ou magia semelhante. (Um jogador também pode receber a cura de St. Markovia em <a href="arco-q-um-farol-reluzente.html">Arco Q - Um Farol Reluzente</a>.) Se a condição for curada, o jogador também perde todos os dons do vestígio, incluindo sua magia e dádiva.</li></ul>
+<p>Se o jogador perguntar ao vestígio sobre a condição, o vestígio o informa de que a condição é um subproduto da conexão imperfeita forjada pelos cacos. Ele convida o jogador ao Templo de Âmbar para receber o dom completo do vestígio e completar sua transformação.</p>
+<p>Se o jogador recusar a oferta da voz, ele pode se comunicar com o vestígio novamente a qualquer momento posterior, repetindo o mesmo processo.</p>
+<h1 id="corrupção-de-âmbar">Corrupção de Âmbar</h1>
+<h2 id="fekre-rainha-das-pragas">Fekre, Rainha das Pragas</h2>
+<p><strong><em>Magia.</em></strong> _Nuvem Fétida_ (_Stinking Cloud_).</p>
+<p><strong><em>Dádiva.</em></strong> Quando você causa um acerto crítico, pode forçar o alvo a ser bem-sucedido num teste de resistência de Constituição ou ficar envenenado. O alvo pode repetir o teste de resistência ao final de cada um dos seus turnos, encerrando o efeito em caso de sucesso.</p>
+<p><strong><em>Condição.</em></strong> Seu corpo fica coberto de furúnculos e pústulas. Outras criaturas têm desvantagem em testes de Sabedoria (Medicina) feitos para estabilizá-lo.</p>
+<h2 id="zrin-hala-a-tempestade-uivante">Zrin-Hala, a Tempestade Uivante</h2>
+<p><em>Localização do Caco: Soldav</em></p>
+<p><strong><em>Magia.</em></strong> _Raio_ (_Lightning Bolt_).</p>
+<p><strong><em>Dádiva.</em></strong> Quando você causa um acerto crítico, pode forçar o alvo a ser bem-sucedido num teste de resistência de Constituição ou ficar paralisado até o início do seu próximo turno.</p>
+<p><strong><em>Condição.</em></strong> Um lado do seu rosto fica flácido e perde toda a sensibilidade. Você tem desvantagem em testes de Carisma (Persuasão).</p>
+<h2 id="sykane-o-devorador-de-almas">Sykane, o Devorador de Almas</h2>
+<p><em>Localização do Caco: Tsolenka Pass</em></p>
+<p><strong><em>Magia.</em></strong> _Guardiões Espirituais_ (_Spirit Guardians_) (necrótico).</p>
+<p><strong><em>Dádiva.</em></strong> Você faz testes de resistência contra a morte com vantagem, e tem vantagem em testes de Sabedoria (Medicina) feitos para estabilizar outras criaturas.</p>
+<p><strong><em>Condição.</em></strong> Seus olhos brilham num amarelo doentio. Você tem desvantagem em testes de Carisma (Enganação).</p>
+<h2 id="savnok-o-inescrutável">Savnok, o Inescrutável</h2>
+<p><strong><em>Magia.</em></strong> _Invisibilidade Maior_ (_Greater Invisibility_).</p>
+<p><strong><em>Dádiva.</em></strong> Você tem vantagem em testes de Carisma (Enganação).</p>
+<p><strong><em>Condição.</em></strong> Seus olhos se derretem, deixando órbitas vazias que ainda conseguem enxergar. Você tem desvantagem em testes de Sabedoria (Percepção).</p>
+<h2 id="tarakamedes-o-wyrm-da-sepultura">Tarakamedes, o Wyrm da Sepultura</h2>
+<p><strong><em>Magia.</em></strong> _Voar_ (_Fly_).</p>
+<p><strong><em>Dádiva.</em></strong> Enquanto estiver no ar, você ganha um deslocamento de voo igual ao seu deslocamento a pé. No entanto, você não pode usar esse deslocamento para ganhar altitude, e desce 30 centímetros a cada 3 metros de distância horizontal percorrida.</p>
+<p><strong><em>Condição.</em></strong> Asas esqueléticas malformadas brotam das suas costas. Você precisa comer ossos ou terra de sepultura para sobreviver. Ao amanhecer, se você não tiver comido pelo menos meio quilo de ossos ou terra de sepultura nas últimas 24 horas, ganha 1 nível de exaustão.</p>
+<h2 id="shami-amourae-a-dama-dos-deleites">Shami-Amourae, a Dama dos Deleites</h2>
+<p><strong><em>Magia.</em></strong> _Sugestão_ (_Suggestion_).</p>
+<p><strong><em>Dádiva.</em></strong> Você tem vantagem em testes de Carisma (Persuasão).</p>
+<p><strong><em>Condição.</em></strong> Você ganha um dedo extra em cada mão. Você tem desvantagem em testes de resistência de Constituição contra veneno, magias e efeitos mágicos.</p>
+<h2 id="drizlash-a-aranha-de-nove-olhos">Drizlash, a Aranha de Nove Olhos</h2>
+<p><strong><em>Magia.</em></strong> _Teia_ (_Web_).</p>
+<p><strong><em>Dádiva.</em></strong> Você pode escalar superfícies difíceis, inclusive de cabeça para baixo em tetos, sem precisar fazer um teste de habilidade.</p>
+<p><strong><em>Condição.</em></strong> Você desenvolve um olho extra em algum lugar do corpo, que é cego e nunca se abre. Você tem desvantagem em testes de Sabedoria (Intuição).</p>
+<h2 id="dahlver-nar-aquele-dos-muitos-dentes">Dahlver-Nar, Aquele dos Muitos Dentes</h2>
+<p><strong><em>Magia.</em></strong> _Metamorfose_ (_Polymorph_).</p>
+<p><strong><em>Dádiva.</em></strong> Quando você seria reduzido a 0 pontos de vida, pode usar sua reação para ficar com 1 ponto de vida em vez disso e ganhar 1 nível de exaustão.</p>
+<p><strong><em>Condição.</em></strong> Você perde todos os seus dentes. Você tem desvantagem em testes de Carisma (Persuasão).</p>
+<h2 id="zantras-o-fazedor-de-reis">Zantras, o Fazedor de Reis</h2>
+<p><strong><em>Magia.</em></strong> _Encantar Monstro_ (_Charm Monster_).</p>
+<p><strong><em>Dádiva.</em></strong> Você tem vantagem em testes de Carisma (Persuasão).</p>
+<p><strong><em>Condição.</em></strong> Sua pele fica vermelha e seus dentes se tornam pontas afiadas. Você tem desvantagem em testes de resistência de Sabedoria.</p>
+<h2 id="delban-a-estrela-do-gelo-e-do-ódio">Delban, a Estrela do Gelo e do Ódio</h2>
+<p><strong><em>Magia.</em></strong> _Fome de Hadar_ (_Hunger of Hadar_).</p>
+<p><strong><em>Dádiva.</em></strong> Quando você causa um acerto crítico, pode forçar o alvo a ser bem-sucedido num teste de resistência de Força ou ficar impedido pelo gelo até o final do seu próximo turno.</p>
+<p><strong><em>Condição.</em></strong> Sua pele fica azul-gelo e quebradiça. Você tem desvantagem em testes de Força.</p>
+<h2 id="khirad-a-estrela-dos-segredos">Khirad, a Estrela dos Segredos</h2>
+<p><em>Localização do Caco: o Templo de Âmbar</em></p>
+<p><strong><em>Magia.</em></strong> _Assassino Fantasmagórico_ (_Phantasmal Killer_).</p>
+<p><strong><em>Dádiva.</em></strong> Você tem vantagem em testes de Inteligência.</p>
+<p><strong><em>Condição.</em></strong> Sua voz se torna um sussurro baixo, e sua boca fica congelada num sorriso perpétuo. Você é incapaz de gritar ou falar alto.</p>
+<h2 id="yrrga-o-olho-das-sombras">Yrrga, o Olho das Sombras</h2>
+<p><strong><em>Magia.</em></strong> _Cegueira/Surdez_ (_Blindness/Deafness_).</p>
+<p><strong><em>Dádiva.</em></strong> Quando você causa um acerto crítico, pode forçar o alvo a ser bem-sucedido num teste de resistência de Constituição ou ficar cego. O alvo pode repetir esse teste de resistência ao final de cada um dos seus turnos, encerrando o efeito em caso de sucesso.</p>
+<p><strong><em>Condição.</em></strong> Seus olhos se tornam vazios estrelados. Você tem desvantagem em testes de Sabedoria (Percepção).</p>
+<h2 id="grande-taar-haak-o-destruidor-de-cinco-cabeças">Grande Taar Haak, o Destruidor de Cinco Cabeças</h2>
+<p><em>Localização do Caco: Castelo Ravenloft</em></p>
+<p><strong><em>Magia.</em></strong> _Tremor da Terra_ (_Earth Tremor_) (no 5º círculo).</p>
+<p><strong><em>Dádiva.</em></strong> Você tem vantagem em testes de Força.</p>
+<p><strong><em>Condição.</em></strong> Sua cabeça fica cheia de nódulos e disforme. Você tem desvantagem em testes de Inteligência.</p>
+<h2 id="yog-o-invencível">Yog, o Invencível</h2>
+<p><em>Localização do Caco: Tsolenka Pass</em></p>
+<p><strong><em>Magia.</em></strong> _Pele de Pedra_ (_Stoneskin_).</p>
+<p><strong><em>Dádiva.</em></strong> Seu total máximo de pontos de vida aumenta numa quantidade igual ao seu bônus de proficiência.</p>
+<p><strong><em>Condição.</em></strong> Uma pelagem negra e oleosa cobre seu rosto e corpo. Você tem desvantagem em testes feitos para escapar de um agarrão.</p>
+<h2 id="norganas-o-dedo-do-esquecimento">Norganas, o Dedo do Esquecimento</h2>
+<p><em>Localização do Caco: Death House</em></p>
+<p><strong><em>Magia.</em></strong> _Rogar Praga_ (_Bestow Curse_) (no 5º círculo).</p>
+<p><strong><em>Dádiva.</em></strong> Quando uma criatura que você pode ver a até 9 metros de você é reduzida a 0 pontos de vida, você pode usar sua reação para ganhar pontos de vida temporários iguais ao seu bônus de proficiência.</p>
+<p><strong><em>Condição.</em></strong> Seu sangue fica preto como piche e viscoso, como alcatrão. Se você fosse recuperar Dados de Vida após terminar um descanso longo, você recupera um Dado de Vida a menos.</p>
+<h2 id="vaund-o-evasivo">Vaund, o Evasivo</h2>
+<p><strong><em>Magia.</em></strong> _Borrão_ (_Blur_).</p>
+<p><strong><em>Dádiva.</em></strong> Você tem vantagem em testes de resistência de Destreza contra efeitos que você pode ver, como armadilhas e magias.</p>
+<p><strong><em>Condição.</em></strong> Você fica trêmulo e nervoso. Você tem desvantagem em testes de Carisma (Enganação).</p>
+<h2 id="seriach-o-sussurrador-de-cães-infernais">Seriach, o Sussurrador de Cães Infernais</h2>
+<p><em>Localização do Caco: Izek Strazni</em></p>
+<p><strong><em>Magia.</em></strong> _Raio Abrasador_ (_Scorching Ray_).</p>
+<p><strong><em>Dádiva.</em></strong> Você ganha resistência a dano de fogo.</p>
+<p><strong><em>Condição.</em></strong> A pele do seu braço esquerdo fica vermelho-carmesim e ganha espinhos farpados, dedos alongados e unhas compridas. Você tem desvantagem em testes de resistência de Sabedoria.</p>
+  </main>
+  <aside class="sidebar-right"><div class="toc-label">Nesta página</div><div class="toc-list"><a class="toc-lvl-1" href="#estágio-um">Estágio Um</a><a class="toc-lvl-1" href="#estágio-dois">Estágio Dois</a><a class="toc-lvl-1" href="#estágio-três">Estágio Três</a><a class="toc-lvl-1" href="#corrupção-de-âmbar">Corrupção de Âmbar</a><a class="toc-lvl-2" href="#fekre-rainha-das-pragas">Fekre, Rainha das Pragas</a><a class="toc-lvl-2" href="#zrin-hala-a-tempestade-uivante">Zrin-Hala, a Tempestade Uivante</a><a class="toc-lvl-2" href="#sykane-o-devorador-de-almas">Sykane, o Devorador de Almas</a><a class="toc-lvl-2" href="#savnok-o-inescrutável">Savnok, o Inescrutável</a><a class="toc-lvl-2" href="#tarakamedes-o-wyrm-da-sepultura">Tarakamedes, o Wyrm da Sepultura</a><a class="toc-lvl-2" href="#shami-amourae-a-dama-dos-deleites">Shami-Amourae, a Dama dos Deleites</a><a class="toc-lvl-2" href="#drizlash-a-aranha-de-nove-olhos">Drizlash, a Aranha de Nove Olhos</a><a class="toc-lvl-2" href="#dahlver-nar-aquele-dos-muitos-dentes">Dahlver-Nar, Aquele dos Muitos Dentes</a><a class="toc-lvl-2" href="#zantras-o-fazedor-de-reis">Zantras, o Fazedor de Reis</a><a class="toc-lvl-2" href="#delban-a-estrela-do-gelo-e-do-ódio">Delban, a Estrela do Gelo e do Ódio</a><a class="toc-lvl-2" href="#khirad-a-estrela-dos-segredos">Khirad, a Estrela dos Segredos</a><a class="toc-lvl-2" href="#yrrga-o-olho-das-sombras">Yrrga, o Olho das Sombras</a><a class="toc-lvl-2" href="#grande-taar-haak-o-destruidor-de-cinco-cabeças">Grande Taar Haak, o Destruidor de Cinco Cabeças</a><a class="toc-lvl-2" href="#yog-o-invencível">Yog, o Invencível</a><a class="toc-lvl-2" href="#norganas-o-dedo-do-esquecimento">Norganas, o Dedo do Esquecimento</a><a class="toc-lvl-2" href="#vaund-o-evasivo">Vaund, o Evasivo</a><a class="toc-lvl-2" href="#seriach-o-sussurrador-de-cães-infernais">Seriach, o Sussurrador de Cães Infernais</a></div></aside>
+</div>
+<script>
+document.querySelectorAll('.search-box input').forEach(function(inp){
+  inp.addEventListener('input', function(){
+    var q = inp.value.trim().toLowerCase();
+    var sidebar = inp.closest('.sidebar-left');
+    if (!q) { sidebar.classList.remove('filtering'); return; }
+    sidebar.classList.add('filtering');
+    sidebar.querySelectorAll('.tree .leaf').forEach(function(a){
+      var hit = a.textContent.toLowerCase().indexOf(q) !== -1;
+      a.classList.toggle('match', hit);
+    });
+    sidebar.querySelectorAll('.tree > details').forEach(function(d){
+      var hasMatch = d.querySelector('.leaf.match');
+      d.classList.toggle('has-match', !!hasMatch);
+    });
+  });
+});
+var mobileBtn = document.querySelector('.mobile-topbar button');
+if (mobileBtn) {
+  mobileBtn.addEventListener('click', function(){
+    document.querySelector('.sidebar-left').classList.toggle('open');
+  });
+}
+</script>
+</body>
+</html>

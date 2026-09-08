@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1c1c1e">
+<link rel="icon" type="image/svg+xml" href="../../assets/img/favicon.svg">
+<title>Epílogo — Curse of Strahd: Reloaded</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+* { box-sizing:border-box; }
+:root {
+  --bg:#1c1c1e; --bg-sidebar:#1a1a1c; --bg-hover:#252528; --bg-card:#232325;
+  --border:#333336;
+  --gold:#e0a542; --gold-dim:#b8863a;
+  --active:#a78bfa; --active-dim:#8a6fd8;
+  --text:#dcdcdd; --text-dim:#9a9a9d; --text-faint:#6e6e72;
+  --title:#f2f1ee;
+}
+* { scrollbar-color: #48484c var(--bg-sidebar); scrollbar-width: thin; }
+html, body { margin:0; min-height:100vh; background:var(--bg);
+  font-family:'Inter', system-ui, -apple-system, sans-serif; color:var(--text); }
+a { color:var(--gold); text-decoration:none; }
+a:hover { text-decoration:underline; }
+
+.layout { display:flex; min-height:100vh; align-items:stretch; }
+
+/* ---------- barra lateral esquerda ---------- */
+.sidebar-left { width:290px; flex:0 0 290px; background:var(--bg-sidebar);
+  border-right:1px solid var(--border); padding:22px 18px 40px;
+  position:sticky; top:0; height:100vh; overflow-y:auto; }
+.brand { font-size:19px; font-weight:800; color:var(--gold); line-height:1.25;
+  margin-bottom:14px; text-decoration:none; display:block; }
+.brand:hover { text-decoration:none; opacity:.9; }
+.search-box { position:relative; margin-bottom:16px; }
+.search-box input { width:100%; padding:8px 10px 8px 30px; border-radius:6px;
+  border:1px solid var(--border); background:var(--bg-card); color:var(--text);
+  font-family:inherit; font-size:13px; }
+.search-box input::placeholder { color:var(--text-faint); }
+.search-box input:focus { outline:none; border-color:var(--gold-dim); }
+.search-box .ico { position:absolute; left:9px; top:50%; transform:translateY(-50%);
+  color:var(--text-faint); font-size:13px; pointer-events:none; }
+.tree { font-size:14px; }
+.tree details { margin-bottom:1px; }
+.tree summary { list-style:none; cursor:pointer; padding:6px 8px; border-radius:6px;
+  color:var(--text); display:flex; align-items:center; gap:6px; user-select:none; }
+.tree summary::-webkit-details-marker { display:none; }
+.tree summary:hover { background:var(--bg-hover); }
+.tree summary .chev { display:inline-block; font-size:10px; color:var(--text-faint);
+  transition:transform .15s; width:10px; }
+.tree details[open] > summary .chev { transform:rotate(90deg); }
+.tree .leaf-list { padding-left:20px; margin-top:1px; }
+.tree .leaf { display:block; padding:6px 8px; border-radius:6px; font-size:13.5px;
+  color:var(--text-dim); }
+.tree .leaf:hover { background:var(--bg-hover); color:var(--text); text-decoration:none; }
+.tree .leaf.active { color:var(--active); font-weight:600; background:rgba(167,139,250,.1); }
+.tree .leaf.locked { color:var(--text-faint); cursor:default; font-style:italic; }
+.tree .leaf.locked:hover { background:none; }
+.tree .no-match { display:none; }
+.sidebar-left.filtering .tree .leaf { display:none; }
+.sidebar-left.filtering .tree .leaf.match { display:block; }
+.sidebar-left.filtering .tree details { display:none; }
+.sidebar-left.filtering .tree details.has-match { display:block; }
+.sidebar-left.filtering .tree details.has-match > summary .chev { transform:rotate(90deg); }
+
+/* ---------- coluna central ---------- */
+main.article { flex:1 1 auto; min-width:0; max-width:760px; margin:0 auto;
+  padding:48px 40px 100px; line-height:1.7; font-size:16.5px; }
+.page-title { font-size:clamp(28px,4vw,38px); font-weight:800; color:var(--title);
+  margin:0 0 28px; letter-spacing:-.3px; }
+main.article h1 { color:var(--gold); font-size:26px; font-weight:700;
+  margin:36px 0 14px; scroll-margin-top:24px; letter-spacing:-.2px; }
+main.article h1:first-child { margin-top:0; }
+main.article h2 { color:var(--gold); font-size:21px; font-weight:700;
+  margin:30px 0 12px; scroll-margin-top:24px; }
+main.article h3 { color:var(--title); font-size:18px; font-weight:700;
+  margin:24px 0 10px; scroll-margin-top:24px; }
+main.article h4 { color:var(--text-dim); font-size:14px; font-weight:700;
+  text-transform:uppercase; letter-spacing:.5px; margin:20px 0 8px; scroll-margin-top:24px; }
+main.article p { margin:0 0 15px; color:var(--text); }
+main.article ul { margin:0 0 15px; padding-left:24px; }
+main.article li { margin-bottom:6px; }
+main.article a { border-bottom:1px solid rgba(224,165,66,.35); }
+main.article a:hover { border-bottom-color:var(--gold); text-decoration:none; }
+main.article em { color:var(--text); font-style:italic; }
+main.article strong { color:var(--title); font-weight:700; }
+main.article hr { border:0; border-top:1px solid var(--border); margin:20px 0; }
+.link-pending { color:var(--text-faint); font-style:italic; border-bottom:1px dotted var(--text-faint); cursor:default; }
+.reloaded-img { max-width:100%; border-radius:8px; border:1px solid var(--border); margin:16px 0; display:block; }
+
+span.citation { font-style:italic; color:var(--text-dim); }
+span.highlight { color:var(--gold); font-weight:600; }
+span.credit { font-size:12px; color:var(--text-faint); display:block; margin-top:4px; }
+
+div.description { background:var(--bg-card); border-left:3px solid var(--active-dim);
+  border-radius:0 8px 8px 0; padding:16px 20px; margin:18px 0; font-style:italic; color:var(--text); }
+div.description p:last-child { margin-bottom:0; }
+
+.callout { border:1px solid var(--border); border-left:4px solid var(--gold-dim);
+  border-radius:0 8px 8px 0; background:rgba(224,165,66,.06); margin:18px 0; padding:14px 18px; }
+.callout-title { font-weight:700; color:var(--gold); font-size:13px; letter-spacing:.3px;
+  text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+.callout-icon { font-size:14px; }
+.callout-body p:last-child { margin-bottom:0; }
+.callout-body { font-size:16px; }
+.callout-warning { border-left-color:#e2645a; background:rgba(226,100,90,.08); }
+.callout-warning .callout-title { color:#f08078; }
+.callout-combat { border-left-color:#e2645a; background:rgba(226,100,90,.1); }
+.callout-combat .callout-title { color:#f08078; }
+.callout-lore, .callout-abstract { border-left-color:#5f9bd8; background:rgba(95,155,216,.08); }
+.callout-lore .callout-title, .callout-abstract .callout-title { color:#7fb4e8; }
+.callout-profile { border-left-color:var(--active-dim); background:rgba(167,139,250,.08); }
+.callout-profile .callout-title { color:var(--active); }
+.callout-item { border-left-color:#4fb86a; background:rgba(79,184,106,.08); }
+.callout-item .callout-title { color:#6fce88; }
+.callout-design { border-left-color:var(--text-faint); background:rgba(158,158,162,.06); }
+.callout-design .callout-title { color:var(--text-dim); }
+.callout-tip { border-left-color:var(--gold); }
+
+.table-wrap { overflow-x:auto; margin:18px 0; }
+table.md-table { border-collapse:collapse; width:100%; font-size:15px; }
+table.md-table th, table.md-table td { border:1px solid var(--border); padding:8px 11px; text-align:left; }
+table.md-table th { background:var(--bg-card); color:var(--gold); font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; }
+
+div.statblock { background:var(--bg-card); border:1px solid var(--border);
+  border-left:3px solid var(--active-dim); border-radius:8px; padding:18px 22px; margin:20px 0; }
+div.statblock h2 { color:var(--title); font-size:20px; font-weight:800; margin:0 0 2px; }
+div.statblock > em:first-of-type { display:block; font-style:italic; color:var(--text-dim); margin-bottom:10px; }
+div.statblock hr { border-top:1px solid var(--border); margin:11px 0; }
+div.statblock h3 { color:var(--gold); font-size:14px; font-weight:700;
+  text-transform:uppercase; letter-spacing:.5px; margin:16px 0 7px; }
+div.statblock p { margin:0 0 9px; font-size:15px; }
+div.statblock table.ability-table { width:100%; border-collapse:collapse; margin:9px 0; }
+div.statblock table.ability-table th, div.statblock table.ability-table td {
+  border:1px solid var(--border); text-align:center; padding:6px 4px; font-size:14px; }
+div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-weight:700; }
+
+/* ---------- coluna direita: sumario ---------- */
+.sidebar-right { width:250px; flex:0 0 250px; padding:48px 20px 40px 0;
+  position:sticky; top:0; height:100vh; overflow-y:auto; }
+.toc-label { font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+  color:var(--text-faint); margin-bottom:12px; }
+.toc-list { font-size:13px; }
+.toc-list a { display:block; padding:4px 0; color:var(--text-dim); border-bottom:none;
+  line-height:1.4; }
+.toc-list a:hover { color:var(--text); text-decoration:none; }
+.toc-lvl-1 { padding-left:0; font-weight:600; }
+.toc-lvl-2 { padding-left:12px; }
+.toc-lvl-3 { padding-left:24px; }
+.toc-lvl-4 { padding-left:36px; font-size:12px; }
+
+/* ---------- pagina indice ---------- */
+.idx-intro { margin-bottom:8px; }
+.idx-intro h1 { font-size:clamp(26px,4vw,36px); font-weight:800; color:var(--gold); margin-bottom:10px; }
+.idx-intro p { color:var(--text-dim); font-size:15px; max-width:640px; }
+.idx-section { margin:34px 0; }
+.idx-section-title { font-size:13px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+  color:var(--text-dim); border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:14px; }
+.idx-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:12px; }
+.idx-card { display:block; background:var(--bg-card); border:1px solid var(--border);
+  border-radius:8px; padding:14px 16px; font-weight:600; font-size:14.5px; color:var(--text);
+  transition:border-color .15s, transform .15s; }
+.idx-card:hover { border-color:var(--gold-dim); transform:translateY(-2px); text-decoration:none; }
+.idx-card.locked { opacity:.45; cursor:default; border-style:dashed; }
+.idx-card.locked:hover { transform:none; }
+.idx-badge { display:block; margin-top:5px; font-size:10px; letter-spacing:.5px; text-transform:uppercase; color:var(--text-faint); font-weight:400; }
+
+/* ---------- mobile ---------- */
+.mobile-topbar { display:none; }
+@media (max-width:1100px) {
+  .sidebar-right { display:none; }
+}
+@media (max-width:860px) {
+  .layout { flex-direction:column; }
+  .mobile-topbar { display:flex; align-items:center; gap:12px; position:sticky; top:0; z-index:40;
+    background:var(--bg-sidebar); border-bottom:1px solid var(--border); padding:12px 16px; }
+  .mobile-topbar .brand { margin:0; font-size:15px; flex:1; }
+  .mobile-topbar button { background:none; border:1px solid var(--border); color:var(--text);
+    border-radius:6px; padding:6px 10px; font-family:inherit; font-size:13px; }
+  .sidebar-left { position:fixed; left:0; top:49px; bottom:0; z-index:39; transform:translateX(-100%);
+    transition:transform .2s; width:82vw; max-width:320px; box-shadow:8px 0 30px rgba(0,0,0,.5); }
+  .sidebar-left.open { transform:translateX(0); }
+  main.article { padding:28px 18px 70px; max-width:100%; }
+}
+</style>
+</head>
+<body>
+<div class="mobile-topbar">
+  <button aria-label="Abrir menu">☰</button>
+  <a class="brand" href="index.html">Curse of Strahd: Reloaded</a>
+</div>
+<div class="layout">
+  <aside class="sidebar-left">
+    <a class="brand" href="index.html">Curse of Strahd:<br>Reloaded</a>
+    <div class="search-box"><span class="ico">🔍</span><input type="text" placeholder="Buscar página..." aria-label="Buscar página"></div>
+    <nav class="tree"><details><summary><span class="chev">▸</span>Introdução</summary><div class="leaf-list"><a class="leaf" href="introducao-usando-este-guia.html">Usando Este Guia</a><a class="leaf" href="introducao-guia-do-mestre.html">Guia do Mestre</a><a class="leaf" href="introducao-changelog.html">Changelog</a></div></details><details><summary><span class="chev">▸</span>Capítulo 1 — Iniciando a Campanha</summary><div class="leaf-list"><a class="leaf" href="cap1-sessao-zero.html">Sessão Zero</a><a class="leaf" href="cap1-criacao-de-personagem.html">Criação de Personagem</a></div></details><details><summary><span class="chev">▸</span>Capítulo 2 — A Terra de Barovia</summary><div class="leaf-list"><a class="leaf" href="cap2-lore-de-barovia.html">Lore de Barovia</a><a class="leaf" href="cap2-historia-de-barovia.html">História de Barovia</a><a class="leaf" href="cap2-strahd-von-zarovich.html">Strahd von Zarovich</a></div></details><details><summary><span class="chev">▸</span>Capítulo 3 — Conduzindo o Jogo</summary><div class="leaf-list"><a class="leaf" href="cap3-resumo-da-aventura.html">Resumo da Aventura</a><a class="leaf" href="cap3-conduzindo-a-aventura.html">Conduzindo a Aventura</a></div></details><details><summary><span class="chev">▸</span>Ato I — Adentrando as Névoas</summary><div class="leaf-list"><a class="leaf" href="ato1-resumo.html">Resumo do Ato I</a><a class="leaf" href="arco-a-fuga-da-death-house.html">Arco A — Fuga da Death House</a><a class="leaf" href="arco-b-bem-vindo-a-barovia.html">Arco B — Bem-vindo a Barovia</a><a class="leaf" href="arco-c-adentrando-o-vale.html">Arco C — Adentrando o Vale</a></div></details><details><summary><span class="chev">▸</span>Ato II — A Cidade Sombria</summary><div class="leaf-list"><a class="leaf" href="ato2-resumo.html">Resumo do Ato II</a><a class="leaf" href="arco-d-a-festa-de-st-andral.html">Arco D — A Festa de St. Andral</a><a class="leaf" href="arco-e-a-vistana-desaparecida.html">Arco E — A Vistana Desaparecida</a><a class="leaf" href="arco-f-o-desejo-de-lady-wachter.html">Arco F — O Desejo de Lady Wachter</a><a class="leaf" href="arco-g-os-irmaos-strazni.html">Arco G — Os Irmãos Strazni</a><a class="leaf" href="arco-h-a-alma-perdida.html">Arco H — A Alma Perdida</a><a class="leaf" href="arco-i-as-muralhas-de-krezk.html">Arco I — As Muralhas de Krezk</a></div></details><details><summary><span class="chev">▸</span>Ato III — A Terra Partida</summary><div class="leaf-list"><a class="leaf" href="ato3-resumo.html">Resumo do Ato III</a><a class="leaf" href="arco-j-a-gema-roubada.html">Arco J — A Gema Roubada</a><a class="leaf" href="arco-k-a-abadia-decaida.html">Arco K — A Abadia Decaída</a><a class="leaf" href="arco-l-o-covil-dos-lobos.html">Arco L — O Covil dos Lobos</a><a class="leaf" href="arco-m-a-mansao-do-dragao.html">Arco M — A Mansão do Dragão</a><a class="leaf" href="arco-o-jantar-com-o-diabo.html">Arco O — Jantar com o Diabo</a><a class="leaf" href="arco-p-o-assalto-a-ravenloft.html">Arco P — O Assalto a Ravenloft</a><a class="leaf" href="arco-q-um-farol-reluzente.html">Arco Q — Um Farol Reluzente</a></div></details><details open><summary><span class="chev">▸</span>Ato IV — Segredos do Ancião</summary><div class="leaf-list"><a class="leaf" href="ato4-resumo.html">Resumo do Ato IV</a><a class="leaf" href="arco-r-provacoes-da-montanha.html">Arco R — Provações da Montanha</a><a class="leaf" href="arco-s-uma-espada-de-luz-solar.html">Arco S — Uma Espada de Luz Solar</a><a class="leaf" href="arco-t-os-tres-fanes.html">Arco T — Os Três Fanes</a><a class="leaf" href="arco-u-sonhos-da-alvorada.html">Arco U — Sonhos da Alvorada</a><a class="leaf active" href="ato4-epilogo.html">Epílogo</a></div></details><details><summary><span class="chev">▸</span>Apêndices</summary><div class="leaf-list"><a class="leaf" href="apendice-fragmentos-de-ambar.html">Fragmentos de Âmbar</a><a class="leaf" href="apendice-bestiario.html">Bestiário</a><a class="leaf" href="apendice-glossario.html">Glossário</a><a class="leaf" href="apendice-npcs.html">Personagens Não Jogadores</a></div></details></nav>
+    <div style="margin-top:18px"><a href="../painel_barovia_dnd5e.html" style="font-size:12px;color:var(--text-faint)">← Voltar ao Painel</a></div>
+  </aside>
+  <main class="article">
+    <div class="page-title">Epílogo</div>
+<p>Strahd von Zarovich está morto, e o Sol nasceu sobre as Montanhas Balinok pela primeira vez em séculos. Mas, para o povo de Barovia, este final é apenas um novo começo.</p>
+<p>Em Vallaki, uma cidade grata prepara uma celebração para o grupo de heróis que retorna. Em Krezk, os amaldiçoados Belview enfrentam uma escolha entre a humanidade e a paz. Em Argynvostholt, um ovo prateado espera em meio às cinzas de seu antecessor.</p>
+<p>Enquanto isso, as Damas Três renasceram, mas uma quarta irmã teme o julgamento delas. Lady Fiona Wachter precisa liderar seu povo rumo a um novo futuro, mas teme que seu passado a tenha deixado indigna disso. Victor Vallakovich precisa decidir se seus sentimentos por Stella Wachter valem a pena defender. Rudolph van Richten e Doru precisam encontrar um jeito de viver onde antes só habitava a morte. E, nas terras selvagens de Barovia, privado de seu mestre, Escher precisa decidir se busca a redenção — ou a vingança.</p>
+<p>Será que os jogadores ajudarão Barovia a dar seus primeiros passos neste admirável mundo novo? Deixarão um legado forte o bastante para suportar os caminhos incertos que virão? E — quando o chamado à aventura soar mais uma vez — irão atendê-lo ou recusá-lo?</p>
+<h2 id="1-retorno-do-castelo">1. Retorno do Castelo</h2>
+<p><strong><em>Cyrus e Lief</em></strong>. Quando Strahd invocou a noite eterna, ordenou que toda criatura em Ravenloft se juntasse à horda de mortos-vivos que marchava sobre os povoados de Barovia. Três membros da horda, no entanto, fugiram às escondidas: Cyrus Belview, Lief Lipsiege e (se ainda presente em Ravenloft) Pidlwick II.</p>
+<p>Desde que escaparam dos exércitos de Strahd, os três desertores permaneceram nas proximidades de <strong>I. Carruagem Negra (p. 37)</strong>, vigiando para se certificar de que não sentiram sua falta, enquanto debatiam ansiosamente seus próximos passos. Cyrus está apavorado com os mortos-vivos remanescentes e ansioso quanto à promessa de Strahd de restaurar a forma de sua família, enquanto Lief está desolado por seu aparente dispensamento do serviço. Se presente, Pidlwick desconfia do mundo além do castelo, mas está encantado por poder explorar o mundo além dos muros de Ravenloft. Os três ficam maravilhados com o nascer do sol — embora Cyrus desconfie que se trate de algum tipo de truque, e Lief, sendo um corpo ancião (<em>wight</em>), ache os raios do sol cansativos, dolorosos e "detestáveis".</p>
+<p>Quando os jogadores chegarem à encruzilhada após seu retorno de Ravenloft, encontrarão os desertores rondando por perto? Se sim, ajudarão Cyrus a encontrar nova esperança diante da promessa quebrada de Strahd, ajudarão Lief a encontrar um novo propósito na destruição do poder de Strahd, e ajudarão Pidlwick II a encontrar um novo lar?</p>
+<p><strong><em>A Cidade de Vallaki</em></strong>. Quando os jogadores partiram de Vallaki em <a href="arco-u-sonhos-da-alvorada.html">Arco U - Sonhos de Alvorada</a>, deixaram seus amigos para enfrentar uma horda de mortos-vivos que se aproximava. Através das visões do Coração da Tristeza, testemunharam vislumbres da luta de Vallaki contra o exército de Strahd — visões de morte e de vida. Agora, ao retornarem a Vallaki, quanto da cidade encontrarão de pé — e como a cidade os receberá?</p>
+<h3 id="1a-a-dupla-estranha">1a. A Dupla Estranha</h3>
+<p>**Quando os jogadores retornarem pela primeira vez a I. Carruagem Negra (p. 37) após concluir <a href="arco-u-sonhos-da-alvorada.html">Arco U - Sonhos de Alvorada</a>, leia:</p>
+<div class="description">
+<p>Uma encruzilhada familiar se estende à frente, fracamente iluminada pelo sol da manhã. Um ramo leva a oeste, rumo a Vallaki, e o outro ao sul, rumo a Barovia.</p>
+<p>Do outro lado, algo se remexe nos arbustos atrás de uma árvore. Vocês captam o vislumbre de uma silhueta atarracada, então ouvem um gemido curto e agudo, seguido por um som abafado de "psiu".</p>
+</div>
+<p>A silhueta atarracada é Cyrus Belview, que está escondido atrás da árvore. Cyrus está acompanhado do <strong>corpo ancião</strong> Lief Lipsiege.</p>
+<p>**Se os jogadores não resgataram Pidlwick II do Castelo Ravenloft em <a href="arco-p-o-assalto-a-ravenloft.html">Arco P - Assalto a Ravenloft</a>, acrescente:</p>
+<div class="description">
+<p>Um instante depois, algo tilinta e zune fracamente vindo da vegetação rasteira próxima.</p>
+</div>
+<p>O zunido vem de Pidlwick II, que está agachado nos arbustos perto de Cyrus e Lief.</p>
+<p><strong>Se os jogadores já conheceram Cyrus, Lief ou Pidlwick anteriormente</strong>, reconhecem o som de suas vozes e de suas engrenagens, respectivamente.</p>
+<p><strong>Durante esta interação,</strong> Cyrus, Lief e Pidlwick têm as seguintes perspectivas:</p>
+<ul><li><strong>Cyrus.</strong> Cyrus está apavorado com os mortos-vivos remanescentes, determinado a retornar à sua família na Abadia de Saint Markovia, e sombriamente pronto para se defender.</li><li><strong>Lief.</strong> Lief está desolado após seu aparente dispensamento do serviço, irritado com as dores de exercitar "ossos velhos e doloridos", e enojado e amedrontado com a "coisa amarela grande e feia" (o Sol).</li><li><strong>Pidlwick II</strong>. Pidlwick está, ao mesmo tempo, desconfiado do mundo além do castelo (incluindo os jogadores) e encantado por poder explorar além dos muros do Castelo Ravenloft.</li></ul>
+<p><strong>Se os jogadores investigarem os espreitadores,</strong> a conversa pode começar da seguinte forma:</p>
+<ul><li><strong>Se um jogador chamar e for bem-sucedido em um teste de Carisma (Persuasão) CD 10</strong>, ou CD 5 se o jogador se identificar, Cyrus responde aos gritos: "Certeza que não são mais um bando de zumbis? Porque é exatamente isso que um zumbi diria se quisesse comer nossos miolos." <strong>Se os jogadores oferecerem mais garantias,</strong> Cyrus acrescenta: "Tá bom, mas se tentarem alguma gracinha, eu desmancho vocês." Cyrus, Lief e Pidlwick II então se revelam, com Cyrus empunhando desconfiado uma colher de pau como se fosse um punhal.</li><li><strong>Se um jogador se aproximar da árvore</strong>, Cyrus grita: "Ei! Seus zumbizinhos, deem mais um passo e eu arranco suas mãos fora." <strong>Se os jogadores contornarem a árvore,</strong> Cyrus se vira de repente para encará-los, empunhando uma colher de pau como se fosse um punhal, com Lief se escondendo nervosamente atrás dele. "Falo sério!" Cyrus adverte.</li><li><strong>Se um jogador se aproximar dos arbustos e Pidlwick II estiver presente,</strong> ele ouve um tique-taque suave e constante vindo dos arbustos. <strong>Se um jogador afastar os galhos do arbusto,</strong> Pidlwick se encolhe diante dele, cobrindo o rosto com as mãos.</li></ul>
+<p><strong>Se os jogadores confortarem ou tranquilizarem os espreitadores,</strong> Cyrus e Lief relaxam e ficam dispostos a conversar com eles. <strong>Entretanto, se os jogadores convidarem Lief para a luz do sol</strong>, ele não deixará as sombras de bom grado, a menos que esteja protegido por um manto ou proteção similar.</p>
+<p><strong>Se a conversa se voltar para o exército de zumbis,</strong> ela pode se desenrolar da seguinte forma:</p>
+<ul><li><strong>As Ordens de Strahd.</strong> Lief compartilha solenemente que Strahd ordenou que toda criatura em Ravenloft se juntasse à horda de mortos-vivos que marchava sobre os povoados de Barovia. "Inaceitável", ele resmunga fungando. "Não completei meu aprendizado de contabilidade para ser <em>recrutado</em>."</li><li><strong>Fuga da Horda.</strong> Cyrus conta que ele, Lief e (se presente) Pidlwick II fugiram às escondidas da horda logo depois de partirem de Ravenloft. "Acho que nenhum deles ligou muito pro que a gente tava fazendo", resmunga ele. "Ainda bem. Não queria dar chance pra nenhum daqueles zumbis dar uma mordida na minha cuca."</li><li><strong>Esperança para Barovia.</strong> Cyrus compartilha, com quieta solenidade, sua esperança de que "Clovin e os outros tenham se saído bem". "Era um número terrível de zumbis", ele murmura, olhando para o chão.</li></ul>
+<p><strong>Se a conversa se voltar para Strahd e o Castelo Ravenloft,</strong> ela pode se desenrolar da seguinte forma:</p>
+<ul><li><strong>O Coração Partido de Lief.</strong> Lief pergunta aos jogadores se "Lord von Zarovich" pediu que ele retornasse ao castelo. "Eu o servi fielmente por séculos", ele diz ansiosamente, remexendo as mãos. "Se fiz algo para desagradá-lo, espero que possa me perdoar."</li><li><strong>O Castelo Flutuante.</strong> Lief e Cyrus confirmam que viram "o castelo flutuante" ao longe enquanto fugiam da horda. (Nenhum dos dois sabe o que aquilo significava, nem por que o castelo estava flutuando. "Não é natural um castelo flutuar", Cyrus acrescenta, rispidamente.)</li><li><strong>A Teoria de Cyrus.</strong> Cyrus compartilha livremente sua teoria de que o castelo era secretamente um morcego enorme, e que alçou voo por ordem de Strahd. "É a única explicação que faz sentido", ele insiste, cruzando os braços.</li><li><strong>A Morte de Strahd.</strong> <strong>Se os jogadores contarem que Strahd está morto,</strong> o queixo de Cyrus cai, e Lief congela. "Peço desculpas", Lief diz rigidamente, "mas devo ter ouvido mal." <strong>Se os jogadores confirmarem que Strahd está morto,</strong> (1) Lief fica desolado, perguntando-se em voz alta como conseguirá trabalho se seu empregador está morto, e (2) Cyrus rosna em frustração chorosa, exigindo saber "como vai deixar a família dele em ordem de novo se o velho chupa-sangue morreu". (Cyrus se refere à promessa de Strahd de "curar" a condição dos Belview caso Cyrus limpasse todos os cômodos do Castelo Ravenloft.)</li></ul>
+<p><strong>Se a conversa se voltar para o Sol</strong>, ela pode se desenrolar da seguinte forma:</p>
+<ul><li><strong>A Coisa Amarela, Grande e Feia.</strong> Lief enxuga a cabeça com um lenço velho e apodrecido e reclama da "coisa amarela, grande e feia" no céu. "Minha pele velha é sensível demais para esse tipo de luz", ele geme. "Será que ninguém pode apagar essa coisa?"</li><li><strong>O Esquema do Rei Lich.</strong> Cyrus insiste que a "tocha gigante no céu" é um plano do Rei Lich Firan, que pretende usá-la para controlar as mentes de todas as criaturas pensantes de Barovia.</li><li><strong>O Que É um Sol?</strong> <strong>Se informados de que o Sol é o Sol</strong>, (1) Lief o encara com desprezo e observa que "nunca ligou muito pra ambientes ao ar livre, de qualquer forma", e (2) Cyrus fica quieto, observa o Sol com reverência, e diz baixinho que sempre acreditou que fosse um mito.</li></ul>
+<p><strong>Se a conversa se voltar para as intenções dos espreitadores após a morte de Strahd</strong>, ela pode se desenrolar da seguinte forma:</p>
+<ul><li><strong>A Intenção de Lief.</strong> Lief lamenta a perda de sua carreira. "Com meu senhor desaparecido, certamente não há lugar neste vale para um homem instruído como eu", ele murmura, enxugando uma lágrima de sangue com o lenço. <strong>(Se os jogadores se oferecerem para apresentar Lief a Lady Wachter ou a outro empregador</strong>, Lief fica cético, mas cautelosamente grato.)</li><li><strong>A Intenção de Cyrus.</strong> Cyrus compartilha sua intenção de se reunir com sua família. "Não sei como vamos consertar as coisas, com <em>ele</em> desaparecido", acrescenta, baixando a cabeça e curvando os ombros. "Só fui ao castelo pra ajudá-los — mas se ele se foi, acho que foi tudo em vão."</li><li><strong>A Intenção de Pidlwick.</strong> <strong>Se presente</strong>, Pidlwick está curioso a respeito dos jogadores, e ansioso por quaisquer oportunidades de explorar mais de Barovia.</li></ul>
+<p><strong>Se os jogadores convidarem os espreitadores para se juntarem a eles</strong>, Lief, Cyrus e Pidlwick II ficam felizes em aceitar.</p>
+<h3 id="1b-a-nova-estrada-svalich">1b. A Nova Estrada Svalich</h3>
+<p><strong>Se os jogadores partirem da encruzilhada</strong> rumo a Vallaki, leia:</p>
+<div class="description">
+<p>Os portões barovianos, já em ruínas, ficam abertos, suas dobradiças enferrujadas velhas e cansadas demais para barrar o caminho adiante. Além deles, a estrada serpenteia rumo ao norte através de um bosque familiar — mas um bosque que parece novamente fresco e renovado.</p>
+<p>Flores desabrocham na terra macia e fértil sob as árvores, e um riacho tranquilo corre ao lado da estrada, suas águas cristalinas e brilhantes. Um vento fresco agita as folhas laranja-avermelhadas acima, que parecem pegar fogo sob a luz dourada do sol de outono. O canto dos pássaros flui pelas copas do bosque, acompanhado pelo chilrear dos esquilos e pelas batidas de um pica-pau distante.</p>
+<p>Uma silhueta desliza pela vegetação rasteira: um lobo, cuja pelagem cinza-acastanhada ganha um brilho dourado sob a luz do sol pontilhada. Acima dele, um corvo de penas negras pousa em um galho robusto de carvalho, onde uma teia de aranha reluz como seda cravejada de diamantes.</p>
+<p>Lentamente — de forma inconfundível — as feras se curvam diante de vocês.</p>
+</div>
+<p>O lobo, o corvo e a aranha são mensageiros das Damas Três. Independentemente da resposta dos jogadores, eles desaparecem no bosque logo após prestarem seus respeitos.</p>
+<h3 id="1c-os-portões-de-vallaki">1c. Os Portões de Vallaki</h3>
+<p><strong>Quando os jogadores retornarem a Vallaki</strong>, leia:</p>
+<div class="description">
+<p>A morte cerca as muralhas de Vallaki — pilhas de corpos empilhados uma dezena de vezes.</p>
+<p>As muralhas estão danificadas, os portões tortos, e a estrada manchada de sangue. Mas acima de tudo isso, tremulando desafiadoramente sob um céu azul e límpido, ergue-se uma bandeira orgulhosa pintada com um sol radiante dourado.</p>
+<p>Pessoas enchem a estrada. Algumas arrastam corpos até os montes de mortos, enquanto outras acendem piras, cujas chamas saltitantes lançam cinzas ao vento. Algumas limpam os destroços pelas ruas, enquanto outras remendam grandes buracos e fendas na paliçada da cidade.</p>
+</div>
+<p>Continue, modificando o texto conforme necessário para refletir a situação atual de cada personagem:</p>
+<div class="description">
+<p>Um dos carregadores repara em vocês e se vira. Embora seu cabelo esteja manchado de sangue e sujeira, e suas roupas rasgadas e enlameadas, vocês o reconhecem: Milivoj. Os olhos dele se arregalam, e ele cambaleia levemente, como que maravilhado.</p>
+<p>Vocês reconhecem outros rostos na multidão. Victor e Stella. Arrigal e Luvash, com Arabelle nos ombros de Luvash. Um por um, seguem o olhar de Milivoj — e um por um, seus olhos se arregalam em reconhecimento.</p>
+<p>Alguém começa a bater palmas — devagar no início, depois mais rápido, crescendo em volume à medida que mais e mais pessoas se juntam. Gritos e exclamações de alegria rompem o ar, muitas vozes se misturando em uma única mensagem compartilhada:</p>
+<p><em>Eles voltaram.</em></p>
+<p><em>Eles estão a salvo.</em></p>
+<p><em>Eles <strong>conseguiram!</strong></em></p>
+</div>
+<ul><li><strong>Milivoj</strong> está grato e humilde ao ver os jogadores, e se arrepende de ter duvidado deles. <strong>Se os jogadores santificaram St. Andral's Church</strong>, ele pode compartilhar com alegria que seus irmãos estão a salvo na igreja com Yeska, que abrigou as crianças e os idosos da cidade durante os combates.</li><li><strong>Victor e Stella</strong> estão radiantes de alegria ao ver os jogadores, tendo sentido sua falta desde sua partida e aguardado ansiosamente seu retorno. Victor, em particular, temeu silenciosamente que os jogadores nunca voltassem, mas proclamou em voz alta a qualquer um que duvidasse que os jogadores certamente "colocariam o chupa-sangue de volta na terra".</li><li><strong>Arrigal</strong> está silenciosamente maravilhado com os jogadores e impressionado com sua força. Embora ainda ligeiramente tenso quanto à sua suspeita de que os vallakianos poderiam rejeitar seu povo, ele é profundamente grato a Lady Wachter e ao restante de Vallaki por terem aceitado os Vistani e os elfos do crepúsculo quando chegaram aos portões da cidade em busca de abrigo e aliados contra a horda que se aproximava.</li><li><strong>Luvash e Arabelle</strong> estão encantados por ver os jogadores, com Luvash os parabenizando em voz alta e oferecendo um enorme abraço de urso a qualquer jogador que aceitar. Arabelle dá as boas-vindas de volta aos jogadores, e pode compartilhar discretamente que sua visão do futuro não se estendia além da Noite Eterna. "Eu queria que vocês tivessem sucesso", ela diz, abraçando-os com força. "Mas eu não sabia ao certo."</li></ul>
+<p><strong>Se os jogadores perguntarem</strong>, podem aprender as seguintes informações:</p>
+<ul><li><strong>A Reunião.</strong> Conforme a Whispering Wall recuava, os Vistani e os elfos do crepúsculo chegaram aos portões ocidentais da cidade, alertando sobre uma grande horda de mortos-vivos e implorando por refúgio. Sob o comando de Lady Wachter, os portões foram abertos para eles, com crianças e idosos se refugiando na St. Andral's Church, não combatentes fortificando o Blue Water Inn, e os demais pegando em armas para defender a cidade. Para marcar a resistência desafiadora da aliança, os defensores hastearam uma bandeira com um sol radiante acima das muralhas. (Uma Stella corada pode admitir que pintou a bandeira e a entregou aos guardas da cidade. "Eu só achei que precisávamos de algo pelo que lutar", ela diz, "não apenas algo contra o que lutar".)</li><li><strong>O Cerco.</strong> Os mortos-vivos de Strahd romperam os portões orientais e quase derrubaram os portões ocidentais, mas os defensores de Vallaki inicialmente os impediram de avançar mais. Quando as forças da cidade pareciam prestes a ceder, o farol a oeste brilhou com luz prateada, e eles se reagruparam. Menos de um minuto depois, o exército de mortos-vivos caiu como um só, os símbolos carmesim em suas testas desaparecendo e a vida os abandonando.</li><li><strong>O Amanhecer.</strong> Pouco depois de o exército de Strahd cair, gritos vieram do leste anunciando que uma nova luz surgira no horizonte — um brilho dourado-avermelhado além da borda oriental das Montanhas Balinok. Lenta, e depois rapidamente, os moradores abriram suas janelas, inundaram as ruas, e olharam para o céu diante de uma visão que Barovia não via há séculos: o nascer do Sol. ("Esse rapaz chorou um pouco com aquilo", Luvash diz, cutucando Victor de brincadeira com o cotovelo. "Ei!" Victor retruca. "Como se você também não tivesse chorado." "Pois é", Luvash acrescenta, rindo. "Isso eu chorei.")</li><li><strong>A Reconstrução.</strong> Desde o fim da batalha, os moradores se uniram para identificar e recolher seus mortos, reparar as estruturas destruídas, e remover e queimar os restos daqueles que abateram. ("Eles não escolheram lutar por ele", Milivoj diz baixinho. "Eles mereciam ao menos isso.") Desde então, muitos aguardaram ansiosamente o retorno dos jogadores — não apenas pelo bem dos jogadores, mas por medo de que sua vitória pudesse ser o último truque de Strahd: uma armadilha para baixarem a guarda.</li><li><strong>Os Demais.</strong> Lady Fiona Wachter está comandando a reconstrução a partir da praça da cidade, auxiliada pelos Martikov (fornecendo comida e bebida) e pelo Padre Petrovich (oferecendo cura aos feridos e conselhos aos enlutados). Os Vistani e os elfos do crepúsculo, liderados por Kasimir, também se instalaram na praça da cidade, e estão auxiliando nos esforços de recuperação.</li></ul>
+<h3 id="1d-a-praça-da-cidade">1d. A Praça da Cidade</h3>
+<p><strong>Se os jogadores forem até a praça da cidade,</strong> leia o texto a seguir, modificando-o conforme necessário:</p>
+<div class="description">
+<p>Tendas, sacos de dormir e fogueiras fumegantes enchem a praça da cidade de Vallaki, junto a multidões de pessoas trabalhando, conversando, ou simplesmente olhando para o céu maravilhadas.</p>
+<p>Uma fila de moradores se formou junto à plataforma de madeira da praça, onde Urwin e Danika Martikov servem pedaços de pão e ensopado de uma grande panela de metal. Vocês avistam Lady Wachter e o Padre Lucian, cada um por sua vez, indo de fogueira em fogueira, parando junto a cada pessoa, falando com elas gentil e calmamente, e então seguindo para a próxima. Junto ao tronco, Blinsky encena uma peça com um par de fantoches, diante de uma multidão de crianças encantadas que assistem enlevadas.</p>
+</div>
+<ul><li><strong>Urwin e Danika</strong> estão cansados após uma longa noite ajudando na defesa da cidade, mas aliviados e gratos pela segurança de seus filhos. Ficam radiantes ao ver que os jogadores estão a salvo (e Danika fica ainda mais feliz em colocá-los para trabalhar, entregando pães a alguns idosos e feridos na praça — embora ela e Urwin insistam que os jogadores primeiro comam até se fartar).</li><li><strong>Lady Wachter</strong> fica reconfortada e profundamente grata ao ver os jogadores. Embora se esforce para permanecer educada e refinada, está sincera e genuinamente feliz com o retorno e a companhia deles. ("Obrigada", ela compartilha, com sinceridade, a tensão deixando seus ombros. "Eu — <em>nós</em> — estaríamos perdidos sem vocês.")</li><li><strong>O Padre Lucian</strong> está radiante de alegria ao ver os jogadores, e os abraça assim que os avista. Embora esteja ansioso para discutir o retorno do Sol e o destino do Castelo Ravenloft, ele insiste em cuidar primeiro das necessidades dos jogadores. ("Vocês voltaram!", ele proclama, olhando-os de cima a baixo. "Estão feridos? Tiveram a chance de descansar?")</li><li><strong>Blinsky</strong> está fazendo o possível para distrair e encantar as crianças de Vallaki, especialmente aquelas cujos familiares ficaram feridos nos combates. Embora as crianças tenham inicialmente se intimidado com os brinquedos macabros de Blinsky, ele acabou por acidente as fazendo rir ao se prender sozinho no tronco — e, pela última hora ou mais, tem mantido a garotada entretida com um show de pastelão "bobo" e autodepreciativo, usando alguns de seus brinquedos e fantoches.</li><li><strong>Yeska, Brom e Bray</strong> estão assistindo ao show de Blinsky junto ao tronco, ao lado dos irmãos de Milivoj e de várias outras crianças vallakianas. Todos ficam felizes em ver o retorno dos jogadores.</li></ul>
+<p>Se os jogadores perguntarem por Kasimir, qualquer Vistani, elfo do crepúsculo ou Martikov pode compartilhar que ele partiu da cidade há pouco tempo para retornar para casa. ("Ele disse que precisava ver uma coisa.")</p>
+<h3 id="1e-o-acampamento-vistani">1e. O Acampamento Vistani</h3>
+<p><strong>Se os jogadores forem até o acampamento Vistani</strong>, leia:</p>
+<div class="description">
+<p>O topo da colina está nu, despojado da grande tenda e das muitas carroças que antes se erguiam ali. Abaixo dele, as pequenas cabanas dos elfos do crepúsculo permanecem silenciosas e vazias ao redor da colina. Uma silhueta solitária repousa na encosta, as gramíneas balançando em uma brisa suave e doce.</p>
+</div>
+<p>A silhueta é <strong>Kasimir</strong>, que observa o céu e reflete.</p>
+<p>Kasimir fica feliz em ver os jogadores, embora esteja pensativo e sóbrio. Ele pode compartilhar que veio até aqui para fugir do barulho e da agitação e refletir. ("Senti que ainda podia fazer mais", ele diz, "mas a senhorita Dorakova insistiu que eu descansasse — e então vim para cá.")</p>
+<p>Kasimir veio até a colina para refletir sobre tudo — seu povo, sua irmã, seus arrependimentos e seu futuro. ("Por quinhentos anos, o destino do meu povo foi ditado pelos caprichos da Casa Von Zarovich", ele diz. "Pensar no que pode vir depois disso — confesso que tenho dificuldade em lidar com essa ideia.")</p>
+<p>Kasimir acolhe quaisquer pensamentos ou orientações que os jogadores estejam dispostos a oferecer. Embora fique grato se os jogadores se juntarem a ele na colina por um tempinho, ele fica feliz em acompanhá-los de volta a Vallaki.</p>
+<h2 id="2-o-festival-da-alvorada">2. O Festival da Alvorada</h2>
+<p>Quando os jogadores retornam a Vallaki, Urwin, Danika, Victor e Stella pressionam Lady Wachter a organizar um festival para celebrar sua vitória e a libertação de Barovia de Strahd. Publicamente relutante, mas discretamente satisfeita, Lady Wachter faz os preparativos necessários, com os Martikov fornecendo comida e bebida, Blinsky fornecendo decorações e jogos, os Vistani fornecendo música, os elfos do crepúsculo fornecendo histórias, e os magos residentes da cidade — Victor e Kasimir — fornecendo exibições coloridas de magia.</p>
+<p>Mas por trás do festival espreita uma colagem de incertezas. Lady Wachter, à mesa principal, se pergunta se sua falta de fé a torna indigna de liderar Vallaki rumo a uma nova alvorada. Victor, no palco dos magos, se pergunta se conseguirá reunir coragem para dizer a Stella o que sente. Escher, remoendo-se pelos becos escurecidos, se pergunta se pode escapar dos pecados de seu passado. E a Sonhadora, encapuzada e disfarçada, se pergunta se pode reparar sua relação com suas irmãs, as Damas Três. Será que os jogadores ajudarão cada um desses convidados perdidos a encontrar seu caminho adiante?</p>
+<h3 id="2a-o-farol-bruxuleante">2a. O Farol Bruxuleante</h3>
+<p>Pouco depois de os jogadores retornarem a Vallaki, Lady Wachter os visita pessoalmente para pedir sua ajuda.</p>
+<p>Lady Wachter compartilha que o farol de Argynvostholt, que brilhou intensamente durante a noite interminável de Strahd, se apagou quando o Sol nasceu sobre Barovia. Desde então, porém, ela recebeu relatos de que o farol acendeu novamente — mas que, desta vez, começou a bruxulear estranhamente, em um padrão irregular e incomum.</p>
+<p>Lady Wachter não tem certeza do que significa o farol reacendido, mas compartilha sua preocupação de que possa se tratar de algum tipo de mensagem ou sinal de socorro. Se os jogadores estiverem dispostos, ela pede que viajem rapidamente a Argynvostholt para descobrir a verdade. Contudo, ela também compartilha que vestígios de mortos-vivos foram avistados no bosque, e insiste que os jogadores retornem ao anoitecer, caso algum deles volte.</p>
+<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>O Esquema de Lady Wachter</strong></div><div class="callout-body"><p>Lady Wachter está contando apenas metade da verdade: o farol de Argynvost <em>de fato</em> reacendeu, e de fato foi visto bruxuleando estranhamente. Contudo, seu pedido é apenas um pretexto para tirar os jogadores de Vallaki enquanto ela supervisiona os preparativos necessários para a celebração de sua vitória. Além disso, embora seus batedores tenham visto "vestígios" de mortos-vivos no bosque próximo, esses vestígios se limitaram a <em>restos</em> de mortos-vivos; a verdadeira motivação de Lady Wachter é garantir que os jogadores retornem a tempo para o festival.</p></div></div>
+<h3 id="2b-a-mansão-vazia">2b. A Mansão Vazia</h3>
+<p>Se os jogadores retornarem a Argynvostholt, leia o texto a seguir quando chegarem:</p>
+<div class="description">
+<p>O outrora grandioso solar se ergue silenciosamente diante de vocês. Onde antes habitava uma sombra fria, agora há apenas vazio — exceto por uma fraca luz prateada que pulsa do topo da mais alta torre da mansão.</p>
+</div>
+<p>Se os jogadores subirem até <span class="citation">Q53. Farol de Argynvostholt (p.142)</span>, leia:</p>
+<div class="description">
+<p>O topo da torre está quieto e vazio — exceto por um grande ovo prateado que repousa no chão, pulsando com uma luz iridescente.</p>
+</div>
+<p>A luz se apaga permanentemente se o ovo for tocado.</p>
+<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>O Ovo</strong></div><div class="callout-body"><p>O ovo é o filho — ou a reencarnação — de Argynvost, trazido à existência pela imolação de seu espírito.</p>
+<p>Um jogador que for bem-sucedido em um teste de Inteligência (Arcanismo ou Natureza) CD 15 se lembra de que o ovo de um dragão prateado só pode incubar em um ambiente adequado — tipicamente, gelo ou neve — e pode levar de meses a anos para eclodir.</p></div></div>
+<h3 id="2c-que-comecem-as-festividades">2c. Que Comecem as Festividades!</h3>
+<p>Quando os jogadores retornam a Vallaki, os guardas do portão ocidental os informam de que Lady Wachter solicitou sua presença na praça da cidade. (Os guardas se recusam a divulgar mais informações, insistindo apenas que foram avisados de que os jogadores eram necessários para "assuntos urgentes".)</p>
+<p>Enquanto os jogadores atravessam as ruas de Vallaki, leia:</p>
+<div class="description">
+<p>As ruas da cidade estão quietas — quase desertas. Nenhuma luz bruxuleia nas janelas da St. Andral's Church, e o Blue Water Inn permanece vazio e escuro. Ao longe, porém, uma luz brilha além dos telhados que cercam a distante praça da cidade — e tons fracos de música flutuam no ar.</p>
+</div>
+<p>Se os jogadores seguirem até a praça da cidade, continue:</p>
+<div class="description">
+<p>Uma rua já familiar se separa da estrada principal rumo à praça da cidade, serpenteando para o sul, passando por casas escuras e vitrines vazias. O som da música distante fica mais forte, agora acompanhado por ondas de risadas e ecos de muitas vozes.</p>
+<p>A rua faz mais uma curva — e a praça da cidade surge à vista, repleta de vida, cor e <em>luz</em>.</p>
+<p>Faixas e grinaldas douradas cruzam a praça, e bandeiras com sóis radiantes pendem de uma dezena de janelas e telhados. Uma centena de lanternas pende de ganchos ao redor do perímetro, sua luz bruxuleante iluminando centenas de pessoas conversando, rindo, dançando. No centro da praça, perto da fonte de pedra, uma grande fogueira foi erguida, suas ferozes línguas de fogo lançando sombras sobre uma trupe de músicos e dançarinos Vistani que conduzem um círculo de celebrantes em uma dança animada ao redor da fogueira.</p>
+<p>Oito pontos de luz cintilante disparam pelo céu límpido acima, então explodem em chuvas de luz azul e violeta. No topo do palco de madeira que domina a praça, vocês veem Victor e Kasimir de pé, com os braços estendidos, conjurando mais uma sequência de fogos de artifício arcanos enquanto seus mantos azul-royal esvoaçam ao vento fresco.</p>
+<p>"Eles chegaram!" Stella Wachter, postada ao lado da lanterna mais próxima, se vira para o palco e acena animadamente com a mão enquanto aponta para vocês. "Eles chegaram!" Um clamor percorre a multidão, que avança em direção a vocês em boas-vindas.</p>
+</div>
+<p>A menos que os jogadores resistam, logo se veem bem abastecidos com canecas de vinho, pastéis de queijo e bolos de mel.</p>
+<p>Pouco depois da chegada de Stella, Lady Wachter chega para cumprimentá-los pessoalmente. Lady Wachter não se desculpa por seu engano, mas se sente honrada em dar as boas-vindas formais aos jogadores como convidados de honra do "Festival da Alvorada". ("Não sou particularmente adepta de 'festivais'", ela resmunga, sorrindo com ironia, "mas fui voto vencido.")</p>
+<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>As Decorações</strong></div><div class="callout-body"><p>As decorações são sobras de antigos festivais Vallakovich que Blinsky mantinha guardadas em seu porão.</p></div></div>
+<p>Lady Wachter convida os jogadores a relaxar e celebrar, e os encoraja a se divertir. "Nossas muralhas estão bem vigiadas esta noite", ela os assegura. "Vocês mais do que merecem uma noite de banquete e festividades."</p>
+<h3 id="2d-jogos-do-festival">2d. Jogos do Festival</h3>
+<p>Se os jogadores explorarem o festival, podem encontrar as seguintes atrações:</p>
+<ul><li>Um jogo de "prenda o rabo no pesadelo", conduzido por Blinsky do lado de fora de sua loja. (Para jogar, um personagem deve fazer um teste de Sabedoria. Com um resultado de 20 ou mais, o personagem prende o rabo no pesadelo e ganha um brinquedo grátis de <span class="citation">Brinquedo de Blinsky (p. 50)</span> ou <span class="citation">N7. Brinquedos de Blinsky (p. 118)</span>. Quanto menor o resultado, mais longe o rabo cai.)</li><li>Uma barraca de vinho conduzida por quaisquer Martikov ainda em Vallaki, na qual Davian Martikov conta em voz alta, para quem quiser ouvir, a história da derrota de Baba Lysaga pelos jogadores. (Se perguntados, Urwin ou Danika podem compartilhar que os Vistani tinham vários barris de vinho em suas carroças e tendas, e os doaram de bom grado para as festividades.) Entre o público de Davian estão Nikolai e Karl Wachter, que desafiam os jogadores alegremente para uma competição de bebida — logo se juntando a eles Arrigal, que pergunta com malícia se os jogadores se incomodariam com "mais um competidor". (Para jogar, um personagem deve fazer um teste de resistência de Constituição a cada vez que bebe um copo. A CD começa em 4 e aumenta em 2 a cada copo sucessivo. Na primeira vez que um personagem falhar em um teste de resistência, ele fica <strong><em><em>envenenado</em></strong></em> — ou seja, bêbado — e a CD volta a 4. Na segunda vez que um personagem falhar em um teste de resistência, ele cai inconsciente.)</li><li>Uma barraca de adivinhação conduzida por Sofiya Zalken, uma jovem Vistani com uma gata malhada chamada Joie (pronuncia-se "Jhuá") enrolada em seu pescoço. Sofiya tem prazer em oferecer leituras de Tarokka por uma peça de prata, mas insiste que os jogadores não paguem caso ela descubra suas identidades. (Embora Sofiya exagere seu "olho interior" para crianças e curiosos, ela admite livremente que não é uma vidente de verdade. "Ainda assim", ela diz, com um brilho no olhar e um sorriso no rosto, "sempre pensei que o futuro que se vê nas cartas costuma ser o futuro que a pessoa <em>precisava</em> ver — ou pelo menos, é isso que minha mãe sempre me disse.")</li></ul>
+<p>Outros presentes no festival incluem Milivoj (com seus irmãos e Yeska), Luvash (com Arabelle), e Szoldar e Yevgeni.</p>
+<h3 id="2e-histórias-de-fé-e-vitória">2e. Histórias de Fé e Vitória</h3>
+<p>Assim que os jogadores tiverem a oportunidade de aproveitar o festival, são abordados por Lady Wachter e o Padre Lucian, que podem compartilhar as seguintes informações:</p>
+<ul><li>Lady Wachter pretende dedicar oficialmente o festival em uma cerimônia mais tarde nesta noite, e ficaria honrada se um ou mais jogadores contassem a história da derrota de Strahd aos participantes do festival.</li><li>O Padre Lucian pretende abrir a cerimônia com uma invocação, mas está incerto sobre como reconhecer adequadamente as "deusas da natureza" sobre as quais ouviu falar por meio de Lady Wachter. Ele agradeceria a ajuda ou orientação dos jogadores para fazê-lo.</li></ul>
+<div class="callout callout-abstract"><div class="callout-title"><span class="callout-icon">📖</span><strong>A Súplica de Milivoj</strong></div><div class="callout-body"><p>Se o Padre Lucian estiver morto, Milivoj se aproxima dos jogadores separadamente, pouco depois do pedido de Lady Wachter. Ele compartilha que, dada a ausência do Padre Lucian e a pouca idade de Yeska, Lady Wachter o convidou para proferir uma invocação e dar início à cerimônia. Contudo, Milivoj não faz ideia de como fazer uma invocação adequada, e se sente indigno de fazê-lo, dada sua cumplicidade passada com os esquemas de Strahd. Milivoj é grato por qualquer ajuda ou orientação que os jogadores possam oferecer.</p></div></div>
+<div class="callout callout-abstract"><div class="callout-title"><span class="callout-icon">📖</span><strong>A Incerteza de Fiona</strong></div><div class="callout-body"><p>Um jogador com uma pontuação de Sabedoria (Intuição) passiva de 13 ou mais percebe que Lady Wachter parece distraída e um tanto ansiosa. Se pressionada, Lady Wachter admite discretamente que se pergunta se é realmente qualificada para liderar Vallaki nesta nova era. "Eu deixei de ver o nascer do sol até que ele já quase tivesse nascido", ela confessa. "Insisti pela submissão em vez da resiliência, e tramei em vez de defender. Que direito tenho de liderar este povo — meus vizinhos — quando falhei em lutar por eles por tanto tempo?"</p>
+<p>Lady Wachter é grata por qualquer orientação ou conselho que os jogadores possam oferecer.</p></div></div>
+<p>Em um momento apropriado após conversar com Lady Wachter e o Padre Lucian, Lady Wachter convida os jogadores a falar no palco como parte da cerimônia. A menos que os jogadores intervenham ou alterem de alguma forma a pauta, a cerimônia se desenrola da seguinte forma:</p>
+<ul><li>Lady Wachter sobe à plataforma de madeira e dá as boas-vindas aos presentes ao Festival da Alvorada, "o dia em que Vallaki — e toda Barovia — celebra nossa liberdade da noite interminável".</li><li>Lady Wachter compartilha sua esperança de que os presentes estejam aproveitando o festival — recebendo um efusivo clamor em resposta — e agradece a eles por sua "defesa corajosa de nosso lar, em um momento em que tudo parecia perdido".</li><li>Lady Wachter convida os seguintes "indivíduos excepcionais" ao palco para receber "tokens da gratidão de Vallaki": a Vistana Arabelle, por sua "visão corajosa e oportuna"; os magos Kasimir Velikov e Victor Vallakovich, por "acender um fogo na escuridão"; e os jogadores, por "trazer de volta a luz do sol a uma terra que há muito a havia esquecido". Em seguida, ela prende um broche dourado em forma de sol radiante no peito de cada personagem, proclamando-os "amigos de Vallaki" e convidados de honra do festival.</li><li>Enquanto os convidados de honra permanecem no palco, o Padre Lucian profere uma invocação ao Morninglord e às Damas Três, agradecendo ao Morninglord por "iluminar o caminho" até a alvorada e agradecendo às Damas por "restaurar uma terra há muito perdida na escuridão e na decadência". Ele conclui pedindo que os deuses abençoem Vallaki, o vale de Barovia, e todo o seu povo, "nesta noite e em todas as noites que virão".</li><li>Lady Wachter então convida um ou mais jogadores a narrar a história da derrota de Strahd, que os presentes recebem com deleite enlevado. (Os jogadores podem tornar essa história tão longa e detalhada quanto desejarem.)</li></ul>
+<h3 id="2f-histórias-de-medo-e-perdão">2f. Histórias de Medo e Perdão</h3>
+<p>Pouco depois da cerimônia, os jogadores são levados à ação por um ou ambos os seguintes eventos:</p>
+<p><strong><em>A Hesitação de Victor.</em></strong> Kasimir pede que os jogadores o ajudem a encontrar Victor, que desapareceu pouco antes do "grande final" dos fogos de artifício. Um jogador que for bem-sucedido em um teste de Sabedoria (Percepção) ou Inteligência (Investigação) CD 10, ou que encontre e pergunte a uma testemunha adequada, consegue rastrear Victor até a fonte de pedra no centro da praça, onde ele está sentado no chão, curvado, com a cabeça entre as mãos.</p>
+<p>Um jogador que trate Victor com gentileza pode convencê-lo a compartilhar que quase pediu a Stella para dançar com ele junto à fogueira depois da cerimônia, mas perdeu a coragem no último instante e se ofereceu para buscar bolos de mel em vez disso. Victor se sente desconfortável com os sentimentos românticos que desenvolveu por Stella, e apavorado com a possibilidade de perder a amizade dela caso compartilhe esses sentimentos. Ele é grato por qualquer orientação ou conselho que os jogadores possam oferecer.</p>
+<p><strong><em>O Retorno da Sonhadora.</em></strong> Se os jogadores redimiram o coração da Sonhadora em <a href="arco-u-sonhos-da-alvorada.html">Arco U - Sonhos de Alvorada</a>, o jogador com a maior pontuação de Sabedoria (Percepção) passiva percebe uma figura os observando de um beco. Leia:</p>
+<div class="description">
+<p>Vocês sentem um arrepio na nuca e percebem a temperatura ao redor despencar de repente. Pelo canto do olho, vocês avistam uma figura os observando de um beco escurecido, sua forma oculta sob um manto azul-pálido. Ela permanece sob o olhar de vocês por um instante, observando-os em silêncio — então recua e desaparece ao virar uma esquina.</p>
+</div>
+<p>A figura é uma manifestação da Sonhadora. Se os jogadores inicialmente a ignorarem, a figura aparece para eles mais duas vezes a partir de um beco durante o festival, antes de desaparecer na noite.</p>
+<p>Se os jogadores seguirem a figura até o beco, leia:</p>
+<div class="description">
+<p>A luz e as risadas do festival parecem tão distantes aqui, e o frio e a escuridão são onipresentes. Uma névoa fria e leve rasteja pela terra, formando uma fraca teia de gelo sobre as janelas próximas.</p>
+<p>Uma pequena borboleta desce esvoaçando do céu noturno acima, suas asas violeta-pálidas cintilando como pó de fada sob a lua prateada. Ela pausa diante de vocês, então se vira para voar mais fundo nas sombras, como que os convidando a seguir adiante.</p>
+</div>
+<p>Se os jogadores seguirem a borboleta, leia:</p>
+<div class="description">
+<p>Vocês contornam a esquina — e encontram um beco sem saída, bloqueado por uma cerca de madeira e uma pilha de barris velhos. Uma poça ao redor dos barris congelou, cristais de gelo brilhando sob o luar pálido.</p>
+<p>Uma figura, usando um manto azul-pálido, está de pé no fim do beco, o chão sob seus pés completamente congelado. A borboleta pousa em seu ombro, acomodando-se confortavelmente junto ao pescoço da figura.</p>
+</div>
+<p>A figura é uma manifestação da Sonhadora. Se ela falar, um jogador que conversou com ela em <a href="arco-u-sonhos-da-alvorada.html#u3h-a-donzela-solitária">A Donzela Solitária</a> reconhece sua voz.</p>
+<p>Se não for abordada primeiro, a Sonhadora cumprimenta os jogadores e se desculpa por observá-los. Em seguida, ela remove o capuz de seu manto, revelando as feições de uma jovem mulher, olhos violeta-pálidos, orelhas levemente pontudas, e cabelos brancos como a neve que caem além dos ombros.</p>
+<p>A Sonhadora pode compartilhar as seguintes informações:</p>
+<ul><li>Ela já teve muitos nomes, mas a maioria a chama de "Sonhadora". (Se perguntada, a Sonhadora também pode confirmar, com tristeza, que às vezes também a chamam de "Dama do Inverno", embora ela se encolha ao ouvir o nome.)</li><li>Ela é a mais nova de suas irmãs, com quem acredita que os jogadores já tenham familiaridade. Se perguntada, ela confirma que os nomes de suas irmãs são Tecelã, Caçadora e Buscadora, embora seus olhos fiquem tristes à menção desses nomes.</li><li>Há muito tempo, ela pereceu às mãos de suas irmãs por crimes que havia cometido. "Vocês não precisam temer, contudo", ela assegura aos jogadores. "Tive bastante tempo para refletir sobre minha loucura, e aceito a justiça que me impuseram."</li><li>Após sua morte, sua essência permaneceu adormecida em meio às "névoas sussurrantes" por muitos anos — até ser tomada e encerrada em âmbar por uma guilda de magos. "Não sei quantos anos meu espírito permaneceu aprisionado", ela confessa. "Restou pouco da minha mente, e aquilo que restou foi distorcido pela dor e pelo ódio."</li><li>De tempos em tempos, mortais vinham até sua prisão em busca de poder. Cada vez que concedia tal poder, ela tomava um fragmento de suas almas como compensação — e, ao fazê-lo, crescia em consciência.</li><li>Quando o "bebedor de sangue" — Strahd — chegou à sua prisão, ela já tinha consciência suficiente para sentir o fedor de sua escuridão — e para reconhecer o poder de suas irmãs que fluía dentro dele. Ele a arrancou de sua prisão, e então a aprisionou novamente em um coração de sangue cristalizado. "Não sei como ele conseguiu", ela diz, "mas forçou a totalidade do poder de minhas irmãs através de mim — para focá-lo, para controlá-lo. Mas estava contaminado e corrompido, e era demais para os cacos da minha mente suportarem. Foi uma agonia — até vocês me salvarem."</li><li>A Sonhadora viu os jogadores, seus rostos refratados através das muitas facetas do coração de cristal, enquanto ascendiam a torre e lutavam contra o "bebedor de sangue" sob "um vazio da noite mais negra". "Quando vocês o derrubaram", ela diz, "sua prisão se estilhaçou — e, pela primeira vez em uma eternidade, fui livre."</li><li>Seu corpo — seu manto de poder — a chamou desde o vale a oeste, e ela foi atraída até ele "como uma mariposa até a luz do fogo". Infundida com o poder remanescente dos Fanes de suas irmãs, ela se uniu a seus restos ancestrais — e assim renasceu. Ao fazê-lo, também obteve as memórias de seu coração, e viu os jogadores como seu coração os havia visto, tanto nas névoas sussurrantes quanto sobre o lago congelado.</li><li>Desde então, ela tem percorrido os lugares frios e escuros do vale, em busca de seus salvadores, na esperança de agradecê-los por sua liberdade.</li></ul>
+<p>A Sonhadora vem até os jogadores com duas coisas: um presente e uma súplica.</p>
+<p><strong><em>O Presente da Sonhadora.</em></strong> A Sonhadora, ainda fortalecida pelas energias remanescentes do Coração da Tristeza e da Grande Conjunção, pode oferecer aos jogadores uma única bênção, "desde que esteja em meu poder concedê-la". A bênção da Sonhadora toma a forma de uma magia de <em>desejo</em> (<em>wish</em>), com as seguintes restrições:</p>
+<ul><li>Os efeitos da magia devem se relacionar a escuridão, frio, gelo, sono ou sonhos.</li><li>A magia não pode ser usada para duplicar uma magia de 8º ou 9º círculo.</li><li>A magia não pode afetar uma área maior do que uma única comunidade.</li><li>A magia não pode manipular espaço ou tempo.</li><li>A Sonhadora não usará a magia para prejudicar inocentes.</li></ul>
+<p><strong><em>A Súplica da Sonhadora.</em></strong> A Sonhadora sente que suas irmãs retornaram ao poder. Ela nada mais deseja do que se reconciliar com elas — pedir desculpas pelo mal que outrora causou, e pelo ciúme que a transformou em um monstro. "Mas tenho vergonha demais para enfrentá-las", ela diz, "e elas não me aceitariam mesmo que eu o fizesse. Vocês são os campeões delas — não há esperança alguma para mim? O que devo fazer?"</p>
+<p>A Sonhadora é grata por qualquer orientação ou conselho que os jogadores possam oferecer. Quando satisfeita, ela se dissipa em um sudário de névoa cinzenta e fria, que logo se desfaz no ar da noite.</p>
+<h2 id="3-retorno-a-krezk">3. Retorno a Krezk</h2>
+<div class="callout callout-abstract"><div class="callout-title"><span class="callout-icon">📖</span><strong>O Pedido de Cyrus</strong></div><div class="callout-body"><p>Se os jogadores escoltaram Cyrus até Vallaki, ele os aborda após o <a href="#2-o-festival-da-alvorada">Festival da Alvorada</a> para pedir que o escoltem até Krezk e a Abadia de Saint Markovia. "Vou retornar um fracasso", ele diz pesarosamente, "mas é melhor ser um fracasso com família do que um fracasso sem ela. Eles merecem saber a verdade, ao menos."</p></div></div>
+<h3 id="3a-chegada-às-muralhas">3a. Chegada às Muralhas</h3>
+<p>Se os jogadores retornarem ao vilarejo de Krezk após derrotar Strahd, encontram o portão guardado por Zygfrek e Otto Belview.</p>
+<p>Zygfrek e Otto ficam felizes em dar as boas-vindas de volta aos jogadores em Krezk, e podem compartilhar as seguintes informações:</p>
+<ul><li>O vilarejo foi atacado por uma investida de mortos-vivos, mas os repeliu em uma grande batalha.</li><li>Para ajudar a manter o vilarejo seguro, Zygfrek e Otto foram nomeados "guardas oficiais" pelo vilarejo. (Otto se infla de orgulho com a ideia, e até Zygfrek parece um tanto orgulhosa.)</li><li>O Abade está ajudando o "homem importante" (o Barão Krezkov) a cuidar dos feridos na "casa grande" (o chalé dos Krezkov).</li></ul>
+<p>Zygfrek e Otto ficam felizes em abrir os portões e conduzir os jogadores até Ithuriel e os Krezkov, se solicitados.</p>
+<h3 id="3b-a-gratidão-de-krezk">3b. A Gratidão de Krezk</h3>
+<p>Se os jogadores visitarem o chalé do burgomestre, podem encontrar os seguintes personagens ali:</p>
+<ul><li><strong>Ithuriel</strong>, se redimido, está — com a ajuda de Vasilka — cuidando dos feridos, trocando curativos, servindo água, e compartilhando preces ao Morninglord. ("Meu toque curador é menor do que costumava ser", ele diz, encabulado, "mas ainda assim farei o que puder.")</li><li><strong>Anna e Dmitri Krezkov</strong> estão discutindo reparos nas muralhas com um pequeno grupo de moradores. (Se perguntados, podem compartilhar que Ilya e Kala foram brincar no Santuário do Sol Branco. "Eu não queria perder nenhum dos dois de vista", Anna diz, mordendo o lábio. "Mas algo na luz simplesmente faz parecer... seguro." Dmitri também pode compartilhar, em particular, se perguntado, que Emil está ajudando ele e Ilya a aprenderem a meditar para se comunicarem com o lobo interior e acalmá-lo. "Ainda não sei se gosto dele", ele diz. "Mas acho que estou começando a compreendê-lo, contra o meu próprio juízo.")</li><li><strong>Zuleika</strong> está ajudando Ithuriel a curar e cuidar dos feridos, e discutindo saberes do Morninglord e de Mother Night (enquanto trocam um debate amistoso sobre os méritos de servir a um ou a outra).</li><li><strong>Emil</strong> está ajudando a entregar cobertores limpos e comida onde for necessário.</li></ul>
+<p><strong>Se os jogadores subirem até a Abadia de Saint Markovia,</strong> encontram alguns dos Belview soltos de suas celas ou barracões para brincar, discutir, capinar, e se aquecer no jardim sob a luz quente do sol, sob o olhar vigilante de Clovin Belview e do golem de carne.</p>
+<p><strong>Se os jogadores reunirem Ithuriel e Cyrus Belview</strong>, Ithuriel se prostra diante de Cyrus e implora seu perdão por suas mentiras e pecados contra ele — especificamente, por ter oferecido Cyrus a Strahd como servo, e por não ter contestado a insinuação de Strahd de que poderia ajudar a "curar" a família de Cyrus. Cyrus, surpreso ao ver o "novo" Abade, olha para os jogadores em busca de orientação antes de responder.</p>
+<p>Embora Cyrus ainda tenha esperança de uma oportunidade de curar sua família de sua loucura, Ithuriel tem poucas ideias sobre como fazê-lo. "O Sol ajudou alguns deles a recuperar uma aparência de sanidade, mas muitos ainda estão perdidos na escuridão de suas mentes e instintos", Ithuriel diz. "O Morninglord não é senhor das mentes ou dos corpos das feras do bosque. Temo que minhas habilidades para ajudá-los sejam limitadas e, talvez, sempre tenham sido assim, apesar de meus melhores esforços em contrário."</p>
+<p>Ithuriel está sombriamente determinado a continuar fazendo o que puder para ajudar os Belview — deixando-os confortáveis, ao menos. Se os jogadores sugerirem buscar a ajuda da Caçadora no Forest Fane, ele fica surpreso, mas mais do que disposto a auxiliá-los.</p>
+<h3 id="3c-retorno-ao-forest-fane">3c. Retorno ao Forest Fane</h3>
+<p>Se os jogadores retornarem a Yester Hill, são recebidos por um <strong>lobo</strong> cinza-acastanhado onde a trilha emerge das árvores — o mesmo lobo que encontraram em <a href="#1b-a-nova-estrada-svalich">1b. A Nova Estrada Svalich</a>. O lobo, servo da Caçadora, pode guiá-los até o Forest Fane no topo de Yester Hill. O Fane está, em grande parte, como os jogadores o deixaram em <a href="arco-t-os-tres-fanes.html">Arco T - Os Três Fanes</a>, exceto que o broto de carvalho cresceu e se tornou uma árvore jovem e robusta, com aproximadamente 3 metros de altura.</p>
+<p>Se os jogadores tentarem se comunicar com a Caçadora no Forest Fane, leia:</p>
+<div class="description">
+<p>Línguas de chama esmeralda envolvem o tronco do carvalho, dançando em deleite selvagem. As chamas sugerem a forma tênue de uma mulher — uma donzela robusta de cabelos longos, uma lança segura em sua mão.</p>
+</div>
+<p>A Caçadora dá as boas-vindas aos "campeões do Forest Fane" em seu domínio, e fica feliz em fazer o que puder para ajudar os Belview, se solicitada. Se os jogadores não trouxeram nenhum Belview, ela os convida a trazer um deles até o Fane para que possa estudar "a natureza de sua aflição".</p>
+<p>Se os jogadores trouxerem um dos Belview até o Forest Fane, a Caçadora lhes pede que toquem o tronco da árvore em chamas. (Dependendo do Belview, esse pedido pode exigir alguma persuasão leve.) Assim que o Belview o faz, as chamas percorrem sua pele, envolvendo-o brevemente em fogo antes de retornar ao tronco. (As chamas são quentes, mas não ardentes, e podem ser descritas como algo que "faz cócegas".)</p>
+<p>Após examinar um Belview, a Caçadora pode compartilhar solenemente as seguintes informações:</p>
+<ul><li>Ela não pode curar a magia sombria que distorceu suas almas e corpos. "Fera e homem vivem como um só dentro deles", ela diz, "instinto e razão em guerra dentro de suas mentes. Não posso separá-los sem destruir ambos."</li><li>Ela pode, contudo, permitir que completem sua transformação por inteiro — permitir que se tornem uma das feras cujos corpos compartilham. "Eles não seriam mais humanos", ela diz, "mas estariam inteiros, de corpo e mente."</li></ul>
+<p>Qualquer Belview que venha até o Forest Fane e escolha passar pela transformação da Caçadora é envolvido por um casulo de chama esmeralda. Quando as chamas se retraem, o Belview se transforma na fera de sua escolha, dentre uma de suas mutações.</p>
+<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>A Escolha dos Belview</strong></div><div class="callout-body"><p>Se lhe for oferecida a oportunidade, Otto escolhe passar pela transformação, mas pergunta aos jogadores se deveria escolher ser um lobo, um leão ou um jumento.</p>
+<p>Se os jogadores a trataram com gentileza, Zygfrek escolhe permanecer humanoide. Caso contrário, ela escolhe se tornar um lagarto, escapulindo para a vegetação logo após sua transformação.</p>
+<p>Se levada até o Forest Fane, Mishka Belview se torna uma aranha e corre para o bosque, enquanto Marzena Belview se torna um morcego e alça voo.</p>
+<p>Nem Clovin nem Cyrus escolhem passar pela transformação, tendo dominado seus instintos animais anos atrás. Contudo, ambos ficam ao mesmo tempo pesarosos por se despedir de seus familiares e felizes por vê-los finalmente em paz.</p></div></div>
+<h2 id="4-retorno-a-barovia">4. Retorno a Barovia</h2>
+<h3 id="4a-o-corvo-e-o-cavaleiro">4a. O Corvo e o Cavaleiro</h3>
+<p>Se os jogadores retornarem à <span class="citation">F. Encruzilhada do Rio Ivlis (p. 35)</span> após derrotar Strahd, leia:</p>
+<div class="description">
+<p>A velha forca de madeira permanece silenciosa sob a luz dourada e quente, sua madeira envelhecida salpicada de musgo verde-viçoso e líquens. Perto do pequeno cemitério repousa uma pilha de ossos sob a vigília atenta de um corvo.</p>
+</div>
+<p>A pilha de ossos são os restos do cavaleiro esquelético — Dalvan Olensky e seu cavalo roubado — cujo espírito encontrou paz quando as Névoas se dissiparam. Um jogador que inspecionar os restos encontra os ossos de um cavalo e de um homem, além de uma lanterna enferrujada e torta.</p>
+<p>O corvo é um corvo comum e servo da Buscadora, vindo para honrar os restos de Dalvan por seu serviço à Buscadora.</p>
+<h3 id="4b-retorno-a-tser-pool">4b. Retorno a Tser Pool</h3>
+<p>Se os jogadores retornarem ao <span class="citation">G. Acampamento de Tser Pool (p. 36)</span>, encontram apenas duas tendas restantes: a tenda de Stanimir e a de Madam Eva. (Os demais Vistani viajaram até o vilarejo de Barovia para auxiliar nos esforços de reconstrução. Apenas Stanimir e sua família — que no momento estão caçando — permaneceram para cuidar do acampamento e de Madam Eva.)</p>
+<p>Stanimir fica encantado ao ver os jogadores, a quem presume responsáveis pelo retorno do Sol e pela evidente derrota de Strahd. Contudo, embora acredite que a derrota de Strahd era necessária para o bem de toda Barovia, ele lamenta discretamente o futuro e o legado do jovem soldado que seus ancestrais outrora auxiliaram no campo de batalha, conforme descrito em <span class="citation">Visitantes Misteriosos (p. 19)</span>. "Não sei como a escuridão veio a consumi-lo", ele diz pesarosamente. "Se ao menos um homem de tamanho poder e ambição tivesse posto sua centelha a serviço do bem, em vez do mal, o que ele poderia ter realizado?"</p>
+<p>Se os jogadores entrarem na tenda de Madam Eva, leia:</p>
+<div class="description">
+<p>A aba aberta da tenda lança um raio de luz quente sobre o interior escuro e silencioso. Em seu centro, Madam Eva está caída sobre sua mesa coberta de veludo negro, como se estivesse dormindo. Um pedaço de pergaminho repousa sobre a mesa diante dela, um tinteiro e uma pena a poucos centímetros de seus dedos.</p>
+</div>
+<p>Um jogador que examinar Madam Eva descobre que ela não reage, mas tem um sorriso caloroso e genuíno no rosto. Um teste de Sabedoria (Medicina) CD 2 bem-sucedido confirma que ela está morta; com um resultado de 10 ou mais, os jogadores descobrem que ela está morta há apenas algumas horas, evidentemente de causas naturais.</p>
+<p>O pergaminho parece ser uma carta incompleta. Ele diz, simplesmente:</p>
+<div class="description">
+<p>Minha querida Varushka,</p>
+<p>Tenho tanto para lhe contar.</p>
+</div>
+<p>Se os jogadores contarem a Stanimir sobre a morte de Eva, ele compartilha, com reverência e pesar, que Eva vigiou o Acampamento de Tser Pool desde "seu nascimento, e o nascimento de seu pai, e o nascimento do pai de seu pai". "Perder sua sabedoria é, de fato, uma perda profunda", ele diz. "Mas espero que ela tenha encontrado paz." (Stanimir não conhece a verdadeira identidade de Eva como Katarina, ou avatar da Buscadora, nem como ela permaneceu viva por séculos, mas sempre acreditou que ela permanecia em Tser Pool por um propósito. "Talvez esse propósito agora tenha se cumprido", ele pondera.)</p>
+<p>Depois que os jogadores partem de Tser Pool, se ajudaram a Sonhadora em <a href="#2f-histórias-de-medo-e-perdão">2f. Histórias de Medo e Perdão</a>, eles têm uma breve visão dos Rozana reunidos. Leia ou parafraseie:</p>
+<div class="description">
+<p>Ao se virarem para partir da encruzilhada, uma brisa quente suspira pelo bosque, fazendo uma rajada de folhas caídas, vermelho-douradas, dançar pela estrada. Além do cemitério solitário, algo chama a atenção de vocês: a silhueta de uma mulher, de cabelos negros como corvo, vestida nos azuis da tempestade mais escura, com um corvo pousado no ombro. Ao seu lado está uma mulher alta e robusta, vestida em peles, com cabelos ruivos como fogo e uma lança longa e afiada; e uma mulher mais baixa e atarracada, cujo vestido parece tecido de longas gramíneas e trepadeiras floridas. As três permanecem orgulhosamente ao lado de uma quarta figura: uma donzela esguia, vestida em gelo e névoa translúcidos, seus olhos brilhantes e cheios de alegria. Elas inclinam a cabeça em saudação — e então desaparecem com o vento que sopra.</p>
+</div>
+<h3 id="4c-boas-vindas-de-heróis">4c. Boas-Vindas de Heróis</h3>
+<p>Se os jogadores retornarem ao vilarejo de Barovia, podem encontrar:</p>
+<ul><li><strong>Quatro das cinco famílias Vistani</strong> de Tser Pool reacampadas em tendas ao pé de Lugdana's Knoll, logo fora do vilarejo, auxiliando os moradores nos esforços de reconstrução.</li><li><strong>Ismark</strong> na taverna Blood of the Vine, tendo estabelecido um pequeno "escritório" no salão principal a partir do qual gerencia e supervisiona os esforços de reconstrução.</li><li><strong>O Padre Donavich</strong>, <strong>Van Richten</strong>, <strong>Erasmus</strong> e <strong>Parriwimple</strong> na igreja do vilarejo, cuidando dos feridos e dos enlutados.</li><li><strong>Gertruda</strong> e <strong>Mary</strong> em sua casa, preparando ensopado e pão para os feridos na igreja, e para serem distribuídos a quem teve a casa danificada ou destruída nos combates.</li><li><strong>Doru</strong> em um caixote cheio de terra em seu quarto durante o dia, ajudando Mary e Gertruda a distribuir comida ao entardecer e à noite, e no quarto de Gertruda ou em seu telhado durante a noite.</li></ul>
+<p>Todos ficam felizes em ver os jogadores novamente, e presumem que suas ações são responsáveis pelo nascer do Sol e pela derrota do exército de mortos-vivos.</p>
+<p>Se os jogadores permanecerem até o anoitecer, Ismark insiste que compareçam a uma celebração — com todas as bebidas pagas — na taverna Blood of the Vine naquela noite.</p>
+<p>Antes de os jogadores partirem, se ajudaram Doru a superar sua sede de sangue em <a href="arco-b-bem-vindo-a-barovia.html">Arco B - Bem-vindo a Barovia</a>, Van Richten e Doru se aproximam deles com uma proposta e um pedido. Podem compartilhar as seguintes informações:</p>
+<ul><li>Após a derrota de Strahd pelas mãos dos jogadores e o reencontro de Van Richten com seu filho, Van Richten acredita que chegou a hora de se aposentar.</li><li>Contudo, ao ver as evidências da capacidade de Doru de resistir à sua sede de sangue, e após sua própria experiência com sua maldição e redenção, Van Richten acredita que ainda pode fazer o bem como um <em>reabilitador</em> de monstros e amaldiçoados, em vez de como um caçador de monstros. Doru pretende se juntar a ele nesse empreendimento, como seu aprendiz e parceiro.</li><li>Van Richten ouviu dizer que a Abadia de Saint Markovia já foi um lugar sagrado de cura e refúgio, e que o Abade de lá é um homem sagrado de grande estatura. "Se não for uma imposição grande demais", ele diz, "eu apreciaria muito uma apresentação."</li></ul>
+<h2 id="5-o-destino-de-escher">5. O Destino de Escher</h2>
+<p>O destino final de Escher depende das escolhas e ações dos jogadores anteriormente na campanha:</p>
+<ul><li>Se os jogadores (1) reuniram Escher e Doru (por exemplo, durante <a href="arco-p-o-assalto-a-ravenloft.html">Arco P - Assalto a Ravenloft</a>), (2) trataram Escher com respeito e compaixão, e (3) encorajaram Escher a buscar redenção, conduza <a href="#5a-a-jornada-de-escher">5a. A Jornada de Escher</a>.</li><li>Se os jogadores alcançaram apenas dois desses três pré-requisitos, conduza <a href="#5b-o-isolamento-de-escher">5b. O Isolamento de Escher</a>.</li><li>Se os jogadores alcançaram apenas um desses três pré-requisitos, conduza <a href="#5c-a-tentação-de-escher">5c. A Tentação de Escher</a>.</li><li>Se os jogadores não alcançaram nenhum desses três pré-requisitos, conduza <a href="#5d-a-queda-de-escher">5d. A Queda de Escher</a>.</li></ul>
+<h3 id="5a-a-jornada-de-escher">5a. A Jornada de Escher</h3>
+<p>Pouco depois da derrota de Strahd, Escher procura os jogadores em Vallaki, viajando à noite e se apresentando abertamente nos portões.</p>
+<ul><li><strong><em>Se for sabido que os jogadores estão presentes em Vallaki,</em></strong> um dos guardas da cidade os busca e pede que venham até o portão, onde "um dos rebentos do Diabo" está perguntando por eles.</li><li><strong><em>Se não for sabido que os jogadores estão presentes em Vallaki</em></strong>, Escher insiste que lhe seja permitido encontrá-los e solicita uma audiência com Lady Wachter. Assim que ela chega, ele se rende a ela e insiste que lhe seja concedida a oportunidade de falar com os jogadores. Sob ordens de Lady Wachter, Escher é amarrado em algemas e aprisionado em <span class="citation">N4t. Quartel-General do Culto (p. 114)</span>, cuja porta secreta é trancada e vigiada por dois <strong>guardas</strong> até que os jogadores retornem a Vallaki.</li></ul>
+<p>Se os jogadores posteriormente falarem com Escher, ele se rende a eles e pede que decidam seu destino. "Não posso reparar as coisas que fiz ou as pessoas que machuquei", ele diz, a voz sufocada em lágrimas. "Toda vez que durmo, vejo os rostos deles em meus sonhos. Por favor — eu só quero que isso pare."</p>
+<p>Escher está disposto a aceitar qualquer decisão que os jogadores tomarem.</p>
+<h3 id="5b-o-isolamento-de-escher">5b. O Isolamento de Escher</h3>
+<p>Uma a duas semanas após a derrota de Strahd, caçadores locais relatam avistamentos de gado e animais selvagens mortos no bosque ao redor de Vallaki, com duas perfurações no pescoço de cada vítima. Temendo um novo tipo de vampiro bestial, Lady Wachter pede que os jogadores investiguem e lidem com qualquer ameaça.</p>
+<p>Szoldar Szoldarovich e Yevgeni Krushkin podem conduzir os jogadores até Jander's Hollow, um pequeno vale na Svalich Woods onde as vítimas mais recentes foram encontradas. Ao chegarem, os jogadores podem encontrar um cervo morto com duas perfurações ao longo da garganta. Um teste de Sabedoria (Medicina) CD 15 revela que as perfurações provavelmente foram feitas por dentes humanoides afiados — não por uma fera.</p>
+<ul><li>Se os jogadores investigarem a área durante o dia, também podem encontrar um rastro de pegadas recentes que leva pela borda do vale até uma pequena caverna sob um carvalho ancião. Dentro da caverna, os jogadores podem encontrar Escher, adormecido em uma pequena depressão no solo e coberto por galhos de pinheiro. Escher se rende rapidamente se acordado.</li><li>Se os jogadores investigarem a área à noite, são observados por Escher a partir das árvores, que tenta se esconder nas sombras. Se o teste de Sabedoria (Percepção) de um jogador, ou sua pontuação de Sabedoria (Percepção) passiva, exceder o teste de Destreza (Furtividade) de Escher, ele automaticamente detecta sua silhueta agachada na copa. Escher tenta fugir se detectado, mas se rende rapidamente se capturado.</li></ul>
+<p>Se capturado, Escher pode compartilhar que fugiu do exército de Strahd pouco depois de sua partida do Castelo Ravenloft, e buscou refúgio no bosque após o nascer do Sol. Desde então, ele tem feito o possível para viver do sangue de feras em vez de sangue humano, na esperança de "evitar mais problemas".</p>
+<p>Jogadores que demonstrem compaixão e respeito a Escher e forem bem-sucedidos em um teste de Carisma (Persuasão) CD 10 podem convencê-lo a buscar reabilitação, rolando com vantagem se mencionarem Doru ou o objetivo de Van Richten de reabilitar "monstros".</p>
+<p>Escher só luta em legítima defesa, mas prefere fugir se atacado.</p>
+<h3 id="5c-a-tentação-de-escher">5c. A Tentação de Escher</h3>
+<p>Pouco depois da queda de Strahd, Escher vasculha as ruínas do Castelo Ravenloft em busca do segredo para se tornar um lorde vampiro, determinado a não deixar sua imortalidade em vão. Após várias noites de busca, ele desenterra o braseiro de teletransporte de Strahd e o usa para se teletransportar até o Amber Temple, onde é expulso do cofre de âmbar pelo fantasma de Exethanter.</p>
+<p>Antes de fugir do templo, Escher aceita o dom sombrio de Zrin-Hala, faminto para se vingar dos jogadores por "destruírem sua vida". Em seguida, ele abre caminho lutando montanha abaixo pelo Monte Ghakis, derrotando ou escapando de vários demônios amaldiçoados pelo âmbar e massacrando um grupo de caçadores do Mountain Folk antes de entrar no vale e rastrear os jogadores.</p>
+<p>Aproximadamente duas semanas após a queda de Strahd, Escher ataca os jogadores em uma noite e em um horário de sua escolha, na esperança de emboscar e matar um deles antes de fugir, repetindo então o padrão a cada noite seguinte. Quando o faz, ele usa as estatísticas de um <strong>vampiro servo</strong>, com as seguintes mudanças:</p>
+<ul><li>Ele tem Força 19 (+4).</li><li>Ele possui as características <strong><em>garra</em></strong> e <strong><em>resistência à magia</em></strong> de um <strong>armanita</strong> (<em>armanite</em>), além de resistência a dano elétrico.</li><li>Ele pode conjurar <em>invocar relâmpago</em> (<em>call lightning</em>) e <em>relâmpago</em> (<em>lightning bolt</em>) sem componentes, duas vezes por dia cada. Toda vez que conjura uma dessas magias, deve fazer um teste de resistência de Carisma CD 5, transformando-se em um <strong>armanita</strong> em caso de falha e aumentando em 3 a CD dos testes de resistência futuros em caso de sucesso.</li><li>Seus pés se fundiram em cascos fendidos, dois chifres ósseos irromperam de sua cabeça, e suas unhas se afiaram em garras longas e serrilhadas.</li></ul>
+<p>Escher luta até a morte, fugindo apenas se conseguir matar um dos jogadores.</p>
+<h3 id="5d-a-queda-de-escher">5d. A Queda de Escher</h3>
+<p>Três semanas após a queda de Strahd, um Escher isolado e faminto por sangue viaja até Vallaki, onde se instala em uma casa abandonada e começa a caçar os moradores nas ruas. Depois que uma mulher vallakiana chamada Miruna Swilova escapa por pouco da morte em suas mãos, Lady Wachter orienta os jogadores a encontrar o "vampiro" que ainda assombra as ruas de Vallaki.</p>
+<p>Miruna pode direcionar os jogadores até uma casa abandonada três portas adiante da casa de Milivoj, no norte de Vallaki, onde ela viu pela primeira vez a silhueta do vampiro agachada no telhado. Se perguntado, Milivoj pode confirmar que, embora os moradores da casa tenham morrido no cerco de Strahd, ele tem tido uma sensação estranha de estar sendo <em>observado</em> sempre que passa por aquela casa nas noites recentes.</p>
+<ul><li>Se os jogadores investigarem a casa durante o dia, Escher está adormecido em um caixão no porão. Escher ataca imediatamente se acordado.</li><li>Se os jogadores investigarem a casa à noite, Escher está observando os jogadores do alto de um telhado do outro lado da rua. Se o teste de Sabedoria (Percepção) de um jogador, ou sua pontuação de Sabedoria (Percepção) passiva, exceder o teste de Destreza (Furtividade) de Escher, ele automaticamente detecta sua silhueta agachada no telhado. Se detectado, Escher desce até um beco e se esconde ali, na esperança de atrair os jogadores para uma emboscada. Detectando-o ou não, Escher passa então a espreitar os jogadores durante a noite, na esperança de emboscá-los e drenar seu sangue.</li></ul>
+<p>A raiva, o isolamento e a fome de Escher o levaram a abandonar completamente sua humanidade, reduzindo-o a um estado enfurecido, quase feral. Ele se recusa a ouvir a razão e luta até a morte.</p>
+<h2 id="6-finais-e-começos">6. Finais e Começos</h2>
+<h3 id="6a-o-conselho">6a. O Conselho</h3>
+<p>Dentro de duas semanas após a derrota de Strahd, Lady Fiona Wachter convida os jogadores — seja por carta, mensageiro, ou convite pessoal — para uma reunião em Wachterhaus para discutir o futuro de Barovia.</p>
+<p>A reunião, que ocorre na <strong>N4j. Sala de Jantar (p. 112)</strong>, conta com a presença de Lady Wachter, Kasimir Velikov, Ismark Kolyanovich, Dmitri Krezkov, Urwin Martikov, Luvash, e Stanimir (ou seus substitutos, caso algum tenha falecido).</p>
+<p>O propósito desta reunião, Lady Wachter explica, é o seguinte:</p>
+<ul><li>avaliar e lidar com os remanescentes da corte e do castelo de Strahd, incluindo as "tribos druídicas" (isto é, o Forest Folk e o Mountain Folk), a alcateia de lobisomens, o conclave de bruxas (se ainda vivo), e quaisquer vampiros servos sobreviventes de Strahd (se houver)</li><li>confirmar o destino da Order of the Silver Dragon</li><li>discutir a governança, o comércio e a defesa comum do vale</li><li>discutir a reintrodução do vale ao mundo exterior (isto é, explorar a região local e estabelecer relações diplomáticas)</li><li>facilitar o retorno dos refugiados barovianos ao seu vilarejo natal, para aqueles que assim desejarem</li></ul>
+<p>Os presentes na reunião têm os seguintes objetivos e interesses, embora possam ser persuadidos a abandoná-los com argumentos adequados e um teste de Carisma (Persuasão):</p>
+<ul><li><strong>Lady Wachter</strong> espera criar uma aliança defensiva e comercial entre os três povoados, com Vallaki como parceira sênior devido ao seu tamanho e recursos, e estabelecer um governo centralizado (ou ao menos coordenado) do vale para garantir prosperidade compartilhada, facilitar a reintegração com o mundo exterior, e prover defesa contra ameaças externas.</li><li><strong>Kasimir</strong> espera preservar a cultura, a dignidade e a independência dos elfos do crepúsculo, ao mesmo tempo em que permite que se reintegrem à população de Barovia. ("Talvez tenhamos permanecido tempo demais nas sombras do passado", ele reflete, "relutantes em abrir mão de memórias e luto.")</li><li><strong>Ismark</strong> espera reforçar e financiar os esforços de restauração do vilarejo de Barovia, especialmente após o segundo cerco de Strahd, facilitar o retorno dos refugiados a Barovia, e garantir a prosperidade e a defesa futura do vilarejo (especialmente devido à sua exposição à passagem oriental do vale e à falta de muralhas).</li><li><strong>Dmitri</strong> (ainda um tanto desconfiado de forasteiros, e fiel às altas muralhas e à autossuficiência de seu vilarejo) espera preservar a independência e a autonomia de Krezk.</li><li><strong>Urwin</strong> (que assumiu o comando dos Keepers of the Feather após a recente aposentadoria de Davian) espera preservar a independência dos Keepers e evitar que qualquer líder político os controle para uso militar ou vigilância.</li><li><strong>Luvash</strong> não tem opiniões fortes sobre política ou governo, mas quer garantir a liberdade das caravanas (e comerciantes) Vistani de ir e vir como bem entenderem, preservando a cultura Vistani e oferecendo um local seguro e permanente para o acampamento vallakiano permanecer.</li><li><strong>Stanimir</strong> está presente apenas para informar aos demais que, após a morte de Madam Eva, o acampamento de Tser Pool será desfeito, com algumas caravanas se realocando para o acampamento vallakiano e outras (incluindo Stanimir) partindo para terras distantes.</li></ul>
+<p>Os presentes acolhem a contribuição e a assistência dos jogadores como mediadores. Contudo, nenhum deles está disposto a viver novamente sob o domínio de um monarca.</p>
+<h3 id="6b-rumo-às-névoas">6b. Rumo às Névoas</h3>
+<p>Pouco depois do conselho de Lady Wachter, Muriel Vinshaw se aproxima dos jogadores ao lado de Ezmerelda e Elvir Martikov. (Se Ireena entrou em um relacionamento romântico com Ezmerelda, Ireena os acompanha também.) Todos carregam pesadas mochilas contendo suprimentos para vários dias de viagem.</p>
+<p>Muriel e Ezmerelda descobriram, tanto por meio de bandos migratórios de corvos quanto de caravanas Vistani viajantes, que — embora Strahd tenha sido derrotado e Barovia libertada — as Névoas (ou um fenômeno quase idêntico) ainda sobrevivem em outros lugares, e que os Poderes que aprisionaram Barovia podem ter enredado outros povoados inocentes dentro delas. ("Parece que Barovia pode não ter sido a única vítima das Névoas", Ezmerelda diz sombriamente. "Já ouvi histórias de terras distantes levadas embora — reinos desérticos, templos na selva, e cidades vastas onde os vivos dormem para sempre.")</p>
+<p>Muriel, Ezmerelda, Elvir e Ireena pretendem viajar até essas terras com a ajuda de um item chamado <em>talismã das névoas</em> (<em>mist talisman</em>), que Ezmerelda obteve de um mercador Vistani. (Veja <strong>Domains of Ravenloft (<em>Van Richten's Guide to Ravenloft</em>, p. 61)</strong> para uma lista de talismãs das névoas que Ezmerelda pode ter obtido.) Ao chegar em cada terra, Muriel pretende fundar novos capítulos dos Keepers of the Feather — e precisará de novos membros para ajudar a fazê-lo.</p>
+<p>Os quatro vieram se despedir dos jogadores — e, se estiverem interessados, convidar qualquer um deles a se juntar à sua empreitada. ("Enquanto qualquer um de nós estiver preso nas Névoas", Ireena diz, com determinação inflexível, "todos nós estaremos.")</p>
+<p>Mesmo que nenhum jogador se junte à expedição, os viajantes agradecem aos jogadores por seus esforços para ajudar Barovia e lhes desejam calorosas despedidas.</p>
+<div class="callout callout-tip"><div class="callout-title"><span class="callout-icon">💡</span>Vocês Chegaram ao Fim das Névoas</div><div class="callout-body"><p>Vocês chegaram ao fim da versão pública atual do guia <em>Curse of Strahd: Reloaded</em>.</p>
+<p>Para conferir com antecedência as revisões dos arcos já publicados e outros trabalhos futuros, apoie o guia entrando no <a href="https://www.patreon.com/DragnaCarta" target="_blank" rel="noopener">Patreon</a> do autor!</p></div></div>
+  </main>
+  <aside class="sidebar-right"><div class="toc-label">Nesta página</div><div class="toc-list"><a class="toc-lvl-2" href="#1-retorno-do-castelo">1. Retorno do Castelo</a><a class="toc-lvl-3" href="#1a-a-dupla-estranha">1a. A Dupla Estranha</a><a class="toc-lvl-3" href="#1b-a-nova-estrada-svalich">1b. A Nova Estrada Svalich</a><a class="toc-lvl-3" href="#1c-os-portões-de-vallaki">1c. Os Portões de Vallaki</a><a class="toc-lvl-3" href="#1d-a-praça-da-cidade">1d. A Praça da Cidade</a><a class="toc-lvl-3" href="#1e-o-acampamento-vistani">1e. O Acampamento Vistani</a><a class="toc-lvl-2" href="#2-o-festival-da-alvorada">2. O Festival da Alvorada</a><a class="toc-lvl-3" href="#2a-o-farol-bruxuleante">2a. O Farol Bruxuleante</a><a class="toc-lvl-3" href="#2b-a-mansão-vazia">2b. A Mansão Vazia</a><a class="toc-lvl-3" href="#2c-que-comecem-as-festividades">2c. Que Comecem as Festividades!</a><a class="toc-lvl-3" href="#2d-jogos-do-festival">2d. Jogos do Festival</a><a class="toc-lvl-3" href="#2e-histórias-de-fé-e-vitória">2e. Histórias de Fé e Vitória</a><a class="toc-lvl-3" href="#2f-histórias-de-medo-e-perdão">2f. Histórias de Medo e Perdão</a><a class="toc-lvl-2" href="#3-retorno-a-krezk">3. Retorno a Krezk</a><a class="toc-lvl-3" href="#3a-chegada-às-muralhas">3a. Chegada às Muralhas</a><a class="toc-lvl-3" href="#3b-a-gratidão-de-krezk">3b. A Gratidão de Krezk</a><a class="toc-lvl-3" href="#3c-retorno-ao-forest-fane">3c. Retorno ao Forest Fane</a><a class="toc-lvl-2" href="#4-retorno-a-barovia">4. Retorno a Barovia</a><a class="toc-lvl-3" href="#4a-o-corvo-e-o-cavaleiro">4a. O Corvo e o Cavaleiro</a><a class="toc-lvl-3" href="#4b-retorno-a-tser-pool">4b. Retorno a Tser Pool</a><a class="toc-lvl-3" href="#4c-boas-vindas-de-heróis">4c. Boas-Vindas de Heróis</a><a class="toc-lvl-2" href="#5-o-destino-de-escher">5. O Destino de Escher</a><a class="toc-lvl-3" href="#5a-a-jornada-de-escher">5a. A Jornada de Escher</a><a class="toc-lvl-3" href="#5b-o-isolamento-de-escher">5b. O Isolamento de Escher</a><a class="toc-lvl-3" href="#5c-a-tentação-de-escher">5c. A Tentação de Escher</a><a class="toc-lvl-3" href="#5d-a-queda-de-escher">5d. A Queda de Escher</a><a class="toc-lvl-2" href="#6-finais-e-começos">6. Finais e Começos</a><a class="toc-lvl-3" href="#6a-o-conselho">6a. O Conselho</a><a class="toc-lvl-3" href="#6b-rumo-às-névoas">6b. Rumo às Névoas</a></div></aside>
+</div>
+<script>
+document.querySelectorAll('.search-box input').forEach(function(inp){
+  inp.addEventListener('input', function(){
+    var q = inp.value.trim().toLowerCase();
+    var sidebar = inp.closest('.sidebar-left');
+    if (!q) { sidebar.classList.remove('filtering'); return; }
+    sidebar.classList.add('filtering');
+    sidebar.querySelectorAll('.tree .leaf').forEach(function(a){
+      var hit = a.textContent.toLowerCase().indexOf(q) !== -1;
+      a.classList.toggle('match', hit);
+    });
+    sidebar.querySelectorAll('.tree > details').forEach(function(d){
+      var hasMatch = d.querySelector('.leaf.match');
+      d.classList.toggle('has-match', !!hasMatch);
+    });
+  });
+});
+var mobileBtn = document.querySelector('.mobile-topbar button');
+if (mobileBtn) {
+  mobileBtn.addEventListener('click', function(){
+    document.querySelector('.sidebar-left').classList.toggle('open');
+  });
+}
+</script>
+</body>
+</html>
