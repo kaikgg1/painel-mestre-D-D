@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1c1c1e">
+<link rel="icon" type="image/svg+xml" href="../../assets/img/favicon.svg">
+<title>Criação de Personagem — Curse of Strahd: Reloaded</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+* { box-sizing:border-box; }
+:root {
+  --bg:#1c1c1e; --bg-sidebar:#1a1a1c; --bg-hover:#252528; --bg-card:#232325;
+  --border:#333336;
+  --gold:#e0a542; --gold-dim:#b8863a;
+  --active:#a78bfa; --active-dim:#8a6fd8;
+  --text:#dcdcdd; --text-dim:#9a9a9d; --text-faint:#6e6e72;
+  --title:#f2f1ee;
+}
+* { scrollbar-color: #48484c var(--bg-sidebar); scrollbar-width: thin; }
+html, body { margin:0; min-height:100vh; background:var(--bg);
+  font-family:'Inter', system-ui, -apple-system, sans-serif; color:var(--text); }
+a { color:var(--gold); text-decoration:none; }
+a:hover { text-decoration:underline; }
+
+.layout { display:flex; min-height:100vh; align-items:stretch; }
+
+/* ---------- barra lateral esquerda ---------- */
+.sidebar-left { width:290px; flex:0 0 290px; background:var(--bg-sidebar);
+  border-right:1px solid var(--border); padding:22px 18px 40px;
+  position:sticky; top:0; height:100vh; overflow-y:auto; }
+.brand { font-size:19px; font-weight:800; color:var(--gold); line-height:1.25;
+  margin-bottom:14px; text-decoration:none; display:block; }
+.brand:hover { text-decoration:none; opacity:.9; }
+.search-box { position:relative; margin-bottom:16px; }
+.search-box input { width:100%; padding:8px 10px 8px 30px; border-radius:6px;
+  border:1px solid var(--border); background:var(--bg-card); color:var(--text);
+  font-family:inherit; font-size:13px; }
+.search-box input::placeholder { color:var(--text-faint); }
+.search-box input:focus { outline:none; border-color:var(--gold-dim); }
+.search-box .ico { position:absolute; left:9px; top:50%; transform:translateY(-50%);
+  color:var(--text-faint); font-size:13px; pointer-events:none; }
+.tree { font-size:14px; }
+.tree details { margin-bottom:1px; }
+.tree summary { list-style:none; cursor:pointer; padding:6px 8px; border-radius:6px;
+  color:var(--text); display:flex; align-items:center; gap:6px; user-select:none; }
+.tree summary::-webkit-details-marker { display:none; }
+.tree summary:hover { background:var(--bg-hover); }
+.tree summary .chev { display:inline-block; font-size:10px; color:var(--text-faint);
+  transition:transform .15s; width:10px; }
+.tree details[open] > summary .chev { transform:rotate(90deg); }
+.tree .leaf-list { padding-left:20px; margin-top:1px; }
+.tree .leaf { display:block; padding:6px 8px; border-radius:6px; font-size:13.5px;
+  color:var(--text-dim); }
+.tree .leaf:hover { background:var(--bg-hover); color:var(--text); text-decoration:none; }
+.tree .leaf.active { color:var(--active); font-weight:600; background:rgba(167,139,250,.1); }
+.tree .leaf.locked { color:var(--text-faint); cursor:default; font-style:italic; }
+.tree .leaf.locked:hover { background:none; }
+.tree .no-match { display:none; }
+.sidebar-left.filtering .tree .leaf { display:none; }
+.sidebar-left.filtering .tree .leaf.match { display:block; }
+.sidebar-left.filtering .tree details { display:none; }
+.sidebar-left.filtering .tree details.has-match { display:block; }
+.sidebar-left.filtering .tree details.has-match > summary .chev { transform:rotate(90deg); }
+
+/* ---------- coluna central ---------- */
+main.article { flex:1 1 auto; min-width:0; max-width:760px; margin:0 auto;
+  padding:48px 40px 100px; line-height:1.7; font-size:16.5px; }
+.page-title { font-size:clamp(28px,4vw,38px); font-weight:800; color:var(--title);
+  margin:0 0 28px; letter-spacing:-.3px; }
+main.article h1 { color:var(--gold); font-size:26px; font-weight:700;
+  margin:36px 0 14px; scroll-margin-top:24px; letter-spacing:-.2px; }
+main.article h1:first-child { margin-top:0; }
+main.article h2 { color:var(--gold); font-size:21px; font-weight:700;
+  margin:30px 0 12px; scroll-margin-top:24px; }
+main.article h3 { color:var(--title); font-size:18px; font-weight:700;
+  margin:24px 0 10px; scroll-margin-top:24px; }
+main.article h4 { color:var(--text-dim); font-size:14px; font-weight:700;
+  text-transform:uppercase; letter-spacing:.5px; margin:20px 0 8px; scroll-margin-top:24px; }
+main.article p { margin:0 0 15px; color:var(--text); }
+main.article ul { margin:0 0 15px; padding-left:24px; }
+main.article li { margin-bottom:6px; }
+main.article a { border-bottom:1px solid rgba(224,165,66,.35); }
+main.article a:hover { border-bottom-color:var(--gold); text-decoration:none; }
+main.article em { color:var(--text); font-style:italic; }
+main.article strong { color:var(--title); font-weight:700; }
+main.article hr { border:0; border-top:1px solid var(--border); margin:20px 0; }
+.link-pending { color:var(--text-faint); font-style:italic; border-bottom:1px dotted var(--text-faint); cursor:default; }
+.reloaded-img { max-width:100%; border-radius:8px; border:1px solid var(--border); margin:16px 0; display:block; }
+
+span.citation { font-style:italic; color:var(--text-dim); }
+span.highlight { color:var(--gold); font-weight:600; }
+span.credit { font-size:12px; color:var(--text-faint); display:block; margin-top:4px; }
+
+div.description { background:var(--bg-card); border-left:3px solid var(--active-dim);
+  border-radius:0 8px 8px 0; padding:16px 20px; margin:18px 0; font-style:italic; color:var(--text); }
+div.description p:last-child { margin-bottom:0; }
+
+.callout { border:1px solid var(--border); border-left:4px solid var(--gold-dim);
+  border-radius:0 8px 8px 0; background:rgba(224,165,66,.06); margin:18px 0; padding:14px 18px; }
+.callout-title { font-weight:700; color:var(--gold); font-size:13px; letter-spacing:.3px;
+  text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+.callout-icon { font-size:14px; }
+.callout-body p:last-child { margin-bottom:0; }
+.callout-body { font-size:16px; }
+.callout-warning { border-left-color:#e2645a; background:rgba(226,100,90,.08); }
+.callout-warning .callout-title { color:#f08078; }
+.callout-combat { border-left-color:#e2645a; background:rgba(226,100,90,.1); }
+.callout-combat .callout-title { color:#f08078; }
+.callout-lore, .callout-abstract { border-left-color:#5f9bd8; background:rgba(95,155,216,.08); }
+.callout-lore .callout-title, .callout-abstract .callout-title { color:#7fb4e8; }
+.callout-profile { border-left-color:var(--active-dim); background:rgba(167,139,250,.08); }
+.callout-profile .callout-title { color:var(--active); }
+.callout-item { border-left-color:#4fb86a; background:rgba(79,184,106,.08); }
+.callout-item .callout-title { color:#6fce88; }
+.callout-design { border-left-color:var(--text-faint); background:rgba(158,158,162,.06); }
+.callout-design .callout-title { color:var(--text-dim); }
+.callout-tip { border-left-color:var(--gold); }
+
+.table-wrap { overflow-x:auto; margin:18px 0; }
+table.md-table { border-collapse:collapse; width:100%; font-size:15px; }
+table.md-table th, table.md-table td { border:1px solid var(--border); padding:8px 11px; text-align:left; }
+table.md-table th { background:var(--bg-card); color:var(--gold); font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; }
+
+div.statblock { background:var(--bg-card); border:1px solid var(--border);
+  border-left:3px solid var(--active-dim); border-radius:8px; padding:18px 22px; margin:20px 0; }
+div.statblock h2 { color:var(--title); font-size:20px; font-weight:800; margin:0 0 2px; }
+div.statblock > em:first-of-type { display:block; font-style:italic; color:var(--text-dim); margin-bottom:10px; }
+div.statblock hr { border-top:1px solid var(--border); margin:11px 0; }
+div.statblock h3 { color:var(--gold); font-size:14px; font-weight:700;
+  text-transform:uppercase; letter-spacing:.5px; margin:16px 0 7px; }
+div.statblock p { margin:0 0 9px; font-size:15px; }
+div.statblock table.ability-table { width:100%; border-collapse:collapse; margin:9px 0; }
+div.statblock table.ability-table th, div.statblock table.ability-table td {
+  border:1px solid var(--border); text-align:center; padding:6px 4px; font-size:14px; }
+div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-weight:700; }
+
+/* ---------- coluna direita: sumario ---------- */
+.sidebar-right { width:250px; flex:0 0 250px; padding:48px 20px 40px 0;
+  position:sticky; top:0; height:100vh; overflow-y:auto; }
+.toc-label { font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+  color:var(--text-faint); margin-bottom:12px; }
+.toc-list { font-size:13px; }
+.toc-list a { display:block; padding:4px 0; color:var(--text-dim); border-bottom:none;
+  line-height:1.4; }
+.toc-list a:hover { color:var(--text); text-decoration:none; }
+.toc-lvl-1 { padding-left:0; font-weight:600; }
+.toc-lvl-2 { padding-left:12px; }
+.toc-lvl-3 { padding-left:24px; }
+.toc-lvl-4 { padding-left:36px; font-size:12px; }
+
+/* ---------- pagina indice ---------- */
+.idx-intro { margin-bottom:8px; }
+.idx-intro h1 { font-size:clamp(26px,4vw,36px); font-weight:800; color:var(--gold); margin-bottom:10px; }
+.idx-intro p { color:var(--text-dim); font-size:15px; max-width:640px; }
+.idx-section { margin:34px 0; }
+.idx-section-title { font-size:13px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+  color:var(--text-dim); border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:14px; }
+.idx-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:12px; }
+.idx-card { display:block; background:var(--bg-card); border:1px solid var(--border);
+  border-radius:8px; padding:14px 16px; font-weight:600; font-size:14.5px; color:var(--text);
+  transition:border-color .15s, transform .15s; }
+.idx-card:hover { border-color:var(--gold-dim); transform:translateY(-2px); text-decoration:none; }
+.idx-card.locked { opacity:.45; cursor:default; border-style:dashed; }
+.idx-card.locked:hover { transform:none; }
+.idx-badge { display:block; margin-top:5px; font-size:10px; letter-spacing:.5px; text-transform:uppercase; color:var(--text-faint); font-weight:400; }
+
+/* ---------- mobile ---------- */
+.mobile-topbar { display:none; }
+@media (max-width:1100px) {
+  .sidebar-right { display:none; }
+}
+@media (max-width:860px) {
+  .layout { flex-direction:column; }
+  .mobile-topbar { display:flex; align-items:center; gap:12px; position:sticky; top:0; z-index:40;
+    background:var(--bg-sidebar); border-bottom:1px solid var(--border); padding:12px 16px; }
+  .mobile-topbar .brand { margin:0; font-size:15px; flex:1; }
+  .mobile-topbar button { background:none; border:1px solid var(--border); color:var(--text);
+    border-radius:6px; padding:6px 10px; font-family:inherit; font-size:13px; }
+  .sidebar-left { position:fixed; left:0; top:49px; bottom:0; z-index:39; transform:translateX(-100%);
+    transition:transform .2s; width:82vw; max-width:320px; box-shadow:8px 0 30px rgba(0,0,0,.5); }
+  .sidebar-left.open { transform:translateX(0); }
+  main.article { padding:28px 18px 70px; max-width:100%; }
+}
+</style>
+</head>
+<body>
+<div class="mobile-topbar">
+  <button aria-label="Abrir menu">☰</button>
+  <a class="brand" href="index.html">Curse of Strahd: Reloaded</a>
+</div>
+<div class="layout">
+  <aside class="sidebar-left">
+    <a class="brand" href="index.html">Curse of Strahd:<br>Reloaded</a>
+    <div class="search-box"><span class="ico">🔍</span><input type="text" placeholder="Buscar página..." aria-label="Buscar página"></div>
+    <nav class="tree"><details><summary><span class="chev">▸</span>Introdução</summary><div class="leaf-list"><a class="leaf" href="introducao-usando-este-guia.html">Usando Este Guia</a><a class="leaf" href="introducao-guia-do-mestre.html">Guia do Mestre</a><a class="leaf" href="introducao-changelog.html">Changelog</a></div></details><details open><summary><span class="chev">▸</span>Capítulo 1 — Iniciando a Campanha</summary><div class="leaf-list"><a class="leaf" href="cap1-sessao-zero.html">Sessão Zero</a><a class="leaf active" href="cap1-criacao-de-personagem.html">Criação de Personagem</a></div></details><details><summary><span class="chev">▸</span>Capítulo 2 — A Terra de Barovia</summary><div class="leaf-list"><a class="leaf" href="cap2-lore-de-barovia.html">Lore de Barovia</a><a class="leaf" href="cap2-historia-de-barovia.html">História de Barovia</a><a class="leaf" href="cap2-strahd-von-zarovich.html">Strahd von Zarovich</a></div></details><details><summary><span class="chev">▸</span>Capítulo 3 — Conduzindo o Jogo</summary><div class="leaf-list"><a class="leaf" href="cap3-resumo-da-aventura.html">Resumo da Aventura</a><a class="leaf" href="cap3-conduzindo-a-aventura.html">Conduzindo a Aventura</a></div></details><details><summary><span class="chev">▸</span>Ato I — Adentrando as Névoas</summary><div class="leaf-list"><a class="leaf" href="ato1-resumo.html">Resumo do Ato I</a><a class="leaf" href="arco-a-fuga-da-death-house.html">Arco A — Fuga da Death House</a><a class="leaf" href="arco-b-bem-vindo-a-barovia.html">Arco B — Bem-vindo a Barovia</a><a class="leaf" href="arco-c-adentrando-o-vale.html">Arco C — Adentrando o Vale</a></div></details><details><summary><span class="chev">▸</span>Ato II — A Cidade Sombria</summary><div class="leaf-list"><span class="leaf locked">Resumo do Ato II</span><span class="leaf locked">Arco D — A Festa de St. Andral</span><span class="leaf locked">Arco E — A Vistana Desaparecida</span><span class="leaf locked">Arco F — O Desejo de Lady Wachter</span><span class="leaf locked">Arco G — Os Irmãos Strazni</span><span class="leaf locked">Arco H — A Alma Perdida</span><span class="leaf locked">Arco I — As Muralhas de Krezk</span></div></details><details><summary><span class="chev">▸</span>Ato III — A Terra Partida</summary><div class="leaf-list"><span class="leaf locked">Resumo do Ato III</span><span class="leaf locked">Arco J — A Gema Roubada</span><span class="leaf locked">Arco K — A Abadia Decaída</span><span class="leaf locked">Arco L — O Covil dos Lobos</span><span class="leaf locked">Arco M — A Mansão do Dragão</span><span class="leaf locked">Arco O — Jantar com o Diabo</span><span class="leaf locked">Arco P — O Assalto a Ravenloft</span><span class="leaf locked">Arco Q — Um Farol Reluzente</span></div></details><details><summary><span class="chev">▸</span>Ato IV — Segredos do Ancião</summary><div class="leaf-list"><span class="leaf locked">Resumo do Ato IV</span><span class="leaf locked">Arco R — Provações da Montanha</span><span class="leaf locked">Arco S — Uma Espada de Luz Solar</span><span class="leaf locked">Arco T — Os Três Fanes</span><span class="leaf locked">Arco U — Sonhos da Alvorada</span><span class="leaf locked">Epílogo</span></div></details><details><summary><span class="chev">▸</span>Apêndices</summary><div class="leaf-list"><span class="leaf locked">Fragmentos de Âmbar</span><span class="leaf locked">Bestiário</span><span class="leaf locked">Glossário</span><span class="leaf locked">Personagens Não Jogadores</span></div></details></nav>
+    <div style="margin-top:18px"><a href="../painel_barovia_dnd5e.html" style="font-size:12px;color:var(--text-faint)">← Voltar ao Painel</a></div>
+  </aside>
+  <main class="article">
+    <div class="page-title">Criação de Personagem</div>
+<h1 id="falhas">Falhas</h1>
+<p>Seus jogadores podem escolher uma ou mais falhas da tabela abaixo para acrescentar um toque de escuridão à história de seus personagens. Incentive-os a abraçar suas lutas internas e a deixar que esses traços complexos impulsionem seus arcos adiante.</p>
+<table>
+    <thead>
+        <tr>
+            <th>Falha</th>
+            <th>Arco do Personagem</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>Vício</td>
+            <td>Preciso aprender a vencer os vícios e demônios que corrompem o que há de melhor em mim.</td>
+        </tr>
+        <tr>
+            <td>Ambição</td>
+            <td>Preciso aprender a dar valor a outras coisas além de poder e controle.</td>
+        </tr>
+        <tr>
+            <td>Ira</td>
+            <td>Preciso aprender a abrir mão da minha sede de vingança.</td>
+        </tr>
+        <tr>
+            <td>Ansiedade</td>
+            <td>Preciso aprender a confiar na minha capacidade de proteger aqueles que amo.</td>
+        </tr>
+        <tr>
+            <td>Apatia</td>
+            <td>Preciso aprender a nutrir esperança pelo futuro outra vez.</td>
+        </tr>
+        <tr>
+            <td>Controle</td>
+            <td>Preciso aprender a abrir mão da minha necessidade de controlar aqueles ao meu redor.</td>
+        </tr>
+        <tr>
+            <td>Cinismo</td>
+            <td>Preciso aprender a ter fé em algo maior do que eu mesmo mais uma vez.</td>
+        </tr>
+        <tr>
+            <td>Negação</td>
+            <td>Preciso aprender a me permitir chorar por tudo aquilo que perdi.</td>
+        </tr>
+        <tr>
+            <td>Dúvida</td>
+            <td>Preciso aprender a me tornar o herói por quem venho esperando.</td>
+        </tr>
+        <tr>
+            <td>Ganância</td>
+            <td>Preciso aprender a abrir mão daquilo que acredito me ser devido.</td>
+        </tr>
+			<tr>
+    <td>Luto</td>
+    <td>Preciso aprender a seguir em frente sem a pessoa amada que perdi.</td>
+</tr>
+<tr>
+    <td>Culpa</td>
+    <td>Preciso aprender a me libertar da culpa por não ter conseguido proteger quem eu amava.</td>
+</tr>
+<tr>
+    <td>Hesitação</td>
+    <td>Preciso aprender a vencer meu medo das responsabilidades que esperam de mim.</td>
+</tr>
+<tr>
+    <td>Soberba</td>
+    <td>Preciso aprender a aceitar que outros possuem uma sabedoria que eu não tenho.</td>
+</tr>
+<tr>
+    <td>Impiedade</td>
+    <td>Preciso aprender a encontrar o caminho de volta à graça que abandonei.</td>
+</tr>
+<tr>
+    <td>Insegurança</td>
+    <td>Preciso aprender a me definir para além das expectativas dos outros.</td>
+</tr>
+<tr>
+    <td>Isolamento</td>
+    <td>Preciso aprender a me abrir e permitir que os outros se aproximem de mim.</td>
+</tr>
+<tr>
+    <td>Ingenuidade</td>
+    <td>Preciso aprender a me proteger daqueles que se aproveitariam de mim.</td>
+</tr>
+<tr>
+    <td>Narcisismo</td>
+    <td>Preciso aprender a valorizar a vida e as experiências dos outros.</td>
+</tr>
+<tr>
+    <td>Nostalgia</td>
+    <td>Preciso aprender a deixar o passado para trás e olhar para o futuro.</td>
+</tr>
+<tr>
+    <td>Obsessão</td>
+    <td>Preciso aprender a encarar o mal que minhas obsessões causaram aos outros.</td>
+</tr>
+<tr>
+    <td>Paranoia</td>
+    <td>Preciso aprender a parar de usar meus medos como desculpa para ferir os outros.</td>
+</tr>
+<tr>
+    <td>Orgulho</td>
+    <td>Preciso aprender a pedir ajuda, em vez de carregar toda a responsabilidade sozinho.</td>
+</tr>
+<tr>
+    <td>Imprudência</td>
+    <td>Preciso aprender a ir mais devagar—a parar, esperar e pensar antes de agir.</td>
+</tr>
+<tr>
+    <td>Ressentimento</td>
+    <td>Preciso aprender a abrir mão da raiva que nasceu do meu luto.</td>
+</tr>
+<tr>
+    <td>Crueldade</td>
+    <td>Preciso aprender o valor da misericórdia e da compaixão.</td>
+</tr>
+<tr>
+    <td>Beatice</td>
+    <td>Preciso aprender a abrir mão da minha necessidade de me sentir justo e puro.</td>
+</tr>
+<tr>
+    <td>Vergonha</td>
+    <td>Preciso aprender a me libertar da culpa pelos erros que cometi.</td>
+</tr>
+<tr>
+    <td>Rancor</td>
+    <td>Preciso aprender a perdoar aqueles que feriram as pessoas que amo.</td>
+</tr>
+<tr>
+    <td>Teimosia</td>
+    <td>Preciso aprender a superar meu orgulho e reparar o mal que causei aos outros.</td>
+</tr>
+<tr>
+    <td>Timidez</td>
+    <td>Preciso aprender a me impor, em vez de deixar que os outros me controlem.</td>
+</tr>
+    </tbody>
+</table>
+<h1 id="vínculos">Vínculos</h1>
+<p>Seus jogadores podem escolher um ou mais vínculos da tabela abaixo para tecer uma teia de conexões entre seus personagens e os fantasmas de seus passados. Incentive-os a reexaminar essas lembranças e a crescer para além delas conforme se aventuram por Barovia, deixando que elas moldem suas interações com os NPCs e as narrativas que encontrarem.</p>
+<div class="table-wrap"><table class="md-table"><thead><tr><th>Vínculo</th><th>História do Personagem</th></tr></thead><tbody><tr><td>Abuso</td><td>Um dos meus irmãos foi cruel comigo na infância. Eu o perdoei, mas jamais esqueci.</td></tr><tr><td>Amargura</td><td>Dois senhores em guerra trouxeram devastação à minha comunidade. Queria poder mostrar a eles o preço da guerra que travaram.</td></tr><tr><td>Limites</td><td>Certa vez fui perseguido por um pretendente insistente. Ninguém deveria ter de suportar o que eu suportei.</td></tr><tr><td>Comparação</td><td>Meu irmão mais velho carregava o peso de grandes expectativas, e eu não. Acho que ele me guardava rancor por isso.</td></tr><tr><td>Compaixão</td><td>Certa vez alguém tentou me roubar. Em vez de feri-lo, resolvi ajudá-lo.</td></tr><tr><td>Preocupação</td><td>Alguém que eu amo partiu de casa em busca de fortuna. Espero que esteja a salvo.</td></tr><tr><td>Corrupção</td><td>Todos sabem que o poder corrompe. Eu vi como, com meus próprios olhos.</td></tr><tr><td>Determinação</td><td>Meu mentor foi uma das poucas pessoas que acreditaram em mim. Estou decidido a deixá-lo orgulhoso.</td></tr><tr><td>Devastação</td><td>Alguém, certa vez, destruiu tudo aquilo que me era caro. Não consigo compreender o que levaria alguém a tamanha maldade.</td></tr><tr><td>Devoção</td><td>Amo minha família acima de todas as coisas. Não há nada que eu não fizesse para protegê-la.</td></tr><tr><td>Dignidade</td><td>Ninguém jamais deveria ser usado como meio para um fim. Eu sei bem disso.</td></tr><tr><td>Divisão</td><td>Minha família foi partida por uma rixa amarga. Ainda tenho esperança de que um dia se reconciliem.</td></tr><tr><td>Empatia</td><td>Jamais esquecerei o som que meus pais fizeram ao descobrir que meu irmão havia morrido.</td></tr><tr><td>Fé</td><td>Sei o que é ser perseguido por aquilo em que se acredita. Nunca deixei que isso abalasse minhas crenças.</td></tr><tr><td>Perdão</td><td>Alguém, certa vez, me fez um grande mal. Só muito depois aprendi a perdoá-lo.</td></tr><tr><td>Gratidão</td><td>Alguém me acolheu quando eu não tinha mais ninguém a quem recorrer. Serei grato para sempre.</td></tr><tr><td>Esperança</td><td>Perdi alguém próximo a mim para o vício e a devassidão. Ainda espero que um dia essa pessoa melhore.</td></tr><tr><td>Humildade</td><td>Já vi o que acontece quando as pessoas acham que têm todas as respostas. Nunca acaba bem.</td></tr><tr><td>Julgamento</td><td>Já vi pessoas causarem grandes males em nome da fé. Riram de mim quando chamei aquilo de pecado.</td></tr><tr><td>Perda</td><td>Alguém que eu amava me foi roubado. Ainda procuro por essa pessoa.</td></tr><tr><td>Lealdade</td><td>Alguém próximo a mim enveredou por um caminho sombrio. Eu faria qualquer coisa para redimi-lo.</td></tr><tr><td>Nostalgia</td><td>Um dos meus pais adorava criar coisas. O trabalho dele sempre me trouxe alegria.</td></tr><tr><td>Opressão</td><td>Um senhor cruel governou minha comunidade certa vez. Jamais perdoarei os males que ele causou ao meu povo.</td></tr><tr><td>Arrependimento</td><td>Certa vez conheci alguém de planos grandiosos e ambiciosos. Quem dera tivesse dado ouvidos aos meus conselhos.</td></tr><tr><td>Responsabilidade</td><td>Vi alguém deixar a própria família cair em ruína. Jamais farei o mesmo.</td></tr><tr><td>Romance</td><td>O amor nunca morre. Pode vacilar, mas jamais deixarei que se apague.</td></tr><tr><td>Segredo</td><td>Certa vez prometi a alguém que guardaria seus segredos. Pretendo cumprir essa promessa—custe o que custar.</td></tr></tbody></table></div>
+<h1 id="motivações">Motivações</h1>
+<p>Se você optar por usar o gancho de aventura <strong><em>Relíquias Barovianas</em></strong> para um ou mais jogadores (veja o <strong>Capítulo 3: Conduzindo o Jogo</strong>), peça a esses jogadores que escolham uma motivação central para seus personagens na tabela a seguir.</p>
+<div class="table-wrap"><table class="md-table"><thead><tr><th>d12</th><th>Motivação</th><th>Relíquia</th></tr></thead><tbody><tr><td>1</td><td>Conhecimento</td><td>Fragmento de Âmbar</td></tr><tr><td>2</td><td>Redenção</td><td>Pena de Anjo</td></tr><tr><td>3</td><td>Família</td><td>Cachecol do Andarilho</td></tr><tr><td>4</td><td>Herança</td><td>Escama de Dragão</td></tr><tr><td>5</td><td>Riqueza</td><td>Moeda de Electro</td></tr><tr><td>6</td><td>Cura</td><td>Dente de Lobo</td></tr><tr><td>7</td><td>Dever</td><td>Pena de Corvo</td></tr><tr><td>8</td><td>Poder</td><td>Página Amassada</td></tr><tr><td>9</td><td>Ambição</td><td>Estandarte Esfarrapado</td></tr><tr><td>10</td><td>Fé</td><td>Medalhão do Nascer do Sol</td></tr><tr><td>11</td><td>Harmonia</td><td>Brasão de Pedra</td></tr><tr><td>12</td><td>Justiça</td><td>Lâmina Quebrada</td></tr></tbody></table></div>
+<p>Depois que um jogador tiver escolhido sua motivação central, use a seção correspondente abaixo para ajudá-lo a desenvolver a história e os objetivos de seu personagem.</p>
+<h2 id="conhecimento-o-fragmento-de-âmbar">Conhecimento—O Fragmento de Âmbar</h2>
+<p><img class="reloaded-img" src="img/Amber%20Shard.png" alt="Amber Shard.png" loading="lazy"> Um jogador em busca de <strong>conhecimento</strong> começa a campanha com o <em>fragmento de âmbar</em>, um pequeno naco de resina âmbar montado num cordão de elos. O fragmento traz incrustadas runas arcanas complexas e tridimensionais. Sob a magia <em>detectar magia</em> (<em>detect magic</em>), ele exala uma forte aura de magia de abjuração.</p>
+<p>Sem que o jogador saiba, o <em>fragmento de âmbar</em> foi outrora parte do sarcófago de âmbar de um vestígio sombrio no Templo de Âmbar, em Barovia. Quando pressente a presença da Death House, ele brilha com luz âmbar e puxa seu cordão na direção da casa.</p>
+<p>O jogador que possui o <em>fragmento de âmbar</em> deve ter motivos fortes e vívidos para querer desvendar seus segredos e a magia que ele guarda.</p>
+<p><strong><em>Desenvolvimentos.</em></strong> Em <a href="arco-a-fuga-da-death-house.html">Arco A - Fuga da Death House</a>, o jogador reconhece o <em>fragmento de âmbar</em> de Elisabeth Durst como semelhante em aparência ao seu próprio. Em <span class="link-pending" title="Ainda não convertido">Arco G - Os Irmãos Strazni</span>, o jogador reconhece da mesma forma o <em>fragmento de âmbar</em> de Izek Strazni. Em <span class="link-pending" title="Ainda não convertido">Arco R - Provações da Montanha</span>, o Ancião Burebis de Soldav é capaz de reconhecer o <em>fragmento de âmbar</em> como um estilhaço de maldade retirado do Templo de Âmbar, e o jogador pode reconhecer os <em>fragmentos de âmbar</em> portados pela <strong>shoosuva</strong> e pelos <strong>bodaks</strong> como iguais ao seu.</p>
+<p>Se o personagem do jogador for reduzido a 0 pontos de vida em Barovia estando de posse de seu <em>fragmento de âmbar</em>, ele se comporta conforme descrito em <span class="link-pending" title="Ainda não convertido">Fragmentos de Âmbar</span>, oferecendo ao jogador a oportunidade de firmar um pacto com um vestígio do Templo de Âmbar que combine com a personalidade, as falhas e as tentações do personagem. Ao entrar no Templo de Âmbar, o <em>fragmento de âmbar</em> do jogador brilha e puxa da mesma forma que fez ao pressentir a Death House, guiando-o até um sarcófago de âmbar adequado.</p>
+<h2 id="redenção-a-pena-de-anjo">Redenção—A Pena de Anjo</h2>
+<p><img class="reloaded-img" src="img/Angel's%20Feather.png" alt="Angel&#x27;s Feather.png" loading="lazy"> Um jogador em busca de <strong>redenção</strong> começa a campanha com a <em>pena de anjo</em>, uma pena grande e branca como a neve. Vistas sob a luz do sol da manhã, as barbas da pena reluzem como ouro.</p>
+<p>Sem que o jogador saiba, a <em>pena de anjo</em> pertenceu outrora a Ithuriel, um <strong>deva</strong> a serviço do deus Lathander, conhecido por seus fiéis como o Morninglord. Ithuriel é o verdadeiro nome do Abade, que habita a Abadia de Santa Markovia, em Barovia. Quando pressente a presença da Death House, a pena é arrebatada por um vento invisível, com as barbas reluzindo em luz dourada, até por fim pousar na soleira da casa.</p>
+<p>O jogador que possui a <em>pena de anjo</em> deve ter motivos fortes e vívidos para acreditar que a pena um dia o conduzirá à redenção pelos pecados que cometeu.</p>
+<p><strong><em>Desenvolvimentos.</em></strong> Quando os jogadores chegam pela primeira vez à Abadia em <span class="link-pending" title="Ainda não convertido">Arco I - As Muralhas de Krezk</span> ou em <span class="link-pending" title="Ainda não convertido">Arco K - A Abadia Decaída</span>, a <em>pena de anjo</em> reluz e é arrebatada da mesma forma que fez ao pressentir a Death House, guiando o jogador até o Abade. O Abade reconhece a pena como sua, mas descarta sua importância.</p>
+<h2 id="família-o-cachecol-do-andarilho">Família—O Cachecol do Andarilho</h2>
+<p><img class="reloaded-img" src="img/Wanderer's%20Scarf.png" alt="Wanderer&#x27;s Scarf.png" loading="lazy"> Um jogador em busca de <strong>família</strong> começa a campanha com o <em>cachecol do andarilho</em>, um cachecol multicolorido tecido com padrões intrincados. O tecido é macio e quente, e comprido o bastante para ser usado em volta do pescoço ou sobre a cabeça. Quando a luz forte do sol, o luar ou a luz das estrelas o atravessam, os padrões parecem cintilar e se retorcer de maneiras belas e inquietantes.</p>
+<p>Sem que o jogador saiba, o <em>cachecol do andarilho</em> pertenceu certa vez a uma Vistana que deixou sua caravana e se estabeleceu para casar com quem amava. O cachecol foi um presente de despedida do líder da caravana—uma lembrança das alegrias que a Vistana havia vivido em suas viagens. Quando pressente a presença da Death House, o cachecol é levado por uma brisa morna e travessa, seus padrões mudando e girando no ar, até por fim pousar na soleira da casa.</p>
+<p>O jogador que possui o <em>cachecol do andarilho</em> deve tê-lo recebido de um ente querido da família, e deve ter motivos fortes e vívidos para ansiar por um sentimento de família e pertencimento.</p>
+<p><strong><em>Desenvolvimentos.</em></strong> Quando os jogadores encontram Ezmerelda pela primeira vez em <span class="link-pending" title="Ainda não convertido">Arco K - A Abadia Decaída</span>, o <em>cachecol do andarilho</em> cintila e é levado pelo ar da mesma forma que fez ao pressentir a Death House, pousando aos pés de Ezmerelda. Ezmerelda reconhece o cachecol e, ao confirmar como o jogador veio a herdá-lo, o saúda como família, chamando-o de "primo".</p>
+<h2 id="herança-a-escama-de-dragão">Herança—A Escama de Dragão</h2>
+<p><img class="reloaded-img" src="img/Dragon's%20Scale.png" alt="Dragon&#x27;s Scale.png" loading="lazy"> Um jogador em busca de <strong>herança</strong> começa a campanha com a <em>escama de dragão</em>, uma grande escama prateada que está sempre fria ao toque. Uma criatura de tendência boa que toque a escama sente uma fugaz sensação de segurança, proteção e conforto.</p>
+<p>Sem que o jogador saiba, a <em>escama de dragão</em> pertenceu outrora a Argynvost, o <strong>dragão de prata adulto</strong> que fundou a Order of the Silver Dragon. O quartel-general da ordem, o solar de Argynvostholt, encontra-se em Barovia. Quando pressente a presença da Death House, a escama arde com um frio gélido, e uma de suas pontas brilha com uma luz prateada e intensa na direção da casa. Enquanto a escama brilha dessa forma, uma criatura de tendência boa que a toque sente um profundo sentimento de anseio, perda e esperança.</p>
+<p>O jogador que possui a <em>escama de dragão</em> deve tê-la recebido de um familiar, e deve ter motivos fortes e vívidos para acreditar que a escama um dia revelará os segredos de sua linhagem.</p>
+<p><strong><em>Desenvolvimentos.</em></strong> Quando o jogador encontra pela primeira vez a sombra de Argynvost no saguão de Argynvostholt em <span class="link-pending" title="Ainda não convertido">Arco M - O Solar do Dragão</span>, a escama arde de frio por um instante, da mesma forma que fez ao pressentir a Death House. Cada vez que o jogador se aproxima de uma manifestação do espírito de Argynvost, a escama arde de frio e brilha com uma luz prateada e intensa na direção da manifestação.</p>
+<p>Se o jogador ajudar a recuperar o crânio de Argynvost e a devolvê-lo à sua cripta em <span class="link-pending" title="Ainda não convertido">Arco Q - Um Farol Reluzente</span>, o espírito de Argynvost saúda o jogador com afeto, nomeando-o herdeiro do legado da Order of the Silver Dragon antes de acender o farol de Argynvostholt.</p>
+<h2 id="riqueza-a-moeda-de-electro">Riqueza—A Moeda de Electro</h2>
+<p><img class="reloaded-img" src="img/Electrum%20Coin.png" alt="Electrum Coin.png" loading="lazy"> Um jogador em busca de <strong>riqueza</strong> começa a campanha com uma velha <em>moeda de electro</em> lascada, cunhada com o perfil de um nobre altivo, porém de aparência fria. Vista sob certa luz, a expressão do nobre parece mudar de um escárnio firme e aristocrático para um rosnado feroz e monstruoso.</p>
+<p>Sem que o jogador saiba, o semblante cunhado na <em>moeda de electro</em> é o rosto de Strahd von Zarovich, o soberano morto-vivo de Barovia. A moeda foi cunhada há muito tempo, mas surrupiada dos tesouros de Strahd por um ladrão pouco antes de Barovia se perder nas brumas. Quando pressente a presença da Death House, a moeda cai em pé sobre a borda e então começa a rolar pelo chão em direção à casa, até alcançar a base dos degraus.</p>
+<p>O jogador que possui a <em>moeda de electro</em> deve ter motivos fortes e vívidos para acreditar que a moeda veio de um cofre prodigioso de tesouros—o butim de um conquistador—e que, um dia, ela o levará a reivindicar riquezas inimagináveis.</p>
+<p><strong><em>Desenvolvimentos.</em></strong> Qualquer baroviano reconhece de imediato o semblante cunhado na moeda como o de Strahd. Se o jogador contar a história da moeda a um dos Vistani do acampamento de Madam Eva em <a href="arco-c-adentrando-o-vale.html">Arco C - Adentrando o Vale</a>, a Sir Godfrey Gwilym em <span class="link-pending" title="Ainda não convertido">Arco M - O Solar do Dragão</span>, ou a Kasimir Velikov em <span class="link-pending" title="Ainda não convertido">Arco E - A Vistana Desaparecida</span>, eles podem ficar sabendo do vasto tesouro de Strahd, reunido em seus dias de conquistador e escondido no Castelo Ravenloft.</p>
+<p>Quando o jogador se aproxima pela primeira vez do tesouro de Strahd, a moeda cai em pé sobre a borda e rola o mais longe que consegue rumo à entrada do tesouro, da mesma forma que fez ao pressentir a Death House.</p>
+<h2 id="cura-o-dente-de-lobo">Cura—O Dente de Lobo</h2>
+<p><img class="reloaded-img" src="img/Wolf's%20Tooth.png" alt="Wolf&#x27;s Tooth.png" loading="lazy"> Um jogador em busca de <strong>cura</strong> começa a campanha com um <em>dente de lobo</em> recoberto de resina transparente e montado num cordão de couro. O dente parece se alongar e afiar nas noites de lua cheia, e acalma os sonhos de quem o usa durante o sono.</p>
+<p>Sem que o jogador saiba, o dente pertenceu certa vez a um wolfir—um <strong>lobisomem</strong> que servia à deusa feérica conhecida como a Caçadora, antes que seu dom da licantropia fosse retorcido em maldição. O lugar sagrado da Caçadora, o Fane da Floresta, repousa em meio às matas de Barovia, aguardando em silêncio para ser restaurado. Quando pressente a presença da Death House, o dente se alonga, brilhando com um luar prateado, e puxa seu cordão na direção da casa.</p>
+<p>O jogador que possui o <em>dente de lobo</em> deve ter motivos fortes e vívidos para acreditar que o dente é a chave para curar determinada ferida, enfermidade ou maldição que o aflige.</p>
+<p><strong><em>Desenvolvimentos.</em></strong> Se o jogador mostrar o <em>dente de lobo</em> a Kavan em <span class="link-pending" title="Ainda não convertido">Arco J - A Gema Roubada</span> ou ao Ancião Burebis em <span class="link-pending" title="Ainda não convertido">Arco R - Provações da Montanha</span>, o dente é reconhecido como artefato e símbolo da Caçadora. Quando o jogador se aproxima pela primeira vez do círculo de pedras no Fane da Floresta em <span class="link-pending" title="Ainda não convertido">Arco T - Os Três Fanes</span>, o dente se alonga e brilha com o luar como fez ao pressentir a Death House.</p>
+<h2 id="dever-a-pena-de-corvo">Dever—A Pena de Corvo</h2>
+<p><img class="reloaded-img" src="img/Raven's%20Feather.png" alt="Raven&#x27;s Feather.png" loading="lazy"> Um jogador em busca de <strong>dever</strong> começa a campanha com uma <em>pena de corvo</em>, uma pequena pluma negra de barbas macias e felpudas. Erguida diante de uma tempestade, a pena parece tremer suavemente, exalando o cheiro de chuva fria e terra úmida.</p>
+<p>Sem que o jogador saiba, a pena pertenceu certa vez à <strong>roca</strong> do Monte Ghakis, serva da deusa feérica conhecida como a Buscadora, cujo Fane da Montanha repousa à sombra do Monte Ghakis, em Barovia. A roca outrora gostava de se disfarçar de corvo comum, e perdeu esta pena em uma dessas ocasiões. Quando pressente a presença da Death House, a pena é arrebatada por um vento invisível e violento, e o cheiro de chuva e ozônio  toma o ar, até que ela por fim pousa na soleira da casa.</p>
+<p>O jogador que possui a <em>pena de corvo</em> deve ter motivos fortes e vívidos para acreditar que a pena sempre o guiará até aqueles que precisam de auxílio, proteção e conforto.</p>
+<p><strong><em>Desenvolvimentos.</em></strong> Se o jogador mostrar a <em>pena de corvo</em> a Madam Eva em <a href="arco-c-adentrando-o-vale.html">Arco C - Adentrando o Vale</a>, ela a examina com reverência e a devolve ao jogador, afirmando misteriosamente que um dia conheceu a ave que a perdeu.  Se o jogador mostrar a pena a Urwin Martikov, Danika Dorakova, Muriel Vinshaw ou a qualquer outro membro dos Keepers of the Feather, esse membro se torna mais caloroso e amistoso com ele.</p>
+<p>Quando o jogador entra pela primeira vez no círculo de pedras eretas do Fane da Montanha em <span class="link-pending" title="Ainda não convertido">Arco T - Os Três Fanes</span>, a pena treme e o ar ao seu redor fica por um instante impregnado do cheiro de chuva e ozônio, como fez ao pressentir a Death House. Se o jogador mostrar a pena à Roca do Monte Ghakis depois de consagrar o Fane da Montanha no mesmo arco, a roca encosta a ponta do bico na testa do jogador em sinal de gratidão e aprovação antes de partir.</p>
+<h2 id="poder-a-página-amassada">Poder—A Página Amassada</h2>
+<p><img class="reloaded-img" src="img/Crumpled%20Page.png" alt="Crumpled Page.png" loading="lazy"> Um jogador em busca de <strong>poder</strong> começa a campanha com a <em>página amassada</em>, uma folha velha e amarelada, arrancada de seu livro há muito tempo. A página está escrita em runas arcanas estranhas e enigmáticas; as poucas runas que podem ser decifradas falam de um caminho que leva à imortalidade e a um poder incalculável.</p>
+<p>Sem que o jogador saiba, a página foi tirada da biblioteca de Exethanter, um <strong>fantasma</strong> que habita o santuário mais profundo do Templo de Âmbar, em Barovia. Quando pressente a presença da Death House, a tinta da página brilha com luz âmbar, e as runas se reorganizam formando um mapa que leva até a casa.</p>
+<p>O jogador que possui a <em>página amassada</em> deve ter motivos fortes e vívidos para querer encontrar e reivindicar o poder que a página promete.</p>
+<p><strong><em>Desenvolvimentos.</em></strong> Quando o jogador se aproxima pela primeira vez da biblioteca de Exethanter em <span class="link-pending" title="Ainda não convertido">Arco S - Uma Espada de Luz Solar</span>, a tinta brilha com luz âmbar como fez ao pressentir a Death House, e as runas se reorganizam formando um mapa dos aposentos de Exethanter e dos acessos próximos. Se o jogador mostrar a página a Exethanter depois de restaurar suas memórias no mesmo arco, Exethanter se torna mais caloroso e amistoso com ele.</p>
+<h2 id="ambição-o-estandarte-esfarrapado">Ambição—O Estandarte Esfarrapado</h2>
+<p><img class="reloaded-img" src="img/Tattered%20Banner.png" alt="Tattered Banner.png" loading="lazy"> Um jogador em busca de <strong>ambição</strong> começa a campanha com o <em>estandarte esfarrapado</em>, uma velha bandeira vermelha e esfiapada que traz o brasão de um corvo diante de um escudo. As asas do corvo estão bem abertas, e o escudo tem a imagem da torre de menagem de um castelo gravada em seu topo. Às vezes, quando uma criatura de tendência leal segura o estandarte, uma luz carmesim parece reluzir no alto da torre do castelo, e o som de soldados em marcha pode ser ouvido ao longe.</p>
+<p>Sem que o jogador saiba, o estandarte foi outrora hasteado pelo senhor da guerra Strahd von Zarovich, nos dias anteriores à sua transformação em vampiro e ao seu aprisionamento nas brumas de Barovia. Quando pressente a presença da Death House, o som distante de tambores de guerra enche os ouvidos de quem o carrega, e o estandarte tremula num vento invisível, puxando na direção da casa.</p>
+<p>O jogador que possui o <em>estandarte esfarrapado</em> deve ter motivos fortes e vívidos para acreditar que o estandarte foi um dia o símbolo de um poderoso conquistador—e que, seguindo os passos desse conquistador, ele um dia alcançará grandeza, glória e o direito de governar.</p>
+<p><strong><em>Desenvolvimentos.</em></strong> Quando o jogador vivencia pela primeira vez o campo de batalha assombrado ao norte de Berez em <span class="link-pending" title="Ainda não convertido">Arco I - As Muralhas de Krezk</span>, o estandarte tremula ao vento, que ecoa com o som de tambores de guerra.</p>
+<p>Se o jogador mostrar o estandarte ao revenante das Quedas de Tser em <a href="arco-c-adentrando-o-vale.html">Arco C - Adentrando o Vale</a>, a Sir Godfrey Gwilym ou Sir Vladimir Horngaard em <span class="link-pending" title="Ainda não convertido">Arco M - O Solar do Dragão</span>, ou a Kasimir Velikov em <span class="link-pending" title="Ainda não convertido">Arco E - A Vistana Desaparecida</span> ou <span class="link-pending" title="Ainda não convertido">Arco S - Uma Espada de Luz Solar</span>, sua aparição é recebida com repulsa e amargo desgosto.</p>
+<p>Se o jogador mostrar o estandarte a Strahd, ele o contempla com uma saudade pensativa, mas se recusa a explicar seu significado. Se o jogador mostrar o estandarte ao Dr. Rudolph van Richten em <strong>Arco M: O Inimigo de Strahd</strong> ou a qualquer Vistani, eles o reconhecem de imediato como o brasão do Castelo Ravenloft.</p>
+<h2 id="fé-o-medalhão-do-nascer-do-sol">Fé—O Medalhão do Nascer do Sol</h2>
+<p><img class="reloaded-img" src="img/Sunrise%20Medallion.png" alt="Sunrise Medallion.png" loading="lazy"> Um jogador em busca de <strong>fé</strong> começa a campanha com o <em>medalhão do nascer do sol</em>, um disco de bronze gravado com a imagem de um sol nascente. O disco cintila como ouro quando exposto à luz do amanhecer, e uma criatura de tendência boa que o toque sente uma fugaz sensação de reverência, retidão e paz.</p>
+<p>Sem que o jogador saiba, o medalhão pertenceu certa vez a Sergei von Zarovich, irmão de Strahd von Zarovich e acólito da Church of the Morninglord, de quem se esperava um dia que se tornasse seu Sumo Sacerdote. Quando pressente a presença da Death House, o medalhão reluz com um brilho dourado e quente, e os raios de sol que emanam do sol gravado apontam na direção da casa.</p>
+<p>O jogador que possui o <em>medalhão do nascer do sol</em> deve ter motivos fortes e vívidos para acreditar que ele o fortalecerá ou o guiará na fé, e que certos sinais do divino o conduzirão até aqueles que precisam de salvação e libertação.</p>
+<p><strong><em>Desenvolvimentos.</em></strong> Quando o jogador se aproxima pela primeira vez da Igreja de St. Andral em <span class="link-pending" title="Ainda não convertido">Arco D - A Festa de St. Andral</span>, o <em>medalhão do nascer do sol</em> brilha e reluz na direção das portas da igreja. Se o jogador mostrar o <em>medalhão do nascer do sol</em> ao Padre Donavich ou a Lucian, eles o reconhecem como um símbolo da Church of the Morninglord e se tornam mais calorosos e amistosos com ele.</p>
+<h2 id="harmonia-o-brasão-de-pedra">Harmonia—O Brasão de Pedra</h2>
+<p><img class="reloaded-img" src="img/Stone%20Crest.png" alt="Stone Crest.png" loading="lazy"> Um jogador em busca de <strong>harmonia</strong> começa a campanha com o <em>brasão de pedra</em>, uma pedra chata e redonda gravada com a imagem de uma estrela de três pontas. Nas noites de lua nova, a estrela parece reluzir com uma luz esmeralda.</p>
+<p>Sem que o jogador saiba, o brasão pertenceu certa vez a um líder espiritual do Primeiro Povo, os que primeiro colonizaram a terra de Barovia há muito tempo, e que hoje se dividem entre o Povo da Floresta (leal a Strahd) e o Povo da Montanha (que não o é). As gravuras sobre ele retratam os símbolos da Buscadora, da Tecelã e da Caçadora—as três deusas feéricas que o Primeiro Povo outrora chamava de <em>Rozana</em>, ou Três Senhoras. Quando pressente a presença da Death House, o brasão emite um zumbido grave e exala um cheiro de agulhas de pinheiro e terra úmida, ambos ficando mais fortes conforme o jogador se aproxima da casa.</p>
+<p>O jogador que possui o <em>brasão de pedra</em> deve ter motivos fortes e vívidos para acreditar que os símbolos gravados nele representam um poder primevo ou divino de harmonia e natureza, e que o brasão pode ajudá-lo a restaurar a santidade dos lugares selvagens.</p>
+<p><strong><em>Desenvolvimentos.</em></strong> Quando o jogador se aproxima pela primeira vez dos arredores de Soldav em <span class="link-pending" title="Ainda não convertido">Arco R - Provações da Montanha</span>, o <em>brasão de pedra</em> zumbe e exala um cheiro de agulhas de pinheiro e terra úmida como fez ao pressentir a Death House, ambos ficando mais fortes conforme o jogador se aproxima do Santuário das Rozana, em Soldav.</p>
+<p>Se o jogador mostrar o <em>brasão de pedra</em> a Kavan em <span class="link-pending" title="Ainda não convertido">Arco J - A Gema Roubada</span> ou ao Ancião Burebis em <span class="link-pending" title="Ainda não convertido">Arco R - Provações da Montanha</span>, o brasão é reconhecido como artefato e símbolo das Senhoras dos Fanes.</p>
+<h2 id="justiça-a-lâmina-quebrada">Justiça—A Lâmina Quebrada</h2>
+<p><img class="reloaded-img" src="img/Broken%20Blade.png" alt="Broken Blade.png" loading="lazy"> Um jogador em busca de <strong>justiça</strong> começa a campanha com a <em>lâmina quebrada</em>, a ponta estilhaçada de uma espada longa élfica. A lâmina traz gravado o sigilo de um leão rampante, que parece rugir quando a luz do crepúsculo o toca.</p>
+<p>Sem que o jogador saiba, a lâmina pertenceu certa vez a Erevan, um príncipe elfo do crepúsculo. Erevan, um mestre cantor de lâminas (<em>bladesinger</em>), praticava o estilo do leão, que também usava como sigilo pessoal. Erevan, porém, recusou-se a pagar tributo ao Rei Barov von Zarovich, um poderoso senhor da guerra e pai de Strahd von Zarovich.</p>
+<p>Rahadin, um elfo do crepúsculo que havia rejeitado o governo de Erevan, ajudou o Rei Barov a conquistar o reino elfo do crepúsculo. Rahadin então quebrou a lâmina de Erevan e executou pessoalmente Erevan e sua família como punição por sua desobediência. Quando pressente a presença da Death House, a lâmina emite um zumbido agudo e começa a tremer violentamente, girando como a agulha de uma bússola na direção da casa.</p>
+<p>O jogador que possui a <em>lâmina quebrada</em> deve ter motivos fortes e vívidos para acreditar que seus ancestrais foram refugiados, expulsos de suas terras ancestrais e perseguidos, e que a lâmina um dia levará justiça ao traidor que os destruiu.</p>
+<p><strong><em>Desenvolvimentos.</em></strong> Se o jogador mostrar a <em>lâmina quebrada</em> a Kasimir Velikov em <span class="link-pending" title="Ainda não convertido">Arco E - A Vistana Desaparecida</span>, ele recorda sua história com pesar e pergunta ao jogador como veio a possuí-la. Se o jogador contar a Kasimir como a herdou, Kasimir o saúda como família, indagando em voz alta se mais elfos do crepúsculo não teriam escapado da chacina de Strahd para fora de Barovia.</p>
+<p>Se a <em>lâmina quebrada</em> estiver em algum momento nas proximidades de Rahadin, o camerlengo de Strahd, ela emite um zumbido agudo e treme violentamente, girando como a agulha de uma bússola na direção dele, exatamente como fez ao pressentir a Death House. Se o jogador mostrar a <em>lâmina quebrada</em> a Rahadin, ele a princípio afirma não ter memória dela, observando com frieza os milhares que já massacrou. Contudo, em combate, Rahadin acaba por se lembrar das origens da lâmina, descartando-a como "o brinquedo estilhaçado de um homem fraco e desprezível."</p>
+  </main>
+  <aside class="sidebar-right"><div class="toc-label">Nesta página</div><div class="toc-list"><a class="toc-lvl-1" href="#falhas">Falhas</a><a class="toc-lvl-1" href="#vínculos">Vínculos</a><a class="toc-lvl-1" href="#motivações">Motivações</a><a class="toc-lvl-2" href="#conhecimento-o-fragmento-de-âmbar">Conhecimento—O Fragmento de Âmbar</a><a class="toc-lvl-2" href="#redenção-a-pena-de-anjo">Redenção—A Pena de Anjo</a><a class="toc-lvl-2" href="#família-o-cachecol-do-andarilho">Família—O Cachecol do Andarilho</a><a class="toc-lvl-2" href="#herança-a-escama-de-dragão">Herança—A Escama de Dragão</a><a class="toc-lvl-2" href="#riqueza-a-moeda-de-electro">Riqueza—A Moeda de Electro</a><a class="toc-lvl-2" href="#cura-o-dente-de-lobo">Cura—O Dente de Lobo</a><a class="toc-lvl-2" href="#dever-a-pena-de-corvo">Dever—A Pena de Corvo</a><a class="toc-lvl-2" href="#poder-a-página-amassada">Poder—A Página Amassada</a><a class="toc-lvl-2" href="#ambição-o-estandarte-esfarrapado">Ambição—O Estandarte Esfarrapado</a><a class="toc-lvl-2" href="#fé-o-medalhão-do-nascer-do-sol">Fé—O Medalhão do Nascer do Sol</a><a class="toc-lvl-2" href="#harmonia-o-brasão-de-pedra">Harmonia—O Brasão de Pedra</a><a class="toc-lvl-2" href="#justiça-a-lâmina-quebrada">Justiça—A Lâmina Quebrada</a></div></aside>
+</div>
+<script>
+document.querySelectorAll('.search-box input').forEach(function(inp){
+  inp.addEventListener('input', function(){
+    var q = inp.value.trim().toLowerCase();
+    var sidebar = inp.closest('.sidebar-left');
+    if (!q) { sidebar.classList.remove('filtering'); return; }
+    sidebar.classList.add('filtering');
+    sidebar.querySelectorAll('.tree .leaf').forEach(function(a){
+      var hit = a.textContent.toLowerCase().indexOf(q) !== -1;
+      a.classList.toggle('match', hit);
+    });
+    sidebar.querySelectorAll('.tree > details').forEach(function(d){
+      var hasMatch = d.querySelector('.leaf.match');
+      d.classList.toggle('has-match', !!hasMatch);
+    });
+  });
+});
+var mobileBtn = document.querySelector('.mobile-topbar button');
+if (mobileBtn) {
+  mobileBtn.addEventListener('click', function(){
+    document.querySelector('.sidebar-left').classList.toggle('open');
+  });
+}
+</script>
+</body>
+</html>

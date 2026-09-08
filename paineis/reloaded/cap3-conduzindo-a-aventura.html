@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1c1c1e">
+<link rel="icon" type="image/svg+xml" href="../../assets/img/favicon.svg">
+<title>Conduzindo a Aventura — Curse of Strahd: Reloaded</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+* { box-sizing:border-box; }
+:root {
+  --bg:#1c1c1e; --bg-sidebar:#1a1a1c; --bg-hover:#252528; --bg-card:#232325;
+  --border:#333336;
+  --gold:#e0a542; --gold-dim:#b8863a;
+  --active:#a78bfa; --active-dim:#8a6fd8;
+  --text:#dcdcdd; --text-dim:#9a9a9d; --text-faint:#6e6e72;
+  --title:#f2f1ee;
+}
+* { scrollbar-color: #48484c var(--bg-sidebar); scrollbar-width: thin; }
+html, body { margin:0; min-height:100vh; background:var(--bg);
+  font-family:'Inter', system-ui, -apple-system, sans-serif; color:var(--text); }
+a { color:var(--gold); text-decoration:none; }
+a:hover { text-decoration:underline; }
+
+.layout { display:flex; min-height:100vh; align-items:stretch; }
+
+/* ---------- barra lateral esquerda ---------- */
+.sidebar-left { width:290px; flex:0 0 290px; background:var(--bg-sidebar);
+  border-right:1px solid var(--border); padding:22px 18px 40px;
+  position:sticky; top:0; height:100vh; overflow-y:auto; }
+.brand { font-size:19px; font-weight:800; color:var(--gold); line-height:1.25;
+  margin-bottom:14px; text-decoration:none; display:block; }
+.brand:hover { text-decoration:none; opacity:.9; }
+.search-box { position:relative; margin-bottom:16px; }
+.search-box input { width:100%; padding:8px 10px 8px 30px; border-radius:6px;
+  border:1px solid var(--border); background:var(--bg-card); color:var(--text);
+  font-family:inherit; font-size:13px; }
+.search-box input::placeholder { color:var(--text-faint); }
+.search-box input:focus { outline:none; border-color:var(--gold-dim); }
+.search-box .ico { position:absolute; left:9px; top:50%; transform:translateY(-50%);
+  color:var(--text-faint); font-size:13px; pointer-events:none; }
+.tree { font-size:14px; }
+.tree details { margin-bottom:1px; }
+.tree summary { list-style:none; cursor:pointer; padding:6px 8px; border-radius:6px;
+  color:var(--text); display:flex; align-items:center; gap:6px; user-select:none; }
+.tree summary::-webkit-details-marker { display:none; }
+.tree summary:hover { background:var(--bg-hover); }
+.tree summary .chev { display:inline-block; font-size:10px; color:var(--text-faint);
+  transition:transform .15s; width:10px; }
+.tree details[open] > summary .chev { transform:rotate(90deg); }
+.tree .leaf-list { padding-left:20px; margin-top:1px; }
+.tree .leaf { display:block; padding:6px 8px; border-radius:6px; font-size:13.5px;
+  color:var(--text-dim); }
+.tree .leaf:hover { background:var(--bg-hover); color:var(--text); text-decoration:none; }
+.tree .leaf.active { color:var(--active); font-weight:600; background:rgba(167,139,250,.1); }
+.tree .leaf.locked { color:var(--text-faint); cursor:default; font-style:italic; }
+.tree .leaf.locked:hover { background:none; }
+.tree .no-match { display:none; }
+.sidebar-left.filtering .tree .leaf { display:none; }
+.sidebar-left.filtering .tree .leaf.match { display:block; }
+.sidebar-left.filtering .tree details { display:none; }
+.sidebar-left.filtering .tree details.has-match { display:block; }
+.sidebar-left.filtering .tree details.has-match > summary .chev { transform:rotate(90deg); }
+
+/* ---------- coluna central ---------- */
+main.article { flex:1 1 auto; min-width:0; max-width:760px; margin:0 auto;
+  padding:48px 40px 100px; line-height:1.7; font-size:16.5px; }
+.page-title { font-size:clamp(28px,4vw,38px); font-weight:800; color:var(--title);
+  margin:0 0 28px; letter-spacing:-.3px; }
+main.article h1 { color:var(--gold); font-size:26px; font-weight:700;
+  margin:36px 0 14px; scroll-margin-top:24px; letter-spacing:-.2px; }
+main.article h1:first-child { margin-top:0; }
+main.article h2 { color:var(--gold); font-size:21px; font-weight:700;
+  margin:30px 0 12px; scroll-margin-top:24px; }
+main.article h3 { color:var(--title); font-size:18px; font-weight:700;
+  margin:24px 0 10px; scroll-margin-top:24px; }
+main.article h4 { color:var(--text-dim); font-size:14px; font-weight:700;
+  text-transform:uppercase; letter-spacing:.5px; margin:20px 0 8px; scroll-margin-top:24px; }
+main.article p { margin:0 0 15px; color:var(--text); }
+main.article ul { margin:0 0 15px; padding-left:24px; }
+main.article li { margin-bottom:6px; }
+main.article a { border-bottom:1px solid rgba(224,165,66,.35); }
+main.article a:hover { border-bottom-color:var(--gold); text-decoration:none; }
+main.article em { color:var(--text); font-style:italic; }
+main.article strong { color:var(--title); font-weight:700; }
+main.article hr { border:0; border-top:1px solid var(--border); margin:20px 0; }
+.link-pending { color:var(--text-faint); font-style:italic; border-bottom:1px dotted var(--text-faint); cursor:default; }
+.reloaded-img { max-width:100%; border-radius:8px; border:1px solid var(--border); margin:16px 0; display:block; }
+
+span.citation { font-style:italic; color:var(--text-dim); }
+span.highlight { color:var(--gold); font-weight:600; }
+span.credit { font-size:12px; color:var(--text-faint); display:block; margin-top:4px; }
+
+div.description { background:var(--bg-card); border-left:3px solid var(--active-dim);
+  border-radius:0 8px 8px 0; padding:16px 20px; margin:18px 0; font-style:italic; color:var(--text); }
+div.description p:last-child { margin-bottom:0; }
+
+.callout { border:1px solid var(--border); border-left:4px solid var(--gold-dim);
+  border-radius:0 8px 8px 0; background:rgba(224,165,66,.06); margin:18px 0; padding:14px 18px; }
+.callout-title { font-weight:700; color:var(--gold); font-size:13px; letter-spacing:.3px;
+  text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+.callout-icon { font-size:14px; }
+.callout-body p:last-child { margin-bottom:0; }
+.callout-body { font-size:16px; }
+.callout-warning { border-left-color:#e2645a; background:rgba(226,100,90,.08); }
+.callout-warning .callout-title { color:#f08078; }
+.callout-combat { border-left-color:#e2645a; background:rgba(226,100,90,.1); }
+.callout-combat .callout-title { color:#f08078; }
+.callout-lore, .callout-abstract { border-left-color:#5f9bd8; background:rgba(95,155,216,.08); }
+.callout-lore .callout-title, .callout-abstract .callout-title { color:#7fb4e8; }
+.callout-profile { border-left-color:var(--active-dim); background:rgba(167,139,250,.08); }
+.callout-profile .callout-title { color:var(--active); }
+.callout-item { border-left-color:#4fb86a; background:rgba(79,184,106,.08); }
+.callout-item .callout-title { color:#6fce88; }
+.callout-design { border-left-color:var(--text-faint); background:rgba(158,158,162,.06); }
+.callout-design .callout-title { color:var(--text-dim); }
+.callout-tip { border-left-color:var(--gold); }
+
+.table-wrap { overflow-x:auto; margin:18px 0; }
+table.md-table { border-collapse:collapse; width:100%; font-size:15px; }
+table.md-table th, table.md-table td { border:1px solid var(--border); padding:8px 11px; text-align:left; }
+table.md-table th { background:var(--bg-card); color:var(--gold); font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; }
+
+div.statblock { background:var(--bg-card); border:1px solid var(--border);
+  border-left:3px solid var(--active-dim); border-radius:8px; padding:18px 22px; margin:20px 0; }
+div.statblock h2 { color:var(--title); font-size:20px; font-weight:800; margin:0 0 2px; }
+div.statblock > em:first-of-type { display:block; font-style:italic; color:var(--text-dim); margin-bottom:10px; }
+div.statblock hr { border-top:1px solid var(--border); margin:11px 0; }
+div.statblock h3 { color:var(--gold); font-size:14px; font-weight:700;
+  text-transform:uppercase; letter-spacing:.5px; margin:16px 0 7px; }
+div.statblock p { margin:0 0 9px; font-size:15px; }
+div.statblock table.ability-table { width:100%; border-collapse:collapse; margin:9px 0; }
+div.statblock table.ability-table th, div.statblock table.ability-table td {
+  border:1px solid var(--border); text-align:center; padding:6px 4px; font-size:14px; }
+div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-weight:700; }
+
+/* ---------- coluna direita: sumario ---------- */
+.sidebar-right { width:250px; flex:0 0 250px; padding:48px 20px 40px 0;
+  position:sticky; top:0; height:100vh; overflow-y:auto; }
+.toc-label { font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+  color:var(--text-faint); margin-bottom:12px; }
+.toc-list { font-size:13px; }
+.toc-list a { display:block; padding:4px 0; color:var(--text-dim); border-bottom:none;
+  line-height:1.4; }
+.toc-list a:hover { color:var(--text); text-decoration:none; }
+.toc-lvl-1 { padding-left:0; font-weight:600; }
+.toc-lvl-2 { padding-left:12px; }
+.toc-lvl-3 { padding-left:24px; }
+.toc-lvl-4 { padding-left:36px; font-size:12px; }
+
+/* ---------- pagina indice ---------- */
+.idx-intro { margin-bottom:8px; }
+.idx-intro h1 { font-size:clamp(26px,4vw,36px); font-weight:800; color:var(--gold); margin-bottom:10px; }
+.idx-intro p { color:var(--text-dim); font-size:15px; max-width:640px; }
+.idx-section { margin:34px 0; }
+.idx-section-title { font-size:13px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+  color:var(--text-dim); border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:14px; }
+.idx-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:12px; }
+.idx-card { display:block; background:var(--bg-card); border:1px solid var(--border);
+  border-radius:8px; padding:14px 16px; font-weight:600; font-size:14.5px; color:var(--text);
+  transition:border-color .15s, transform .15s; }
+.idx-card:hover { border-color:var(--gold-dim); transform:translateY(-2px); text-decoration:none; }
+.idx-card.locked { opacity:.45; cursor:default; border-style:dashed; }
+.idx-card.locked:hover { transform:none; }
+.idx-badge { display:block; margin-top:5px; font-size:10px; letter-spacing:.5px; text-transform:uppercase; color:var(--text-faint); font-weight:400; }
+
+/* ---------- mobile ---------- */
+.mobile-topbar { display:none; }
+@media (max-width:1100px) {
+  .sidebar-right { display:none; }
+}
+@media (max-width:860px) {
+  .layout { flex-direction:column; }
+  .mobile-topbar { display:flex; align-items:center; gap:12px; position:sticky; top:0; z-index:40;
+    background:var(--bg-sidebar); border-bottom:1px solid var(--border); padding:12px 16px; }
+  .mobile-topbar .brand { margin:0; font-size:15px; flex:1; }
+  .mobile-topbar button { background:none; border:1px solid var(--border); color:var(--text);
+    border-radius:6px; padding:6px 10px; font-family:inherit; font-size:13px; }
+  .sidebar-left { position:fixed; left:0; top:49px; bottom:0; z-index:39; transform:translateX(-100%);
+    transition:transform .2s; width:82vw; max-width:320px; box-shadow:8px 0 30px rgba(0,0,0,.5); }
+  .sidebar-left.open { transform:translateX(0); }
+  main.article { padding:28px 18px 70px; max-width:100%; }
+}
+</style>
+</head>
+<body>
+<div class="mobile-topbar">
+  <button aria-label="Abrir menu">☰</button>
+  <a class="brand" href="index.html">Curse of Strahd: Reloaded</a>
+</div>
+<div class="layout">
+  <aside class="sidebar-left">
+    <a class="brand" href="index.html">Curse of Strahd:<br>Reloaded</a>
+    <div class="search-box"><span class="ico">🔍</span><input type="text" placeholder="Buscar página..." aria-label="Buscar página"></div>
+    <nav class="tree"><details><summary><span class="chev">▸</span>Introdução</summary><div class="leaf-list"><a class="leaf" href="introducao-usando-este-guia.html">Usando Este Guia</a><a class="leaf" href="introducao-guia-do-mestre.html">Guia do Mestre</a><a class="leaf" href="introducao-changelog.html">Changelog</a></div></details><details><summary><span class="chev">▸</span>Capítulo 1 — Iniciando a Campanha</summary><div class="leaf-list"><a class="leaf" href="cap1-sessao-zero.html">Sessão Zero</a><a class="leaf" href="cap1-criacao-de-personagem.html">Criação de Personagem</a></div></details><details><summary><span class="chev">▸</span>Capítulo 2 — A Terra de Barovia</summary><div class="leaf-list"><a class="leaf" href="cap2-lore-de-barovia.html">Lore de Barovia</a><a class="leaf" href="cap2-historia-de-barovia.html">História de Barovia</a><a class="leaf" href="cap2-strahd-von-zarovich.html">Strahd von Zarovich</a></div></details><details open><summary><span class="chev">▸</span>Capítulo 3 — Conduzindo o Jogo</summary><div class="leaf-list"><a class="leaf" href="cap3-resumo-da-aventura.html">Resumo da Aventura</a><a class="leaf active" href="cap3-conduzindo-a-aventura.html">Conduzindo a Aventura</a></div></details><details><summary><span class="chev">▸</span>Ato I — Adentrando as Névoas</summary><div class="leaf-list"><a class="leaf" href="ato1-resumo.html">Resumo do Ato I</a><a class="leaf" href="arco-a-fuga-da-death-house.html">Arco A — Fuga da Death House</a><a class="leaf" href="arco-b-bem-vindo-a-barovia.html">Arco B — Bem-vindo a Barovia</a><a class="leaf" href="arco-c-adentrando-o-vale.html">Arco C — Adentrando o Vale</a></div></details><details><summary><span class="chev">▸</span>Ato II — A Cidade Sombria</summary><div class="leaf-list"><span class="leaf locked">Resumo do Ato II</span><span class="leaf locked">Arco D — A Festa de St. Andral</span><span class="leaf locked">Arco E — A Vistana Desaparecida</span><span class="leaf locked">Arco F — O Desejo de Lady Wachter</span><span class="leaf locked">Arco G — Os Irmãos Strazni</span><span class="leaf locked">Arco H — A Alma Perdida</span><span class="leaf locked">Arco I — As Muralhas de Krezk</span></div></details><details><summary><span class="chev">▸</span>Ato III — A Terra Partida</summary><div class="leaf-list"><span class="leaf locked">Resumo do Ato III</span><span class="leaf locked">Arco J — A Gema Roubada</span><span class="leaf locked">Arco K — A Abadia Decaída</span><span class="leaf locked">Arco L — O Covil dos Lobos</span><span class="leaf locked">Arco M — A Mansão do Dragão</span><span class="leaf locked">Arco O — Jantar com o Diabo</span><span class="leaf locked">Arco P — O Assalto a Ravenloft</span><span class="leaf locked">Arco Q — Um Farol Reluzente</span></div></details><details><summary><span class="chev">▸</span>Ato IV — Segredos do Ancião</summary><div class="leaf-list"><span class="leaf locked">Resumo do Ato IV</span><span class="leaf locked">Arco R — Provações da Montanha</span><span class="leaf locked">Arco S — Uma Espada de Luz Solar</span><span class="leaf locked">Arco T — Os Três Fanes</span><span class="leaf locked">Arco U — Sonhos da Alvorada</span><span class="leaf locked">Epílogo</span></div></details><details><summary><span class="chev">▸</span>Apêndices</summary><div class="leaf-list"><span class="leaf locked">Fragmentos de Âmbar</span><span class="leaf locked">Bestiário</span><span class="leaf locked">Glossário</span><span class="leaf locked">Personagens Não Jogadores</span></div></details></nav>
+    <div style="margin-top:18px"><a href="../painel_barovia_dnd5e.html" style="font-size:12px;color:var(--text-faint)">← Voltar ao Painel</a></div>
+  </aside>
+  <main class="article">
+    <div class="page-title">Conduzindo a Aventura</div>
+<h1 id="organização-da-aventura">Organização da Aventura</h1>
+<p>Embora <em>Curse of Strahd</em>, como a maioria dos módulos de campanha oficiais, seja organizado em torno de áreas e localizações específicas, <em>Curse of Strahd: Reloaded</em> é organizado em torno de <strong>narrativas</strong>:</p>
+<ul><li><strong>Atos.</strong> Um <strong>ato</strong> é um conjunto de aventuras com cenários e riscos semelhantes que devem ser concluídas em aproximadamente o mesmo período de tempo (por exemplo, "aventuras em Vallaki").</li><li><strong>Arcos.</strong> Um <strong>arco</strong> é uma aventura de alto conceito dentro de um ato que tem um objetivo específico (por exemplo, "restaurar os ossos de Saint Andral").</li><li><strong>Capítulos.</strong> Um <strong>capítulo</strong> é uma parte de um arco que se passa numa localização específica (por exemplo, "a loja do fabricante de caixões").</li><li><strong>Cenas.</strong> Uma <strong>cena</strong> é uma cena específica que se desenrola num momento e lugar específicos dentro de um capítulo (por exemplo, "batalhar contra o vampiro servo").</li></ul>
+<p>Embora nenhuma campanha de <em>Dungeons & Dragons</em> possa ser perfeitamente prevista, este guia usa uma estratégia de "perguntas dramáticas" fortes, um design narrativo flexível, e a experiência do autor em conduzir campanhas de <em>Curse of Strahd</em> para elaborar um "caminho crítico" de arcos, capítulos e cenas com maior probabilidade de conduzir seus jogadores em sua jornada por Barovia.</p>
+<p>Note que, como <em>Curse of Strahd</em> é uma campanha sandbox, é razoavelmente possível que os jogadores acionem um novo ato antes de completar todos os arcos de aventura do ato anterior. Se isso acontecer, os jogadores ainda podem continuar e completar quaisquer arcos de aventura dos atos anteriores — supondo, é claro, que ainda seja possível completá-los. (Por exemplo, se os jogadores não conseguirem recuperar os ossos de Saint Andral antes da noite da Saint Andral's Feast, a congregação da Saint Andral's Church é massacrada e a missão não pode mais ser concluída.)</p>
+<p>É claro que sempre é possível que os jogadores "saiam dos trilhos" e forjem seu próprio caminho nesta aventura. As diretrizes de Sessão Zero deste guia foram moldadas com a intenção explícita de minimizar essa possibilidade (por exemplo, desencorajando os jogadores a criar personagens não-heroicos). No entanto, é importante lembrar que a narrativa deste guia apresenta, na melhor das hipóteses, um único "caminho crítico" que seus jogadores podem seguir, e que os fios do destino sempre podem guiá-los por outro.</p>
+<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>Níveis e Marcos</strong></div><div class="callout-body"><p><em>Curse of Strahd: Reloaded</em> permite que os jogadores aumentem de nível ganhando pontos de experiência cada vez que completam um marco da história. Os jogadores normalmente ganharão uma quantidade especificada de XP de marco cada vez que completarem um arco. Os jogadores também podem ganhar XP de marco adicional ao completar um segmento de um arco, ou ao completar "conteúdo bônus" opcional.</p>
+<p>Os jogadores só podem ganhar XP onde estiver indicado no guia, e não podem ganhar XP derrotando monstros ou por outros meios.</p></div></div>
+<div class="callout callout-design"><div class="callout-title"><span class="callout-icon">🛠</span><strong>Nota de Design: XP de Marco</strong></div><div class="callout-body"><p><em>Curse of Strahd</em> é, em sua essência, uma aventura não-linear. Embora <em>Curse of Strahd: Reloaded</em> forneça uma estrutura adicional ao sandbox, cada ato ainda pode ser concluído de diversas formas diferentes, com alguns arcos potencialmente permanecendo inacabados até um ato bem posterior. Além disso, como a maioria dos arcos dentro de um ato pode ser concluída em qualquer ordem, a maioria dos atos carece de um "clímax" ou "ápice" claro, o que significa que os jogadores podem frequentemente se sentir ansiosos por uma sensação de progressão no meio de um ato.</p>
+<p>O XP de marco resolve esses problemas, garantindo que os jogadores tenham uma sensação de progressão mecânica conforme completam arcos, além de atribuir uma quantidade de XP proporcional à dificuldade de cada arco.</p></div></div>
+<h1 id="ganchos-de-aventura">Ganchos de Aventura</h1>
+<p>Em contraste com o módulo original de <em>Curse of Strahd</em>, este guia oferece um único gancho de aventura original para conduzir os jogadores até Barovia. Nesse gancho, Death House serve como um portal para o domínio de Strahd: os jogadores entram na Death House em seu próprio mundo e — ao derrotar ou pacificar o culto — emergem na terra de Barovia. No entanto, esse gancho pode ser implementado de duas formas possíveis:</p>
+<ul><li><strong><em>Perdidos nas Névoas.</em></strong> Nesta versão, os jogadores são membros de um grupo mercenário de aventureiros contratado para investigar uma série de desaparecimentos misteriosos ligados a uma casa específica (a Death House). Esse gancho concentra a atenção dos jogadores exclusivamente na tirania de Strahd e nos baroveses que sofrem sob seu domínio, incentivando os jogadores a se imergirem na lore da campanha e a desenvolver relacionamentos únicos com seu diverso elenco de personagens.</li><li><strong><em>Relíquias Barovesas.</em></strong> Nesta versão, um ou mais jogadores possuem certas relíquias únicas originárias de Barovia e ligadas às suas histórias de fundo. Quando a Death House se manifesta nas proximidades, essas relíquias são atraídas até ela, incentivando os jogadores a entrar e investigar. (Qualquer jogador que não deseje criar uma história de fundo pode, em vez disso, optar por ser um mercenário investigando desaparecimentos recentes, como em <strong><em>Perdidos nas Névoas</em></strong>.) Esse gancho concentra a atenção dos jogadores em seus próprios interesses e conexões pessoais com a terra de Barovia, incentivando-os a investir sua atenção em NPCs e localizações ligadas às suas relíquias únicas.</li></ul>
+<p>Em geral, <strong><em>Perdidos nas Névoas</em></strong> pode ser visto como uma versão "pura" de <em>Curse of Strahd</em>, concentrando sua narrativa no isolamento e na alienação de Barovia. Em contraste, <strong><em>Relíquias Barovesas</em></strong> é mais bem utilizado por Mestres apaixonados pela atmosfera e ambiente góticos de Barovia, mas cujos jogadores precisam de uma conexão pessoal com a campanha para se envolverem emocionalmente.</p>
+<p>Veja <strong><em>Arc A. Escape From Death House</em></strong> e <strong>A1. Daggerford</strong> para mais informações sobre como conduzir esses ganchos. Se você optar por conduzir <strong><em>Relíquias Barovesas</em></strong> para um ou mais dos seus jogadores, peça que cada um desses jogadores escolha uma motivação na seção <strong><em>Motivations</em></strong> em <strong>Chapter 1: Into the Mists</strong> antes de começar a campanha.</p>
+<h1 id="os-espiões-de-strahd">Os Espiões de Strahd</h1>
+<p>Um ou mais espiões de Strahd verificam os jogadores uma vez por dia e uma vez por noite, conforme descrito em <strong>Strahd's Spies</strong> (p. 29). No entanto, a natureza dos espiões de Strahd pode variar de acordo com a localização dos jogadores e a hora do dia. Use a tabela a seguir ao planejar um encontro com um espião:</p>
+<div class="table-wrap"><table class="md-table"><thead><tr><th>Localização</th><th>Encontro Diurno</th><th>Encontro Noturno</th></tr></thead><tbody><tr><td>Vila de Barovia</td><td>1 <strong>bandido</strong> vistani</td><td>1d4 <strong>enxames de morcegos</strong></td></tr><tr><td>Floresta Svalich</td><td>1 <strong>lobo</strong> ou <strong>druida</strong></td><td>1 <strong>lobo</strong> ou 1d4 <strong>enxames de morcegos</strong></td></tr><tr><td>Cidade de Vallaki</td><td>1 <strong>enxame de ratos</strong></td><td>1 <strong>enxame de morcegos</strong></td></tr><tr><td>Vila de Krezk</td><td>1 <strong>enxame de ratos</strong></td><td>1 <strong>enxame de morcegos</strong></td></tr><tr><td>Monte Ghakis</td><td>1 <strong>lobo atroz</strong> ou 1 <strong>berserker</strong></td><td>1 <strong>enxame de morcegos</strong></td></tr></tbody></table></div>
+<p>Os espiões de Strahd, que todos entendem o idioma Comum, relatam as seguintes informações, que você deve registrar usando o <a href="https://publish-01.obsidian.md/access/7db64b11c71d88572ddc6cd06b888976/Strahd&#x27;s%20Espionage.pdf" target="_blank" rel="noopener">material <strong>Strahd's Espionage</strong></a>:</p>
+<ul><li>quaisquer conversas que os jogadores forem ouvidos tendo;</li><li>quaisquer magias, armas ou habilidades que os jogadores forem vistos usando; e</li><li>quaisquer localizações ou NPCs que os jogadores forem vistos visitando.</li></ul>
+<h1 id="encontros-com-strahd">Encontros com Strahd</h1>
+<p>Ao longo da aventura, os jogadores terão diversos encontros com Strahd von Zarovich. Depois de conhecer Strahd pela primeira vez na Encruzilhada do Rio Ivlis (veja <a href="arco-c-adentrando-o-vale.html">Arco C - Adentrando o Vale</a>), os jogadores podem posteriormente falar com ele em Yester Hill (veja <span class="link-pending" title="Ainda não convertido">Arco J - A Gema Roubada</span>) e jantar com ele no Castelo Ravenloft (veja <span class="link-pending" title="Ainda não convertido">Arco O - Jantar com o Diabo</span>).</p>
+<p>Assim que Strahd descobre que os jogadores obtiveram o <em>Símbolo Sagrado de Ravenkind</em> ou reacenderam o farol de Argynvostholt, ele redireciona seus esforços para determinar se algum deles é digno de servir como general ou consorte em sua corte. Veja <strong><em>Arc R: The Tyrant's Trials</em></strong> para mais informações.</p>
+<div class="callout callout-warning"><div class="callout-title"><span class="callout-icon">⚠</span><strong>Táticas de Combate</strong></div><div class="callout-body"><p>Os combates neste guia foram projetados usando o <a href="https://www.gmbinder.com/share/-N4m46K77hpMVnh7upYa" target="_blank" rel="noopener">Challenge Ratings 2.0</a>, um sistema que calibra a dificuldade dos encontros para garantir combates desafiadores e equilibrados. A menos que especificamente indicado neste guia, ou a menos que seja necessário para competir com jogadores usando táticas semelhantes, os inimigos (incluindo Strahd) não deveriam precisar usar nenhuma tática (por exemplo, mirar em jogadores fracos ou concentrar fogo) para proporcionar uma experiência desafiadora.</p></div></div>
+<h1 id="a-leitura-de-tarokka">A Leitura de Tarokka</h1>
+<h2 id="o-tomo-de-strahd">O Tomo de Strahd</h2>
+<p>O conteúdo do Tomo de Strahd agora é conforme descrito em <span class="link-pending" title="Ainda não convertido">Arco H - A Alma Perdida</span>.</p>
+<h2 id="o-símbolo-sagrado-de-ravenkind">O Símbolo Sagrado de Ravenkind</h2>
+<p>O <em>Símbolo Sagrado de Ravenkind</em> foi revisado da seguinte forma:</p>
+<div class="item">
+<h3>Símbolo Sagrado de Ravenkind</h3>
+<div class="subtitle"><em>Item maravilhoso, lendário (requer sintonia por uma criatura de tendência boa)</em></div>
+<p>O símbolo sagrado tem 5 cargas para as propriedades a seguir. Ele recupera 1d4 + 1 cargas diariamente ao amanhecer.</p>
+<p><strong><em>Abraço da Aurora.</em></strong> Como reação, quando uma criatura que você pode ver a até 18 metros de você seria reduzida a 0 pontos de vida, você pode gastar 1 carga para fazer com que essa criatura fique com 1 ponto de vida em vez disso. Essa criatura ganha imunidade a todo dano até o início do seu próximo turno.</p>
+<p><strong><em>Luz da Esperança.</em></strong> Como ação, você pode gastar 1 carga e escolher uma criatura que você possa ver a até 9 metros de você. Todas as seguintes condições nessa criatura terminam: cego, enfeitiçado, surdo, amedrontado, paralisado, envenenado e atordoado.</p>
+<p><strong><em>Bênção do Sol.</em></strong> Como ação, você pode gastar 3 cargas para fazer com que um poder sagrado irradie do símbolo num raio de 9 metros por 1 minuto. Criaturas não hostis nesse raio causam 1d4 de dano radiante extra quando acertam com um ataque de arma.</p>
+<p>Você também pode usar o símbolo sagrado como foco de conjuração para suas magias de clérigo e paladino. Você ganha um bônus de +1 nas jogadas de ataque com magia e nas CDs de teste de resistência de suas magias de clérigo e paladino.</p>
+</div>
+<h2 id="a-espada-do-sol">A Espada do Sol</h2>
+<p>A <em>Espada do Sol</em> pode ser sintonizada assim que os jogadores a obtêm. No entanto, no estado em que a encontram, ela carece da centelha necessária para se acender. Para restaurá-la, precisam vincular uma alma radiante à espada. (O punho mantém sua senciência e capacidade de se comunicar telepaticamente antes que sua lâmina seja restaurada.) Para mais informações, veja <span class="link-pending" title="Ainda não convertido">Arco S - Uma Espada de Luz Solar</span>.</p>
+<p>Note que a <em>Espada do Sol</em> é um item mágico senciente; conforme descrito em <strong>Conflict</strong> (<em>Dungeon Master's Guide</em>, p. 216), ela pode fazer exigências ao seu portador ou tentar tomar controle dele se ele agir contra sua vontade. (Isso tem chance especialmente alta de ocorrer se, por exemplo, seu portador estiver enfeitiçado por Strahd von Zarovich.)</p>
+<h2 id="o-inimigo-de-strahd">O Inimigo de Strahd</h2>
+<p>O inimigo de Strahd não possui mais a ação <strong><em>Inspire</em></strong> (<strong>Strahd's Enemy</strong>, p. 15). Em vez disso, se ela enfrentar os Poderes Sombrios no Monumento de Marina em Berez (veja <strong><em>Arc X: Whispers of the Mists</em></strong>), Ireena Kolyana ganha essa habilidade como uma ação bônus. Veja <strong><em>Arc B: Welcome to Barovia</em></strong> para mais informações sobre as estatísticas de Ireena.</p>
+<h2 id="a-leitura-das-cartas">A Leitura das Cartas</h2>
+<p>Imediatamente antes da cena em que os jogadores conhecem Madame Eva, se você estiver usando um baralho físico de Tarokka para a leitura, escolha quais cinco cartas Madame Eva vai puxar e as empilhe no topo do baralho na ordem descrita em <strong>Card Reading</strong> (p. 11).</p>
+<p>Ao escolher qual(is) carta(s) usar para qual parte da leitura, selecione o seguinte.</p>
+<h3 id="o-tomo-de-strahd-2">O Tomo de Strahd</h3>
+<p>O Tomo de Strahd não está presente no Plano Material de Barovia. Em vez disso, o <strong>Nove de Glifos — Traidor</strong> prevê que ele está em posse do <strong>orador da forca</strong> Leo Dilisnya, dentro do Plano Etéreo. Veja <span class="link-pending" title="Ainda não convertido">Arco H - A Alma Perdida</span> para mais informações sobre o orador da forca.</p>
+<h3 id="o-símbolo-sagrado-de-ravenkind-2">O Símbolo Sagrado de Ravenkind</h3>
+<p>Coloque o <em>Símbolo Sagrado de Ravenkind</em> no santuário de Mother Night no covil dos lobisomens (<strong><em>Cinco de Espadas — Mirmidão</em></strong>).</p>
+<h3 id="a-espada-do-sol-2">A Espada do Sol</h3>
+<p>Coloque a <em>Espada do Sol</em> no sarcófago do Vampyr no Templo de Âmbar (<strong><em>Oito de Glifos — Bispo</em></strong>).</p>
+<h3 id="o-inimigo-de-strahd-2">O Inimigo de Strahd</h3>
+<p>Atribua o papel de Inimigo de Strahd a Ezmerelda d'Avenir (<strong><em>Névoas — Dama de Espadas</em></strong>).</p>
+<h3 id="a-localização-de-strahd">A Localização de Strahd</h3>
+<p>Atribua a localização de Strahd no Castelo Ravenloft a <strong>K20. Coração da Tristeza</strong>, representada pelo <strong><em>Marionete (Valete de Copas).</em></strong></p>
+<h1 id="notas-de-design-conduzindo-a-aventura">Notas de Design: Conduzindo a Aventura</h1>
+<h2 id="a-leitura-de-tarokka-2">A Leitura de Tarokka</h2>
+<p><strong><em>O Tomo de Strahd.</em></strong> O <em>Tomo de Strahd</em> foi expandido para fornecer aos jogadores informações secretas sobre o plano definitivo de Strahd, assim como ganchos adicionais para os Santuários de Barovia e o Templo de Âmbar. (Se os jogadores restaurarem sua memória e lhe mostrarem o <em>Tomo</em>, o <strong>fantasma</strong> Exethanter pode interpretar as cifras e anotações de Strahd a pedido deles.)</p>
+<p>O <em>Tomo</em> foi intencionalmente colocado em Vallaki para garantir que os jogadores o encontrem (e fiquem intrigados com seus mistérios) o mais cedo possível. Por estarem fortemente ligados a outras missões, a carroça de Rictavio (<strong><em>Sete de Estrelas — Ilusionista</em></strong>) e o sótão da Blue Water Inn (<strong><em>Mestre das Moedas — Ladino</em></strong>) foram removidos como localizações possíveis.</p>
+<p><strong><em>O Símbolo Sagrado de Ravenkind.</em></strong> As estatísticas do <em>Símbolo Sagrado</em> foram revisadas para garantir que sua utilidade não seja ofuscada pela <em>Espada do Sol</em> assim que esta for obtida, e para substituir suas características pouco estratégicas de <em>conter vampiros</em> e <em>repelir mortos-vivos</em> por habilidades táticas e envolventes. Suas restrições de classe para sintonia foram removidas para garantir que qualquer grupo possa usá-lo — com ou sem um clérigo ou paladino.</p>
+<p>O <em>Símbolo Sagrado</em> foi intencionalmente colocado no Covil dos Lobisomens para garantir que os jogadores o encontrem depois de já terem enfrentado as noivas de Strahd (em Vallaki e em Yester Hill), mas antes de invadirem quaisquer localizações verdadeiramente perigosas (por exemplo, o Castelo Ravenloft, o Templo de Âmbar, ou as ruínas de Berez).</p>
+<p>As quatro profecias que levam a Krezk — o espantalho no jardim da Abbey of Saint Markovia (<strong><em>Dois de Glifos — Missionário</em></strong>), o salão principal da Abadia (<strong><em>Um de Glifos — Monge</em></strong>), o berçário da Abadia (<strong><em>Dois de Moedas — Filantropo</em></strong>), e o gazebo no Santuário do Sol Branco (<strong><em>Três de Glifos — Curandeiro</em></strong>) — foram removidas para garantir que os jogadores não cumpram duas de suas leituras de Tarokka (ou seja, tanto o <em>Símbolo Sagrado</em> quanto o Inimigo de Strahd) dentro da mesma área relativa.</p>
+<p><strong><em>A Espada do Sol.</em></strong> A lâmina radiante da <em>Espada do Sol</em> foi retida dos jogadores para criar uma oportunidade mais orgânica de conhecer o espírito de Sergei von Zarovich, para produzir uma interação tardia entre Sergei e Ireena, e para criar uma narrativa mais climática e envolvente.</p>
+<p>Devido ao seu poder em combate contra Strahd, a <em>Espada do Sol</em> foi intencionalmente colocada no Templo de Âmbar — a localização mais perigosa e isolada do jogo — para garantir que os jogadores não a obtenham cedo demais. Essa colocação também garante que os jogadores tenham um gancho confiável para o Templo e um objetivo recompensador a alcançar enquanto estiverem lá.</p>
+<p><strong><em>O Inimigo de Strahd.</em></strong> Todos os possíveis aliados, exceto a caçadora de monstros vistani Ezmerelda d'Avenir, foram intencionalmente removidos da leitura de Tarokka.</p>
+<p>Vários desses aliados, como Sir Godfrey Gwilym ou o (agora inexistente) arquimago Mordenkainen, são poderosos demais e desequilibram a balança em favor do grupo. Outros, como Nikolai Wachter ou Clovin Belview, são fracos demais para fornecer ajuda significativa. Outros ainda, como Vasilka, Pidlwick II, Sir Klutz, ou Parriwimple, carecem de profundidade de personagem suficiente para cumprir um papel narrativo significativo.</p>
+<p>Muitos dos demais possíveis aliados — incluindo Davian Martikov, Victor Vallakovich, ou Ismark Kolyanovich — foram removidos como possibilidades porque seus arcos de personagem revisados os ligam mais fortemente às suas famílias, amigos ou lares. O último aliado alternativo, Kasimir Velikov, foi removido para garantir que os jogadores não o procurem — e recebam a mortal linha de missões do Templo de Âmbar — até que estejam fortes o suficiente para isso.</p>
+<p>Isso deixa Ezmerelda d'Avenir. Selecionar Ezmerelda como Inimiga de Strahd reduz o número de aliados NPCs que os jogadores podem recrutar, mantendo o grupo num tamanho mais gerenciável; fornece aos jogadores um gancho claro para Krezk e a Abbey of Saint Markovia, o que desbloqueia diversas missões adicionais; e garante que os jogadores nunca sejam nem superados nem superiores demais em relação à sua aliada em nenhum ponto do jogo.</p>
+<p><strong><em>A Localização de Strahd.</em></strong> A localização da batalha final contra Strahd foi intencionalmente limitada a <strong>K20. Coração da Tristeza</strong>. Como a nova peça central do poder e dos esquemas de Strahd, uma arena perfeita para combate tático, e uma área com visão clara do nascer do sol pós-batalha, o Coração — incluindo sua ponte adjacente e o telhado — é o lugar ideal (e esperado) para o desfecho se desenrolar.</p>
+<h2 id="ganchos-de-aventura-2">Ganchos de Aventura</h2>
+<p>Os quatro ganchos de aventura do módulo original são fundamentalmente falhos: <em>Plea for Help</em> tende a fazer os jogadores nutrirem ressentimento por Ireena Kolyana; <em>Mysterious Visitors</em> tende a fazer os jogadores se sentirem enganados (e, portanto, se arrependerem de aceitar a missão de Stanimir); <em>Werewolves in the Mist</em> atinge seu clímax cedo demais; e <em>Creeping Fog</em> oferece pouca preparação ou envolvimento emocional. Mais significativamente, à exceção de <em>Mysterious Visitors</em>, nenhum gancho de aventura conduz os jogadores direta e inevitavelmente a um confronto final com Strahd.</p>
+<p>Ganchos de aventura personalizados que ligam as histórias de fundo dos jogadores diretamente a Barovia (por exemplo, permitindo que os jogadores resgatem um ente querido perdido) tendem a falhar por três razões: faltam uma ligação direta com Strahd; distraem os jogadores da luta contra Strahd; e violam princípios de verossimilhança (ou seja, tornando Barovia um lugar muito mais movimentado do que deveria ser). É importante notar que os jogadores que recebem esses ganchos podem ter dificuldade para entender a importância da leitura de Tarokka de Madame Eva, especialmente enquanto ainda tiverem assuntos pendentes no vale.</p>
+<p>No entanto, um grande subconjunto de Mestres de <em>Curse of Strahd</em> ainda assim prefere ligar as histórias de fundo dos jogadores a Barovia, a fim de promover o envolvimento e o investimento emocional dos jogadores na própria campanha. Para isso, o gancho <strong><em>Relíquias Barovesas</em></strong> fornece aos jogadores razões para viajar a Barovia que inevitavelmente os conduzirão a um confronto direto com Strahd. Enquanto isso, <strong><em>Perdidos nas Névoas</em></strong> serve como um substituto mais desenvolvido para <em>Creeping Fog</em>, ajudando Mestres que prefeririam manter Barovia como um lugar sinistro e alienante.</p>
+  </main>
+  <aside class="sidebar-right"><div class="toc-label">Nesta página</div><div class="toc-list"><a class="toc-lvl-1" href="#organização-da-aventura">Organização da Aventura</a><a class="toc-lvl-1" href="#ganchos-de-aventura">Ganchos de Aventura</a><a class="toc-lvl-1" href="#os-espiões-de-strahd">Os Espiões de Strahd</a><a class="toc-lvl-1" href="#encontros-com-strahd">Encontros com Strahd</a><a class="toc-lvl-1" href="#a-leitura-de-tarokka">A Leitura de Tarokka</a><a class="toc-lvl-2" href="#o-tomo-de-strahd">O Tomo de Strahd</a><a class="toc-lvl-2" href="#o-símbolo-sagrado-de-ravenkind">O Símbolo Sagrado de Ravenkind</a><a class="toc-lvl-2" href="#a-espada-do-sol">A Espada do Sol</a><a class="toc-lvl-2" href="#o-inimigo-de-strahd">O Inimigo de Strahd</a><a class="toc-lvl-2" href="#a-leitura-das-cartas">A Leitura das Cartas</a><a class="toc-lvl-3" href="#o-tomo-de-strahd-2">O Tomo de Strahd</a><a class="toc-lvl-3" href="#o-símbolo-sagrado-de-ravenkind-2">O Símbolo Sagrado de Ravenkind</a><a class="toc-lvl-3" href="#a-espada-do-sol-2">A Espada do Sol</a><a class="toc-lvl-3" href="#o-inimigo-de-strahd-2">O Inimigo de Strahd</a><a class="toc-lvl-3" href="#a-localização-de-strahd">A Localização de Strahd</a><a class="toc-lvl-1" href="#notas-de-design-conduzindo-a-aventura">Notas de Design: Conduzindo a Aventura</a><a class="toc-lvl-2" href="#a-leitura-de-tarokka-2">A Leitura de Tarokka</a><a class="toc-lvl-2" href="#ganchos-de-aventura-2">Ganchos de Aventura</a></div></aside>
+</div>
+<script>
+document.querySelectorAll('.search-box input').forEach(function(inp){
+  inp.addEventListener('input', function(){
+    var q = inp.value.trim().toLowerCase();
+    var sidebar = inp.closest('.sidebar-left');
+    if (!q) { sidebar.classList.remove('filtering'); return; }
+    sidebar.classList.add('filtering');
+    sidebar.querySelectorAll('.tree .leaf').forEach(function(a){
+      var hit = a.textContent.toLowerCase().indexOf(q) !== -1;
+      a.classList.toggle('match', hit);
+    });
+    sidebar.querySelectorAll('.tree > details').forEach(function(d){
+      var hasMatch = d.querySelector('.leaf.match');
+      d.classList.toggle('has-match', !!hasMatch);
+    });
+  });
+});
+var mobileBtn = document.querySelector('.mobile-topbar button');
+if (mobileBtn) {
+  mobileBtn.addEventListener('click', function(){
+    document.querySelector('.sidebar-left').classList.toggle('open');
+  });
+}
+</script>
+</body>
+</html>

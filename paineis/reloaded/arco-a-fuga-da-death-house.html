@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1c1c1e">
+<link rel="icon" type="image/svg+xml" href="../../assets/img/favicon.svg">
+<title>Arco A — Fuga da Death House — Curse of Strahd: Reloaded</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+* { box-sizing:border-box; }
+:root {
+  --bg:#1c1c1e; --bg-sidebar:#1a1a1c; --bg-hover:#252528; --bg-card:#232325;
+  --border:#333336;
+  --gold:#e0a542; --gold-dim:#b8863a;
+  --active:#a78bfa; --active-dim:#8a6fd8;
+  --text:#dcdcdd; --text-dim:#9a9a9d; --text-faint:#6e6e72;
+  --title:#f2f1ee;
+}
+* { scrollbar-color: #48484c var(--bg-sidebar); scrollbar-width: thin; }
+html, body { margin:0; min-height:100vh; background:var(--bg);
+  font-family:'Inter', system-ui, -apple-system, sans-serif; color:var(--text); }
+a { color:var(--gold); text-decoration:none; }
+a:hover { text-decoration:underline; }
+
+.layout { display:flex; min-height:100vh; align-items:stretch; }
+
+/* ---------- barra lateral esquerda ---------- */
+.sidebar-left { width:290px; flex:0 0 290px; background:var(--bg-sidebar);
+  border-right:1px solid var(--border); padding:22px 18px 40px;
+  position:sticky; top:0; height:100vh; overflow-y:auto; }
+.brand { font-size:19px; font-weight:800; color:var(--gold); line-height:1.25;
+  margin-bottom:14px; text-decoration:none; display:block; }
+.brand:hover { text-decoration:none; opacity:.9; }
+.search-box { position:relative; margin-bottom:16px; }
+.search-box input { width:100%; padding:8px 10px 8px 30px; border-radius:6px;
+  border:1px solid var(--border); background:var(--bg-card); color:var(--text);
+  font-family:inherit; font-size:13px; }
+.search-box input::placeholder { color:var(--text-faint); }
+.search-box input:focus { outline:none; border-color:var(--gold-dim); }
+.search-box .ico { position:absolute; left:9px; top:50%; transform:translateY(-50%);
+  color:var(--text-faint); font-size:13px; pointer-events:none; }
+.tree { font-size:14px; }
+.tree details { margin-bottom:1px; }
+.tree summary { list-style:none; cursor:pointer; padding:6px 8px; border-radius:6px;
+  color:var(--text); display:flex; align-items:center; gap:6px; user-select:none; }
+.tree summary::-webkit-details-marker { display:none; }
+.tree summary:hover { background:var(--bg-hover); }
+.tree summary .chev { display:inline-block; font-size:10px; color:var(--text-faint);
+  transition:transform .15s; width:10px; }
+.tree details[open] > summary .chev { transform:rotate(90deg); }
+.tree .leaf-list { padding-left:20px; margin-top:1px; }
+.tree .leaf { display:block; padding:6px 8px; border-radius:6px; font-size:13.5px;
+  color:var(--text-dim); }
+.tree .leaf:hover { background:var(--bg-hover); color:var(--text); text-decoration:none; }
+.tree .leaf.active { color:var(--active); font-weight:600; background:rgba(167,139,250,.1); }
+.tree .leaf.locked { color:var(--text-faint); cursor:default; font-style:italic; }
+.tree .leaf.locked:hover { background:none; }
+.tree .no-match { display:none; }
+.sidebar-left.filtering .tree .leaf { display:none; }
+.sidebar-left.filtering .tree .leaf.match { display:block; }
+.sidebar-left.filtering .tree details { display:none; }
+.sidebar-left.filtering .tree details.has-match { display:block; }
+.sidebar-left.filtering .tree details.has-match > summary .chev { transform:rotate(90deg); }
+
+/* ---------- coluna central ---------- */
+main.article { flex:1 1 auto; min-width:0; max-width:760px; margin:0 auto;
+  padding:48px 40px 100px; line-height:1.7; font-size:16.5px; }
+.page-title { font-size:clamp(28px,4vw,38px); font-weight:800; color:var(--title);
+  margin:0 0 28px; letter-spacing:-.3px; }
+main.article h1 { color:var(--gold); font-size:26px; font-weight:700;
+  margin:36px 0 14px; scroll-margin-top:24px; letter-spacing:-.2px; }
+main.article h1:first-child { margin-top:0; }
+main.article h2 { color:var(--gold); font-size:21px; font-weight:700;
+  margin:30px 0 12px; scroll-margin-top:24px; }
+main.article h3 { color:var(--title); font-size:18px; font-weight:700;
+  margin:24px 0 10px; scroll-margin-top:24px; }
+main.article h4 { color:var(--text-dim); font-size:14px; font-weight:700;
+  text-transform:uppercase; letter-spacing:.5px; margin:20px 0 8px; scroll-margin-top:24px; }
+main.article p { margin:0 0 15px; color:var(--text); }
+main.article ul { margin:0 0 15px; padding-left:24px; }
+main.article li { margin-bottom:6px; }
+main.article a { border-bottom:1px solid rgba(224,165,66,.35); }
+main.article a:hover { border-bottom-color:var(--gold); text-decoration:none; }
+main.article em { color:var(--text); font-style:italic; }
+main.article strong { color:var(--title); font-weight:700; }
+main.article hr { border:0; border-top:1px solid var(--border); margin:20px 0; }
+.link-pending { color:var(--text-faint); font-style:italic; border-bottom:1px dotted var(--text-faint); cursor:default; }
+.reloaded-img { max-width:100%; border-radius:8px; border:1px solid var(--border); margin:16px 0; display:block; }
+
+span.citation { font-style:italic; color:var(--text-dim); }
+span.highlight { color:var(--gold); font-weight:600; }
+span.credit { font-size:12px; color:var(--text-faint); display:block; margin-top:4px; }
+
+div.description { background:var(--bg-card); border-left:3px solid var(--active-dim);
+  border-radius:0 8px 8px 0; padding:16px 20px; margin:18px 0; font-style:italic; color:var(--text); }
+div.description p:last-child { margin-bottom:0; }
+
+.callout { border:1px solid var(--border); border-left:4px solid var(--gold-dim);
+  border-radius:0 8px 8px 0; background:rgba(224,165,66,.06); margin:18px 0; padding:14px 18px; }
+.callout-title { font-weight:700; color:var(--gold); font-size:13px; letter-spacing:.3px;
+  text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+.callout-icon { font-size:14px; }
+.callout-body p:last-child { margin-bottom:0; }
+.callout-body { font-size:16px; }
+.callout-warning { border-left-color:#e2645a; background:rgba(226,100,90,.08); }
+.callout-warning .callout-title { color:#f08078; }
+.callout-combat { border-left-color:#e2645a; background:rgba(226,100,90,.1); }
+.callout-combat .callout-title { color:#f08078; }
+.callout-lore, .callout-abstract { border-left-color:#5f9bd8; background:rgba(95,155,216,.08); }
+.callout-lore .callout-title, .callout-abstract .callout-title { color:#7fb4e8; }
+.callout-profile { border-left-color:var(--active-dim); background:rgba(167,139,250,.08); }
+.callout-profile .callout-title { color:var(--active); }
+.callout-item { border-left-color:#4fb86a; background:rgba(79,184,106,.08); }
+.callout-item .callout-title { color:#6fce88; }
+.callout-design { border-left-color:var(--text-faint); background:rgba(158,158,162,.06); }
+.callout-design .callout-title { color:var(--text-dim); }
+.callout-tip { border-left-color:var(--gold); }
+
+.table-wrap { overflow-x:auto; margin:18px 0; }
+table.md-table { border-collapse:collapse; width:100%; font-size:15px; }
+table.md-table th, table.md-table td { border:1px solid var(--border); padding:8px 11px; text-align:left; }
+table.md-table th { background:var(--bg-card); color:var(--gold); font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; }
+
+div.statblock { background:var(--bg-card); border:1px solid var(--border);
+  border-left:3px solid var(--active-dim); border-radius:8px; padding:18px 22px; margin:20px 0; }
+div.statblock h2 { color:var(--title); font-size:20px; font-weight:800; margin:0 0 2px; }
+div.statblock > em:first-of-type { display:block; font-style:italic; color:var(--text-dim); margin-bottom:10px; }
+div.statblock hr { border-top:1px solid var(--border); margin:11px 0; }
+div.statblock h3 { color:var(--gold); font-size:14px; font-weight:700;
+  text-transform:uppercase; letter-spacing:.5px; margin:16px 0 7px; }
+div.statblock p { margin:0 0 9px; font-size:15px; }
+div.statblock table.ability-table { width:100%; border-collapse:collapse; margin:9px 0; }
+div.statblock table.ability-table th, div.statblock table.ability-table td {
+  border:1px solid var(--border); text-align:center; padding:6px 4px; font-size:14px; }
+div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-weight:700; }
+
+/* ---------- coluna direita: sumario ---------- */
+.sidebar-right { width:250px; flex:0 0 250px; padding:48px 20px 40px 0;
+  position:sticky; top:0; height:100vh; overflow-y:auto; }
+.toc-label { font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+  color:var(--text-faint); margin-bottom:12px; }
+.toc-list { font-size:13px; }
+.toc-list a { display:block; padding:4px 0; color:var(--text-dim); border-bottom:none;
+  line-height:1.4; }
+.toc-list a:hover { color:var(--text); text-decoration:none; }
+.toc-lvl-1 { padding-left:0; font-weight:600; }
+.toc-lvl-2 { padding-left:12px; }
+.toc-lvl-3 { padding-left:24px; }
+.toc-lvl-4 { padding-left:36px; font-size:12px; }
+
+/* ---------- pagina indice ---------- */
+.idx-intro { margin-bottom:8px; }
+.idx-intro h1 { font-size:clamp(26px,4vw,36px); font-weight:800; color:var(--gold); margin-bottom:10px; }
+.idx-intro p { color:var(--text-dim); font-size:15px; max-width:640px; }
+.idx-section { margin:34px 0; }
+.idx-section-title { font-size:13px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+  color:var(--text-dim); border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:14px; }
+.idx-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:12px; }
+.idx-card { display:block; background:var(--bg-card); border:1px solid var(--border);
+  border-radius:8px; padding:14px 16px; font-weight:600; font-size:14.5px; color:var(--text);
+  transition:border-color .15s, transform .15s; }
+.idx-card:hover { border-color:var(--gold-dim); transform:translateY(-2px); text-decoration:none; }
+.idx-card.locked { opacity:.45; cursor:default; border-style:dashed; }
+.idx-card.locked:hover { transform:none; }
+.idx-badge { display:block; margin-top:5px; font-size:10px; letter-spacing:.5px; text-transform:uppercase; color:var(--text-faint); font-weight:400; }
+
+/* ---------- mobile ---------- */
+.mobile-topbar { display:none; }
+@media (max-width:1100px) {
+  .sidebar-right { display:none; }
+}
+@media (max-width:860px) {
+  .layout { flex-direction:column; }
+  .mobile-topbar { display:flex; align-items:center; gap:12px; position:sticky; top:0; z-index:40;
+    background:var(--bg-sidebar); border-bottom:1px solid var(--border); padding:12px 16px; }
+  .mobile-topbar .brand { margin:0; font-size:15px; flex:1; }
+  .mobile-topbar button { background:none; border:1px solid var(--border); color:var(--text);
+    border-radius:6px; padding:6px 10px; font-family:inherit; font-size:13px; }
+  .sidebar-left { position:fixed; left:0; top:49px; bottom:0; z-index:39; transform:translateX(-100%);
+    transition:transform .2s; width:82vw; max-width:320px; box-shadow:8px 0 30px rgba(0,0,0,.5); }
+  .sidebar-left.open { transform:translateX(0); }
+  main.article { padding:28px 18px 70px; max-width:100%; }
+}
+</style>
+</head>
+<body>
+<div class="mobile-topbar">
+  <button aria-label="Abrir menu">☰</button>
+  <a class="brand" href="index.html">Curse of Strahd: Reloaded</a>
+</div>
+<div class="layout">
+  <aside class="sidebar-left">
+    <a class="brand" href="index.html">Curse of Strahd:<br>Reloaded</a>
+    <div class="search-box"><span class="ico">🔍</span><input type="text" placeholder="Buscar página..." aria-label="Buscar página"></div>
+    <nav class="tree"><details><summary><span class="chev">▸</span>Introdução</summary><div class="leaf-list"><a class="leaf" href="introducao-usando-este-guia.html">Usando Este Guia</a><a class="leaf" href="introducao-guia-do-mestre.html">Guia do Mestre</a><a class="leaf" href="introducao-changelog.html">Changelog</a></div></details><details><summary><span class="chev">▸</span>Capítulo 1 — Iniciando a Campanha</summary><div class="leaf-list"><a class="leaf" href="cap1-sessao-zero.html">Sessão Zero</a><a class="leaf" href="cap1-criacao-de-personagem.html">Criação de Personagem</a></div></details><details><summary><span class="chev">▸</span>Capítulo 2 — A Terra de Barovia</summary><div class="leaf-list"><a class="leaf" href="cap2-lore-de-barovia.html">Lore de Barovia</a><a class="leaf" href="cap2-historia-de-barovia.html">História de Barovia</a><a class="leaf" href="cap2-strahd-von-zarovich.html">Strahd von Zarovich</a></div></details><details><summary><span class="chev">▸</span>Capítulo 3 — Conduzindo o Jogo</summary><div class="leaf-list"><a class="leaf" href="cap3-resumo-da-aventura.html">Resumo da Aventura</a><a class="leaf" href="cap3-conduzindo-a-aventura.html">Conduzindo a Aventura</a></div></details><details open><summary><span class="chev">▸</span>Ato I — Adentrando as Névoas</summary><div class="leaf-list"><a class="leaf" href="ato1-resumo.html">Resumo do Ato I</a><a class="leaf active" href="arco-a-fuga-da-death-house.html">Arco A — Fuga da Death House</a><a class="leaf" href="arco-b-bem-vindo-a-barovia.html">Arco B — Bem-vindo a Barovia</a><a class="leaf" href="arco-c-adentrando-o-vale.html">Arco C — Adentrando o Vale</a></div></details><details><summary><span class="chev">▸</span>Ato II — A Cidade Sombria</summary><div class="leaf-list"><span class="leaf locked">Resumo do Ato II</span><span class="leaf locked">Arco D — A Festa de St. Andral</span><span class="leaf locked">Arco E — A Vistana Desaparecida</span><span class="leaf locked">Arco F — O Desejo de Lady Wachter</span><span class="leaf locked">Arco G — Os Irmãos Strazni</span><span class="leaf locked">Arco H — A Alma Perdida</span><span class="leaf locked">Arco I — As Muralhas de Krezk</span></div></details><details><summary><span class="chev">▸</span>Ato III — A Terra Partida</summary><div class="leaf-list"><span class="leaf locked">Resumo do Ato III</span><span class="leaf locked">Arco J — A Gema Roubada</span><span class="leaf locked">Arco K — A Abadia Decaída</span><span class="leaf locked">Arco L — O Covil dos Lobos</span><span class="leaf locked">Arco M — A Mansão do Dragão</span><span class="leaf locked">Arco O — Jantar com o Diabo</span><span class="leaf locked">Arco P — O Assalto a Ravenloft</span><span class="leaf locked">Arco Q — Um Farol Reluzente</span></div></details><details><summary><span class="chev">▸</span>Ato IV — Segredos do Ancião</summary><div class="leaf-list"><span class="leaf locked">Resumo do Ato IV</span><span class="leaf locked">Arco R — Provações da Montanha</span><span class="leaf locked">Arco S — Uma Espada de Luz Solar</span><span class="leaf locked">Arco T — Os Três Fanes</span><span class="leaf locked">Arco U — Sonhos da Alvorada</span><span class="leaf locked">Epílogo</span></div></details><details><summary><span class="chev">▸</span>Apêndices</summary><div class="leaf-list"><span class="leaf locked">Fragmentos de Âmbar</span><span class="leaf locked">Bestiário</span><span class="leaf locked">Glossário</span><span class="leaf locked">Personagens Não Jogadores</span></div></details></nav>
+    <div style="margin-top:18px"><a href="../painel_barovia_dnd5e.html" style="font-size:12px;color:var(--text-faint)">← Voltar ao Painel</a></div>
+  </aside>
+  <main class="article">
+    <div class="page-title">Arco A — Fuga da Death House</div>
+<p><em>Uma aventura para cinco personagens de 2º nível.</em></p>
+<div class="callout callout-warning"><div class="callout-title"><span class="callout-icon">⚠</span><strong>Uma Aventura de Segundo Nível</strong></div><div class="callout-body"><p>Lembre-se de que, ao contrário da aventura original de <em>Curse of Strahd</em>, os jogadores deste guia começam no 2º nível, e não no 1º.</p></div></div>
+<p>Os jogadores começam na cidade de Daggerford, na noite anterior ao Highharvesttide, um banquete e festividade anual. As estalagens locais estão lotadas para a noite, e os jogadores — vagabundos com pouca moeda e menos companhia ainda — encontram abrigo no estábulo do Nightmare’s Bridle, uma taverna caindo aos pedaços nos arredores da cidade.</p>
+<p>Quando as relíquias que carregam pressentem a presença da Death House, porém, os jogadores são conduzidos pelas ruas encharcadas de Daggerford até a soleira à espera da casa.</p>
+<p>Uma vez lá dentro, os jogadores ficam presos e são informados de que um monstro os caçará assim que despertar. Eles têm seis horas para encontrá-lo primeiro e ou aplacá-lo com um sacrifício adequado — ou matá-lo. Enquanto exploram a casa, vão descobrindo sua história macabra, bem como a verdadeira identidade da fera que espreita lá embaixo.</p>
+<p>Se os jogadores matarem o monstro, a casa começa a ruir, forçando-os a fugir ou a se perderem sob os escombros. Ao emergirem, descobrem que os arredores mudaram, transportando-os para a terra sombria de Barovia.</p>
+<div class="callout callout-lore"><div class="callout-title"><span class="callout-icon">📜</span><strong>A História da Death House</strong></div><div class="callout-body"><p>Veja <a href="cap2-historia-de-barovia.html#os-primeiros-seguidores-de-strahd">Os Primeiros Seguidores de Strahd</a> para um relato completo da história medonha da Death House.</p></div></div>
+<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>Módulo do Arco A para Foundry</strong></div><div class="callout-body"><p>Quer um módulo de Foundry totalmente pronto para o <strong><em>Arco A: Fuga da Death House</em></strong>? Baixe o manifesto do módulo oficial do Reloaded, da Eidolon Publishing, <a href="https://github.com/Eidolon-Publishing/cosrl-escape-from-death-house/releases/latest/download/module.json" target="_blank" rel="noopener">aqui</a>!</p></div></div>
+<h1 id="a1-daggerford">A1. Daggerford</h1>
+<div class="callout callout-warning"><div class="callout-title"><span class="callout-icon">⚠</span><strong>Mantenha Sua Carga de Trabalho Baixa</strong></div><div class="callout-body"><p><em>Curse of Strahd: Reloaded</em> foi escrito deliberadamente para minimizar o tempo gasto longe da mesa, com o objetivo de servir, na maior medida possível, como uma campanha de "preparação zero". Para tornar isso viável, este guia foi projetado para conduzir os jogadores por caminhos específicos e cuidadosamente curados ao longo da aventura, ainda que oferecendo graus intencionais de liberdade que, embora significativos, não alteram substancialmente o desfecho final da campanha.</p>
+<p>Se você quiser minimizar sua carga de trabalho, faça o possível para evitar mudanças ou acréscimos a este guia. Fazê-lo provavelmente alterará o modo como os jogadores se relacionam com sua narrativa e sua jogabilidade, perturbando pilares de sustentação difíceis de perceber sem reler o guia inteiro várias vezes. (Por exemplo, aumentar as distâncias entre os assentamentos barovianos torna diversas missões dos Atos II e III impossíveis de concluir sem uma reformulação completa de toda a linha do tempo da campanha.) Quaisquer modificações — como mudanças em prazos, distâncias, blocos de estatísticas, motivações de personagens ou eventos — são feitas por conta e risco do próprio Mestre, e podem levar a TPKs, divergências descontroladas ou tramas insatisfatórias.</p></div></div>
+<h2 id="a1a-o-freio-do-pesadelo">A1a. O Freio do Pesadelo</h2>
+<p>Se um ou mais de seus jogadores estiverem usando o gancho <a href="cap3-conduzindo-a-aventura.html#ganchos-de-aventura-2">Relíquias Barovianas</a>, leia o texto a seguir. Caso contrário, prossiga para <a href="#a2-death-house">A2. Death House</a>, abaixo.</p>
+<div class="description">
+<p>É a véspera do Highharvesttide, e uma tempestade desabou sobre Daggerford, com nuvens escuras despejando cascatas de chuva sobre a cidade lá embaixo. Apesar do tempo, porém, a cidade fervilha de expectativa pelo festival de outono que se aproxima, e cada lar transborda de calor e alegria. Uma luz de velas viva e acolhedora cintila em todas as janelas, e sons de canto e dança ecoam pelas ruas molhadas e enlameadas.</p>
+<p>Em meio à folia, no entanto, vocês estão à parte. Nem moradores nem visitantes, vocês são vagabundos — viajantes, fantasmas de passagem por uma cidade desconhecida. Enquanto as risadas ressoam de estalagens e casas, vocês encaram um dilema mais simples e mais duro: a busca por abrigo.</p>
+<p>Todos os quartos desta cidade já têm dono, todas as lareiras estão lotadas até não caber mais ninguém, deixando vocês nas garras da tempestade impiedosa. Até que o dono da decadente taverna Nightmare’s Bridle lhes oferece um alívio a contragosto: o palheiro acima de seu estábulo. Não é nada de que se gabar, e restam apenas o frio cortante e o cheiro persistente de feno mofado por companhia. Mas é um teto sobre a cabeça de vocês — uma pequena misericórdia numa noite como esta.</p>
+<p>Um a um, vocês encontram um lugar em meio à lama e ao feno. Lá em cima, a chuva açoita o estábulo, e trovões pontuam o tamborilar ritmado no telhado. Relâmpagos rasgam os céus, lançando o interior do estábulo em contrastes crus de luz e sombra. A água da chuva pinga sem parar por uma goteira no telhado, serpenteando pelo chão até formar uma poça no canto.</p>
+<p>Aqui, então, vocês se encontram: encolhidos na escuridão entre estranhos, enquanto a alegria e o júbilo dançam logo ali, fora de alcance.</p>
+</div>
+<p>Convide os jogadores a descrever a aparência e o semblante de cada personagem, como se acomodaram e como dispuseram seus pertences.</p>
+<p>Quando os jogadores terminarem de se apresentar, leia:</p>
+<div class="description">
+<p>Um raio abrasador rasga o céu, iluminando a noite num clarão branco e ofuscante. O estrondo do trovão que se segue é tão alto que sacode o próprio chão sob os pés de vocês, fazendo as vigas do estábulo rangerem e gemerem.</p>
+<p>A luz do relâmpago se demora de forma antinatural, silhuetando pequenos fiapos de névoa que se retorcem no ar. Uma bruma espessa, na altura dos tornozelos, se acumula lá fora, envolvendo a terra num véu espectral. Seus tentáculos se enroscam num convite, como se acenassem para vocês rumo à escuridão além.</p>
+<p>A chuva continua a fustigar o telhado, mas o vento já não uiva, e os sons festivos de Daggerford parecem abafados e distantes. Os cavalos no estábulo abaixo se agitam inquietos, e seus relinchos ecoam altos na quietude. Uma sensação aflitiva percorre o palheiro, um arrepio gelado que nada tem a ver com o vento ou a chuva.</p>
+</div>
+<p>Uma a uma, as relíquias dos jogadores então reagem como se segue, nesta ordem.</p>
+<ul><li><strong><em>Brasão de Pedra.</em></strong> O brasão emite um zumbido grave e exala um cheiro de agulhas de pinheiro e terra úmida, odores que se intensificam quando o brasão é movido na direção da Death House.</li><li><strong><em>Lâmina Quebrada.</em></strong> A lâmina emite um zumbido agudo e começa a tremer violentamente, girando como a agulha de uma bússola na direção da Death House.</li><li><strong><em>Escama de Dragão.</em></strong> A escama arde num frio gélido, e uma de suas pontas brilha com uma luz prateada e intensa na direção da Death House.</li><li><strong><em>Medalhão do Nascer do Sol.</em></strong> O medalhão reluz com um brilho dourado e quente, emitindo raios de luz intensa na direção da Death House.</li><li><strong><em>Fragmento de Âmbar.</em></strong> O fragmento brilha com luz âmbar e puxa seu cordão na direção da Death House.</li><li><strong><em>Dente de Lobo.</em></strong> O dente se alonga, reluzindo com um luar prateado, e puxa seu cordão na direção da Death House.</li><li><strong><em>Página Amassada.</em></strong> A tinta na página brilha com luz âmbar, e as runas se rearranjam formando um mapa que mostra a localização da própria página — e uma seta que aponta o caminho até a Death House.</li><li><strong><em>Estandarte Esfarrapado.</em></strong> O som de tambores de guerra enche o ar, e o estandarte tremula sob um vento invisível na direção da Death House.</li><li><strong><em>Moeda de Electro.</em></strong> A moeda cai em pé e começa a rolar pelos paralelepípedos enlameados na direção da Death House.</li><li><strong><em>Pena de Anjo.</em></strong> A pena é arrebatada por um vento invisível, suas barbas cintilando com luz dourada enquanto rodopia pelas ruas rumo à Death House.</li><li><strong><em>Pena de Corvo.</em></strong> A pena é arrebatada pelo vento, e sua sombra parece dançar no ar enquanto ela rodopia pelas ruas rumo à Death House.</li><li><strong><em>Cachecol do Andarilho.</em></strong> O cachecol é levado pelo vento, seus padrões mudando e girando no ar enquanto ele redemoinha pelas ruas rumo à Death House.</li></ul>
+<p>Se os jogadores partirem no encalço, leia:</p>
+<div class="description">
+<p>Vocês emergem do palheiro para a névoa rodopiante lá fora, as pedras das ruas de Daggerford escorregadias e reluzentes sob seus pés. As risadas e a alegria da cidade agora não passam de um eco oco, e o brilho de sua folia se afogou na neblina que os cerca. O gosto do ar frio e úmido é cortante na língua de vocês, e o som da própria respiração ressoa alto em seus ouvidos.</p>
+<p>Suas relíquias os chamam adiante, e as brumas se abrem para dar passagem. Vocês avançam devagar a princípio, depois cada vez mais rápido, o coração martelando no peito. Conforme se embrenham mais fundo no nevoeiro, cada passo pesa mais, e cada eco de trovão é uma batida nesta marcha implacável.</p>
+<p>O nevoeiro engole a cidade, reduzindo os edifícios a sombras ameaçadoras, cujas formas dançam e tremeluzem nos clarões esporádicos da tempestade. A chuva martela um ritmo incessante, e o repicar das gotas nos paralelepípedos acompanha o estrondo distante e lamentoso do trovão. Por breves instantes, vocês sentem algo mais sob os pés: a pulsação constante de um coração fundo e distante.</p>
+<p>Vocês são puxados para a esquerda, depois para a direita, depois para a esquerda de novo, as relíquias guiando-os por esse labirinto turvo. Distância e direção perderam todo o sentido, e as sombras ao redor se contorcem em formas retorcidas. O sangue canta em seus ouvidos, e o ar fica mais denso, elétrico, enquanto a energia da tempestade — da perseguição — cresce sem qualquer freio.</p>
+<p>E então — a pulsação cessa.</p>
+<p>O trovão silencia.</p>
+<p>E a névoa se abre.</p>
+<p>O nevoeiro recua como uma cortina, revelando uma silhueta alta e sinistra que se ergue na penumbra diante de vocês.</p>
+</div>
+<p>Esta é a <strong>Death House.</strong></p>
+<h1 id="a2-death-house">A2. Death House</h1>
+<p>Se um ou mais de seus jogadores estiverem usando o gancho <a href="cap3-conduzindo-a-aventura.html#ganchos-de-aventura-2">Perdidos nas Brumas</a>, leia o texto a seguir. Caso contrário, prossiga para <a href="#a2a-a-chegada">A2a. A Chegada</a>, abaixo.</p>
+<div class="description">
+<p>Highharvesttide em Daggerford. É tempo de alegria e celebração, de lareira e lar, de risadas douradas ressoando noite adentro. Mas esta noite, enquanto uma tempestade varre a cidade, vocês se encontram apartados do calor e da folia, atraídos para o abraço frio e escuro do mistério.</p>
+<p>Como mercenários, vocês não são estranhos ao perigo nem ao desconhecido. Mas isto — isto é diferente. Nas últimas semanas, sussurros se espalharam por Daggerford falando de desaparecimentos: gente comum, sumida sem deixar rastro.</p>
+<p>A única ligação entre eles? Um casarão antigo e imponente, conhecido em tom de sussurro como “Death House”.</p>
+<p>Esta noite, com a tempestade rugindo lá fora, vocês foram convocados para investigar essa morada misteriosa. A proclamação do arauto da cidade ainda ecoa em seus ouvidos, uma recompensa para quaisquer almas valentes que ousassem descobrir a verdade. Movidos por uma mistura de ganância, curiosidade e talvez uma pitada de bravata, vocês deram um passo à frente.</p>
+<p>Agora, guiados pelo brilho fraco de suas lanternas, vocês percorrem as ruas de paralelepípedos escorregadias e encobertas pela névoa. A alegria distante contrasta duramente com o silêncio inquietante ao redor. O mundo se reduziu a sussurros abafados e ao tamborilar constante da chuva, uma serenata sombria para a jornada perigosa de vocês.</p>
+<p>E então, como se respondesse a uma convocação não dita, as brumas à sua frente se abrem, revelando a silhueta funesta de seu destino: a “Death House”. Sua fachada escura de pedra e suas torres altivas pairam ameaçadoras contra o céu revolto pela tempestade, um desafio mudo à determinação de vocês.</p>
+</div>
+<h2 id="a2a-a-chegada">A2a. A Chegada</h2>
+<h3 id="entrada">Entrada</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 1.</em></span></p>
+<p>Leia a todos os jogadores o texto a seguir:</p>
+<div class=description>
+<p>Um casarão imponente se ergue diante de vocês: quatro andares de pedra fria manchada de fuligem, janelas altas e estreitas e telhados de cumeeira aguda formando um retrato de grandiosidade austera e arrepiante. Na metade da altura, uma sacada estreita se projeta do terceiro andar, oferecendo um poleiro lúgubre de onde vigiar os arredores.</p>
+<p>A peça central dessa fachada intimidante é o pórtico, um arco de pedra que monta guarda diante das portas de carvalho da casa. Um portão de ferro forjado preenche esse arco, e suas dobradiças enferrujadas rangem enquanto ele balança ao vento.</p>
+<p>Dos dois lados do portão, lampiões a óleo pendem de correntes, com uma luz fraca e trêmula que lança um clarão adoentado, mal capaz de perfurar a névoa ao redor.</p>
+<p>Além do portão, um par de portas robustas de carvalho permanece fechado, emoldurado pelo portão e pelos lampiões. As portas são velhas e castigadas, com a madeira escurecida pelo tempo, mas se mantêm firmes e altivas — uma entrada nada acolhedora para a casa que há por trás.</p>
+<p>Uma rajada de vento passa por vocês, trazendo consigo um sussurro de pavor gélido que faz um arrepio descer pela espinha.</p>
+</div>
+<p>Quaisquer jogadores que tenham começado com o gancho <strong><em>Relíquias Barovianas</em></strong> agora conseguem ver os jogadores que começaram com o gancho <strong><em>Perdidos nas Brumas</em></strong>, e vice-versa. (Se alguma das relíquias dos jogadores voou ou rolou até a Death House — como o <strong><em>cachecol do andarilho</em></strong> ou a <strong><em>moeda de electro</em></strong> —, ela pousa na soleira da casa, logo depois do pórtico.) Fora isso, a rua está deserta.</p>
+<p>A entrada além do pórtico é, no mais, como descrita em <span class="citation">Entrance (p. 212)</span>.</p>
+<div class="callout callout-lore"><div class="callout-title"><span class="callout-icon">📜</span><strong>Strahd & o Culto</strong></div><div class="callout-body"><p>O culto da Death House não conquistou o afeto de Strahd em vida. Mas, na morte, as duas partes chegaram a um entendimento informal e tácito.</p>
+<p>Em troca da permissão de vagar bem longe da terra enevoada de Barovia para reivindicar sacrifícios, a Death House é obrigada a retornar ao vale após cada excursão de caça. Se algum aventureiro consegue escapar do altar ensanguentado da casa, ele inevitavelmente emerge no domínio de Strahd — garantindo a ele uma safra digna de presas a perseguir.</p></div></div>
+<h3 id="salão-principal">Salão Principal</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 2.</em></span></p>
+<p>Quando os jogadores cruzam a soleira da Death House, quaisquer relíquias barovianas que carreguem deixam de estar ativas. (Por exemplo, o <em>medalhão do nascer do sol</em> para de brilhar.)</p>
+<p>O salão principal é em grande parte como descrito em <span class="citation">Main Hall (p. 212)</span>, mas agora contém um relógio de pêndulo, posicionado no espaço circular ao pé da escadaria.</p>
+<p>Em vez de uma espada longa, é o retrato da família Durst de <span class="citation">Upper Hall (p. 213)</span> que agora está pendurado acima da lareira. No retrato, Thorn segura uma boneca sorridente vestida com um vestido de renda amarela. Uma placa sob o retrato diz: <em>Sr. Gustav e Sra. Elisabeth Durst, com seus dois filhos, Rosavalda e Thornboldt.</em><sup><a href="https://www.reddit.com/r/CurseofStrahd/comments/8sfpkn/fleshing_out_curse_of_strahd_part_2_entering/">1</a></sup></p>
+<p><img class="reloaded-img" src="img/The%20Durst%20Family.png" alt="The Durst Family.png" loading="lazy"> <span class="credit">"The Durst Family", de Caleb Cleveland. Apoie-o no <a href="https://patreon.com/calebisdrawing/">Patreon!</a></span></p>
+<p>Pouco depois de todos os personagens entrarem no salão principal, a porta da frente se fecha com estrondo, apagando todas as luzes da casa. O som da chuva lá fora desaparece por completo, deixando a casa num silêncio arrepiante.</p>
+<p>Então, letras de sangue começam a surgir na parede sul, logo acima da escadaria de mármore. Elas dizem o seguinte:</p>
+<div class="description" style="text-align: center; padding: 15px;">
+<em>Sob esta casa dorme uma fera</em>
+<br>
+<em>Que um festim de sangue espera.</em>
+<br>
+<em>Dorme até a meia-noite soar</em>
+<br>
+<em>E acorda para se saciar.</em>
+<br>
+<em>Se a presa quiser seu fim adiar,</em>
+<br>
+<em>Que ao quarto secreto vá levar</em>
+<br>
+<em>Um dom que lhe abrande o furor</em>
+<br>
+<em>Mas cuidado com os servos do senhor.</em>
+</div>
+<p>O relógio de pêndulo então bate seis horas.</p>
+<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>O Tempo na Death House</strong></div><div class="callout-body"><p>Quando o relógio bater seis horas, coloque três dados de seis faces na mesa, diante dos jogadores, cada um mostrando o número seis. Cada ponto nos dados representa vinte minutos até a meia-noite.</p>
+<p>Conforme os jogadores exploram a casa, vá diminuindo esse relógio de dados para indicar a passagem do tempo, sempre começando pelo dado que mostra o menor número. Se o menor dado mostrar um, você pode baixá-lo a "zero" removendo-o do grupo.</p>
+<p>O relógio de dados regride da seguinte forma, representando o tempo total que os jogadores passaram na casa:</p>
+<ul><li>Cada vez que os jogadores entram em um novo andar da casa ou da masmorra, reduza o relógio de dados em um.</li><li>Cada vez que os jogadores fazem um teste de Percepção ou Investigação para vasculhar um cômodo inteiro, reduza o relógio de dados em um.</li><li>Cada vez que os jogadores completam um descanso curto, reduza o relógio de dados em três.</li></ul>
+<p>Uma hora inteira se passa toda vez que um dado cai de 4 para 3, ou toda vez que um dado cai de 1 para 0. O relógio de pêndulo do <strong>Salão Principal</strong> badala a cada hora cheia, e pode ser ouvido por toda a casa e por toda a masmorra.</p>
+<p>Quando o relógio bater meia-noite, o <strong>monte de carne</strong> (<em>flesh mound</em>) da <strong>Câmara Ritual</strong> desperta e segue direto ao encontro dos jogadores, saindo pelo <strong>Alçapão Oculto</strong> rumo ao <strong>Covil dos Lobos</strong>, se for preciso, para alcançá-los. Ao menos um minuto deve transcorrer entre o momento em que o monte acorda e o momento em que ele alcança os jogadores pela primeira vez, anulando sua característica <em>sono pesado</em> e permitindo que ele use suas ações de <em>ataque múltiplo</em>.</p></div></div>
+<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>Descansar na Death House</strong></div><div class="callout-body"><p>Por causa do prazo até a meia-noite, é impossível para os jogadores fazer um descanso longo na Death House. Ainda assim, eles podem precisar de um descanso curto. Cada vez que o fizerem dentro da casa principal, vivenciam uma ou mais das seguintes assombrações:</p>
+<ul><li>Um jogador ouve ratos arranhando para cima e para baixo nos vãos entre as paredes. Um fedor espesso e sufocante de podridão se infiltra no cômodo.</li><li>Um jogador ouve o cantarolar de uma mulher vindo do outro lado de uma porta fechada. Se a porta for entreaberta, um olho azul e frio encara de volta antes de sumir.</li><li>Um jogador ouve passos descendo do sótão, que param diante de sua porta antes de se afastar rumo à biblioteca. Logo depois, um ruído de raspagem pode ser ouvido vindo da biblioteca — o som da porta secreta.</li><li>Um jogador ouve uma risada maníaca ecoando de muito abaixo da casa.</li><li>Um jogador ouve, no ouvido direito, uma voz feminina suplicante que jura que "não é dele". No ouvido esquerdo, outra voz feminina, mais fria, zomba e diz: "Claro que você diria isso, sua pequena <em>meretriz</em>."</li></ul></div></div>
+<p>Um jogador que abra qualquer porta ou cortina voltada para fora na Death House, ou que saia para qualquer sacada, descobre que o exterior da casa foi cercado por tentáculos grossos e carnosos. Embora os tentáculos possam ser danificados, outros crescem rapidamente para substituí-los, selando os jogadores lá dentro. Um jogador que examine os tentáculos percebe que eles parecem brotar de baixo da casa.</p>
+<h2 id="a2b-o-primeiro-andar">A2b. O Primeiro Andar</h2>
+<h3 id="guarda-casacos">Guarda-Casacos</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 2.</em></span></p>
+<p>Um jogador que investigue o guarda-casacos anexo ao Salão Principal pode notar um envelope despontando do bolso de uma das capas. O envelope, endereçado a Lady Lovina Wachter, contém um convite. Ele diz:</p>
+<div class="description" style="text-align:center; padding: 15px;">
+Vós estais cordialmente convidados a comparecer à
+<div style="height: 3px;"></div>
+<strong>SR. GUSTAV & ELISABETH DURST</strong>
+<div style="height: 3px;"></div>
+celebração do primeiro aniversário do Moinho Durst.
+<div style="height: 3px;"></div>
+<strong><em>Residência Durst, Vila de Barovia</em></strong>
+<div style="height: 3px;"></div>
+6 horas da tarde
+<br>
+13 de Neyavr, 348
+<div style="height: 3px;"></div>
+<em>Jantar e refrescos serão servidos.</em>
+</div>
+<p><img class="reloaded-img" src="img/Durst%20Invitation.jpg" alt="Durst Invitation.jpg" loading="lazy"> <span class="credit">"Durst Invitation", de Caleb Cleveland. Apoie-o no <a href="https://patreon.com/calebisdrawing/">Patreon!</a></span></p>
+<h3 id="covil-dos-lobos">Covil dos Lobos</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 3.</em></span></p>
+<p>Este cômodo é em grande parte como descrito em <span class="citation">Den of Wolves (p. 212)</span>. Quando os jogadores entram nele, leia:</p>
+<div class="description">
+<p>Ao entreabrirem a porta deste cômodo, vocês vislumbram algo feroz lá dentro: um olho âmbar que reluz na escuridão e um focinho bestial retorcido num rosnado.</p>
+</div>
+<p>Se os jogadores prosseguirem, leia:</p>
+<div class="description">
+<p>A porta se abre com um rangido, revelando um lobo de pelo cinzento congelado no lugar. Basta um instante para vocês perceberem que ele não está se movendo — e mais um para perceberem que ele não está sozinho.</p>
+<p>Este cômodo revestido de painéis de carvalho parece o covil de um caçador. Montada acima da lareira há uma cabeça de cervo e, dispostos pelas bordas do aposento, mais dois lobos empalhados — um grande lobo cinzento e um lobo marrom menor.</p>
+<p>Duas poltronas acolchoadas, cobertas por peles de animais, estão voltadas para a lareira, com uma mesa de carvalho entre elas sustentando um sortimento de objetos. Um lustre pende sobre uma mesa forrada de tecido cercada por quatro cadeiras, e dois armários se encostam nas paredes. Um par de pequenos brinquedos parece ter sido esquecido debaixo de uma das poltronas.</p>
+</div>
+<p>Os brinquedos largados são pequenos lobos cinzentos de pelúcia, cujas peles puídas mostram sinais de muito remendo e retalhos. Costuras desajeitadas em suas barrigas dizem ROSE e THORN, respectivamente.</p>
+<p>Além de seu outro conteúdo, o armário leste contém cinco virotes de besta prateados misturados aos outros sessenta virotes. Já o armário norte contém também um bordado infantil emoldurado que retrata um menino e uma menina segurando as mãos de uma jovem, ao lado de palavras costuradas de forma desajeitada que dizem PARA A SENHORITA KLARA. O rosto da jovem foi rasgado e recortado.</p>
+<p>Na primeira vez em que nenhum jogador estiver olhando para eles, os três lobos taxidermizados se movem. Quando os jogadores voltam a olhar, o grande lobo cinzento está de pé ao lado do lobo marrom menor, e o primeiro lobo cinzento virou o rosnado na direção dos outros.</p>
+<p>Um jogador que passe num teste de Inteligência (Natureza) CD 12 consegue identificar o grande lobo cinzento como macho e os outros dois como fêmeas.</p>
+<h3 id="sala-de-jantar">Sala de Jantar</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 5.</em></span></p>
+<p>Os jogadores que se aproximam desta porta conseguem ouvir o som abafado de um animado banquete: taças tilintando, risadas discretas e conversas distantes. Se os jogadores abrirem a porta ou baterem nela, porém, o cômodo silencia, restando apenas a imobilidade e a grandiosidade fria do aposento além.</p>
+<p>Este cômodo é em grande parte como descrito em <span class="citation">Dining Room (p. 213)</span>. Quando os jogadores entram nele, leia:</p>
+<div class="description">
+<p>Vocês entram numa sala de jantar revestida de painéis de madeira. A peça central é uma mesa entalhada de mogno cercada por oito cadeiras de espaldar alto, com braços esculpidos e assentos estofados. Um lustre de cristal pende sobre a mesa, que está posta com talheres resplandecentes e taças de cristal polidas até brilharem. Montado acima da lareira de mármore há um quadro com moldura de mogno retratando um vale alpino.</p>
+<p>Os painéis das paredes trazem entalhes elegantes de cervos entre as árvores. Cortinas de seda vermelha cobrem as janelas, e uma tapeçaria pende de uma barra de ferro presa à parede sul.</p>
+<p>A mesa geme sob o peso de um banquete de aparência deliciosa. Pratos primorosos repousam sobre travessas suntuosas: aves assadas suculentas glaceadas com um molho de mel reluzente, cortes de carne bovina perfeitamente grelhados ainda soltando um leve vapor, uma variedade de queijos e frutas frescas, e pães recém-assados exalando um aroma reconfortante. </p>
+</div>
+<p>Um jogador que prove a comida não sofre efeito nocivo algum.</p>
+<h3 id="cozinha-e-despensa">Cozinha e Despensa</h3>
+<p><span class="citation"><em>Esta cena corresponde ao Apêndice B: Área 4.</em></span></p>
+<p>Este cômodo é em grande parte como descrito em <span class="citation">Kitchen and Pantry (p. 213)</span>. Quando os jogadores entram nele, leia:</p>
+<div class="description">
+<p>Vocês entram numa cozinha arrumada, com louças, panelas e utensílios dispostos com esmero nas prateleiras. Sobre uma bancada de trabalho há uma tábua de corte e um rolo de macarrão. Um forno de pedra em forma de cúpula fica perto da parede leste, com sua chaminé de ferro torta ligada a um buraco no teto. Atrás do fogão e à esquerda há uma porta estreita.</p>
+<p>No canto frontal direito do cômodo há uma pequena porta de madeira encaixada na parede.</p>
+</div>
+<p>Se os jogadores examinarem os utensílios, descobrem que a maior faca de cozinha está faltando.</p>
+<p>Um jogador que entre na despensa descobre que uma das prateleiras guarda um jogo de belos pratos decorativos pintados com imagens de moinhos de vento. Um dos pratos parece ter sido derrubado da prateleira e jaz em cacos no chão, deixando um vazio na fileira de pratos.</p>
+<p>Alguns centímetros atrás do espaço vazio na prateleira repousa uma antiga panela de cobre, com a tampa ligeiramente entreaberta. Espiando por baixo da tampa está a rolha do que parece ser uma garrafa de vinho.</p>
+<p>Um jogador que abra a panela encontra dentro dela uma garrafa de vinho, um pedaço dobrado de renda delicada, um frasco com um pó seco amarronzado e um buquê de girassóis murchos amarrado a um pequeno rolo de pergaminho.</p>
+<ul><li>O rótulo do vinho mostra que ele vem da vinícola Wizard of Wines e traz o nome da bebida: Champagne du le Stomp. (Um jogador que beba o vinho descobre que ele virou vinagre, como se tivesse envelhecido séculos por magia em meros instantes.)</li><li>O pedaço de renda traz a inicial "K" bordada num dos cantos. </li><li>Um teste de Inteligência (Natureza) CD 14 bem-sucedido identifica o pó marrom como sílfio seco, uma erva contraceptiva. </li><li>O rolo de pergaminho diz: "Para a luz da minha vida. —G."</li></ul>
+<p>Se os jogadores lerem o bilhete, uma das facas da cozinha voa de sua prateleira e se crava na parede oposta.</p>
+<h2 id="a2c-o-segundo-andar">A2c. O Segundo Andar</h2>
+<h3 id="salão-superior">Salão Superior</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 6.</em></span></p>
+<p>Este cômodo é em grande parte como descrito em <span class="citation">Upper Hall (p. 213)</span>. Quando os jogadores entram nele, leia:</p>
+<div class="description">
+<p>Lampiões a óleo apagados estão fixados nas paredes deste salão elegante. Pendurada acima da cornija da lareira há uma espada longa com um camafeu de moinho de vento trabalhado no punho.</p>
+<p>Armaduras completas de pé ladeiam portas de madeira nas paredes leste e oeste. Cada armadura empunha uma lança e traz um elmo com viseira em forma de cabeça de lobo. As portas entre elas estão entalhadas com imagens de jovens dançando.</p>
+<p>A escadaria de mármore vermelho segue sua espiral ascendente até um terceiro andar, com uma corrente de ar frio sussurrando lá de cima.</p>
+</div>
+<h3 id="quarto-dos-criados">Quarto dos Criados</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 7.</em></span></p>
+<p>Este cômodo é em grande parte como descrito em <span class="citation">Servants’ Room (p. 213)</span>. Quando os jogadores entram nele, leia:</p>
+<div class="description">
+<p>Este quarto sem qualquer decoração contém um par de camas com colchões de palha. Ao pé de cada cama há um baú fechado. Uma porta à esquerda parece levar a um armário.</p>
+<p>No canto direito há uma pequena porta de madeira, com um botão de metal embutido na parede ao lado dela. Um cesto cheio de roupa suja parece ter sido deixado ali perto.</p>
+</div>
+<p>O cesto contém roupas de homem, incluindo ternos finos, túnicas, gravatas, calças e meias. No entanto, uma única combinação feminina, bem menor, parece ter se misturado às demais.</p>
+<h3 id="conservatório">Conservatório</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 10.</em></span></p>
+<p>Os jogadores que se aproximam desta porta conseguem ouvir o som tênue de um cravo tocando do outro lado. Se os jogadores abrirem a porta ou baterem nela, porém, a música silencia.</p>
+<p>Este cômodo é em grande parte como descrito em <span class="citation">Conservatory (p. 214)</span>. Quando os jogadores entram nele, leia:</p>
+<div class="description">
+<p>Vocês entram num salão de decoração elegante, cujas janelas estão cobertas por cortinas diáfanas. Um lustre folheado a latão pende do teto, e cadeiras estofadas se alinham junto às paredes. </p>
+<p>Vários painéis de vitral nas paredes retratam homens, mulheres e crianças belíssimos cantando e tocando instrumentos. Um cravo com seu banco repousa no canto noroeste. Perto da lareira há uma grande harpa de pé. Estatuetas de alabastro de dançarinos bem-vestidos adornam a cornija da lareira. </p>
+</div>
+<p><strong><em>O Cravo.</em></strong> Um jogador que examine o cravo descobre que uma das teclas parece estar permanentemente afundada. Um jogador que investigue o interior do cravo encontra a causa: um pergaminho enrolado enfiado sob uma das cordas.</p>
+<p>O pergaminho é uma partitura manuscrita para cravo intitulada <em>Valsa para Klara</em>. Se a partitura for tocada no cravo, leia:</p>
+<div class="description">
+<p>Assim que vocês pousam os dedos nas teclas, as notas ecoam, e uma melodia assombrosa preenche o cômodo silencioso e empoeirado. Conforme a execução avança, a música parece ganhar vida própria, e suas mãos correm pelas teclas sem serem chamadas, como se guiadas por uma força invisível.</p>
+<p>Das bordas do salão, figuras espectrais começam a se materializar, girando e serpenteando numa dança fantasmagórica, como se conduzidas pela canção. A maioria é desconhecida para vocês, mas dois rostos vocês reconhecem: Elisabeth Durst, no canto, observando a aparição de Gustav dançar com uma jovem bonita vestida com roupas humildes.</p>
+<p>Os olhos da aparição de Elisabeth se estreitam num olhar frio e furioso. Os dançarinos, porém, mal lhe dão atenção, e a canção acelera enquanto os espíritos rodopiam ao ritmo do crescendo do cravo.</p>
+<p>Num movimento rápido, Elisabeth leva a mão a um pingente em seu pescoço espectral — um fragmento de âmbar cintilante pendurado num cordão de névoa etérea. Quando seu punho fantasmagórico se fecha em torno dele, seus olhos faíscam num âmbar vivo e ameaçador — e os dançarinos espectrais se dissipam, varridos como que por um vento invisível.</p>
+<p>A aparição de Elisabeth permanece apenas mais um instante antes de desaparecer com as demais. Ao sumir, um som ressoa pelo cômodo: o rangido grave de madeira raspando, vindo do aposento do outro lado do corredor. O chão treme de leve — e vocês ouvem um estrondo vindo da cornija da lareira. Duas das estatuetas de alabastro caíram de seu lugar na prateleira: uma tombada de lado; a outra, estilhaçada pelo chão.</p>
+</div>
+<p>Um jogador que examine as estatuetas caídas descobre que a estatueta tombada rachou no rosto, nos braços e no torso, e retrata uma dançarina jovem e esbelta. A estatueta estilhaçada partiu-se em dezenas de pedaços e parece ter retratado, um dia, um homem atraente e mais velho. Uma terceira estatueta, também de uma dançarina, permanece desafiadoramente de pé sobre a cornija, onde as três outrora se erguiam.</p>
+<p>Tocar a <em>Valsa para Klara</em> também faz com que a estante — e não a porta atrás dela — na <a href="#biblioteca">Biblioteca</a> se abra, expondo a porta secreta trancada logo atrás. (O som de raspagem é o da estante arrastando pelo chão.)</p>
+<h3 id="biblioteca">Biblioteca</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 8.</em></span></p>
+<p>Este cômodo é em grande parte como descrito em <span class="citation">Library (p. 213-14)</span>. Quando os jogadores entram nele, leia:</p>
+<div class="description">
+<p>Cortinas de veludo vermelho cobrem as janelas deste cômodo. Uma primorosa escrivaninha de mogno e uma cadeira de espaldar alto combinando estão voltadas para a entrada e para a lareira, acima da qual pende um quadro emoldurado de um moinho de vento empoleirado sobre um rochedo. Nos cantos do aposento há duas poltronas fofas e estofadas. </p>
+<p>Estantes do chão ao teto revestem a parede sul. Uma escada de madeira sobre rodízios permite alcançar com mais facilidade as prateleiras altas.</p>
+</div>
+<p><strong><em>A Escrivaninha.</em></strong> Um bilhete manuscrito repousa sobre a escrivaninha. Ele diz:</p>
+<div class="description">
+<p>Prezados Sr. e Sra. Durst,</p>
+<p>À luz da minha atual condição, peço respeitosamente sua licença para um breve afastamento de minhas responsabilidades. </p>
+<p>Ainda que minha devoção a seus queridos filhos torne esta decisão difícil, tomei a iniciativa de encontrar uma solução que, espero, sirva bem à sua casa. Uma boa conhecida minha tem experiência no cuidado de crianças, e acredito que ela poderia assumir meu papel durante meu afastamento temporário sem dificuldade alguma.</p>
+<p>Sei que meu pedido não é isento de complicações. Contudo, meus anos a serviço de sua família me mostraram a profundidade de sua compreensão e de sua compaixão. Sinto de verdade que me tornei parte desta família, e aguardo com esperança o momento de trazer mais um membro dessa família ao mundo.</p>
+<p>Com sinceros votos,</p>
+<p>Klara</p>
+</div>
+<p>A gaveta superior da escrivaninha agora contém uma série de recibos de velas, adagas e incenso, em vez da chave do <a href="#quarto-das-crianças">Quarto das Crianças</a>.</p>
+<p>Um personagem que vasculhe o cômodo por 1 minuto e passe num teste de Sabedoria (Percepção) CD 15 consegue ver a luz trêmula de velas escapando por baixo da porta secreta.<sup><a href="https://www.reddit.com/r/dndnext/comments/49bvms/notes_from_running_death_house/">4</a></sup></p>
+<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>Fazendo Múltiplos Testes de Habilidade</strong></div><div class="callout-body"><p>Conforme os jogadores exploram a Death House e os muitos lugares secretos da terra de Barovia, não se esqueça da regra de <strong>Múltiplos Testes de Habilidade</strong> (<span class="citation">Dungeon Master's Guide, p. 237</span>). Por exemplo, um jogador que vasculhe a biblioteca pode levar 10 minutos para ser automaticamente bem-sucedido no teste.</p></div></div>
+<p><strong><em>A Porta Secreta.</em></strong> A porta secreta deste cômodo tem dois componentes. Primeiro, um jogador precisa puxar a alavanca como descrito em <span class="citation">Secret Door (p. 214)</span>. Fazê-lo faz a estante girar para a frente, revelando uma parede de madeira lisa atrás dela.</p>
+<p>Uma vez movida a estante, os jogadores podem ver atrás dela um pequeno painel de madeira escura, embutido na parede aproximadamente à altura do peito. Um pequeno nicho oco, irregular e recortado, fica no centro do painel e emana um tênue brilho âmbar.</p>
+<p>A porta não pode ser aberta a menos que o fragmento de âmbar da <a href="#suíte-principal">Suíte Principal</a> seja encaixado no nicho. A porta secreta então se abre, permitindo que os jogadores entrem na <a href="#sala-secreta">Sala Secreta</a>.</p>
+<h3 id="sala-secreta">Sala Secreta</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 9.</em></span></p>
+<p>Este cômodo é em grande parte como descrito em <span class="citation">Secret Room (p. 214)</span>. Quando os jogadores entram nele, leia:</p>
+<div class="description">
+<p>Esta pequena sala oculta está abarrotada de estantes que gemem sob o peso de tomos antigos e de aparência sinistra, encadernados em couro. Um pesado baú de madeira com pés de ferro em forma de garras está encostado na parede sul, com a tampa semicerrada. Saindo do baú, com as costelas e a cabeça presas sob a tampa, há um esqueleto vestindo armadura de couro.</p>
+</div>
+<p>O baú não contém mais a escritura de Old Bonegrinder. Além disso, altere a carta de Strahd para que diga o seguinte:</p>
+<div class="description">
+<p>Minha mais patética serva,</p>
+<p>Não sou um messias enviado a você pelos Poderes Sombrios desta terra. Não vim para conduzi-la por um caminho rumo à imortalidade. Por mais almas que tenha sangrado em seu altar oculto, por mais visitantes que tenha torturado em sua masmorra, saiba que não foi você quem me trouxe a esta bela terra. Você não passa de um verme se contorcendo em meu solo.</p>
+<p>Você diz estar amaldiçoada, sua fortuna esgotada. Seu marido buscou consolo no seio de outra mulher, gerou um filho bastardo e a levou a trocar o amor pela loucura. Amaldiçoada pelas trevas? Disso não tenho dúvida alguma. Salvá-la de sua desgraça? Penso que não. Prefiro-a bem como está.</p>
+<p>Seu temível lorde e senhor,</p>
+<p>Strahd von Zarovich</p>
+</div>
+<p>Os jogadores não reconhecem o nome "Strahd von Zarovich".</p>
+<div class="callout callout-design"><div class="callout-title"><span class="callout-icon">🛠</span><strong>Nota de Design: A Remoção da Escritura</strong></div><div class="callout-body"><p>Os jogadores que encontram a escritura de Old Bonegrinder no baú secreto frequentemente chegam à conclusão equivocada de que saqueá-la os torna os novos donos do moinho. Como resultado, é provável que tentem explorar o moinho durante <a href="arco-c-adentrando-o-vale.html">Arco C: Rumo ao Vale</a>, desencadeando um conflito com o coven de bruxas noturnas e — sem culpa alguma da parte deles — um provável TPK. Por isso, a escritura foi removida, para ajudar a evitar esse desfecho.</p></div></div>
+<h2 id="a2d-o-terceiro-andar">A2d. O Terceiro Andar</h2>
+<p>Conforme os jogadores sobem a escada em espiral até o terceiro andar, lembre-os de que conseguem enxergar pelo vão central da escadaria até o andar mais baixo.</p>
+<h3 id="sacada">Sacada</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 11.</em></span></p>
+<p>Este cômodo é em grande parte como descrito em <span class="citation">Balcony (p. 214)</span>. Quando os jogadores entram nele, leia:</p>
+<div class="description">
+<p>Vocês sobem a escadaria de mármore vermelho até o seu ponto mais alto, chegando a uma sacada empoeirada. O ar aqui é seco e mofado, mas com um leve travo estranho de cobre. </p>
+<p>Uma armadura completa de placas negras está encostada numa das paredes, coberta de teias de aranha e marcada pelo tempo. Lampiões a óleo estão fixados nas paredes de painéis de carvalho desbotados, entalhadas com cenas silvestres de árvores, folhas caindo e pequenos animais.</p>
+</div>
+<p>Quando acionada, a <strong>armadura animada</strong> usará um ou ambos os ataques de seu <strong>_ataque múltiplo_</strong> para tentar empurrar um jogador por cima do parapeito com um ataque de <strong><em>empurrar</em></strong>, ou para tentar agarrar o alvo mais próximo antes de derrubá-lo caído.</p>
+<p>Se a armadura for jogada lá embaixo, no primeiro andar, e os jogadores não revelarem sua presença no alto da sacada, ela não consegue percebê-los com seus 18 metros de visão às cegas, e é estúpida demais para pensar em subir de volta.</p>
+<p>Uma criatura empurrada por cima da beirada da sacada cai dois andares, ou seis metros, e sofre 2d6 de dano de concussão. Essa criatura precisa passar num teste de Destreza (Acrobacia) CD 15 ou cai caída.</p>
+<div class="callout callout-combat"><div class="callout-title"><span class="callout-icon">⚔</span><strong>Combate - Armadura Animada</strong></div><div class="callout-body"><p><strong>Nível do Combate</strong>: Leve <strong>Nível de Personagem Esperado</strong>: 2 <strong>Consumo de PV Esperado:</strong> 15%</p>
+<p>### <strong>Inimigos:</strong></p>
+<p>| |3 Jogadores | 4 Jogadores | 5 Jogadores | 6 Jogadores | |-|-|-|-|-| | Armadura Animada | 1 | 1 | 1 | 1 |</p>
+<p>### <strong>Balanceamento:</strong> Se você tiver menos ou mais de 5 jogadores, modifique o encontro das seguintes formas:</p>
+<p>| Número de Jogadores | Modificação | |-|-| | 3 | Reduza os pontos de vida da armadura para 12. | | 4 | Reduza os pontos de vida da armadura para 21. | | 6 | Aumente os pontos de vida da armadura para 48. |</p></div></div>
+<h3 id="suíte-principal">Suíte Principal</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 12.</em></span></p>
+<p>Quando um jogador se aproxima desta porta pela primeira vez, leia:</p>
+<div class="description">
+<p>Estas portas suntuosas erguem-se altíssimas, com molduras de madeira escura envolvendo um par de vitrais empoeirados. Cada vidraça traz gravados desenhos intrincados que lembram moinhos de vento, e seus tons outrora vibrantes agora estão desbotados e encobertos sob um véu espesso de sujeira.</p>
+<p>Através da névoa poeirenta que arde nos olhos de vocês, vocês vislumbram algo do outro lado das vidraças: uma silhueta, parada a poucos centímetros do vidro, iluminada por trás por um brilho âmbar fraco. Está imóvel, sem se mexer, mas a simples visão dela trava seus músculos como num torno, e seus membros se recusam a obedecer à mente.</p>
+<p>O ar ao redor de vocês se adensa, e sua temperatura despenca para um frio de gelar os ossos. A respiração de vocês embaça as vidraças, uma geada delicada se alastra sobre elas, e os rangidos e sussurros distantes da casa são engolidos por um silêncio pesado.</p>
+<p>A sombra atrás da porta é quase disforme — insubstancial —, mas sua presença desperta um pavor primordial no fundo da medula de vocês. Seus corações batem mais rápido, o suor brota na testa, o pulso dispara nas veias. Lentamente, a silhueta começa a virar a cabeça na direção de vocês.</p>
+<p>E então, tão de repente quanto surgiu, a sombra se evapora. O frio cortante se dissipa, e os sons discretos da casa retornam mais uma vez.</p>
+</div>
+<p>Este cômodo é em grande parte como descrito em <span class="citation">Master Suite (p. 214)</span>. Quando os jogadores entram nele, leia:</p>
+<div class="description">
+<p>Vocês entram num quarto principal empoeirado e tomado de teias de aranha, com cortinas cor de vinho cobrindo as janelas. Uma cama de dossel com cortinados bordados e véus diáfanos esfarrapados está encostada na parede central.</p>
+<p>Uma porta voltada para o pé da cama tem um espelho de corpo inteiro desbotado montado nela. No canto direito do cômodo há uma pequena porta de madeira, com a superfície meio apodrecida pelo tempo. Um botão de metal embaçado está embutido na parede ao lado dela.</p>
+<p>Um tapete de pele de tigre apodrecido jaz no chão diante da lareira, acima da qual pende um retrato coberto de poeira do homem e da mulher do retrato do primeiro andar. Uma saleta tomada por teias no canto sudoeste contém duas cadeiras e uma mesa com vários objetos sobre ela, além de uma porta com uma janela escura e salpicada de sujeira. </p>
+<p>O aposento também contém um par combinando de guarda-roupas, uma poltrona acolchoada e uma penteadeira com espelho de moldura de madeira e um porta-joias de prata. Um suave brilho âmbar escapa por baixo da tampa do porta-joias.</p>
+</div>
+<p><strong><em>A Cama.</em></strong> Um jogador que se aproxime da cama consegue ver que uma grande faca de cozinha manchada de sangue foi cravada num dos travesseiros.</p>
+<p><strong><em>O Porta-Joias.</em></strong> O porta-joias não guarda objeto de valor algum. Em vez disso, está cheio de grãos, com um <em>fragmento de âmbar</em> repousando bem no centro. (Esse fragmento de âmbar é a chave exclusiva da porta secreta da <a href="#biblioteca">Biblioteca</a>.)</p>
+<p>Um rolo de pergaminho está meio enterrado nos grãos, ao lado do fragmento. Se for desenrolado, diz o seguinte:</p>
+<div class="description">
+<p>Drasha,</p>
+<p>Escolhi você como guardiã da Besta em minha ausência. Caso a Besta fique indócil ou dê sinais de agitação enquanto eu estiver fora, deixei este fragmento de âmbar para enfraquecê-la e aplacar sua fúria.</p>
+<p>Se a necessidade surgir, apresente o fragmento e pronuncie o nome da Besta; se falar com convicção, ela lhe obedecerá em meu lugar, ainda que por pouco tempo. Mas trate de estar longe da casa antes que ela desperte por completo à meia-noite.</p>
+<p>Enquanto a Besta respirar, é ela — e não você — o coração desta casa, e refeição alguma jamais saciará seu apetite. Se você se demorar em seu domínio, isso significará a perdição de todos vocês.</p>
+<p>Elisabeth</p>
+</div>
+<p>Veja <strong>O Fragmento de Âmbar de Elisabeth</strong> em <a href="#câmara-ritual">Câmara Ritual</a>, abaixo, para mais informações sobre o fragmento de âmbar.</p>
+<p><strong><em>A Sacada.</em></strong> Um jogador que saia do quarto para a sacada vê apenas uma parede de tentáculos carnosos envolvendo o exterior da casa. Os tentáculos são como descritos em <a href="#salão-principal">Salão Principal</a>.</p>
+<h3 id="banheiro">Banheiro</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 13.</em></span></p>
+<p>Este cômodo é como descrito em <span class="citation">Bathroom (p. 215)</span>.</p>
+<h3 id="depósito">Depósito</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 14.</em></span></p>
+<p>Este cômodo é em grande parte como descrito em <span class="citation">Storage Room (p. 215)</span>. Quando os jogadores entram nele, leia:</p>
+<div class="description">
+<p>Prateleiras empoeiradas revestem as paredes deste cômodo. Algumas delas têm lençóis dobrados, cobertores e velhas barras de sabão. Uma vassoura coberta de teias de aranha está encostada na parede do fundo.</p>
+</div>
+<p>Quando um jogador se aproxima pela primeira vez a até 1,5 metro da <strong>vassoura de ataque animado</strong>, ela ataca de surpresa assim que ele desvia o olhar ou se vira, dando-lhe uma paulada na cabeça. Em seguida, ela retorna imediatamente à sua posição inicial — agora livre de teias. Nos turnos seguintes, a vassoura usa seu <strong>_ataque múltiplo_</strong> para continuar atacando qualquer jogador que não esteja olhando para ela e permaneça a até 1,5 metro, abrindo mão de ataques de oportunidade contra os jogadores que se afastarem.</p>
+<h3 id="suíte-da-babá">Suíte da Babá</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 15.</em></span></p>
+<p>Este cômodo é em grande parte como descrito em <span class="citation">Nursemaid’s Suite (p. 217)</span>. Quando os jogadores entram nele, leia:</p>
+<div class="description">
+<p>Poeira e teias de aranha encobrem este quarto de decoração elegante. Uma cama grande está encostada na parede do fundo, com suas roupas outrora opulentas agora desbotadas e puídas. </p>
+<p>Ao lado da cama, uma toalha coberta de mofo cobre a maior parte de um livro empoeirado e amarelado sobre uma das duas mesinhas de cabeceira. Do outro lado do aposento, vocês conseguem ver mais um par de portas de vitral, com as vidraças salpicadas de sujeira e encardido.</p>
+<p>À esquerda há um guarda-roupa vazio, com as portas ligeiramente entreabertas. Fixado ao lado dele há um espelho de corpo inteiro, cuja moldura de madeira é entalhada imitando heras e frutinhas. À direita há uma porta fechada.</p>
+<p>Enquanto observam o quarto, vocês notam que os cobertores sobre a cama se erguem ligeiramente acima do colchão, como se algo estivesse deitado ali embaixo. Sob o olhar de vocês, dá para ver as cobertas subindo e descendo devagar, quase imperceptivelmente, com um farfalhar baixo e ritmado.</p>
+</div>
+<p><strong><em>A Cama.</em></strong> Um jogador que retire as cobertas da cama descobre que não há nada debaixo delas. Em vez disso, ele encontra apenas um colchão manchado de sangue e grosseiras amarras para mãos e pés, feitas de arame farpado pregado nos quatro postes da estrutura da cama.</p>
+<p><strong><em>As Portas.</em></strong> Um jogador que saia do quarto pelas portas de vitral e vá até a sacada vê apenas uma parede de tentáculos carnosos envolvendo o exterior da casa. Os tentáculos são como descritos em <a href="#salão-principal">Salão Principal</a>.</p>
+<p><strong><em>O Livro.</em></strong> O livro é um exemplar coberto de teias de um romance açucarado e picante intitulado <em>Lábios de Sangue Azul</em>. Ele conta a história do romance entre uma camponesa e um duque abastado.</p>
+<p><strong><em>O Quarto do Bebê.</em></strong> A porta do quarto do bebê está fechada. Um jogador que se aproxime dela ouve o cantarolar baixinho de uma jovem. (Um jogador que já tenha lido ou ouvido a canção no <a href="#conservatório">Conservatório</a> reconhece a melodia como a <em>Valsa para Klara</em>.)</p>
+<p>Se um jogador entrar no quarto do bebê, o cantarolar cessa abruptamente. Leia:</p>
+<div class="description">
+<p>O ar neste pequeno quarto de bebê é estranhamente morno e traz um travo de cobre. Runas vermelhas como sangue cobrem as paredes, dispostas em círculos concêntricos ao redor do berço no centro, que parece ter um nome entalhado na lateral. Estranhos tumores de aspecto carnoso brotaram do chão à volta dele, em aglomerados esparsos, e pulsam lentamente como se respirassem.</p>
+<p>Ao olharem para baixo, vocês notam que um pequeno objeto parece ter caído sob o berço. Ao longe, dá para ouvir, bem fraquinho, o gemido suave de um bebê.</p>
+</div>
+<p>O objeto é um dedo humano decepado, com vários pedaços de carne arrancados. Marcas minúsculas de dentes podem ser vistas em torno dos ferimentos. Um teste de Sabedoria (Medicina) CD 12 identifica o dedo como sendo de uma mulher, e as marcas de dentes como as de uma criança humana.</p>
+<p>O nome "Walter" foi entalhado com carinho na cabeceira do berço. Um teste de Inteligência (Arcanismo) CD 14 bem-sucedido identifica as runas ao redor como magia necromântica sombria.</p>
+<p><strong><em>O Espelho.</em></strong> O <strong>espectro</strong> da babá não aparece neste cômodo. Em vez disso, quando um jogador se aproxima do espelho, o espírito da babá surge como uma aparição no vidro.</p>
+<p>O espírito lembra uma jovem pálida e esquelética, com todos os dedos das mãos e dos pés removidos, os olhos costurados e os lábios e dentes arrancados da boca. Incontáveis cicatrizes finas como fio de faca cobrem seu corpo inteiro, inclusive a carne em torno dos punhos e tornozelos, e seu cabelo foi cortado sem qualquer cuidado até virar tocos.</p>
+<p>Embora sua aparência seja perturbadora, os jogadores que observam o espírito sentem que ele está apenas observando-os com uma curiosidade tímida.</p>
+<p>O espírito não consegue falar em voz alta nem sair do espelho. Contudo, não demonstra hostilidade alguma contra os jogadores, e pode responder a perguntas simples acenando ou balançando a cabeça. Ele sabe tudo o que a babá sabia em vida. Demonstra medo a qualquer menção ao nome da Sra. Durst, tristeza a qualquer menção ao do Sr. Durst, um carinho melancólico a qualquer menção a Rose ou Thorn, e desespero a qualquer menção a Walter.</p>
+<p>Se os jogadores pedirem ao espírito ajuda para chegar ao porão ou para encontrar o "monstro", o espírito se afasta para o lado — sumindo de vista — e a porta secreta atrás do espelho se abre lentamente. O espírito não retorna.</p>
+<h2 id="a2e-o-sótão">A2e. O Sótão</h2>
+<h3 id="salão-do-sótão">Salão do Sótão</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 16.</em></span></p>
+<p>Este cômodo é em grande parte como descrito em <span class="citation">Attic Hall (p. 215)</span>. Quando os jogadores entram nele, leia:</p>
+<div class="description">
+<p>Este corredor vazio está sufocado de poeira e teias de aranha. Várias portas partem deste corredor do sótão, incluindo uma porta mantida fechada por um cadeado.</p>
+<p>Um rangido grave corta o ar enquanto uma das portas destrancadas se abre devagar.</p>
+</div>
+<p>A porta leva ao <a href="#quarto-vago">Quarto Vago</a>.</p>
+<h3 id="quarto-vago">Quarto Vago</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 17.</em></span></p>
+<p>Este cômodo é em grande parte como descrito em <span class="citation">Spare Bedroom (p. 215)</span>. A boneca do Children’s Room (p. 215-16) pode ser encontrada aqui. Quando os jogadores entram nele pela primeira vez, leia:</p>
+<div class="description">
+<p>Este cômodo frio e sufocado de poeira contém uma cama estreita, uma mesinha de cabeceira, um pequeno fogão de ferro, uma escrivaninha com um banquinho, um guarda-roupa vazio e uma cadeira de balanço. Uma boneca de semblante fechado, num vestido amarelo de renda, está sentada no vão da janela ao norte, ao lado de uma velha caixa de música embaçada, com teias de aranha caindo sobre ela como um véu de noiva.</p>
+</div>
+<p>Os jogadores conseguem reconhecer a boneca como a mesma que Thorn segurava no retrato de família do Salão Principal.</p>
+<p>A caixa de música contém uma faca de esfolar enferrujada e manchada de sangue, além da chave do cadeado da porta do quarto de Rose e Thorn.</p>
+<p>A caixa de música também contém dois pedaços enrolados de pergaminho. O primeiro mostra uma planta baixa simples dividida em três retângulos rotulados APOSENTOS, SANTUÁRIO e ALTAR. APOSENTOS e SANTUÁRIO estão ligados no alto por uma linha simples e, embaixo, por uma linha dupla, que conecta ambos ao ALTAR. O segundo pergaminho traz uma lista de nomes desconhecidos sob a palavra RECRUTAMENTO.</p>
+<p><img class="reloaded-img" src="img/Death%20House%20Dungeon%20Map.png" alt="Death House Dungeon Map.png" loading="lazy"> <span class="credit">"Death House Dungeon Map", de Caleb Cleveland. Apoie-o no <a href="https://patreon.com/calebisdrawing/">Patreon!</a></span></p>
+<p>Quando os jogadores saem do cômodo, a cadeira de balanço começa a se mover suavemente, e a caixa de música se abre e começa a tocar. O som de um cantarolar maternal paira no ar por dois compassos, mas vai se desafinando e distorcendo até parar num guincho violento. A cadeira de balanço então para de balançar.</p>
+<h3 id="quarto-das-crianças">Quarto das Crianças</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 20.</em></span></p>
+<p>Este cômodo é em grande parte como descrito em <strong>Children’s Room</strong> (p. 215-16).</p>
+<p><img class="reloaded-img" src="img/Rose%20and%20Thorn.png" alt="Rose and Thorn.png" loading="lazy"> <span class="credit">"Rose & Thorn", de Caleb Cleveland. Apoie-o no <a href="https://patreon.com/calebisdrawing/">Patreon!</a></span></p>
+<div class="callout callout-profile"><div class="callout-title"><span class="callout-icon">👤</span><strong>Perfil: Rosavalda "Rose" Durst</strong></div><div class="callout-body"><p><strong>Informações de Interpretação</strong> <strong><em>Ressonância.</em></strong> Rose deve inspirar compaixão por suas inseguranças e medos, ternura por sua dedicação a Thorn e gratidão por seus esforços sinceros em ajudar os jogadores.</p>
+<p><strong><em>Emoções.</em></strong> Rose costuma se sentir apreensiva, curiosa, desafiadora ou audaciosa.</p>
+<p><strong><em>Motivações.</em></strong> Rose quer manter Thorn a salvo e confortado, e permitir que os espíritos de ambos finalmente encontrem a paz.</p>
+<p><strong><em>Inspirações.</em></strong> Ao interpretar Rose, canalize Eleven (<em>Stranger Things</em>), Matilda (<em>Matilda</em>) e Lucy Pevensie (<em>As Crônicas de Nárnia</em>).</p>
+<p><strong>Informações de Personagem</strong> <strong><em>Persona.</em></strong> Para o mundo, Rose é a mais feroz protetora de Thorn. Para aqueles em quem confia, Rose é uma menina perdida, medrosa e traumatizada.</p>
+<p><strong><em>Moral.</em></strong> Numa luta, Rose imploraria por paz, mas fugiria com Thorn caso isso se mostrasse impossível.</p>
+<p><strong><em>Relações.</em></strong> Rose é a irmã mais velha de Thorn Durst, meia-irmã de Walter Durst e a filha mais velha de Elisabeth e Gustav Durst.</p></div></div>
+<div class="callout callout-profile"><div class="callout-title"><span class="callout-icon">👤</span><strong>Perfil: Thornboldt "Thorn" Durst</strong></div><div class="callout-body"><p><strong>Informações de Interpretação</strong> <strong><em>Ressonância.</em></strong> Thorn deve inspirar compaixão por sua timidez e seu medo, e ternura por sua alegria infantil.</p>
+<p><strong><em>Emoções.</em></strong> Thorn costuma se sentir desconfortável, alegre, ansioso ou aterrorizado.</p>
+<p><strong><em>Motivações.</em></strong> Thorn quer ficar sempre perto de Rose e achar brinquedos para brincar.</p>
+<p><strong><em>Inspirações.</em></strong> Ao interpretar Thorn, canalize Neville Longbottom (<em>Harry Potter</em>) e o Leitão (<em>Ursinho Pooh</em>).</p>
+<p><strong>Informações de Personagem</strong></p></div></div>
+<p><strong><em>Persona.</em></strong> Para o mundo, Thorn é um menininho assustado que se agarra à irmã. Para aqueles em quem confia, Thorn é  uma criança discretamente observadora e perspicaz. > > <strong><em>Moral.</em></strong> Numa luta, Thorn se encolheria e choraria, implorando para Rose salvá-lo. > > <strong><em>Relações.</em></strong> Thorn é o irmão mais novo de Rose Durst, meio-irmão de Walter Durst e o filho mais novo de Elisabeth e Gustav Durst.</p>
+<p>Em vida, Rose era uma maga em formação que descobriu um pequeno livro de magias na biblioteca do pai, e teve o maior cuidado ao copiar os truques _consertar_ (_mending_), _luz_ (_light_) e _toque chocante_ (_shocking grasp_) em seu diário.<sup><a href="https://www.reddit.com/r/dndnext/comments/49bvms/notes_from_running_death_house/">4</a></sup></p>
+<p>Enquanto as crianças fantasmas conversam com os jogadores, Thorn faz um de seus brinquedos levitar no ar, e ele cai e se quebra. Rose prontamente usa sua magia _consertar_ para repará-lo. Se comentarem sobre o uso de magia por ela, a menina revela timidamente onde está seu diário, escondido dentro da fronha coberta de teias sobre sua cama.</p>
+<p>Além dos truques, o diário velho e desbotado de Rose também traz anotações sobre seus estudos, suas amigas, seu irmão mais novo, sua babá ("Senhorita Klara") e discussões entre a mãe e o pai. (Rose não sabe nada sobre o conteúdo dessas brigas.)</p>
+<p>Rose sabe o caminho para o porão, mas "não pode descer lá". Se o grupo a convencer a mostrar o caminho, ela aponta para a casa de bonecas, revelando a entrada secreta. Em troca, ela pede aos jogadores que levem os ossos dela e de Thorn consigo quando escaparem, enterrando-os no jardim lá fora.</p>
+<p>A casa de bonecas contém pequenas bonecas que representam moldes minúsculos e retorcidos de quaisquer personagens e criaturas atualmente visíveis na casa. As bonecas são feitas de resina pintada. Qualquer personagem que olhe dentro da casa de bonecas enquanto estiver no quarto de Rose e Thorn consegue ver as bonecas de todas as criaturas vivas da mansão, dispostas nos lugares corretos. A casa de bonecas contém apenas os cômodos da casa em si, e não representa os níveis da masmorra lá embaixo.</p>
+<p>Quando a porta secreta é revelada, Thorn pergunta timidamente aos jogadores se ele e Rose podem acompanhá-los lá para baixo a fim de ajudá-los, e tenta possuir um jogador amistoso, se permitido. Quando Rose ou Thorn tenta possuir um jogador, descreva isso como "a mãozinha de uma criança, buscando desesperadamente o toque de outra alma."</p>
+<p>Um jogador possuído por Rose pode conjurar os truques do diário dela, enquanto um jogador possuído por Thorn pode obter os efeitos do truque _mãos mágicas_ (_mage hand_) como uma ação, sem o uso de componentes. (A mão espectral é invisível.)</p>
+<h3 id="depósito-2">Depósito</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 18.</em></span></p>
+<p>Este cômodo é em grande parte como descrito em <span class="citation">Storage Room (p. 215)</span>. Quando os jogadores entram nele, leia:</p>
+<div class="description">
+<p>Esta câmara empoeirada está abarrotada de formas atarracadas e disformes cobertas por lençóis brancos e poeirentos. Um velho fogão de ferro está encostado na parede da direita, ao lado do que parece ser um grande baú coberto por um lençol.</p>
+</div>
+<p>O <strong>espectro</strong> da babá não aparece neste cômodo. Em vez disso, um personagem que abra o baú encontra o cadáver da babá, com ferimentos condizentes com os vistos no corpo do espírito na <strong>Suíte da Babá</strong>. Um teste de Sabedoria (Medicina) CD 14 revela que a mulher morreu de inanição.</p>
+<p>Um jogador que examine os restos mortais sente um sopro gelado no ombro e a sensação inabalável de estar sendo observado. Enquanto isso, se outro jogador já tiver descoberto um espelho próximo, retirando o lençol que o cobria, esse jogador consegue ver, dentro do espelho, uma aparição de Elisabeth Durst encarando o jogador que está perto do baú. Assim que é notada, a aparição some rapidamente.</p>
+<h3 id="quarto-de-hóspedes">Quarto de Hóspedes</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 19.</em></span></p>
+<p>Este cômodo é como descrito em <span class="citation">Spare Bedroom (p. 215)</span>.</p>
+<h3 id="escada-secreta">Escada Secreta</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 21.</em></span></p>
+<p>Este cômodo é em grande parte como descrito em <span class="citation">Secret Stairs (p. 217)</span>. Contudo, abrir a porta secreta revela apenas uma laje de pedra do outro lado, com um pequeno painel de bronze embutido aproximadamente à altura do peito. Um pequeno nicho oco, idêntico ao da biblioteca, fica no centro do painel, emanando um tênue brilho âmbar. Quando o nicho é exposto, o fragmento de âmbar da <a href="#suíte-principal">Suíte Principal</a> cintila de leve e flutua no ar em direção a ele, como se sustentado por uma força invisível.</p>
+<p>Para que a laje de pedra possa girar e revelar a escada oculta do outro lado, os jogadores precisam encaixar o fragmento de âmbar no nicho.</p>
+<p>Quando os jogadores entram neste cômodo, leia:</p>
+<div class="description">
+<p>A porta secreta se abre revelando uma estreita escada em espiral construída com madeira de aspecto antigo, dentro de um poço apertado de pedra e argamassa. Teias de aranha espessas tomam a escadaria enquanto ela desce para a escuridão lá embaixo.</p>
+</div>
+<p>Conforme os jogadores descem a escada, leia:</p>
+<div class="description">
+<p>As teias rompidas ao redor de vocês balançam como um véu de noiva diáfano, acenando para que avancem enquanto os degraus antiquíssimos rangem e gemem sob seus pés. As fauces escancaradas do poço da escada os puxam mais fundo, engolindo-os enquanto vocês descem goela abaixo. Vocês descem um andar — dois andares — três.</p>
+<p>As paredes do poço de pedra se estreitam à sua volta, forçando-os a encolher os ombros e recolher os cotovelos para continuar descendo. Na escuridão, vocês só conseguem ouvir o arrastar dos próprios pés, o gemido sufocado dos degraus e o pulsar do sangue nos ouvidos. </p>
+<p>Enfim, depois do que parecem horas, a descida se nivela, e a escada em espiral termina num patamar escuro de terra batida. Um túnel estreito, sustentado por escoras de madeira envelhecida, se estende à frente de vocês, e suas paredes de pedra parecem sangrar com depósitos de argila vermelha em veios. Dois metros e meio adiante, o túnel se bifurca, ramificando-se para a esquerda e para a direita.</p>
+<p>Conforme os olhos e os ouvidos de vocês se ajustam ao corredor frio e subterrâneo, vocês notam que o túnel não é tão silencioso quanto a escadaria lá em cima. Um som grave e inquietante ecoa pelo espaço — e logo vocês o reconhecem: um cântico profundo e incessante.</p>
+</div>
+<p><strong>_Marco_</strong>. Descer até o nível da masmorra da Death House completa um marco da história. Quando o grupo sai da escada secreta, conceda 200 XP a cada jogador.</p>
+<h2 id="a2f-o-porão">A2f. O Porão</h2>
+<h3 id="criptas-da-família">Criptas da Família</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 23.</em></span></p>
+<p>Estes cômodos são em grande parte como descritos em <strong>Family Crypts</strong> (p. 217-18).</p>
+<p>Conforme os jogadores se aproximam da <strong>Cripta Vazia</strong> e da <strong>Cripta de Walter</strong>, leia:</p>
+<div class="description">
+<p>Este corredor lateral se bifurca outra vez, à esquerda e à direita. Dos dois lados, grandes lajes de pedra foram afastadas e encostadas nas paredes, abrindo caminho para um par de criptas escuras e silenciosas. A laje da direita traz gravado o nome "Walter Durst"; a da esquerda está em branco.</p>
+</div>
+<p>Se os personagens entrarem na <strong>Cripta Vazia</strong>, leia:</p>
+<div class="description">
+<p>Vocês espiam além da laje de pedra encostada e veem uma cripta vazia de terra batida.</p>
+</div>
+<p>Se os personagens entrarem na <strong>Cripta de Walter</strong>, leia:</p>
+<div class="description">
+<p>Cistos inchados e sangrentos cobrem as paredes desta cripta como tumores. De tempos em tempos, eles pulsam e estouram, e filetes de pus escorrem até se acumular no chão. Cada vez que isso acontece, vocês conseguem ouvir os gemidos baixinhos de um bebê, logo silenciados pelo som de um cantarolar distante.</p>
+</div>
+<p>Os jogadores que já leram ou ouviram a canção reconhecem a melodia do cantarolar como a <em>Valsa para Klara.</em></p>
+<p>Conforme os jogadores se aproximam da <strong>Cripta de Gustav</strong> e da <strong>Cripta de Elisabeth</strong>, leia:</p>
+<div class="description">
+<p>Este corredor lateral se bifurca outra vez, à esquerda e à direita. Grandes lajes de pedra vedam a entrada dos túneis dos dois lados, bloqueando a passagem. A laje da esquerda traz gravado o nome "Gustav Durst"; a da direita traz gravado o nome "Elisabeth Durst". O túnel aqui é anormalmente silencioso, e uma névoa rala se agarra ao chão.</p>
+</div>
+<p>Se os personagens entrarem na <strong>Cripta de Gustav</strong>, leia:</p>
+<div class="description">
+<p>A cripta além da laje contém um caixão de pedra repousando sobre um esquife de pedra empoeirado. O silêncio pesa sobre a câmara solitária.</p>
+</div>
+<p>Se os personagens entrarem na <strong>Cripta de Elisabeth</strong>, leia:</p>
+<div class="description">
+<p>Um miasma espesso e acre paira no interior desta cripta, que abriga um caixão entalhado em pedra repousando sobre um esquife de pedra. O chão diante dele está coberto pelos corpos de centenas de cupins mortos. Muitos deles se agarram ao corpo alongado e inchado de uma rainha cupim morta, enquanto outros parecem ter morrido sobre os corpos marcados e mutilados de quatro besouros maiores, não muito longe dali.</p>
+</div>
+<p>Conforme os jogadores se aproximam da <strong>Cripta de Rose</strong> e da <strong>Cripta de Thorn</strong>, leia:</p>
+<div class="description">
+<p>Este corredor lateral se bifurca outra vez, à esquerda e à direita. Grandes lajes de pedra vedam a entrada dos túneis dos dois lados, bloqueando a passagem. A laje da esquerda traz gravado o nome "Rosavalda Durst"; a da direita traz gravado o nome "Thornboldt Durst". Cada laje exala o silêncio de um túmulo esquecido.</p>
+</div>
+<p>Se os personagens entrarem em qualquer uma das criptas, leia:</p>
+<div class="description">
+<p>Esta pequena câmara contém um caixão de pedra repousando sobre um esquife de pedra. O ar desta cripta está carregado de tristeza.</p>
+</div>
+<p>Os jogadores não conseguem ajudar os fantasmas de Rose ou Thorn a encontrar a paz colocando seus restos mortais nos caixões. Nem <span class="link-pending" title="Ainda não convertido">Rose</span> nem <span class="link-pending" title="Ainda não convertido">Thorn</span> acham estas criptas reconfortantes. Ambos preferem partir o quanto antes.</p>
+<h3 id="aposentos-dos-iniciados-do-culto">Aposentos dos Iniciados do Culto</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 24.</em></span></p>
+<p>Este cômodo é em grande parte como descrito em <span class="citation">Cult Initiates’ Quarters (p. 218)</span>.</p>
+<p>Conforme os personagens se preparam para descer até o <span class="citation">Well and Cultist Quarters (p. 218)</span>, um repentino som de água se agitando pode ser ouvido — e logo cessa.</p>
+<h3 id="poço-e-aposentos-dos-cultistas">Poço e Aposentos dos Cultistas</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 25.</em></span></p>
+<p>Este cômodo é em grande parte como descrito em <span class="citation">Well and Cultist Quarters (p. 218)</span>. Quando os jogadores entram nele, leia:</p>
+<div class="description">
+<p>O teto desta câmara escura de terra batida se ergue uns trinta centímetros acima do túnel apertado. Ele é sustentado por grossos postes e vigas transversais de madeira apodrecidos pelo tempo, com buracos profundos que denunciam insetos famintos.</p>
+<p>Aqui, um poço solitário se ergue no centro do aposento, cercado em três lados por várias câmaras menores, feito alcovas, escavadas nas paredes. Pegadas antigas se cruzam pelo chão, levando para dentro das alcovas, ao redor do poço, até uma escadaria no outro extremo do cômodo, e de volta para cima, pelo caminho por onde vocês vieram.</p>
+<p>Uma velha corda de cânhamo presa a uma roldana enferrujada desce pela boca do poço, balançando de leve no ar parado, como se tivesse acabado de ser largada por um ocupante invisível.</p>
+</div>
+<p>O poço consiste num fosso de 1,2 metro de diâmetro com uma borda de pedra de 90 centímetros de altura, e desce 9 metros até uma cisterna cheia de água. Um balde de madeira pende de um mecanismo de corda e roldana preso às vigas transversais acima do poço. O interior do fosso está coberto por uma espécie de fungo negro como cinza.</p>
+<p>Se os jogadores atirarem um objeto poço abaixo e depois se virarem, ouvem sons altos de água agitada e de algo sendo rasgado lá embaixo. Quando se voltam, o objeto foi despedaçado, com grandes partes faltando.</p>
+<p>Substitua a espada curta prateada do baú <strong>25E</strong> por um livro encadernado em couro negro e encardido. Esse diário, assinado por Drasha, contém uma lista de nomes e descrições físicas associadas a cada nome. Cada registro inclui detalhes macabros descrevendo o sacrifício da vítima, como "resistiu com afinco" ou "nenhum sedativo administrado",<sup><a href="https://www.reddit.com/r/CurseofStrahd/comments/8sfpkn/fleshing_out_curse_of_strahd_part_2_entering/">1</a></sup> e termina com a frase "Alimentado a Walter."</p>
+<h3 id="fosso-de-espinhos-oculto">Fosso de Espinhos Oculto</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 26.</em></span></p>
+<p>Este cômodo é em grande parte como descrito em <span class="citation">Hidden Spiked Pit (p. 218)</span>. Se os personagens entrarem nesta área vindos do <a href="#poço-e-aposentos-dos-cultistas">Poço e Aposentos dos Cultistas</a>, leia:</p>
+<div class="description">
+<p>A escadaria leva a um patamar silencioso. À frente, os degraus continuam subindo e somem numa curva. À direita, o patamar segue reto para um corredor solitário. Este corredor em túnel parece surpreendentemente limpo e livre de entulho; em sua outra extremidade, mais uma escadaria de terra desce para a escuridão.</p>
+<p>O cântico incessante que enche o ar deste complexo subterrâneo fica mais forte na direção do fundo deste corredor. Sua origem parece estar além da escadaria descendente.</p>
+</div>
+<p>Se os personagens entrarem nesta área vindos do <a href="#salão-de-banquetes">Salão de Banquetes</a>, leia:</p>
+<div class="description">
+<p>A escadaria desce até um patamar silencioso. À frente, os degraus continuam descendo, abrindo-se para uma câmara mais ampla. À esquerda, o patamar segue reto para um corredor solitário. Este corredor em túnel parece surpreendentemente limpo e livre de entulho; em sua outra extremidade, mais uma escadaria de terra desce para a escuridão.</p>
+<p>O cântico incessante que enche o ar deste complexo subterrâneo fica mais forte na direção do fundo deste corredor.</p>
+</div>
+<p>Se os personagens entrarem nesta área vindos do <a href="#encontro-macabro">Encontro Macabro</a>, leia:</p>
+<div class="description">
+<p>A escadaria desce até um patamar silencioso. À esquerda, os degraus continuam descendo, contornando uma curva antes de sumir na escuridão. O cântico incessante que enche o ar deste complexo subterrâneo parece ecoar lá de baixo.</p>
+<p>À direita, o patamar segue reto para um corredor solitário. Este corredor em túnel parece surpreendentemente limpo e livre de entulho; em sua outra extremidade, o corredor se bifurca para a esquerda e para a direita.</p>
+</div>
+<h3 id="salão-de-banquetes">Salão de Banquetes</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 27.</em></span></p>
+<p>Este cômodo é em grande parte como descrito em <span class="citation">Dining Hall (p. 218)</span>. Quando os jogadores entram nele, leia:</p>
+<div class="description">
+<p>Este cômodo contém uma mesa simples de madeira ladeada por bancos compridos. Ossos humanoides mofados jazem espalhados pelo chão de terra.  Um fedor espesso de podridão e vísceras enche a câmara, tão metálico de sangue que vocês conseguem senti-lo na língua.</p>
+<p>Algumas dezenas de ossos mofados foram empilhados numa pirâmide grotesca e disforme, numa alcova escura ao sul.</p>
+</div>
+<h3 id="despensa">Despensa</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 28.</em></span></p>
+<p>Esta área é em grande parte como descrita em <span class="citation">Larder (p. 218)</span>.</p>
+<p>O <strong>grick</strong> desta alcova — os restos deformados do cadáver esfolado de Gustav Durst — está enrodilhado no teto e se joga sobre a vítima quando ela entra. Um teste de Sabedoria (Percepção) CD 17 permite que um jogador detecte sua presença antes de entrar.</p>
+<p>Se os jogadores perturbarem o grick, leia:</p>
+<div class="description">
+<p>Uma criatura medonha despenca do teto — um verme longo e carnoso, da largura e do comprimento de um homem adulto, cujo tronco lembra um corpo humanoide com os braços costurados ao torso e as duas pernas costuradas uma à outra. Seus músculos esfolados se abrem revelando uma bocarra escancarada e trêmula, cercada por centenas de dentes minúsculos e humanos e por um bico ósseo que range. </p>
+<p>Ela solta um guincho agudo e gorgolejante enquanto se arremessa para a frente, com tentáculos retorcidos como tendões chicoteando na direção do rosto de vocês.</p>
+</div>
+<div class="callout callout-combat"><div class="callout-title"><span class="callout-icon">⚔</span><strong>Combate - Grick</strong></div><div class="callout-body"><p><strong>Nível do Combate</strong>: Severo <strong>Nível de Personagem Esperado</strong>: 2 <strong>Consumo de PV Esperado:</strong> 28%</p>
+<p>### <strong>Inimigos:</strong></p>
+<p>| |3 Jogadores | 4 Jogadores | 5 Jogadores | 6 Jogadores | |-|-|-|-|-| | Grick | 1 | 1 | 1 | 1 |</p>
+<p>### <strong>Balanceamento:</strong> Se você tiver menos ou mais de 5 jogadores, modifique o encontro das seguintes formas:</p>
+<p>| Número de Jogadores | Modificação | |-|-| | 3 | <ul><li>Reduza os pontos de vida do grick para 16</li><li>Reduza o dano de seu ataque de tentáculos para 5 (2d4)</li><li>Reduza o dano de seu ataque de bico para 3 (1d6)</li></ul> | | 4 | <ul><li>Reduza os pontos de vida do grick para 22</li><li>Reduza o dano de seu ataque de tentáculos para 7 (2d6)</li><li>Reduza o dano de seu ataque de bico para 4 (1d8)</li></ul> | | 6 | <ul><li>Aumente os pontos de vida do grick para 32</li><li>Aumente seu ataque de tentáculos para 11 (2d8+2)</li><li>Aumente seu ataque de mordida para 6 (1d8+2)</li></ul> |</p></div></div>
+<p><img class="reloaded-img" src="img/Durst_Grick_Transparent.png" alt="Durst_Grick_Transparent.png" loading="lazy"></p>
+<p><span class="credit">"The Grick", de Cuddly Kraken. Apoie-o <a href="https://cuddlykraken.carrd.co/">aqui!</a></span></p>
+<h3 id="encontro-macabro">Encontro Macabro</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 29.</em></span></p>
+<p>Esta área é em grande parte como descrita em <span class="citation">Ghoulish Encounter (p. 218)</span>. Quando os jogadores se aproximam desta área pela primeira vez, leia:</p>
+<div class="description">
+<p>Um fedor de morte emana deste corredor. As paredes de pedra trazem manchas vermelhas ressecadas e rachadas, e uma trilha de ossos velhos leva túnel adentro.</p>
+
+</div>
+<p>Quando um jogador entra pela primeira vez em um dos quadrados de 1,5 metro na entrada dos corredores (marcados com T no mapa), três <strong>carniçais</strong> brotam do chão nos espaços marcados com S e atacam.</p>
+<p><img class="reloaded-img" src="img/Ghoulish%20Encounter%20Map.png" alt="Ghoulish Encounter Map.png" loading="lazy"></p>
+<div class="callout callout-combat"><div class="callout-title"><span class="callout-icon">⚔</span><strong>Combate - Carniçais</strong></div><div class="callout-body"><p><strong>Nível do Combate</strong>: 3 encontros Leves consecutivos <strong>Nível de Personagem Esperado</strong>: 2 <strong>Consumo de PV Esperado:</strong> 15% cada, totalizando 45%</p>
+<p>### <strong>Inimigos:</strong></p>
+<p>| |3 Jogadores | 4 Jogadores | 5 Jogadores | 6 Jogadores | |-|-|-|-|-| | Carniçal | 1 | 2 | 3 | 4 |</p>
+<p>### <strong>Balanceamento:</strong> Se você tiver menos ou mais de 5 jogadores, modifique o encontro das seguintes formas:</p>
+<p>| Número de Jogadores | Modificação | |-|-| | 3 |  | | 4 | Deixe apenas um carniçal atacar por vez | | 6 | Deixe apenas um carniçal atacar por vez |</p></div></div>
+<p>Enquanto atacam, os carniçais repetem, de forma insensata, uma ou todas as frases a seguir:</p>
+<ul><li>"Belos. Nós somos tão belos."</li><li>"Nós somos perfeitos. Nós somos imortais."</li><li>"Ajudem-nos a viver para sempre."</li></ul>
+<p>Se os jogadores seguirem corredor adentro, leia:</p>
+<div class="description">
+<p>A trilha termina no centro de um cruzamento silencioso. O cântico incessante que vocês vêm ouvindo desde que entraram na masmorra está nitidamente mais alto pelo ramo norte do cruzamento.</p>
+</div>
+<h3 id="escadaria-descendente">Escadaria Descendente</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 30.</em></span></p>
+<p>Este cômodo é em grande parte como descrito em <span class="citation">Stairs Down (p. 218)</span>. Quando os jogadores se aproximam desta área, leia:</p>
+<div class="description">
+<p>Uma escadaria escura de degraus talhados em pedra desce para a escuridão. Fica claro que a origem do cântico abafado que vocês vêm ouvindo está lá embaixo.</p>
+</div>
+<h3 id="santuário-do-senhor-das-trevas">Santuário do Senhor das Trevas</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 31.</em></span></p>
+<p>Este cômodo é em grande parte como descrito em <span class="citation">Darklord’s Shrine (p. 218)</span>. Além disso, quando os jogadores entram nele, leia:</p>
+<div class="description">
+<p>Este cômodo está enfeitado de esqueletos mofados que pendem de grilhões enferrujados presos às paredes, com as bocas escancaradas em gritos silenciosos. </p>
+<p>Uma ampla alcova na parede sul contém uma estátua de madeira pintada, entalhada à semelhança de um homem magro e de rosto pálido vestindo um manto negro e volumoso, com a mão esquerda alva repousada sobre a cabeça de um lobo que se posta ao seu lado. A mão direita da estátua segura um orbe de cristal cinza-fumaça, e seu olhar pintado encara vocês lá de cima, com um brilho frio e cruel nos olhos.</p>
+<p>Cinco sombras cinzentas estão queimadas nas paredes, com marcas de fuligem que se estendem pelo chão na direção da estátua.</p>
+<p>O cômodo tem saídas a oeste e ao norte. Um cântico pode ser ouvido vindo do norte.</p>
+</div>
+<p>Um jogador que se aproxime do orbe consegue ouvir muitas vozes sussurrando as seguintes frases:</p>
+<ul><li>"Seu olhar arde sobre nós."</li><li>"Os olhos do Senhor das Trevas estão sempre vigiando."</li></ul>
+<p>Além disso, a sombra desse jogador começa a se contorcer e retorcer, com as bordas ficando esgarçadas e borradas enquanto chicoteia erraticamente pelo chão. Um jogador que toque o orbe sente como se um "mal antigo e sombrio" tivesse subitamente voltado seu olho para ele.</p>
+<p>Se o orbe for retirado de sua posição, as <strong>sombras</strong> acinzentadas nas paredes começam a se agitar. A cada rodada, até duas delas "despertam", deslizando pelas paredes. Ao despertarem, murmuram e gemem as seguintes frases:</p>
+<ul><li>"Fora deste lugar!"</li><li>"Não olhem para nós."</li><li>"Devolvam a oferenda do Senhor das Trevas!"</li></ul>
+<p>Assim que todas as sombras despertarem, elas atacam, e cada uma prefere ter como alvo um jogador diferente. Se o orbe for devolvido ao seu lugar na estátua, as sombras retornam às suas posições originais e voltam a ficar adormecidas.</p>
+<p>As sombras ganham a seguinte característica adicional:</p>
+<p><strong><em>Sensibilidade à Luz.</em></strong> A sombra é imune a dano de ácido, frio, fogo, elétrico e trovejante, bem como a dano de concussão, perfurante e cortante, enquanto estiver na escuridão. A sombra é resistente a esses tipos de dano enquanto estiver sob luz fraca, e sofre normalmente esses tipos de dano enquanto estiver sob luz plena.</p>
+<div class="callout callout-combat"><div class="callout-title"><span class="callout-icon">⚔</span><strong>Combate - Sombras</strong></div><div class="callout-body"><p><strong>Nível do Combate</strong>: Esmagador <strong>Nível de Personagem Esperado</strong>: 2 <strong>Consumo de PV Esperado:</strong> 131%</p>
+<p>### <strong>Inimigos:</strong></p>
+<p>| |3 Jogadores | 4 Jogadores | 5 Jogadores | 6 Jogadores | |-|-|-|-|-| | Sombra | 3 | 4 | 5 | 6 |</p></div></div>
+<h3 id="alçapão-oculto">Alçapão Oculto</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 32.</em></span></p>
+<p>Este cômodo é em grande parte como descrito em <span class="citation">Hidden Trapdoor (p. 219)</span>. Quando os jogadores encontram e entram nesta área, leia:</p>
+<div class="description">
+<p>A escadaria de argila termina num patamar apertado. A quase dois metros do chão, um teto meio apodrecido de tábuas bem-encaixadas sustenta um alçapão de madeira fechado que leva a um andar superior. O alçapão está trancado com um ferrolho deste lado.</p>
+</div>
+<h3 id="covil-do-líder-do-culto">Covil do Líder do Culto</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 33.</em></span></p>
+<p>Este cômodo é em grande parte como descrito em <span class="citation">Cult Leaders’ Den (p. 219)</span>. Contudo, remova o <strong>mímico</strong> desta área. Além disso, quando os jogadores entram neste cômodo, leia:</p>
+<div class="description">
+<p>Este cômodo silencioso contém uma mesa de madeira ladeada por duas cadeiras de espaldar alto, sobre a qual repousam um jarro de barro e dois canecos. Acima da mesa pende um lustre de ferro fundido apagado. Castiçais de ferro se erguem em dois cantos da câmara, com suas velas há muito derretidas. Um corredor curto na extremidade norte do cômodo leva a uma câmara escurecida mais adiante.</p>
+</div>
+<h3 id="aposentos-do-líder-do-culto">Aposentos do Líder do Culto</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 34.</em></span></p>
+<p>Este cômodo é em grande parte como descrito em <span class="citation">Cult Leaders’ Quarters (p. 219)</span>. Quando os jogadores entram nele, leia:</p>
+<div class="description">
+<p>Este cômodo contém uma cama grande com estrutura de madeira, cujo colchão de penas apodreceu ao longo de anos de abandono. Um velho guarda-roupa de madeira, entalhado com faces demoníacas, está encostado na parede à esquerda, e um baú de madeira desbotado repousa em silêncio ao pé da cama.</p>
+<p>O cômodo está impregnado de um fedor de morte já familiar — mas muito mais forte, misturado a um odor nocivo que enche os pulmões de vocês a cada respiração.</p>
+</div>
+<p>O guarda-roupa contém várias vestes velhas, um par de castiçais de ferro e um engradado aberto com trinta tochas e um saco de couro com quinze velas dentro. Um aroma pútrido também emana de um par de órgãos apodrecidos — um fígado meio devorado e um intestino roído — escondidos sob as barras das vestes.</p>
+<p>Dobrado dentro do baú, sobre o restante de seu conteúdo, está um <strong>desossado</strong> (<em>boneless</em>) (<span class="citation">Van Richten’s Guide to Ravenloft, p. 228)</span> feito da pele esfolada e reconhecível de Gustav Durst. Quando o baú é aberto, o <strong>desossado</strong> salta para atacar a criatura mais próxima.</p>
+<div class="callout callout-combat"><div class="callout-title"><span class="callout-icon">⚔</span><strong>Combate - Desossado</strong></div><div class="callout-body"><p><strong>Nível do Combate</strong>: Leve <strong>Nível de Personagem Esperado</strong>: 2 <strong>Consumo de PV Esperado:</strong> 15%</p>
+<p>### <strong>Inimigos:</strong></p>
+<p>| |3 Jogadores | 4 Jogadores | 5 Jogadores | 6 Jogadores | |-|-|-|-|-| | Desossado | 1 | 1 | 1 | 1 |</p>
+<p>### <strong>Balanceamento:</strong> Se você tiver menos ou mais de 5 jogadores, modifique o encontro das seguintes formas:</p>
+<p>| Número de Jogadores | Modificação | |-|-| | 3 |  <ul><li>Reduza os pontos de vida do desossado para 16.</li><li>Reduza seu <strong><em>ataque</em></strong> de pancada e sua ação de <strong><em>abraço esmagador</em></strong> para 3 (1d4+1) de dano cada.</li></ul> | | 4 | <ul><li>Reduza os pontos de vida do desossado para 21.</li><li>Reduza seu ataque de <strong><em>pancada</em></strong> e sua ação de <strong><em>abraço esmagador</em></strong> para 4 (1d4+2) de dano cada.</li></ul> | | 6 | <ul><li>Aumente os pontos de vida do desossado para 31.</li><li>Aumente seu ataque de <strong><em>pancada</em></strong> e sua ação de <strong><em>abraço esmagador</em></strong> para 6 (1d6+3) de dano cada.</li></ul> |</p></div></div>
+<p>Nenhum <strong>necrófago</strong> (<em>ghast</em>) ataca se um jogador retirar itens do baú, e não há cavidades ocultas atrás das paredes.</p>
+<h2 id="a2g-a-masmorra">A2g. A Masmorra</h2>
+<h3 id="relicário">Relicário</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 35.</em></span></p>
+<p>Este cômodo é em grande parte como descrito em <span class="citation">Reliquary (p. 219)</span>. Quando os jogadores entram nele, leia:</p>
+<div class="description">
+<p>Os degraus empoeirados de pedra descem além de um patamar e contornam uma curva até terminarem numa câmara retangular e fria. Uma névoa rala e ondulante se agarra ao chão, e as vigas transversais de madeira que sustentam o teto gemem sob o peso da casa e do complexo subterrâneo lá em cima. </p>
+<p>As paredes deste cômodo são recortadas por pequenas alcovas talhadas, cada uma abrigando uma quinquilharia ou relíquia estranha e medonha. Um corredor de teto arriado sai da câmara e faz uma curva para a direita, sumindo de vista. Além dele, vocês conseguem ver uma rampa de pedra que desce até uma água negra e turva. O cântico fantasmagórico que vocês vêm ouvindo desde que entraram no porão é mais forte aqui, e parece emanar do outro lado de uma grade levadiça enferrujada e fechada.</p>
+<p>Vocês finalmente conseguem entender as palavras.</p>
+<p>Elas dizem, repetidas vezes, num refrão incessante:</p>
+<p>"Ele é o Ancião."</p>
+<p>"Ele é a Terra."</p>
+</div>
+<h3 id="prisão">Prisão</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 36.</em></span></p>
+<p>Este cômodo é em grande parte como descrito em <span class="citation">Prison (p. 219)</span>. Quando os jogadores entram nele, leia:</p>
+<div class="description">
+<p>O som de correntes tilintando se mistura a um farfalhar baixo, quase imperceptível, enquanto vocês contornam a curva e entram numa masmorra longa e escura. Grilhões enferrujados pendem pacientemente das paredes, como se esperassem cravar-se na carne de prisioneiros mais uma vez.</p>
+</div>
+<h3 id="grade-levadiça">Grade Levadiça</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 37.</em></span></p>
+<p>Esta área é em grande parte como descrita em <span class="citation">Portcullis (p. 219)</span>. Quando os jogadores se aproximam dela, leia:</p>
+<div class="description">
+<p>O chão está submerso sob sessenta centímetros de água escura e turva que se agita em torno das panturrilhas e das botas de vocês. O túnel à frente está bloqueado por uma grade levadiça de ferro enferrujado. Além de suas barras, vocês distinguem o contorno escuro de uma câmara semissubmersa, um estrado de pedra elevado e uma espessa nuvem de névoa ondulante.</p>
+</div>
+<p>A roda de madeira que abre a grade levadiça permanece do lado oeste do portão (ou seja, do lado voltado para a <a href="#câmara-ritual">Câmara Ritual</a>). Contudo, o mecanismo de correntes que abre a grade quebrou, impedindo os jogadores de prosseguir sem repará-lo (por exemplo, usando o truque _consertar_ de Rose) ou sem erguer a grade à mão. (Se os jogadores erguerem a grade à mão e depois a soltarem, seu peso a faz descer de novo, a menos que seja escorada.)</p>
+<h3 id="câmara-ritual">Câmara Ritual</h3>
+<p><span class="citation"><em>Esta cena ocorre no Apêndice B: Área 38.</em></span></p>
+<p>Este cômodo é em grande parte como descrito em <span class="citation">Ritual Chamber (p. 219)</span>. A água tem 60 cm de profundidade e deve ser tratada como terreno difícil para criaturas Médias ou menores. Subir da piscina para as plataformas também conta como terreno difícil. Quando os jogadores entram no cômodo, leia:</p>
+<div class="description">
+<p>As paredes de alvenaria lisa deste cômodo de doze metros quadrados de lado proporcionam uma acústica excelente. Pilares de pedra sem qualquer ornamento sustentam o teto, e uma água turva cobre a maior parte do chão. Degraus sobem até plataformas secas de pedra que margeiam as paredes. No meio do aposento, mais degraus se erguem formando um estrado octogonal que também se ergue acima da água. Correntes enferrujadas com grilhões pendem do teto, bem acima de um altar de pedra montado sobre o estrado. O altar é entalhado com representações hediondas de carniçais agarrando suas presas e está manchado de sangue seco. Um pequeno embrulho branco jaz sobre ele, cercado por tentáculos carnosos que pulsam.</p>
+<p>Os tentáculos correm até uma brecha na parede do fundo que dá para uma caverna escura, e suas massas carnosas se ligam a uma sombra escura e volumosa que jaz lá dentro, cuja massa inchada sobe e desce num ritmo lento e trêmulo.</p>
+<p>Assim que vocês pisam na câmara, o cântico fantasmagórico que vinham ouvindo silencia de repente.</p>
+</div>
+<p>Um jogador que se aproxime do altar vê que as palavras "ALIMENTEM-NO" estão entalhadas em sua superfície lisa de pedra, logo abaixo do embrulho branco, cercadas por vários tentáculos carnosos incrustados de dentes humanos. Os tentáculos pertencem ao <strong>monte de carne</strong> (veja abaixo), que desperta e ataca se eles forem danificados.</p>
+<p>O embrulho sobre o altar tem o tamanho e o formato de um bebê enrolado em cueiros. Se for desembrulhado, os jogadores descobrem que, na verdade, ele guarda uma adaga serrilhada e enferrujada, manchada de vermelho por sangue antigo.</p>
+<p>A sombra escura na caverna é um <strong>monte de carne</strong> que contém o espírito e os restos mortais de Walter.<sup><a href="https://www.reddit.com/r/CurseofStrahd/comments/8sfpkn/fleshing_out_curse_of_strahd_part_2_entering/">1</a></sup> Trata-se de um montículo inchado e intumescido de ossos, carne e vísceras que parece respirar enquanto sua massa sobe e desce. Um jogador que o observe conclui que ele parece estar dormindo.</p>
+<p>As sombras dos cultistas descritas em <span class="citation">“One Must Die!” (p. 220)</span> não aparecem quando um jogador sobe no altar. Em vez disso, os jogadores têm duas escolhas: sacrificar uma criatura viva no altar ou atacar o monte de carne.</p>
+<p>Se uma criatura for sacrificada no altar, os tentáculos do monte de carne acolhem seu cadáver e o arrastam até o covil do monte. Lá, o monte o devora de forma desleixada antes de devolver seus tentáculos ao altar mais uma vez. Alimentar o monte não liberta os jogadores, porque sua fome não pode ser saciada.</p>
+<p>O monte de carne desperta se for atacado. Quando isso acontece, seu uivo estridente faz a terra tremer, derrubando a <a href="#grade-levadiça">Grade Levadiça</a> com estrondo, caso ela tenha sido aberta, e danificando o mecanismo responsável por erguê-la.</p>
+<p>Em combate, o monte de carne começa em sua primeira forma, <strong>o monte de carne</strong>. Por um minuto após despertar, a característica <strong>_sono pesado_</strong> do monte de carne reduz o poder de suas ações de <strong><em>ataque múltiplo</em></strong> em ambas as formas. Se for atacado enquanto dorme, o monte de carne terá a condição <strong><em>Surpreso</em></strong>.</p>
+<p>Uma criatura engolfada pela primeira forma do monte consegue ouvir o som tênue de um bebê chorando no centro daquela massa inchada.</p>
+<div class="callout callout-item"><div class="callout-title"><span class="callout-icon">✦</span><strong>O Fragmento de Âmbar de Elisabeth</strong></div><div class="callout-body"><p>Um jogador de posse do fragmento de âmbar de Elisabeth, vindo da <strong>Suíte Principal</strong>, pode apresentar o fragmento como uma ação bônus enquanto estiver a até 9 metros do <strong>monte de carne</strong>, pronunciar o nome "Walter" e dar uma ordem breve. Se o jogador passar num teste de Carisma (Intimidação) CD 13, o monte precisa usar imediatamente uma reação, se tiver alguma disponível, para obedecer à ordem, deslocando-se até seu deslocamento para isso, se necessário. O monte não obedece a uma ordem que lhe seja diretamente prejudicial, e pode deixar de seguir a ordem no início de seu turno seguinte. Se não tiver reações disponíveis, o monte pode usar sua ação bônus para obedecer à ordem.</p></div></div>
+<div class="callout callout-warning"><div class="callout-title"><span class="callout-icon">⚠</span><strong>Não Use Táticas!</strong></div><div class="callout-body"><p>Todos os inimigos deste guia, incluindo os monstros-chefe, foram exaustivamente testados e balanceados usando o sistema de construção de encontros Challenge Ratings 2.0. Todos os grandes encontros de chefe, incluindo a luta em duas fases contra o <strong>monte de carne</strong>, foram calibrados para consumir a maior parte ou a totalidade dos pontos de vida dos jogadores, a fim de criar um combate perigoso e emocionante.</p>
+<p>Contudo, esses blocos de estatísticas de chefe têm pontos de vida suficientes e causam dano por rodada (DPR) suficiente para garantir que representem uma ameaça adequada sem qualquer tática ou estratégia especial. Na medida em que tais estratégias existam, elas já foram embutidas no bloco de estatísticas e não exigem nenhum planejamento adicional por parte do Mestre.</p>
+<p>Portanto, a menos que seus jogadores tenham provado ser altamente táticos e/ou otimizados, <strong>evite jogar esses blocos de estatísticas de chefe de forma tática</strong> — porque, se você <em>realmente</em> os jogar assim, é muito provável que cause um TPK. Em vez disso, simplesmente escolha as ações, ações bônus, reações e alvos que proporcionarem mais interesse e emoção na rodada atual.</p></div></div>
+<div class="callout callout-combat"><div class="callout-title"><span class="callout-icon">⚔</span><strong>Combate - Monte de Carne</strong></div><div class="callout-body"><p><strong>Nível do Combate</strong>: 2 encontros Severos consecutivos <strong>Nível de Personagem Esperado</strong>: 2 <strong>Consumo de PV Esperado:</strong> 28% cada, totalizando 56%</p>
+<p>### <strong>Inimigos:</strong></p>
+<p>| |3 Jogadores | 4 Jogadores | 5 Jogadores | 6 Jogadores | |-|-|-|-|-| | Monte de Carne | 1 | 1 | 1 | 1 |</p>
+<p>### <strong>Balanceamento:</strong> Se você tiver menos ou mais de 5 jogadores, modifique o encontro das seguintes formas:</p>
+<p>| Número de Jogadores | Modificação | |-|-| | 3 | <ul><li>Reduza os pontos de vida do monte para 56 em cada fase.</li><li>Reduza o ataque de Pancada da primeira forma para 8 (2d6+1) de dano, ou 6 (2d4+1) de dano enquanto a característica sono pesado estiver ativa.</li><li>Reduza as Lascas de Osso para 3 (1d4+1) de dano.</li><li>Reduza Engolfar para 6 (2d4+1) de dano.</li><li>Reduza o dano do ataque de Tentáculo para 9 (2d6+2), ou 4 (1d4+2) enquanto Sono Pesado estiver ativa.</li><li>Reduza o dano do ataque de Mordida para 7 (2d4+2).</li><li>Reduza o dano do Jato de Vísceras para 5 (2d4).</li></ul> | | 4 | <ul><li>Reduza os pontos de vida do monte para 75 em cada fase.</li><li>Reduza o ataque de Pancada da primeira forma para 11 (2d10+1) de dano, ou 8 (2d6+1) de dano enquanto a característica sono pesado estiver ativa.</li><li>Reduza as Lascas de Osso para 4 (1d6+1) de dano.</li><li>Altere Engolfar para 8 (2d6+1) de dano.</li><li>Reduza o dano do ataque de Tentáculo para 12 (2d10+1), ou 5 (1d8+1) enquanto Sono Pesado estiver ativa.</li><li>Reduza o dano do ataque de Mordida para 9 (2d8+1).</li></ul> | | 6 | <ul><li>Aumente os pontos de vida do monte para 112 em cada fase.</li><li>Aumente o ataque de Pancada da primeira forma para 16 (2d12+3) de dano, ou 12 (2d8+3) de dano enquanto a característica sono pesado estiver ativa.</li><li>Aumente as Lascas de Osso para 6 (1d6+3) de dano.</li><li>Aumente Engolfar para 12 (2d8+3) de dano.</li><li>Aumente o dano do ataque de Tentáculo para 17 (4d6+3), ou 8 (2d4+3) enquanto Sono Pesado estiver ativa.</li><li>Aumente o dano do ataque de Mordida para 14 (2d10+3).</li><li>Aumente o dano do Jato de Vísceras para 9 (2d8).</li></ul> |</p></div></div>
+<div class="statblock">
+<h2>O Monte de Carne</h2>
+<em>Morto-vivo Grande, caótico e mau</em>
+<hr>
+<strong>Classe de Armadura</strong> 15 (armadura natural)
+<br>
+<strong>Pontos de Vida</strong> 93 (11d10 + 33)
+<br>
+<strong>Deslocamento</strong> 6 m
+<hr>
+<table class="ability-table">
+  <thead>
+    <tr>
+      <th>FOR</th>
+      <th>DES</th>
+      <th>CON</th>
+      <th>INT</th>
+      <th>SAB</th>
+      <th>CAR</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>16 (+3)</td>
+      <td>8 (-1)</td>
+      <td>16 (+3)</td>
+      <td>3 (-4)</td>
+      <td>10 (+0)</td>
+      <td>5 (-3)</td>
+    </tr>
+  </tbody>
+</table>
+<hr>
+<strong>Imunidades a Condições</strong> cego, surdo, exaustão, agarrado, caído<br>
+<strong>Sentidos</strong> visão às cegas 18 m, Percepção passiva 10<br>
+<strong>Idiomas</strong> Entende Comum, mas não consegue falá-lo<br>
+<strong>Nível de Desafio</strong> 4, ou 3 quando sua característica <strong><em>sono pesado</em></strong> está ativa.<br>
+<hr>
+<p><strong><em>Lutador de Curta Distância.</em></strong> O monte não tem desvantagem em suas jogadas de ataque à distância quando está a até 1,5 metro de uma criatura hostil.</p>
+<p><strong><em>Sono Pesado.</em></strong> Se qualquer uma das formas do monte esteve inconsciente no último minuto, ela não pode usar seu ataque de <strong><em>pancada</em></strong> mais de uma vez por turno.</p>
+<p><strong><em>Corpo Gosmento.</em></strong> O monte de carne pode se mover através de espaços ocupados por criaturas inimigas, bem como por espaços menores que os de uma criatura Grande. (Ele não pode encerrar seu turno dentro de um espaço ocupado, e provoca ataques de oportunidade normalmente.)</p>
+<p><strong><em>A Defesa do Nascido da Sepultura.</em></strong> Quando o monte cai a 0 pontos de vida, ele expele cada criatura por ele engolfada no momento. (Essas criaturas surgem caídas em um espaço vazio a até 1,5 metro do monte.) O monte de carne se rasga, exibindo a cavidade da caixa torácica que contém Walter e projetando vários tentáculos a partir dela. As estatísticas do monte são então instantaneamente substituídas pelas de sua segunda forma. Sua contagem de iniciativa não muda. O dano excedente não é transferido para a nova forma, mas ele mantém quaisquer condições que tivesse na forma anterior.</p>
+<h3>Ações</h3>
+<p><strong><em>Ataque Múltiplo.</em></strong> O monte de carne faz dois ataques. Ele pode substituir um desses ataques por <strong><em>engolfar</em></strong>. Se sua característica <strong><em>sono pesado</em></strong> estiver ativa, ele não pode usar seu ataque de <strong><em>pancada</em></strong> mais de uma vez, e não pode usar <strong><em>engolfar</em></strong> no mesmo turno em que usa sua <strong><em>pancada</em></strong>.
+<p><strong><em>Pancada.</em></strong> <em>Ataque com Arma Corpo a Corpo:</em> +5 para acertar, alcance 1,5 m, um alvo. <em>Acerto:</em> 14 (2d10 + 3) de dano de concussão, ou 10 (2d6 + 3) de dano de concussão se a característica <strong><em>sono pesado</em></strong> do monte estiver ativa. Se o ataque acertar um alvo Médio ou menor, o alvo fica agarrado (CD para escapar 13).</p>
+<p><strong><em>Lascas de Osso.</em></strong> <em>Ataque com Arma à Distância:</em> +5 para acertar, alcance 6/18 m, até dois alvos a até 1,5 metro um do outro. <em>Acerto:</em> 5 (1d4 + 3) de dano perfurante.
+<p><strong><em>Engolfar.</em></strong> O monte de carne tenta engolfar uma criatura Média ou menor por ele agarrada, forçando essa criatura a fazer um teste de resistência de Força CD 13. Se falhar, o alvo engolfado fica cego, impedido e incapaz de respirar, e precisa passar num teste de resistência de Constituição CD 13 no início de cada um de seus turnos ou sofrer 8 (2d4 + 3) de dano de concussão. Se o monte se mover, o alvo engolfado se move junto. O monte só pode ter uma criatura engolfada por vez. Uma criatura engolfada pode fazer um teste de resistência de Força CD 13 no fim de cada um de seus turnos, libertando-se se for bem-sucedida. (Uma vez livre, a criatura deixa de estar agarrada.)</p>
+<h3>Ações Bônus</h3>
+<p><strong><em>Ruptura.</em></strong> O monte de carne expele uma pústula de carne apodrecida, que atinge um ponto a até 6 metros dele e estoura, borrifando sangue e pus cáusticos em cada criatura a até 1,5 metro. O alvo precisa passar num teste de resistência de Constituição CD 13 ou fica envenenado até o início do próximo turno do monte de carne.</p>
+<p><strong><em>Tremor.</em></strong> O monte de carne se arremessa contra o chão, fazendo o cômodo estremecer. Cada criatura a até 3 metros do monte precisa passar num teste de resistência de Força CD 13 ou cai caída.</p>
+<h3>Reações</h3>
+<p>O monte de carne pode usar até três reações por rodada, mas não mais que uma por turno. Se um efeito ou condição o impediria de usar reações, ele perde uma reação em vez disso.</p>
+<p><strong><em>Indomável.</em></strong> <strong>Gatilho:</strong> Uma criatura hostil encerra seu turno. <strong>Efeito:</strong> O monte de carne pode repetir o teste de resistência contra um efeito ou condição que o esteja afetando. (Esta reação não tem efeito se o efeito ou condição não exigiu originalmente que ele falhasse num teste de resistência.)</p>
+<p><strong><em>Esmagar.</em></strong> Em resposta a sofrer dano de um ataque corpo a corpo, o monte de carne ataca a criatura que o feriu usando <strong><em>Pancada.</em></strong></p>
+<p><strong><em>Rolar.</em></strong> Em resposta a sofrer dano de um ataque à distância ou de uma magia, o monte de carne se desloca até seu deslocamento diretamente na direção do atacante ou para longe dele, sem provocar ataques de oportunidade. Se ele se mover na direção do atacante, pode então tentar imediatamente empurrá-lo.</p>
+</div><br>
+<div class="statblock">
+<h2>Walter, o Nascido da Sepultura</h2>
+<em>Morto-vivo Grande, caótico e mau</em>
+<hr>
+<strong>Classe de Armadura</strong> 15 (armadura natural)
+<br>
+<strong>Pontos de Vida</strong> 93 (11d10 + 33)
+<br>
+<strong>Deslocamento</strong> 6 m
+<hr>
+<table class="ability-table">
+  <thead>
+    <tr>
+      <th>FOR</th>
+      <th>DES</th>
+      <th>CON</th>
+      <th>INT</th>
+      <th>SAB</th>
+      <th>CAR</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>16 (+3)</td>
+      <td>8 (-1)</td>
+      <td>16 (+3)</td>
+      <td>3 (-4)</td>
+      <td>10 (+0)</td>
+      <td>10 (+0)</td>
+    </tr>
+  </tbody>
+</table>
+<hr>
+<strong>Imunidades a Condições</strong> cego, surdo, exaustão, agarrado, caído<br>
+<strong>Sentidos</strong> visão às cegas 18 m, Percepção passiva 10<br>
+<strong>Idiomas</strong> Entende Comum, mas não consegue falá-lo<br>
+<strong>Nível de Desafio</strong> 4, ou 3 quando sua característica <em>sono pesado</em> está ativa.<br>
+<hr>
+<p><strong><em>Sono Pesado.</em></strong> Se qualquer uma das formas do monte esteve inconsciente no último minuto, ela não pode usar seu ataque de <strong><em>tentáculo</em></strong> mais de uma vez por turno.</p>
+<p><strong><em>Corpo Gosmento.</em></strong> O monte de carne pode se mover através de espaços ocupados por criaturas inimigas, bem como por espaços menores que os de uma criatura Grande. (Ele não pode encerrar seu turno dentro de um espaço ocupado, e provoca ataques de oportunidade normalmente.)</p>
+<p><strong><em>Coração Inocente.</em></strong> O centro do monte oculta seu "coração": uma caixa torácica grande e disforme. Dentro dela paira o cadáver do bebê Walter Durst. O cadáver de Walter tem CA 15 e os mesmos valores de habilidade do monte de carne. Cada vez que o cadáver de Walter sofre dano, o monte de carne sofre o dobro de dano.</p>
+<p><strong><em>Canção de Ninar da Mãe.</em></strong> Se um jogador usar sua ação para cantarolar ou tocar a <em>Valsa para Klara</em> e passar num teste de Carisma (Atuação) CD 10, o monte expõe seu coração e não pode usar sua reação <strong><em>recolher</em></strong> até o início do próximo turno do jogador.
+<h3>Ações</h3>
+<p><strong><em>Ataque Múltiplo.</em></strong> O monte de carne faz três ataques, ou dois ataques se sua característica <strong><em>sono pesado</em></strong> estiver ativa.</p>
+<p><strong><em>Tentáculo.</em></strong> <em>Ataque com Arma Corpo a Corpo:</em> +5 para acertar, alcance 4,5 m, um alvo. <em>Acerto:</em> 14 (2d10 + 3) de dano de concussão, ou 7 (1d8 + 3) de dano de concussão se a característica <strong><em>sono pesado</em></strong> do monte estiver ativa. Se o alvo for uma criatura, ela precisa passar num teste de resistência de Força CD 13 ou é puxada até 4,5 metros na direção do monte.</p>
+<p><strong><em>Mordida.</em></strong> <em>Ataque com Arma Corpo a Corpo:</em> +5 para acertar, alcance 1,5 m, um alvo. <em>Acerto:</em> 10 (2d6 + 3) de dano perfurante.</p>
+<h3>Ações Bônus</h3>
+<p><strong><em>Jato de Vísceras.</em></strong> O monte cospe sangue e vísceras num cone de 4,5 metros. Cada criatura naquela área precisa fazer um teste de resistência de Destreza CD 13. Se falhar, a criatura sofre 7 (2d6) de dano necrótico e fica cega até o fim do próximo turno do monte. Se passar, a criatura sofre metade do dano e não fica cega. Usar esta habilidade expõe o coração do monte, permitindo que ele seja atacado.</p>
+<p><strong><em>Lamento.</em></strong> O cadáver do bebê Walter Durst solta um guincho penetrante. Cada criatura que possa ouvir o guincho a até 9 metros do monte precisa passar num teste de resistência de Constituição CD 10 ou sofre 2 (1d4) de dano psíquico e fica surda até o fim do próximo turno do monte. Usar esta habilidade expõe o coração do monte, permitindo que ele seja atacado.</p>
+<h3>Reação</h3>
+<p>O monte de carne pode usar até três reações por rodada, mas não mais que uma por turno. Se um efeito ou condição o impediria de usar reações, ele perde uma reação em vez disso.</p>
+<p><strong><em>Indomável.</em></strong> <strong>Gatilho:</strong> Uma criatura hostil encerra seu turno. <strong>Efeito:</strong> O monte de carne pode repetir o teste de resistência contra um efeito ou condição que o esteja afetando. (Esta reação não tem efeito se o efeito ou condição não exigiu originalmente que ele falhasse num teste de resistência.)</p>
+<p><strong><em>Recolher.</em></strong> Em resposta a um ataque ou magia nociva acertar ou errar seu coração, o monte recolhe o coração para dentro do corpo, ocultando-o da vista e protegendo-o de ataques.</p>
+<p><strong><em>Chicotear.</em></strong> Em resposta a sofrer dano de um ataque corpo a corpo, o monte chicoteia o atacante com um tentáculo. O atacante precisa passar num teste de resistência de Destreza CD 13 ou é empurrado 3 metros para longe. Se o atacante falhar no teste de resistência por 5 ou mais, ele também cai caído.</p>
+<p><strong><em>Rolar.</em></strong> Em resposta a sofrer dano de um ataque à distância ou de uma magia, o monte se desloca até seu deslocamento diretamente na direção do atacante ou para longe dele, sem provocar ataques de oportunidade. Se ele se mover na direção do atacante, pode então tentar imediatamente empurrá-lo.</p>
+</div>
+<h2 id="a2h-fuga-da-death-house">A2h. Fuga da Death House</h2>
+<p>Quando o <strong>monte de carne</strong> morre, os jogadores conseguem ouvir o som da porta da frente da casa se abrindo bem lá em cima, e a tempestade distante que ruge além dela.</p>
+<p>Quando os jogadores começarem a se mover em direção à saída, leia:</p>
+<div class="description">
+<p>Um gemido gutural ecoa pelo ar — e uma aparição aterradora se manifesta diante de vocês: o espírito de Elisabeth Durst, suas feições outrora belas agora grotescamente distorcidas. Seus cabelos antes luxuosos são uma bagunça selvagem e desgrenhada, sua pele tem uma palidez mortal, e seus lábios se retraem para revelar dentes afiados e amarelados. Um fragmento de âmbar reluz de modo ameaçador num cordão em torno de seu pescoço espectral, um filamento sombrio redemoinhando em suas profundezas.</p>
+<p>O espírito levita bem acima do chão, olhos fundos ardendo de malícia e boca torcida num rosnado. "Vocês podem ter escapado do meu bichinho de estimação," ela rosna, "mas vou destruir esta casa antes de deixar vocês fugirem." Ela joga a cabeça para trás e solta um grito de cortar o sangue que reverbera pelas paredes de pedra — e faz os próprios alicerces da casa tremerem.</p>
+<p>Bem no alto, o relógio de pêndulo começa a badalar, o som crescendo até uma cacofonia estrondosa. Poeira e destroços caem enquanto o chão treme sob seus pés, as vigas de madeira do teto começando a rachar e estalar. O espírito de Elisabeth fixa em vocês um sorriso feral — e então se dissipa no ar, deixando apenas ecos de sua risada maldosa enquanto a casa range, se desloca e geme.</p>
+</div>
+<p>Os jogadores precisam fugir da câmara ritual até a <a href="#entrada">Entrada</a> da Death House antes que toda a estrutura desabe sobre suas cabeças. Contudo, eles não precisam rolar iniciativa, e as mudanças arquitetônicas descritas em <span class="citation">The Cult is Denied (p. 220)</span> não estão presentes.</p>
+<p>Em vez disso, ao escaparem da Death House em ruínas, os jogadores enfrentam dois obstáculos adicionais.</p>
+<p><strong><em>O Fantasma de Gustav.</em></strong> Enquanto os jogadores se movem para sair do <a href="#relicário">Relicário</a>, o fantasma de Gustav Durst (utilize as estatísticas de um <strong>poltergeist</strong>, mas sem sua característica <strong><em>invisibilidade</em></strong>) os confronta. Leia:</p>
+<div class="description">
+<p>Uma aparição etérea surge diante de vocês, bloqueando a escada — o fantasma de um homem. Ele é uma figura magra e pálida, com olhos fundos e atormentados e mãos trêmulas, vestindo roupas outrora finas, agora esfarrapadas pelo tempo.</p>
+<p>"Por favor," diz o espírito, lágrimas se formando nos cantos de seus olhos. "Vocês precisam ficar aqui e morrer. Ela não vai aceitar mais nada."</p>
+</div>
+<p>O espírito é reconhecível como Gustav Durst. Gustav implora aos jogadores que desistam, insistindo que o espírito de Elisabeth é simplesmente poderoso demais — assustador demais — para ser desobedecido. Um teste de Sabedoria (Intuição) CD 10 revela que Gustav está aterrorizado por Elisabeth — e tomado pela culpa, pela dúvida e pelo autodesprezo.</p>
+<p>Se os jogadores tentarem passar por Gustav ou atacá-lo, um enxame de detritos e estilhaços levitantes se ergue ao redor dele. Ele implora aos jogadores mais uma vez, insistindo que não quer lutar contra eles, mas que não sabe se tem outra escolha.</p>
+<div class="callout callout-combat"><div class="callout-title"><span class="callout-icon">⚔</span><strong>Combate - Gustav</strong></div><div class="callout-body"><p><strong>Nível do Combate</strong>: Leve <strong>Nível de Personagem Esperado</strong>: 2 <strong>Consumo de PV Esperado:</strong> 28%</p>
+<p>### <strong>Inimigos:</strong></p>
+<p>| |3 Jogadores | 4 Jogadores | 5 Jogadores | 6 Jogadores | |-|-|-|-|-| | Poltergeist | 1 | 1 | 1 | 1 |</p>
+<p>### <strong>Balanceamento:</strong> Se você tiver menos ou mais de 5 jogadores, modifique o encontro das seguintes formas:</p>
+<p>| Número de Jogadores | Modificação | |-|-| | 3 | <ul><li>Reduza os pontos de vida de Gustav para 13.</li><li>Reduza seu ataque de <strong><em>pancada forçada</em></strong> para 6 (3d4-1) de dano de energia, e o ataque de sua ação de <strong><em>arremesso telecinético</em></strong> para 3 (1d6) de dano de concussão.</li></ul> | | 4 | <ul><li>Reduza os pontos de vida de Gustav para 18.</li><li>Reduza seu ataque de <strong><em>pancada forçada</em></strong> para 8 (3d4+1) de dano de energia, e o ataque de sua ação de <strong><em>arremesso telecinético</em></strong> para 4 (1d8) de dano de concussão.</li></ul> | | 6 | <ul><li>Aumente os pontos de vida de Gustav para 26.</li><li>Aumente seu ataque de <strong><em>pancada forçada</em></strong> para 12 (3d6+2) de dano de energia, e o ataque de sua ação de <strong><em>arremesso telecinético</em></strong> para 6 (1d12) de dano de concussão.</li></ul> |</p></div></div>
+<p>Os jogadores podem convencer Gustav a se afastar com um teste de Carisma (Intimidação) CD 20 bem-sucedido. Alternativamente, se os jogadores mencionarem a história de Gustav com Elisabeth e Klara, podem convencê-lo a se afastar com um teste de Carisma (Persuasão) CD 10, tendo sucesso automático se demonstrarem empatia ou gentileza, ou se pedirem aos espíritos de Rose e Thorn que os ajudem em seu apelo.</p>
+<p>Se os jogadores persuadirem Gustav com sucesso a se afastar, ele os avisa que "os outros servos dela" estão à espreita mais adiante para bloquear a fuga dos jogadores. "Não tenham medo deles," ele diz. "O único poder que possuem é o medo." Então ele desaparece.</p>
+<p><strong><em>O Retorno do Culto.</em></strong> Quando os jogadores alcançam pela primeira vez as <a href="#criptas-da-família">Criptas da Família</a> ou (caso já tenham encontrado e aberto o alçapão oculto descrito em <strong>32. Alçapão Oculto</strong>, p. 219) perto do <a href="#santuário-do-senhor-das-trevas">Santuário do Senhor das Trevas</a>, os espíritos do culto se erguem para detê-los. Leia:</p>
+<div class="description">
+<p>O cântico se ergue mais uma vez enquanto treze aparições sombrias surgem ao redor de vocês, bloqueando o caminho à frente — assim como o caminho de volta. Cada uma se assemelha a uma figura encapuzada de preto segurando uma tocha, mas o fogo da tocha é negro e parece sugar a luz para dentro de si. Onde vocês esperariam ver rostos, há apenas vazios. "Ele é o Ancião!" elas cantam, repetidas vezes. "Ele é a Terra!"</p>
+</div>
+<p>As aparições são figuras inofensivas e intangíveis que não podem ser danificadas, repelidas ou dissipadas. Ao fim de cada rodada, cada jogador que permanecer entre as aparições precisa passar num teste de resistência de Destreza CD 10 ou sofre 2 (1d4) de dano de concussão por causa de destroços que caem.</p>
+<div class="callout callout-combat"><div class="callout-title"><span class="callout-icon">⚔</span><strong>Balanceando a Fuga</strong></div><div class="callout-body"><p>Este encontro foi projetado para ser uma ameaça a um grupo de cinco jogadores de 2º nível. Para grupos de tamanho bem menor, modifique o encontro da seguinte forma:</p>
+<ul><li><strong><em>Três Jogadores.</em></strong>  Reduza o dano por rodada para 1 de concussão.</li></ul></div></div>
+<h1 id="a3-fora-da-death-house">A3. Fora da Death House</h1>
+<p>Quando os jogadores saem da Death House, a tempestade lá em cima diminuiu para um mero chuvisco, e a névoa ao redor da casa desapareceu. A noite já caiu há muito tempo, e a lua minguante está alta no céu.</p>
+<p>Para sua maior surpresa, os jogadores agora se encontram numa clareira escura na floresta, no início da <span class="citation">Old Svalich Road (p. 33)</span>, em vez de nas ruas de Daggerford. A estrada segue rumo ao oeste. A leste, ficam bosques escuros e intermináveis repletos pela <span class="citation">Mists of Ravenloft (p. 23)</span>.</p>
+<p>A casa então desaba na terra, deixando para trás um poço escuro e sem fundo. Se os jogadores ainda o tiverem, o fragmento de âmbar de Elisabeth Durst então se desfaz em pó. O poço desaparece na primeira vez em que os jogadores deixarem a clareira.</p>
+<p>Se ainda estiverem possuindo os jogadores, os espíritos de <span class="link-pending" title="Ainda não convertido">Rose</span> e <span class="link-pending" title="Ainda não convertido">Thorn</span> encerram suas possessões. As crianças comentam que os bosques se parecem com a Floresta de Svalich, que outrora cercava seu lar — Barovia. Contudo, as crianças acrescentam que esses bosques em particular lhes são desconhecidos, e que parecem estar longe da vila original de sua família.</p>
+<p>Enquanto os jogadores exploram os arredores, conseguem rapidamente ver o topo de uma torre de pedra antiga e arruinada, despontando por entre as copas das árvores. A arquitetura da torre é como descrita em <span class="citation">Will-o'-Wisp (p. 33)</span>, mas o interior não é terreno profanado, não há um baú de madeira no chão, e não há <strong>zumbis</strong> ou <strong>fogos-fátuos</strong> dentro ou ao redor da torre.</p>
+<p>Os jogadores podem facilmente concluir que essa ruína parece ser um lugar seguro para passar a noite. Rose e Thorn se oferecem para servir como sentinelas enquanto os jogadores descansam, vigiando os bosques e acordando os jogadores caso alguma ameaça surja.</p>
+<p>A noite passa sem incidentes. Quando os jogadores acordam na manhã seguinte, Rose e Thorn perguntam se eles podem enterrar seus restos mortais antes de prosseguir, para que finalmente possam descansar. (Os espíritos das crianças não seguirão adiante em Barovia, implorando em vez disso que os jogadores lhes permitam descansar.) Se os jogadores enterrarem seus restos mortais ali, os espíritos das crianças os agradecem antes de desaparecer.</p>
+<p>Os jogadores conseguem encontrar o início da Old Svalich Road um pouco à frente, através dos bosques, longe da torre. <a href="arco-b-bem-vindo-a-barovia.html">Arco B: Bem-vindo a Barovia</a> então começa.</p>
+<p><strong>_Marco._</strong> Escapar da Death House completa um marco da história. Quando o grupo começar seu primeiro descanso longo após escapar da casa, conceda 400 PX a cada jogador. (Isso deve permitir que os jogadores avancem para o 3º nível.)</p>
+<h1 id="notas-de-design-death-house">Notas de Design: Death House</h1>
+<p><strong><em>A Chegada.</em></strong> As ilusórias Rose e Thorn foram intencionalmente removidas desta versão da Death House para garantir que os jogadores entrem na casa por vontade própria e confiem nas verdadeiras crianças Durst ao conhecê-las.</p>
+<p>A contagem regressiva e o poema foram adicionados para dar aos jogadores um senso claro de direção e propósito enquanto exploram a casa, e para impedir que os jogadores façam um descanso longo (e, assim, perturbem o equilíbrio dos combates subsequentes) enquanto o fazem.</p>
+<p><strong><em>O Primeiro Andar.</em></strong> O banquete na sala de jantar foi tornado intencionalmente inofensivo para incentivar os jogadores a confiar na segurança do convite de jantar de Strahd quando o receberem mais adiante. Pistas adicionais foram acrescentadas para transmitir aos jogadores os relacionamentos dentro da família Durst, incluindo o caso extraconjugal do Sr. Durst.</p>
+<p><strong><em>O Segundo Andar.</em></strong> Pistas foram acrescentadas para facilitar a descoberta do cômodo secreto da biblioteca e para transmitir a profundidade do caso do Sr. Durst, bem como a gravidez da babá.</p>
+<p>O cão Lancelot, um personagem popular na comunidade, foi intencionalmente cortado da Death House para evitar oferecer aos jogadores um sacrifício fácil para fazer no altar da câmara ritual — um sacrifício que não teria mais função (já que o culto não liberta mais os jogadores ao aceitar um sacrifício) e que soaria vazio se comparado à campanha que se segue (já que a "fome" de Strahd não pode ser saciada).</p>
+<p><strong><em>O Terceiro Andar.</em></strong> O espectro da babá agora serve como uma ferramenta vital que permite aos jogadores encontrar a escada do sótão sem frustração ou atraso desnecessários. Pistas adicionais foram acrescentadas para transmitir o destino de Walter, do Sr. Durst e da babá.</p>
+<p><strong><em>O Sótão.</em></strong> Pistas foram acrescentadas para transmitir o destino da babá e a fundação do culto da Sra. Durst.</p>
+<p><strong><em>A Masmorra.</em></strong> Vários dos encontros nesta área foram alterados para reduzir a probabilidade de um TPK e para ensinar os jogadores a agir com cautela e tomar decisões sensatas. Na câmara ritual, o culto não está mais disposto a aceitar o sacrifício de uma besta (como Lancelot, por exemplo), pressagiando que Strahd não se contentará apenas com Ireena. O <strong>monte tropegoso</strong> foi substituído por um <strong>monte de carne</strong> de dois estágios, cujas estatísticas foram calibradas para proporcionar uma luta desafiadora sem arriscar um TPK.</p>
+<p><strong><em>Fuga da Death House.</em></strong> A sequência original de "fuga da Death House" foi substituída por um par de encontros sociais que recompensam os jogadores por investigar a história da casa, e que servem para pressagiar as caracterizações de Sergi von Zarovich, Lady Fiona Wachter e as noivas e servos de Strahd na aventura que está por vir.</p>
+<p>O acréscimo frequente, feito pela comunidade, de um desafio de perícia para escapar da casa foi removido para garantir uma transição suave e simples entre a morte do monte de carne e a saída dos jogadores da casa, para eliminar qualquer atrito com jogadores que possam ter dificuldade em aprender a mecânica de um sistema novo de jogo no calor do momento, e para preservar a imersão dos jogadores na narrativa da fuga, em vez de em sua jogabilidade.</p>
+<p>Este guia intencionalmente deixou de lado um acréscimo popular da comunidade que coloca uma garrafa de vinho — cortesia de Strahd — na saída da casa ou perto dela. Strahd não é onisciente, e os esforços dos jogadores para evitar ou frustrar seus espiões vão se mostrar um aspecto recorrente da jogabilidade ao longo da aventura. Além disso, a Death House fica longe demais de Barovia propriamente dita para que Strahd pudesse ter obtido e entregado uma garrafa de vinho fresca até aquele local. Um vilão é tão evocativo quanto suas limitações, e Strahd tem muitas.</p>
+  </main>
+  <aside class="sidebar-right"><div class="toc-label">Nesta página</div><div class="toc-list"><a class="toc-lvl-1" href="#a1-daggerford">A1. Daggerford</a><a class="toc-lvl-2" href="#a1a-o-freio-do-pesadelo">A1a. O Freio do Pesadelo</a><a class="toc-lvl-1" href="#a2-death-house">A2. Death House</a><a class="toc-lvl-2" href="#a2a-a-chegada">A2a. A Chegada</a><a class="toc-lvl-3" href="#entrada">Entrada</a><a class="toc-lvl-3" href="#salão-principal">Salão Principal</a><a class="toc-lvl-2" href="#a2b-o-primeiro-andar">A2b. O Primeiro Andar</a><a class="toc-lvl-3" href="#guarda-casacos">Guarda-Casacos</a><a class="toc-lvl-3" href="#covil-dos-lobos">Covil dos Lobos</a><a class="toc-lvl-3" href="#sala-de-jantar">Sala de Jantar</a><a class="toc-lvl-3" href="#cozinha-e-despensa">Cozinha e Despensa</a><a class="toc-lvl-2" href="#a2c-o-segundo-andar">A2c. O Segundo Andar</a><a class="toc-lvl-3" href="#salão-superior">Salão Superior</a><a class="toc-lvl-3" href="#quarto-dos-criados">Quarto dos Criados</a><a class="toc-lvl-3" href="#conservatório">Conservatório</a><a class="toc-lvl-3" href="#biblioteca">Biblioteca</a><a class="toc-lvl-3" href="#sala-secreta">Sala Secreta</a><a class="toc-lvl-2" href="#a2d-o-terceiro-andar">A2d. O Terceiro Andar</a><a class="toc-lvl-3" href="#sacada">Sacada</a><a class="toc-lvl-3" href="#suíte-principal">Suíte Principal</a><a class="toc-lvl-3" href="#banheiro">Banheiro</a><a class="toc-lvl-3" href="#depósito">Depósito</a><a class="toc-lvl-3" href="#suíte-da-babá">Suíte da Babá</a><a class="toc-lvl-2" href="#a2e-o-sótão">A2e. O Sótão</a><a class="toc-lvl-3" href="#salão-do-sótão">Salão do Sótão</a><a class="toc-lvl-3" href="#quarto-vago">Quarto Vago</a><a class="toc-lvl-3" href="#quarto-das-crianças">Quarto das Crianças</a><a class="toc-lvl-3" href="#depósito-2">Depósito</a><a class="toc-lvl-3" href="#quarto-de-hóspedes">Quarto de Hóspedes</a><a class="toc-lvl-3" href="#escada-secreta">Escada Secreta</a><a class="toc-lvl-2" href="#a2f-o-porão">A2f. O Porão</a><a class="toc-lvl-3" href="#criptas-da-família">Criptas da Família</a><a class="toc-lvl-3" href="#aposentos-dos-iniciados-do-culto">Aposentos dos Iniciados do Culto</a><a class="toc-lvl-3" href="#poço-e-aposentos-dos-cultistas">Poço e Aposentos dos Cultistas</a><a class="toc-lvl-3" href="#fosso-de-espinhos-oculto">Fosso de Espinhos Oculto</a><a class="toc-lvl-3" href="#salão-de-banquetes">Salão de Banquetes</a><a class="toc-lvl-3" href="#despensa">Despensa</a><a class="toc-lvl-3" href="#encontro-macabro">Encontro Macabro</a><a class="toc-lvl-3" href="#escadaria-descendente">Escadaria Descendente</a><a class="toc-lvl-3" href="#santuário-do-senhor-das-trevas">Santuário do Senhor das Trevas</a><a class="toc-lvl-3" href="#alçapão-oculto">Alçapão Oculto</a><a class="toc-lvl-3" href="#covil-do-líder-do-culto">Covil do Líder do Culto</a><a class="toc-lvl-3" href="#aposentos-do-líder-do-culto">Aposentos do Líder do Culto</a><a class="toc-lvl-2" href="#a2g-a-masmorra">A2g. A Masmorra</a><a class="toc-lvl-3" href="#relicário">Relicário</a><a class="toc-lvl-3" href="#prisão">Prisão</a><a class="toc-lvl-3" href="#grade-levadiça">Grade Levadiça</a><a class="toc-lvl-3" href="#câmara-ritual">Câmara Ritual</a><a class="toc-lvl-2" href="#a2h-fuga-da-death-house">A2h. Fuga da Death House</a><a class="toc-lvl-1" href="#a3-fora-da-death-house">A3. Fora da Death House</a><a class="toc-lvl-1" href="#notas-de-design-death-house">Notas de Design: Death House</a></div></aside>
+</div>
+<script>
+document.querySelectorAll('.search-box input').forEach(function(inp){
+  inp.addEventListener('input', function(){
+    var q = inp.value.trim().toLowerCase();
+    var sidebar = inp.closest('.sidebar-left');
+    if (!q) { sidebar.classList.remove('filtering'); return; }
+    sidebar.classList.add('filtering');
+    sidebar.querySelectorAll('.tree .leaf').forEach(function(a){
+      var hit = a.textContent.toLowerCase().indexOf(q) !== -1;
+      a.classList.toggle('match', hit);
+    });
+    sidebar.querySelectorAll('.tree > details').forEach(function(d){
+      var hasMatch = d.querySelector('.leaf.match');
+      d.classList.toggle('has-match', !!hasMatch);
+    });
+  });
+});
+var mobileBtn = document.querySelector('.mobile-topbar button');
+if (mobileBtn) {
+  mobileBtn.addEventListener('click', function(){
+    document.querySelector('.sidebar-left').classList.toggle('open');
+  });
+}
+</script>
+</body>
+</html>

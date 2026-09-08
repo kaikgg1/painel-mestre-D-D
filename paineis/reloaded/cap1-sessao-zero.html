@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1c1c1e">
+<link rel="icon" type="image/svg+xml" href="../../assets/img/favicon.svg">
+<title>Sessão Zero — Curse of Strahd: Reloaded</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+* { box-sizing:border-box; }
+:root {
+  --bg:#1c1c1e; --bg-sidebar:#1a1a1c; --bg-hover:#252528; --bg-card:#232325;
+  --border:#333336;
+  --gold:#e0a542; --gold-dim:#b8863a;
+  --active:#a78bfa; --active-dim:#8a6fd8;
+  --text:#dcdcdd; --text-dim:#9a9a9d; --text-faint:#6e6e72;
+  --title:#f2f1ee;
+}
+* { scrollbar-color: #48484c var(--bg-sidebar); scrollbar-width: thin; }
+html, body { margin:0; min-height:100vh; background:var(--bg);
+  font-family:'Inter', system-ui, -apple-system, sans-serif; color:var(--text); }
+a { color:var(--gold); text-decoration:none; }
+a:hover { text-decoration:underline; }
+
+.layout { display:flex; min-height:100vh; align-items:stretch; }
+
+/* ---------- barra lateral esquerda ---------- */
+.sidebar-left { width:290px; flex:0 0 290px; background:var(--bg-sidebar);
+  border-right:1px solid var(--border); padding:22px 18px 40px;
+  position:sticky; top:0; height:100vh; overflow-y:auto; }
+.brand { font-size:19px; font-weight:800; color:var(--gold); line-height:1.25;
+  margin-bottom:14px; text-decoration:none; display:block; }
+.brand:hover { text-decoration:none; opacity:.9; }
+.search-box { position:relative; margin-bottom:16px; }
+.search-box input { width:100%; padding:8px 10px 8px 30px; border-radius:6px;
+  border:1px solid var(--border); background:var(--bg-card); color:var(--text);
+  font-family:inherit; font-size:13px; }
+.search-box input::placeholder { color:var(--text-faint); }
+.search-box input:focus { outline:none; border-color:var(--gold-dim); }
+.search-box .ico { position:absolute; left:9px; top:50%; transform:translateY(-50%);
+  color:var(--text-faint); font-size:13px; pointer-events:none; }
+.tree { font-size:14px; }
+.tree details { margin-bottom:1px; }
+.tree summary { list-style:none; cursor:pointer; padding:6px 8px; border-radius:6px;
+  color:var(--text); display:flex; align-items:center; gap:6px; user-select:none; }
+.tree summary::-webkit-details-marker { display:none; }
+.tree summary:hover { background:var(--bg-hover); }
+.tree summary .chev { display:inline-block; font-size:10px; color:var(--text-faint);
+  transition:transform .15s; width:10px; }
+.tree details[open] > summary .chev { transform:rotate(90deg); }
+.tree .leaf-list { padding-left:20px; margin-top:1px; }
+.tree .leaf { display:block; padding:6px 8px; border-radius:6px; font-size:13.5px;
+  color:var(--text-dim); }
+.tree .leaf:hover { background:var(--bg-hover); color:var(--text); text-decoration:none; }
+.tree .leaf.active { color:var(--active); font-weight:600; background:rgba(167,139,250,.1); }
+.tree .leaf.locked { color:var(--text-faint); cursor:default; font-style:italic; }
+.tree .leaf.locked:hover { background:none; }
+.tree .no-match { display:none; }
+.sidebar-left.filtering .tree .leaf { display:none; }
+.sidebar-left.filtering .tree .leaf.match { display:block; }
+.sidebar-left.filtering .tree details { display:none; }
+.sidebar-left.filtering .tree details.has-match { display:block; }
+.sidebar-left.filtering .tree details.has-match > summary .chev { transform:rotate(90deg); }
+
+/* ---------- coluna central ---------- */
+main.article { flex:1 1 auto; min-width:0; max-width:760px; margin:0 auto;
+  padding:48px 40px 100px; line-height:1.7; font-size:16.5px; }
+.page-title { font-size:clamp(28px,4vw,38px); font-weight:800; color:var(--title);
+  margin:0 0 28px; letter-spacing:-.3px; }
+main.article h1 { color:var(--gold); font-size:26px; font-weight:700;
+  margin:36px 0 14px; scroll-margin-top:24px; letter-spacing:-.2px; }
+main.article h1:first-child { margin-top:0; }
+main.article h2 { color:var(--gold); font-size:21px; font-weight:700;
+  margin:30px 0 12px; scroll-margin-top:24px; }
+main.article h3 { color:var(--title); font-size:18px; font-weight:700;
+  margin:24px 0 10px; scroll-margin-top:24px; }
+main.article h4 { color:var(--text-dim); font-size:14px; font-weight:700;
+  text-transform:uppercase; letter-spacing:.5px; margin:20px 0 8px; scroll-margin-top:24px; }
+main.article p { margin:0 0 15px; color:var(--text); }
+main.article ul { margin:0 0 15px; padding-left:24px; }
+main.article li { margin-bottom:6px; }
+main.article a { border-bottom:1px solid rgba(224,165,66,.35); }
+main.article a:hover { border-bottom-color:var(--gold); text-decoration:none; }
+main.article em { color:var(--text); font-style:italic; }
+main.article strong { color:var(--title); font-weight:700; }
+main.article hr { border:0; border-top:1px solid var(--border); margin:20px 0; }
+.link-pending { color:var(--text-faint); font-style:italic; border-bottom:1px dotted var(--text-faint); cursor:default; }
+.reloaded-img { max-width:100%; border-radius:8px; border:1px solid var(--border); margin:16px 0; display:block; }
+
+span.citation { font-style:italic; color:var(--text-dim); }
+span.highlight { color:var(--gold); font-weight:600; }
+span.credit { font-size:12px; color:var(--text-faint); display:block; margin-top:4px; }
+
+div.description { background:var(--bg-card); border-left:3px solid var(--active-dim);
+  border-radius:0 8px 8px 0; padding:16px 20px; margin:18px 0; font-style:italic; color:var(--text); }
+div.description p:last-child { margin-bottom:0; }
+
+.callout { border:1px solid var(--border); border-left:4px solid var(--gold-dim);
+  border-radius:0 8px 8px 0; background:rgba(224,165,66,.06); margin:18px 0; padding:14px 18px; }
+.callout-title { font-weight:700; color:var(--gold); font-size:13px; letter-spacing:.3px;
+  text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+.callout-icon { font-size:14px; }
+.callout-body p:last-child { margin-bottom:0; }
+.callout-body { font-size:16px; }
+.callout-warning { border-left-color:#e2645a; background:rgba(226,100,90,.08); }
+.callout-warning .callout-title { color:#f08078; }
+.callout-combat { border-left-color:#e2645a; background:rgba(226,100,90,.1); }
+.callout-combat .callout-title { color:#f08078; }
+.callout-lore, .callout-abstract { border-left-color:#5f9bd8; background:rgba(95,155,216,.08); }
+.callout-lore .callout-title, .callout-abstract .callout-title { color:#7fb4e8; }
+.callout-profile { border-left-color:var(--active-dim); background:rgba(167,139,250,.08); }
+.callout-profile .callout-title { color:var(--active); }
+.callout-item { border-left-color:#4fb86a; background:rgba(79,184,106,.08); }
+.callout-item .callout-title { color:#6fce88; }
+.callout-design { border-left-color:var(--text-faint); background:rgba(158,158,162,.06); }
+.callout-design .callout-title { color:var(--text-dim); }
+.callout-tip { border-left-color:var(--gold); }
+
+.table-wrap { overflow-x:auto; margin:18px 0; }
+table.md-table { border-collapse:collapse; width:100%; font-size:15px; }
+table.md-table th, table.md-table td { border:1px solid var(--border); padding:8px 11px; text-align:left; }
+table.md-table th { background:var(--bg-card); color:var(--gold); font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; }
+
+div.statblock { background:var(--bg-card); border:1px solid var(--border);
+  border-left:3px solid var(--active-dim); border-radius:8px; padding:18px 22px; margin:20px 0; }
+div.statblock h2 { color:var(--title); font-size:20px; font-weight:800; margin:0 0 2px; }
+div.statblock > em:first-of-type { display:block; font-style:italic; color:var(--text-dim); margin-bottom:10px; }
+div.statblock hr { border-top:1px solid var(--border); margin:11px 0; }
+div.statblock h3 { color:var(--gold); font-size:14px; font-weight:700;
+  text-transform:uppercase; letter-spacing:.5px; margin:16px 0 7px; }
+div.statblock p { margin:0 0 9px; font-size:15px; }
+div.statblock table.ability-table { width:100%; border-collapse:collapse; margin:9px 0; }
+div.statblock table.ability-table th, div.statblock table.ability-table td {
+  border:1px solid var(--border); text-align:center; padding:6px 4px; font-size:14px; }
+div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-weight:700; }
+
+/* ---------- coluna direita: sumario ---------- */
+.sidebar-right { width:250px; flex:0 0 250px; padding:48px 20px 40px 0;
+  position:sticky; top:0; height:100vh; overflow-y:auto; }
+.toc-label { font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+  color:var(--text-faint); margin-bottom:12px; }
+.toc-list { font-size:13px; }
+.toc-list a { display:block; padding:4px 0; color:var(--text-dim); border-bottom:none;
+  line-height:1.4; }
+.toc-list a:hover { color:var(--text); text-decoration:none; }
+.toc-lvl-1 { padding-left:0; font-weight:600; }
+.toc-lvl-2 { padding-left:12px; }
+.toc-lvl-3 { padding-left:24px; }
+.toc-lvl-4 { padding-left:36px; font-size:12px; }
+
+/* ---------- pagina indice ---------- */
+.idx-intro { margin-bottom:8px; }
+.idx-intro h1 { font-size:clamp(26px,4vw,36px); font-weight:800; color:var(--gold); margin-bottom:10px; }
+.idx-intro p { color:var(--text-dim); font-size:15px; max-width:640px; }
+.idx-section { margin:34px 0; }
+.idx-section-title { font-size:13px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+  color:var(--text-dim); border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:14px; }
+.idx-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:12px; }
+.idx-card { display:block; background:var(--bg-card); border:1px solid var(--border);
+  border-radius:8px; padding:14px 16px; font-weight:600; font-size:14.5px; color:var(--text);
+  transition:border-color .15s, transform .15s; }
+.idx-card:hover { border-color:var(--gold-dim); transform:translateY(-2px); text-decoration:none; }
+.idx-card.locked { opacity:.45; cursor:default; border-style:dashed; }
+.idx-card.locked:hover { transform:none; }
+.idx-badge { display:block; margin-top:5px; font-size:10px; letter-spacing:.5px; text-transform:uppercase; color:var(--text-faint); font-weight:400; }
+
+/* ---------- mobile ---------- */
+.mobile-topbar { display:none; }
+@media (max-width:1100px) {
+  .sidebar-right { display:none; }
+}
+@media (max-width:860px) {
+  .layout { flex-direction:column; }
+  .mobile-topbar { display:flex; align-items:center; gap:12px; position:sticky; top:0; z-index:40;
+    background:var(--bg-sidebar); border-bottom:1px solid var(--border); padding:12px 16px; }
+  .mobile-topbar .brand { margin:0; font-size:15px; flex:1; }
+  .mobile-topbar button { background:none; border:1px solid var(--border); color:var(--text);
+    border-radius:6px; padding:6px 10px; font-family:inherit; font-size:13px; }
+  .sidebar-left { position:fixed; left:0; top:49px; bottom:0; z-index:39; transform:translateX(-100%);
+    transition:transform .2s; width:82vw; max-width:320px; box-shadow:8px 0 30px rgba(0,0,0,.5); }
+  .sidebar-left.open { transform:translateX(0); }
+  main.article { padding:28px 18px 70px; max-width:100%; }
+}
+</style>
+</head>
+<body>
+<div class="mobile-topbar">
+  <button aria-label="Abrir menu">☰</button>
+  <a class="brand" href="index.html">Curse of Strahd: Reloaded</a>
+</div>
+<div class="layout">
+  <aside class="sidebar-left">
+    <a class="brand" href="index.html">Curse of Strahd:<br>Reloaded</a>
+    <div class="search-box"><span class="ico">🔍</span><input type="text" placeholder="Buscar página..." aria-label="Buscar página"></div>
+    <nav class="tree"><details><summary><span class="chev">▸</span>Introdução</summary><div class="leaf-list"><a class="leaf" href="introducao-usando-este-guia.html">Usando Este Guia</a><a class="leaf" href="introducao-guia-do-mestre.html">Guia do Mestre</a><a class="leaf" href="introducao-changelog.html">Changelog</a></div></details><details open><summary><span class="chev">▸</span>Capítulo 1 — Iniciando a Campanha</summary><div class="leaf-list"><a class="leaf active" href="cap1-sessao-zero.html">Sessão Zero</a><a class="leaf" href="cap1-criacao-de-personagem.html">Criação de Personagem</a></div></details><details><summary><span class="chev">▸</span>Capítulo 2 — A Terra de Barovia</summary><div class="leaf-list"><a class="leaf" href="cap2-lore-de-barovia.html">Lore de Barovia</a><a class="leaf" href="cap2-historia-de-barovia.html">História de Barovia</a><a class="leaf" href="cap2-strahd-von-zarovich.html">Strahd von Zarovich</a></div></details><details><summary><span class="chev">▸</span>Capítulo 3 — Conduzindo o Jogo</summary><div class="leaf-list"><a class="leaf" href="cap3-resumo-da-aventura.html">Resumo da Aventura</a><a class="leaf" href="cap3-conduzindo-a-aventura.html">Conduzindo a Aventura</a></div></details><details><summary><span class="chev">▸</span>Ato I — Adentrando as Névoas</summary><div class="leaf-list"><a class="leaf" href="ato1-resumo.html">Resumo do Ato I</a><a class="leaf" href="arco-a-fuga-da-death-house.html">Arco A — Fuga da Death House</a><a class="leaf" href="arco-b-bem-vindo-a-barovia.html">Arco B — Bem-vindo a Barovia</a><a class="leaf" href="arco-c-adentrando-o-vale.html">Arco C — Adentrando o Vale</a></div></details><details><summary><span class="chev">▸</span>Ato II — A Cidade Sombria</summary><div class="leaf-list"><span class="leaf locked">Resumo do Ato II</span><span class="leaf locked">Arco D — A Festa de St. Andral</span><span class="leaf locked">Arco E — A Vistana Desaparecida</span><span class="leaf locked">Arco F — O Desejo de Lady Wachter</span><span class="leaf locked">Arco G — Os Irmãos Strazni</span><span class="leaf locked">Arco H — A Alma Perdida</span><span class="leaf locked">Arco I — As Muralhas de Krezk</span></div></details><details><summary><span class="chev">▸</span>Ato III — A Terra Partida</summary><div class="leaf-list"><span class="leaf locked">Resumo do Ato III</span><span class="leaf locked">Arco J — A Gema Roubada</span><span class="leaf locked">Arco K — A Abadia Decaída</span><span class="leaf locked">Arco L — O Covil dos Lobos</span><span class="leaf locked">Arco M — A Mansão do Dragão</span><span class="leaf locked">Arco O — Jantar com o Diabo</span><span class="leaf locked">Arco P — O Assalto a Ravenloft</span><span class="leaf locked">Arco Q — Um Farol Reluzente</span></div></details><details><summary><span class="chev">▸</span>Ato IV — Segredos do Ancião</summary><div class="leaf-list"><span class="leaf locked">Resumo do Ato IV</span><span class="leaf locked">Arco R — Provações da Montanha</span><span class="leaf locked">Arco S — Uma Espada de Luz Solar</span><span class="leaf locked">Arco T — Os Três Fanes</span><span class="leaf locked">Arco U — Sonhos da Alvorada</span><span class="leaf locked">Epílogo</span></div></details><details><summary><span class="chev">▸</span>Apêndices</summary><div class="leaf-list"><span class="leaf locked">Fragmentos de Âmbar</span><span class="leaf locked">Bestiário</span><span class="leaf locked">Glossário</span><span class="leaf locked">Personagens Não Jogadores</span></div></details></nav>
+    <div style="margin-top:18px"><a href="../painel_barovia_dnd5e.html" style="font-size:12px;color:var(--text-faint)">← Voltar ao Painel</a></div>
+  </aside>
+  <main class="article">
+    <div class="page-title">Sessão Zero</div>
+<h1 id="definindo-expectativas">Definindo Expectativas</h1>
+<p>Antes de começar a campanha, você deve estabelecer as seguintes expectativas com seus jogadores:</p>
+<ul><li><strong><em>Tom</em></strong>. Esta será uma aventura de fantasia heroica ambientada num cenário de fantasia sombria/horror gótico. Seu personagem deve ser um herói, ou ter o potencial de rapidamente se tornar um herói quando confrontado com uma situação de vida ou morte. Esteja preparado para cooperar e colaborar com os outros jogadores a fim de ter sucesso.</li><li><strong><em>Tema</em></strong>. Embora esta campanha não explore ou se concentre na história de fundo pessoal do seu personagem, você deve permitir que os personagens e o cenário da campanha inspirem seu personagem a confrontar seus próprios arrependimentos, traumas, defeitos e medos.</li><li><strong><em>Envolvimento</em></strong>. Esta campanha se passa num cenário com uma história profunda, incluindo relacionamentos complexos entre várias dezenas de personagens não-jogadores. Você deve esperar tomar notas e ter um interesse sincero na lore deste mundo.</li><li><strong><em>Táticas e Dificuldade</em></strong>. Esta campanha foi balanceada para apresentar uma experiência de jogo desafiadora, porém justa. No entanto, para ter sucesso, você frequentemente precisará recrutar aliados adicionais enquanto evita alienar inimigos em potencial. Considere cuidadosamente as consequências de suas ações, e evite agir sem uma reflexão cuidadosa.</li><li><strong><em>Interpretação</em></strong>. Esta campanha é impulsionada principalmente pelas histórias de seus personagens não-jogadores, e por seus relacionamentos com o grupo. Esteja preparado para formar relacionamentos significativos com os personagens que encontrar, e permita-se investir emocionalmente no sucesso desses personagens.</li><li><strong><em>Recompensas</em></strong>. Tesouros, itens mágicos e outras recompensas materiais serão muito mais escassos do que numa campanha de fantasia comum. Em vez disso, a maioria das recompensas assumirá a forma de aliados, informações e novos ganchos de história, com pontos de experiência concedidos por marcos narrativos que você alcançar ao longo da campanha.</li><li><strong><em>Narrativa</em></strong>. A campanha começa com uma estrutura linear, mas logo evolui para um sandbox mais expansivo. Esteja preparado para equilibrar e priorizar diversas missões, incluindo muitas com prazos claros.</li></ul>
+<h1 id="gatilhos-e-acomodações">Gatilhos e Acomodações</h1>
+<p>Nosso objetivo é criar uma experiência de horror gótico memorável e agradável para todos os envolvidos. Para isso, é essencial abordar quaisquer tópicos potencialmente desconfortáveis ou controversos antes de começar sua aventura de <em>Curse of Strahd</em>. Durante a Sessão Zero, encorajamos uma comunicação aberta e honesta com seus jogadores sobre seus limites pessoais e quaisquer elementos da campanha que possam exigir modificação ou remoção.</p>
+<p>Uma lista de tópicos potencialmente desconfortáveis que você pode querer discutir com seus jogadores antes de começar a campanha inclui:</p>
+<ul><li>Abuso e morte infantil (por exemplo, as crianças Durst)</li><li>Tortura e mutilação (por exemplo, as orelhas decepadas de Kasimir)</li><li>Controle mental (por exemplo, a habilidade de <strong><em>enfeitiçar</em></strong> de Strahd)</li><li>Incesto (implícito) (por exemplo, os Belview)</li><li>Perseguição obsessiva e agressão sexual (simbólica) (por exemplo, a obsessão de Strahd por Ireena)</li><li>Suicídio (por exemplo, a morte de Tatyana)</li><li>Vício em drogas (por exemplo, os pastéis dos sonhos)</li><li>Horror corporal (por exemplo, os dons sombrios dos vestígios)</li><li>Racismo (por exemplo, as visões baroveses sobre os vistani)</li></ul>
+<h1 id="contrato-da-campanha">Contrato da Campanha</h1>
+<p>Para garantir que todos os jogadores estejam alinhados ao começar a campanha, considere pedir que cada jogador revise e/ou assine o seguinte "contrato da campanha" durante a Sessão Zero:</p>
+<div class="description">
+<p>Eu, <strong>&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;&#95;</strong>, entendo e concordo com as seguintes expectativas:</p> 
+<ul> 
+<li>Eu vou criar e interpretar um personagem que seja — embora potencialmente falho — (a) ativamente heroico; ou (b) um personagem sociável e cooperativo que inevitável e ativamente começa a crescer rumo ao heroísmo dentro das primeiras cinco sessões.</li>
+<li>Eu vou permitir que meu personagem sinta um medo verdadeiro e impotente quando confrontado com uma ameaça esmagadora, e vou permitir que esse medo afete as ações, o crescimento e o desenvolvimento do meu personagem.</li>
+<li>Eu vou fazer todo esforço razoável para construir relacionamentos significativos de curto e longo prazo com NPCs, e vou me permitir investir emocionalmente em suas vidas e objetivos.</li> 
+<li>Esta campanha exige alianças e cooperação com NPCs e outros jogadores, em vez de paranoia ou comportamento antissocial.</li> 
+<li>O Mestre não vai tentar me enganar, e vai me dar uma chance justa de evitar situações ruins por meio de indícios claros. No entanto, os NPCs vão reter informações não essenciais sobre lore e personagens, a menos que sejam especificamente solicitadas.</li>
+<li>Esta campanha vai se concentrar, em grande parte, em encontros sociais, investigações e exploração, e combates podem ocorrer com uma frequência tão baixa quanto uma vez a cada duas ou três sessões.</li> 
+<li>Tesouros, itens mágicos e componentes de magia caros serão raros e obtidos com pouca frequência, sendo que a maioria das recompensas assumirá a forma de relacionamentos e alianças com NPCs amigáveis.</li>
+<li>Esta campanha vai se passar num cenário de "peixe fora d'água", e elementos da história de fundo do meu personagem não vão aparecer nem ser referenciados diretamente na campanha.</li>
+<li>É de minha exclusiva responsabilidade colaborar com o Mestre e os outros jogadores para dar ao meu personagem um arco emocional interno, caso eu deseje.</li> 
+<li>Alguns inimigos poderosos serão impossíveis de derrotar por meio de combate, e precisaremos ganhar níveis, aliados ou recursos para conseguir fazê-lo.</li>
+<li>As tendências e a moralidade das criaturas nem sempre serão determinadas por sua espécie ou tipo. Alguns monstros podem ser neutros, ou até mesmo amigáveis, enquanto alguns humanoides podem ser monstruosamente irredimíveis.</li>
+<li>O Mestre balanceou todos os combates esperados para tornar um TPK improvável, a menos que tomemos decisões ruins; caso um TPK ocorra, o grupo pode ter a oportunidade de "falhar para frente" e continuar a campanha, ainda que com consequências severas.</li> 
+<li>Esta campanha alterou as estatísticas de muitos monstros oficiais de D&D 5e, e introduziu mecânicas adicionais ou estatísticas alteradas para outros inimigos, a fim de criar uma experiência de combate equilibrada e de alta tensão que pode diferir do <em>Monster Manual</em> e de outros suplementos oficiais.</li>
+<li>Eu não vou procurar nenhuma informação, arte, vídeo ou outra mídia relevante a Curse of Strahd, nem qualquer personagem, localização ou lore dentro da campanha.</li> 
+</ul>
+</div>
+<div class="callout callout-warning"><div class="callout-title"><span class="callout-icon">⚠</span><strong>Quebrando a Quarta Parede</strong></div><div class="callout-body"><p>Às vezes, um jogador vai agir de uma forma que parece quebrar o <a href="#contrato-da-campanha">Contrato da Campanha</a>. (Por exemplo, um jogador frustrado, afobado ou desconfiado pode planejar atacar e matar um NPC que poderia ser aliado ou tornar-se amigo.) Quando isso acontecer, não hesite em pausar o jogo, lembrar o jogador da cláusula relevante do contrato da campanha, e garantir que todos estejam alinhados antes de retomar o jogo.</p></div></div>
+  </main>
+  <aside class="sidebar-right"><div class="toc-label">Nesta página</div><div class="toc-list"><a class="toc-lvl-1" href="#definindo-expectativas">Definindo Expectativas</a><a class="toc-lvl-1" href="#gatilhos-e-acomodações">Gatilhos e Acomodações</a><a class="toc-lvl-1" href="#contrato-da-campanha">Contrato da Campanha</a></div></aside>
+</div>
+<script>
+document.querySelectorAll('.search-box input').forEach(function(inp){
+  inp.addEventListener('input', function(){
+    var q = inp.value.trim().toLowerCase();
+    var sidebar = inp.closest('.sidebar-left');
+    if (!q) { sidebar.classList.remove('filtering'); return; }
+    sidebar.classList.add('filtering');
+    sidebar.querySelectorAll('.tree .leaf').forEach(function(a){
+      var hit = a.textContent.toLowerCase().indexOf(q) !== -1;
+      a.classList.toggle('match', hit);
+    });
+    sidebar.querySelectorAll('.tree > details').forEach(function(d){
+      var hasMatch = d.querySelector('.leaf.match');
+      d.classList.toggle('has-match', !!hasMatch);
+    });
+  });
+});
+var mobileBtn = document.querySelector('.mobile-topbar button');
+if (mobileBtn) {
+  mobileBtn.addEventListener('click', function(){
+    document.querySelector('.sidebar-left').classList.toggle('open');
+  });
+}
+</script>
+</body>
+</html>

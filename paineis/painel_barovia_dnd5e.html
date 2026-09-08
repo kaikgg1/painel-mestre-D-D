@@ -882,6 +882,7 @@
   <button onclick="descansoLongo()" id="btn-descanso-global" style="display:none" aria-label="Aplicar descanso longo a todos"><span data-ico="noite" aria-hidden="true"></span> Descanso Longo</button>
   <button type="button" onclick="abrirNotasMestre({ chave: 'barovia', titulo: 'Maldição de Strahd' })" id="btn-notas-mestre" style="display:none" aria-label="Abrir anotações do mestre"><span data-ico="notas" aria-hidden="true"></span> Anotações</button>
   <a href="vilao/index.html" id="link-vilao" class="back-link" style="display:none;text-decoration:none" aria-label="Abrir fichas de vilão"><span data-ico="vampiro" aria-hidden="true"></span> Vilões</a>
+  <a href="reloaded/index.html" id="link-reloaded" class="back-link" style="display:none;text-decoration:none" aria-label="Abrir guia Curse of Strahd: Reloaded"><span data-ico="grimorio" aria-hidden="true"></span> Reloaded</a>
   <button onclick="window.print()" aria-label="Imprimir painel"><span data-ico="imprimir" aria-hidden="true"></span> Imprimir</button>
   <span class="auth-slot" id="auth-slot" aria-label="Status de login" style="margin-left:auto;display:flex;gap:8px;align-items:center;font-family:'Cinzel',serif;font-size:11px"></span>
 </nav>
@@ -1761,7 +1762,7 @@ async function descansoLongo() {
     ehMestre = r.ehMestre;
     // Botões exclusivos do Mestre na toolbar
     if (ehMestre) {
-      ['btn-adicionar','btn-descanso-global','btn-notas-mestre','link-vilao'].forEach(id => {
+      ['btn-adicionar','btn-descanso-global','btn-notas-mestre','link-vilao','link-reloaded'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.style.display = '';
       });

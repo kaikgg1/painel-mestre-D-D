@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1c1c1e">
+<link rel="icon" type="image/svg+xml" href="../../assets/img/favicon.svg">
+<title>Guia do Mestre — Curse of Strahd: Reloaded</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+* { box-sizing:border-box; }
+:root {
+  --bg:#1c1c1e; --bg-sidebar:#1a1a1c; --bg-hover:#252528; --bg-card:#232325;
+  --border:#333336;
+  --gold:#e0a542; --gold-dim:#b8863a;
+  --active:#a78bfa; --active-dim:#8a6fd8;
+  --text:#dcdcdd; --text-dim:#9a9a9d; --text-faint:#6e6e72;
+  --title:#f2f1ee;
+}
+* { scrollbar-color: #48484c var(--bg-sidebar); scrollbar-width: thin; }
+html, body { margin:0; min-height:100vh; background:var(--bg);
+  font-family:'Inter', system-ui, -apple-system, sans-serif; color:var(--text); }
+a { color:var(--gold); text-decoration:none; }
+a:hover { text-decoration:underline; }
+
+.layout { display:flex; min-height:100vh; align-items:stretch; }
+
+/* ---------- barra lateral esquerda ---------- */
+.sidebar-left { width:290px; flex:0 0 290px; background:var(--bg-sidebar);
+  border-right:1px solid var(--border); padding:22px 18px 40px;
+  position:sticky; top:0; height:100vh; overflow-y:auto; }
+.brand { font-size:19px; font-weight:800; color:var(--gold); line-height:1.25;
+  margin-bottom:14px; text-decoration:none; display:block; }
+.brand:hover { text-decoration:none; opacity:.9; }
+.search-box { position:relative; margin-bottom:16px; }
+.search-box input { width:100%; padding:8px 10px 8px 30px; border-radius:6px;
+  border:1px solid var(--border); background:var(--bg-card); color:var(--text);
+  font-family:inherit; font-size:13px; }
+.search-box input::placeholder { color:var(--text-faint); }
+.search-box input:focus { outline:none; border-color:var(--gold-dim); }
+.search-box .ico { position:absolute; left:9px; top:50%; transform:translateY(-50%);
+  color:var(--text-faint); font-size:13px; pointer-events:none; }
+.tree { font-size:14px; }
+.tree details { margin-bottom:1px; }
+.tree summary { list-style:none; cursor:pointer; padding:6px 8px; border-radius:6px;
+  color:var(--text); display:flex; align-items:center; gap:6px; user-select:none; }
+.tree summary::-webkit-details-marker { display:none; }
+.tree summary:hover { background:var(--bg-hover); }
+.tree summary .chev { display:inline-block; font-size:10px; color:var(--text-faint);
+  transition:transform .15s; width:10px; }
+.tree details[open] > summary .chev { transform:rotate(90deg); }
+.tree .leaf-list { padding-left:20px; margin-top:1px; }
+.tree .leaf { display:block; padding:6px 8px; border-radius:6px; font-size:13.5px;
+  color:var(--text-dim); }
+.tree .leaf:hover { background:var(--bg-hover); color:var(--text); text-decoration:none; }
+.tree .leaf.active { color:var(--active); font-weight:600; background:rgba(167,139,250,.1); }
+.tree .leaf.locked { color:var(--text-faint); cursor:default; font-style:italic; }
+.tree .leaf.locked:hover { background:none; }
+.tree .no-match { display:none; }
+.sidebar-left.filtering .tree .leaf { display:none; }
+.sidebar-left.filtering .tree .leaf.match { display:block; }
+.sidebar-left.filtering .tree details { display:none; }
+.sidebar-left.filtering .tree details.has-match { display:block; }
+.sidebar-left.filtering .tree details.has-match > summary .chev { transform:rotate(90deg); }
+
+/* ---------- coluna central ---------- */
+main.article { flex:1 1 auto; min-width:0; max-width:760px; margin:0 auto;
+  padding:48px 40px 100px; line-height:1.7; font-size:16.5px; }
+.page-title { font-size:clamp(28px,4vw,38px); font-weight:800; color:var(--title);
+  margin:0 0 28px; letter-spacing:-.3px; }
+main.article h1 { color:var(--gold); font-size:26px; font-weight:700;
+  margin:36px 0 14px; scroll-margin-top:24px; letter-spacing:-.2px; }
+main.article h1:first-child { margin-top:0; }
+main.article h2 { color:var(--gold); font-size:21px; font-weight:700;
+  margin:30px 0 12px; scroll-margin-top:24px; }
+main.article h3 { color:var(--title); font-size:18px; font-weight:700;
+  margin:24px 0 10px; scroll-margin-top:24px; }
+main.article h4 { color:var(--text-dim); font-size:14px; font-weight:700;
+  text-transform:uppercase; letter-spacing:.5px; margin:20px 0 8px; scroll-margin-top:24px; }
+main.article p { margin:0 0 15px; color:var(--text); }
+main.article ul { margin:0 0 15px; padding-left:24px; }
+main.article li { margin-bottom:6px; }
+main.article a { border-bottom:1px solid rgba(224,165,66,.35); }
+main.article a:hover { border-bottom-color:var(--gold); text-decoration:none; }
+main.article em { color:var(--text); font-style:italic; }
+main.article strong { color:var(--title); font-weight:700; }
+main.article hr { border:0; border-top:1px solid var(--border); margin:20px 0; }
+.link-pending { color:var(--text-faint); font-style:italic; border-bottom:1px dotted var(--text-faint); cursor:default; }
+.reloaded-img { max-width:100%; border-radius:8px; border:1px solid var(--border); margin:16px 0; display:block; }
+
+span.citation { font-style:italic; color:var(--text-dim); }
+span.highlight { color:var(--gold); font-weight:600; }
+span.credit { font-size:12px; color:var(--text-faint); display:block; margin-top:4px; }
+
+div.description { background:var(--bg-card); border-left:3px solid var(--active-dim);
+  border-radius:0 8px 8px 0; padding:16px 20px; margin:18px 0; font-style:italic; color:var(--text); }
+div.description p:last-child { margin-bottom:0; }
+
+.callout { border:1px solid var(--border); border-left:4px solid var(--gold-dim);
+  border-radius:0 8px 8px 0; background:rgba(224,165,66,.06); margin:18px 0; padding:14px 18px; }
+.callout-title { font-weight:700; color:var(--gold); font-size:13px; letter-spacing:.3px;
+  text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+.callout-icon { font-size:14px; }
+.callout-body p:last-child { margin-bottom:0; }
+.callout-body { font-size:16px; }
+.callout-warning { border-left-color:#e2645a; background:rgba(226,100,90,.08); }
+.callout-warning .callout-title { color:#f08078; }
+.callout-combat { border-left-color:#e2645a; background:rgba(226,100,90,.1); }
+.callout-combat .callout-title { color:#f08078; }
+.callout-lore, .callout-abstract { border-left-color:#5f9bd8; background:rgba(95,155,216,.08); }
+.callout-lore .callout-title, .callout-abstract .callout-title { color:#7fb4e8; }
+.callout-profile { border-left-color:var(--active-dim); background:rgba(167,139,250,.08); }
+.callout-profile .callout-title { color:var(--active); }
+.callout-item { border-left-color:#4fb86a; background:rgba(79,184,106,.08); }
+.callout-item .callout-title { color:#6fce88; }
+.callout-design { border-left-color:var(--text-faint); background:rgba(158,158,162,.06); }
+.callout-design .callout-title { color:var(--text-dim); }
+.callout-tip { border-left-color:var(--gold); }
+
+.table-wrap { overflow-x:auto; margin:18px 0; }
+table.md-table { border-collapse:collapse; width:100%; font-size:15px; }
+table.md-table th, table.md-table td { border:1px solid var(--border); padding:8px 11px; text-align:left; }
+table.md-table th { background:var(--bg-card); color:var(--gold); font-size:12px; font-weight:700; text-transform:uppercase; letter-spacing:.4px; }
+
+div.statblock { background:var(--bg-card); border:1px solid var(--border);
+  border-left:3px solid var(--active-dim); border-radius:8px; padding:18px 22px; margin:20px 0; }
+div.statblock h2 { color:var(--title); font-size:20px; font-weight:800; margin:0 0 2px; }
+div.statblock > em:first-of-type { display:block; font-style:italic; color:var(--text-dim); margin-bottom:10px; }
+div.statblock hr { border-top:1px solid var(--border); margin:11px 0; }
+div.statblock h3 { color:var(--gold); font-size:14px; font-weight:700;
+  text-transform:uppercase; letter-spacing:.5px; margin:16px 0 7px; }
+div.statblock p { margin:0 0 9px; font-size:15px; }
+div.statblock table.ability-table { width:100%; border-collapse:collapse; margin:9px 0; }
+div.statblock table.ability-table th, div.statblock table.ability-table td {
+  border:1px solid var(--border); text-align:center; padding:6px 4px; font-size:14px; }
+div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-weight:700; }
+
+/* ---------- coluna direita: sumario ---------- */
+.sidebar-right { width:250px; flex:0 0 250px; padding:48px 20px 40px 0;
+  position:sticky; top:0; height:100vh; overflow-y:auto; }
+.toc-label { font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
+  color:var(--text-faint); margin-bottom:12px; }
+.toc-list { font-size:13px; }
+.toc-list a { display:block; padding:4px 0; color:var(--text-dim); border-bottom:none;
+  line-height:1.4; }
+.toc-list a:hover { color:var(--text); text-decoration:none; }
+.toc-lvl-1 { padding-left:0; font-weight:600; }
+.toc-lvl-2 { padding-left:12px; }
+.toc-lvl-3 { padding-left:24px; }
+.toc-lvl-4 { padding-left:36px; font-size:12px; }
+
+/* ---------- pagina indice ---------- */
+.idx-intro { margin-bottom:8px; }
+.idx-intro h1 { font-size:clamp(26px,4vw,36px); font-weight:800; color:var(--gold); margin-bottom:10px; }
+.idx-intro p { color:var(--text-dim); font-size:15px; max-width:640px; }
+.idx-section { margin:34px 0; }
+.idx-section-title { font-size:13px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;
+  color:var(--text-dim); border-bottom:1px solid var(--border); padding-bottom:8px; margin-bottom:14px; }
+.idx-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr)); gap:12px; }
+.idx-card { display:block; background:var(--bg-card); border:1px solid var(--border);
+  border-radius:8px; padding:14px 16px; font-weight:600; font-size:14.5px; color:var(--text);
+  transition:border-color .15s, transform .15s; }
+.idx-card:hover { border-color:var(--gold-dim); transform:translateY(-2px); text-decoration:none; }
+.idx-card.locked { opacity:.45; cursor:default; border-style:dashed; }
+.idx-card.locked:hover { transform:none; }
+.idx-badge { display:block; margin-top:5px; font-size:10px; letter-spacing:.5px; text-transform:uppercase; color:var(--text-faint); font-weight:400; }
+
+/* ---------- mobile ---------- */
+.mobile-topbar { display:none; }
+@media (max-width:1100px) {
+  .sidebar-right { display:none; }
+}
+@media (max-width:860px) {
+  .layout { flex-direction:column; }
+  .mobile-topbar { display:flex; align-items:center; gap:12px; position:sticky; top:0; z-index:40;
+    background:var(--bg-sidebar); border-bottom:1px solid var(--border); padding:12px 16px; }
+  .mobile-topbar .brand { margin:0; font-size:15px; flex:1; }
+  .mobile-topbar button { background:none; border:1px solid var(--border); color:var(--text);
+    border-radius:6px; padding:6px 10px; font-family:inherit; font-size:13px; }
+  .sidebar-left { position:fixed; left:0; top:49px; bottom:0; z-index:39; transform:translateX(-100%);
+    transition:transform .2s; width:82vw; max-width:320px; box-shadow:8px 0 30px rgba(0,0,0,.5); }
+  .sidebar-left.open { transform:translateX(0); }
+  main.article { padding:28px 18px 70px; max-width:100%; }
+}
+</style>
+</head>
+<body>
+<div class="mobile-topbar">
+  <button aria-label="Abrir menu">☰</button>
+  <a class="brand" href="index.html">Curse of Strahd: Reloaded</a>
+</div>
+<div class="layout">
+  <aside class="sidebar-left">
+    <a class="brand" href="index.html">Curse of Strahd:<br>Reloaded</a>
+    <div class="search-box"><span class="ico">🔍</span><input type="text" placeholder="Buscar página..." aria-label="Buscar página"></div>
+    <nav class="tree"><details open><summary><span class="chev">▸</span>Introdução</summary><div class="leaf-list"><a class="leaf" href="introducao-usando-este-guia.html">Usando Este Guia</a><a class="leaf active" href="introducao-guia-do-mestre.html">Guia do Mestre</a><a class="leaf" href="introducao-changelog.html">Changelog</a></div></details><details><summary><span class="chev">▸</span>Capítulo 1 — Iniciando a Campanha</summary><div class="leaf-list"><a class="leaf" href="cap1-sessao-zero.html">Sessão Zero</a><a class="leaf" href="cap1-criacao-de-personagem.html">Criação de Personagem</a></div></details><details><summary><span class="chev">▸</span>Capítulo 2 — A Terra de Barovia</summary><div class="leaf-list"><a class="leaf" href="cap2-lore-de-barovia.html">Lore de Barovia</a><a class="leaf" href="cap2-historia-de-barovia.html">História de Barovia</a><a class="leaf" href="cap2-strahd-von-zarovich.html">Strahd von Zarovich</a></div></details><details><summary><span class="chev">▸</span>Capítulo 3 — Conduzindo o Jogo</summary><div class="leaf-list"><a class="leaf" href="cap3-resumo-da-aventura.html">Resumo da Aventura</a><a class="leaf" href="cap3-conduzindo-a-aventura.html">Conduzindo a Aventura</a></div></details><details><summary><span class="chev">▸</span>Ato I — Adentrando as Névoas</summary><div class="leaf-list"><a class="leaf" href="ato1-resumo.html">Resumo do Ato I</a><a class="leaf" href="arco-a-fuga-da-death-house.html">Arco A — Fuga da Death House</a><a class="leaf" href="arco-b-bem-vindo-a-barovia.html">Arco B — Bem-vindo a Barovia</a><a class="leaf" href="arco-c-adentrando-o-vale.html">Arco C — Adentrando o Vale</a></div></details><details><summary><span class="chev">▸</span>Ato II — A Cidade Sombria</summary><div class="leaf-list"><span class="leaf locked">Resumo do Ato II</span><span class="leaf locked">Arco D — A Festa de St. Andral</span><span class="leaf locked">Arco E — A Vistana Desaparecida</span><span class="leaf locked">Arco F — O Desejo de Lady Wachter</span><span class="leaf locked">Arco G — Os Irmãos Strazni</span><span class="leaf locked">Arco H — A Alma Perdida</span><span class="leaf locked">Arco I — As Muralhas de Krezk</span></div></details><details><summary><span class="chev">▸</span>Ato III — A Terra Partida</summary><div class="leaf-list"><span class="leaf locked">Resumo do Ato III</span><span class="leaf locked">Arco J — A Gema Roubada</span><span class="leaf locked">Arco K — A Abadia Decaída</span><span class="leaf locked">Arco L — O Covil dos Lobos</span><span class="leaf locked">Arco M — A Mansão do Dragão</span><span class="leaf locked">Arco O — Jantar com o Diabo</span><span class="leaf locked">Arco P — O Assalto a Ravenloft</span><span class="leaf locked">Arco Q — Um Farol Reluzente</span></div></details><details><summary><span class="chev">▸</span>Ato IV — Segredos do Ancião</summary><div class="leaf-list"><span class="leaf locked">Resumo do Ato IV</span><span class="leaf locked">Arco R — Provações da Montanha</span><span class="leaf locked">Arco S — Uma Espada de Luz Solar</span><span class="leaf locked">Arco T — Os Três Fanes</span><span class="leaf locked">Arco U — Sonhos da Alvorada</span><span class="leaf locked">Epílogo</span></div></details><details><summary><span class="chev">▸</span>Apêndices</summary><div class="leaf-list"><span class="leaf locked">Fragmentos de Âmbar</span><span class="leaf locked">Bestiário</span><span class="leaf locked">Glossário</span><span class="leaf locked">Personagens Não Jogadores</span></div></details></nav>
+    <div style="margin-top:18px"><a href="../painel_barovia_dnd5e.html" style="font-size:12px;color:var(--text-faint)">← Voltar ao Painel</a></div>
+  </aside>
+  <main class="article">
+    <div class="page-title">Guia do Mestre</div>
+<p>--- description: "Bem-vindo a Curse of Strahd: Reloaded — um guia abrangente para conduzir Curse of Strahd tanto para Mestres novatos quanto veteranos. Viva uma narrativa aprimorada, informações organizadas e orientações no nível de cena que tornam mais fácil do que nunca dar vida a Barovia." keywords: Curse of Strahd guide, DM's guide to Curse of Strahd, guide to running Curse of Strahd, how to run Curse of Strahd, D&D, Dungeons and Dragons, Curse of Strahd, DM Guide, Barovia, Role-playing Game, DM Tips, Campaign Guide, Strahd Von Zarovich, Tabletop Games cover: preview.png --- <img class="image-dark" src="https://publish-01.obsidian.md/access/7db64b11c71d88572ddc6cd06b888976/images/cover-dark.png"> <img class="image-light" src="https://publish-01.obsidian.md/access/7db64b11c71d88572ddc6cd06b888976/images/cover-light.png"></p>
+<p><strong>Combates desequilibrados. Capítulos desorganizados. Lore esmagadora. E o vilão mais desafiador de <em>Dungeons & Dragons</em>.</strong> <em>Curse of Strahd</em> conquistou sua reputação como o módulo mais notório da 5ª Edição — mas a campanha oficial costuma ser mais difícil para os Mestres do que para seus jogadores.</p>
+<p>É aí que entra <strong><em>Curse of Strahd: Reloaded</em></strong>. Como seu guia pessoal de <em>Curse of Strahd</em>, o <em>Reloaded</em> vai ajudá-lo a levar seus jogadores numa jornada inesquecível através das Névoas — uma jornada revisada para ser o mais fácil e agradável possível de conduzir.</p>
+<p>Seja você esteja procurando um guia para interpretar Strahd von Zarovich, uma história abrangente de Barovia, ou um passo a passo completo da campanha de <em>Curse of Strahd</em>, não procure mais — pois você chegou ao lugar certo.</p>
+<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>Sou um Mestre novato. Por que usar um guia, afinal?</strong></div><div class="callout-body"><p>O módulo oficial de <em>Curse of Strahd</em> é uma experiência de horror gótico envolvente, dramática e conceitualmente vívida. Não é à toa que é a campanha mais popular da 5ª edição!</p>
+<p>No entanto, <em>Curse of Strahd</em> também tem uma grande quantidade de falhas e características debilitantes que dificultam sua condução por um Mestre novato:</p>
+<ul><li>O livro não está organizado em ordem cronológica, obrigando os Mestres a descobrir sozinhos a estrutura da aventura.</li><li>Informações críticas estão espalhadas por diversos capítulos e apêndices do livro, muitas vezes exigindo que os Mestres leiam ou releiam o livro inteiro só para lembrar os detalhes relevantes dos objetivos ou da história de um único NPC.</li><li>Os capítulos são divididos por localização, e não por momento narrativo, forçando os Mestres a montar sozinhos a narrativa e a tensão dramática de cada área.</li><li>A aventura é um sandbox com pouco direcionamento além da leitura de Tarokka, e sem ganchos fortes que conduzam a essa leitura além do gancho de aventura dos Visitantes Misteriosos.</li><li>Muitos combates (por exemplo, o covil de Bonegrinder) apresentam alto risco de TPK (aniquilação total do grupo), especialmente em níveis baixos, enquanto outros são trivialmente fáceis (por exemplo, Izek e todo o Covil dos Lobisomens).</li><li>A natureza aleatória da leitura de Tarokka pode permitir que seus jogadores obtenham o artefato mais poderoso da campanha — a Espada do Sol, capaz de matar Strahd automaticamente em sete turnos — já no nível três. Alternativamente, a leitura de Tarokka pode colocar os três artefatos dentro do Castelo Ravenloft, privando seus jogadores de qualquer motivo real para aventurar-se por Barovia.</li><li>Diversas narrativas — incluindo o encontro de Ireena com Sergei na poça abençoada de Krezk, assim como a eventual ressurreição de Strahd no epílogo — são incrivelmente insatisfatórias para a grande maioria dos jogadores.</li><li>O statblock de Strahd é mal elaborado, de modo que um grupo de nível médio pode facilmente derrotá-lo fora de Ravenloft sem a Espada do Sol, mas um grupo de nível alto achará literalmente impossível derrotá-lo dentro de Ravenloft (devido à sua habilidade de deslocamento entre planos) a menos que o Mestre cometa um erro, intencional ou não.</li><li>Strahd é um vilão incrivelmente desafiador de conduzir, o que facilita que um Mestre inexperiente conduza seus jogadores à força por uma experiência sem graça e deprimente, em vez de lhes dar oportunidades reais de vitória e crescimento.</li></ul>
+<p>Não importa o que você faça: se quiser conduzir <em>Curse of Strahd</em> como uma aventura divertida, envolvente e memorável, você vai precisar fazer pelo menos algumas mudanças — e, muito provavelmente, um número significativo delas.</p>
+<p>Muitos Mestres novatos precisam se esforçar bastante só para lembrar o que está no livro e descobrir como conduzi-lo à mesa. Mestres novatos e até mesmo intermediários frequentemente não precisam nem querem fazer um trabalho extra para interpretar ou montar o conteúdo da aventura, e podem ter dificuldade em corrigir adequadamente quaisquer problemas, mesmo que os tenham percebido.</p>
+<p>Se você está no mesmo barco, talvez queira usar um guia para ajudá-lo a conduzir a aventura — uma obra publicada por um Mestre experiente que já conduziu o módulo diversas vezes, identificou e resolveu esses problemas, e testou suas soluções com a ampla comunidade online de <em>Curse of Strahd</em>. <strong>Se você vai precisar resolver os problemas da campanha de qualquer forma, por que não usar um guia que já fez isso por você?</strong></p></div></div>
+<h1 id="seu-guia-pessoal-de-curse-of-strahd">Seu Guia Pessoal de <em>Curse of Strahd</em></h1>
+<p><em>Curse of Strahd: Reloaded</em> tem como objetivo transformar a aventura original em algo muito mais acessível, coeso e ressonante. É por isso que este guia do Mestre para <em>Curse of Strahd</em>:</p>
+<ul><li><strong>Simplifica</strong> seu material de preparação, apresentando a campanha num formato organizado e amigável para o Mestre.</li><li><strong>Guia</strong> você por cenas complexas com perfis de NPCs, descrições pré-escritas e dicas de gerenciamento de mesa.</li><li><strong>Aprimora</strong> a experiência dos seus jogadores preenchendo lacunas, amarrando pontas soltas e apresentando uma narrativa mais imersiva e coesa.</li><li><strong>Eleva</strong> a jogabilidade e a história, podando e refinando o material da aventura ao mesmo tempo em que garante que todo o conteúdo sirva à narrativa maior.</li></ul>
+<p><em>Curse of Strahd: Reloaded</em>, é claro, é um dos vários guias para a campanha de <em>Curse of Strahd</em>. Eis o que o diferencia:</p>
+<ul><li><strong><em>Simplicidade.</em></strong> Uma abordagem focada da campanha, evitando lore complicada ou tramas paralelas desnecessárias e garantindo uma experiência direta e simplificada.</li><li><strong><em>Ressonância.</em></strong> Ênfase reforçada nos temas de tragédia, orgulho, esperança e redenção que tornam <em>Curse of Strahd</em> verdadeiramente memorável.</li><li><strong><em>Profundidade.</em></strong> Uma exploração mais profunda de Barovia e de seus habitantes, dando vida ao cenário e ao seu povo.</li><li><strong><em>Empoderamento.</em></strong> Um design de jogo que permite que seus jogadores sejam os heróis de Barovia, em vez de vítimas de uma experiência sombria e esmagadora de horror e sobrevivência.</li><li><strong><em>Acessibilidade.</em></strong> Notas e preparação detalhadas, permitindo que você foque em conduzir sessões envolventes em vez de se atolar em planejamento e trabalho de preparação.</li></ul>
+<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>Que tipo de guia é o Reloaded?</strong></div><div class="callout-body"><p>Há quatro perguntas que um Mestre pode usar ao projetar um guia ou outro suplemento para uma aventura popular como <em>Curse of Strahd:</em></p>
+<ul><li>Que conteúdo interessante, temático ou cheio de personalidade a aventura precisa para realmente se destacar?</li><li>Que lore ou informação está faltando na aventura e precisa ser desenvolvida?</li><li>Que orientação ou conselho o Mestre precisa para executar de forma eficaz o que está na aventura?</li><li>Que partes da aventura precisam ser editadas para torná-la funcional e fundamentalmente divertida para os jogadores?</li></ul>
+<p>O Reloaded não foca na pergunta nº 1 (adicionar conteúdo extra). Ele foca na nº 2 (preencher lacunas) apenas quando necessário, para dar aos Mestres o contexto necessário para conduzir certos personagens ou cenas. Ele oferece a nº 3 (orientação ao Mestre) em alguns pontos, principalmente na forma de perfis de interpretação de NPCs e estruturas desenvolvidas para cenas sociais e outras.</p>
+<p>No entanto, o foco central do <em>Reloaded</em> é, acima de tudo, a nº 4: a necessidade de oferecer uma experiência de campanha funcional, elegante e agradável. Ele faz a pergunta simples: <em>Como seria Curse of Strahd se tivesse sido mais playtestado e editado, usando apenas os componentes, personagens e temas já disponíveis no próprio livro básico?</em></p>
+<p>Como exemplo, algumas das mudanças mais notáveis do <em>Reloaded</em> incluem:</p>
+<ul><li>Organizar cada capítulo cronologicamente, estruturando-o por narrativa em vez de por área, para tornar a aventura mais fácil de conduzir e compreender para o Mestre</li><li>Incorporar a aventura oficial apenas por referência direta, ao mesmo tempo em que fornece todas as informações que os Mestres podem precisar exatamente quando precisam delas, > garantindo que os leitores nunca precisem folhear várias páginas ou capítulos para encontrar o que procuram. </li><li>Reestruturar Vallaki para ter uma "condição de vitória" clara e positiva, permitindo que os jogadores conquistem uma sensação de realização e segurança em vez de afundá-los num pântano de política e más opções</li><li>Combinar e simplificar os arcos centrais da aventura envolvendo o Dr. Rudolph van Richten, a vistani desaparecida Arabelle, e a rebelião de Doru, a fim de oferecer uma única narrativa satisfatória que amarre todas as pontas soltas. </li><li>Estruturar uma progressão clara do relacionamento dos jogadores com Strahd, incluindo encontros pré-escritos com conflitos dramáticos tensos e significativos que preservam a agência dos jogadores ao mesmo tempo em que promovem um relacionamento antagônico com o próprio Strahd. </li><li>Revisar e rebalancear quase todos os combates da aventura a fim de criar uma experiência envolvente, dinâmica, justa e desafiadora, sem arriscar mortes frequentes de personagens ou TPKs.</li></ul>
+<p>Isso não quer dizer que o <em>Reloaded</em> nunca acrescente conteúdo adicional. Como regra geral, porém, o guia só o faz quando absolutamente necessário para servir aos propósitos de sua trama central subjacente, e prefere fazê-lo expandindo a lore já existente de <em>Curse of Strahd</em> na 5ª edição (por exemplo, as noivas de Strahd) ou incorporando lore clássica de Ravenloft de edições mais antigas de D&D (por exemplo, Arturi Radanavich ou os Santuários de Barovia) sempre que possível.</p></div></div>
+<p>Você pode <a href="introducao-usando-este-guia.html">clicar aqui</a> para aprender como usar e ler este guia. Caso contrário, se estiver pronto para começar sua aventura através das Névoas, confira o <strong>Sumário</strong> abaixo — e prepare-se para uma campanha que você e seus jogadores não esquecerão tão cedo.</p>
+<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>Baixe este Guia</strong></div><div class="callout-body"><p>Quer baixar o <em>Reloaded</em> como um Vault do Obsidian para usar, editar e revisar no seu dispositivo local? Você pode baixar todos os arquivos usando o <a href="https://github.com/DragnaCarta/Curse-of-Strahd-Reloaded" target="_blank" rel="noopener">Repositório do Github</a> .</p></div></div>
+<h1 id="sumário">Sumário</h1>
+<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>Um Guia Vivo</strong></div><div class="callout-body"><p>Curse of Strahd: Reloaded é um projeto em andamento, e novas atualizações para arcos existentes são lançadas regularmente. Você pode se inscrever para receber notificações de atualização na sua caixa de e-mail entrando na comunidade gratuita do autor no <a href="https://www.patreon.com/DragnaCarta" target="_blank" rel="noopener">Patreon</a>.</p>
+<p>Alternativamente, se quiser ler rascunhos, esboços e anotações de lançamentos futuros — como o ainda não lançado Epílogo, o arco opcional de tempo livre <strong><em>Arc N: Tales of Vallaki</em></strong>, ou edições substanciais de arcos já existentes —, você pode fazer isso se tornando um apoiador pago do <a href="https://www.patreon.com/DragnaCarta" target="_blank" rel="noopener">Patreon</a> de DragnaCarta. Isso também permite que você entre numa comunidade exclusiva no Discord de Mestres novatos e experientes que também conduzem o Reloaded, receba blogs de desenvolvimento regulares detalhando o design dos arcos do Reloaded, e receba conselhos e ajuda pessoal do autor para sua campanha.</p></div></div>
+<h2 id="capítulo-1-iniciando-a-campanha">Capítulo 1 - Iniciando a Campanha</h2>
+<p><a href="cap1-sessao-zero.html">Sessão Zero</a>. Definindo expectativas e esclarecendo gatilhos dos jogadores. <a href="cap1-criacao-de-personagem.html">Criação de Personagem</a>. Desenvolvendo vínculos, defeitos e motivações de personagem.</p>
+<h2 id="capítulo-2-a-terra-de-barovia">Capítulo 2 - A Terra de Barovia</h2>
+<p><a href="cap2-lore-de-barovia.html">Lore de Barovia</a>. Um compêndio da magia, geografia, cultura, facções e religiões de Barovia. <a href="cap2-historia-de-barovia.html">História de Barovia</a>. Uma história narrativa de Barovia e da família Von Zarovich. <a href="cap2-strahd-von-zarovich.html">Strahd von Zarovich</a>. Um guia sobre a personalidade, relacionamentos, objetivos, aliados e táticas de Strahd.</p>
+<h2 id="capítulo-3-conduzindo-o-jogo">Capítulo 3 - Conduzindo o Jogo</h2>
+<p><a href="cap3-resumo-da-aventura.html">Resumo da Aventura</a>. Resumos dos seis atos narrativos da campanha. <a href="cap3-conduzindo-a-aventura.html">Conduzindo a Aventura</a>. Um guia para ler — e conduzir — este guia.</p>
+<h2 id="ato-i-rumo-às-névoas">Ato I - Rumo às Névoas</h2>
+<p><a href="ato1-resumo.html">Resumo do Ato I</a>. Um resumo da primeira passagem dos personagens para Barovia. <a href="arco-a-fuga-da-death-house.html">Arc A - Escape From Death House</a>. Os personagens são atraídos para uma casa assombrada e precisam escapar antes que um mal voraz desperte. <a href="arco-b-bem-vindo-a-barovia.html">Arco B - Bem-vindos a Barovia</a>. Os personagens chegam à Vila de Barovia em meio a um cerco em andamento e precisam se defender, junto de seus novos amigos, das legiões de mortos-vivos de Strahd. <a href="arco-c-adentrando-o-vale.html">Arco C - Adentrando o Vale</a>. Os personagens partem rumo à Cidade de Vallaki, recebendo uma consulta ao destino misteriosa e enfrentando provações e tribulações pelo caminho.</p>
+<h2 id="ato-ii-a-cidade-sombria">Ato II - A Cidade Sombria</h2>
+<p><span class="link-pending" title="Ainda não convertido">Resumo do Ato II</span>. Um resumo das aventuras dos personagens na cidade de Vallaki. <span class="link-pending" title="Ainda não convertido">Arco D - A Festa de St. Andral</span>. Os personagens investigam o roubo de ossos sagrados da igreja de Vallaki. <span class="link-pending" title="Ainda não convertido">Arco E - A Vistani Desaparecida</span>. Os personagens seguem o rastro de uma vistani sequestrada pelo oeste de Barovia. <span class="link-pending" title="Ainda não convertido">Arco F - O Desejo de Lady Wachter</span>. Os personagens são convidados a se juntar a uma conspiração perigosa para depor o burgomestre de Vallaki. <span class="link-pending" title="Ainda não convertido">Arco G - Os Irmãos Strazni</span>. Os personagens encontram os sonhos sombrios do Capitão da Guarda de Vallaki. <span class="link-pending" title="Ainda não convertido">Arco H - A Alma Perdida</span>. Os personagens ajudam os filhos de duas casas nobres rivais a encenar um ousado resgate espectral. <span class="link-pending" title="Ainda não convertido">Arco I - As Muralhas de Krezk</span>. Os personagens viajam até as ruínas de Berez para conquistar passagem até a vila de Krezk.</p>
+<h2 id="ato-iii-a-terra-despedaçada">Ato III - A Terra Despedaçada</h2>
+<p><span class="link-pending" title="Ainda não convertido">Resumo do Ato III</span>. Um resumo das aventuras dos personagens pelo vale mais amplo de Barovia. <span class="link-pending" title="Ainda não convertido">Arco J - A Gema Roubada</span>. Os personagens repelem uma tribo de druidas que causa problemas para a vinícola Wizard of Wines. <span class="link-pending" title="Ainda não convertido">Arco K - A Abadia Caída</span>. Os personagens recrutam um novo aliado e restauram a divindade corrompida do Abade. <span class="link-pending" title="Ainda não convertido">Arco L - O Covil dos Lobos</span>. Os personagens vigiam e se infiltram num covil de lobisomens. <span class="link-pending" title="Ainda não convertido">Arco M - A Mansão do Dragão</span>. Os personagens investigam uma mansão assombrada e desvendam a mensagem do dragão prateado Argynvost. Arco N - Histórias de Vallaki. Em breve. <span class="link-pending" title="Ainda não convertido">Arco O - Jantar com o Diabo</span>. Os personagens jantam com Strahd e sua corte no Castelo Ravenloft. <span class="link-pending" title="Ainda não convertido">Arco P - O Assalto a Ravenloft</span>. Os personagens invadem o Castelo Ravenloft enquanto Strahd está ausente. <span class="link-pending" title="Ainda não convertido">Arco Q - Um Farol Reluzente</span>. Os personagens redimem o Abade, derrotam o lobisomem Kiril Stoyanovich e acendem o farol de Argynvostholt.</p>
+<h2 id="ato-iv-segredos-do-antigo">Ato IV - Segredos do Antigo</h2>
+<p><span class="link-pending" title="Ainda não convertido">Resumo do Ato IV</span>. Em breve. <span class="link-pending" title="Ainda não convertido">Arco R - As Provações da Montanha</span>. Os personagens sobem a traiçoeira Tsolenka Pass enquanto sobrevivem às perseguições de Strahd. <span class="link-pending" title="Ainda não convertido">Arco S - Uma Espada de Luz Solar</span>. Os personagens recuperam a <em>Espada do Sol</em> quebrada do Templo de Âmbar. <span class="link-pending" title="Ainda não convertido">Arco T - Os Três Santuários</span>. Os personagens ajudam seus amigos baroveses a fim de purificar a terra da corrupção de Strahd. <span class="link-pending" title="Ainda não convertido">Arco U - Sonhos da Aurora</span>. Os personagens precisam derrotar o vampiro Strahd von Zarovich, de uma vez por todas. <span class="link-pending" title="Ainda não convertido">Epílogo</span>. Em breve.</p>
+<h2 id="apêndices">Apêndices</h2>
+<p><span class="link-pending" title="Ainda não convertido">Personagens Não-Jogadores</span>. Um compêndio de todos os principais NPCs da aventura. <span class="link-pending" title="Ainda não convertido">Cacos de Âmbar</span>. Um compêndio de todos os cacos de âmbar que aparecem na aventura. <span class="link-pending" title="Ainda não convertido">Glossário</span>. Um glossário de todas as novas regras ou mecânicas usadas na aventura.</p>
+<p><hr></p>
+<h1 id="agradecimentos">Agradecimentos</h1>
+<p><strong><em>Curse of Strahd: Reloaded</em></strong> é escrito por <strong>DragnaCarta</strong> e editado por <strong>Maxim</strong>. Você pode apoiar o trabalho de Dragna entrando no seu <a href="https://www.patreon.com/DragnaCarta" target="_blank" rel="noopener">Patreon</a>.</p>
+<p>Este guia gratuito e não-oficial é disponibilizado sob a <a href="https://company.wizards.com/en/legal/fancontentpolicy" target="_blank" rel="noopener">Fan Content Policy</a> da Wizards of the Coast. Você pode comprar o módulo oficial da campanha <em>Curse of Strahd</em> no <a href="https://dnd.wizards.com/products/curse-strahd-revamped" target="_blank" rel="noopener">site</a> de <em>Dungeons & Dragons</em> ou pelo <a href="https://www.dndbeyond.com/sources/cos" target="_blank" rel="noopener">D&DBeyond</a>.</p>
+<p>Este trabalho inclui material extraído do System Reference Document 5.1 ("SRD 5.1") da Wizards of the Coast LLC, disponível <a href="https://dnd.wizards.com/resources/systems-reference-document" target="_blank" rel="noopener">aqui</a>. O SRD 5.1 é licenciado sob a Creative Commons Attribution 4.0 International License, disponível <a href="https://creativecommons.org/licenses/by/4.0/legalcode" target="_blank" rel="noopener">aqui</a>.</p>
+<p><strong><em>Arte.</em></strong> Capa e arte de fundo por <a href="https://jamesrpgart.com/" target="_blank" rel="noopener">JamesRPGArt</a>, disponível no <a href="https://www.patreon.com/jamesrpgart" target="_blank" rel="noopener">Patreon</a>. Ilustrações adicionais por <a href="https://calebisdrawing.com/" target="_blank" rel="noopener">Caleb Cleveland</a>. Diagramas de mapas de batalha feitos usando <a href="https://app.dungeonscrawl.com/" target="_blank" rel="noopener">Dungeon Scrawl</a>.</p>
+<p><strong><em>Agradecimentos especiais a</em></strong> <strong>Twi</strong>, cuja deliberação e criatividade tornaram esta revisão possível; <strong>Ziopliukas</strong> e <strong>Paintknight</strong> por seu incentivo e apoio; <strong>Cheese</strong> e <strong>Nancy</strong> por sua ajuda no balanceamento e playtesting de combates; e a <strong>Friendly</strong>, <strong>Faisal</strong>, <strong>shmamy</strong>, <strong>yaboicorny</strong>, <strong>Busdriver</strong>, <strong>Eliza</strong>, e <strong>Scarfe</strong> por seus conselhos e feedback frequentes.</p>
+<p><strong><em>Agradecimentos adicionais a</em></strong> a_Kyrill, AaronElWhite, AbsentBagel, ActualPaperweight, Aeristria, aevinpaos, Alantes, Alcibiades, alexai, AlexanderThulin, Alfie, alfie104, Allnightlight, Anp117, Aonbarr, Aquilon, arkansandragoness, Arkayne, Arow-Remade, Arthur, Autumn, AvengingBlowfish, Awox, Az, BasMelis, Bearbag, beau_motion, BeaverBoy99, Ben, BenD, Bender, Berzingh, BetaMax-Arcana, bibl/Tim, Blade710, Bobothezombie, boganlanks, Booyahg, Bous237, boxfriend, Branston, Bruuneri, Buddy, Burnsider, Butters, calebisdrawing, CatDog, cesargm, chroma900, ChrisInGarden, ClanRedHead, cleo, cliotheuncaring, CoffeeKobold, Colioli, continuity, corrinisacat, Cpt Crawler, crabcakes01, Cracked Skeleton, CrazyEnough1757, Crazymajor, Crimson-1, Cryptid, cuddly kraken, CSEngineAlt, Daeplin, Dakota Official, DanPrime, Darkseraph, DarthHarambae, David Looss, dead_dads, DerkLucas, Deskkorps, Dice, DMJP, DND Ravenloftenjoyer, dontloseyourway, Dragonfire, Draziray, droideck, Dumaka, DumpsterFireMaster, Eban921, Ebonhawk, ElderDovah, Elijah, Elijah-Rafael, Ella, ELQUEMANDA4, Ep, Eradu, ericthealfabee1, Eve, Exdeth, Faisal, Father Longlegs, farlet10, Ferrisderby, Fezznick, FinRingil, Franz, Friendly's Games, FriendlyInstance5722, FrozenEcho, Fu, Fugi, Fugicara, Galahadred, glorious-blue, gloriouslarper, gmbenjamin, GodSpeeD, Goldorgh, GoYardiG0, GoYardiGO, goyardigo, gr4v3dgr, Gray, Gray Embry, greenglowstix, GreenTie, Guilhermo, hakich, hashtagpuglife, Helan, Heximus Prime, ho3in, Howard, InconditeCullion, IneptHackberry, InsideNervous, Ishna, Ispanicos, ItsLance, jabberdoot, JaeOnasi, Jakers, JamesMighty, Jeby, JediMasterLotryen, JehutyPT, JoeyGrizzle, John, JohnnyBuilder, Jorik, joshuacc, JRL, justadmhero, Kaiya, kaitlin, Kayledon, Keirbor, Knight of the Nine, KrempelRitter, Krossweft, le_ptit_lulu, Lenny, LFrog, Lif, LiquidAnalog, Lindsalot, Llewinidas, LordMordor, Lucky Actor, LususNaturae, Lyrics42, Mac, madcap, madelineblack, Martha, Massiah, Matthew, mattjanor, Maurycy-skell, Meliagant, Merfie, Miata07, Mightym, MikaFirefly, Mikkel, Milvus, Mon5teRico, Mr_Gelan, MSD, murdoc, Murhapuro, Naro-Alk'arin, Nate, Neo Noire, Neokke, NerfWesPls, Nessa, Nickolas Ivanov, NobodyJustBrad, Nova, nultra, Numerous-Ad-1357, Nyletak, nyrafernvale, Olivier, Ostheim, pgsmith2000, pirate_femme, PJ, PM_me_your_PhDs, pookmeister, popaul5305, presley, PrismPunch, Pugs, Pyrosophy, QueenOfThorns, RaePi, RafaelLopes, Rapid, rave98, rawnan, redhavirr, Remagen, RickymQrk, Rofeletan, Rustyroo, Sabrina, Schelling, scubbo, shananigans, ShapKees, Shard, Sherlock, shower_ghost, Sigmarius, Silent Scribe, Silver, SkroxiousDM, SnackoSaurusRex, snarkycatboy, snickduck, Snakeseye, sodneu, Søren, Stand Up Nate, Starless, stevexec, StoRmVoRtex, storm, Struan, styx, sunirgerep, Supa, sydney, szemere, taffer, Talanor, Tarhalindur, TehBestAtGames, terrible_boots, terribleOpera, Theatretech37, Thyme, Tidy Cribs, Tim Thomas, Timetheif, Tirrigon, Todd, ToobahRaptor, tstory30, UniquelyDefined, Unyielding_Capybara, Ur, Visparu, Vypr1981, Walui, Wasyl, Werben, whatistheancient, Windsock, Wolkensieger, XeroChance0, xxItsAJackalxx, Yakei, Yazstromo, yeboycole, Zifbox, and Zumarius por feedback, playtesting e revisão.</p>
+<h1 id="sobre-o-autor">Sobre o Autor</h1>
+<p><strong>DragnaCarta</strong> começou a mestrar em 2008 com a "Caixa Vermelha" da 4ª Edição. Desde então, ele conduziu três campanhas completas de <em>Curse of Strahd</em>, incluindo <a href="https://www.youtube.com/watch?v=fiu6bM9RxbM" target="_blank" rel="noopener"><em>Curse of Strahd: Twice Bitten</em></a>, um Actual Play Rules-As-Written com cinco outros Mestres de <em>Curse of Strahd</em> como jogadores.</p>
+<p>Dragna começou a escrever sua série <a href="https://www.reddit.com/r/DnDBehindTheScreen/comments/76v6q4/lessons_from_running_curse_of_strahd_barovia/" target="_blank" rel="noopener"><em>Lessons from Running Curse of Strahd</em></a> em 2017, que logo evoluiu para o primeiro rascunho de <a href="https://www.reddit.com/r/CurseofStrahd/comments/9bpzbh/curse_of_strahd_reloaded_compilation_thread/" target="_blank" rel="noopener"><em>Curse of Strahd: Reloaded</em></a>, uma série que buscava "guiar os Mestres na condução de <em>Curse of Strahd</em>, ao mesmo tempo em que fazia expansões adicionais para tornar a aventura mais envolvente". Dragna iniciou uma revisão completa do <em>Reloaded</em> em dezembro de 2022, e lançou os primeiros capítulos do guia revisado em junho de 2023.</p>
+<p>Dragna também é autor de diversos materiais e recursos adicionais relacionados a <em>Curse of Strahd</em>, incluindo <a href="https://www.reddit.com/r/CurseofStrahd/comments/t49no0/a_comprehensive_guide_to_strahds_raw_final_battle/" target="_blank" rel="noopener">A Comprehensive Guide to Strahd's RAW Final Battle Tactics</a>, <a href="https://www.reddit.com/r/CurseofStrahd/comments/f3w658/so_you_want_to_run_curse_of_strahd_a_primer_on/" target="_blank" rel="noopener">So You Want to Run Curse of Strahd: A Primer on Preparing (and Running) the Game</a>, e <a href="https://www.reddit.com/r/CurseofStrahd/comments/h98xgv/how_you_can_use_curse_of_strahds_four_adventure/" target="_blank" rel="noopener">How You Can Use <em>Curse of Strahd's</em> Four Adventure Hooks to Shape Your Campaign</a>.</p>
+<p>Além de <em>Curse of Strahd</em>, Dragna também é o criador de <a href="https://www.gmbinder.com/share/-N4m46K77hpMVnh7upYa" target="_blank" rel="noopener">Challenge Ratings 2.0</a>, um sistema matemático abrangente de balanceamento de encontros para a 5ª Edição de <em>Dungeons & Dragons</em>; um ex-redator do blog <a href="https://www.flutesloot.com/author/dragnacarta/" target="_blank" rel="noopener">FlutesLoot</a> sobre <em>Dungeons & Dragons</em>; o criador da série "Dungeon Master Fundamentals" no <a href="https://www.youtube.com/watch?v=GgJHxv-jzxI&amp;list=PLKMakNcXqsI7eGeQdoL-aJWQKfxEB1ZHi" target="_blank" rel="noopener">YouTube</a>; e um publicador ocasional de conteúdo relacionado a <em>Dungeons & Dragons</em> no <a href="https://dragnacarta.substack.com/" target="_blank" rel="noopener">Substack</a>. Ele atualmente conduz uma campanha homebrew ativa para nove jogadores e espera publicar <em>The Dungeon Master's Guide: Reloaded</em>, um livro-texto para Mestres novatos e intermediários, após concluir <em>Curse of Strahd: Reloaded</em>.</p>
+<p>Você pode contatar Dragna com feedback, perguntas e sugestões em dragnacartacreations@gmail.com.</p>
+  </main>
+  <aside class="sidebar-right"><div class="toc-label">Nesta página</div><div class="toc-list"><a class="toc-lvl-1" href="#seu-guia-pessoal-de-curse-of-strahd">Seu Guia Pessoal de Curse of Strahd</a><a class="toc-lvl-1" href="#sumário">Sumário</a><a class="toc-lvl-2" href="#capítulo-1-iniciando-a-campanha">Capítulo 1 - Iniciando a Campanha</a><a class="toc-lvl-2" href="#capítulo-2-a-terra-de-barovia">Capítulo 2 - A Terra de Barovia</a><a class="toc-lvl-2" href="#capítulo-3-conduzindo-o-jogo">Capítulo 3 - Conduzindo o Jogo</a><a class="toc-lvl-2" href="#ato-i-rumo-às-névoas">Ato I - Rumo às Névoas</a><a class="toc-lvl-2" href="#ato-ii-a-cidade-sombria">Ato II - A Cidade Sombria</a><a class="toc-lvl-2" href="#ato-iii-a-terra-despedaçada">Ato III - A Terra Despedaçada</a><a class="toc-lvl-2" href="#ato-iv-segredos-do-antigo">Ato IV - Segredos do Antigo</a><a class="toc-lvl-2" href="#apêndices">Apêndices</a><a class="toc-lvl-1" href="#agradecimentos">Agradecimentos</a><a class="toc-lvl-1" href="#sobre-o-autor">Sobre o Autor</a></div></aside>
+</div>
+<script>
+document.querySelectorAll('.search-box input').forEach(function(inp){
+  inp.addEventListener('input', function(){
+    var q = inp.value.trim().toLowerCase();
+    var sidebar = inp.closest('.sidebar-left');
+    if (!q) { sidebar.classList.remove('filtering'); return; }
+    sidebar.classList.add('filtering');
+    sidebar.querySelectorAll('.tree .leaf').forEach(function(a){
+      var hit = a.textContent.toLowerCase().indexOf(q) !== -1;
+      a.classList.toggle('match', hit);
+    });
+    sidebar.querySelectorAll('.tree > details').forEach(function(d){
+      var hasMatch = d.querySelector('.leaf.match');
+      d.classList.toggle('has-match', !!hasMatch);
+    });
+  });
+});
+var mobileBtn = document.querySelector('.mobile-topbar button');
+if (mobileBtn) {
+  mobileBtn.addEventListener('click', function(){
+    document.querySelector('.sidebar-left').classList.toggle('open');
+  });
+}
+</script>
+</body>
+</html>

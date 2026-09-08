@@ -14,3 +14,7 @@ package-lock.json
 .env
 .env.local
 .env.*.local
+
+# Clone local do guia original (fonte da tradução em paineis/reloaded/) —
+# repositório de terceiros, não faz parte deste projeto
+Curse-of-Strahd-Reloaded/
