@@ -104,54 +104,81 @@
     max-width: 1280px;
     margin: 0 auto 24px;
     display: flex;
-    gap: 8px;
+    align-items: center;
+    gap: 10px;
     justify-content: center;
     flex-wrap: wrap;
   }
-  .toolbar .back-link {
-    padding: 8px 14px;
-    background: transparent;
-    border: 1px solid var(--gold);
-    color: var(--parchment-dim);
-    border-radius: 2px;
-    text-decoration: none;
+  .toolbar-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .toolbar-sep {
+    width: 1px;
+    align-self: stretch;
+    min-height: 28px;
+    background: linear-gradient(to bottom, transparent, var(--gold), transparent);
+    opacity: 0.5;
+    margin: 0 2px;
+  }
+  .toolbar .back-link,
+  .toolbar button {
+    padding: 10px 18px;
+    min-height: 42px;
+    border-radius: 3px;
     font-family: 'Cinzel', serif;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
     letter-spacing: 1px;
     text-transform: uppercase;
-    transition: all 0.2s;
+    transition: transform 0.15s, box-shadow 0.15s, background 0.15s, border-color 0.15s, color 0.15s;
     display: inline-flex;
     align-items: center;
+    gap: 7px;
+    cursor: pointer;
+    line-height: 1;
+  }
+  .toolbar .back-link span[data-ico], .toolbar button span[data-ico] { font-size: 15px; }
+  .toolbar .back-link {
+    background: transparent;
+    border: 1px solid var(--gold);
+    color: var(--parchment-dim);
+    text-decoration: none;
   }
   .toolbar .back-link:hover {
     background: var(--gold);
     color: var(--bg-deep);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(184,138,44,0.35);
   }
   .toolbar button {
-    padding: 8px 16px;
     background: linear-gradient(to bottom, var(--bg-card-soft), var(--bg-card));
     border: 1px solid var(--gold);
     color: var(--parchment);
-    border-radius: 2px;
-    cursor: pointer;
-    font-family: 'Cinzel', serif;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    transition: all 0.2s;
     box-shadow: 0 2px 8px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05);
   }
   .toolbar button:hover {
     background: linear-gradient(to bottom, var(--blood), var(--blood-dark));
     color: var(--bone);
     border-color: var(--gold-bright);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(139,29,29,0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(139,29,29,0.45);
+  }
+  .toolbar .back-link:active, .toolbar button:active {
+    transform: translateY(0);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  }
+  .toolbar .back-link:focus-visible, .toolbar button:focus-visible {
+    outline: 2px solid var(--gold-bright);
+    outline-offset: 2px;
   }
   .toolbar button.danger { border-color: var(--blood); }
   .toolbar button.danger:hover { background: linear-gradient(to bottom, var(--blood-bright), var(--blood)); }
+  @media (max-width: 700px) {
+    .toolbar-sep { display: none; }
+  }
 
   /* ===== GRID DE CARDS ===== */
   .grid {
@@ -768,7 +795,8 @@
     .grid { grid-template-columns: 1fr; gap: 14px; }
     .card { padding: 16px 14px; }
     .toolbar { flex-direction: column; align-items: stretch; gap: 8px; padding: 10px; }
-    .toolbar button, .toolbar .back-link { padding: 12px 16px; min-height: 44px; width: 100%; text-align: center; font-size: 12px; }
+    .toolbar-group { flex-direction: column; align-items: stretch; gap: 8px; }
+    .toolbar button, .toolbar .back-link { padding: 12px 16px; min-height: 44px; width: 100%; justify-content: center; text-align: center; font-size: 12px; }
 
     .stats-row { gap: 8px; }
     .stat-box { padding: 8px 6px; }
@@ -877,13 +905,18 @@
 </header>
 
 <nav class="toolbar" aria-label="Ações do painel">
-  <a href="maldicao_strahd.html" class="back-link" aria-label="Voltar à escolha de Maldição de Strahd">← Voltar</a>
-  <button onclick="adicionarCard()" id="btn-adicionar" style="display:none" aria-label="Adicionar novo personagem"><span aria-hidden="true">⚜</span> Adicionar</button>
-  <button onclick="descansoLongo()" id="btn-descanso-global" style="display:none" aria-label="Aplicar descanso longo a todos"><span data-ico="noite" aria-hidden="true"></span> Descanso Longo</button>
-  <button type="button" onclick="abrirNotasMestre({ chave: 'barovia', titulo: 'Maldição de Strahd' })" id="btn-notas-mestre" style="display:none" aria-label="Abrir anotações do mestre"><span data-ico="notas" aria-hidden="true"></span> Anotações</button>
-  <a href="vilao/index.html" id="link-vilao" class="back-link" style="display:none;text-decoration:none" aria-label="Abrir fichas de vilão"><span data-ico="vampiro" aria-hidden="true"></span> Vilões</a>
-  <a href="reloaded/index.html" id="link-reloaded" class="back-link" style="display:none;text-decoration:none" aria-label="Abrir guia Curse of Strahd: Reloaded"><span data-ico="grimorio" aria-hidden="true"></span> Reloaded</a>
-  <button onclick="window.print()" aria-label="Imprimir painel"><span data-ico="imprimir" aria-hidden="true"></span> Imprimir</button>
+  <div class="toolbar-group">
+    <a href="maldicao_strahd.html" class="back-link" aria-label="Voltar à escolha de Maldição de Strahd">← Voltar</a>
+    <a href="vilao/index.html" id="link-vilao" class="back-link" style="display:none;text-decoration:none" aria-label="Abrir personagens"><span data-ico="personagens" aria-hidden="true"></span> Personagens</a>
+    <a href="reloaded/index.html" id="link-reloaded" class="back-link" style="display:none;text-decoration:none" aria-label="Abrir guia Curse of Strahd: Reloaded"><span data-ico="grimorio" aria-hidden="true"></span> Reloaded</a>
+  </div>
+  <div class="toolbar-sep" aria-hidden="true"></div>
+  <div class="toolbar-group">
+    <button onclick="adicionarCard()" id="btn-adicionar" style="display:none" aria-label="Adicionar novo personagem"><span aria-hidden="true">⚜</span> Adicionar</button>
+    <button onclick="descansoLongo()" id="btn-descanso-global" style="display:none" aria-label="Aplicar descanso longo a todos"><span data-ico="noite" aria-hidden="true"></span> Descanso Longo</button>
+    <button type="button" onclick="abrirNotasMestre({ chave: 'barovia', titulo: 'Maldição de Strahd' })" id="btn-notas-mestre" style="display:none" aria-label="Abrir anotações do mestre"><span data-ico="notas" aria-hidden="true"></span> Anotações</button>
+    <button onclick="window.print()" aria-label="Imprimir painel"><span data-ico="imprimir" aria-hidden="true"></span> Imprimir</button>
+  </div>
   <span class="auth-slot" id="auth-slot" aria-label="Status de login" style="margin-left:auto;display:flex;gap:8px;align-items:center;font-family:'Cinzel',serif;font-size:11px"></span>
 </nav>
 
