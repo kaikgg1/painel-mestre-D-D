@@ -15,10 +15,14 @@
 (function () {
   let _injetado = false;
 
+  // Usa os tokens compartilhados (assets/css/tokens.css) com fallback pro
+  // valor Strahd — hoje esse modal só é usado no painel do Mestre
+  // (painel_barovia_dnd5e.html), mas fica pronto pra tema geral também
+  // se algum dia for reaproveitado numa página fora da campanha.
   const CSS = `
   .cf-overlay {
     position: fixed; inset: 0; z-index: 9000;
-    background: rgba(0,0,0,0.82);
+    background: rgba(0,0,0,0.75);
     backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
     display: flex; align-items: center; justify-content: center;
     padding: 20px;
@@ -27,14 +31,14 @@
   }
   .cf-overlay.open { opacity: 1; pointer-events: auto; }
   .cf-modal {
-    background: linear-gradient(160deg, #1f1416 0%, #160c10 100%);
-    border: 2px solid #8B6914;
+    background: linear-gradient(160deg, var(--surface-raised, #211012) 0%, var(--surface, #180b0d) 100%);
+    border: 1px solid var(--border, #5f171b);
     border-radius: 8px;
     max-width: 460px; width: 100%;
     padding: 22px 24px 20px;
-    box-shadow: 0 0 0 1px #8b1d1d inset, 0 24px 60px rgba(0,0,0,0.85);
-    font-family: 'EB Garamond', Georgia, serif;
-    color: #d4c5a0;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.7);
+    font-family: var(--font-body, Georgia, serif);
+    color: var(--text, #ddd0bc);
     transform: scale(0.95) translateY(8px);
     transition: transform 0.18s ease-out;
     position: relative;
@@ -42,21 +46,21 @@
   .cf-overlay.open .cf-modal { transform: scale(1) translateY(0); }
   .cf-modal::before {
     content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-    background: linear-gradient(to right, transparent, #b88a2c, transparent);
+    background: linear-gradient(to right, transparent, var(--gold, #a8232b), transparent);
   }
   .cf-modal.danger::before {
-    background: linear-gradient(to right, transparent, #c4302b, transparent);
+    background: linear-gradient(to right, transparent, var(--danger, #861820), transparent);
   }
   .cf-titulo {
-    font-family: 'Cinzel Decorative', serif;
+    font-family: var(--font-heading-deco, var(--font-heading, serif));
     font-size: 18px; font-weight: 700;
-    color: #b88a2c; letter-spacing: 1px;
+    color: var(--gold, #a8232b); letter-spacing: 1px;
     margin-bottom: 10px;
   }
-  .cf-modal.danger .cf-titulo { color: #c4302b; }
+  .cf-modal.danger .cf-titulo { color: var(--danger, #861820); }
   .cf-msg {
     font-size: 14px; line-height: 1.55;
-    color: #d4c5a0;
+    color: var(--text, #ddd0bc);
     margin-bottom: 20px;
     white-space: pre-wrap;
   }
@@ -66,29 +70,29 @@
   }
   .cf-btn {
     padding: 9px 16px;
-    font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700;
+    font-family: var(--font-heading, serif); font-size: 12px; font-weight: 700;
     letter-spacing: 1px; text-transform: uppercase;
     border-radius: 5px; cursor: pointer;
     min-height: 42px; min-width: 100px;
     transition: all 0.15s;
   }
   .cf-btn-cancel {
-    background: transparent; border: 1px solid #8c7d5e; color: #d4c5a0;
+    background: transparent; border: 1px solid var(--text-muted, #89776d); color: var(--text, #ddd0bc);
   }
-  .cf-btn-cancel:hover { border-color: #b88a2c; color: #d4a843; background: rgba(184,138,44,0.08); }
+  .cf-btn-cancel:hover {
+    border-color: var(--gold, #a8232b); color: var(--gold-light, #d14242);
+    background: color-mix(in srgb, var(--gold, #a8232b) 10%, transparent);
+  }
   .cf-btn-ok {
-    background: linear-gradient(180deg, #b88a2c, #6a4f0e);
-    border: 1px solid #d4a843; color: #1a1014;
+    background: linear-gradient(180deg, var(--gold-light, #d14242), var(--gold, #a8232b));
+    border: 1px solid var(--gold, #a8232b); color: var(--bg, #070506);
   }
-  .cf-btn-ok:hover { background: linear-gradient(180deg, #d4a843, #b88a2c); }
+  .cf-btn-ok:hover { filter: brightness(1.1); }
   .cf-modal.danger .cf-btn-ok {
-    background: linear-gradient(180deg, #8b1a1a, #5a0e0e);
-    border-color: #c4302b; color: #f4d878;
+    background: linear-gradient(180deg, var(--danger, #861820), color-mix(in srgb, var(--danger, #861820) 70%, black));
+    border-color: var(--danger, #861820); color: var(--text, #ddd0bc);
   }
-  .cf-modal.danger .cf-btn-ok:hover {
-    background: linear-gradient(180deg, #c4302b, #8b1a1a);
-    color: #fff;
-  }
+  .cf-modal.danger .cf-btn-ok:hover { filter: brightness(1.15); }
   @media (max-width: 480px) {
     .cf-modal { padding: 18px; }
     .cf-titulo { font-size: 16px; }
