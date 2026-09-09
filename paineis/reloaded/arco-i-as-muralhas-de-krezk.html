@@ -110,7 +110,13 @@ div.description p:last-child { margin-bottom:0; }
 .callout { border:1px solid var(--border); border-left:4px solid var(--gold-dim);
   border-radius:0 8px 8px 0; background:rgba(224,165,66,.06); margin:18px 0; padding:14px 18px; }
 .callout-title { font-weight:700; color:var(--gold); font-size:13px; letter-spacing:.3px;
-  text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+  text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:8px;
+  cursor:pointer; list-style:none; user-select:none; }
+.callout-title::-webkit-details-marker { display:none; }
+.callout-title::after { content:'▸'; margin-left:auto; font-size:11px; color:var(--text-faint);
+  transition:transform .15s; flex-shrink:0; }
+.callout[open] > .callout-title::after { transform:rotate(90deg); }
+.callout:not([open]) > .callout-title { margin-bottom:0; }
 .callout-icon { font-size:14px; }
 .callout-body p:last-child { margin-bottom:0; }
 .callout-body { font-size:16px; }
@@ -152,13 +158,30 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 .toc-label { font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
   color:var(--text-faint); margin-bottom:12px; }
 .toc-list { font-size:13px; }
-.toc-list a { display:block; padding:4px 0; color:var(--text-dim); border-bottom:none;
-  line-height:1.4; }
+.toc-list a { display:block; padding:4px 9px; color:var(--text-dim); border-bottom:none;
+  border-left:2px solid transparent; line-height:1.4; transition:color .15s, border-color .15s; }
 .toc-list a:hover { color:var(--text); text-decoration:none; }
-.toc-lvl-1 { padding-left:0; font-weight:600; }
-.toc-lvl-2 { padding-left:12px; }
-.toc-lvl-3 { padding-left:24px; }
-.toc-lvl-4 { padding-left:36px; font-size:12px; }
+.toc-list a.active { color:var(--gold); font-weight:600; border-left-color:var(--gold-dim); }
+/* padding-left por nivel: fica de fora do shorthand acima de proposito
+   (mesma especificidade que .toc-list a venceria e anularia o recuo). */
+.toc-lvl-1 { padding-left:9px; font-weight:600; }
+.toc-lvl-2 { padding-left:21px; }
+.toc-lvl-3 { padding-left:33px; }
+.toc-lvl-4 { padding-left:45px; font-size:12px; }
+
+/* ---------- progresso de leitura + voltar ao topo ---------- */
+.reading-progress { position:fixed; top:0; left:0; height:3px; width:0%;
+  background:var(--gold); z-index:100; transition:width .1s linear; }
+.back-to-top { position:fixed; right:22px; bottom:22px; z-index:60;
+  width:44px; height:44px; border-radius:50%; background:var(--bg-card);
+  border:1px solid var(--border); color:var(--gold); font-size:18px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 4px 16px rgba(0,0,0,.4); transition:opacity .15s, transform .15s, border-color .15s;
+  opacity:0; pointer-events:none; }
+.back-to-top.visible { opacity:1; pointer-events:auto; }
+.back-to-top:hover { border-color:var(--gold-dim); transform:translateY(-2px); }
+@media (max-width:860px) { .back-to-top { right:14px; bottom:14px; width:40px; height:40px; } }
+@media (prefers-reduced-motion: reduce) { .reading-progress, .back-to-top { transition:none; } }
 
 /* ---------- pagina indice ---------- */
 .idx-intro { margin-bottom:8px; }
@@ -203,6 +226,7 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 </style>
 </head>
 <body>
+<div class="reading-progress" id="reading-progress"></div>
 <div class="mobile-topbar">
   <button aria-label="Abrir menu">☰</button>
   <a class="brand" href="index.html">Curse of Strahd: Reloaded</a>
@@ -251,13 +275,13 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 <h1 id="i2-os-portões-de-krezk">I2. Os Portões de Krezk</h1>
 <p><span class="citation"><em>Esta cena ocorre no Capítulo 8: Área S2.</em></span></p>
 <p>Os portões de Krezk são, em grande parte, como descritos em <span class="citation">S2. Casa do Portão (p. 145)</span>. Se os jogadores já derrotaram os druidas que ocupavam o Vinícola Feiticeiro dos Vinhos em <a href="arco-j-a-gema-roubada.html">Arco J - A Gema Roubada</a>, o Barão Krezkov os reconhece pelas descrições compartilhadas por Adrian e Elvir Martikov e os recebe de bom grado em Krezk. Prossiga para <a href="#i6-a-vila-de-krezk">I6. A Vila de Krezk</a> abaixo.</p>
-<div class="callout callout-profile"><div class="callout-title"><span class="callout-icon">👤</span><strong>Perfil: Barão Dmitri Krezkov</strong></div><div class="callout-body"><p><strong>Informações de Interpretação.</strong> <strong><em>Ressonância.</em></strong> Dmitri deve inspirar conforto com sua confiança tranquila e sua liderança, compaixão por sua ansiedade e seu luto após o desaparecimento do filho, e leve irritação por sua teimosia e sua desconfiança habitual de forasteiros.</p>
+<details class="callout callout-profile" open><summary class="callout-title"><span class="callout-icon">👤</span><strong>Perfil: Barão Dmitri Krezkov</strong></summary><div class="callout-body"><p><strong>Informações de Interpretação.</strong> <strong><em>Ressonância.</em></strong> Dmitri deve inspirar conforto com sua confiança tranquila e sua liderança, compaixão por sua ansiedade e seu luto após o desaparecimento do filho, e leve irritação por sua teimosia e sua desconfiança habitual de forasteiros.</p>
 <p><strong><em>Emoções.</em></strong> Dmitri costuma sentir preocupação, melancolia, tristeza, determinação, cautela, teimosia ou gentileza.</p>
 <p><strong><em>Motivações.</em></strong> Dmitri quer proteger sua vila e manter sua família unida.</p>
 <p><strong><em>Inspirações.</em></strong> Ao interpretar Dmitri, canalize Eddard Stark (<em>Game of Thrones</em>), o Rei Théoden (<em>O Senhor dos Anéis</em>) e Stoico, o Vasto (<em>Como Treinar o Seu Dragão</em>).</p>
 <p><strong>Informações do Personagem</strong> <strong><em>Persona.</em></strong> Para o mundo, Dmitri é um líder sombrio, mas caloroso. Para aqueles em quem confia, Dmitri é um pai, marido e amigo afetuoso e dedicado. Somente Dmitri conhece a real extensão de seu luto, sua ansiedade e sua culpa a respeito da maldição de sua família e do destino de seus filhos e de sua esposa.</p>
 <p><strong><em>Moral.</em></strong> Em uma luta, Dmitri agiria apenas para proteger a si mesmo ou seus entes queridos, começando por avisar seu oponente para recuar, e então lutando ferozmente até que o oponente cedesse ou fosse derrotado.</p>
-<p><strong><em>Relações.</em></strong> Dmitri, um <strong>lobisomem</strong> secreto, é o marido da Baronesa Anna Krezkova, o irmão da clériga de Mãe Noite e <strong>lobisomem</strong> Zuleika Toranescu, o pai de Kala e Ilya Krezkov, e o burgomestre da vila de Krezk.</p></div></div>
+<p><strong><em>Relações.</em></strong> Dmitri, um <strong>lobisomem</strong> secreto, é o marido da Baronesa Anna Krezkova, o irmão da clériga de Mãe Noite e <strong>lobisomem</strong> Zuleika Toranescu, o pai de Kala e Ilya Krezkov, e o burgomestre da vila de Krezk.</p></div></details>
 <p>Caso contrário, em vez de pedir aos jogadores que garantam uma carroça de vinho do Vinícola Feiticeiro dos Vinhos, o Barão Krezkov pede que os jogadores viajem até a cabana da bruxa Baba Lysaga, nas ruínas de Berez, a sudeste. Lá, ele lhes diz, devem suplicar a Baba Lysaga que lance a magia de <em>escrutínio</em> (<em>scrying</em>) para descobrir o paradeiro e o estado de uma pessoa em particular.</p>
 <p>Se os jogadores aceitarem a tarefa do Barão Krezkov, ele lhes fornece algumas mechas de cabelo escuro para que Baba Lysaga use em seu escrutínio, além de uma grande pulseira de ouro incrustada com entalhes intrincados de lobos e corvos (no valor de 300 po) como presente para comprar seu favor.</p>
 <p>Se perguntado, o Barão Krezkov confessa que a pessoa desaparecida é seu filho, Ilya Krezkov, que desapareceu há vários dias. Um teste de Sabedoria (Intuição) CD 15 bem-sucedido revela que ele não está contando toda a verdade, embora não esteja disposto a compartilhar mais informações.</p>
@@ -270,9 +294,9 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 <p>De repente, uma nuvem de penas negras irrompe das árvores ao norte, quando um bando de corvos alça voo a menos de cem metros da beira da estrada, seus gritos apavorados ecoando no ar gelado. Da moita sob eles, vocês ouvem o som rítmico e inconfundível de numerosos passos inumanos, e conseguem distinguir o contorno de uma horda de sombras trôpegas e espinhentas na luz fraca. As figuras, que parecem estar se aproximando de uma curva na estrada logo à frente de vocês, ainda não parecem tê-los notado — mas suas silhuetas se aproximam a cada segundo que passa.</p>
 </div>
 <p>Os jogadores podem travar batalha contra os flagelos, ou podem se esconder nas moitas para evitar a atenção da horda com um teste de grupo de Destreza (Furtividade) CD 10 bem-sucedido, conforme descrito em <strong>Testes em Grupo</strong> (<em>Player's Handbook</em>, p. 175).</p>
-<div class="callout callout-combat"><div class="callout-title"><span class="callout-icon">⚔</span><strong>Combate - Os Flagelos de Agulha</strong></div><div class="callout-body"><p><strong>Nível do Combate</strong>: Leve <strong>Nível de Personagem Esperado</strong>: 5 <strong>Consumo Esperado de PV:</strong> 18%</p>
+<details class="callout callout-combat" open><summary class="callout-title"><span class="callout-icon">⚔</span><strong>Combate - Os Flagelos de Agulha</strong></summary><div class="callout-body"><p><strong>Nível do Combate</strong>: Leve <strong>Nível de Personagem Esperado</strong>: 5 <strong>Consumo Esperado de PV:</strong> 18%</p>
 <h3 id="inimigos"><strong>Inimigos:</strong></h3>
-<div class="table-wrap"><table class="md-table"><thead><tr><th></th><th>3 Jogadores</th><th>4 Jogadores</th><th>5 Jogadores</th><th>6 Jogadores</th></tr></thead><tbody><tr><td>Flagelos de Agulha</td><td>6</td><td>8</td><td>10</td><td>12</td></tr></tbody></table></div></div></div>
+<div class="table-wrap"><table class="md-table"><thead><tr><th></th><th>3 Jogadores</th><th>4 Jogadores</th><th>5 Jogadores</th><th>6 Jogadores</th></tr></thead><tbody><tr><td>Flagelos de Agulha</td><td>6</td><td>8</td><td>10</td><td>12</td></tr></tbody></table></div></div></details>
 <h2 id="i3b-o-caminho-do-rio-luna">I3b. O Caminho do Rio Luna</h2>
 <p>Enquanto os jogadores partem da Encruzilhada do Rio Luna, leia:</p>
 <div class="description">
@@ -302,29 +326,29 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 </div>
 <p>A silhueta pertence a Wensencia, uma <strong>bruxa baroviana</strong> de voz estridente, zombeteira e de língua afiada, vinda de Vallaki, que vem estudando sob a tutela de Baba Lysaga nos últimos três meses. (Wensencia, assim como as outras quatro alunas atuais de Baba Lysaga, viu o retorno de Strahd como a chegada de um messias sombrio, e buscou a bruxa do pântano por conselho de Ludmilla Vilisevic, a noiva vampírica de Strahd.)</p>
 <p>Wensencia informa secamente aos jogadores que "Mãe Lysaga" os convocou até sua cabana, e que devem segui-la se quiserem chegar lá em segurança. Ela não faz perguntas nem responde a nenhuma, exceto para dizer aos jogadores que ninguém vem a Berez a não ser para buscar o favor de "Mãe Lysaga", e que somente Baba Lysaga determinará se podem conquistá-lo.</p>
-<div class="callout callout-abstract"><div class="callout-title"><span class="callout-icon">📖</span><strong>Os Megálitos</strong></div><div class="callout-body"><p>Os megálitos além do Rio Luna demarcam os limites da Fane do Pântano: o santuário da Tecelã das Damas Três.</p>
+<details class="callout callout-abstract" open><summary class="callout-title"><span class="callout-icon">📖</span><strong>Os Megálitos</strong></summary><div class="callout-body"><p>Os megálitos além do Rio Luna demarcam os limites da Fane do Pântano: o santuário da Tecelã das Damas Três.</p>
 <p>(A Fane do Pântano recebe esse nome porque, antes das múltiplas invasões do vale, esta área era originalmente um pântano. Foi o Rei Dostron quem represou o afluente do Rio Luna vindo do Monte Ghakis, a nordeste, criando assim terras aráveis que suas tropas podiam cultivar — e foi Strahd quem destruiu essa represa usando os poderes das Fanes como punição a Berez após a morte de Marina.)</p>
 <p>Conforme os jogadores se aproximam dos megálitos, leia:</p>
 <p><hr></p>
 <p>Um círculo de megálitos robustos e lisos se ergue em meio à lama espessa, no centro de um bosque de árvores retorcidas, não muito longe da margem do rio. As árvores e as pedras eretas estão sufocadas por um espesso manto de teias branco-azuladas, cujos cordões grossos parecem cintilar com uma qualidade etérea.</p>
 <p><hr></p>
 <p>A área dentro das pedras é obscurecida pela cobertura proporcionada pelas teias, descritas em <strong>Teias</strong> (<span class="citation">Dungeon Master's Guide, p. 105</span>). Se os jogadores chegarem ao centro do círculo, encontram uma pedra de ônix negro e liso, com 1,5 metro de diâmetro, meio enterrada no centro do círculo. A pedra não tem marcas ou símbolos visíveis em sua superfície, e é imune a todo dano e a quaisquer tentativas de movê-la.</p>
-<p>Um minuto depois que os jogadores entram no manto de teias, sua presença chama a atenção de uma <strong>aranha etérea</strong>, que usa sua característica <strong><em>passeio etéreo</em></strong> para piscar brevemente para dentro (e depois para fora) do Plano Material. Na rodada seguinte, a primeira aranha etérea repete o processo, agora acompanhada por cinco <strong>aranhas etéreas</strong> adicionais, antes de todas retornarem ao Plano Etéreo. Se os jogadores permanecerem dentro das teias, todas as aranhas atacam na rodada seguinte.</p></div></div>
-<div class="callout callout-abstract"><div class="callout-title"><span class="callout-icon">📖</span><strong>Ruínas de Berez</strong></div><div class="callout-body"><p>Caso os jogadores tentem explorar as outras estruturas dentro de Berez, essas ruínas são, em grande parte, como descritas em <span class="citation">U1. Casebres Abandonados (p. 162)</span>, <span class="citation">U2. Mansão Ulrich (p. 162)</span>, <span class="citation">U4. Cemitério da Igreja (p. 164)</span>, e <span class="citation">U5. Monumento de Marina (p. 164)</span>. Contudo, o fantasma de Lazlo Ulrich não aparece na mansão Ulrich, e o cercado de cabras de Baba Lysaga é como descrito em <a href="#i4c-a-magia-de-escrutínio">I4c. A Magia de Escrutínio</a> abaixo.</p></div></div>
+<p>Um minuto depois que os jogadores entram no manto de teias, sua presença chama a atenção de uma <strong>aranha etérea</strong>, que usa sua característica <strong><em>passeio etéreo</em></strong> para piscar brevemente para dentro (e depois para fora) do Plano Material. Na rodada seguinte, a primeira aranha etérea repete o processo, agora acompanhada por cinco <strong>aranhas etéreas</strong> adicionais, antes de todas retornarem ao Plano Etéreo. Se os jogadores permanecerem dentro das teias, todas as aranhas atacam na rodada seguinte.</p></div></details>
+<details class="callout callout-abstract" open><summary class="callout-title"><span class="callout-icon">📖</span><strong>Ruínas de Berez</strong></summary><div class="callout-body"><p>Caso os jogadores tentem explorar as outras estruturas dentro de Berez, essas ruínas são, em grande parte, como descritas em <span class="citation">U1. Casebres Abandonados (p. 162)</span>, <span class="citation">U2. Mansão Ulrich (p. 162)</span>, <span class="citation">U4. Cemitério da Igreja (p. 164)</span>, e <span class="citation">U5. Monumento de Marina (p. 164)</span>. Contudo, o fantasma de Lazlo Ulrich não aparece na mansão Ulrich, e o cercado de cabras de Baba Lysaga é como descrito em <a href="#i4c-a-magia-de-escrutínio">I4c. A Magia de Escrutínio</a> abaixo.</p></div></details>
 <h2 id="i4b-a-cabana-de-baba-lysaga">I4b. A Cabana de Baba Lysaga</h2>
 <p><span class="citation"><em>Esta cena ocorre no Capítulo 10: Área U3.</em></span></p>
 <p>A Cabana de Baba Lysaga é como descrita em <span class="citation">U3. Cabana de Baba Lysaga (p. 163)</span>. Contudo, o som de uma suave canção de ninar pode ser ouvido vindo do batente aberto da porta da cabana, abafado pelo som dos grasnados dos corvos. Além disso, se a <strong>estirge maior</strong> avisou Baba Lysaga da chegada dos jogadores, ela está empoleirada sobre a cabana, observando silenciosamente os jogadores enquanto se aproximam.</p>
 <p>Ao chegarem à base do toco sobre o qual a cabana está empoleirada, se Wensencia estiver presente, ela anuncia a presença dos jogadores antes de se virar e partir. (Note que, como a cabana é construída sobre um toco enorme, os jogadores devem escalar as raízes do toco para alcançar a entrada e a porta da frente da cabana.)</p>
 <p>Se os jogadores entrarem na cabana, encontram Baba Lysaga cantarolando uma canção de ninar sobre o berço e a criança ilusórios. Caso contrário, a canção termina um minuto depois da chegada dos jogadores; se Baba Lysaga foi alertada da chegada dos jogadores pela <strong>estirge maior</strong>, ela então emerge para recebê-los.</p>
 <p>Baba Lysaga está hesitantemente disposta a conceder uma audiência aos jogadores, desde que ainda não tenham combatido os druidas que ocupam a vinícola Vinícola Feiticeiro dos Vinhos em <a href="arco-j-a-gema-roubada.html">Arco J - A Gema Roubada</a> (Se os jogadores já o tiverem feito, Baba Lysaga os ataca à vista.) Contudo, se os jogadores ofenderem Baba Lysaga — como ao afirmar que o bebê no berço é ilusório e insistir em discutir sobre isso, ou ao expressar desagrado por Strahd e se recusar a pedir desculpas ao "bebê" — ela lhes ordena que deixem sua cabana, atacando se eles se recusarem.</p>
-<div class="callout callout-abstract"><div class="callout-title"><span class="callout-icon">📖</span><strong>A Ira de Lysaga</strong></div><div class="callout-body"><p>Se ela conseguir deixá-los inconscientes, Baba Lysaga transforma magicamente os jogadores em <strong>cabras</strong> e os tranca em seu cercado de cabras (descrito abaixo), onde despertam 1d4 + 1 horas depois. Lá, os jogadores encontram um <strong>batedor</strong> baroviano chamado Darzin Voltanescu, que foi transformado em cabra como eles.</p>
-<p>Darzin avisa aos jogadores que Lysaga pretende mantê-los como sacrifícios para uso em suas poções de longevidade. Ele pode contar, porém, que uma bruxa baroviana que o provocava deixou escapar que Lysaga guarda, numa prateleira de seu armário de vime, doses de uma poção chamada <em>tintura nula</em> (<em>null tincture</em>), que, se ingerida, encerra todas as magias e efeitos mágicos atualmente afetando quem a bebe. Jogadores que conseguirem escapar do cercado de cabras e se esgueirar até a cabana de Baba Lysaga podem encontrar seis <em>tinturas nulas</em> em seu armário de vime.</p></div></div>
+<details class="callout callout-abstract" open><summary class="callout-title"><span class="callout-icon">📖</span><strong>A Ira de Lysaga</strong></summary><div class="callout-body"><p>Se ela conseguir deixá-los inconscientes, Baba Lysaga transforma magicamente os jogadores em <strong>cabras</strong> e os tranca em seu cercado de cabras (descrito abaixo), onde despertam 1d4 + 1 horas depois. Lá, os jogadores encontram um <strong>batedor</strong> baroviano chamado Darzin Voltanescu, que foi transformado em cabra como eles.</p>
+<p>Darzin avisa aos jogadores que Lysaga pretende mantê-los como sacrifícios para uso em suas poções de longevidade. Ele pode contar, porém, que uma bruxa baroviana que o provocava deixou escapar que Lysaga guarda, numa prateleira de seu armário de vime, doses de uma poção chamada <em>tintura nula</em> (<em>null tincture</em>), que, se ingerida, encerra todas as magias e efeitos mágicos atualmente afetando quem a bebe. Jogadores que conseguirem escapar do cercado de cabras e se esgueirar até a cabana de Baba Lysaga podem encontrar seis <em>tinturas nulas</em> em seu armário de vime.</p></div></details>
 <p>Para conquistar o direito de falar com ela, Baba Lysaga determina que um dos jogadores deve primeiro arrancar uma pena de um dos corvos nas gaiolas penduradas e colocá-la no berço de "Strahd" como oferenda. (Baba Lysaga observa que os corvos são, segundo se diz, servos da profecia, e que o destino de uma criança real deve ser exaltado acima de todos os outros. A pena, se arrancada, cai através do berço ilusório até o chão da cabana, mas a louca Baba Lysaga não dá atenção a isso.)</p>
 <p>Assim que os jogadores fizerem a oferenda solicitada, Baba Lysaga fica satisfeita em fazer negócio com eles. Ela está disposta a aceitar a pulseira de ouro do Barão Krezkov como pagamento por uma única magia de <em>escrutínio</em>. Caso os jogadores solicitem, ela também está disposta a aceitar um item de valor semelhante para lançar <em>escrutínio</em> uma segunda vez sobre um alvo à escolha dos jogadores.</p>
 <p>Ao aceitar o pagamento do Barão Krezkov, Baba Lysaga instrui os jogadores a viajar até o cercado de cabras ao lado da <span class="citation">U2. Mansão Ulrich (p. 162)</span> e buscar uma única <strong>cabra</strong> viva. (Baba Lysaga precisa do sangue da cabra viva para criar um meio através do qual realizar seu ritual de <em>escrutínio</em>.) Embora não haja portão na cerca do cercado de cabras, ela informa aos jogadores que podem criar um magicamente ao falar a senha: "Death to Ravenovia."</p>
 <p>Se perguntada sobre as estirges, Lysaga explica, com regozijo, que são um artefato de sua própria criação — excelentes para matar ou capturar corvos, que ela detesta.</p>
 <p>Se perguntada sobre Lady Fiona Wachter, o humor de Lysaga desmorona, e ela adverte sombriamente aos jogadores que nunca mais falem o nome "daquela garota tola" em sua presença.</p>
-<div class="callout callout-abstract"><div class="callout-title"><span class="callout-icon">📖</span><strong>A Cura de Baba Lysaga</strong></div><div class="callout-body"><p>Se os jogadores pedirem a Baba Lysaga que cure sua doença, ela dispensa o pedido com uma gargalhada, alegando que seu preço seria alto demais para que pudessem pagar, e que eles não gostariam de seu remédio. Ela se recusa a discutir mais o assunto, sugerindo apenas que "a carne deve pagar pela santidade da carne."</p></div></div>
+<details class="callout callout-abstract" open><summary class="callout-title"><span class="callout-icon">📖</span><strong>A Cura de Baba Lysaga</strong></summary><div class="callout-body"><p>Se os jogadores pedirem a Baba Lysaga que cure sua doença, ela dispensa o pedido com uma gargalhada, alegando que seu preço seria alto demais para que pudessem pagar, e que eles não gostariam de seu remédio. Ela se recusa a discutir mais o assunto, sugerindo apenas que "a carne deve pagar pela santidade da carne."</p></div></details>
 <h2 id="i4c-a-magia-de-escrutínio">I4c. A Magia de Escrutínio</h2>
 <p>O cercado de cabras é, em grande parte, como descrito em <span class="citation">U2. Mansão Ulrich (p. 162)</span>. Contudo, falar a senha "Death to Ravenovia" a até 3 metros do cercado de cabras cria um portão na cerca de madeira por um minuto. Os jogadores podem capturar uma cabra deixando-a inconsciente, contendo-a ou conduzindo-a com uma corda, ou agarrando-a e puxando-a diretamente até a cabana. Se estiver consciente, uma cabra capturada se debate e bale pateticamente enquanto é conduzida em direção à cabana.</p>
 <p>Se os jogadores conseguirem trazer uma cabra para Baba Lysaga, ela retira uma adaga enferrujada e manchada de sangue de seu armário de vime e instrui os jogadores a posicionar a cabra de forma que seu pescoço fique acima da banheira. Leia:</p>
@@ -344,7 +368,7 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 <p>Baba Lysaga não consegue dizer aos jogadores, contudo, <em>onde</em> a caverna realmente está localizada, observando com desdém que a magia de <em>escrutínio</em> só permite observar os arredores imediatos de uma criatura. Para resgatar o garoto que ela viu, os jogadores precisarão encontrar a caverna por conta própria.</p>
 <h1 id="i5-retorno-a-krezk">I5. Retorno a Krezk</h1>
 <p>O retorno dos jogadores a Krezk tem quatorze quilômetros de extensão e leva três horas. Alternativamente, se os jogadores não tiverem tempo para retornar a Krezk, a jornada até Vallaki tem sete quilômetros de extensão e leva uma hora e meia.</p>
-<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>Marcha Forçada</strong></div><div class="callout-body"><p>Lembre-se de que jogadores que viajam por mais de oito horas em um dia correm o risco de sofrer exaustão, conforme descrito em <span class="citation">Ritmo de Viagem (Player's Handbook, p. 181)</span>.</p></div></div>
+<details class="callout callout-info" open><summary class="callout-title"><span class="callout-icon">ℹ</span><strong>Marcha Forçada</strong></summary><div class="callout-body"><p>Lembre-se de que jogadores que viajam por mais de oito horas em um dia correm o risco de sofrer exaustão, conforme descrito em <span class="citation">Ritmo de Viagem (Player's Handbook, p. 181)</span>.</p></div></details>
 <p>Independentemente de seu destino, os jogadores vivenciam o evento <span class="citation">Lost Battlefield (p. 166)</span> ao passarem pelo ponto onde o Rio Luna se divide.</p>
 <h1 id="i6-a-vila-de-krezk">I6. A Vila de Krezk</h1>
 <p>Se os jogadores retornarem com sucesso a Krezk com as informações obtidas pela magia de <em>escrutínio</em> de Baba Lysaga e as compartilharem com o Barão Krezkov, ele lhes concede, agradecido, entrada na vila.</p>
@@ -361,13 +385,13 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 <p>As flores são <em>acônito</em> (<em>wolfsbane</em>). O jovem é o Abade da Abadia de St. Markovia, que é, em grande parte, como descrito em <span class="citation">S13. Salão Principal (p. 150)</span> e <span class="citation">Apêndice D (p. 225)</span>.</p>
 <p><img class="reloaded-img" src="img/The%20Abbot.png" alt="The Abbot.png" loading="lazy"> <span class="credit">"O Abade", de Caleb Cleveland. Apoie-o no <a href="https://patreon.com/calebisdrawing/">Patreon!</a></span></p>
 <p>Caso os jogadores se aproximem ou se dirijam a ele, o Abade, sem erguer os olhos da flor, diz: "Uma proteção contra o mal, e ainda assim um veneno mortal. Não é estranho que uma simples flor possa conter tal dualidade em si?"</p>
-<div class="callout callout-profile"><div class="callout-title"><span class="callout-icon">👤</span><strong>Perfil: O Abade</strong></div><div class="callout-body"><p><strong>Informações de Interpretação</strong> <strong><em>Ressonância.</em></strong> O Abade deve inspirar desconforto com seu estoicismo e suas observações rotineiras a respeito dos "mortais," repulsa por sua falta de respeito pela vida ou pelos valores humanos, raiva por sua autoconfiança suprema e inabalável, e gratidão por sua simpatia (um tanto perturbadora) e por sua disposição em curar os jogadores da licantropia sem cobrar nada.</p>
+<details class="callout callout-profile" open><summary class="callout-title"><span class="callout-icon">👤</span><strong>Perfil: O Abade</strong></summary><div class="callout-body"><p><strong>Informações de Interpretação</strong> <strong><em>Ressonância.</em></strong> O Abade deve inspirar desconforto com seu estoicismo e suas observações rotineiras a respeito dos "mortais," repulsa por sua falta de respeito pela vida ou pelos valores humanos, raiva por sua autoconfiança suprema e inabalável, e gratidão por sua simpatia (um tanto perturbadora) e por sua disposição em curar os jogadores da licantropia sem cobrar nada.</p>
 <p><strong><em>Emoções.</em></strong> O Abade costuma sentir curiosidade, fascínio, frieza, indiferença ou (raramente) fúria.</p>
 <p><strong><em>Motivações.</em></strong> O Abade quer livrar Barovia da "maldição" que pesa sobre ela e preservar a "santidade" da Abadia de Saint Markovia.</p>
 <p><strong><em>Inspirações.</em></strong> Ao interpretar o Abade, canalize Visão (<em>Marvel</em>), Data (<em>Star Trek</em>) e Dr. Manhattan (<em>Watchmen</em>).</p>
 <p><strong>Informações do Personagem</strong> <strong><em>Persona.</em></strong> Para o mundo, o Abade é um homem sagrado e "cientista" sereno, porém desumanamente indiferente. Somente o Abade sabe que ele é Ithuriel: um anjo do Senhor da Manhã enviado para honrar a memória de Saint Markovia.</p>
 <p><strong><em>Moral.</em></strong> Em uma luta, o Abade revelaria sua forma divina, e então ordenaria que seus inimigos depusessem as armas e se rendessem. Se eles não o fizessem, ele os atacaria sem piedade, buscando esmagar qualquer resistência até que se rendessem ou fugissem.</p>
-<p><strong><em>Relações.</em></strong> O Abade, um anjo do Senhor da Manhã outrora chamado Ithuriel, é o senhor da Abadia de Saint Markovia, incluindo os <strong>mestiços</strong> Otto, Zygfrek e Clovin Belview. Ele também é o criador do <strong>corpanzil de carne</strong> Vasilka e o responsável por ressuscitar Kala Krezkova.</p></div></div>
+<p><strong><em>Relações.</em></strong> O Abade, um anjo do Senhor da Manhã outrora chamado Ithuriel, é o senhor da Abadia de Saint Markovia, incluindo os <strong>mestiços</strong> Otto, Zygfrek e Clovin Belview. Ele também é o criador do <strong>corpanzil de carne</strong> Vasilka e o responsável por ressuscitar Kala Krezkova.</p></div></details>
 <p>Depois que os jogadores tiverem a oportunidade de discutir e debater sua pergunta, se algum deles estiver infectado com a maldição da licantropia de lobisomem, o nariz do Abade se franze. Ele então se vira para os jogadores infectados, as sobrancelhas cerradas. "Perdoe-me, meu amigo," ele diz, "mas você carrega o fedor do lobo. É algo desagradável, e polui o ar deste lugar sagrado. Posso removê-lo de você?" Se o jogador consentir, o Abade usa seu <strong><em>toque curativo</em></strong> para curar sua licantropia.</p>
 <p>Se os jogadores perguntarem sua identidade, o Abade se apresenta como o Abade da Abadia de St. Markovia e os convida a visitar a Abadia, caso queiram conhecer sua história. (Caso queiram fazê-lo imediatamente, ele fica feliz em acompanhá-los.)</p>
 <p>Se perguntado sobre a fonte de seu poder, o Abade ri suavemente, afirmando apenas: "Sob a luz do Senhor da Manhã, todas as coisas são possíveis."</p>
@@ -377,6 +401,7 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
     <aside class="sidebar-right"><div class="toc-label">Nesta página</div><div class="toc-list"><a class="toc-lvl-1" href="#i1-a-estrada-para-krezk">I1. A Estrada para Krezk</a><a class="toc-lvl-1" href="#i2-os-portões-de-krezk">I2. Os Portões de Krezk</a><a class="toc-lvl-1" href="#i3-a-estrada-para-berez">I3. A Estrada para Berez</a><a class="toc-lvl-2" href="#i3a-a-horda-de-flagelos-de-agulha">I3a. A Horda de Flagelos de Agulha</a><a class="toc-lvl-2" href="#i3b-o-caminho-do-rio-luna">I3b. O Caminho do Rio Luna</a><a class="toc-lvl-1" href="#i4-as-ruínas-de-berez">I4. As Ruínas de Berez</a><a class="toc-lvl-2" href="#i4a-aproximando-se-das-ruínas">I4a. Aproximando-se das Ruínas</a><a class="toc-lvl-2" href="#i4b-a-cabana-de-baba-lysaga">I4b. A Cabana de Baba Lysaga</a><a class="toc-lvl-2" href="#i4c-a-magia-de-escrutínio">I4c. A Magia de Escrutínio</a><a class="toc-lvl-1" href="#i5-retorno-a-krezk">I5. Retorno a Krezk</a><a class="toc-lvl-1" href="#i6-a-vila-de-krezk">I6. A Vila de Krezk</a><a class="toc-lvl-2" href="#i6a-o-poço-abençoado">I6a. O Poço Abençoado</a><a class="toc-lvl-2" href="#i6b-a-abadia-de-st-markovia">I6b. A Abadia de St. Markovia</a></div></aside>
   </div>
 </div>
+<button type="button" class="back-to-top" id="back-to-top" aria-label="Voltar ao topo">↑</button>
 <script>
 document.querySelectorAll('.search-box input').forEach(function(inp){
   inp.addEventListener('input', function(){
@@ -400,6 +425,55 @@ if (mobileBtn) {
     document.querySelector('.sidebar-left').classList.toggle('open');
   });
 }
+
+// ---------- sumario ativo (scrollspy) ----------
+(function () {
+  var headings = document.querySelectorAll('main.article h1[id], main.article h2[id], main.article h3[id], main.article h4[id]');
+  var tocLinks = document.querySelectorAll('.toc-list a');
+  if (!headings.length || !tocLinks.length || !window.IntersectionObserver) return;
+  var map = {};
+  tocLinks.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a; });
+  var current = null;
+  function setActive(id) {
+    var a = map[id];
+    if (!a || a === current) return;
+    if (current) current.classList.remove('active');
+    a.classList.add('active');
+    current = a;
+    if (typeof a.scrollIntoView === 'function') {
+      a.scrollIntoView({ block: 'nearest' });
+    }
+  }
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) setActive(entry.target.id);
+    });
+  }, { rootMargin: '0px 0px -70% 0px', threshold: 0 });
+  headings.forEach(function (h) { observer.observe(h); });
+})();
+
+// ---------- progresso de leitura + voltar ao topo ----------
+(function () {
+  var progress = document.getElementById('reading-progress');
+  var toTop = document.getElementById('back-to-top');
+  if (!progress && !toTop) return;
+  function update() {
+    var doc = document.documentElement;
+    var scrollTop = window.scrollY || doc.scrollTop;
+    var height = doc.scrollHeight - doc.clientHeight;
+    var pct = height > 0 ? Math.min(100, (scrollTop / height) * 100) : 0;
+    if (progress) progress.style.width = pct + '%';
+    if (toTop) toTop.classList.toggle('visible', scrollTop > 500);
+  }
+  window.addEventListener('scroll', update, { passive: true });
+  update();
+  if (toTop) toTop.addEventListener('click', function () {
+    window.scrollTo({
+      top: 0,
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+    });
+  });
+})();
 </script>
 </body>
 </html>

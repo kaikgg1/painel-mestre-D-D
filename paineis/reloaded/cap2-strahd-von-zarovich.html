@@ -110,7 +110,13 @@ div.description p:last-child { margin-bottom:0; }
 .callout { border:1px solid var(--border); border-left:4px solid var(--gold-dim);
   border-radius:0 8px 8px 0; background:rgba(224,165,66,.06); margin:18px 0; padding:14px 18px; }
 .callout-title { font-weight:700; color:var(--gold); font-size:13px; letter-spacing:.3px;
-  text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+  text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:8px;
+  cursor:pointer; list-style:none; user-select:none; }
+.callout-title::-webkit-details-marker { display:none; }
+.callout-title::after { content:'▸'; margin-left:auto; font-size:11px; color:var(--text-faint);
+  transition:transform .15s; flex-shrink:0; }
+.callout[open] > .callout-title::after { transform:rotate(90deg); }
+.callout:not([open]) > .callout-title { margin-bottom:0; }
 .callout-icon { font-size:14px; }
 .callout-body p:last-child { margin-bottom:0; }
 .callout-body { font-size:16px; }
@@ -152,13 +158,30 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 .toc-label { font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
   color:var(--text-faint); margin-bottom:12px; }
 .toc-list { font-size:13px; }
-.toc-list a { display:block; padding:4px 0; color:var(--text-dim); border-bottom:none;
-  line-height:1.4; }
+.toc-list a { display:block; padding:4px 9px; color:var(--text-dim); border-bottom:none;
+  border-left:2px solid transparent; line-height:1.4; transition:color .15s, border-color .15s; }
 .toc-list a:hover { color:var(--text); text-decoration:none; }
-.toc-lvl-1 { padding-left:0; font-weight:600; }
-.toc-lvl-2 { padding-left:12px; }
-.toc-lvl-3 { padding-left:24px; }
-.toc-lvl-4 { padding-left:36px; font-size:12px; }
+.toc-list a.active { color:var(--gold); font-weight:600; border-left-color:var(--gold-dim); }
+/* padding-left por nivel: fica de fora do shorthand acima de proposito
+   (mesma especificidade que .toc-list a venceria e anularia o recuo). */
+.toc-lvl-1 { padding-left:9px; font-weight:600; }
+.toc-lvl-2 { padding-left:21px; }
+.toc-lvl-3 { padding-left:33px; }
+.toc-lvl-4 { padding-left:45px; font-size:12px; }
+
+/* ---------- progresso de leitura + voltar ao topo ---------- */
+.reading-progress { position:fixed; top:0; left:0; height:3px; width:0%;
+  background:var(--gold); z-index:100; transition:width .1s linear; }
+.back-to-top { position:fixed; right:22px; bottom:22px; z-index:60;
+  width:44px; height:44px; border-radius:50%; background:var(--bg-card);
+  border:1px solid var(--border); color:var(--gold); font-size:18px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 4px 16px rgba(0,0,0,.4); transition:opacity .15s, transform .15s, border-color .15s;
+  opacity:0; pointer-events:none; }
+.back-to-top.visible { opacity:1; pointer-events:auto; }
+.back-to-top:hover { border-color:var(--gold-dim); transform:translateY(-2px); }
+@media (max-width:860px) { .back-to-top { right:14px; bottom:14px; width:40px; height:40px; } }
+@media (prefers-reduced-motion: reduce) { .reading-progress, .back-to-top { transition:none; } }
 
 /* ---------- pagina indice ---------- */
 .idx-intro { margin-bottom:8px; }
@@ -203,6 +226,7 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 </style>
 </head>
 <body>
+<div class="reading-progress" id="reading-progress"></div>
 <div class="mobile-topbar">
   <button aria-label="Abrir menu">☰</button>
   <a class="brand" href="index.html">Curse of Strahd: Reloaded</a>
@@ -285,7 +309,7 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 <p>Strahd comanda um vasto séquito de bestas, mortos-vivos e outros lacaios, que ele pode direcionar em uma série de planos e esquemas. Incluem-se:</p>
 <ul><li><strong><em>Rahadin,</em></strong> camareiro elfo do crepúsculo de Strahd</li><li><strong><em>Beucephalus,</em></strong> montaria <strong>pesadelo</strong> de Strahd</li><li><strong><em>As noivas vampíricas de Strahd,</em></strong> Ludmilla, Anastrasya e Volenta</li><li><strong><em>Os vampiros servos de Strahd,</em></strong> incluindo seu consorte, Escher</li><li><strong><em>Servos mortos-vivos,</em></strong> incluindo <strong>zumbis</strong>, <strong>zumbis de Strahd</strong> e <strong>corpos ancião</strong> (<em>wights</em>)</li><li><strong><em>Bestas leais,</em></strong> incluindo morcegos, ratos e lobos barovianos, e <strong>lobos atrozes</strong></li><li><strong><em>A alcateia de lobisomens</em></strong> comandada por Kiril Stoyanovich</li><li><strong><em>Espiões Vistani</em></strong>, incluindo Eliza (no Tser Pool Encampment) e Arrigal (no acampamento de Vallaki)</li><li><strong><em>O bando de bruxas</em></strong> que habita o Castle Ravenloft</li></ul>
 <p>Contudo, Strahd <strong>sempre enfrenta a batalha final sozinho.</strong> Seja por orgulho, destino ou mera coincidência, essa luta é dele para vencer — ou perder.</p>
-<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>Os Servos de Strahd</strong></div><div class="callout-body"><p>Os <strong>vampiros servos</strong> de Strahd, conforme descrito em <span class="citation">Vampire Spawn (Monster Manual, p. 298)</span>, estão presos por duas compulsões: sua fome de sangue e a necessidade de obedecer a qualquer ordem que Strahd lhes dê. Apenas os servos de vontade mais forte conseguem dominar sua necessidade de sangue, mas nenhum servo consegue ignorar uma ordem direta de Strahd. Ainda assim, embora todos os servos de Strahd estejam presos a obedecer à letra de seus comandos, servos inteligentes e obstinados podem encontrar oportunidades de desobedecer ao seu espírito.</p></div></div>
+<details class="callout callout-info" open><summary class="callout-title"><span class="callout-icon">ℹ</span><strong>Os Servos de Strahd</strong></summary><div class="callout-body"><p>Os <strong>vampiros servos</strong> de Strahd, conforme descrito em <span class="citation">Vampire Spawn (Monster Manual, p. 298)</span>, estão presos por duas compulsões: sua fome de sangue e a necessidade de obedecer a qualquer ordem que Strahd lhes dê. Apenas os servos de vontade mais forte conseguem dominar sua necessidade de sangue, mas nenhum servo consegue ignorar uma ordem direta de Strahd. Ainda assim, embora todos os servos de Strahd estejam presos a obedecer à letra de seus comandos, servos inteligentes e obstinados podem encontrar oportunidades de desobedecer ao seu espírito.</p></div></details>
 <h1 id="as-táticas-de-strahd">As Táticas de Strahd</h1>
 <p>Mesmo em combate, Strahd não é um inimigo comum. Como diversos dos inimigos encontrados nesta aventura, ele usa uma <strong>ficha de multi-fases</strong> em batalha. As estatísticas de Strahd funcionam da seguinte forma:</p>
 <h3 id="fases">Fases</h3>
@@ -307,10 +331,10 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 <ul><li><strong><em>Mudança de Forma.</em></strong> Se Strahd não estiver em água corrente ou luz do sol, ele se transforma em um <strong>morcego</strong> minúsculo, um <strong>lobo</strong> médio, ou uma nuvem de névoa média, ou retorna à sua forma verdadeira. Suas estatísticas, exceto tamanho e deslocamento, permanecem inalteradas. Qualquer coisa que ele esteja vestindo se transforma com ele, mas nada que ele esteja carregando o faz. Ele retorna à sua forma verdadeira se morrer. Enquanto em forma de névoa, Strahd não pode realizar ações, falar ou manipular objetos. Ele não tem peso, possui deslocamento de voo de 9 metros, pode pairar, e pode entrar no espaço de uma criatura hostil e parar ali. Além disso, se o ar puder passar por um espaço, a névoa pode fazê-lo sem se espremer, e ele não pode atravessar água. Ele tem vantagem em testes de resistência de Força, Destreza e Constituição, e é imune a todo dano não mágico, exceto o dano que sofre da luz do sol.</li></ul>
 <p>Enquanto Strahd mantiver uma conexão com as Fanes of Barovia, ele também possui as seguintes características em todas as três fases:</p>
 <ul><li><strong><em>Domínio da Montanha.</em></strong> Enquanto Strahd mantiver o poder da Mountain Fane, ele está sob o efeito de uma <em>não detecção</em> permanente.</li><li><strong><em>Domínio do Pântano.</em></strong> Enquanto Strahd mantiver o poder da Swamp Fane, ele pode conjurar <em>imagem maior</em> e <em>mover terra</em> sem componentes.</li><li><strong><em>Domínio da Floresta.</em></strong> Enquanto Strahd mantiver o poder da Forest Fane, ele pode conjurar <em>sentir animais</em> e <em>localizar criatura</em> sem componentes.</li><li><strong><em>Rejuvenescimento.</em></strong> Se Strahd for destruído enquanto mantiver o poder de ao menos uma das Fanes, ele ganha um novo corpo em 24 horas, recuperando todos os seus pontos de vida e fases e se tornando ativo novamente. Seu novo corpo surge dentro de seu caixão.</li></ul>
-<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>Interdição Vampírica</strong></div><div class="callout-body"><p>Ao decidir se e como a característica de <strong><em>Interdição</em></strong> de Strahd se aplica, use as seguintes definições:</p>
+<details class="callout callout-info" open><summary class="callout-title"><span class="callout-icon">ℹ</span><strong>Interdição Vampírica</strong></summary><div class="callout-body"><p>Ao decidir se e como a característica de <strong><em>Interdição</em></strong> de Strahd se aplica, use as seguintes definições:</p>
 <p>Uma <strong>residência</strong> é um local de moradia que não é geralmente aberto ao público, incluindo casas, apartamentos, cabanas e até mesmo certos tipos de cômodos dentro de um edifício maior, como uma pousada ou igreja, desde que sejam usados para fins de moradia e ofereçam algum grau de privacidade. A definição não inclui locais públicos como tavernas, lojas, ruas ou praças.</p>
 <p>Um <strong>ocupante</strong> é um indivíduo que espera residir na habitação indefinidamente, ou um convidado de tal indivíduo. Essa pessoa deve ter alguma reivindicação sobre o espaço, como ser proprietário, locatário, inquilino ou convidado de um destes.</p>
-<p>Lembre-se de que um ocupante enfeitiçado pela habilidade de <strong><em>enfeitiçar</em></strong> da fase de Vampiro de Strahd o convidará de bom grado a entrar, se solicitado.</p></div></div>
+<p>Lembre-se de que um ocupante enfeitiçado pela habilidade de <strong><em>enfeitiçar</em></strong> da fase de Vampiro de Strahd o convidará de bom grado a entrar, se solicitado.</p></div></details>
 <h2 id="as-estatísticas-de-strahd">As Estatísticas de Strahd</h2>
 <h3 id="o-mago">O Mago</h3>
 <p><br></p>
@@ -452,7 +476,7 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 <p><strong><em>Crescimento de Plantas (requer a Forest Fane).</em></strong> Strahd conjura <em>crescimento de plantas</em> sem componentes ou concentração.</p>
 <p><strong><em>Fúria da Natureza (requer a Forest Fane).</em></strong> Strahd conjura <em>fúria da natureza</em> sem componentes ou concentração. Ao conjurá-la dessa forma, Strahd não pode usar o efeito de <strong><em>rochas</em></strong> da magia.
 </div>
-<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>Banco de Neblina</strong></div><div class="callout-body"><p>Como a neblina cria apenas obscurecimento intenso e não extingue ou de outra forma atenua fontes de luz, Strahd e outros mortos-vivos ainda são afetados pela luz do sol criada pela <em>Sunsword</em> e outras fontes enquanto estiverem intensamente obscurecidos pela neblina.</p></div></div>
+<details class="callout callout-info" open><summary class="callout-title"><span class="callout-icon">ℹ</span><strong>Banco de Neblina</strong></summary><div class="callout-body"><p>Como a neblina cria apenas obscurecimento intenso e não extingue ou de outra forma atenua fontes de luz, Strahd e outros mortos-vivos ainda são afetados pela luz do sol criada pela <em>Sunsword</em> e outras fontes enquanto estiverem intensamente obscurecidos pela neblina.</p></div></details>
 <h3 id="o-vampiro">O Vampiro</h3>
 <p><br></p>
 <div class="statblock"> <h2>Strahd, o Vampiro</h2> <em>Morto-vivo Médio (metamorfo), leal e mau</em> <hr> <strong>Classe de Armadura</strong> 16 (armadura natural) <br> <strong>Pontos de Vida</strong> 331 (39d8 + 156) <br> <strong>Deslocamento</strong> 12 m, escalada 12 m <hr> <table class="ability-table"> <thead> <tr> <th>FOR</th> <th>DES</th> <th>CON</th> <th>INT</th> <th>SAB</th> <th>CAR</th> </tr> </thead> <tbody> <tr> <td>20 (+5)</td> <td>20 (+5)</td> <td>18 (+4)</td> <td>20 (+5)</td> <td>15 (+2)</td> <td>20 (+5)</td> </tr> </tbody> </table> <hr> <strong>Testes de Resistência</strong> Des +12, Sab +9, Car +12<br> <strong>Perícias</strong> Arcanismo +19, Atletismo +12, Enganação +19, Intuição +9, Percepção +16, Religião +13, Furtividade +19<br> <strong>Resistências a Dano</strong> necrótico; concussão, perfurante e cortante provenientes de ataques não mágicos<br> <strong>Sentidos</strong> visão no escuro 36 m, Percepção passiva 24<br> <strong>Idiomas</strong> Abissal, Comum, Dracônico, Élfico, Gigante, Infernal<br> <strong>Nível de Desafio</strong> 21, ou 19 se enfrentado à luz do sol<br> <strong>Bônus de Proficiência.</strong> +7<br> <hr> 
@@ -502,6 +526,7 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
     <aside class="sidebar-right"><div class="toc-label">Nesta página</div><div class="toc-list"><a class="toc-lvl-1" href="#interpretando-strahd">Interpretando Strahd</a><a class="toc-lvl-2" href="#o-cavalheiro">O Cavalheiro</a><a class="toc-lvl-2" href="#o-tirano">O Tirano</a><a class="toc-lvl-2" href="#o-monstro">O Monstro</a><a class="toc-lvl-1" href="#os-relacionamentos-de-strahd">Os Relacionamentos de Strahd</a><a class="toc-lvl-1" href="#os-objetivos-de-strahd">Os Objetivos de Strahd</a><a class="toc-lvl-2" href="#reconquistando-o-vale">Reconquistando o Vale</a><a class="toc-lvl-2" href="#renovando-seus-servos">Renovando Seus Servos</a><a class="toc-lvl-2" href="#escapando-das-névoas">Escapando das Névoas</a><a class="toc-lvl-1" href="#os-aliados-de-strahd">Os Aliados de Strahd</a><a class="toc-lvl-1" href="#as-táticas-de-strahd">As Táticas de Strahd</a><a class="toc-lvl-3" href="#fases">Fases</a><a class="toc-lvl-3" href="#transições-de-fase">Transições de Fase</a><a class="toc-lvl-3" href="#derrota">Derrota</a><a class="toc-lvl-3" href="#atributos-e-fraquezas">Atributos e Fraquezas</a><a class="toc-lvl-2" href="#as-estatísticas-de-strahd">As Estatísticas de Strahd</a><a class="toc-lvl-3" href="#o-mago">O Mago</a><a class="toc-lvl-3" href="#o-soldado">O Soldado</a><a class="toc-lvl-3" href="#o-vampiro">O Vampiro</a><a class="toc-lvl-1" href="#notas-de-design-strahd-von-zarovich">Notas de Design: Strahd von Zarovich</a></div></aside>
   </div>
 </div>
+<button type="button" class="back-to-top" id="back-to-top" aria-label="Voltar ao topo">↑</button>
 <script>
 document.querySelectorAll('.search-box input').forEach(function(inp){
   inp.addEventListener('input', function(){
@@ -525,6 +550,55 @@ if (mobileBtn) {
     document.querySelector('.sidebar-left').classList.toggle('open');
   });
 }
+
+// ---------- sumario ativo (scrollspy) ----------
+(function () {
+  var headings = document.querySelectorAll('main.article h1[id], main.article h2[id], main.article h3[id], main.article h4[id]');
+  var tocLinks = document.querySelectorAll('.toc-list a');
+  if (!headings.length || !tocLinks.length || !window.IntersectionObserver) return;
+  var map = {};
+  tocLinks.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a; });
+  var current = null;
+  function setActive(id) {
+    var a = map[id];
+    if (!a || a === current) return;
+    if (current) current.classList.remove('active');
+    a.classList.add('active');
+    current = a;
+    if (typeof a.scrollIntoView === 'function') {
+      a.scrollIntoView({ block: 'nearest' });
+    }
+  }
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) setActive(entry.target.id);
+    });
+  }, { rootMargin: '0px 0px -70% 0px', threshold: 0 });
+  headings.forEach(function (h) { observer.observe(h); });
+})();
+
+// ---------- progresso de leitura + voltar ao topo ----------
+(function () {
+  var progress = document.getElementById('reading-progress');
+  var toTop = document.getElementById('back-to-top');
+  if (!progress && !toTop) return;
+  function update() {
+    var doc = document.documentElement;
+    var scrollTop = window.scrollY || doc.scrollTop;
+    var height = doc.scrollHeight - doc.clientHeight;
+    var pct = height > 0 ? Math.min(100, (scrollTop / height) * 100) : 0;
+    if (progress) progress.style.width = pct + '%';
+    if (toTop) toTop.classList.toggle('visible', scrollTop > 500);
+  }
+  window.addEventListener('scroll', update, { passive: true });
+  update();
+  if (toTop) toTop.addEventListener('click', function () {
+    window.scrollTo({
+      top: 0,
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+    });
+  });
+})();
 </script>
 </body>
 </html>

@@ -110,7 +110,13 @@ div.description p:last-child { margin-bottom:0; }
 .callout { border:1px solid var(--border); border-left:4px solid var(--gold-dim);
   border-radius:0 8px 8px 0; background:rgba(224,165,66,.06); margin:18px 0; padding:14px 18px; }
 .callout-title { font-weight:700; color:var(--gold); font-size:13px; letter-spacing:.3px;
-  text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+  text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:8px;
+  cursor:pointer; list-style:none; user-select:none; }
+.callout-title::-webkit-details-marker { display:none; }
+.callout-title::after { content:'▸'; margin-left:auto; font-size:11px; color:var(--text-faint);
+  transition:transform .15s; flex-shrink:0; }
+.callout[open] > .callout-title::after { transform:rotate(90deg); }
+.callout:not([open]) > .callout-title { margin-bottom:0; }
 .callout-icon { font-size:14px; }
 .callout-body p:last-child { margin-bottom:0; }
 .callout-body { font-size:16px; }
@@ -152,13 +158,30 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 .toc-label { font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
   color:var(--text-faint); margin-bottom:12px; }
 .toc-list { font-size:13px; }
-.toc-list a { display:block; padding:4px 0; color:var(--text-dim); border-bottom:none;
-  line-height:1.4; }
+.toc-list a { display:block; padding:4px 9px; color:var(--text-dim); border-bottom:none;
+  border-left:2px solid transparent; line-height:1.4; transition:color .15s, border-color .15s; }
 .toc-list a:hover { color:var(--text); text-decoration:none; }
-.toc-lvl-1 { padding-left:0; font-weight:600; }
-.toc-lvl-2 { padding-left:12px; }
-.toc-lvl-3 { padding-left:24px; }
-.toc-lvl-4 { padding-left:36px; font-size:12px; }
+.toc-list a.active { color:var(--gold); font-weight:600; border-left-color:var(--gold-dim); }
+/* padding-left por nivel: fica de fora do shorthand acima de proposito
+   (mesma especificidade que .toc-list a venceria e anularia o recuo). */
+.toc-lvl-1 { padding-left:9px; font-weight:600; }
+.toc-lvl-2 { padding-left:21px; }
+.toc-lvl-3 { padding-left:33px; }
+.toc-lvl-4 { padding-left:45px; font-size:12px; }
+
+/* ---------- progresso de leitura + voltar ao topo ---------- */
+.reading-progress { position:fixed; top:0; left:0; height:3px; width:0%;
+  background:var(--gold); z-index:100; transition:width .1s linear; }
+.back-to-top { position:fixed; right:22px; bottom:22px; z-index:60;
+  width:44px; height:44px; border-radius:50%; background:var(--bg-card);
+  border:1px solid var(--border); color:var(--gold); font-size:18px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 4px 16px rgba(0,0,0,.4); transition:opacity .15s, transform .15s, border-color .15s;
+  opacity:0; pointer-events:none; }
+.back-to-top.visible { opacity:1; pointer-events:auto; }
+.back-to-top:hover { border-color:var(--gold-dim); transform:translateY(-2px); }
+@media (max-width:860px) { .back-to-top { right:14px; bottom:14px; width:40px; height:40px; } }
+@media (prefers-reduced-motion: reduce) { .reading-progress, .back-to-top { transition:none; } }
 
 /* ---------- pagina indice ---------- */
 .idx-intro { margin-bottom:8px; }
@@ -203,6 +226,7 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 </style>
 </head>
 <body>
+<div class="reading-progress" id="reading-progress"></div>
 <div class="mobile-topbar">
   <button aria-label="Abrir menu">☰</button>
   <a class="brand" href="index.html">Curse of Strahd: Reloaded</a>
@@ -305,7 +329,7 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 <p>Pouco depois de os jogadores retornarem a Vallaki, Lady Wachter os visita pessoalmente para pedir sua ajuda.</p>
 <p>Lady Wachter compartilha que o farol de Argynvostholt, que brilhou intensamente durante a noite interminável de Strahd, se apagou quando o Sol nasceu sobre Barovia. Desde então, porém, ela recebeu relatos de que o farol acendeu novamente — mas que, desta vez, começou a bruxulear estranhamente, em um padrão irregular e incomum.</p>
 <p>Lady Wachter não tem certeza do que significa o farol reacendido, mas compartilha sua preocupação de que possa se tratar de algum tipo de mensagem ou sinal de socorro. Se os jogadores estiverem dispostos, ela pede que viajem rapidamente a Argynvostholt para descobrir a verdade. Contudo, ela também compartilha que vestígios de mortos-vivos foram avistados no bosque, e insiste que os jogadores retornem ao anoitecer, caso algum deles volte.</p>
-<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>O Esquema de Lady Wachter</strong></div><div class="callout-body"><p>Lady Wachter está contando apenas metade da verdade: o farol de Argynvost <em>de fato</em> reacendeu, e de fato foi visto bruxuleando estranhamente. Contudo, seu pedido é apenas um pretexto para tirar os jogadores de Vallaki enquanto ela supervisiona os preparativos necessários para a celebração de sua vitória. Além disso, embora seus batedores tenham visto "vestígios" de mortos-vivos no bosque próximo, esses vestígios se limitaram a <em>restos</em> de mortos-vivos; a verdadeira motivação de Lady Wachter é garantir que os jogadores retornem a tempo para o festival.</p></div></div>
+<details class="callout callout-info" open><summary class="callout-title"><span class="callout-icon">ℹ</span><strong>O Esquema de Lady Wachter</strong></summary><div class="callout-body"><p>Lady Wachter está contando apenas metade da verdade: o farol de Argynvost <em>de fato</em> reacendeu, e de fato foi visto bruxuleando estranhamente. Contudo, seu pedido é apenas um pretexto para tirar os jogadores de Vallaki enquanto ela supervisiona os preparativos necessários para a celebração de sua vitória. Além disso, embora seus batedores tenham visto "vestígios" de mortos-vivos no bosque próximo, esses vestígios se limitaram a <em>restos</em> de mortos-vivos; a verdadeira motivação de Lady Wachter é garantir que os jogadores retornem a tempo para o festival.</p></div></details>
 <h3 id="2b-a-mansão-vazia">2b. A Mansão Vazia</h3>
 <p>Se os jogadores retornarem a Argynvostholt, leia o texto a seguir quando chegarem:</p>
 <div class="description">
@@ -316,8 +340,8 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 <p>O topo da torre está quieto e vazio — exceto por um grande ovo prateado que repousa no chão, pulsando com uma luz iridescente.</p>
 </div>
 <p>A luz se apaga permanentemente se o ovo for tocado.</p>
-<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>O Ovo</strong></div><div class="callout-body"><p>O ovo é o filho — ou a reencarnação — de Argynvost, trazido à existência pela imolação de seu espírito.</p>
-<p>Um jogador que for bem-sucedido em um teste de Inteligência (Arcanismo ou Natureza) CD 15 se lembra de que o ovo de um dragão prateado só pode incubar em um ambiente adequado — tipicamente, gelo ou neve — e pode levar de meses a anos para eclodir.</p></div></div>
+<details class="callout callout-info" open><summary class="callout-title"><span class="callout-icon">ℹ</span><strong>O Ovo</strong></summary><div class="callout-body"><p>O ovo é o filho — ou a reencarnação — de Argynvost, trazido à existência pela imolação de seu espírito.</p>
+<p>Um jogador que for bem-sucedido em um teste de Inteligência (Arcanismo ou Natureza) CD 15 se lembra de que o ovo de um dragão prateado só pode incubar em um ambiente adequado — tipicamente, gelo ou neve — e pode levar de meses a anos para eclodir.</p></div></details>
 <h3 id="2c-que-comecem-as-festividades">2c. Que Comecem as Festividades!</h3>
 <p>Quando os jogadores retornam a Vallaki, os guardas do portão ocidental os informam de que Lady Wachter solicitou sua presença na praça da cidade. (Os guardas se recusam a divulgar mais informações, insistindo apenas que foram avisados de que os jogadores eram necessários para "assuntos urgentes".)</p>
 <p>Enquanto os jogadores atravessam as ruas de Vallaki, leia:</p>
@@ -334,7 +358,7 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 </div>
 <p>A menos que os jogadores resistam, logo se veem bem abastecidos com canecas de vinho, pastéis de queijo e bolos de mel.</p>
 <p>Pouco depois da chegada de Stella, Lady Wachter chega para cumprimentá-los pessoalmente. Lady Wachter não se desculpa por seu engano, mas se sente honrada em dar as boas-vindas formais aos jogadores como convidados de honra do "Festival da Alvorada". ("Não sou particularmente adepta de 'festivais'", ela resmunga, sorrindo com ironia, "mas fui voto vencido.")</p>
-<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>As Decorações</strong></div><div class="callout-body"><p>As decorações são sobras de antigos festivais Vallakovich que Blinsky mantinha guardadas em seu porão.</p></div></div>
+<details class="callout callout-info" open><summary class="callout-title"><span class="callout-icon">ℹ</span><strong>As Decorações</strong></summary><div class="callout-body"><p>As decorações são sobras de antigos festivais Vallakovich que Blinsky mantinha guardadas em seu porão.</p></div></details>
 <p>Lady Wachter convida os jogadores a relaxar e celebrar, e os encoraja a se divertir. "Nossas muralhas estão bem vigiadas esta noite", ela os assegura. "Vocês mais do que merecem uma noite de banquete e festividades."</p>
 <h3 id="2d-jogos-do-festival">2d. Jogos do Festival</h3>
 <p>Se os jogadores explorarem o festival, podem encontrar as seguintes atrações:</p>
@@ -343,9 +367,9 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 <h3 id="2e-histórias-de-fé-e-vitória">2e. Histórias de Fé e Vitória</h3>
 <p>Assim que os jogadores tiverem a oportunidade de aproveitar o festival, são abordados por Lady Wachter e o Padre Lucian, que podem compartilhar as seguintes informações:</p>
 <ul><li>Lady Wachter pretende dedicar oficialmente o festival em uma cerimônia mais tarde nesta noite, e ficaria honrada se um ou mais jogadores contassem a história da derrota de Strahd aos participantes do festival.</li><li>O Padre Lucian pretende abrir a cerimônia com uma invocação, mas está incerto sobre como reconhecer adequadamente as "deusas da natureza" sobre as quais ouviu falar por meio de Lady Wachter. Ele agradeceria a ajuda ou orientação dos jogadores para fazê-lo.</li></ul>
-<div class="callout callout-abstract"><div class="callout-title"><span class="callout-icon">📖</span><strong>A Súplica de Milivoj</strong></div><div class="callout-body"><p>Se o Padre Lucian estiver morto, Milivoj se aproxima dos jogadores separadamente, pouco depois do pedido de Lady Wachter. Ele compartilha que, dada a ausência do Padre Lucian e a pouca idade de Yeska, Lady Wachter o convidou para proferir uma invocação e dar início à cerimônia. Contudo, Milivoj não faz ideia de como fazer uma invocação adequada, e se sente indigno de fazê-lo, dada sua cumplicidade passada com os esquemas de Strahd. Milivoj é grato por qualquer ajuda ou orientação que os jogadores possam oferecer.</p></div></div>
-<div class="callout callout-abstract"><div class="callout-title"><span class="callout-icon">📖</span><strong>A Incerteza de Fiona</strong></div><div class="callout-body"><p>Um jogador com uma pontuação de Sabedoria (Intuição) passiva de 13 ou mais percebe que Lady Wachter parece distraída e um tanto ansiosa. Se pressionada, Lady Wachter admite discretamente que se pergunta se é realmente qualificada para liderar Vallaki nesta nova era. "Eu deixei de ver o nascer do sol até que ele já quase tivesse nascido", ela confessa. "Insisti pela submissão em vez da resiliência, e tramei em vez de defender. Que direito tenho de liderar este povo — meus vizinhos — quando falhei em lutar por eles por tanto tempo?"</p>
-<p>Lady Wachter é grata por qualquer orientação ou conselho que os jogadores possam oferecer.</p></div></div>
+<details class="callout callout-abstract" open><summary class="callout-title"><span class="callout-icon">📖</span><strong>A Súplica de Milivoj</strong></summary><div class="callout-body"><p>Se o Padre Lucian estiver morto, Milivoj se aproxima dos jogadores separadamente, pouco depois do pedido de Lady Wachter. Ele compartilha que, dada a ausência do Padre Lucian e a pouca idade de Yeska, Lady Wachter o convidou para proferir uma invocação e dar início à cerimônia. Contudo, Milivoj não faz ideia de como fazer uma invocação adequada, e se sente indigno de fazê-lo, dada sua cumplicidade passada com os esquemas de Strahd. Milivoj é grato por qualquer ajuda ou orientação que os jogadores possam oferecer.</p></div></details>
+<details class="callout callout-abstract" open><summary class="callout-title"><span class="callout-icon">📖</span><strong>A Incerteza de Fiona</strong></summary><div class="callout-body"><p>Um jogador com uma pontuação de Sabedoria (Intuição) passiva de 13 ou mais percebe que Lady Wachter parece distraída e um tanto ansiosa. Se pressionada, Lady Wachter admite discretamente que se pergunta se é realmente qualificada para liderar Vallaki nesta nova era. "Eu deixei de ver o nascer do sol até que ele já quase tivesse nascido", ela confessa. "Insisti pela submissão em vez da resiliência, e tramei em vez de defender. Que direito tenho de liderar este povo — meus vizinhos — quando falhei em lutar por eles por tanto tempo?"</p>
+<p>Lady Wachter é grata por qualquer orientação ou conselho que os jogadores possam oferecer.</p></div></details>
 <p>Em um momento apropriado após conversar com Lady Wachter e o Padre Lucian, Lady Wachter convida os jogadores a falar no palco como parte da cerimônia. A menos que os jogadores intervenham ou alterem de alguma forma a pauta, a cerimônia se desenrola da seguinte forma:</p>
 <ul><li>Lady Wachter sobe à plataforma de madeira e dá as boas-vindas aos presentes ao Festival da Alvorada, "o dia em que Vallaki — e toda Barovia — celebra nossa liberdade da noite interminável".</li><li>Lady Wachter compartilha sua esperança de que os presentes estejam aproveitando o festival — recebendo um efusivo clamor em resposta — e agradece a eles por sua "defesa corajosa de nosso lar, em um momento em que tudo parecia perdido".</li><li>Lady Wachter convida os seguintes "indivíduos excepcionais" ao palco para receber "tokens da gratidão de Vallaki": a Vistana Arabelle, por sua "visão corajosa e oportuna"; os magos Kasimir Velikov e Victor Vallakovich, por "acender um fogo na escuridão"; e os jogadores, por "trazer de volta a luz do sol a uma terra que há muito a havia esquecido". Em seguida, ela prende um broche dourado em forma de sol radiante no peito de cada personagem, proclamando-os "amigos de Vallaki" e convidados de honra do festival.</li><li>Enquanto os convidados de honra permanecem no palco, o Padre Lucian profere uma invocação ao Senhor da Manhã e às Damas Três, agradecendo ao Senhor da Manhã por "iluminar o caminho" até a alvorada e agradecendo às Damas por "restaurar uma terra há muito perdida na escuridão e na decadência". Ele conclui pedindo que os deuses abençoem Vallaki, o vale de Barovia, e todo o seu povo, "nesta noite e em todas as noites que virão".</li><li>Lady Wachter então convida um ou mais jogadores a narrar a história da derrota de Strahd, que os presentes recebem com deleite enlevado. (Os jogadores podem tornar essa história tão longa e detalhada quanto desejarem.)</li></ul>
 <h3 id="2f-histórias-de-medo-e-perdão">2f. Histórias de Medo e Perdão</h3>
@@ -377,7 +401,7 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 <p><strong><em>A Súplica da Sonhadora.</em></strong> A Sonhadora sente que suas irmãs retornaram ao poder. Ela nada mais deseja do que se reconciliar com elas — pedir desculpas pelo mal que outrora causou, e pelo ciúme que a transformou em um monstro. "Mas tenho vergonha demais para enfrentá-las", ela diz, "e elas não me aceitariam mesmo que eu o fizesse. Vocês são os campeões delas — não há esperança alguma para mim? O que devo fazer?"</p>
 <p>A Sonhadora é grata por qualquer orientação ou conselho que os jogadores possam oferecer. Quando satisfeita, ela se dissipa em um sudário de névoa cinzenta e fria, que logo se desfaz no ar da noite.</p>
 <h2 id="3-retorno-a-krezk">3. Retorno a Krezk</h2>
-<div class="callout callout-abstract"><div class="callout-title"><span class="callout-icon">📖</span><strong>O Pedido de Cyrus</strong></div><div class="callout-body"><p>Se os jogadores escoltaram Cyrus até Vallaki, ele os aborda após o <a href="#2-o-festival-da-alvorada">Festival da Alvorada</a> para pedir que o escoltem até Krezk e a Abadia de Saint Markovia. "Vou retornar um fracasso", ele diz pesarosamente, "mas é melhor ser um fracasso com família do que um fracasso sem ela. Eles merecem saber a verdade, ao menos."</p></div></div>
+<details class="callout callout-abstract" open><summary class="callout-title"><span class="callout-icon">📖</span><strong>O Pedido de Cyrus</strong></summary><div class="callout-body"><p>Se os jogadores escoltaram Cyrus até Vallaki, ele os aborda após o <a href="#2-o-festival-da-alvorada">Festival da Alvorada</a> para pedir que o escoltem até Krezk e a Abadia de Saint Markovia. "Vou retornar um fracasso", ele diz pesarosamente, "mas é melhor ser um fracasso com família do que um fracasso sem ela. Eles merecem saber a verdade, ao menos."</p></div></details>
 <h3 id="3a-chegada-às-muralhas">3a. Chegada às Muralhas</h3>
 <p>Se os jogadores retornarem ao vilarejo de Krezk após derrotar Strahd, encontram o portão guardado por Zygfrek e Otto Belview.</p>
 <p>Zygfrek e Otto ficam felizes em dar as boas-vindas de volta aos jogadores em Krezk, e podem compartilhar as seguintes informações:</p>
@@ -401,10 +425,10 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 <p>Após examinar um Belview, a Caçadora pode compartilhar solenemente as seguintes informações:</p>
 <ul><li>Ela não pode curar a magia sombria que distorceu suas almas e corpos. "Fera e homem vivem como um só dentro deles", ela diz, "instinto e razão em guerra dentro de suas mentes. Não posso separá-los sem destruir ambos."</li><li>Ela pode, contudo, permitir que completem sua transformação por inteiro — permitir que se tornem uma das feras cujos corpos compartilham. "Eles não seriam mais humanos", ela diz, "mas estariam inteiros, de corpo e mente."</li></ul>
 <p>Qualquer Belview que venha até o Forest Fane e escolha passar pela transformação da Caçadora é envolvido por um casulo de chama esmeralda. Quando as chamas se retraem, o Belview se transforma na fera de sua escolha, dentre uma de suas mutações.</p>
-<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>A Escolha dos Belview</strong></div><div class="callout-body"><p>Se lhe for oferecida a oportunidade, Otto escolhe passar pela transformação, mas pergunta aos jogadores se deveria escolher ser um lobo, um leão ou um jumento.</p>
+<details class="callout callout-info" open><summary class="callout-title"><span class="callout-icon">ℹ</span><strong>A Escolha dos Belview</strong></summary><div class="callout-body"><p>Se lhe for oferecida a oportunidade, Otto escolhe passar pela transformação, mas pergunta aos jogadores se deveria escolher ser um lobo, um leão ou um jumento.</p>
 <p>Se os jogadores a trataram com gentileza, Zygfrek escolhe permanecer humanoide. Caso contrário, ela escolhe se tornar um lagarto, escapulindo para a vegetação logo após sua transformação.</p>
 <p>Se levada até o Forest Fane, Mishka Belview se torna uma aranha e corre para o bosque, enquanto Marzena Belview se torna um morcego e alça voo.</p>
-<p>Nem Clovin nem Cyrus escolhem passar pela transformação, tendo dominado seus instintos animais anos atrás. Contudo, ambos ficam ao mesmo tempo pesarosos por se despedir de seus familiares e felizes por vê-los finalmente em paz.</p></div></div>
+<p>Nem Clovin nem Cyrus escolhem passar pela transformação, tendo dominado seus instintos animais anos atrás. Contudo, ambos ficam ao mesmo tempo pesarosos por se despedir de seus familiares e felizes por vê-los finalmente em paz.</p></div></details>
 <h2 id="4-retorno-a-barovia">4. Retorno a Barovia</h2>
 <h3 id="4a-o-corvo-e-o-cavaleiro">4a. O Corvo e o Cavaleiro</h3>
 <p>Se os jogadores retornarem à <span class="citation">F. Encruzilhada do Rio Ivlis (p. 35)</span> após derrotar Strahd, leia:</p>
@@ -479,12 +503,13 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 <p>Muriel, Ezmerelda, Elvir e Ireena pretendem viajar até essas terras com a ajuda de um item chamado <em>talismã das névoas</em> (<em>mist talisman</em>), que Ezmerelda obteve de um mercador Vistani. (Veja <strong>Domains of Ravenloft (<em>Van Richten's Guide to Ravenloft</em>, p. 61)</strong> para uma lista de talismãs das névoas que Ezmerelda pode ter obtido.) Ao chegar em cada terra, Muriel pretende fundar novos capítulos dos Guardiões da Pena — e precisará de novos membros para ajudar a fazê-lo.</p>
 <p>Os quatro vieram se despedir dos jogadores — e, se estiverem interessados, convidar qualquer um deles a se juntar à sua empreitada. ("Enquanto qualquer um de nós estiver preso nas Névoas", Ireena diz, com determinação inflexível, "todos nós estaremos.")</p>
 <p>Mesmo que nenhum jogador se junte à expedição, os viajantes agradecem aos jogadores por seus esforços para ajudar Barovia e lhes desejam calorosas despedidas.</p>
-<div class="callout callout-tip"><div class="callout-title"><span class="callout-icon">💡</span>Vocês Chegaram ao Fim das Névoas</div><div class="callout-body"><p>Vocês chegaram ao fim da versão pública atual do guia <em>Curse of Strahd: Reloaded</em>.</p>
-<p>Para conferir com antecedência as revisões dos arcos já publicados e outros trabalhos futuros, apoie o guia entrando no <a href="https://www.patreon.com/DragnaCarta" target="_blank" rel="noopener">Patreon</a> do autor!</p></div></div>
+<details class="callout callout-tip" open><summary class="callout-title"><span class="callout-icon">💡</span>Vocês Chegaram ao Fim das Névoas</summary><div class="callout-body"><p>Vocês chegaram ao fim da versão pública atual do guia <em>Curse of Strahd: Reloaded</em>.</p>
+<p>Para conferir com antecedência as revisões dos arcos já publicados e outros trabalhos futuros, apoie o guia entrando no <a href="https://www.patreon.com/DragnaCarta" target="_blank" rel="noopener">Patreon</a> do autor!</p></div></details>
     </main>
     <aside class="sidebar-right"><div class="toc-label">Nesta página</div><div class="toc-list"><a class="toc-lvl-2" href="#1-retorno-do-castelo">1. Retorno do Castelo</a><a class="toc-lvl-3" href="#1a-a-dupla-estranha">1a. A Dupla Estranha</a><a class="toc-lvl-3" href="#1b-a-nova-estrada-svalich">1b. A Nova Estrada Svalich</a><a class="toc-lvl-3" href="#1c-os-portões-de-vallaki">1c. Os Portões de Vallaki</a><a class="toc-lvl-3" href="#1d-a-praça-da-cidade">1d. A Praça da Cidade</a><a class="toc-lvl-3" href="#1e-o-acampamento-vistani">1e. O Acampamento Vistani</a><a class="toc-lvl-2" href="#2-o-festival-da-alvorada">2. O Festival da Alvorada</a><a class="toc-lvl-3" href="#2a-o-farol-bruxuleante">2a. O Farol Bruxuleante</a><a class="toc-lvl-3" href="#2b-a-mansão-vazia">2b. A Mansão Vazia</a><a class="toc-lvl-3" href="#2c-que-comecem-as-festividades">2c. Que Comecem as Festividades!</a><a class="toc-lvl-3" href="#2d-jogos-do-festival">2d. Jogos do Festival</a><a class="toc-lvl-3" href="#2e-histórias-de-fé-e-vitória">2e. Histórias de Fé e Vitória</a><a class="toc-lvl-3" href="#2f-histórias-de-medo-e-perdão">2f. Histórias de Medo e Perdão</a><a class="toc-lvl-2" href="#3-retorno-a-krezk">3. Retorno a Krezk</a><a class="toc-lvl-3" href="#3a-chegada-às-muralhas">3a. Chegada às Muralhas</a><a class="toc-lvl-3" href="#3b-a-gratidão-de-krezk">3b. A Gratidão de Krezk</a><a class="toc-lvl-3" href="#3c-retorno-ao-forest-fane">3c. Retorno ao Forest Fane</a><a class="toc-lvl-2" href="#4-retorno-a-barovia">4. Retorno a Barovia</a><a class="toc-lvl-3" href="#4a-o-corvo-e-o-cavaleiro">4a. O Corvo e o Cavaleiro</a><a class="toc-lvl-3" href="#4b-retorno-a-tser-pool">4b. Retorno a Tser Pool</a><a class="toc-lvl-3" href="#4c-boas-vindas-de-heróis">4c. Boas-Vindas de Heróis</a><a class="toc-lvl-2" href="#5-o-destino-de-escher">5. O Destino de Escher</a><a class="toc-lvl-3" href="#5a-a-jornada-de-escher">5a. A Jornada de Escher</a><a class="toc-lvl-3" href="#5b-o-isolamento-de-escher">5b. O Isolamento de Escher</a><a class="toc-lvl-3" href="#5c-a-tentação-de-escher">5c. A Tentação de Escher</a><a class="toc-lvl-3" href="#5d-a-queda-de-escher">5d. A Queda de Escher</a><a class="toc-lvl-2" href="#6-finais-e-começos">6. Finais e Começos</a><a class="toc-lvl-3" href="#6a-o-conselho">6a. O Conselho</a><a class="toc-lvl-3" href="#6b-rumo-às-névoas">6b. Rumo às Névoas</a></div></aside>
   </div>
 </div>
+<button type="button" class="back-to-top" id="back-to-top" aria-label="Voltar ao topo">↑</button>
 <script>
 document.querySelectorAll('.search-box input').forEach(function(inp){
   inp.addEventListener('input', function(){
@@ -508,6 +533,55 @@ if (mobileBtn) {
     document.querySelector('.sidebar-left').classList.toggle('open');
   });
 }
+
+// ---------- sumario ativo (scrollspy) ----------
+(function () {
+  var headings = document.querySelectorAll('main.article h1[id], main.article h2[id], main.article h3[id], main.article h4[id]');
+  var tocLinks = document.querySelectorAll('.toc-list a');
+  if (!headings.length || !tocLinks.length || !window.IntersectionObserver) return;
+  var map = {};
+  tocLinks.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a; });
+  var current = null;
+  function setActive(id) {
+    var a = map[id];
+    if (!a || a === current) return;
+    if (current) current.classList.remove('active');
+    a.classList.add('active');
+    current = a;
+    if (typeof a.scrollIntoView === 'function') {
+      a.scrollIntoView({ block: 'nearest' });
+    }
+  }
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) setActive(entry.target.id);
+    });
+  }, { rootMargin: '0px 0px -70% 0px', threshold: 0 });
+  headings.forEach(function (h) { observer.observe(h); });
+})();
+
+// ---------- progresso de leitura + voltar ao topo ----------
+(function () {
+  var progress = document.getElementById('reading-progress');
+  var toTop = document.getElementById('back-to-top');
+  if (!progress && !toTop) return;
+  function update() {
+    var doc = document.documentElement;
+    var scrollTop = window.scrollY || doc.scrollTop;
+    var height = doc.scrollHeight - doc.clientHeight;
+    var pct = height > 0 ? Math.min(100, (scrollTop / height) * 100) : 0;
+    if (progress) progress.style.width = pct + '%';
+    if (toTop) toTop.classList.toggle('visible', scrollTop > 500);
+  }
+  window.addEventListener('scroll', update, { passive: true });
+  update();
+  if (toTop) toTop.addEventListener('click', function () {
+    window.scrollTo({
+      top: 0,
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+    });
+  });
+})();
 </script>
 </body>
 </html>

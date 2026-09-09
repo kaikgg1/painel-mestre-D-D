@@ -110,7 +110,13 @@ div.description p:last-child { margin-bottom:0; }
 .callout { border:1px solid var(--border); border-left:4px solid var(--gold-dim);
   border-radius:0 8px 8px 0; background:rgba(224,165,66,.06); margin:18px 0; padding:14px 18px; }
 .callout-title { font-weight:700; color:var(--gold); font-size:13px; letter-spacing:.3px;
-  text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+  text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:8px;
+  cursor:pointer; list-style:none; user-select:none; }
+.callout-title::-webkit-details-marker { display:none; }
+.callout-title::after { content:'▸'; margin-left:auto; font-size:11px; color:var(--text-faint);
+  transition:transform .15s; flex-shrink:0; }
+.callout[open] > .callout-title::after { transform:rotate(90deg); }
+.callout:not([open]) > .callout-title { margin-bottom:0; }
 .callout-icon { font-size:14px; }
 .callout-body p:last-child { margin-bottom:0; }
 .callout-body { font-size:16px; }
@@ -152,13 +158,30 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 .toc-label { font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
   color:var(--text-faint); margin-bottom:12px; }
 .toc-list { font-size:13px; }
-.toc-list a { display:block; padding:4px 0; color:var(--text-dim); border-bottom:none;
-  line-height:1.4; }
+.toc-list a { display:block; padding:4px 9px; color:var(--text-dim); border-bottom:none;
+  border-left:2px solid transparent; line-height:1.4; transition:color .15s, border-color .15s; }
 .toc-list a:hover { color:var(--text); text-decoration:none; }
-.toc-lvl-1 { padding-left:0; font-weight:600; }
-.toc-lvl-2 { padding-left:12px; }
-.toc-lvl-3 { padding-left:24px; }
-.toc-lvl-4 { padding-left:36px; font-size:12px; }
+.toc-list a.active { color:var(--gold); font-weight:600; border-left-color:var(--gold-dim); }
+/* padding-left por nivel: fica de fora do shorthand acima de proposito
+   (mesma especificidade que .toc-list a venceria e anularia o recuo). */
+.toc-lvl-1 { padding-left:9px; font-weight:600; }
+.toc-lvl-2 { padding-left:21px; }
+.toc-lvl-3 { padding-left:33px; }
+.toc-lvl-4 { padding-left:45px; font-size:12px; }
+
+/* ---------- progresso de leitura + voltar ao topo ---------- */
+.reading-progress { position:fixed; top:0; left:0; height:3px; width:0%;
+  background:var(--gold); z-index:100; transition:width .1s linear; }
+.back-to-top { position:fixed; right:22px; bottom:22px; z-index:60;
+  width:44px; height:44px; border-radius:50%; background:var(--bg-card);
+  border:1px solid var(--border); color:var(--gold); font-size:18px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 4px 16px rgba(0,0,0,.4); transition:opacity .15s, transform .15s, border-color .15s;
+  opacity:0; pointer-events:none; }
+.back-to-top.visible { opacity:1; pointer-events:auto; }
+.back-to-top:hover { border-color:var(--gold-dim); transform:translateY(-2px); }
+@media (max-width:860px) { .back-to-top { right:14px; bottom:14px; width:40px; height:40px; } }
+@media (prefers-reduced-motion: reduce) { .reading-progress, .back-to-top { transition:none; } }
 
 /* ---------- pagina indice ---------- */
 .idx-intro { margin-bottom:8px; }
@@ -203,6 +226,7 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 </style>
 </head>
 <body>
+<div class="reading-progress" id="reading-progress"></div>
 <div class="mobile-topbar">
   <button aria-label="Abrir menu">☰</button>
   <a class="brand" href="index.html">Curse of Strahd: Reloaded</a>
@@ -225,9 +249,9 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 <h1 id="marcos">Marcos</h1>
 <p>Os jogadores começam este ato no 4º nível e o terminam no 5º nível, com cada jogador ganhando uma quantidade igual de XP de marco ao realizar com sucesso qualquer um dos seguintes feitos:</p>
 <ul><li>restaurar os ossos de St. Andral (1.250 XP)</li><li>encontrar a desaparecida Arabelle (1.250 XP)</li><li>derrotar Izek Strazni (1.500 XP)</li><li>obter o <em>Tomo de Strahd</em> (750 XP)</li><li>restaurar a alma de Stella Wachter (1.750 XP)</li><li>conseguir acesso aos portões de Krezk (750 XP)</li></ul>
-<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>Mercadores de Vallaki</strong></div><div class="callout-body"><p>Enquanto estiverem em Vallaki, os jogadores podem comprar mercadorias em Arasek Stockyard, conforme descrito em <span class="citation">N5. Arasek Stockyard (p. 115)</span>, mas pelo preço normal fornecido no <em>Player's Handbook</em>.</p>
+<details class="callout callout-info" open><summary class="callout-title"><span class="callout-icon">ℹ</span><strong>Mercadores de Vallaki</strong></summary><div class="callout-body"><p>Enquanto estiverem em Vallaki, os jogadores podem comprar mercadorias em Arasek Stockyard, conforme descrito em <span class="citation">N5. Arasek Stockyard (p. 115)</span>, mas pelo preço normal fornecido no <em>Player's Handbook</em>.</p>
 <p>Além disso, jogadores que vasculharem as lojas da cidade podem encontrar a maioria dos itens com preço de até 25 po, incluindo armas e armaduras. Os jogadores também podem comprar materiais para grimório e componentes de magia no valor de até 50 po cada.</p>
-<p>Ao comprar itens dos jogadores, os mercadores de Vallaki pagarão o valor integral por itens mágicos e tesouros, mas apenas metade do valor por todos os outros bens (por exemplo, armas ou armaduras). Os mercadores também possuem fundos limitados. Uma loja não pode oferecer mais de 50 peças de ouro por um único item, mas pode conceder crédito na loja pelo valor restante.</p></div></div>
+<p>Ao comprar itens dos jogadores, os mercadores de Vallaki pagarão o valor integral por itens mágicos e tesouros, mas apenas metade do valor por todos os outros bens (por exemplo, armas ou armaduras). Os mercadores também possuem fundos limitados. Uma loja não pode oferecer mais de 50 peças de ouro por um único item, mas pode conceder crédito na loja pelo valor restante.</p></div></details>
 <h1 id="linha-do-tempo">Linha do Tempo</h1>
 <p>Assim que os jogadores chegam a Vallaki e o Ato II começa, a linha do tempo dos eventos se desenrola da seguinte forma.</p>
 <h2 id="neyavr-2">Neyavr 2</h2>
@@ -237,10 +261,10 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 <h2 id="neyavr-3">Neyavr 3</h2>
 <p>Ao amanhecer, o Padre Lucian Petrovich descobre o desaparecimento dos ossos. Jogadores que levarem Ireena à Igreja de St. Andral a partir deste ponto iniciam <a href="arco-d-a-festa-de-st-andral.html">Arco D - A Festa de St. Andral</a>.</p>
 <p>Izek Strazni e dois <strong>guardas</strong> afixam cartazes na Praça de Vallaki anunciando o Festival do Sol Ardente. Jogadores que levarem Ireena à Praça neste momento iniciam <a href="arco-g-os-irmaos-strazni.html">Arco G - Os Irmãos Strazni</a>, caso Izek ainda não tenha visto Ireena.</p>
-<div class="callout callout-abstract"><div class="callout-title"><span class="callout-icon">📖</span><strong>A Diplomacia de Ireena</strong></div><div class="callout-body"><p>No dia seguinte à sua primeira conversa com os refugiados, Ireena tenta se encontrar com o Barão, usando seu nascimento nobre como meio de obter sua atenção. Embora espere se encontrar com ele sozinha, ela recebe de bom grado o apoio e a assistência dos jogadores, caso lhe sejam oferecidos.</p>
+<details class="callout callout-abstract" open><summary class="callout-title"><span class="callout-icon">📖</span><strong>A Diplomacia de Ireena</strong></summary><div class="callout-body"><p>No dia seguinte à sua primeira conversa com os refugiados, Ireena tenta se encontrar com o Barão, usando seu nascimento nobre como meio de obter sua atenção. Embora espere se encontrar com ele sozinha, ela recebe de bom grado o apoio e a assistência dos jogadores, caso lhe sejam oferecidos.</p>
 <p>Se Ireena já tiver encontrado ou ouvido falar do temperamento do Barão, ela não nutre ilusões quanto à dificuldade de conquistar seu favor. Ainda assim, está determinada a fazer o possível para, ao menos, tentar ajudar seu povo — e, como nobre, não é estranha às realidades da negociação, do compromisso e da manipulação.</p>
 <p>Durante o encontro de Ireena com o Barão — estejam os jogadores presentes ou não —, o Barão rejeita de imediato qualquer sugestão de que os refugiados sejam autorizados a entrar na cidade. Contudo, ele está disposto a permitir que Ireena entre e saia da cidade rumo ao acampamento de refugiados sem exigir que pague o pedágio nos portões.</p>
-<p>Se os jogadores estiverem presentes nesse encontro e fizerem amizade com o Barão ou o hostilizarem, ele reage conforme descrito em <span class="citation">Roleplaying the Vallakovich Family (p. 105)</span>. Ele também se gaba aos jogadores do próximo Festival do Sol Ardente, no qual planeja fazer oferendas queimadas ao Senhor da Manhã em um sol gigante de vime — carnes curadas, incenso, joias e afins. "Os céus verão nossa alegria e nossa riqueza e olharão para nós com bons olhos", ele exclama. "Por meio de nosso bom ânimo, nos aproximaremos cada vez mais de nossa liberdade desta funesta escuridão."</p></div></div>
+<p>Se os jogadores estiverem presentes nesse encontro e fizerem amizade com o Barão ou o hostilizarem, ele reage conforme descrito em <span class="citation">Roleplaying the Vallakovich Family (p. 105)</span>. Ele também se gaba aos jogadores do próximo Festival do Sol Ardente, no qual planeja fazer oferendas queimadas ao Senhor da Manhã em um sol gigante de vime — carnes curadas, incenso, joias e afins. "Os céus verão nossa alegria e nossa riqueza e olharão para nós com bons olhos", ele exclama. "Por meio de nosso bom ânimo, nos aproximaremos cada vez mais de nossa liberdade desta funesta escuridão."</p></div></details>
 <p>Naquela noite, se os jogadores desafiaram o Barão Vallakovich ou ajudaram Willemina Rikalova em sua primeira manhã em Vallaki, eles recebem um convite deixado por Ernst Larnak, convidando-os para jantar com Lady Fiona Wachter em Wachterhaus. Jogadores que aceitarem o convite de Lady Wachter neste momento iniciam <a href="arco-f-o-desejo-de-lady-wachter.html">Arco F - O Desejo de Lady Wachter</a>.</p>
 <h2 id="neyavr-4">Neyavr 4</h2>
 <p>O dia do nome de Arabelle ocorre no acampamento vistani. (Se os jogadores ainda não a resgataram em <a href="arco-e-a-vistana-desaparecida.html">Arco E - A Vistani Desaparecida</a>, ela está desaparecida e nenhuma celebração acontece.)</p>
@@ -323,6 +347,7 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
     <aside class="sidebar-right"><div class="toc-label">Nesta página</div><div class="toc-list"><a class="toc-lvl-1" href="#marcos">Marcos</a><a class="toc-lvl-1" href="#linha-do-tempo">Linha do Tempo</a><a class="toc-lvl-2" href="#neyavr-2">Neyavr 2</a><a class="toc-lvl-2" href="#neyavr-3">Neyavr 3</a><a class="toc-lvl-2" href="#neyavr-4">Neyavr 4</a><a class="toc-lvl-2" href="#neyavr-5">Neyavr 5</a><a class="toc-lvl-2" href="#neyavr-6">Neyavr 6</a><a class="toc-lvl-2" href="#neyavr-7">Neyavr 7</a><a class="toc-lvl-2" href="#neyavr-8">Neyavr 8</a><a class="toc-lvl-2" href="#neyavr-9">Neyavr 9</a><a class="toc-lvl-2" href="#linha-do-tempo-das-missões">Linha do Tempo das Missões</a><a class="toc-lvl-2" href="#caminhos-divergentes">Caminhos Divergentes</a><a class="toc-lvl-2" href="#os-cruzados-zelosos">Os Cruzados Zelosos</a><a class="toc-lvl-3" href="#neyavr-2-2">Neyavr 2</a><a class="toc-lvl-3" href="#neyavr-3-2">Neyavr 3</a><a class="toc-lvl-3" href="#neyavr-4-2">Neyavr 4</a><a class="toc-lvl-3" href="#neyavr-5-2">Neyavr 5</a><a class="toc-lvl-3" href="#neyavr-6-2">Neyavr 6</a><a class="toc-lvl-3" href="#neyavr-7-2">Neyavr 7</a><a class="toc-lvl-3" href="#neyavr-8-2">Neyavr 8</a><a class="toc-lvl-2" href="#os-exploradores-cautelosos">Os Exploradores Cautelosos</a><a class="toc-lvl-3" href="#neyavr-2-3">Neyavr 2</a><a class="toc-lvl-3" href="#neyavr-3-3">Neyavr 3</a><a class="toc-lvl-3" href="#neyavr-4-3">Neyavr 4</a><a class="toc-lvl-3" href="#neyavr-5-3">Neyavr 5</a><a class="toc-lvl-3" href="#neyavr-6-3">Neyavr 6</a><a class="toc-lvl-3" href="#neyavr-7-3">Neyavr 7</a><a class="toc-lvl-3" href="#neyavr-8-3">Neyavr 8</a></div></aside>
   </div>
 </div>
+<button type="button" class="back-to-top" id="back-to-top" aria-label="Voltar ao topo">↑</button>
 <script>
 document.querySelectorAll('.search-box input').forEach(function(inp){
   inp.addEventListener('input', function(){
@@ -346,6 +371,55 @@ if (mobileBtn) {
     document.querySelector('.sidebar-left').classList.toggle('open');
   });
 }
+
+// ---------- sumario ativo (scrollspy) ----------
+(function () {
+  var headings = document.querySelectorAll('main.article h1[id], main.article h2[id], main.article h3[id], main.article h4[id]');
+  var tocLinks = document.querySelectorAll('.toc-list a');
+  if (!headings.length || !tocLinks.length || !window.IntersectionObserver) return;
+  var map = {};
+  tocLinks.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a; });
+  var current = null;
+  function setActive(id) {
+    var a = map[id];
+    if (!a || a === current) return;
+    if (current) current.classList.remove('active');
+    a.classList.add('active');
+    current = a;
+    if (typeof a.scrollIntoView === 'function') {
+      a.scrollIntoView({ block: 'nearest' });
+    }
+  }
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) setActive(entry.target.id);
+    });
+  }, { rootMargin: '0px 0px -70% 0px', threshold: 0 });
+  headings.forEach(function (h) { observer.observe(h); });
+})();
+
+// ---------- progresso de leitura + voltar ao topo ----------
+(function () {
+  var progress = document.getElementById('reading-progress');
+  var toTop = document.getElementById('back-to-top');
+  if (!progress && !toTop) return;
+  function update() {
+    var doc = document.documentElement;
+    var scrollTop = window.scrollY || doc.scrollTop;
+    var height = doc.scrollHeight - doc.clientHeight;
+    var pct = height > 0 ? Math.min(100, (scrollTop / height) * 100) : 0;
+    if (progress) progress.style.width = pct + '%';
+    if (toTop) toTop.classList.toggle('visible', scrollTop > 500);
+  }
+  window.addEventListener('scroll', update, { passive: true });
+  update();
+  if (toTop) toTop.addEventListener('click', function () {
+    window.scrollTo({
+      top: 0,
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+    });
+  });
+})();
 </script>
 </body>
 </html>

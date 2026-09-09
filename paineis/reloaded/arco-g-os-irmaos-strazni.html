@@ -110,7 +110,13 @@ div.description p:last-child { margin-bottom:0; }
 .callout { border:1px solid var(--border); border-left:4px solid var(--gold-dim);
   border-radius:0 8px 8px 0; background:rgba(224,165,66,.06); margin:18px 0; padding:14px 18px; }
 .callout-title { font-weight:700; color:var(--gold); font-size:13px; letter-spacing:.3px;
-  text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+  text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:8px;
+  cursor:pointer; list-style:none; user-select:none; }
+.callout-title::-webkit-details-marker { display:none; }
+.callout-title::after { content:'▸'; margin-left:auto; font-size:11px; color:var(--text-faint);
+  transition:transform .15s; flex-shrink:0; }
+.callout[open] > .callout-title::after { transform:rotate(90deg); }
+.callout:not([open]) > .callout-title { margin-bottom:0; }
 .callout-icon { font-size:14px; }
 .callout-body p:last-child { margin-bottom:0; }
 .callout-body { font-size:16px; }
@@ -152,13 +158,30 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 .toc-label { font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
   color:var(--text-faint); margin-bottom:12px; }
 .toc-list { font-size:13px; }
-.toc-list a { display:block; padding:4px 0; color:var(--text-dim); border-bottom:none;
-  line-height:1.4; }
+.toc-list a { display:block; padding:4px 9px; color:var(--text-dim); border-bottom:none;
+  border-left:2px solid transparent; line-height:1.4; transition:color .15s, border-color .15s; }
 .toc-list a:hover { color:var(--text); text-decoration:none; }
-.toc-lvl-1 { padding-left:0; font-weight:600; }
-.toc-lvl-2 { padding-left:12px; }
-.toc-lvl-3 { padding-left:24px; }
-.toc-lvl-4 { padding-left:36px; font-size:12px; }
+.toc-list a.active { color:var(--gold); font-weight:600; border-left-color:var(--gold-dim); }
+/* padding-left por nivel: fica de fora do shorthand acima de proposito
+   (mesma especificidade que .toc-list a venceria e anularia o recuo). */
+.toc-lvl-1 { padding-left:9px; font-weight:600; }
+.toc-lvl-2 { padding-left:21px; }
+.toc-lvl-3 { padding-left:33px; }
+.toc-lvl-4 { padding-left:45px; font-size:12px; }
+
+/* ---------- progresso de leitura + voltar ao topo ---------- */
+.reading-progress { position:fixed; top:0; left:0; height:3px; width:0%;
+  background:var(--gold); z-index:100; transition:width .1s linear; }
+.back-to-top { position:fixed; right:22px; bottom:22px; z-index:60;
+  width:44px; height:44px; border-radius:50%; background:var(--bg-card);
+  border:1px solid var(--border); color:var(--gold); font-size:18px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 4px 16px rgba(0,0,0,.4); transition:opacity .15s, transform .15s, border-color .15s;
+  opacity:0; pointer-events:none; }
+.back-to-top.visible { opacity:1; pointer-events:auto; }
+.back-to-top:hover { border-color:var(--gold-dim); transform:translateY(-2px); }
+@media (max-width:860px) { .back-to-top { right:14px; bottom:14px; width:40px; height:40px; } }
+@media (prefers-reduced-motion: reduce) { .reading-progress, .back-to-top { transition:none; } }
 
 /* ---------- pagina indice ---------- */
 .idx-intro { margin-bottom:8px; }
@@ -203,6 +226,7 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 </style>
 </head>
 <body>
+<div class="reading-progress" id="reading-progress"></div>
 <div class="mobile-topbar">
   <button aria-label="Abrir menu">☰</button>
   <a class="brand" href="index.html">Curse of Strahd: Reloaded</a>
@@ -221,11 +245,11 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 <p>Neste arco, pouco depois de ver Ireena Kolyana, Izek Strazni percebe que ela é — literalmente — a mulher de seus sonhos.</p>
 <p>Depois de saber, por meio de seus espiões, que Ireena esteve hospedada recentemente na Estalagem Água Azul, Izek visita a estalagem pessoalmente na tentativa de descobrir seu paradeiro. Se o esforço não der resultado, ele ordena que a guarda da cidade afixe cartazes de PROCURA-SE por Vallaki, oferecendo uma recompensa por informações sobre o paradeiro de Ireena.</p>
 <p>Se os jogadores não impedirem Izek nem tomarem medidas extraordinárias para manter Ireena escondida, Izek a encontra e a sequestra dois dias depois, aprisionando-a em seu quarto na mansão do Barão. Será que os jogadores conseguem libertar Ireena das garras de Izek — ou perecerão na tentativa?</p>
-<div class="callout callout-abstract"><div class="callout-title"><span class="callout-icon">📖</span><strong>O Pedido de Lady Wachter</strong></div><div class="callout-body"><p>Se os jogadores matarem Izek sem aceitar a missão de Lady Wachter em <a href="arco-f-o-desejo-de-lady-wachter.html">Arco F - O Desejo de Lady Wachter</a>, Lady Wachter envia Ernst Larnak na manhã seguinte para convidá-los a um chá em Wachterhaus naquela tarde, "à luz de suas recentes conquistas." Se os jogadores recusarem o convite de Ernst, Lady Wachter visita a Estalagem Água Azul pessoalmente naquela noite, vestindo um manto azul-escuro com capuz, e pede para falar com eles em particular.</p>
+<details class="callout callout-abstract" open><summary class="callout-title"><span class="callout-icon">📖</span><strong>O Pedido de Lady Wachter</strong></summary><div class="callout-body"><p>Se os jogadores matarem Izek sem aceitar a missão de Lady Wachter em <a href="arco-f-o-desejo-de-lady-wachter.html">Arco F - O Desejo de Lady Wachter</a>, Lady Wachter envia Ernst Larnak na manhã seguinte para convidá-los a um chá em Wachterhaus naquela tarde, "à luz de suas recentes conquistas." Se os jogadores recusarem o convite de Ernst, Lady Wachter visita a Estalagem Água Azul pessoalmente naquela noite, vestindo um manto azul-escuro com capuz, e pede para falar com eles em particular.</p>
 <p>Independentemente de como ela e os jogadores se encontrem, Lady Wachter os parabeniza por libertar Vallaki da tirania e crueldade de Izek e pede francamente sua bênção para reivindicar o cargo de Burgomestre do Barão Vallakovich. Ela fica feliz em aceitar a ajuda dos jogadores nesse empreendimento, caso seja oferecida, mas, caso contrário, garante que acredita que ele pode ser persuadido a abdicar pacificamente.</p>
 <p>Se os jogadores estiverem receosos de conceder a Lady Wachter o "poder" do cargo, Lady Wachter os tranquiliza, afirmando que o burgomestre de Vallaki não detém nenhum poder intrínseco, exceto aquele concedido pelo povo da cidade. "Confesso que não conheço bem os poderes de rainhas e duquesas para além das Brumas," ela admite, "mas em Barovia, o burgomestre é o administrador de uma cidade — não seu governante."</p>
 <p>"Eu pagaria os salários da guarda da cidade, sim," ela diz, "mas eles são um povo temente ao Senhor da Manhã — não hesitariam em me depor se sentissem que minhas ordens prejudicam seus vizinhos." Ela acrescenta, sarcástica: "Garanto a vocês: não tenho nenhum desejo de <em>governar</em> Vallaki. Minhas aspirações, clericais como são, são bem mais monótonas que isso."</p>
-<p>Se os jogadores ainda parecerem desconfiados da possibilidade de que ela possa traí-los para Strahd, ela zomba e observa que os jogadores mataram Izek — que ela mesma não conseguiria tocar. "Se alguém deveria estar com medo, sou eu," ela diz, rindo de um jeito levemente histérico. "Um bando de forasteiros armados e poderosos chegou à minha pequena cidade e matou a criatura mais poderosa dentro de seus muros. Estou aqui apenas porque tenho fé em sua boa vontade e em seu amor por meus vizinhos.")</p></div></div>
+<p>Se os jogadores ainda parecerem desconfiados da possibilidade de que ela possa traí-los para Strahd, ela zomba e observa que os jogadores mataram Izek — que ela mesma não conseguiria tocar. "Se alguém deveria estar com medo, sou eu," ela diz, rindo de um jeito levemente histérico. "Um bando de forasteiros armados e poderosos chegou à minha pequena cidade e matou a criatura mais poderosa dentro de seus muros. Estou aqui apenas porque tenho fé em sua boa vontade e em seu amor por meus vizinhos.")</p></div></details>
 <h1 id="g1-estalagem-água-azul">G1. Estalagem Água Azul</h1>
 <h2 id="g1a-a-visita-de-izek">G1a. A Visita de Izek</h2>
 <p>Pouco mais de um dia depois de avistar Ireena Kolyana pela primeira vez — seja na rua em frente à Estalagem Água Azul, na praça central de Vallaki, ou em algum outro lugar — Izek Strazni a reconhece como a mulher que tem visto repetidamente em seus sonhos e fica determinado a encontrá-la.</p>
@@ -251,9 +275,9 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 <p><strong><em>A Escolha de Ireena.</em></strong> Estivesse Ireena na estalagem ou na igreja durante o ataque de Izek, ela se enche de culpa, raiva e frustração ao saber do ocorrido. Com um tremor na voz, ela exige que os jogadores permitam que ela os acompanhe caso decidam pôr fim à fúria destrutiva de Izek. Ireena não se importa com a motivação de Izek; ela simplesmente quer que as pessoas parem de sofrer por decisões tomadas para protegê-la.</p>
 <p>Se os jogadores insistirem que ela permaneça na estalagem, Ireena pergunta se eles realmente a consideram "indefesa e incompetente." "Sou eu uma peça de porcelana, para ser guardada de modo que nunca se lasque?" ela exige, furiosa. "Sou eu uma princesa, para ser trancada numa torre para que nenhum dragão possa me raptar? Vocês esqueceram que meu pai e meu irmão me treinaram para empunhar uma espada? Ou vocês pretendem tomar essa decisão por mim, assim como Strazni e o Diabo fazem?"</p>
 <p>Ireena, determinada e teimosa, não pode ser convencida a permanecer na estalagem ou na igreja, e insiste em acompanhar os jogadores caso eles tentem partir sem ela. Os jogadores só conseguem impedi-la de tentar se juntar a eles obtendo sucesso em um teste de Carisma (Enganação) CD 16 para enganá-la, ou obtendo sucesso em um teste de Destreza (Furtividade) CD 14 para escapulir enquanto ela está distraída.</p>
-<div class="callout callout-abstract"><div class="callout-title"><span class="callout-icon">📖</span><strong>A Ajuda de Urwin</strong></div><div class="callout-body"><p>Se os jogadores pedirem a ajuda de Urwin para rastrear Izek, Urwin os encontra na taberna na manhã seguinte para compartilhar as seguintes informações, embora educadamente se recuse a revelar suas fontes:</p>
+<details class="callout callout-abstract" open><summary class="callout-title"><span class="callout-icon">📖</span><strong>A Ajuda de Urwin</strong></summary><div class="callout-body"><p>Se os jogadores pedirem a ajuda de Urwin para rastrear Izek, Urwin os encontra na taberna na manhã seguinte para compartilhar as seguintes informações, embora educadamente se recuse a revelar suas fontes:</p>
 <ul><li>Izek é acompanhado durante a maior parte do dia por dois <strong>guardas</strong> vallakianos. Os guardas ficam de olho atento ao redor dele, dificultando uma emboscada. No entanto, Izek costuma dispensar os guardas e se recolher a um de seus vários pontos preferidos para beber ao entardecer.</li><li>A rotina diária de Izek varia, mas ele confiavelmente faz sua refeição do meio-dia na praça central de Vallaki, entregue pelo cozinheiro do Barão. Ele retorna todas as noites à mansão do Barão Vallakovich para dormir.</li><li>Figuras estranhas têm sido vistas entrando e saindo de Wachterhaus, a residência de Lady Fiona Wachter, uma das mais ferrenhas inimigas políticas do Barão. Segundo os rumores, um de seus servos tem seguido Izek pela cidade nas últimas duas semanas. Ela pode ter ajuda a oferecer.</li></ul>
-<p>Se os jogadores viajarem até a propriedade de Lady Wachter para buscar sua ajuda, eles iniciam <a href="arco-f-o-desejo-de-lady-wachter.html">o Arco F - O Desejo de Lady Wachter</a>.</p></div></div>
+<p>Se os jogadores viajarem até a propriedade de Lady Wachter para buscar sua ajuda, eles iniciam <a href="arco-f-o-desejo-de-lady-wachter.html">o Arco F - O Desejo de Lady Wachter</a>.</p></div></details>
 <h1 id="g2-as-ruas-de-vallaki">G2. As Ruas de Vallaki</h1>
 <p>Um dia após sua visita à Estalagem Água Azul, Izek ordena que os guardas da cidade comecem a afixar cartazes solicitando informações sobre o paradeiro de uma mulher com a descrição de Ireena. Cada cartaz inclui um esboço que se assemelha vagamente à aparência de Ireena e oferece uma recompensa de cinco peças de ouro por informações entregues a Izek Strazni na mansão do Barão.</p>
 <h1 id="g3-o-sequestro">G3. O Sequestro</h1>
@@ -261,25 +285,25 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 <p>Na próxima vez em que Ireena e os jogadores estiverem separados naquele dia, <a href="apendice-npcs.html#izek-strazni">Izek</a>, acompanhado por quatro <strong>guardas</strong>, invade o local onde Ireena está e tenta sequestrá-la. <a href="apendice-npcs.html#ireena-kolyana">Ireena</a> arranca sua orelha esquerda a mordidas no processo, dando a ele, permanentemente, desvantagem em todos os testes de Sabedoria (Percepção) que envolvam audição.</p>
 <ul><li><strong><em>Estalagem Água Azul.</em></strong> Se Ireena ainda estiver na Estalagem Água Azul, <a href="apendice-npcs.html#urwin-martikov">Urwin</a> e <a href="apendice-npcs.html#danika-dorakova">Danika</a>, alertados por um <strong>corvo-licantropo</strong> sobre a aproximação de Izek, rapidamente a levam para escondê-la na escada secreta. No entanto, Izek percebe uma mecha de cabelo de Ireena presa na porta secreta e força a porta, encontrando-a. Enquanto arrasta Ireena para fora, ele ordena aos guardas que coloquem Urwin no tronco da cidade. Ele usa sua habilidade de <strong><em>arremesso de chamas</em></strong> para incendiar a Estalagem Água Azul, causando graves danos materiais antes que Danika e seis <strong>corvos-licantropos</strong> membros dos Guardiões da Pena consigam extingui-lo usando água do poço da estalagem.</li><li><strong><em>Igreja de St. Andral.</em></strong> Se Ireena foi levada para a Igreja de St. Andral, Izek interrompe o <a href="apendice-npcs.html#padre-lucian-petrovich">Padre Petrovich</a> no meio de um sermão e exige saber o paradeiro de Ireena. Apesar dos protestos do Padre Petrovich, Izek encontra Ireena no escritório do padre (que o Padre Petrovich e Yeska converteram em um terceiro quarto improvisado) e a captura. Izek jura friamente que voltará para punir a igreja por escondê-la dele, mas parte sem causar mais danos.</li></ul>
 <p>Se Izek for bem-sucedido, ele então leva Ireena à força até seu quarto na mansão do Barão (descrito em <strong>N3j. Quarto de Izek</strong>, p. 107), onde a amarra com cordas, a amordaça e a coloca em sua cama. Em seguida, ele pega uma cadeira e várias garrafas de vinho do primeiro andar, posiciona a cadeira em seu quarto ao lado da cama, e ali permanece até o amanhecer do Festival do Sol Flamejante.</p>
-<div class="callout callout-lore"><div class="callout-title"><span class="callout-icon">📜</span><strong>O Sacrifício de Izek</strong></div><div class="callout-body"><p>Pouco depois de Izek trazer Ireena para a mansão, Ireena exige saber o motivo de seu sequestro. Se Ireena não souber de sua relação com Izek, Izek então a revela; caso contrário, Izek exige saber por que ela se manteve afastada dele apesar de saber.</p>
+<details class="callout callout-lore" open><summary class="callout-title"><span class="callout-icon">📜</span><strong>O Sacrifício de Izek</strong></summary><div class="callout-body"><p>Pouco depois de Izek trazer Ireena para a mansão, Ireena exige saber o motivo de seu sequestro. Se Ireena não souber de sua relação com Izek, Izek então a revela; caso contrário, Izek exige saber por que ela se manteve afastada dele apesar de saber.</p>
 <p>Em qualquer um dos casos, Ireena fica perturbada pela profundidade da psicopatia e da obsessão de Izek, e sua lealdade à família adotiva e à aldeia enfurecem Izek, que a considera uma "farsante" enviada para enganá-lo. Mergulhando na loucura, Izek decide que precisa sacrificar Ireena nas chamas para trazer sua irmã "de verdade" de volta a ele.</p>
 <p>Ao amanhecer da manhã do Festival do Sol Flamejante, Izek remove as oferendas ao Senhor da Manhã — incenso, carnes salgadas, entalhes de madeira e joias — do interior oco do sol de vime, despeja-as no chão de seu quarto e as substitui secretamente por uma Ireena amarrada e amordaçada. Izek então insiste em escoltar e vigiar pessoalmente o sol de vime até o Festival.</p>
-<p>Se os jogadores não conseguirem resgatar Ireena, o sol de vime é levado à praça central às nove horas da manhã e queimado ao meio-dia, no auge das "festividades," matando Ireena.</p></div></div>
+<p>Se os jogadores não conseguirem resgatar Ireena, o sol de vime é levado à praça central às nove horas da manhã e queimado ao meio-dia, no auge das "festividades," matando Ireena.</p></div></details>
 <h1 id="g4-o-resgate">G4. O Resgate</h1>
 <p>Os jogadores podem resgatar Ireena das garras de Izek obtendo, primeiro, acesso ao quarto dele na mansão do Barão. Podem fazer isso infiltrando-se na mansão ou invadindo-a abertamente.</p>
 <p>Em qualquer um dos casos, se os jogadores forem encontrados em um lugar onde não deveriam estar, um ocupante da mansão pode soar o alarme gritando por ajuda. Se o alarme for soado, doze <strong>guardas</strong> chegam à mansão dois minutos depois.</p>
 <p>Os NPCs da mansão normalmente se comportam da seguinte forma:</p>
 <ul><li>O Barão Vallakovich geralmente pode ser encontrado na <span class="citation">N3l. Biblioteca (p. 107)</span> durante o dia, e no <span class="citation">N3o. Quarto Principal (p. 108)</span> à noite. Ele é acompanhado por seus dois <strong>mastins</strong>, Fang e Claw, em todos os momentos. Se encontrar os jogadores invadindo a propriedade, ele ordena que Fang e Claw os ataquem, mas soa o alarme se os cães forem derrotados.</li><li>A Baronesa Lydia Petrovna geralmente pode ser encontrada na <span class="citation">N3c. Sala de Jantar (p. 106)</span> durante o dia e no <span class="citation">N3o. Quarto Principal (p. 108)</span> à noite. Se encontrar os jogadores invadindo a propriedade durante o dia, ela presume que são convidados de seu marido, Vargas, e os cumprimenta de acordo; caso contrário, ela grita e depois desmaia.</li><li><a href="apendice-npcs.html#victor-vallakovich">Victor Vallakovich</a> geralmente pode ser encontrado na <span class="citation">N3t. Oficina de Victor (p. 109)</span>, tanto de dia quanto de noite. Se encontrar os jogadores invadindo a propriedade, ele os cumprimenta com cautela e exige saber seus nomes e propósitos. (Ele não soa o alarme se sua curiosidade for satisfeita.)</li><li>Tereska, a cozinheira, geralmente pode ser encontrada na <span class="citation">N3g. Cozinha (p. 106)</span> durante o dia, e nos <span class="citation">N3f. Aposentos dos Criados (p. 106)</span> à noite. Se encontrar os jogadores invadindo a propriedade, ela soa o alarme, a menos que concordem em ir embora.</li><li>Clavdia, a empregada, geralmente pode ser encontrada no segundo andar durante a manhã, no primeiro andar durante a tarde, e nos <span class="citation">N3f. Aposentos dos Criados (p. 106)</span> à noite. Se encontrar os jogadores invadindo a propriedade, ela soa o alarme imediatamente.</li></ul>
 <p><a href="apendice-npcs.html#izek-strazni">Izek</a> permanece em seu quarto com Ireena o tempo todo e se recusa a permitir que qualquer outra pessoa entre, incluindo o Barão e os criados da casa. Se os jogadores saquearem o corpo de Izek após sua morte, podem recuperar seu machado de batalha prateado, uma bolsa contendo 35 po e um fragmento de âmbar de Seriach, a Sussurradora dos Cães Infernais. (Veja o apêndice <strong>Fragmentos de Âmbar</strong> para mais informações sobre fragmentos de âmbar.)</p>
-<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>Não Acorde Izek</strong></div><div class="callout-body"><p>Quando os jogadores chegarem pela primeira vez ao quarto de Izek, role 1d20 para determinar se ele está dormindo, com vantagem se for noite. Izek está dormindo em sua cadeira com um resultado de 15 ou mais.</p>
+<details class="callout callout-info" open><summary class="callout-title"><span class="callout-icon">ℹ</span><strong>Não Acorde Izek</strong></summary><div class="callout-body"><p>Quando os jogadores chegarem pela primeira vez ao quarto de Izek, role 1d20 para determinar se ele está dormindo, com vantagem se for noite. Izek está dormindo em sua cadeira com um resultado de 15 ou mais.</p>
 <p>Se um jogador tentar se esgueirar para dentro do quarto enquanto Izek está dormindo, ele descobre que é impossível alcançar a cama sem passar perto da cadeira de Izek. Ao fazer isso, Izek, ainda roncando, envolve desajeitadamente a mão em volta de seu pulso, forçando o jogador a obter sucesso em um teste de Destreza (Prestidigitação) CD 12 para se soltar sem acordá-lo.</p>
-<p>Se os jogadores libertarem Ireena e tentarem sair do quarto com ela, uma das tábuas do assoalho range ruidosamente, tirando Izek brevemente de seu sono profundo. Com os olhos ainda fechados, ele estica a mão sonolentamente como se fosse pegar um objeto à sua frente, murmurando: "Ireena." Se lhe entregarem uma de suas bonecas, ele a aperta contra o peito e volta a dormir. Caso contrário, ele acorda na rodada seguinte.</p></div></div>
-<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>Fogo na Mansão!</strong></div><div class="callout-body"><p>As habilidades flamejantes de Izek provavelmente incendeiam o piso de madeira e os painéis da mansão. Se isso acontecer, aplique as seguintes regras:</p>
+<p>Se os jogadores libertarem Ireena e tentarem sair do quarto com ela, uma das tábuas do assoalho range ruidosamente, tirando Izek brevemente de seu sono profundo. Com os olhos ainda fechados, ele estica a mão sonolentamente como se fosse pegar um objeto à sua frente, murmurando: "Ireena." Se lhe entregarem uma de suas bonecas, ele a aperta contra o peito e volta a dormir. Caso contrário, ele acorda na rodada seguinte.</p></div></details>
+<details class="callout callout-info" open><summary class="callout-title"><span class="callout-icon">ℹ</span><strong>Fogo na Mansão!</strong></summary><div class="callout-body"><p>As habilidades flamejantes de Izek provavelmente incendeiam o piso de madeira e os painéis da mansão. Se isso acontecer, aplique as seguintes regras:</p>
 <ul><li>Cada conjunto contíguo de quadrados incendiados conta como um único <strong>incêndio</strong>. Na contagem de iniciativa 20 de cada rodada, para cada incêndio, role uma quantidade de d4 igual ao número de quadrados naquele incêndio. Para cada 4 obtido, um quadrado adicional adjacente ao incêndio também pega fogo (à sua escolha), passando a fazer parte do incêndio. Os quadrados incendiados podem incluir tanto pisos quanto paredes. (Uma parede incendiada fica envolta em chamas dos dois lados.)</li><li>Quando o incêndio se espalha, cada criatura dentro de sua área deve fazer um teste de resistência de Destreza CD 10. Se for bem-sucedida, essa criatura pode se mover imediatamente para um quadrado adjacente e desocupado a até 1,5 metro.</li><li>Uma criatura que entre no incêndio ou comece seu turno ali pela primeira vez em um turno sofre 1d8 de dano de fogo.</li><li>Todos os quadrados a até 3 metros de um <strong>incêndio</strong> ficam fortemente obscurecidos pela fumaça. Uma criatura que não seja Izek e comece seu turno na fumaça deve fazer um teste de resistência de Constituição CD 10 ou fica <strong>envenenada</strong> até o início de seu próximo turno. Mortos-vivos e constructos são bem-sucedidos automaticamente no teste de resistência.</li></ul>
-<p>Um minuto depois que os primeiros incêndios começam, Victor Vallakovich desce até o campo de batalha, se puder, e ordena que todos os combatentes se movam para trás dele. Ele então conjura <em>cone de frio</em> (<em>cone of cold</em>) para extinguir todos os quadrados em chamas.</p></div></div>
+<p>Um minuto depois que os primeiros incêndios começam, Victor Vallakovich desce até o campo de batalha, se puder, e ordena que todos os combatentes se movam para trás dele. Ele então conjura <em>cone de frio</em> (<em>cone of cold</em>) para extinguir todos os quadrados em chamas.</p></div></details>
 <h2 id="g4a-infiltrando-se-na-mansão">G4a. Infiltrando-se na Mansão</h2>
 <p>Se os jogadores se infiltrarem na mansão e conseguirem chegar até o quarto de Izek, a porta está trancada, conforme descrito em <span class="citation">N3j. Quarto de Izek (p. 107)</span>. Se os jogadores tentarem arrombar a fechadura e <a href="apendice-npcs.html#izek-strazni">Izek</a> estiver acordado (veja <strong><em>Não Acorde Izek</em></strong> abaixo), eles também devem obter sucesso em um teste de Destreza (Furtividade) CD 13 para fazê-lo sem alertá-lo.</p>
-<div class="callout callout-warning"><div class="callout-title"><span class="callout-icon">⚠</span><strong>Surpreendendo Izek</strong></div><div class="callout-body"><p>Não se esqueça de que Izek, mesmo se surpreendido, ainda pode usar suas reações após o fim de seu primeiro turno de combate. Veja <span class="citation">Surpresa (<em>Player's Handbook</em>, p. 189)</span> para mais informações.</p></div></div>
+<details class="callout callout-warning" open><summary class="callout-title"><span class="callout-icon">⚠</span><strong>Surpreendendo Izek</strong></summary><div class="callout-body"><p>Não se esqueça de que Izek, mesmo se surpreendido, ainda pode usar suas reações após o fim de seu primeiro turno de combate. Veja <span class="citation">Surpresa (<em>Player's Handbook</em>, p. 189)</span> para mais informações.</p></div></details>
 <p>Os jogadores acharão difícil atrair Izek para fora do quarto enquanto Ireena estiver presente, mas podem fazê-lo com esforços suficientemente criativos e provocativos — supondo, é claro, que obtenham resultados suficientemente altos nos dados. Caso contrário, Izek saca seu machado de batalha prateado e luta à menor provocação.</p>
 <p>Durante a batalha, Izek pode atravessar uma das paredes internas da mansão do Barão gastando 4,5 metros de seu deslocamento. Se fizer isso, sofre 7 (2d6) de dano de concussão.</p>
 <p>Se estiver consciente, Ireena usa uma adaga escondida em sua bota para se libertar das amarras de Izek em seu primeiro turno de combate. Ela então se junta à batalha na segunda rodada de combate.</p>
@@ -396,16 +420,16 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 <p><strong><em>Fagulhas de Brasa.</em></strong> Em resposta a sofrer dano de um ataque corpo a corpo, Izek faz o ar ao seu redor explodir em brasas rodopiantes. O agressor deve ser bem-sucedido em um teste de resistência de Constituição CD 13 ou sofre 2 (1d4) de dano de fogo e fica cego até o fim de seu próximo turno.</p>
 <p><strong><em>Queimadura Retaliatória (1/rodada).</em></strong> Em resposta a sofrer dano de um ataque corpo a corpo feito com uma arma de metal, Izek faz o objeto brilhar em brasa até o início de seu próximo turno. Qualquer criatura em contato físico com a arma sofre imediatamente 4 (1d8) de dano de fogo e deve ser bem-sucedida em um teste de resistência de Constituição CD 13 ou larga a arma, se puder. Se não largar o objeto, ela sofre desvantagem em jogadas de ataque e testes de habilidade até o início do próximo turno de Izek.</p>
 </div>
-<div class="callout callout-combat"><div class="callout-title"><span class="callout-icon">⚔</span><strong>Combate - O Brutamontes</strong></div><div class="callout-body"><p><strong>Nível do Combate</strong>: Contundente (primeira fase), Contundente (segunda fase) <strong>Nível de Personagem Esperado</strong>: 4 <strong>Aliados:</strong> Ireena Kolyana (ND 2) <strong>Consumo Esperado de PV:</strong> 31% (primeira fase) e 31% (segunda fase), num total de 62%</p>
+<details class="callout callout-combat" open><summary class="callout-title"><span class="callout-icon">⚔</span><strong>Combate - O Brutamontes</strong></summary><div class="callout-body"><p><strong>Nível do Combate</strong>: Contundente (primeira fase), Contundente (segunda fase) <strong>Nível de Personagem Esperado</strong>: 4 <strong>Aliados:</strong> Ireena Kolyana (ND 2) <strong>Consumo Esperado de PV:</strong> 31% (primeira fase) e 31% (segunda fase), num total de 62%</p>
 <h3 id="balanceamento"><strong>Balanceamento:</strong></h3>
 <p>Se você tiver menos ou mais de 5 jogadores, modifique o encontro das seguintes maneiras:</p>
-<div class="table-wrap"><table class="md-table"><thead><tr><th>Número de Jogadores</th><th>Modificação</th></tr></thead><tbody><tr><td>3</td><td>Reduza os pontos de vida de Izek para 75 em cada fase. Na primeira fase, reduza o ataque de machado de batalha prateado para 7 (1d8+3) de dano, o ataque de arremesso de chamas e a ação bônus saraivada de chamas para 4 (1d8) de dano, e a ação bônus rodopio cortante para 3 (1d6) de dano. Na segunda fase, reduza o ataque de machado de batalha prateado para 6 (1d6+3) de dano cortante mais 1 de dano de fogo, o ataque de soco flamejante para 5 (1d4+3) de dano de concussão mais 1 de dano de fogo, a ação onda flamejante para 7 (2d6) de dano, as ações bônus explosão de chamas e estouro explosivo para 4 (1d8) de dano, a reação queimadura retaliatória para 2 (1d4) de dano de fogo, e a reação fagulhas de brasa para 1 de dano de fogo.</td></tr><tr><td>4</td><td>Reduza os pontos de vida de Izek para 92 em cada fase. Na primeira fase, reduza o ataque de machado de batalha prateado para 9 (1d8+5) de dano, o ataque de arremesso de chamas e a ação bônus saraivada de chamas para 5 (1d10) de dano, e a ação bônus rodopio cortante para 4 (1d8) de dano. Na segunda fase, reduza o ataque de machado de batalha prateado para 8 (1d6+5) de dano cortante mais 1 de dano de fogo, o ataque de soco flamejante para 7 (1d4+5) de dano de concussão mais 1 de dano de fogo, a ação onda flamejante para 9 (2d8) de dano, as ações bônus explosão de chamas e estouro explosivo para 6 (1d12) de dano, a reação queimadura retaliatória para 3 (1d6) de dano de fogo, e a reação fagulhas de brasa para 1 de dano de fogo.</td></tr><tr><td>6</td><td>Aumente os pontos de vida de Izek para 128 em cada fase. Na primeira fase, aumente o ataque de machado de batalha prateado para 11 (1d12+5) de dano e a ação bônus rodopio cortante para 6 (1d12) de dano. Na segunda fase, aumente o ataque de machado de batalha prateado para 10 (1d10+5) de dano cortante mais 2 (1d4) de dano de fogo, o ataque de soco flamejante para 9 (1d8+5) de dano de concussão mais 2 (1d4) de dano de fogo, a ação onda flamejante para 13 (2d12) de dano, e a reação queimadura retaliatória para 5 (1d10) de dano de fogo.</td></tr></tbody></table></div></div></div>
+<div class="table-wrap"><table class="md-table"><thead><tr><th>Número de Jogadores</th><th>Modificação</th></tr></thead><tbody><tr><td>3</td><td>Reduza os pontos de vida de Izek para 75 em cada fase. Na primeira fase, reduza o ataque de machado de batalha prateado para 7 (1d8+3) de dano, o ataque de arremesso de chamas e a ação bônus saraivada de chamas para 4 (1d8) de dano, e a ação bônus rodopio cortante para 3 (1d6) de dano. Na segunda fase, reduza o ataque de machado de batalha prateado para 6 (1d6+3) de dano cortante mais 1 de dano de fogo, o ataque de soco flamejante para 5 (1d4+3) de dano de concussão mais 1 de dano de fogo, a ação onda flamejante para 7 (2d6) de dano, as ações bônus explosão de chamas e estouro explosivo para 4 (1d8) de dano, a reação queimadura retaliatória para 2 (1d4) de dano de fogo, e a reação fagulhas de brasa para 1 de dano de fogo.</td></tr><tr><td>4</td><td>Reduza os pontos de vida de Izek para 92 em cada fase. Na primeira fase, reduza o ataque de machado de batalha prateado para 9 (1d8+5) de dano, o ataque de arremesso de chamas e a ação bônus saraivada de chamas para 5 (1d10) de dano, e a ação bônus rodopio cortante para 4 (1d8) de dano. Na segunda fase, reduza o ataque de machado de batalha prateado para 8 (1d6+5) de dano cortante mais 1 de dano de fogo, o ataque de soco flamejante para 7 (1d4+5) de dano de concussão mais 1 de dano de fogo, a ação onda flamejante para 9 (2d8) de dano, as ações bônus explosão de chamas e estouro explosivo para 6 (1d12) de dano, a reação queimadura retaliatória para 3 (1d6) de dano de fogo, e a reação fagulhas de brasa para 1 de dano de fogo.</td></tr><tr><td>6</td><td>Aumente os pontos de vida de Izek para 128 em cada fase. Na primeira fase, aumente o ataque de machado de batalha prateado para 11 (1d12+5) de dano e a ação bônus rodopio cortante para 6 (1d12) de dano. Na segunda fase, aumente o ataque de machado de batalha prateado para 10 (1d10+5) de dano cortante mais 2 (1d4) de dano de fogo, o ataque de soco flamejante para 9 (1d8+5) de dano de concussão mais 2 (1d4) de dano de fogo, a ação onda flamejante para 13 (2d12) de dano, e a reação queimadura retaliatória para 5 (1d10) de dano de fogo.</td></tr></tbody></table></div></div></details>
 <h2 id="g4b-invadindo-a-mansão">G4b. Invadindo a Mansão</h2>
 <p>Se os jogadores causarem um alvoroço na porta da frente ou no primeiro andar da mansão, <a href="apendice-npcs.html#izek-strazni">Izek</a> os ouve e sai de seu quarto, trazendo seu machado de batalha prateado para o caso de uma luta. Ele luta à menor provocação.</p>
 <h2 id="g4c-a-gratidão-de-ireena">G4c. A Gratidão de Ireena</h2>
 <p><a href="apendice-npcs.html#ireena-kolyana">Ireena</a> fica profundamente perturbada com a obsessão de Izek por ela. Se os jogadores lhe contarem que ela é irmã de Izek, ela lamenta a criança que um dia deve ter conhecido, mas não o homem em que ele se tornou. Ela reafirma que, não importa quem acredite o contrário, ela é e escolhe ser Ireena Kolyana — não Ireena Strazni, nem qualquer outra pessoa.</p>
 <p><strong><em>Marco.</em></strong> Resgatar Ireena das garras de Izek completa um marco da história. Quando Ireena for escoltada até um local seguro, conceda a cada jogador 750 XP, ou 1.500 XP caso Izek tenha sido derrotado.</p>
-<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>Sem Contagem Dupla</strong></div><div class="callout-body"><p>Os jogadores podem ganhar no máximo 1.500 XP ao completar <a href="arco-f-o-desejo-de-lady-wachter.html">o Arco F - O Desejo de Lady Wachter</a> e/ou <a href="">o Arco G - Os Irmãos Strazni</a>. Grupos que resgatem Ireena e depois matem Izek ganharão 750 XP pelo primeiro e mais 750 XP adicionais pelo segundo.</p></div></div>
+<details class="callout callout-info" open><summary class="callout-title"><span class="callout-icon">ℹ</span><strong>Sem Contagem Dupla</strong></summary><div class="callout-body"><p>Os jogadores podem ganhar no máximo 1.500 XP ao completar <a href="arco-f-o-desejo-de-lady-wachter.html">o Arco F - O Desejo de Lady Wachter</a> e/ou <a href="">o Arco G - Os Irmãos Strazni</a>. Grupos que resgatem Ireena e depois matem Izek ganharão 750 XP pelo primeiro e mais 750 XP adicionais pelo segundo.</p></div></details>
 <h1 id="notas-de-design-os-irmãos-strazni">Notas de Design: Os Irmãos Strazni</h1>
 <p>Este arco foi expandido para fornecer um "relógio contando as horas" mais explícito, que empurra os jogadores para o conflito com Izek Strazni, e como um incidente incitante que impele Ireena a viajar com os jogadores e assumir um papel ativo em sua luta contra Strahd.</p>
 <p><strong><em>A Estalagem Água Azul.</em></strong> O ataque de Izek à Estalagem Água Azul foi adicionado para dar aos jogadores uma motivação adicional para buscar sua morte — especialmente se estiverem desconfiados das motivações de Lady Wachter ou em dúvida quanto aos benefícios de remover os obstáculos ao seu poder.</p>
@@ -417,6 +441,7 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
     <aside class="sidebar-right"><div class="toc-label">Nesta página</div><div class="toc-list"><a class="toc-lvl-1" href="#g1-estalagem-água-azul">G1. Estalagem Água Azul</a><a class="toc-lvl-2" href="#g1a-a-visita-de-izek">G1a. A Visita de Izek</a><a class="toc-lvl-2" href="#g1b-os-jogadores-retornam">G1b. Os Jogadores Retornam</a><a class="toc-lvl-2" href="#g1c-as-consequências-para-ireena">G1c. As Consequências para Ireena</a><a class="toc-lvl-1" href="#g2-as-ruas-de-vallaki">G2. As Ruas de Vallaki</a><a class="toc-lvl-1" href="#g3-o-sequestro">G3. O Sequestro</a><a class="toc-lvl-1" href="#g4-o-resgate">G4. O Resgate</a><a class="toc-lvl-2" href="#g4a-infiltrando-se-na-mansão">G4a. Infiltrando-se na Mansão</a><a class="toc-lvl-2" href="#g4b-invadindo-a-mansão">G4b. Invadindo a Mansão</a><a class="toc-lvl-2" href="#g4c-a-gratidão-de-ireena">G4c. A Gratidão de Ireena</a><a class="toc-lvl-1" href="#notas-de-design-os-irmãos-strazni">Notas de Design: Os Irmãos Strazni</a></div></aside>
   </div>
 </div>
+<button type="button" class="back-to-top" id="back-to-top" aria-label="Voltar ao topo">↑</button>
 <script>
 document.querySelectorAll('.search-box input').forEach(function(inp){
   inp.addEventListener('input', function(){
@@ -440,6 +465,55 @@ if (mobileBtn) {
     document.querySelector('.sidebar-left').classList.toggle('open');
   });
 }
+
+// ---------- sumario ativo (scrollspy) ----------
+(function () {
+  var headings = document.querySelectorAll('main.article h1[id], main.article h2[id], main.article h3[id], main.article h4[id]');
+  var tocLinks = document.querySelectorAll('.toc-list a');
+  if (!headings.length || !tocLinks.length || !window.IntersectionObserver) return;
+  var map = {};
+  tocLinks.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a; });
+  var current = null;
+  function setActive(id) {
+    var a = map[id];
+    if (!a || a === current) return;
+    if (current) current.classList.remove('active');
+    a.classList.add('active');
+    current = a;
+    if (typeof a.scrollIntoView === 'function') {
+      a.scrollIntoView({ block: 'nearest' });
+    }
+  }
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) setActive(entry.target.id);
+    });
+  }, { rootMargin: '0px 0px -70% 0px', threshold: 0 });
+  headings.forEach(function (h) { observer.observe(h); });
+})();
+
+// ---------- progresso de leitura + voltar ao topo ----------
+(function () {
+  var progress = document.getElementById('reading-progress');
+  var toTop = document.getElementById('back-to-top');
+  if (!progress && !toTop) return;
+  function update() {
+    var doc = document.documentElement;
+    var scrollTop = window.scrollY || doc.scrollTop;
+    var height = doc.scrollHeight - doc.clientHeight;
+    var pct = height > 0 ? Math.min(100, (scrollTop / height) * 100) : 0;
+    if (progress) progress.style.width = pct + '%';
+    if (toTop) toTop.classList.toggle('visible', scrollTop > 500);
+  }
+  window.addEventListener('scroll', update, { passive: true });
+  update();
+  if (toTop) toTop.addEventListener('click', function () {
+    window.scrollTo({
+      top: 0,
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+    });
+  });
+})();
 </script>
 </body>
 </html>

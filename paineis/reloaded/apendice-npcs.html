@@ -110,7 +110,13 @@ div.description p:last-child { margin-bottom:0; }
 .callout { border:1px solid var(--border); border-left:4px solid var(--gold-dim);
   border-radius:0 8px 8px 0; background:rgba(224,165,66,.06); margin:18px 0; padding:14px 18px; }
 .callout-title { font-weight:700; color:var(--gold); font-size:13px; letter-spacing:.3px;
-  text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+  text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:8px;
+  cursor:pointer; list-style:none; user-select:none; }
+.callout-title::-webkit-details-marker { display:none; }
+.callout-title::after { content:'▸'; margin-left:auto; font-size:11px; color:var(--text-faint);
+  transition:transform .15s; flex-shrink:0; }
+.callout[open] > .callout-title::after { transform:rotate(90deg); }
+.callout:not([open]) > .callout-title { margin-bottom:0; }
 .callout-icon { font-size:14px; }
 .callout-body p:last-child { margin-bottom:0; }
 .callout-body { font-size:16px; }
@@ -152,13 +158,30 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 .toc-label { font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
   color:var(--text-faint); margin-bottom:12px; }
 .toc-list { font-size:13px; }
-.toc-list a { display:block; padding:4px 0; color:var(--text-dim); border-bottom:none;
-  line-height:1.4; }
+.toc-list a { display:block; padding:4px 9px; color:var(--text-dim); border-bottom:none;
+  border-left:2px solid transparent; line-height:1.4; transition:color .15s, border-color .15s; }
 .toc-list a:hover { color:var(--text); text-decoration:none; }
-.toc-lvl-1 { padding-left:0; font-weight:600; }
-.toc-lvl-2 { padding-left:12px; }
-.toc-lvl-3 { padding-left:24px; }
-.toc-lvl-4 { padding-left:36px; font-size:12px; }
+.toc-list a.active { color:var(--gold); font-weight:600; border-left-color:var(--gold-dim); }
+/* padding-left por nivel: fica de fora do shorthand acima de proposito
+   (mesma especificidade que .toc-list a venceria e anularia o recuo). */
+.toc-lvl-1 { padding-left:9px; font-weight:600; }
+.toc-lvl-2 { padding-left:21px; }
+.toc-lvl-3 { padding-left:33px; }
+.toc-lvl-4 { padding-left:45px; font-size:12px; }
+
+/* ---------- progresso de leitura + voltar ao topo ---------- */
+.reading-progress { position:fixed; top:0; left:0; height:3px; width:0%;
+  background:var(--gold); z-index:100; transition:width .1s linear; }
+.back-to-top { position:fixed; right:22px; bottom:22px; z-index:60;
+  width:44px; height:44px; border-radius:50%; background:var(--bg-card);
+  border:1px solid var(--border); color:var(--gold); font-size:18px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 4px 16px rgba(0,0,0,.4); transition:opacity .15s, transform .15s, border-color .15s;
+  opacity:0; pointer-events:none; }
+.back-to-top.visible { opacity:1; pointer-events:auto; }
+.back-to-top:hover { border-color:var(--gold-dim); transform:translateY(-2px); }
+@media (max-width:860px) { .back-to-top { right:14px; bottom:14px; width:40px; height:40px; } }
+@media (prefers-reduced-motion: reduce) { .reading-progress, .back-to-top { transition:none; } }
 
 /* ---------- pagina indice ---------- */
 .idx-intro { margin-bottom:8px; }
@@ -203,6 +226,7 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 </style>
 </head>
 <body>
+<div class="reading-progress" id="reading-progress"></div>
 <div class="mobile-topbar">
   <button aria-label="Abrir menu">☰</button>
   <a class="brand" href="index.html">Curse of Strahd: Reloaded</a>
@@ -252,12 +276,12 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 <p><strong>Informações do Personagem</strong> <strong><em>Persona.</em></strong> Para o mundo, Ireena é uma jovem nobre compassiva, curiosa, porém teimosa. Para aqueles em quem confia, Ireena é uma jovem ansiosa, porém determinada, que sonha com liberdade e aventura. No fundo, Ireena se pergunta se entregar-se a Strahd não seria a melhor maneira de proteger aqueles que ama.</p>
 <p><strong><em>Moral.</em></strong> Em um combate, Ireena sempre recorrerá às palavras antes da espada. Se for necessário para defender-se, porém, sacará seu florete—com relutância, se estiver protegendo a si mesma, e com orgulho, se estiver protegendo outra pessoa.</p>
 <p><strong><em>Relacionamentos.</em></strong> Ireena é a irmã adotiva (ciente) de Ismark Kolyanovich, a irmã (inconsciente) de Izek Strazni e a reencarnação (inconsciente) de Tatyana Federovna.</p>
-<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>Ireena se Junta ao Grupo</strong></div><div class="callout-body"><p>Ireena tem as estatísticas de uma <strong>coadjuvante especialista (Tasha's Cauldron of Everything, p. 142)</strong>, usando o bloco de estatísticas base de uma <strong>nobre</strong>, e carrega uma besta leve (+3 para acertar, alcance 24/96 m, um alvo. _Acerto:_ 5 (1d8 + 1) de dano perfurante). Ela também possui o talento <span class="citation">Curandeira (Player's Handbook, p. 167)</span> e começa com dois <em>kits de curandeiro</em>.</p>
+<details class="callout callout-info" open><summary class="callout-title"><span class="callout-icon">ℹ</span><strong>Ireena se Junta ao Grupo</strong></summary><div class="callout-body"><p>Ireena tem as estatísticas de uma <strong>coadjuvante especialista (Tasha's Cauldron of Everything, p. 142)</strong>, usando o bloco de estatísticas base de uma <strong>nobre</strong>, e carrega uma besta leve (+3 para acertar, alcance 24/96 m, um alvo. _Acerto:_ 5 (1d8 + 1) de dano perfurante). Ela também possui o talento <span class="citation">Curandeira (Player's Handbook, p. 167)</span> e começa com dois <em>kits de curandeiro</em>.</p>
 <p>O nível inicial de Ireena é igual ao nível médio do grupo no momento em que ela se junta a eles pela primeira vez. Ela começa com proficiências adicionais em História, Investigação, Medicina, Percepção e Furtividade, e proficiência em testes de resistência de Destreza. Quando ela se junta ao grupo pela primeira vez no 3º nível, ela tem 25 (5d8) pontos de vida.</p>
 <p>Ireena também sobe de nível sempre que o grupo sobe, quer os tenha acompanhado ou não, terminando a aventura no 10º nível. (Veja <span class="citation">Tasha’s Cauldron of Everything, p. 142</span> para mais informações sobre como conduzir e evoluir coadjuvantes.)</p>
 <p>Por padrão, Ireena escolhe as seguintes opções de coadjuvante conforme sobe de nível:</p>
 <ul><li><strong>3º Nível.</strong> Ireena ganha especialização nas perícias Intuição e Medicina.</li><li><strong>4º Nível.</strong> O valor de Destreza de Ireena aumenta em 2, para 14.</li><li><strong>8º Nível.</strong> O valor de Destreza de Ireena aumenta em 2, para 16.</li><li><strong>10º Nível.</strong> O valor de Destreza de Ireena aumenta em 2, para 18.</li></ul>
-<p>Nenhum dos servos ou monstros de Strahd—independentemente de sua inteligência, e muito menos o próprio Strahd—jamais ataca Ireena.</p></div></div>
+<p>Nenhum dos servos ou monstros de Strahd—independentemente de sua inteligência, e muito menos o próprio Strahd—jamais ataca Ireena.</p></div></details>
 <h3 id="parriwimple">Parriwimple</h3>
 <p><strong>Informações de Interpretação</strong> <strong><em>Ressonância.</em></strong> Parriwimple deve inspirar compaixão pela perda de seus pais, ternura por seus modos infantis e sua perseverança otimista, e lisonja por seu fascínio pelas armas e roupas exóticas dos jogadores.</p>
 <p><strong><em>Emoções.</em></strong> Parriwimple costuma sentir curiosidade, esperança, admiração, melancolia e confusão.</p>
@@ -2790,7 +2814,7 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 <p><strong><em>Andar no Pântano (1/rodada).</em></strong> <strong>Gatilho:</strong> Uma criatura hostil encerra seu turno. <strong>Efeito:</strong> Baba Lysaga usa seu Andar no Pântano.</p>
 <p><strong><em>Trepadeira Agarradora.</em></strong> <strong>Gatilho:</strong> Uma criatura hostil encerra seu turno. <strong>Efeito:</strong> Baba Lysaga usa sua Trepadeira Agarradora contra aquela criatura.</p>
 </div>
-<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>Trepadeira Agarradora</strong></div><div class="callout-body"><p>A magia <em>trepadeira agarradora</em> de Baba Lysaga usa as estatísticas base fornecidas no <em>Player's Handbook</em> de 2024, em vez daquelas fornecidas no <em>Player's Handbook</em> de 2014.</p></div></div>
+<details class="callout callout-info" open><summary class="callout-title"><span class="callout-icon">ℹ</span><strong>Trepadeira Agarradora</strong></summary><div class="callout-body"><p>A magia <em>trepadeira agarradora</em> de Baba Lysaga usa as estatísticas base fornecidas no <em>Player's Handbook</em> de 2024, em vez daquelas fornecidas no <em>Player's Handbook</em> de 2014.</p></div></details>
 <h2 id="choupana-rastejante">Choupana Rastejante</h2>
 <div class="statblock">
 <h2>Choupana Rastejante</h2>
@@ -2850,6 +2874,7 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
     <aside class="sidebar-right"><div class="toc-label">Nesta página</div><div class="toc-list"><a class="toc-lvl-1" href="#companheiros">Companheiros</a><a class="toc-lvl-1" href="#casa-da-morte">Casa da Morte</a><a class="toc-lvl-3" href="#rosavalda-rose-durst">Rosavalda "Rose" Durst</a><a class="toc-lvl-3" href="#thornboldt-thorn-durst">Thornboldt "Thorn" Durst</a><a class="toc-lvl-1" href="#vilarejo-de-barovia">Vilarejo de Barovia</a><a class="toc-lvl-3" href="#ismark-kolyanovich">Ismark Kolyanovich</a><a class="toc-lvl-3" href="#ireena-kolyana">Ireena Kolyana</a><a class="toc-lvl-3" href="#parriwimple">Parriwimple</a><a class="toc-lvl-3" href="#padre-donavich">Padre Donavich</a><a class="toc-lvl-3" href="#doru">Doru</a><a class="toc-lvl-1" href="#acampamento-de-tser-pool">Acampamento de Tser Pool</a><a class="toc-lvl-4" href="#madam-eva">Madam Eva</a><a class="toc-lvl-1" href="#castle-ravenloft">Castle Ravenloft</a><a class="toc-lvl-2" href="#volenta-popofsky">Volenta Popofsky</a><a class="toc-lvl-4" href="#primeiro-encontro">Primeiro Encontro</a><a class="toc-lvl-4" href="#segundo-encontro">Segundo Encontro</a><a class="toc-lvl-2" href="#ludmilla-vilisevic">Ludmilla Vilisevic</a><a class="toc-lvl-4" href="#primeiro-encontro-2">Primeiro Encontro</a><a class="toc-lvl-4" href="#segundo-encontro-2">Segundo Encontro</a><a class="toc-lvl-2" href="#anastrasya-karelova">Anastrasya Karelova</a><a class="toc-lvl-2" href="#escher">Escher</a><a class="toc-lvl-2" href="#sasha-ivliskova">Sasha Ivliskova</a><a class="toc-lvl-2" href="#rahadin">Rahadin</a><a class="toc-lvl-3" href="#antes-da-corrupção">Antes da Corrupção</a><a class="toc-lvl-3" href="#depois-da-corrupção">Depois da Corrupção</a><a class="toc-lvl-2" href="#cyrus-belview">Cyrus Belview</a><a class="toc-lvl-2" href="#gertruda">Gertruda</a><a class="toc-lvl-2" href="#varushka">Varushka</a><a class="toc-lvl-1" href="#velho-triturador-de-ossos">Velho Triturador de Ossos</a><a class="toc-lvl-2" href="#morgantha-a-vendedora-de-sonhos">Morgantha, a Vendedora de Sonhos</a><a class="toc-lvl-1" href="#town-of-vallaki">Town of Vallaki</a><a class="toc-lvl-2" href="#estalagem-água-azul">Estalagem Água Azul</a><a class="toc-lvl-4" href="#urwin-martikov">Urwin Martikov</a><a class="toc-lvl-4" href="#danika-dorakova">Danika Dorakova</a><a class="toc-lvl-3" href="#dr-rudolph-van-richten">Dr. Rudolph van Richten</a><a class="toc-lvl-4" href="#disfarçado-como-rictavio">Disfarçado (como Rictavio)</a><a class="toc-lvl-4" href="#sem-disfarce-como-ele-mesmo">Sem Disfarce (como Ele Mesmo)</a><a class="toc-lvl-3" href="#muriel-vinshaw">Muriel Vinshaw</a><a class="toc-lvl-2" href="#igreja-de-st-andral">Igreja de St. Andral</a><a class="toc-lvl-3" href="#padre-lucian-petrovich">Padre Lucian Petrovich</a><a class="toc-lvl-3" href="#milivoj">Milivoj</a><a class="toc-lvl-2" href="#vallakovich-manor">Vallakovich Manor</a><a class="toc-lvl-3" href="#barão-vargas-vallakovich">Barão Vargas Vallakovich</a><a class="toc-lvl-3" href="#izek-strazni">Izek Strazni</a><a class="toc-lvl-3" href="#victor-vallakovich">Victor Vallakovich</a><a class="toc-lvl-2" href="#brinquedos-blinsky">Brinquedos Blinsky</a><a class="toc-lvl-3" href="#gadof-blinsky">Gadof Blinsky</a><a class="toc-lvl-2" href="#vistani-encampment">Vistani Encampment</a><a class="toc-lvl-3" href="#luvash">Luvash</a><a class="toc-lvl-3" href="#arrigal">Arrigal</a><a class="toc-lvl-3" href="#kasimir-velikov">Kasimir Velikov</a><a class="toc-lvl-2" href="#wachterhaus">Wachterhaus</a><a class="toc-lvl-3" href="#lady-fiona-wachter">Lady Fiona Wachter</a><a class="toc-lvl-3" href="#orador-da-forca">Orador da Forca</a><a class="toc-lvl-1" href="#vila-de-krezk">Vila de Krezk</a><a class="toc-lvl-2" href="#barão-dmitri-krezkov">Barão Dmitri Krezkov</a><a class="toc-lvl-1" href="#abadia-de-santa-márkovia">Abadia de Santa Márkovia</a><a class="toc-lvl-3" href="#ezmerelda-davenir">Ezmerelda d'Avenir</a><a class="toc-lvl-2" href="#o-abade">O Abade</a><a class="toc-lvl-3" href="#antes-da-redenção">Antes da Redenção</a><a class="toc-lvl-3" href="#depois-da-redenção">Depois da Redenção</a><a class="toc-lvl-2" href="#vasilka">Vasilka</a><a class="toc-lvl-1" href="#the-vinícola-feiticeiro-dos-vinhos">The Vinícola Feiticeiro dos Vinhos</a><a class="toc-lvl-1" href="#a-toca-dos-lobisomens">A Toca dos Lobisomens</a><a class="toc-lvl-2" href="#bianca-stoyanovich">Bianca Stoyanovich</a><a class="toc-lvl-2" href="#kiril-stoyanovich">Kiril Stoyanovich</a><a class="toc-lvl-1" href="#argynvostholt">Argynvostholt</a><a class="toc-lvl-2" href="#zorya">Zorya</a><a class="toc-lvl-2" href="#irmão-marek">Irmão Marek</a><a class="toc-lvl-2" href="#sir-godfrey-gwilym">Sir Godfrey Gwilym</a><a class="toc-lvl-2" href="#comandante-vladimir-horngaard">Comandante Vladimir Horngaard</a><a class="toc-lvl-1" href="#templo-de-âmbar">Templo de Âmbar</a><a class="toc-lvl-2" href="#vilnius">Vilnius</a><a class="toc-lvl-2" href="#patrina">Patrina</a><a class="toc-lvl-1" href="#berez">Berez</a><a class="toc-lvl-2" href="#baba-lysaga">Baba Lysaga</a><a class="toc-lvl-2" href="#choupana-rastejante">Choupana Rastejante</a></div></aside>
   </div>
 </div>
+<button type="button" class="back-to-top" id="back-to-top" aria-label="Voltar ao topo">↑</button>
 <script>
 document.querySelectorAll('.search-box input').forEach(function(inp){
   inp.addEventListener('input', function(){
@@ -2873,6 +2898,55 @@ if (mobileBtn) {
     document.querySelector('.sidebar-left').classList.toggle('open');
   });
 }
+
+// ---------- sumario ativo (scrollspy) ----------
+(function () {
+  var headings = document.querySelectorAll('main.article h1[id], main.article h2[id], main.article h3[id], main.article h4[id]');
+  var tocLinks = document.querySelectorAll('.toc-list a');
+  if (!headings.length || !tocLinks.length || !window.IntersectionObserver) return;
+  var map = {};
+  tocLinks.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a; });
+  var current = null;
+  function setActive(id) {
+    var a = map[id];
+    if (!a || a === current) return;
+    if (current) current.classList.remove('active');
+    a.classList.add('active');
+    current = a;
+    if (typeof a.scrollIntoView === 'function') {
+      a.scrollIntoView({ block: 'nearest' });
+    }
+  }
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) setActive(entry.target.id);
+    });
+  }, { rootMargin: '0px 0px -70% 0px', threshold: 0 });
+  headings.forEach(function (h) { observer.observe(h); });
+})();
+
+// ---------- progresso de leitura + voltar ao topo ----------
+(function () {
+  var progress = document.getElementById('reading-progress');
+  var toTop = document.getElementById('back-to-top');
+  if (!progress && !toTop) return;
+  function update() {
+    var doc = document.documentElement;
+    var scrollTop = window.scrollY || doc.scrollTop;
+    var height = doc.scrollHeight - doc.clientHeight;
+    var pct = height > 0 ? Math.min(100, (scrollTop / height) * 100) : 0;
+    if (progress) progress.style.width = pct + '%';
+    if (toTop) toTop.classList.toggle('visible', scrollTop > 500);
+  }
+  window.addEventListener('scroll', update, { passive: true });
+  update();
+  if (toTop) toTop.addEventListener('click', function () {
+    window.scrollTo({
+      top: 0,
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+    });
+  });
+})();
 </script>
 </body>
 </html>

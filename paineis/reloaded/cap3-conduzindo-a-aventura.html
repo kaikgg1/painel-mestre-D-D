@@ -110,7 +110,13 @@ div.description p:last-child { margin-bottom:0; }
 .callout { border:1px solid var(--border); border-left:4px solid var(--gold-dim);
   border-radius:0 8px 8px 0; background:rgba(224,165,66,.06); margin:18px 0; padding:14px 18px; }
 .callout-title { font-weight:700; color:var(--gold); font-size:13px; letter-spacing:.3px;
-  text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+  text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:8px;
+  cursor:pointer; list-style:none; user-select:none; }
+.callout-title::-webkit-details-marker { display:none; }
+.callout-title::after { content:'▸'; margin-left:auto; font-size:11px; color:var(--text-faint);
+  transition:transform .15s; flex-shrink:0; }
+.callout[open] > .callout-title::after { transform:rotate(90deg); }
+.callout:not([open]) > .callout-title { margin-bottom:0; }
 .callout-icon { font-size:14px; }
 .callout-body p:last-child { margin-bottom:0; }
 .callout-body { font-size:16px; }
@@ -152,13 +158,30 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 .toc-label { font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
   color:var(--text-faint); margin-bottom:12px; }
 .toc-list { font-size:13px; }
-.toc-list a { display:block; padding:4px 0; color:var(--text-dim); border-bottom:none;
-  line-height:1.4; }
+.toc-list a { display:block; padding:4px 9px; color:var(--text-dim); border-bottom:none;
+  border-left:2px solid transparent; line-height:1.4; transition:color .15s, border-color .15s; }
 .toc-list a:hover { color:var(--text); text-decoration:none; }
-.toc-lvl-1 { padding-left:0; font-weight:600; }
-.toc-lvl-2 { padding-left:12px; }
-.toc-lvl-3 { padding-left:24px; }
-.toc-lvl-4 { padding-left:36px; font-size:12px; }
+.toc-list a.active { color:var(--gold); font-weight:600; border-left-color:var(--gold-dim); }
+/* padding-left por nivel: fica de fora do shorthand acima de proposito
+   (mesma especificidade que .toc-list a venceria e anularia o recuo). */
+.toc-lvl-1 { padding-left:9px; font-weight:600; }
+.toc-lvl-2 { padding-left:21px; }
+.toc-lvl-3 { padding-left:33px; }
+.toc-lvl-4 { padding-left:45px; font-size:12px; }
+
+/* ---------- progresso de leitura + voltar ao topo ---------- */
+.reading-progress { position:fixed; top:0; left:0; height:3px; width:0%;
+  background:var(--gold); z-index:100; transition:width .1s linear; }
+.back-to-top { position:fixed; right:22px; bottom:22px; z-index:60;
+  width:44px; height:44px; border-radius:50%; background:var(--bg-card);
+  border:1px solid var(--border); color:var(--gold); font-size:18px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 4px 16px rgba(0,0,0,.4); transition:opacity .15s, transform .15s, border-color .15s;
+  opacity:0; pointer-events:none; }
+.back-to-top.visible { opacity:1; pointer-events:auto; }
+.back-to-top:hover { border-color:var(--gold-dim); transform:translateY(-2px); }
+@media (max-width:860px) { .back-to-top { right:14px; bottom:14px; width:40px; height:40px; } }
+@media (prefers-reduced-motion: reduce) { .reading-progress, .back-to-top { transition:none; } }
 
 /* ---------- pagina indice ---------- */
 .idx-intro { margin-bottom:8px; }
@@ -203,6 +226,7 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 </style>
 </head>
 <body>
+<div class="reading-progress" id="reading-progress"></div>
 <div class="mobile-topbar">
   <button aria-label="Abrir menu">☰</button>
   <a class="brand" href="index.html">Curse of Strahd: Reloaded</a>
@@ -223,10 +247,10 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 <p>Embora nenhuma campanha de <em>Dungeons & Dragons</em> possa ser perfeitamente prevista, este guia usa uma estratégia de "perguntas dramáticas" fortes, um design narrativo flexível, e a experiência do autor em conduzir campanhas de <em>Curse of Strahd</em> para elaborar um "caminho crítico" de arcos, capítulos e cenas com maior probabilidade de conduzir seus jogadores em sua jornada por Barovia.</p>
 <p>Note que, como <em>Curse of Strahd</em> é uma campanha sandbox, é razoavelmente possível que os jogadores acionem um novo ato antes de completar todos os arcos de aventura do ato anterior. Se isso acontecer, os jogadores ainda podem continuar e completar quaisquer arcos de aventura dos atos anteriores — supondo, é claro, que ainda seja possível completá-los. (Por exemplo, se os jogadores não conseguirem recuperar os ossos de Saint Andral antes da noite da Saint Andral's Feast, a congregação da Saint Andral's Church é massacrada e a missão não pode mais ser concluída.)</p>
 <p>É claro que sempre é possível que os jogadores "saiam dos trilhos" e forjem seu próprio caminho nesta aventura. As diretrizes de Sessão Zero deste guia foram moldadas com a intenção explícita de minimizar essa possibilidade (por exemplo, desencorajando os jogadores a criar personagens não-heroicos). No entanto, é importante lembrar que a narrativa deste guia apresenta, na melhor das hipóteses, um único "caminho crítico" que seus jogadores podem seguir, e que os fios do destino sempre podem guiá-los por outro.</p>
-<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>Níveis e Marcos</strong></div><div class="callout-body"><p><em>Curse of Strahd: Reloaded</em> permite que os jogadores aumentem de nível ganhando pontos de experiência cada vez que completam um marco da história. Os jogadores normalmente ganharão uma quantidade especificada de XP de marco cada vez que completarem um arco. Os jogadores também podem ganhar XP de marco adicional ao completar um segmento de um arco, ou ao completar "conteúdo bônus" opcional.</p>
-<p>Os jogadores só podem ganhar XP onde estiver indicado no guia, e não podem ganhar XP derrotando monstros ou por outros meios.</p></div></div>
-<div class="callout callout-design"><div class="callout-title"><span class="callout-icon">🛠</span><strong>Nota de Design: XP de Marco</strong></div><div class="callout-body"><p><em>Curse of Strahd</em> é, em sua essência, uma aventura não-linear. Embora <em>Curse of Strahd: Reloaded</em> forneça uma estrutura adicional ao sandbox, cada ato ainda pode ser concluído de diversas formas diferentes, com alguns arcos potencialmente permanecendo inacabados até um ato bem posterior. Além disso, como a maioria dos arcos dentro de um ato pode ser concluída em qualquer ordem, a maioria dos atos carece de um "clímax" ou "ápice" claro, o que significa que os jogadores podem frequentemente se sentir ansiosos por uma sensação de progressão no meio de um ato.</p>
-<p>O XP de marco resolve esses problemas, garantindo que os jogadores tenham uma sensação de progressão mecânica conforme completam arcos, além de atribuir uma quantidade de XP proporcional à dificuldade de cada arco.</p></div></div>
+<details class="callout callout-info" open><summary class="callout-title"><span class="callout-icon">ℹ</span><strong>Níveis e Marcos</strong></summary><div class="callout-body"><p><em>Curse of Strahd: Reloaded</em> permite que os jogadores aumentem de nível ganhando pontos de experiência cada vez que completam um marco da história. Os jogadores normalmente ganharão uma quantidade especificada de XP de marco cada vez que completarem um arco. Os jogadores também podem ganhar XP de marco adicional ao completar um segmento de um arco, ou ao completar "conteúdo bônus" opcional.</p>
+<p>Os jogadores só podem ganhar XP onde estiver indicado no guia, e não podem ganhar XP derrotando monstros ou por outros meios.</p></div></details>
+<details class="callout callout-design"><summary class="callout-title"><span class="callout-icon">🛠</span><strong>Nota de Design: XP de Marco</strong></summary><div class="callout-body"><p><em>Curse of Strahd</em> é, em sua essência, uma aventura não-linear. Embora <em>Curse of Strahd: Reloaded</em> forneça uma estrutura adicional ao sandbox, cada ato ainda pode ser concluído de diversas formas diferentes, com alguns arcos potencialmente permanecendo inacabados até um ato bem posterior. Além disso, como a maioria dos arcos dentro de um ato pode ser concluída em qualquer ordem, a maioria dos atos carece de um "clímax" ou "ápice" claro, o que significa que os jogadores podem frequentemente se sentir ansiosos por uma sensação de progressão no meio de um ato.</p>
+<p>O XP de marco resolve esses problemas, garantindo que os jogadores tenham uma sensação de progressão mecânica conforme completam arcos, além de atribuir uma quantidade de XP proporcional à dificuldade de cada arco.</p></div></details>
 <h1 id="ganchos-de-aventura">Ganchos de Aventura</h1>
 <p>Em contraste com o módulo original de <em>Curse of Strahd</em>, este guia oferece um único gancho de aventura original para conduzir os jogadores até Barovia. Nesse gancho, Casa da Morte serve como um portal para o domínio de Strahd: os jogadores entram na Casa da Morte em seu próprio mundo e — ao derrotar ou pacificar o culto — emergem na terra de Barovia. No entanto, esse gancho pode ser implementado de duas formas possíveis:</p>
 <ul><li><strong><em>Perdidos nas Névoas.</em></strong> Nesta versão, os jogadores são membros de um grupo mercenário de aventureiros contratado para investigar uma série de desaparecimentos misteriosos ligados a uma casa específica (a Casa da Morte). Esse gancho concentra a atenção dos jogadores exclusivamente na tirania de Strahd e nos baroveses que sofrem sob seu domínio, incentivando os jogadores a se imergirem na lore da campanha e a desenvolver relacionamentos únicos com seu diverso elenco de personagens.</li><li><strong><em>Relíquias Barovesas.</em></strong> Nesta versão, um ou mais jogadores possuem certas relíquias únicas originárias de Barovia e ligadas às suas histórias de fundo. Quando a Casa da Morte se manifesta nas proximidades, essas relíquias são atraídas até ela, incentivando os jogadores a entrar e investigar. (Qualquer jogador que não deseje criar uma história de fundo pode, em vez disso, optar por ser um mercenário investigando desaparecimentos recentes, como em <strong><em>Perdidos nas Névoas</em></strong>.) Esse gancho concentra a atenção dos jogadores em seus próprios interesses e conexões pessoais com a terra de Barovia, incentivando-os a investir sua atenção em NPCs e localizações ligadas às suas relíquias únicas.</li></ul>
@@ -240,7 +264,7 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 <h1 id="encontros-com-strahd">Encontros com Strahd</h1>
 <p>Ao longo da aventura, os jogadores terão diversos encontros com Strahd von Zarovich. Depois de conhecer Strahd pela primeira vez na Encruzilhada do Rio Ivlis (veja <a href="arco-c-adentrando-o-vale.html">Arco C - Adentrando o Vale</a>), os jogadores podem posteriormente falar com ele em Yester Hill (veja <a href="arco-j-a-gema-roubada.html">Arco J - A Gema Roubada</a>) e jantar com ele no Castelo Ravenloft (veja <a href="arco-o-jantar-com-o-diabo.html">Arco O - Jantar com o Diabo</a>).</p>
 <p>Assim que Strahd descobre que os jogadores obtiveram o <em>Símbolo Sagrado de Ravenkind</em> ou reacenderam o farol de Argynvostholt, ele redireciona seus esforços para determinar se algum deles é digno de servir como general ou consorte em sua corte. Veja <strong><em>Arc R: The Tyrant's Trials</em></strong> para mais informações.</p>
-<div class="callout callout-warning"><div class="callout-title"><span class="callout-icon">⚠</span><strong>Táticas de Combate</strong></div><div class="callout-body"><p>Os combates neste guia foram projetados usando o <a href="https://www.gmbinder.com/share/-N4m46K77hpMVnh7upYa" target="_blank" rel="noopener">Challenge Ratings 2.0</a>, um sistema que calibra a dificuldade dos encontros para garantir combates desafiadores e equilibrados. A menos que especificamente indicado neste guia, ou a menos que seja necessário para competir com jogadores usando táticas semelhantes, os inimigos (incluindo Strahd) não deveriam precisar usar nenhuma tática (por exemplo, mirar em jogadores fracos ou concentrar fogo) para proporcionar uma experiência desafiadora.</p></div></div>
+<details class="callout callout-warning" open><summary class="callout-title"><span class="callout-icon">⚠</span><strong>Táticas de Combate</strong></summary><div class="callout-body"><p>Os combates neste guia foram projetados usando o <a href="https://www.gmbinder.com/share/-N4m46K77hpMVnh7upYa" target="_blank" rel="noopener">Challenge Ratings 2.0</a>, um sistema que calibra a dificuldade dos encontros para garantir combates desafiadores e equilibrados. A menos que especificamente indicado neste guia, ou a menos que seja necessário para competir com jogadores usando táticas semelhantes, os inimigos (incluindo Strahd) não deveriam precisar usar nenhuma tática (por exemplo, mirar em jogadores fracos ou concentrar fogo) para proporcionar uma experiência desafiadora.</p></div></details>
 <h1 id="a-leitura-de-tarokka">A Leitura de Tarokka</h1>
 <h2 id="o-tomo-de-strahd">O Tomo de Strahd</h2>
 <p>O conteúdo do Tomo de Strahd agora é conforme descrito em <a href="arco-h-a-alma-perdida.html#h9a-lendo-o-tomo">Arco H - A Alma Perdida</a>.</p>
@@ -290,6 +314,7 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
     <aside class="sidebar-right"><div class="toc-label">Nesta página</div><div class="toc-list"><a class="toc-lvl-1" href="#organização-da-aventura">Organização da Aventura</a><a class="toc-lvl-1" href="#ganchos-de-aventura">Ganchos de Aventura</a><a class="toc-lvl-1" href="#os-espiões-de-strahd">Os Espiões de Strahd</a><a class="toc-lvl-1" href="#encontros-com-strahd">Encontros com Strahd</a><a class="toc-lvl-1" href="#a-leitura-de-tarokka">A Leitura de Tarokka</a><a class="toc-lvl-2" href="#o-tomo-de-strahd">O Tomo de Strahd</a><a class="toc-lvl-2" href="#o-símbolo-sagrado-de-ravenkind">O Símbolo Sagrado de Ravenkind</a><a class="toc-lvl-2" href="#a-espada-do-sol">A Espada do Sol</a><a class="toc-lvl-2" href="#o-inimigo-de-strahd">O Inimigo de Strahd</a><a class="toc-lvl-2" href="#a-leitura-das-cartas">A Leitura das Cartas</a><a class="toc-lvl-3" href="#o-tomo-de-strahd-2">O Tomo de Strahd</a><a class="toc-lvl-3" href="#o-símbolo-sagrado-de-ravenkind-2">O Símbolo Sagrado de Ravenkind</a><a class="toc-lvl-3" href="#a-espada-do-sol-2">A Espada do Sol</a><a class="toc-lvl-3" href="#o-inimigo-de-strahd-2">O Inimigo de Strahd</a><a class="toc-lvl-3" href="#a-localização-de-strahd">A Localização de Strahd</a><a class="toc-lvl-1" href="#notas-de-design-conduzindo-a-aventura">Notas de Design: Conduzindo a Aventura</a><a class="toc-lvl-2" href="#a-leitura-de-tarokka-2">A Leitura de Tarokka</a><a class="toc-lvl-2" href="#ganchos-de-aventura-2">Ganchos de Aventura</a></div></aside>
   </div>
 </div>
+<button type="button" class="back-to-top" id="back-to-top" aria-label="Voltar ao topo">↑</button>
 <script>
 document.querySelectorAll('.search-box input').forEach(function(inp){
   inp.addEventListener('input', function(){
@@ -313,6 +338,55 @@ if (mobileBtn) {
     document.querySelector('.sidebar-left').classList.toggle('open');
   });
 }
+
+// ---------- sumario ativo (scrollspy) ----------
+(function () {
+  var headings = document.querySelectorAll('main.article h1[id], main.article h2[id], main.article h3[id], main.article h4[id]');
+  var tocLinks = document.querySelectorAll('.toc-list a');
+  if (!headings.length || !tocLinks.length || !window.IntersectionObserver) return;
+  var map = {};
+  tocLinks.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a; });
+  var current = null;
+  function setActive(id) {
+    var a = map[id];
+    if (!a || a === current) return;
+    if (current) current.classList.remove('active');
+    a.classList.add('active');
+    current = a;
+    if (typeof a.scrollIntoView === 'function') {
+      a.scrollIntoView({ block: 'nearest' });
+    }
+  }
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) setActive(entry.target.id);
+    });
+  }, { rootMargin: '0px 0px -70% 0px', threshold: 0 });
+  headings.forEach(function (h) { observer.observe(h); });
+})();
+
+// ---------- progresso de leitura + voltar ao topo ----------
+(function () {
+  var progress = document.getElementById('reading-progress');
+  var toTop = document.getElementById('back-to-top');
+  if (!progress && !toTop) return;
+  function update() {
+    var doc = document.documentElement;
+    var scrollTop = window.scrollY || doc.scrollTop;
+    var height = doc.scrollHeight - doc.clientHeight;
+    var pct = height > 0 ? Math.min(100, (scrollTop / height) * 100) : 0;
+    if (progress) progress.style.width = pct + '%';
+    if (toTop) toTop.classList.toggle('visible', scrollTop > 500);
+  }
+  window.addEventListener('scroll', update, { passive: true });
+  update();
+  if (toTop) toTop.addEventListener('click', function () {
+    window.scrollTo({
+      top: 0,
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+    });
+  });
+})();
 </script>
 </body>
 </html>

@@ -110,7 +110,13 @@ div.description p:last-child { margin-bottom:0; }
 .callout { border:1px solid var(--border); border-left:4px solid var(--gold-dim);
   border-radius:0 8px 8px 0; background:rgba(224,165,66,.06); margin:18px 0; padding:14px 18px; }
 .callout-title { font-weight:700; color:var(--gold); font-size:13px; letter-spacing:.3px;
-  text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:8px; }
+  text-transform:uppercase; margin-bottom:8px; display:flex; align-items:center; gap:8px;
+  cursor:pointer; list-style:none; user-select:none; }
+.callout-title::-webkit-details-marker { display:none; }
+.callout-title::after { content:'▸'; margin-left:auto; font-size:11px; color:var(--text-faint);
+  transition:transform .15s; flex-shrink:0; }
+.callout[open] > .callout-title::after { transform:rotate(90deg); }
+.callout:not([open]) > .callout-title { margin-bottom:0; }
 .callout-icon { font-size:14px; }
 .callout-body p:last-child { margin-bottom:0; }
 .callout-body { font-size:16px; }
@@ -152,13 +158,30 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 .toc-label { font-size:11px; font-weight:700; letter-spacing:1px; text-transform:uppercase;
   color:var(--text-faint); margin-bottom:12px; }
 .toc-list { font-size:13px; }
-.toc-list a { display:block; padding:4px 0; color:var(--text-dim); border-bottom:none;
-  line-height:1.4; }
+.toc-list a { display:block; padding:4px 9px; color:var(--text-dim); border-bottom:none;
+  border-left:2px solid transparent; line-height:1.4; transition:color .15s, border-color .15s; }
 .toc-list a:hover { color:var(--text); text-decoration:none; }
-.toc-lvl-1 { padding-left:0; font-weight:600; }
-.toc-lvl-2 { padding-left:12px; }
-.toc-lvl-3 { padding-left:24px; }
-.toc-lvl-4 { padding-left:36px; font-size:12px; }
+.toc-list a.active { color:var(--gold); font-weight:600; border-left-color:var(--gold-dim); }
+/* padding-left por nivel: fica de fora do shorthand acima de proposito
+   (mesma especificidade que .toc-list a venceria e anularia o recuo). */
+.toc-lvl-1 { padding-left:9px; font-weight:600; }
+.toc-lvl-2 { padding-left:21px; }
+.toc-lvl-3 { padding-left:33px; }
+.toc-lvl-4 { padding-left:45px; font-size:12px; }
+
+/* ---------- progresso de leitura + voltar ao topo ---------- */
+.reading-progress { position:fixed; top:0; left:0; height:3px; width:0%;
+  background:var(--gold); z-index:100; transition:width .1s linear; }
+.back-to-top { position:fixed; right:22px; bottom:22px; z-index:60;
+  width:44px; height:44px; border-radius:50%; background:var(--bg-card);
+  border:1px solid var(--border); color:var(--gold); font-size:18px; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 4px 16px rgba(0,0,0,.4); transition:opacity .15s, transform .15s, border-color .15s;
+  opacity:0; pointer-events:none; }
+.back-to-top.visible { opacity:1; pointer-events:auto; }
+.back-to-top:hover { border-color:var(--gold-dim); transform:translateY(-2px); }
+@media (max-width:860px) { .back-to-top { right:14px; bottom:14px; width:40px; height:40px; } }
+@media (prefers-reduced-motion: reduce) { .reading-progress, .back-to-top { transition:none; } }
 
 /* ---------- pagina indice ---------- */
 .idx-intro { margin-bottom:8px; }
@@ -203,6 +226,7 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 </style>
 </head>
 <body>
+<div class="reading-progress" id="reading-progress"></div>
 <div class="mobile-topbar">
   <button aria-label="Abrir menu">☰</button>
   <a class="brand" href="index.html">Curse of Strahd: Reloaded</a>
@@ -219,11 +243,11 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
       <div class="page-title">Fragmentos de Âmbar</div>
 <p>Ao longo da aventura, os jogadores terão a oportunidade de obter um ou mais <em>cacos de âmbar</em> — fragmentos dos sarcófagos de âmbar que aprisionam os vestígios do Templo de Âmbar.</p>
 <p>Embora não carreguem toda a essência dos vestígios, cada caco de âmbar carrega uma ligação psíquica com o sarcófago do qual veio. Através dessa ligação, um vestígio pode sussurrar para quem segura o caco, oferecendo promessas de poder em troca de uma descida à corrupção.</p>
-<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>Encontrando Cacos de Âmbar</strong></div><div class="callout-body"><p>Os jogadores têm a oportunidade de obter um caco de âmbar:</p>
+<details class="callout callout-info" open><summary class="callout-title"><span class="callout-icon">ℹ</span><strong>Encontrando Cacos de Âmbar</strong></summary><div class="callout-body"><p>Os jogadores têm a oportunidade de obter um caco de âmbar:</p>
 <ul><li>durante a <a href="cap1-criacao-de-personagem.html">Criação de Personagem</a></li><li>após derrotar Izek Strazni em <a href="arco-f-o-desejo-de-lady-wachter.html">Arco F - O Desejo de Lady Wachter</a> / <a href="arco-g-os-irmaos-strazni.html">Arco G - Os Irmãos Strazni</a> (veja <a href="#seriach-o-sussurrador-de-cães-infernais">Seriach, o Sussurrador de Cães Infernais</a>)</li><li>após saquear o tesouro do Castelo Ravenloft em <a href="arco-p-o-assalto-a-ravenloft.html">Arco P - O Assalto a Ravenloft</a> (veja <a href="#grande-taar-haak-o-destruidor-de-cinco-cabeças">Grande Taar Haak, o Destruidor de Cinco Cabeças</a>)</li><li>seguindo Scorilo se ele perder a disputa de fanfarronice em <a href="arco-r-provacoes-da-montanha.html">Arco R - As Provações da Montanha</a> (veja <a href="#zrin-hala-a-tempestade-uivante">Zrin-Hala, a Tempestade Uivante</a>)</li><li>após derrotar os bodaks em <a href="arco-r-provacoes-da-montanha.html">Arco R - As Provações da Montanha</a> (veja <a href="#sykane-o-devorador-de-almas">Sykane, o Devorador de Almas</a>)</li><li>dentro da <a href="arco-r-provacoes-da-montanha.html#a-caverna-de-adagas">Caverna das Adagas</a> (veja <a href="#yog-o-invencível">Yog, o Invencível</a>)</li><li>do <strong>nothic</strong> Meda em <a href="arco-s-uma-espada-de-luz-solar.html">Arco S - Uma Espada de Luz Solar</a> (veja <a href="#khirad-a-estrela-dos-segredos">Khirad, a Estrela dos Segredos</a>)</li></ul>
-<p>Você não deve, no entanto, adicionar cacos extras para os jogadores obterem.</p></div></div>
-<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>A Magia dos Cacos</strong></div><div class="callout-body"><p>Um jogador que examinar um caco de âmbar com a magia <em>detectar magia</em> (<em>detect magic</em>) percebe traços de magia de abjuração. Um jogador que tentar identificar um caco com a magia <em>identificar</em> (<em>identify</em>) descobre que ele já fez parte de uma estrutura maior destinada a conter ou aprisionar alguma entidade ou criatura, e que ainda retém alguma ligação arcana com o recipiente original.</p></div></div>
-<div class="callout callout-info"><div class="callout-title"><span class="callout-icon">ℹ</span><strong>Por Que Âmbar?</strong></div><div class="callout-body"><p>Um jogador que for bem-sucedido num teste de Inteligência (Arcanismo) CD 15 se lembra de que o âmbar tem uma propriedade mágica única: é um "isolante" mágico, e não pode ser danificado ou atravessado por nenhum tipo de energia, seja mágica ou divina. Com um resultado de 20 ou mais, o jogador também se lembra de que energias mágicas só conseguem atravessar o âmbar muito lentamente, numa escala de anos a décadas.</p></div></div>
+<p>Você não deve, no entanto, adicionar cacos extras para os jogadores obterem.</p></div></details>
+<details class="callout callout-info" open><summary class="callout-title"><span class="callout-icon">ℹ</span><strong>A Magia dos Cacos</strong></summary><div class="callout-body"><p>Um jogador que examinar um caco de âmbar com a magia <em>detectar magia</em> (<em>detect magic</em>) percebe traços de magia de abjuração. Um jogador que tentar identificar um caco com a magia <em>identificar</em> (<em>identify</em>) descobre que ele já fez parte de uma estrutura maior destinada a conter ou aprisionar alguma entidade ou criatura, e que ainda retém alguma ligação arcana com o recipiente original.</p></div></details>
+<details class="callout callout-info" open><summary class="callout-title"><span class="callout-icon">ℹ</span><strong>Por Que Âmbar?</strong></summary><div class="callout-body"><p>Um jogador que for bem-sucedido num teste de Inteligência (Arcanismo) CD 15 se lembra de que o âmbar tem uma propriedade mágica única: é um "isolante" mágico, e não pode ser danificado ou atravessado por nenhum tipo de energia, seja mágica ou divina. Com um resultado de 20 ou mais, o jogador também se lembra de que energias mágicas só conseguem atravessar o âmbar muito lentamente, numa escala de anos a décadas.</p></div></details>
 <h1 id="estágio-um">Estágio Um</h1>
 <p>Neste estágio, o jogador é apenas um possuidor do caco de âmbar, provavelmente sem saber do verdadeiro poder que ele oferece.</p>
 <p>Na primeira vez em que o jogador é reduzido a 0 pontos de vida e cai inconsciente enquanto possui o caco, uma silhueta sombria aparece a ele numa visão e se oferece para ajudá-lo a escapar do espectro da morte e retornar à luta. A silhueta não menciona nenhum preço, e permanece em silêncio a menos que o jogador aceite sua oferta.</p>
@@ -320,6 +344,7 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
     <aside class="sidebar-right"><div class="toc-label">Nesta página</div><div class="toc-list"><a class="toc-lvl-1" href="#estágio-um">Estágio Um</a><a class="toc-lvl-1" href="#estágio-dois">Estágio Dois</a><a class="toc-lvl-1" href="#estágio-três">Estágio Três</a><a class="toc-lvl-1" href="#corrupção-de-âmbar">Corrupção de Âmbar</a><a class="toc-lvl-2" href="#fekre-rainha-das-pragas">Fekre, Rainha das Pragas</a><a class="toc-lvl-2" href="#zrin-hala-a-tempestade-uivante">Zrin-Hala, a Tempestade Uivante</a><a class="toc-lvl-2" href="#sykane-o-devorador-de-almas">Sykane, o Devorador de Almas</a><a class="toc-lvl-2" href="#savnok-o-inescrutável">Savnok, o Inescrutável</a><a class="toc-lvl-2" href="#tarakamedes-o-wyrm-da-sepultura">Tarakamedes, o Wyrm da Sepultura</a><a class="toc-lvl-2" href="#shami-amourae-a-dama-dos-deleites">Shami-Amourae, a Dama dos Deleites</a><a class="toc-lvl-2" href="#drizlash-a-aranha-de-nove-olhos">Drizlash, a Aranha de Nove Olhos</a><a class="toc-lvl-2" href="#dahlver-nar-aquele-dos-muitos-dentes">Dahlver-Nar, Aquele dos Muitos Dentes</a><a class="toc-lvl-2" href="#zantras-o-fazedor-de-reis">Zantras, o Fazedor de Reis</a><a class="toc-lvl-2" href="#delban-a-estrela-do-gelo-e-do-ódio">Delban, a Estrela do Gelo e do Ódio</a><a class="toc-lvl-2" href="#khirad-a-estrela-dos-segredos">Khirad, a Estrela dos Segredos</a><a class="toc-lvl-2" href="#yrrga-o-olho-das-sombras">Yrrga, o Olho das Sombras</a><a class="toc-lvl-2" href="#grande-taar-haak-o-destruidor-de-cinco-cabeças">Grande Taar Haak, o Destruidor de Cinco Cabeças</a><a class="toc-lvl-2" href="#yog-o-invencível">Yog, o Invencível</a><a class="toc-lvl-2" href="#norganas-o-dedo-do-esquecimento">Norganas, o Dedo do Esquecimento</a><a class="toc-lvl-2" href="#vaund-o-evasivo">Vaund, o Evasivo</a><a class="toc-lvl-2" href="#seriach-o-sussurrador-de-cães-infernais">Seriach, o Sussurrador de Cães Infernais</a></div></aside>
   </div>
 </div>
+<button type="button" class="back-to-top" id="back-to-top" aria-label="Voltar ao topo">↑</button>
 <script>
 document.querySelectorAll('.search-box input').forEach(function(inp){
   inp.addEventListener('input', function(){
@@ -343,6 +368,55 @@ if (mobileBtn) {
     document.querySelector('.sidebar-left').classList.toggle('open');
   });
 }
+
+// ---------- sumario ativo (scrollspy) ----------
+(function () {
+  var headings = document.querySelectorAll('main.article h1[id], main.article h2[id], main.article h3[id], main.article h4[id]');
+  var tocLinks = document.querySelectorAll('.toc-list a');
+  if (!headings.length || !tocLinks.length || !window.IntersectionObserver) return;
+  var map = {};
+  tocLinks.forEach(function (a) { map[a.getAttribute('href').slice(1)] = a; });
+  var current = null;
+  function setActive(id) {
+    var a = map[id];
+    if (!a || a === current) return;
+    if (current) current.classList.remove('active');
+    a.classList.add('active');
+    current = a;
+    if (typeof a.scrollIntoView === 'function') {
+      a.scrollIntoView({ block: 'nearest' });
+    }
+  }
+  var observer = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting) setActive(entry.target.id);
+    });
+  }, { rootMargin: '0px 0px -70% 0px', threshold: 0 });
+  headings.forEach(function (h) { observer.observe(h); });
+})();
+
+// ---------- progresso de leitura + voltar ao topo ----------
+(function () {
+  var progress = document.getElementById('reading-progress');
+  var toTop = document.getElementById('back-to-top');
+  if (!progress && !toTop) return;
+  function update() {
+    var doc = document.documentElement;
+    var scrollTop = window.scrollY || doc.scrollTop;
+    var height = doc.scrollHeight - doc.clientHeight;
+    var pct = height > 0 ? Math.min(100, (scrollTop / height) * 100) : 0;
+    if (progress) progress.style.width = pct + '%';
+    if (toTop) toTop.classList.toggle('visible', scrollTop > 500);
+  }
+  window.addEventListener('scroll', update, { passive: true });
+  update();
+  if (toTop) toTop.addEventListener('click', function () {
+    window.scrollTo({
+      top: 0,
+      behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth'
+    });
+  });
+})();
 </script>
 </body>
 </html>
