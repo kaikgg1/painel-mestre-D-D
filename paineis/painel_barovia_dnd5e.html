@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Painel da campanha Maldição de Strahd — controle de status, HP, slots de magia e condições dos jogadores em Barovia.">
-<meta name="theme-color" content="#0a0608">
+<meta name="theme-color" content="#0C090B">
 <meta property="og:title" content="Crônicas de Barovia — Painel do Mestre">
 <meta property="og:description" content="Painel da campanha Maldição de Strahd.">
 <meta property="og:type" content="website">
@@ -16,881 +16,509 @@
   * { box-sizing: border-box; }
 
   :root {
-    --bg-deep: #0a0608;
-    --bg-mid: #1a0e10;
-    --bg-card: #1f1416;
-    --bg-card-soft: #2a1a1c;
-    --parchment: #d4c5a0;
-    --parchment-dim: #a89878;
-    --gold: #8B6914;
-    --gold-bright: #b88a2c;
-    --blood: #6b1010;
-    --blood-bright: #8b1d1d;
-    --blood-dark: #3d0808;
-    --bone: #c4b896;
-    --shadow: #050304;
-    --text: #d4c5a0;
-    --text-dim: #8c7d5e;
+    --bg-deep: #0C090B;
+    --bg-card: #171013;
+    --bg-card-elev: #1D1418;
+    --gold: #C2A15B;
+    --gold-muted: #756038;
+    --text: #E7DFD3;
+    --text-dim: #988D84;
+    --divider: #40252B;
+    --danger: #A94149;
+    --danger-dim: #6b2a2e;
+    --success: #667A58;
+    --magic: #73518A;
+    --shadow: #030202;
+    /* mantidos por compatibilidade com módulos JS externos (efeitos.js etc.) */
+    --parchment: #E7DFD3;
+    --parchment-dim: #988D84;
+    --gold-bright: #C2A15B;
+    --blood: #40252B;
+    --blood-bright: #A94149;
+    --blood-dark: #2a1519;
+    --bone: #E7DFD3;
+    --bg-card-soft: #1D1418;
   }
 
   body {
     margin: 0;
-    padding: 28px 16px;
+    padding: 24px 16px 60px;
     font-family: 'EB Garamond', Georgia, serif;
     background-color: var(--bg-deep);
-    background-image:
-      radial-gradient(ellipse at top, #2a1518 0%, #150a0c 50%, #050304 100%),
-      repeating-linear-gradient(45deg, transparent 0 2px, rgba(0,0,0,0.15) 2px 4px);
+    background-image: radial-gradient(ellipse at top, #17101299 0%, transparent 55%);
     background-attachment: fixed;
     color: var(--text);
     min-height: 100vh;
   }
-
-  /* Vinheta sutil nas bordas */
   body::before {
     content: '';
-    position: fixed;
-    inset: 0;
-    pointer-events: none;
-    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.6) 100%);
-    z-index: 1;
+    position: fixed; inset: 0; pointer-events: none; z-index: 1;
+    background:
+      radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.5) 100%),
+      repeating-linear-gradient(45deg, transparent 0 3px, rgba(0,0,0,0.05) 3px 6px);
   }
   body > * { position: relative; z-index: 2; }
 
   /* ===== CABEÇALHO ===== */
   .header {
-    max-width: 1280px;
-    margin: 0 auto 28px;
+    max-width: 1320px;
+    margin: 0 auto 20px;
     text-align: center;
-    padding: 12px 0 22px;
-    position: relative;
+    padding: 8px 0 16px;
   }
   .header h1 {
     font-family: 'Cinzel Decorative', serif;
-    font-size: 42px;
+    font-size: 34px;
     font-weight: 900;
     margin: 0;
-    letter-spacing: 4px;
-    color: var(--blood-bright);
-    text-shadow:
-      0 0 20px rgba(139, 29, 29, 0.5),
-      2px 2px 0 var(--shadow),
-      3px 3px 6px rgba(0,0,0,0.8);
+    letter-spacing: 3px;
+    color: var(--gold);
+    text-shadow: 1px 1px 0 var(--shadow);
     font-variant: small-caps;
   }
   .header .subtitle {
     font-style: italic;
-    font-size: 15px;
-    color: var(--parchment-dim);
-    margin-top: 8px;
-    letter-spacing: 2px;
-    font-family: 'EB Garamond', serif;
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-top: 6px;
+    letter-spacing: 1.5px;
   }
-  .header .subtitle::before { content: '† '; color: var(--blood); }
-  .header .subtitle::after { content: ' †'; color: var(--blood); }
-
+  .header .subtitle::before { content: '† '; color: var(--gold-muted); }
+  .header .subtitle::after { content: ' †'; color: var(--gold-muted); }
   .header::after {
     content: '';
-    display: block;
-    width: 70%;
-    margin: 16px auto 0;
-    height: 1px;
-    background: linear-gradient(to right, transparent, var(--gold), transparent);
-    box-shadow: 0 1px 0 rgba(0,0,0,0.5);
+    display: block; width: 60%; margin: 14px auto 0; height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold-muted), transparent);
   }
 
   /* ===== TOOLBAR ===== */
   .toolbar {
-    max-width: 1280px;
-    margin: 0 auto 24px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    justify-content: center;
-    flex-wrap: wrap;
+    max-width: 1320px;
+    margin: 0 auto 20px;
+    display: flex; align-items: center; gap: 10px;
+    justify-content: center; flex-wrap: wrap;
   }
-  .toolbar-group {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
+  .toolbar-group { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .toolbar-sep {
-    width: 1px;
-    align-self: stretch;
-    min-height: 28px;
-    background: linear-gradient(to bottom, transparent, var(--gold), transparent);
-    opacity: 0.5;
+    width: 1px; align-self: stretch; min-height: 28px;
+    background: linear-gradient(to bottom, transparent, var(--divider), transparent);
     margin: 0 2px;
   }
-  .toolbar .back-link,
-  .toolbar button {
-    padding: 10px 18px;
-    min-height: 42px;
-    border-radius: 3px;
-    font-family: 'Cinzel', serif;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    transition: transform 0.15s, box-shadow 0.15s, background 0.15s, border-color 0.15s, color 0.15s;
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    cursor: pointer;
-    line-height: 1;
+  .toolbar .back-link, .toolbar button {
+    padding: 9px 16px; min-height: 40px; border-radius: 4px;
+    font-family: 'Cinzel', serif; font-size: 11.5px; font-weight: 600;
+    letter-spacing: 0.8px; text-transform: uppercase;
+    transition: transform .15s, background .15s, border-color .15s, color .15s;
+    display: inline-flex; align-items: center; gap: 7px;
+    cursor: pointer; line-height: 1;
   }
-  .toolbar .back-link span[data-ico], .toolbar button span[data-ico] { font-size: 15px; }
+  .toolbar .back-link span[data-ico], .toolbar button span[data-ico] { font-size: 14px; }
   .toolbar .back-link {
-    background: transparent;
-    border: 1px solid var(--gold);
-    color: var(--parchment-dim);
-    text-decoration: none;
+    background: transparent; border: 1px solid var(--gold-muted); color: var(--text-dim); text-decoration: none;
   }
-  .toolbar .back-link:hover {
-    background: var(--gold);
-    color: var(--bg-deep);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 14px rgba(184,138,44,0.35);
-  }
+  .toolbar .back-link:hover { background: var(--gold-muted); color: var(--bg-deep); transform: translateY(-1px); }
   .toolbar button {
-    background: linear-gradient(to bottom, var(--bg-card-soft), var(--bg-card));
-    border: 1px solid var(--gold);
-    color: var(--parchment);
-    box-shadow: 0 2px 8px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05);
+    background: var(--bg-card-elev); border: 1px solid var(--gold-muted); color: var(--text);
   }
-  .toolbar button:hover {
-    background: linear-gradient(to bottom, var(--blood), var(--blood-dark));
-    color: var(--bone);
-    border-color: var(--gold-bright);
-    transform: translateY(-2px);
-    box-shadow: 0 6px 16px rgba(139,29,29,0.45);
+  .toolbar button:hover { border-color: var(--gold); background: #241a1e; transform: translateY(-1px); }
+  .toolbar .back-link:active, .toolbar button:active { transform: translateY(0); }
+  .toolbar .back-link:focus-visible, .toolbar button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+  @media (max-width: 700px) { .toolbar-sep { display: none; } }
+
+  /* ===== BARRA DA PARTY ===== */
+  .party-bar {
+    max-width: 1320px;
+    margin: 0 auto 22px;
+    display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
   }
-  .toolbar .back-link:active, .toolbar button:active {
-    transform: translateY(0);
-    box-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  .party-chip {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--bg-card); border: 1px solid var(--divider); border-radius: 20px;
+    padding: 6px 14px 6px 8px; cursor: pointer; transition: border-color .15s, transform .15s;
+    min-width: 150px;
   }
-  .toolbar .back-link:focus-visible, .toolbar button:focus-visible {
-    outline: 2px solid var(--gold-bright);
-    outline-offset: 2px;
-  }
-  .toolbar button.danger { border-color: var(--blood); }
-  .toolbar button.danger:hover { background: linear-gradient(to bottom, var(--blood-bright), var(--blood)); }
-  @media (max-width: 700px) {
-    .toolbar-sep { display: none; }
-  }
+  .party-chip:hover { border-color: var(--gold-muted); transform: translateY(-1px); }
+  .party-chip .pc-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; background: var(--tema-cor, var(--gold)); }
+  .party-chip .pc-nome { font-family: 'Cinzel', serif; font-size: 11.5px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90px; }
+  .party-chip .pc-hp { font-size: 11px; color: var(--text-dim); margin-left: auto; white-space: nowrap; }
+  .party-chip.critico .pc-hp { color: var(--danger); font-weight: 700; }
+  .party-chip.inconsciente { border-color: var(--danger); }
+  .party-chip.inconsciente .pc-nome { color: var(--danger); }
+  .party-chip .pc-flag { font-size: 12px; }
+  .party-bar-vazia { text-align: center; color: var(--text-dim); font-style: italic; font-size: 12px; }
 
   /* ===== GRID DE CARDS ===== */
   .grid {
-    max-width: 1280px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 22px;
+    max-width: 1320px; margin: 0 auto;
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 16px; align-items: start;
   }
 
   /* ===== CARD ===== */
   .card {
-    background:
-      linear-gradient(to bottom, var(--bg-card), var(--bg-card-soft) 50%, var(--bg-card)),
-      var(--bg-card);
-    border: 2px solid var(--tema-cor, var(--gold));
-    border-radius: 3px;
-    padding: 16px 14px 24px;
+    background: var(--bg-card);
+    border: 1px solid var(--divider);
+    border-radius: 6px;
+    padding: 0;
     position: relative;
-    z-index: 0; /* contém o watermark de classe dentro deste card */
-    box-shadow:
-      0 0 0 1px var(--blood-dark) inset,
-      0 6px 20px rgba(0,0,0,0.7),
-      inset 0 0 30px rgba(0,0,0,0.5);
+    overflow: hidden;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.5);
     transition: border-color 0.2s;
   }
-
-  /* Decoração de cantos góticos */
-  .card::before, .card::after {
-    content: '✠';
-    position: absolute;
-    color: var(--tema-cor, var(--blood));
-    font-size: 16px;
-    opacity: 0.7;
-    text-shadow: 0 0 4px rgba(0,0,0,0.8);
+  .card.critico { border-color: var(--danger); }
+  /* linha fina de cor da classe no topo — o único destaque de cor por personagem */
+  .card::before {
+    content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+    background: var(--tema-cor, var(--gold-muted));
+    z-index: 1;
   }
-  .card::before { top: 4px; left: 8px; }
-  .card::after { top: 4px; right: 8px; }
-
-  /* ===== TEMA VISUAL POR CLASSE ===== */
+  /* brasão discreto no canto, quase invisível */
   .class-watermark {
-    position: absolute;
-    z-index: -1;
-    right: -14px;
-    bottom: -14px;
-    font-size: 130px;
-    line-height: 1;
-    color: var(--tema-cor, var(--gold));
-    opacity: 0.08;
-    pointer-events: none;
-    transform: rotate(-6deg);
+    position: absolute; z-index: 0; right: -10px; bottom: -10px;
+    font-size: 84px; line-height: 1; color: var(--tema-cor, var(--gold));
+    opacity: 0.045; pointer-events: none; transform: rotate(-6deg);
   }
-  .class-badge {
-    display: inline-flex;
-    vertical-align: -3px;
-    margin-right: 5px;
-    color: var(--tema-cor, var(--gold-bright));
-    font-size: 13px;
-  }
-  .char-header { border-bottom-color: var(--tema-cor, var(--blood)); }
-  .section-title { border-bottom-color: var(--tema-cor, var(--blood)); }
+  .class-badge { display: inline-flex; vertical-align: -2px; margin-right: 4px; color: var(--tema-cor, var(--gold)); font-size: 11px; opacity: .85; }
+
+  .card-body { position: relative; z-index: 1; padding: 14px 14px 10px; }
 
   /* ===== CABEÇALHO DO CARD ===== */
-  .char-header {
-    text-align: center;
-    margin-bottom: 12px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--blood);
-    position: relative;
-  }
+  .char-header { margin-bottom: 10px; padding-right: 66px; }
   .char-name {
-    font-family: 'Cinzel Decorative', serif;
-    font-size: 21px;
-    font-weight: 700;
-    color: var(--gold-bright);
-    font-variant: small-caps;
-    letter-spacing: 2px;
-    line-height: 1.15;
-    outline: none;
-    min-height: 24px;
-    text-shadow: 1px 1px 3px var(--shadow);
+    font-family: 'Cinzel Decorative', serif; font-size: 17px; font-weight: 700;
+    color: var(--text); letter-spacing: 0.5px; line-height: 1.2; outline: none;
   }
-  .player-name {
-    font-style: italic;
-    font-size: 12px;
-    color: var(--parchment-dim);
-    margin-top: 3px;
-    outline: none;
-  }
-  .race-class {
-    font-family: 'Cinzel', serif;
-    font-size: 12px;
-    color: var(--parchment);
-    margin-top: 5px;
-    outline: none;
-    letter-spacing: 0.5px;
-  }
-  .race-class strong { color: var(--blood-bright); }
+  .char-meta { font-size: 11.5px; color: var(--text-dim); margin-top: 2px; outline: none; }
+  .char-meta .jogador-nome { font-style: italic; }
+  .char-meta .sep { margin: 0 4px; opacity: .5; }
+  .char-meta [data-field] { outline: none; }
+  .char-meta strong { color: var(--gold); font-weight: 600; }
 
-  /* ===== INSPIRAÇÃO ===== */
   .inspiration {
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    min-width: 36px;
-    height: 30px;
-    padding: 0 8px;
-    background: var(--bg-card);
-    border: 2px solid var(--gold);
-    border-radius: 15px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 4px;
-    cursor: pointer;
-    font-family: 'Cinzel', serif;
-    font-weight: 700;
-    font-size: 14px;
-    color: var(--parchment-dim);
-    transition: all 0.2s;
-    user-select: none;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+    position: absolute; top: 10px; right: 10px;
+    display: flex; align-items: center; gap: 2px;
+    background: transparent; border: 1px solid var(--gold-muted); border-radius: 13px;
+    padding: 0 2px; height: 24px;
+    font-family: 'Cinzel', serif; user-select: none;
   }
-  .inspiration .ic { font-size: 14px; line-height: 1; }
-  .inspiration .qty { font-size: 13px; }
-  .inspiration.active {
-    background: var(--gold-bright);
-    color: var(--shadow);
-    box-shadow: 0 0 12px var(--gold-bright), 0 0 4px var(--gold);
-    border-color: var(--gold-bright);
+  .inspiration.active { border-color: var(--gold); }
+  .inspiration .insp-btn {
+    background: transparent; border: none; color: var(--text-dim);
+    width: 18px; height: 18px; border-radius: 50%; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700; line-height: 1; padding: 0; transition: background .12s, color .12s;
   }
-  .inspiration:hover { transform: scale(1.08); }
+  .inspiration .insp-btn:hover { background: var(--gold-muted); color: var(--bg-deep); }
+  .inspiration .insp-btn:disabled { opacity: .3; cursor: not-allowed; }
+  .inspiration .insp-btn:disabled:hover { background: transparent; color: var(--text-dim); }
+  .inspiration .insp-qty { display: flex; align-items: center; gap: 2px; font-weight: 700; font-size: 11px; color: var(--text-dim); padding: 0 1px; }
+  .inspiration.active .insp-qty { color: var(--gold); }
+  .inspiration .ic { font-size: 10px; line-height: 1; }
 
-  /* ===== STATS PRINCIPAIS ===== */
-  .stats-row {
-    display: grid;
-    grid-template-columns: 1.4fr 1fr 1fr;
-    gap: 8px;
-    margin-bottom: 14px;
-  }
-  .stat-box {
-    background: linear-gradient(to bottom, rgba(107, 16, 16, 0.15), rgba(107, 16, 16, 0.05));
-    border: 1px solid var(--blood);
-    border-radius: 2px;
-    padding: 6px 4px;
-    text-align: center;
-    box-shadow: inset 0 0 8px rgba(0,0,0,0.4);
-  }
-  .stat-label {
-    font-family: 'Cinzel', serif;
-    font-size: 9px;
-    font-weight: 700;
-    color: var(--gold);
-    text-transform: uppercase;
-    letter-spacing: 1.2px;
-    margin-bottom: 3px;
-  }
-  .stat-value {
-    font-size: 19px;
-    font-weight: 700;
-    color: var(--parchment);
-    outline: none;
-    line-height: 1.1;
-    font-family: 'EB Garamond', serif;
-    text-shadow: 1px 1px 2px var(--shadow);
-  }
-  .stat-value.hp-grouped {
-    font-size: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 2px;
-  }
-  .hp-current { color: var(--blood-bright); font-weight: 700; }
-  .hp-sep { color: var(--text-dim); }
+  /* ===== HP ===== */
+  .hp-block { margin-bottom: 8px; }
+  .hp-row { display: flex; align-items: baseline; gap: 6px; margin-bottom: 4px; }
+  .hp-label { font-family: 'Cinzel', serif; font-size: 9.5px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-right: auto; }
+  .hp-nums { font-size: 16px; font-family: 'EB Garamond', serif; display: flex; align-items: baseline; gap: 2px; }
+  .hp-current-input { color: var(--text); font-weight: 700; max-width: 38px; }
+  .hp-current-input.critico { color: var(--danger); }
+  .hp-sep { color: var(--text-dim); font-size: 13px; }
+  .hp-max-input { max-width: 34px; color: var(--text-dim); }
+  .hp-temp-wrap { display: flex; align-items: baseline; gap: 2px; color: var(--magic); font-size: 12px; margin-left: 4px; }
+  .hp-temp-wrap .hp-temp-plus { opacity: .7; }
+  .hp-temp-input { max-width: 26px; color: var(--magic); font-weight: 700; }
   .stat-input {
-    background: transparent;
-    border: none;
-    color: inherit;
-    font: inherit;
-    text-align: center;
-    width: 100%;
-    outline: none;
-    padding: 1px;
-    border-radius: 2px;
+    background: transparent; border: none; color: inherit; font: inherit;
+    text-align: center; width: 100%; outline: none; padding: 0 2px; border-radius: 3px;
     transition: background 0.12s;
   }
-  .stat-input:focus { background: rgba(184, 138, 44, 0.15); }
-  .hp-current-input { color: var(--blood-bright); font-weight: 700; max-width: 40px; }
-  .hp-max-input { max-width: 36px; color: var(--parchment); }
+  .stat-input:focus { background: rgba(194,161,91,0.15); }
   .stat-input::placeholder { color: var(--text-dim); opacity: 0.5; }
 
-  /* ===== SEÇÕES ===== */
-  .section { margin-top: 12px; }
-  .section-title {
-    font-family: 'Cinzel', serif;
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--gold);
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    padding-bottom: 3px;
-    border-bottom: 1px solid var(--blood);
-    margin-bottom: 7px;
-    text-shadow: 1px 1px 2px var(--shadow);
+  .hp-bar-track {
+    height: 6px; border-radius: 3px; background: rgba(255,255,255,0.06);
+    overflow: hidden; position: relative;
+  }
+  .hp-bar-fill { height: 100%; border-radius: 3px; background: var(--success); transition: width .2s, background .2s; }
+  .hp-bar-fill.medio { background: #b08a4a; }
+  .hp-bar-fill.baixo { background: var(--danger); }
+  .hp-bar-track.zero { background: rgba(169,65,73,0.25); }
+
+  .unconscious-badge {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(169,65,73,0.14); border: 1px solid var(--danger);
+    color: var(--danger); border-radius: 4px; padding: 4px 8px;
+    font-family: 'Cinzel', serif; font-size: 10.5px; font-weight: 700;
+    letter-spacing: 0.5px; text-transform: uppercase; margin: 6px 0;
   }
 
-  /* ===== EXAUSTÃO ===== */
-  .exhaustion {
-    display: flex;
-    gap: 5px;
-    justify-content: center;
-    margin: 4px 0;
+  /* ===== CHIPS DE COMBATE (CA / Iniciativa / Movimento / Perc. Passiva) ===== */
+  .stat-chips { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 8px; }
+  .stat-chip {
+    background: var(--bg-card-elev); border: 1px solid var(--divider); border-radius: 4px;
+    padding: 5px 3px; text-align: center;
   }
+  .stat-chip-label { font-family: 'Cinzel', serif; font-size: 8px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.8px; margin-bottom: 2px; }
+  .stat-chip-value { font-size: 15px; font-weight: 700; color: var(--text); }
+  .stat-chip-value .stat-input { font-size: 15px; font-weight: 700; }
+
+  /* ===== LINHA DE ALERTA (condições / concentração / death saves) ===== */
+  .alert-row { display: flex; flex-direction: column; gap: 6px; margin-bottom: 4px; }
+  .tags-row { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+  .condition-tag {
+    background: rgba(169,65,73,0.14); border: 1px solid var(--danger);
+    color: var(--danger); padding: 3px 9px; border-radius: 10px; font-size: 10px;
+    cursor: pointer; user-select: none; font-family: 'Cinzel', serif; font-weight: 600; letter-spacing: 0.4px;
+    display: inline-flex; align-items: center; gap: 4px;
+  }
+  .condition-tag .rm { opacity: .7; }
+  .condition-tag:hover { opacity: .85; }
+  .add-condition-btn {
+    background: transparent; border: 1px dashed var(--divider); color: var(--text-dim);
+    padding: 3px 9px; border-radius: 10px; font-size: 10px; cursor: pointer;
+    font-family: 'Cinzel', serif; letter-spacing: 0.4px; transition: border-color .15s, color .15s;
+  }
+  .add-condition-btn:hover { border-color: var(--gold-muted); color: var(--gold); }
+  .condition-picker {
+    display: none; flex-wrap: wrap; gap: 4px; padding: 8px; margin-top: 2px;
+    background: var(--bg-card-elev); border: 1px solid var(--divider); border-radius: 4px;
+  }
+  .condition-picker.aberto { display: flex; }
+  .condition-picker .cp-tag {
+    background: transparent; border: 1px solid var(--divider); color: var(--text-dim);
+    padding: 3px 9px; border-radius: 10px; font-size: 10px; cursor: pointer;
+    font-family: 'Cinzel', serif; font-weight: 600; letter-spacing: 0.4px; transition: all .12s;
+  }
+  .condition-picker .cp-tag.ativa { background: rgba(169,65,73,0.18); border-color: var(--danger); color: var(--danger); }
+  .condition-picker .cp-tag:hover { border-color: var(--gold-muted); }
+
+  .concentration-badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(115,81,138,0.16); border: 1px solid var(--magic);
+    color: var(--magic); border-radius: 10px; padding: 3px 10px; font-size: 10.5px;
+    font-family: 'Cinzel', serif; font-weight: 600; letter-spacing: 0.4px; cursor: pointer;
+  }
+  .concentration-badge.inativa { background: transparent; border-style: dashed; color: var(--text-dim); border-color: var(--divider); }
+
+  /* ===== EXAUSTÃO (compacto) ===== */
+  .exhaustion-compact {
+    display: inline-flex; align-items: center; gap: 6px; cursor: pointer; user-select: none;
+    font-size: 10.5px; color: var(--text-dim); font-family: 'Cinzel', serif; letter-spacing: 0.4px;
+  }
+  .exhaustion-compact .exh-dots { display: flex; gap: 2px; }
+  .exhaustion-compact .exh-dot { width: 6px; height: 6px; border-radius: 50%; background: rgba(255,255,255,0.12); }
+  .exhaustion-compact .exh-dot.on { background: var(--danger); }
+  .exhaustion-compact.zero { opacity: .55; }
+  .exhaustion-picker {
+    display: none; gap: 5px; margin-top: 4px;
+  }
+  .exhaustion-picker.aberto { display: flex; }
   .exh-pip {
-    width: 24px;
-    height: 24px;
-    border: 1.5px solid var(--text-dim);
-    border-radius: 3px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--text-dim);
-    background: rgba(0,0,0,0.3);
-    transition: all 0.15s;
-    user-select: none;
-    font-family: 'Cinzel', serif;
+    width: 22px; height: 22px; border: 1px solid var(--divider); border-radius: 4px;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 700; color: var(--text-dim); background: var(--bg-card-elev);
+    transition: all 0.15s; font-family: 'Cinzel', serif;
   }
-  .exh-pip:hover { border-color: var(--blood-bright); }
-  .exh-pip.filled {
-    background: linear-gradient(to bottom, var(--blood), var(--blood-dark));
-    border-color: var(--blood-bright);
-    color: var(--gold-bright);
-    box-shadow: 0 0 6px rgba(139,29,29,0.5), inset 0 0 4px rgba(0,0,0,0.5);
-  }
+  .exh-pip:hover { border-color: var(--danger); }
+  .exh-pip.filled { background: var(--danger-dim); border-color: var(--danger); color: var(--text); }
 
   /* ===== SALVAGUARDAS DE MORTE ===== */
-  .death-saves {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin: 4px 0;
+  .death-saves-inline { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: 4px; background: rgba(169,65,73,0.08); border: 1px solid var(--danger); }
+  .death-saves-inline .dsi-label { font-family: 'Cinzel', serif; font-size: 9.5px; font-weight: 700; color: var(--danger); text-transform: uppercase; letter-spacing: 0.6px; }
+  .death-group { display: flex; align-items: center; gap: 4px; }
+  .death-pips { display: flex; gap: 4px; }
+  .death-pip { width: 13px; height: 13px; border-radius: 50%; border: 1.5px solid; cursor: pointer; transition: all 0.15s; background: rgba(0,0,0,0.3); }
+  .death-group.success .death-pip { border-color: var(--success); }
+  .death-group.success .death-pip.filled { background: var(--success); }
+  .death-group.failure .death-pip { border-color: var(--danger); }
+  .death-group.failure .death-pip.filled { background: var(--danger); }
+
+  /* ===== RESUMO DE MAGIA / EQUIPAMENTO ===== */
+  .summary-line {
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    font-size: 11px; color: var(--text-dim); padding: 6px 0;
+    border-top: 1px solid var(--divider); margin-top: 6px;
   }
-  .death-group {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 4px;
-    padding: 4px;
-    background: rgba(0,0,0,0.2);
-    border-radius: 2px;
+  .summary-line strong { color: var(--text); font-weight: 600; }
+  .summary-line .sl-magic strong { color: var(--magic); }
+  .summary-btn {
+    margin-left: auto; background: transparent; border: 1px solid var(--divider); color: var(--text-dim);
+    padding: 3px 10px; border-radius: 3px; font-size: 10px; font-family: 'Cinzel', serif;
+    letter-spacing: 0.4px; text-transform: uppercase; cursor: pointer; transition: all .15s; white-space: nowrap;
   }
-  .death-group-label {
-    font-size: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    font-family: 'Cinzel', serif;
+  .summary-btn:hover { border-color: var(--gold-muted); color: var(--gold); }
+  .summary-btn.aberto { border-color: var(--gold); color: var(--gold); }
+
+  /* ===== TABS ===== */
+  .tabbar { display: flex; gap: 2px; margin-top: 10px; border-bottom: 1px solid var(--divider); }
+  .tab-btn {
+    flex: 1; background: transparent; border: none; color: var(--text-dim);
+    padding: 7px 4px; font-family: 'Cinzel', serif; font-size: 10px; font-weight: 600;
+    letter-spacing: 0.6px; text-transform: uppercase; cursor: pointer;
+    border-bottom: 2px solid transparent; transition: color .15s, border-color .15s;
   }
-  .death-group.success .death-group-label { color: #6b8c5a; }
-  .death-group.failure .death-group-label { color: var(--blood-bright); }
-  .death-pips { display: flex; gap: 5px; }
-  .death-pip {
-    width: 15px;
-    height: 15px;
-    border-radius: 50%;
-    border: 1.5px solid;
-    cursor: pointer;
-    transition: all 0.15s;
-    background: rgba(0,0,0,0.4);
-  }
-  .death-group.success .death-pip { border-color: #5a7048; }
-  .death-group.success .death-pip.filled {
-    background: #6b8c5a;
-    box-shadow: 0 0 6px rgba(107,140,90,0.5);
-  }
-  .death-group.failure .death-pip { border-color: var(--blood); }
-  .death-group.failure .death-pip.filled {
-    background: var(--blood-bright);
-    box-shadow: 0 0 6px rgba(139,29,29,0.5);
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.ativa { color: var(--gold); border-bottom-color: var(--gold); }
+  .tab-panel { display: none; padding: 10px 0 2px; }
+  .tab-panel.ativa { display: block; }
+
+  /* ===== SEÇÕES (dentro das abas) ===== */
+  .section { margin-bottom: 10px; }
+  .section:last-child { margin-bottom: 0; }
+  .section-title {
+    font-family: 'Cinzel', serif; font-size: 9.5px; font-weight: 700; color: var(--text-dim);
+    text-transform: uppercase; letter-spacing: 1.1px; margin-bottom: 6px;
   }
 
-  /* ===== SLOTS DE MAGIA ===== */
-  .spell-slots {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 4px;
-    font-size: 11px;
+  /* ===== SLOTS DE MAGIA (compacto: círculos) ===== */
+  .spell-slots-compact { display: flex; flex-direction: column; gap: 5px; }
+  .slot-row { display: flex; align-items: center; gap: 8px; }
+  .slot-row .slot-nv { font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700; color: var(--text-dim); width: 34px; flex-shrink: 0; }
+  .slot-row .slot-dots { display: flex; gap: 4px; flex-wrap: wrap; }
+  .slot-dot {
+    width: 13px; height: 13px; border-radius: 50%; border: 1.5px solid var(--magic);
+    background: transparent; cursor: pointer; padding: 0; transition: transform .12s, background .12s;
   }
-  .slot-level {
-    background: linear-gradient(180deg, rgba(0,0,0,0.3), rgba(0,0,0,0.15));
-    border: 1px solid rgba(139, 105, 20, 0.4);
-    border-radius: 5px;
-    padding: 6px 4px;
-    text-align: center;
-    transition: opacity 0.2s, filter 0.2s;
-  }
-  .slot-level.indisponivel { opacity: 0.3; filter: grayscale(0.6); }
-  .slot-level-num {
-    font-family: 'Cinzel', serif;
-    font-weight: 700;
-    color: var(--gold);
-    font-size: 10px;
-    letter-spacing: 1px;
-    margin-bottom: 4px;
-  }
-  .slot-pips-mestre {
-    display: flex; flex-wrap: wrap; gap: 3px;
-    justify-content: center; min-height: 16px; margin-bottom: 3px;
-  }
-  .slot-pip-m {
-    width: 14px; height: 14px;
-    border: 1.5px solid var(--gold);
-    border-radius: 50%;
-    background: transparent;
-    cursor: pointer; padding: 0;
-    transition: transform 0.12s, background 0.12s;
-  }
-  .slot-pip-m:hover { transform: scale(1.2); }
-  .slot-pip-m.gasto {
-    background: radial-gradient(circle, var(--blood-bright), var(--blood));
-    border-color: var(--blood-bright);
-    box-shadow: inset 0 0 3px rgba(0,0,0,0.5);
-  }
-  .slot-status-m {
-    font-size: 10px; font-family: 'Cinzel', serif;
-    color: var(--parchment-dim); letter-spacing: 0.5px;
-  }
-  .slot-status-m strong { color: var(--gold-bright); font-size: 11px; }
+  .slot-dot:hover { transform: scale(1.15); }
+  .slot-dot.gasto { background: var(--magic); }
+  .slot-row .slot-frac { margin-left: auto; font-size: 10px; color: var(--text-dim); font-family: 'Cinzel', serif; }
 
-  /* ===== MAGIAS PREPARADAS (Mestre — do spell_lists), agrupadas por nível ===== */
+  .spell-meta-row { display: flex; gap: 14px; margin-bottom: 8px; flex-wrap: wrap; }
+  .spell-meta-item { text-align: center; }
+  .spell-meta-label { font-family: 'Cinzel', serif; font-size: 8.5px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.6px; }
+  .spell-meta-value { font-size: 15px; font-weight: 700; color: var(--magic); }
+  .spell-meta-value .stat-input { color: var(--magic); font-size: 15px; font-weight: 700; max-width: 34px; }
+
   .magias-prep-mestre { padding: 2px 0; }
   .magia-prep-grupo + .magia-prep-grupo { margin-top: 7px; }
-  .magia-prep-grupo-titulo {
-    font-family: 'Cinzel', serif;
-    font-size: 9.5px; font-weight: 700;
-    color: var(--tema-cor, var(--gold));
-    text-transform: uppercase;
-    letter-spacing: 1.2px;
-    margin-bottom: 4px;
-    opacity: 0.9;
-  }
+  .magia-prep-grupo-titulo { font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; color: var(--magic); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; opacity: 0.9; }
   .magia-prep-grupo-tags { display: flex; flex-wrap: wrap; gap: 4px; }
-  .magia-prep-tag {
-    display: inline-flex; align-items: center;
-    background: rgba(184, 138, 44, 0.15);
-    border: 1px solid rgba(139, 105, 20, 0.4);
-    border-radius: 10px;
-    padding: 2px 9px;
-    font-size: 11px;
-    color: var(--parchment);
-  }
-  .magia-prep-vazio {
-    font-size: 11px; color: var(--text-dim);
-    font-style: italic; padding: 4px 0;
-  }
+  .magia-prep-tag { display: inline-flex; align-items: center; background: rgba(115,81,138,0.12); border: 1px solid rgba(115,81,138,0.35); border-radius: 10px; padding: 2px 9px; font-size: 11px; color: var(--text); }
+  .magia-prep-vazio { font-size: 11px; color: var(--text-dim); font-style: italic; padding: 4px 0; }
 
-  /* ===== EQUIPAMENTO (Mestre — editável, sincroniza com a ficha) ===== */
+  /* ===== EQUIPAMENTO ===== */
   .equip-grupo + .equip-grupo { margin-top: 9px; }
-  .equip-grupo-titulo {
-    font-family: 'Cinzel', serif;
-    font-size: 9.5px; font-weight: 700;
-    color: var(--tema-cor, var(--gold));
-    text-transform: uppercase;
-    letter-spacing: 1.2px;
-    margin-bottom: 4px;
-    opacity: 0.9;
-  }
+  .equip-grupo-titulo { font-family: 'Cinzel', serif; font-size: 9px; font-weight: 700; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 4px; opacity: 0.9; }
   .equip-tags { display: flex; flex-wrap: wrap; gap: 4px; min-height: 4px; }
-  .equip-tag {
-    display: inline-flex; align-items: center; gap: 6px;
-    background: rgba(0,0,0,0.3);
-    border: 1px solid rgba(139, 105, 20, 0.4);
-    border-radius: 10px;
-    padding: 2px 6px 2px 9px;
-    font-size: 11px;
-    color: var(--parchment);
-  }
+  .equip-tag { display: inline-flex; align-items: center; gap: 6px; background: var(--bg-card-elev); border: 1px solid var(--divider); border-radius: 10px; padding: 2px 6px 2px 9px; font-size: 11px; color: var(--text); }
   .equip-tag .equip-tag-extra { color: var(--text-dim); font-size: 10px; }
-  .equip-tag .equip-rm {
-    background: none; border: none; cursor: pointer;
-    color: var(--text-dim); font-size: 12px; line-height: 1;
-    padding: 2px 3px; border-radius: 50%;
-  }
-  .equip-tag .equip-rm:hover { color: var(--blood-bright); background: rgba(139,29,29,0.2); }
+  .equip-tag .equip-rm { display: none; background: none; border: none; cursor: pointer; color: var(--text-dim); font-size: 12px; line-height: 1; padding: 2px 3px; border-radius: 50%; }
+  .modo-edicao .equip-tag .equip-rm { display: inline; }
+  .equip-tag .equip-rm:hover { color: var(--danger); }
   .equip-vazio { font-size: 11px; color: var(--text-dim); font-style: italic; }
-  .equip-add { display: flex; gap: 4px; margin-top: 5px; }
-  .equip-add input {
-    flex: 1; min-width: 0;
-    background: rgba(0,0,0,0.3);
-    border: 1px solid rgba(139, 105, 20, 0.4);
-    border-radius: 2px;
-    color: var(--parchment);
-    font-size: 11px;
-    padding: 4px 6px;
-    font-family: 'EB Garamond', serif;
-  }
+  .equip-add { display: none; gap: 4px; margin-top: 5px; }
+  .modo-edicao .equip-add { display: flex; }
+  .equip-add input { flex: 1; min-width: 0; background: var(--bg-card-elev); border: 1px solid var(--divider); border-radius: 3px; color: var(--text); font-size: 11px; padding: 4px 6px; font-family: 'EB Garamond', serif; }
   .equip-add input.equip-add-extra { flex: 0 0 52px; }
   .equip-add input::placeholder { color: var(--text-dim); opacity: 0.6; }
-  .equip-add button {
-    background: rgba(184,138,44,0.15);
-    border: 1px solid var(--gold);
-    color: var(--gold-bright);
-    border-radius: 2px;
-    padding: 0 10px;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 700;
+  .equip-add button { background: rgba(194,161,91,0.12); border: 1px solid var(--gold-muted); color: var(--gold); border-radius: 3px; padding: 0 10px; cursor: pointer; font-size: 13px; font-weight: 700; }
+  .equip-add button:hover { background: var(--gold); color: var(--bg-deep); }
+  .edit-toggle {
+    background: transparent; border: 1px solid var(--divider); color: var(--text-dim);
+    padding: 3px 10px; border-radius: 3px; font-size: 10px; font-family: 'Cinzel', serif;
+    letter-spacing: 0.4px; text-transform: uppercase; cursor: pointer; margin-bottom: 8px;
   }
-  .equip-add button:hover { background: var(--gold); color: var(--shadow); }
+  .edit-toggle.ativo { border-color: var(--gold); color: var(--gold); }
 
-  /* ===== MOEDAS (visão do mestre — somente leitura) ===== */
-  .moedas-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 6px;
-  }
-  .moeda-box-mestre {
-    display: flex; flex-direction: column;
-    align-items: center; justify-content: center;
-    padding: 6px 4px;
-    background: linear-gradient(180deg, rgba(184,138,44,0.12), rgba(0,0,0,0.3));
-    border: 1px solid rgba(184,138,44,0.35);
-    border-radius: 5px;
-    transition: border-color 0.15s, transform 0.15s;
-    min-height: 56px;
-  }
-  .moeda-box-mestre:hover { border-color: var(--gold-bright); transform: translateY(-1px); }
+  /* ===== MOEDAS ===== */
+  .moedas-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .moeda-box-mestre { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 6px 4px; background: var(--bg-card-elev); border: 1px solid var(--divider); border-radius: 4px; min-height: 48px; }
   .moeda-box-mestre.zero { opacity: 0.4; }
-  .moeda-box-mestre .m-ic { font-size: 16px; line-height: 1; }
-  .moeda-box-mestre .m-val {
-    font-family: 'Cinzel', serif; font-weight: 700;
-    color: var(--gold-bright); font-size: 14px; line-height: 1.1;
-    margin-top: 3px;
-  }
-  .moeda-box-mestre .m-tag {
-    font-family: 'Cinzel', serif; font-size: 9px;
-    color: var(--text-dim); letter-spacing: 1px;
-    margin-top: 2px;
-  }
-  @media (max-width: 640px) {
-    .moedas-grid { grid-template-columns: repeat(5, 1fr); gap: 4px; }
-    .moeda-box-mestre { padding: 5px 2px; min-height: 50px; }
-    .moeda-box-mestre .m-val { font-size: 13px; }
-    .moeda-box-mestre .m-tag { font-size: 8px; }
-  }
-
-  /* ===== MAGIAS PREPARADAS ===== */
-  .spell-list {
-    min-height: 32px;
-    font-size: 12px;
-    line-height: 1.55;
-    outline: none;
-    color: var(--parchment);
-    padding: 4px 6px;
-    border-radius: 2px;
-    background: rgba(0,0,0,0.25);
-    border: 1px solid rgba(139, 105, 20, 0.3);
-    transition: all 0.15s;
-    font-family: 'EB Garamond', serif;
-  }
-  .spell-list:hover { border-color: rgba(139, 105, 20, 0.6); }
-  .spell-list:focus { border-color: var(--gold); background: rgba(0,0,0,0.35); }
-  .spell-list:empty::before {
-    content: 'Truque, Mísseis Mágicos, Escudo...';
-    color: var(--text-dim);
-    font-style: italic;
-    opacity: 0.6;
-  }
-
-  /* ===== CONDIÇÕES ===== */
-  .conditions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-    margin-top: 4px;
-  }
-  .condition-tag {
-    background: rgba(0,0,0,0.4);
-    border: 1px solid var(--text-dim);
-    color: var(--text-dim);
-    padding: 3px 9px;
-    border-radius: 2px;
-    font-size: 10px;
-    cursor: pointer;
-    transition: all 0.15s;
-    user-select: none;
-    font-family: 'Cinzel', serif;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-  }
-  .condition-tag.active {
-    background: linear-gradient(to bottom, var(--blood), var(--blood-dark));
-    border-color: var(--gold);
-    color: var(--bone);
-    box-shadow: 0 0 8px rgba(139,29,29,0.4), inset 0 0 4px rgba(0,0,0,0.5);
-  }
-  .condition-tag:hover { border-color: var(--blood-bright); transform: translateY(-1px); }
-
-  /* ===== ÁREAS EDITÁVEIS ===== */
-  [contenteditable="true"] {
-    transition: background 0.12s;
-    border-radius: 2px;
-    padding: 0 3px;
-  }
-  [contenteditable="true"]:hover { background: rgba(184, 138, 44, 0.08); cursor: text; }
-  [contenteditable="true"]:focus { background: rgba(184, 138, 44, 0.18); outline: none; }
-
-  /* ===== BOTÕES DE CARD ===== */
-  .card-actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 14px;
-    padding-top: 8px;
-    border-top: 1px solid rgba(107,16,16,0.3);
-  }
-  .save-card {
-    background: linear-gradient(to bottom, rgba(139,105,20,0.2), rgba(139,105,20,0.1));
-    border: 1px solid var(--gold);
-    color: var(--gold-bright);
-    cursor: pointer;
-    font-size: 10px;
-    font-family: 'Cinzel', serif;
-    padding: 5px 14px;
-    border-radius: 2px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    font-weight: 600;
-    transition: all 0.2s;
-  }
-  .save-card:hover {
-    background: var(--gold);
-    color: var(--shadow);
-    box-shadow: 0 0 8px rgba(184,138,44,0.4);
-  }
-  .save-card.saved {
-    border-color: #6b8c5a;
-    color: #6b8c5a;
-    background: rgba(107,140,90,0.15);
-  }
-  .remove-card {
-    background: transparent;
-    border: none;
-    color: var(--text-dim);
-    cursor: pointer;
-    font-size: 10px;
-    opacity: 0.4;
-    transition: opacity 0.15s;
-    font-family: 'Cinzel', serif;
-    letter-spacing: 0.5px;
-  }
-  .remove-card:hover { opacity: 1; color: var(--blood-bright); }
-
-  /* ===== TOAST DE SALVAMENTO ===== */
-  .toast {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: linear-gradient(to bottom, var(--bg-card-soft), var(--bg-card));
-    border: 1px solid var(--gold);
-    color: var(--parchment);
-    padding: 10px 18px;
-    border-radius: 2px;
-    font-family: 'Cinzel', serif;
-    font-size: 12px;
-    letter-spacing: 1px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.7);
-    opacity: 0;
-    transform: translateY(20px);
-    transition: all 0.3s;
-    pointer-events: none;
-    z-index: 100;
-  }
-  .toast.show { opacity: 1; transform: translateY(0); }
-
-  /* ===== HINT ===== */
-  .hint {
-    max-width: 1280px;
-    margin: 32px auto 0;
-    text-align: center;
-    color: var(--text-dim);
-    font-size: 12px;
-    font-style: italic;
-    line-height: 1.7;
-    font-family: 'EB Garamond', serif;
-  }
-  .hint strong { color: var(--gold); font-style: normal; font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; }
-  .hint code {
-    background: rgba(0,0,0,0.4);
-    border: 1px solid var(--blood);
-    color: var(--gold-bright);
-    padding: 1px 6px;
-    border-radius: 2px;
-    font-family: 'Courier New', monospace;
-    font-size: 11px;
-  }
-
-  input[type="file"] { display: none; }
-
-  /* Tablet */
-  @media (max-width: 1024px) {
-    .grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
-    .toolbar { gap: 8px; padding: 12px; }
-  }
-
-  /* Mobile */
-  @media (max-width: 640px) {
-    body { padding: 16px 8px; }
-    .header h1 { font-size: 24px; letter-spacing: 2px; }
-    .grid { grid-template-columns: 1fr; gap: 14px; }
-    .card { padding: 16px 14px; }
-    .toolbar { flex-direction: column; align-items: stretch; gap: 8px; padding: 10px; }
-    .toolbar-group { flex-direction: column; align-items: stretch; gap: 8px; }
-    .toolbar button, .toolbar .back-link { padding: 12px 16px; min-height: 44px; width: 100%; justify-content: center; text-align: center; font-size: 12px; }
-
-    .stats-row { gap: 8px; }
-    .stat-box { padding: 8px 6px; }
-    .stat-value { font-size: 20px; }
-    .stat-value input { font-size: 20px; min-width: 36px; }
-
-    .exh-pip { width: 32px; height: 32px; font-size: 13px; }
-    .death-pip { width: 26px; height: 26px; }
-
-    .spell-slots { grid-template-columns: 1fr 1fr; gap: 8px; }
-    .slot-input { width: 42px; font-size: 16px; padding: 6px 4px; min-height: 32px; }
-    .slot-inputs { gap: 4px; }
-    .slot-level { padding: 10px 8px; }
-
-    .condition-tag { padding: 6px 12px; font-size: 11px; min-height: 32px; }
-
-    .spell-list { min-height: 70px; font-size: 14px; padding: 10px; }
-
-    .class-watermark { font-size: 90px; }
-    .magia-prep-tag { font-size: 12px; padding: 4px 10px; }
-    .equip-tag { font-size: 12px; padding: 4px 8px 4px 10px; }
-    .equip-add input, .equip-add button { min-height: 34px; }
-
-    .card-actions { gap: 6px; flex-wrap: wrap; }
-    .card-actions button { padding: 10px 12px; min-height: 40px; font-size: 11px; flex: 1; }
-
-    .hint { padding: 12px 14px; font-size: 12px; }
-  }
-
-  /* Tablet pequeno (entre mobile e 1024) */
-  @media (min-width: 641px) and (max-width: 820px) {
-    .spell-slots { grid-template-columns: 1fr 1fr 1fr; }
-  }
-
-  /* Foco visível */
-  button:focus-visible, input:focus-visible, [contenteditable]:focus-visible {
-    outline: 2px solid var(--gold);
-    outline-offset: 2px;
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after { animation: none !important; transition: none !important; }
-  }
-
-  @media print {
-    @page { margin: 12mm; size: A4 portrait; }
-    body { background: white !important; padding: 0 !important; color: #222 !important;
-      background-image: none !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-    body::before { display: none !important; }
-    .toolbar, .hint, .remove-card, .toast, .auth-slot, .back-link { display: none !important; }
-    .header { margin: 0 0 12px; padding: 0 0 8px; border-bottom: 2px solid #6b1010; }
-    .header h1 { color: #6b1010 !important; text-shadow: none !important; font-size: 24pt; letter-spacing: 2px; }
-    .header .subtitle { color: #6a4f0e !important; font-size: 11pt; }
-    .grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
-    .card {
-      break-inside: avoid; page-break-inside: avoid;
-      box-shadow: none !important;
-      background: #fffdf5 !important; background-image: none !important;
-      border: 1.5px solid #6b1010 !important;
-      color: #222 !important;
-      padding: 10px !important;
-      font-size: 10pt !important;
-    }
-    .card::before, .card::after { display: none !important; }
-    .class-watermark { display: none !important; }
-    .class-badge { display: none !important; }
-    .char-name { color: #6b1010 !important; text-shadow: none !important; font-size: 14pt !important; }
-    .player-name, .race-class { color: #444 !important; }
-    .stat-label, .section-title { color: #6a4f0e !important; }
-    .stat-value, .stat-value input { color: #6b1010 !important; }
-    input, textarea, [contenteditable] { background: transparent !important; border: none !important; color: #222 !important; }
-    .spell-list { border: 1px solid #ccc !important; min-height: 40px !important; }
-  }
-
-  /* ===== ÍCONES VETORIAIS (assets/js/icones.js) ===== */
-  .toolbar button, .toolbar .back-link {
-    display: inline-flex; align-items: center; justify-content: center; gap: 7px;
-  }
-  .toolbar iconify-icon { font-size: 15px; }
-  .card-actions button iconify-icon { font-size: 14px; vertical-align: -2px; margin-right: 5px; }
-  .magia-prep-vazio iconify-icon { font-size: 15px; vertical-align: -2px; color: var(--blood-bright); }
-  .grid-vazio iconify-icon { font-size: 30px; color: var(--gold-bright); display: block; margin: 0 auto 10px; }
-
-  /* Moedas: a COR é a informação, então continua um círculo CSS (não vira ícone) */
-  .moeda-box-mestre .m-ic.moeda-dot {
-    width: 15px; height: 15px; border-radius: 50%;
-    border: 1px solid rgba(0,0,0,0.45);
-    box-shadow: inset 0 1px 2px rgba(255,255,255,0.5), 0 1px 2px rgba(0,0,0,0.5);
-  }
+  .moeda-box-mestre .m-val { font-family: 'Cinzel', serif; font-weight: 700; color: var(--gold); font-size: 13px; line-height: 1.1; margin-top: 3px; }
+  .moeda-box-mestre .m-tag { font-family: 'Cinzel', serif; font-size: 8.5px; color: var(--text-dim); letter-spacing: 1px; margin-top: 2px; }
+  .moeda-box-mestre .m-ic.moeda-dot { width: 13px; height: 13px; border-radius: 50%; border: 1px solid rgba(0,0,0,0.45); }
   .moeda-dot--pl { background: linear-gradient(160deg, #eef4ff, #8fb0cf); }
   .moeda-dot--po { background: linear-gradient(160deg, #ffe6a0, #c9a24a); }
   .moeda-dot--pe { background: linear-gradient(160deg, #bdf0c4, #4c9a5f); }
   .moeda-dot--pp { background: linear-gradient(160deg, #f6f6f6, #a8adb5); }
   .moeda-dot--pc { background: linear-gradient(160deg, #e2a97b, #8a4b22); }
+
+  /* ===== RECURSOS DE CLASSE ===== */
+  .recurso-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 11px; }
+  .recurso-nome { color: var(--text-dim); text-transform: capitalize; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .recurso-pips { display: flex; gap: 3px; }
+  .recurso-pip { width: 11px; height: 11px; border-radius: 3px; border: 1.5px solid var(--gold-muted); background: transparent; cursor: pointer; padding: 0; }
+  .recurso-pip.gasto { background: var(--gold-muted); }
+  .recurso-vazio { font-size: 11px; color: var(--text-dim); font-style: italic; }
+
+  /* ===== AÇÕES DO CARD ===== */
+  .card-actions { display: flex; justify-content: space-between; align-items: center; gap: 6px; margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--divider); flex-wrap: wrap; }
+  .save-card {
+    background: transparent; border: 1px solid var(--gold-muted); color: var(--gold);
+    cursor: pointer; font-size: 10px; font-family: 'Cinzel', serif; padding: 5px 12px;
+    border-radius: 3px; letter-spacing: 0.6px; text-transform: uppercase; font-weight: 600; transition: all 0.2s;
+  }
+  .save-card:hover { background: var(--gold); color: var(--bg-deep); }
+  .save-card.saved { border-color: var(--success); color: var(--success); background: rgba(102,122,88,0.12); }
+  .remove-card { background: transparent; border: none; color: var(--text-dim); cursor: pointer; font-size: 10px; opacity: 0.5; transition: opacity 0.15s; font-family: 'Cinzel', serif; letter-spacing: 0.4px; }
+  .remove-card:hover { opacity: 1; color: var(--danger); }
+
+  /* ===== TOAST ===== */
+  .toast {
+    position: fixed; bottom: 20px; right: 20px;
+    background: var(--bg-card-elev); border: 1px solid var(--gold-muted); color: var(--text);
+    padding: 10px 18px; border-radius: 4px; font-family: 'Cinzel', serif; font-size: 12px;
+    letter-spacing: 0.6px; box-shadow: 0 4px 16px rgba(0,0,0,0.7);
+    opacity: 0; transform: translateY(20px); transition: all 0.3s; pointer-events: none; z-index: 100;
+  }
+  .toast.show { opacity: 1; transform: translateY(0); }
+
+  /* ===== HINT ===== */
+  .hint { max-width: 1320px; margin: 28px auto 0; text-align: center; color: var(--text-dim); font-size: 11.5px; font-style: italic; line-height: 1.7; }
+  .hint strong { color: var(--gold); font-style: normal; font-family: 'Cinzel', serif; font-size: 9.5px; letter-spacing: 0.6px; text-transform: uppercase; }
+  .hint code { background: var(--bg-card-elev); border: 1px solid var(--divider); color: var(--gold); padding: 1px 6px; border-radius: 3px; font-family: 'Courier New', monospace; font-size: 11px; }
+
+  input[type="file"] { display: none; }
+
+  @media (max-width: 1024px) {
+    .grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+  }
+  @media (min-width: 1280px) {
+    .grid { grid-template-columns: repeat(4, 1fr); }
+  }
+
+  @media (max-width: 640px) {
+    body { padding: 16px 8px 50px; }
+    .header h1 { font-size: 22px; letter-spacing: 2px; }
+    .grid { grid-template-columns: 1fr; gap: 12px; }
+    .toolbar { flex-direction: column; align-items: stretch; gap: 8px; }
+    .toolbar-group { flex-direction: column; align-items: stretch; gap: 8px; }
+    .toolbar button, .toolbar .back-link { padding: 12px 16px; min-height: 44px; width: 100%; justify-content: center; font-size: 12px; }
+    .party-chip { min-width: calc(50% - 5px); flex: 1 1 calc(50% - 5px); }
+    .stat-chips { grid-template-columns: repeat(2, 1fr); }
+    .exh-pip { width: 30px; height: 30px; font-size: 12px; }
+    .death-pip { width: 20px; height: 20px; }
+    .slot-dot { width: 18px; height: 18px; }
+    .card-actions button, .card-actions .remove-card { min-height: 38px; }
+  }
+
+  button:focus-visible, input:focus-visible, [contenteditable]:focus-visible {
+    outline: 2px solid var(--gold); outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }
+
+  @media print {
+    @page { margin: 12mm; size: A4 portrait; }
+    body { background: white !important; padding: 0 !important; color: #222 !important; background-image: none !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    body::before { display: none !important; }
+    .toolbar, .hint, .remove-card, .toast, .auth-slot, .back-link, .party-bar, .tabbar, .edit-toggle, .summary-btn { display: none !important; }
+    .header { margin: 0 0 12px; padding: 0 0 8px; border-bottom: 2px solid #6b1010; }
+    .header h1 { color: #6b1010 !important; text-shadow: none !important; font-size: 24pt; letter-spacing: 2px; }
+    .header .subtitle { color: #6a4f0e !important; font-size: 11pt; }
+    .grid { grid-template-columns: repeat(2, 1fr) !important; gap: 10px !important; }
+    .card { break-inside: avoid; page-break-inside: avoid; box-shadow: none !important; background: #fffdf5 !important; border: 1.5px solid #6b1010 !important; color: #222 !important; font-size: 10pt !important; }
+    .card::before { display: none !important; }
+    .class-watermark, .class-badge { display: none !important; }
+    .char-name { color: #6b1010 !important; text-shadow: none !important; font-size: 14pt !important; }
+    .char-meta { color: #444 !important; }
+    .tab-panel { display: block !important; }
+    input, textarea, [contenteditable] { background: transparent !important; border: none !important; color: #222 !important; }
+  }
+
+  .toolbar iconify-icon { font-size: 14px; }
+  .card-actions button iconify-icon { font-size: 13px; vertical-align: -2px; margin-right: 4px; }
+  .magia-prep-vazio iconify-icon { font-size: 14px; vertical-align: -2px; color: var(--danger); }
+  .grid-vazio iconify-icon { font-size: 28px; color: var(--gold); display: block; margin: 0 auto 10px; }
 </style>
 <link rel="stylesheet" href="../assets/css/ui.css">
 <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
@@ -920,12 +548,15 @@
   <span class="auth-slot" id="auth-slot" aria-label="Status de login" style="margin-left:auto;display:flex;gap:8px;align-items:center;font-family:'Cinzel',serif;font-size:11px"></span>
 </nav>
 
+<div class="party-bar" id="party-bar"></div>
+
 <main class="grid" id="grid"></main>
 
 <p class="hint">
   <strong>Edição</strong> Clique nos textos para editar · Clique nos círculos pra marcar/desmarcar<br>
   <strong>Matemática nos números</strong> Digite <code>-5</code> em qualquer campo numérico (PV, slots, CA) e pressione Enter pra subtrair · <code>+3</code> pra somar · <code>=20</code> pra definir valor<br>
-  <strong>Save</strong> Os dados são salvos no navegador automaticamente · Use <strong>Baixar Save</strong> para guardar em arquivo (recomendado entre sessões)
+  <strong>Condições e equipamento</strong> Use <code>+ Condição</code> pra abrir a lista completa · Use <code>Editar</code> dentro de Ficha pra adicionar armas/itens<br>
+  <strong>Save</strong> Os dados são salvos automaticamente no banco
 </p>
 
 <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
@@ -936,6 +567,7 @@
 <script src="../assets/js/efeitos.js"></script>
 <script src="../assets/js/dbsync.js"></script>
 <script src="../assets/js/phb_slots.js"></script>
+<script src="../assets/js/exaustao_regras.js"></script>
 <script src="../assets/js/master_notes.js"></script>
 <script src="../assets/js/confirmar.js"></script>
 <script src="../assets/js/pericias_mestre.js"></script>
@@ -979,6 +611,7 @@ function salvar(p) {
   if (p && p.id) {
     marcarEcoLocal(p.id);
     window.DBSync.salvarCampo(p.id, p);
+    renderPartyBar();
     return;
   }
   for (const x of estado.personagens) {
@@ -987,6 +620,7 @@ function salvar(p) {
       window.DBSync.salvarCampo(x.id, x);
     }
   }
+  renderPartyBar();
 }
 
 function carregar() { return estado; }
@@ -1009,11 +643,18 @@ function criarPersonagem(base = {}) {
     nivel: base.nivel || 1,
     hpAtual: base.hpAtual ?? 10,
     hpMax: base.hpMax ?? 10,
+    hpTemp: base.hpTemp ?? 0,
     ca: base.ca || 10,
+    iniciativa_bonus: base.iniciativa_bonus ?? 0,
+    deslocamento: base.deslocamento ?? 9,
+    percepcaoPassiva: base.percepcaoPassiva ?? 10,
     inspiracao: 0,
     exaustao: 0,
     sucessos: 0,
     falhas: 0,
+    concentracao: base.concentracao || { ativa: false, magia: '' },
+    spellDC: base.spellDC ?? null,
+    spellAtk: base.spellAtk ?? null,
     slots: {1:{atual:0,max:0},2:{atual:0,max:0},3:{atual:0,max:0},4:{atual:0,max:0},5:{atual:0,max:0},6:{atual:0,max:0},7:{atual:0,max:0},8:{atual:0,max:0},9:{atual:0,max:0}},
     magias: '',
     condicoes: [],
@@ -1027,28 +668,22 @@ function criarPersonagem(base = {}) {
 function aplicarMatematica(valorAtual, entrada) {
   const txt = String(entrada).trim();
   if (txt === '') return valorAtual;
-  // = define valor absoluto
   if (txt.startsWith('=')) {
     const n = parseInt(txt.slice(1));
     return isNaN(n) ? valorAtual : n;
   }
-  // + soma
   if (txt.startsWith('+')) {
     const n = parseInt(txt.slice(1));
     return isNaN(n) ? valorAtual : valorAtual + n;
   }
-  // - subtrai (apenas se tiver dígito depois)
   if (txt.startsWith('-') && txt.length > 1) {
     const n = parseInt(txt.slice(1));
     return isNaN(n) ? valorAtual : valorAtual - n;
   }
-  // Número puro: substitui
   const n = parseInt(txt);
   return isNaN(n) ? valorAtual : n;
 }
 
-/** Cria input numérico com suporte a +/-/= */
-// Escape HTML básico
 function escapeHtml(s) {
   return String(s || '').replace(/[&<>"']/g, c => ({
     '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
@@ -1121,7 +756,7 @@ function render() {
   const grid = document.getElementById('grid');
   grid.innerHTML = '';
   if (!estado.personagens.length) {
-    grid.innerHTML = `<div class="grid-vazio" style="padding:50px 20px;text-align:center;color:var(--parchment-dim);font-style:italic;grid-column:1/-1;background:rgba(0,0,0,0.25);border:1px dashed var(--blood);border-radius:6px">
+    grid.innerHTML = `<div class="grid-vazio" style="padding:50px 20px;text-align:center;color:var(--text-dim);font-style:italic;grid-column:1/-1;background:var(--bg-card);border:1px dashed var(--divider);border-radius:6px">
       ${ehMestre
         ? ico('vampiro') + 'Nenhum personagem ativo em Barovia ainda.<br><br>Os jogadores precisam abrir <strong>Minha Ficha</strong>, vincular à campanha "Maldição de Strahd" e marcar como ★ Ativo.<br><br>Você também pode criar NPCs com o botão <strong>⚜ Adicionar</strong>.'
         : 'Nenhum personagem na campanha. Clique em <strong>⚜ Adicionar</strong>.'}
@@ -1129,10 +764,41 @@ function render() {
   } else {
     estado.personagens.forEach(p => grid.appendChild(criarCard(p)));
   }
+  renderPartyBar();
+}
+
+// ===== BARRA DA PARTY: resumo rápido acima dos cards =====
+function renderPartyBar() {
+  const bar = document.getElementById('party-bar');
+  if (!bar) return;
+  if (!estado.personagens.length) { bar.innerHTML = ''; return; }
+  bar.innerHTML = estado.personagens.map(p => {
+    const hpMax = +p.hpMax || 1;
+    const hpAtual = +p.hpAtual || 0;
+    const pct = Math.max(0, Math.min(100, (hpAtual / hpMax) * 100));
+    const inconsciente = hpAtual <= 0;
+    const critico = !inconsciente && pct <= 25;
+    const tema = window.ClasseTema ? window.ClasseTema.obter(p.classe) : null;
+    const flags = [];
+    if (inconsciente) flags.push('💀');
+    else if (p.condicoes?.length) flags.push('⚠');
+    if (p.concentracao?.ativa) flags.push('🔮');
+    return `<div class="party-chip${critico ? ' critico' : ''}${inconsciente ? ' inconsciente' : ''}" data-goto="${p.id}" title="${escapeHtml(p.nome)} — ${hpAtual}/${hpMax} PV">
+      <span class="pc-dot" style="--tema-cor:${tema ? tema.cor : 'var(--gold-muted)'}"></span>
+      <span class="pc-nome">${escapeHtml(p.nome)}</span>
+      ${flags.map(f => `<span class="pc-flag">${f}</span>`).join('')}
+      <span class="pc-hp">${hpAtual}/${hpMax}</span>
+    </div>`;
+  }).join('');
+  bar.querySelectorAll('.party-chip').forEach(chip => {
+    chip.onclick = () => {
+      const alvo = document.querySelector(`[data-card-id="${chip.dataset.goto}"]`);
+      if (alvo) alvo.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+  });
 }
 
 // Patch cirúrgico: re-renderiza apenas o card de um personagem específico
-// Anti-flicker: debounce por card + skip se o usuário está editando dentro dele.
 const _rerenderTimers = new Map();
 const _rerenderPending = new Map();
 
@@ -1169,10 +835,11 @@ function _aplicarRerender(id) {
   novo.style.minHeight = h + 'px';
   antigo.replaceWith(novo);
   requestAnimationFrame(() => requestAnimationFrame(() => { novo.style.minHeight = ''; }));
+  renderPartyBar();
 }
 
-// Aplica cor + ícone de fundo temáticos da classe do personagem no card.
-// Some silenciosamente se a classe não for reconhecida (mantém o tema padrão dourado/sangue).
+// Aplica cor temática da classe: uma linha fina no topo do card + ícone discreto,
+// nunca uma borda forte no card inteiro.
 function aplicarTemaClasse(card, p) {
   const tema = window.ClasseTema ? window.ClasseTema.obter(p.classe) : null;
 
@@ -1192,12 +859,12 @@ function aplicarTemaClasse(card, p) {
   wm.innerHTML = ico(tema.icone, { cor: tema.cor });
   card.appendChild(wm);
 
-  const raceClass = card.querySelector('.race-class');
-  if (raceClass) {
+  const meta = card.querySelector('.char-meta');
+  if (meta) {
     const badge = document.createElement('span');
     badge.className = 'class-badge';
     badge.innerHTML = ico(tema.icone, { titulo: tema.chave });
-    raceClass.prepend(badge);
+    meta.prepend(badge);
   }
 }
 
@@ -1212,13 +879,27 @@ const GRUPOS_EQUIP = [
     campos: [{ chave: 'nome', placeholder: 'Nome' }, { chave: 'qtd', placeholder: 'Qtd', extra: true }] },
 ];
 
+function contarEquipamento(p) {
+  const inv = p.inventario || {};
+  return (inv.armas?.length || 0) + (inv.armaduras?.length || 0) + (inv.itens?.length || 0);
+}
+
 function criarSecaoEquipamento(p) {
   if (!p.inventario) p.inventario = { moedas: {}, armas: [], armaduras: [], itens: [] };
   ['armas', 'armaduras', 'itens'].forEach(t => { if (!Array.isArray(p.inventario[t])) p.inventario[t] = []; });
 
-  const section = document.createElement('div');
-  section.className = 'section';
-  section.innerHTML = `<div class="section-title">Equipamento</div>`;
+  const wrap = document.createElement('div');
+
+  const editBtn = document.createElement('button');
+  editBtn.type = 'button';
+  editBtn.className = 'edit-toggle';
+  editBtn.textContent = 'Editar';
+  editBtn.onclick = () => {
+    const editando = wrap.classList.toggle('modo-edicao');
+    editBtn.classList.toggle('ativo', editando);
+    editBtn.textContent = editando ? 'Concluir edição' : 'Editar';
+  };
+  wrap.appendChild(editBtn);
 
   GRUPOS_EQUIP.forEach(g => {
     const grupo = document.createElement('div');
@@ -1286,10 +967,10 @@ function criarSecaoEquipamento(p) {
     });
     addRow.appendChild(btn);
     grupo.appendChild(addRow);
-    section.appendChild(grupo);
+    wrap.appendChild(grupo);
   });
 
-  return section;
+  return wrap;
 }
 
 function criarCard(p) {
@@ -1297,24 +978,43 @@ function criarCard(p) {
   card.className = 'card';
   if (p.id) card.dataset.cardId = p.id;
 
+  const hpAtualNum = +p.hpAtual || 0;
+  const hpMaxNum = Math.max(1, +p.hpMax || 1);
+  const inconsciente = hpAtualNum <= 0;
+  const pctHp = Math.max(0, Math.min(100, (hpAtualNum / hpMaxNum) * 100));
+  const hpCritico = !inconsciente && pctHp <= 25;
+  if (hpCritico || inconsciente) card.classList.add('critico');
+
+  // Efeitos de Exaustão (PHB 2014) — cumulativos, calculados a partir de p.exaustao.
+  // Mesmas regras usadas em ficha.html (assets/js/exaustao_regras.js), então o
+  // que o Mestre vê aqui bate com o que o jogador vê na própria ficha.
+  const exhEfeitos = window.ExaustaoRegras ? window.ExaustaoRegras.efeitos(p.exaustao) : null;
+  if (exhEfeitos?.morto) card.classList.add('critico');
+
+  const body = document.createElement('div');
+  body.className = 'card-body';
+  card.appendChild(body);
+
   // ===== CABEÇALHO =====
   const header = document.createElement('div');
   header.className = 'char-header';
 
   const insp = document.createElement('div');
-  const inspNum = +p.inspiracao || 0;
-  insp.className = 'inspiration' + (inspNum > 0 ? ' active' : '');
-  insp.title = `Inspiração: ${inspNum} (clique para +1 · Shift+clique para −1)`;
-  insp.innerHTML = `<span class="ic">★</span><span class="qty">${inspNum}</span>`;
-  insp.onclick = (e) => {
-    if (e.shiftKey) p.inspiracao = Math.max(0, (+p.inspiracao || 0) - 1);
-    else p.inspiracao = (+p.inspiracao || 0) + 1;
-    salvar(p);
-    // Atualização cirúrgica: só o badge
-    const novoN = +p.inspiracao || 0;
-    insp.classList.toggle('active', novoN > 0);
-    insp.querySelector('.qty').textContent = novoN;
+  const inspNum0 = +p.inspiracao || 0;
+  insp.className = 'inspiration' + (inspNum0 > 0 ? ' active' : '');
+  insp.title = 'Inspiração';
+  insp.innerHTML = `<button type="button" class="insp-btn insp-menos" aria-label="Remover inspiração">−</button><span class="insp-qty"><span class="ic">★</span><span class="qty">${inspNum0}</span></span><button type="button" class="insp-btn insp-mais" aria-label="Adicionar inspiração">+</button>`;
+  const inspMenos = insp.querySelector('.insp-menos');
+  const inspMais = insp.querySelector('.insp-mais');
+  const atualizarInsp = () => {
+    const n = +p.inspiracao || 0;
+    insp.classList.toggle('active', n > 0);
+    insp.querySelector('.qty').textContent = n;
+    inspMenos.disabled = n <= 0;
   };
+  atualizarInsp();
+  inspMenos.onclick = () => { p.inspiracao = Math.max(0, (+p.inspiracao || 0) - 1); salvar(p); atualizarInsp(); };
+  inspMais.onclick = () => { p.inspiracao = (+p.inspiracao || 0) + 1; salvar(p); atualizarInsp(); };
 
   const nome = document.createElement('div');
   nome.className = 'char-name';
@@ -1323,52 +1023,38 @@ function criarCard(p) {
   nome.oninput = () => { p.nome = nome.textContent.trim() || 'Personagem'; salvar(p); };
   nome.onblur = () => { p.nome = nome.textContent.trim() || 'Personagem'; salvar(p); };
 
-  const jogador = document.createElement('div');
-  jogador.className = 'player-name';
-  jogador.contentEditable = true;
-  jogador.textContent = p.jogador;
-  jogador.oninput = () => { p.jogador = jogador.textContent.trim() || 'Jogador'; salvar(p); };
-  jogador.onblur = () => { p.jogador = jogador.textContent.trim() || 'Jogador'; salvar(p); };
-
-  const raceClass = document.createElement('div');
-  raceClass.className = 'race-class';
-  raceClass.innerHTML = `<span contenteditable="true" data-field="raca">${p.raca}</span> · <span contenteditable="true" data-field="classe">${p.classe}</span> · <strong>Nv <span contenteditable="true" data-field="nivel">${p.nivel}</span></strong>`;
-  raceClass.querySelectorAll('[contenteditable]').forEach(el => {
-    el.oninput = () => {
+  const meta = document.createElement('div');
+  meta.className = 'char-meta';
+  meta.innerHTML = `<span class="jogador-nome" contenteditable="true" data-field="jogador">${escapeHtml(p.jogador)}</span><span class="sep">·</span><span contenteditable="true" data-field="classe">${escapeHtml(p.classe)}</span> <strong contenteditable="true" data-field="nivel">${p.nivel}</strong><span class="sep">•</span><span contenteditable="true" data-field="raca">${escapeHtml(p.raca)}</span>`;
+  meta.querySelectorAll('[contenteditable]').forEach(el => {
+    const aplicarCampo = () => {
       const field = el.dataset.field;
       p[field] = field === 'nivel' ? (parseInt(el.textContent) || 1) : (el.textContent.trim() || '?');
       salvar(p);
-      if (field === 'classe') aplicarTemaClasse(card, p);
+      if (field === 'classe' || field === 'nivel') rerenderCard(p);
     };
-    el.onblur = () => {
-      const field = el.dataset.field;
-      p[field] = field === 'nivel' ? (parseInt(el.textContent) || 1) : (el.textContent.trim() || '?');
-      salvar(p);
-      if (field === 'classe') aplicarTemaClasse(card, p);
-    };
+    el.oninput = aplicarCampo;
+    el.onblur = aplicarCampo;
   });
 
   header.appendChild(insp);
   header.appendChild(nome);
-  header.appendChild(jogador);
-  header.appendChild(raceClass);
-  card.appendChild(header);
+  header.appendChild(meta);
+  body.appendChild(header);
 
-  // ===== TEMA VISUAL POR CLASSE (cor + ícone de fundo) =====
+  // ===== TEMA VISUAL POR CLASSE =====
   aplicarTemaClasse(card, p);
 
-  // ===== STATS PRINCIPAIS =====
-  const stats = document.createElement('div');
-  stats.className = 'stats-row';
-
-  // PV
-  const hpBox = document.createElement('div');
-  hpBox.className = 'stat-box';
-  const hpLabel = document.createElement('div');
-  hpLabel.className = 'stat-label';
-  hpLabel.textContent = 'Pontos de Vida';
-  const hpVal = document.createElement('div');
-  hpVal.className = 'stat-value hp-grouped';
+  // ===== HP =====
+  const hpBlock = document.createElement('div');
+  hpBlock.className = 'hp-block';
+  const hpRow = document.createElement('div');
+  hpRow.className = 'hp-row';
+  const hpLabel = document.createElement('span');
+  hpLabel.className = 'hp-label';
+  hpLabel.textContent = 'PV';
+  const hpNums = document.createElement('div');
+  hpNums.className = 'hp-nums';
   const hpCur = inputNumerico(p.hpAtual, v => {
     const delta = v - (p.hpAtual ?? v);
     p.hpAtual = v; salvar(p); toast(`PV atualizado: ${v}`);
@@ -1376,114 +1062,380 @@ function criarCard(p) {
       const alvo = hpCur.closest('.card') || hpCur;
       if (delta < 0) FX.dano(alvo, delta); else FX.cura(alvo, delta);
     }
-  }, 'hp-current-input', 0);
+    rerenderCard(p);
+  }, 'hp-current-input' + (hpCritico || inconsciente ? ' critico' : ''), null);
   const hpSep = document.createElement('span');
   hpSep.className = 'hp-sep';
   hpSep.textContent = '/';
-  const hpMax = inputNumerico(p.hpMax, v => { p.hpMax = v; salvar(p); }, 'hp-max-input', 1);
-  hpVal.appendChild(hpCur);
-  hpVal.appendChild(hpSep);
-  hpVal.appendChild(hpMax);
-  hpBox.appendChild(hpLabel);
-  hpBox.appendChild(hpVal);
+  const hpMax = inputNumerico(p.hpMax, v => { p.hpMax = v; salvar(p); rerenderCard(p); }, 'hp-max-input', 1);
+  hpNums.appendChild(hpCur);
+  hpNums.appendChild(hpSep);
+  hpNums.appendChild(hpMax);
+  const hpTempWrap = document.createElement('div');
+  hpTempWrap.className = 'hp-temp-wrap';
+  const hpTempPlus = document.createElement('span');
+  hpTempPlus.className = 'hp-temp-plus';
+  hpTempPlus.textContent = '+';
+  const hpTemp = inputNumerico(p.hpTemp || 0, v => { p.hpTemp = v; salvar(p); }, 'hp-temp-input', 0);
+  hpTemp.title = 'PV temporários';
+  hpTempWrap.appendChild(hpTempPlus);
+  hpTempWrap.appendChild(hpTemp);
+  hpRow.appendChild(hpLabel);
+  hpRow.appendChild(hpNums);
+  hpRow.appendChild(hpTempWrap);
+  hpBlock.appendChild(hpRow);
 
-  // CA
-  const caBox = document.createElement('div');
-  caBox.className = 'stat-box';
-  caBox.innerHTML = `<div class="stat-label">CA</div>`;
-  const caVal = document.createElement('div');
-  caVal.className = 'stat-value';
-  const caInput = inputNumerico(p.ca, v => { p.ca = v; salvar(p); }, '', 0);
-  caVal.appendChild(caInput);
-  caBox.appendChild(caVal);
+  const hpBarTrack = document.createElement('div');
+  hpBarTrack.className = 'hp-bar-track' + (inconsciente ? ' zero' : '');
+  const hpBarFill = document.createElement('div');
+  hpBarFill.className = 'hp-bar-fill' + (hpCritico ? ' baixo' : (pctHp <= 60 ? ' medio' : ''));
+  hpBarFill.style.width = inconsciente ? '0%' : pctHp + '%';
+  hpBarTrack.appendChild(hpBarFill);
+  hpBlock.appendChild(hpBarTrack);
 
-  // Nível
-  const nvBox = document.createElement('div');
-  nvBox.className = 'stat-box';
-  nvBox.innerHTML = `<div class="stat-label">Nível</div>`;
-  const nvVal = document.createElement('div');
-  nvVal.className = 'stat-value';
-  const nvInput = inputNumerico(p.nivel, v => {
-    p.nivel = Math.max(1, Math.min(20, v));
-    nvInput.value = p.nivel;
-    salvar(p);
-    // Nível afeta os slots; só re-renderiza o card desse PJ (não toda a grid)
-    rerenderCard(p);
-  }, '', 1);
-  nvVal.appendChild(nvInput);
-  nvBox.appendChild(nvVal);
-
-  stats.appendChild(hpBox);
-  stats.appendChild(caBox);
-  stats.appendChild(nvBox);
-  card.appendChild(stats);
-
-  // ===== EXAUSTÃO =====
-  const exhSection = document.createElement('div');
-  exhSection.className = 'section';
-  exhSection.innerHTML = `<div class="section-title">Exaustão</div><div class="exhaustion"></div>`;
-  const exhContainer = exhSection.querySelector('.exhaustion');
-  for (let i = 1; i <= 6; i++) {
-    const pip = document.createElement('div');
-    pip.className = 'exh-pip' + (i <= p.exaustao ? ' filled' : '');
-    pip.textContent = i;
-    pip.title = `Nível ${i}`;
-    pip.onclick = () => {
-      p.exaustao = (p.exaustao === i) ? i - 1 : i;
-      salvar(p);
-      // Update cirúrgico: refaz só o estado dos pips de exaustão
-      exhContainer.querySelectorAll('.exh-pip').forEach((el, idx) => {
-        el.classList.toggle('filled', (idx + 1) <= p.exaustao);
-      });
-    };
-    exhContainer.appendChild(pip);
+  if (inconsciente) {
+    const badge = document.createElement('div');
+    badge.className = 'unconscious-badge';
+    badge.innerHTML = `${ico('atordoado') || '💀'} Inconsciente`;
+    hpBlock.appendChild(badge);
   }
-  card.appendChild(exhSection);
+  if (exhEfeitos?.morto) {
+    const badgeMorte = document.createElement('div');
+    badgeMorte.className = 'unconscious-badge';
+    badgeMorte.innerHTML = `${ico('caveira') || '☠'} Exaustão nível 6 — morto`;
+    hpBlock.appendChild(badgeMorte);
+  } else if (exhEfeitos && exhEfeitos.hpMaxMult < 1) {
+    const notaHpMax = document.createElement('div');
+    notaHpMax.className = 'unconscious-badge';
+    notaHpMax.innerHTML = `${ico('aviso') || '⚠'} PV máx. efetivo (exaustão): ${window.ExaustaoRegras.hpMaxEfetivo(p.hpMax, p.exaustao)}`;
+    hpBlock.appendChild(notaHpMax);
+  }
+  body.appendChild(hpBlock);
 
-  // ===== SALVAGUARDAS DE MORTE =====
-  const deathSection = document.createElement('div');
-  deathSection.className = 'section';
-  deathSection.innerHTML = `
-    <div class="section-title">Salvaguardas de Morte</div>
-    <div class="death-saves">
-      <div class="death-group success">
-        <div class="death-group-label">Sucessos</div>
-        <div class="death-pips" data-type="sucessos"></div>
-      </div>
-      <div class="death-group failure">
-        <div class="death-group-label">Falhas</div>
-        <div class="death-pips" data-type="falhas"></div>
-      </div>
-    </div>`;
-  ['sucessos','falhas'].forEach(tipo => {
-    const cont = deathSection.querySelector(`[data-type="${tipo}"]`);
-    for (let i = 1; i <= 3; i++) {
-      const pip = document.createElement('div');
-      pip.className = 'death-pip' + (i <= p[tipo] ? ' filled' : '');
-      pip.onclick = () => {
-        p[tipo] = (p[tipo] === i) ? i - 1 : i;
+  // ===== CHIPS: CA / Iniciativa / Movimento / Percepção Passiva =====
+  const chips = document.createElement('div');
+  chips.className = 'stat-chips';
+  const fazChip = (label, valor, callback, min) => {
+    const box = document.createElement('div');
+    box.className = 'stat-chip';
+    const lb = document.createElement('div');
+    lb.className = 'stat-chip-label';
+    lb.textContent = label;
+    const val = document.createElement('div');
+    val.className = 'stat-chip-value';
+    val.appendChild(inputNumerico(valor, callback, '', min));
+    box.appendChild(lb);
+    box.appendChild(val);
+    return box;
+  };
+  chips.appendChild(fazChip('CA', p.ca, v => { p.ca = v; salvar(p); }, 0));
+  chips.appendChild(fazChip('Iniciativa', p.iniciativa_bonus ?? 0, v => { p.iniciativa_bonus = v; salvar(p); }, null));
+  const movChip = fazChip('Mov. (m)', p.deslocamento ?? 9, v => { p.deslocamento = v; salvar(p); rerenderCard(p); }, 0);
+  if (exhEfeitos && (exhEfeitos.velocidadeMult < 1 || exhEfeitos.velocidadeZero)) {
+    const efetivo = window.ExaustaoRegras.velocidadeEfetiva(p.deslocamento ?? 9, p.exaustao);
+    const nota = document.createElement('div');
+    nota.style.cssText = 'font-size:9px;color:var(--danger);margin-top:1px;';
+    nota.textContent = `efetivo: ${efetivo}`;
+    movChip.appendChild(nota);
+  }
+  chips.appendChild(movChip);
+  chips.appendChild(fazChip('Perc. Pass.', p.percepcaoPassiva ?? 10, v => { p.percepcaoPassiva = v; salvar(p); }, 0));
+  body.appendChild(chips);
+
+  // ===== LINHA DE ALERTA: condições ativas + concentração + death saves =====
+  const alertRow = document.createElement('div');
+  alertRow.className = 'alert-row';
+
+  // condições
+  const condWrap = document.createElement('div');
+  const condTagsRow = document.createElement('div');
+  condTagsRow.className = 'tags-row';
+  const condPicker = document.createElement('div');
+  condPicker.className = 'condition-picker';
+
+  const repintarCondicoes = () => {
+    condTagsRow.innerHTML = '';
+    (p.condicoes || []).forEach(cond => {
+      const tag = document.createElement('span');
+      tag.className = 'condition-tag';
+      tag.innerHTML = `${escapeHtml(cond)} <span class="rm">✕</span>`;
+      tag.onclick = () => {
+        p.condicoes = p.condicoes.filter(c => c !== cond);
         salvar(p);
-        cont.querySelectorAll('.death-pip').forEach((el, idx) => {
-          el.classList.toggle('filled', (idx + 1) <= p[tipo]);
-        });
+        repintarCondicoes();
+        repintarPicker();
       };
-      cont.appendChild(pip);
-    }
-  });
-  card.appendChild(deathSection);
+      condTagsRow.appendChild(tag);
+    });
+    const addBtn = document.createElement('button');
+    addBtn.type = 'button';
+    addBtn.className = 'add-condition-btn';
+    addBtn.textContent = '+ Condição';
+    addBtn.onclick = () => condPicker.classList.toggle('aberto');
+    condTagsRow.appendChild(addBtn);
+  };
+  const repintarPicker = () => {
+    condPicker.innerHTML = '';
+    CONDICOES.forEach(cond => {
+      const ativa = (p.condicoes || []).includes(cond);
+      const tag = document.createElement('button');
+      tag.type = 'button';
+      tag.className = 'cp-tag' + (ativa ? ' ativa' : '');
+      tag.textContent = cond;
+      tag.onclick = () => {
+        if (!p.condicoes) p.condicoes = [];
+        if (p.condicoes.includes(cond)) p.condicoes = p.condicoes.filter(c => c !== cond);
+        else p.condicoes.push(cond);
+        salvar(p);
+        repintarCondicoes();
+        repintarPicker();
+      };
+      condPicker.appendChild(tag);
+    });
+  };
+  repintarCondicoes();
+  repintarPicker();
+  condWrap.appendChild(condTagsRow);
+  condWrap.appendChild(condPicker);
+  alertRow.appendChild(condWrap);
 
-  // ===== SLOTS DE MAGIA =====
-  // Semântica: p.slots[nv].atual = USADOS (gastos); max calculado pela classe.
+  // concentração (só exibida se o personagem tiver slots de magia — decidido abaixo)
   const slotsClasse = (window.SlotsPHB && p.classe)
     ? window.SlotsPHB.porClasse(p.classe, p.nivel, p._subclasse)
     : null;
+  const ehConjurador = !!(slotsClasse && NIVEIS_SLOTS.some(nv => (slotsClasse[nv] || 0) > 0));
 
-  if (slotsClasse) {
+  let concBadge = null;
+  if (ehConjurador) {
+    if (!p.concentracao) p.concentracao = { ativa: false, magia: '' };
+    concBadge = document.createElement('span');
+    const atualizarConcBadge = () => {
+      concBadge.className = 'concentration-badge' + (p.concentracao.ativa ? '' : ' inativa');
+      concBadge.innerHTML = p.concentracao.ativa
+        ? `${ico('encantamento') || '🔮'} Concentrando${p.concentracao.magia ? ': ' + escapeHtml(p.concentracao.magia) : ''}`
+        : `${ico('encantamento') || '🔮'} Sem concentração`;
+    };
+    atualizarConcBadge();
+    concBadge.onclick = () => {
+      p.concentracao.ativa = !p.concentracao.ativa;
+      salvar(p);
+      atualizarConcBadge();
+    };
+    concBadge.oncontextmenu = (e) => {
+      e.preventDefault();
+      const nome = prompt('Magia em concentração:', p.concentracao.magia || '');
+      if (nome === null) return;
+      p.concentracao.magia = nome.trim();
+      p.concentracao.ativa = !!p.concentracao.magia || p.concentracao.ativa;
+      salvar(p);
+      atualizarConcBadge();
+    };
+    concBadge.title = 'Clique para ativar/desativar · botão direito pra nomear a magia';
+    const concRow = document.createElement('div');
+    concRow.className = 'tags-row';
+    concRow.appendChild(concBadge);
+    alertRow.appendChild(concRow);
+  }
+
+  // death saves — sempre presentes, discretos; destacados quando inconsciente
+  const deathWrap = document.createElement('div');
+  deathWrap.className = 'death-saves-inline';
+  if (!inconsciente) deathWrap.style.display = 'none';
+  deathWrap.innerHTML = `<span class="dsi-label">Morte</span>`;
+  ['sucessos','falhas'].forEach(tipo => {
+    const grupo = document.createElement('div');
+    grupo.className = 'death-group ' + (tipo === 'sucessos' ? 'success' : 'failure');
+    const pips = document.createElement('div');
+    pips.className = 'death-pips';
+    for (let i = 1; i <= 3; i++) {
+      const pip = document.createElement('div');
+      pip.className = 'death-pip' + (i <= (p[tipo] || 0) ? ' filled' : '');
+      pip.onclick = () => {
+        p[tipo] = (p[tipo] === i) ? i - 1 : i;
+        salvar(p);
+        pips.querySelectorAll('.death-pip').forEach((el, idx) => {
+          el.classList.toggle('filled', (idx + 1) <= p[tipo]);
+        });
+      };
+      pips.appendChild(pip);
+    }
+    grupo.appendChild(pips);
+    deathWrap.appendChild(grupo);
+  });
+  alertRow.appendChild(deathWrap);
+
+  // exaustão compacta
+  const exhWrap = document.createElement('div');
+  const exhCompact = document.createElement('div');
+  const nivelExa = p.exaustao || 0;
+  exhCompact.className = 'exhaustion-compact' + (nivelExa === 0 ? ' zero' : '');
+  exhCompact.innerHTML = `<span>Exaustão ${nivelExa}</span><span class="exh-dots">${
+    Array.from({length:6}).map((_,i) => `<span class="exh-dot${i < nivelExa ? ' on' : ''}"></span>`).join('')
+  }</span>`;
+  const exhPicker = document.createElement('div');
+  exhPicker.className = 'exhaustion-picker';
+  for (let i = 1; i <= 6; i++) {
+    const pip = document.createElement('div');
+    pip.className = 'exh-pip' + (i <= (p.exaustao || 0) ? ' filled' : '');
+    pip.textContent = i;
+    pip.onclick = (e) => {
+      e.stopPropagation();
+      p.exaustao = (p.exaustao === i) ? i - 1 : i;
+      salvar(p);
+      // Efeitos (PV máx./deslocamento/badges) dependem do nível — re-renderiza o card inteiro.
+      rerenderCard(p);
+    };
+    exhPicker.appendChild(pip);
+  }
+  exhCompact.onclick = () => exhPicker.classList.toggle('aberto');
+  exhWrap.appendChild(exhCompact);
+  if (nivelExa > 0 && exhEfeitos) {
+    const efeitosTexto = document.createElement('div');
+    efeitosTexto.style.cssText = 'font-size:10px;color:var(--danger);margin-top:2px;line-height:1.5;';
+    efeitosTexto.textContent = exhEfeitos.resumo.join(' · ');
+    exhWrap.appendChild(efeitosTexto);
+  }
+  exhWrap.appendChild(exhPicker);
+  alertRow.appendChild(exhWrap);
+
+  body.appendChild(alertRow);
+
+  // ===== RESUMO DE MAGIA (se conjurador) =====
+  let magiasTabContent = null;
+  if (ehConjurador) {
+    const dcRow = document.createElement('div');
+    dcRow.className = 'summary-line sl-magic';
+    const preparadasSpan = document.createElement('span');
+    preparadasSpan.textContent = 'carregando…';
+    dcRow.innerHTML = `<span>CD <strong data-dc>${p.spellDC ?? '—'}</strong></span><span>Ataque <strong data-atk>${p.spellAtk != null ? (p.spellAtk >= 0 ? '+' + p.spellAtk : p.spellAtk) : '—'}</strong></span>`;
+    dcRow.appendChild(preparadasSpan);
+    const btnMagias = document.createElement('button');
+    btnMagias.type = 'button';
+    btnMagias.className = 'summary-btn';
+    btnMagias.textContent = 'Ver Magias';
+    dcRow.appendChild(btnMagias);
+    body.appendChild(dcRow);
+
+    const magiasPanel = document.createElement('div');
+    magiasPanel.style.display = 'none';
+    magiasPanel.style.marginTop = '8px';
+    btnMagias.onclick = () => {
+      const abrir = magiasPanel.style.display === 'none';
+      magiasPanel.style.display = abrir ? 'block' : 'none';
+      btnMagias.classList.toggle('aberto', abrir);
+      btnMagias.textContent = abrir ? 'Ocultar Magias' : 'Ver Magias';
+    };
+    body.appendChild(magiasPanel);
+    magiasTabContent = magiasPanel;
+
+    carregarMagiasPreparadasMestre(p.id).then(magias => {
+      if (magias === null) { preparadasSpan.textContent = ''; return; }
+      preparadasSpan.textContent = `${magias.length} preparada${magias.length === 1 ? '' : 's'}`;
+    });
+  }
+
+  // ===== TABS =====
+  const tabbar = document.createElement('div');
+  tabbar.className = 'tabbar';
+  const abas = [
+    { chave: 'combate', label: 'Combate' },
+    ...(ehConjurador ? [{ chave: 'magias', label: 'Magias' }] : []),
+    { chave: 'ficha', label: 'Ficha' },
+    { chave: 'mais', label: 'Mais' },
+  ];
+  const painelPorAba = {};
+  abas.forEach((aba, idx) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'tab-btn' + (idx === 0 ? ' ativa' : '');
+    btn.textContent = aba.label;
+    btn.dataset.aba = aba.chave;
+    btn.onclick = () => {
+      tabbar.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('ativa', b === btn));
+      Object.entries(painelPorAba).forEach(([k, painel]) => painel.classList.toggle('ativa', k === aba.chave));
+    };
+    tabbar.appendChild(btn);
+  });
+  body.appendChild(tabbar);
+
+  // --- Painel Combate ---
+  const painelCombate = document.createElement('div');
+  painelCombate.className = 'tab-panel ativa';
+  painelPorAba.combate = painelCombate;
+
+  // recursos de classe (recursosUsados)
+  const recSection = document.createElement('div');
+  recSection.className = 'section';
+  recSection.innerHTML = `<div class="section-title">Recursos de Classe</div>`;
+  const recBody = document.createElement('div');
+  const recursos = p.recursosUsados && typeof p.recursosUsados === 'object' ? p.recursosUsados : {};
+  const chavesRec = Object.keys(recursos).filter(k => recursos[k] && typeof recursos[k].max === 'number' && recursos[k].max > 0);
+  if (!chavesRec.length) {
+    recBody.innerHTML = `<span class="recurso-vazio">Nenhum recurso rastreado (sincroniza com a ficha do jogador).</span>`;
+  } else {
+    chavesRec.forEach(k => {
+      const r = recursos[k];
+      const row = document.createElement('div');
+      row.className = 'recurso-row';
+      const nomeSpan = document.createElement('span');
+      nomeSpan.className = 'recurso-nome';
+      nomeSpan.textContent = k.replace(/_/g, ' ');
+      const pips = document.createElement('div');
+      pips.className = 'recurso-pips';
+      for (let i = 0; i < r.max; i++) {
+        const pip = document.createElement('button');
+        pip.type = 'button';
+        pip.className = 'recurso-pip' + (i < (r.atual || 0) ? ' gasto' : '');
+        pip.onclick = () => {
+          const novo = pip.classList.contains('gasto') ? i : i + 1;
+          r.atual = Math.max(0, Math.min(r.max, novo));
+          salvar(p);
+          pips.querySelectorAll('.recurso-pip').forEach((el, idx) => el.classList.toggle('gasto', idx < r.atual));
+        };
+        pips.appendChild(pip);
+      }
+      row.appendChild(nomeSpan);
+      row.appendChild(pips);
+      recBody.appendChild(row);
+    });
+  }
+  recSection.appendChild(recBody);
+  painelCombate.appendChild(recSection);
+  body.appendChild(painelCombate);
+
+  // --- Painel Magias ---
+  if (ehConjurador) {
+    const painelMagias = document.createElement('div');
+    painelMagias.className = 'tab-panel';
+    painelPorAba.magias = painelMagias;
+
+    const metaSection = document.createElement('div');
+    metaSection.className = 'section';
+    const metaRow = document.createElement('div');
+    metaRow.className = 'spell-meta-row';
+    const fazMeta = (label, valor, callback) => {
+      const item = document.createElement('div');
+      item.className = 'spell-meta-item';
+      const lb = document.createElement('div');
+      lb.className = 'spell-meta-label';
+      lb.textContent = label;
+      const val = document.createElement('div');
+      val.className = 'spell-meta-value';
+      val.appendChild(inputNumerico(valor ?? '', callback, '', null));
+      item.appendChild(lb);
+      item.appendChild(val);
+      return item;
+    };
+    metaRow.appendChild(fazMeta('CD', p.spellDC ?? '', v => { p.spellDC = v; salvar(p); rerenderCard(p); }));
+    metaRow.appendChild(fazMeta('Ataque', p.spellAtk ?? '', v => { p.spellAtk = v; salvar(p); rerenderCard(p); }));
+    metaSection.appendChild(metaRow);
+    painelMagias.appendChild(metaSection);
+
     const slotsSection = document.createElement('div');
     slotsSection.className = 'section';
     slotsSection.innerHTML = `<div class="section-title">Slots de Magia</div>`;
-    const slotsGrid = document.createElement('div');
-    slotsGrid.className = 'spell-slots';
+    const slotsCompact = document.createElement('div');
+    slotsCompact.className = 'spell-slots-compact';
 
     if (!p.slots) p.slots = {};
     for (let n = 1; n <= 9; n++) if (!p.slots[n]) p.slots[n] = { atual: 0, max: 0 };
@@ -1491,109 +1443,76 @@ function criarCard(p) {
     NIVEIS_SLOTS.forEach(nv => {
       const maxClasse = slotsClasse[nv] || 0;
       p.slots[nv].max = maxClasse;
+      if (maxClasse === 0) return; // não mostra níveis que o personagem não possui
       const usados = Math.min(p.slots[nv].atual || 0, maxClasse);
-      const disp = maxClasse - usados;
 
-      const slot = document.createElement('div');
-      slot.className = 'slot-level' + (maxClasse === 0 ? ' indisponivel' : '');
-      const numDiv = document.createElement('div');
-      numDiv.className = 'slot-level-num';
-      numDiv.textContent = `Nv ${nv}`;
-      slot.appendChild(numDiv);
+      const row = document.createElement('div');
+      row.className = 'slot-row';
+      const lbl = document.createElement('span');
+      lbl.className = 'slot-nv';
+      lbl.textContent = `Nv ${nv}`;
+      const dots = document.createElement('div');
+      dots.className = 'slot-dots';
+      const frac = document.createElement('span');
+      frac.className = 'slot-frac';
 
-      if (maxClasse === 0) {
-        const stat = document.createElement('div');
-        stat.className = 'slot-status-m';
-        stat.textContent = '—';
-        slot.appendChild(stat);
-      } else {
-        const pipsBox = document.createElement('div');
-        pipsBox.className = 'slot-pips-mestre';
-        const stat = document.createElement('div');
-        stat.className = 'slot-status-m';
+      const atualizar = () => {
+        const u = Math.min(p.slots[nv].atual || 0, maxClasse);
+        frac.textContent = `${maxClasse - u}/${maxClasse}`;
+        dots.querySelectorAll('.slot-dot').forEach((el, idx) => el.classList.toggle('gasto', idx < u));
+      };
 
-        const atualizarStatus = () => {
-          const u = Math.min(p.slots[nv].atual || 0, maxClasse);
-          const d = maxClasse - u;
-          stat.innerHTML = `<strong>${d}</strong>/${maxClasse}`;
-          pipsBox.querySelectorAll('.slot-pip-m').forEach((el, idx) => {
-            el.classList.toggle('gasto', idx < u);
-          });
+      for (let i = 0; i < maxClasse; i++) {
+        const dot = document.createElement('button');
+        dot.type = 'button';
+        dot.className = 'slot-dot' + (i < usados ? ' gasto' : '');
+        dot.setAttribute('aria-label', `Slot ${nv}° ${i+1}`);
+        dot.onclick = () => {
+          const novo = dot.classList.contains('gasto') ? i : (i + 1);
+          p.slots[nv].atual = Math.max(0, Math.min(maxClasse, novo));
+          salvar(p);
+          atualizar();
         };
-
-        for (let i = 0; i < maxClasse; i++) {
-          const pip = document.createElement('button');
-          pip.type = 'button';
-          pip.className = 'slot-pip-m' + (i < usados ? ' gasto' : '');
-          pip.setAttribute('aria-label', `Slot ${nv}° ${i+1} — ${i < usados ? 'gasto' : 'disponível'}`);
-          pip.onclick = () => {
-            const novo = pip.classList.contains('gasto') ? i : (i + 1);
-            p.slots[nv].atual = Math.max(0, Math.min(maxClasse, novo));
-            salvar(p);
-            atualizarStatus();
-          };
-          pipsBox.appendChild(pip);
-        }
-        atualizarStatus();
-        slot.appendChild(pipsBox);
-        slot.appendChild(stat);
+        dots.appendChild(dot);
       }
-      slotsGrid.appendChild(slot);
+      row.appendChild(lbl);
+      row.appendChild(dots);
+      row.appendChild(frac);
+      atualizar();
+      slotsCompact.appendChild(row);
     });
-    slotsSection.appendChild(slotsGrid);
-    card.appendChild(slotsSection);
+    slotsSection.appendChild(slotsCompact);
+    painelMagias.appendChild(slotsSection);
 
-    // ===== MOEDAS (somente leitura) =====
-    if (p.moedas && Object.values(p.moedas).some(v => +v > 0)) {
-      const moedasSection = document.createElement('div');
-      moedasSection.className = 'section';
-      moedasSection.innerHTML = `<div class="section-title">Bolsa</div>`;
-      const moedasGrid = document.createElement('div');
-      moedasGrid.className = 'moedas-grid';
-      // A cor identifica a moeda -> ponto colorido em CSS (ícone perderia a cor)
-      const NOMES  = { pl:'Platina', po:'Ouro', pe:'Eletro', pp:'Prata', pc:'Cobre' };
-      ['pl','po','pe','pp','pc'].forEach(k => {
-        const v = +p.moedas[k] || 0;
-        const box = document.createElement('div');
-        box.className = 'moeda-box-mestre' + (v === 0 ? ' zero' : '');
-        box.title = `${NOMES[k]}: ${v}`;
-        box.innerHTML = `<span class="m-ic moeda-dot moeda-dot--${k}" aria-hidden="true"></span><span class="m-val">${v}</span><span class="m-tag">${k.toUpperCase()}</span>`;
-        moedasGrid.appendChild(box);
-      });
-      moedasSection.appendChild(moedasGrid);
-      card.appendChild(moedasSection);
-    }
+    const prepSection = document.createElement('div');
+    prepSection.className = 'section';
+    prepSection.innerHTML = `<div class="section-title">Magias Preparadas</div>`;
+    const prepWrap = document.createElement('div');
+    prepWrap.className = 'magias-prep-mestre';
+    prepWrap.innerHTML = `<span class="magia-prep-vazio">Carregando…</span>`;
+    prepSection.appendChild(prepWrap);
+    painelMagias.appendChild(prepSection);
 
-    // ===== MAGIAS PREPARADAS (do spell_lists do jogador) =====
-    const magiasSection = document.createElement('div');
-    magiasSection.className = 'section';
-    magiasSection.innerHTML = `<div class="section-title">Magias Preparadas</div>`;
-    const wrap = document.createElement('div');
-    wrap.className = 'magias-prep-mestre';
-    wrap.innerHTML = `<span class="magia-prep-vazio">Carregando…</span>`;
-    magiasSection.appendChild(wrap);
-    card.appendChild(magiasSection);
     function pintarMagias(magias) {
       if (magias === null) {
-        wrap.innerHTML = `<span class="magia-prep-vazio" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">${ico('aviso')} Erro ao carregar magias.<button type="button" class="back-link" style="padding:4px 10px;font-size:10px" data-retry-magias="${p.id}">Tentar de novo</button></span>`;
-        wrap.querySelector('[data-retry-magias]')?.addEventListener('click', () => {
-          wrap.innerHTML = `<span class="magia-prep-vazio">Carregando…</span>`;
+        prepWrap.innerHTML = `<span class="magia-prep-vazio" style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">${ico('aviso')} Erro ao carregar magias.<button type="button" class="save-card" style="padding:4px 10px;font-size:10px" data-retry-magias="${p.id}">Tentar de novo</button></span>`;
+        prepWrap.querySelector('[data-retry-magias]')?.addEventListener('click', () => {
+          prepWrap.innerHTML = `<span class="magia-prep-vazio">Carregando…</span>`;
           carregarMagiasPreparadasMestre(p.id).then(pintarMagias);
         });
         return;
       }
       if (!magias.length) {
-        wrap.innerHTML = `<span class="magia-prep-vazio">Nenhuma magia favoritada pelo jogador.</span>`;
+        prepWrap.innerHTML = `<span class="magia-prep-vazio">Nenhuma magia favoritada pelo jogador.</span>`;
         return;
       }
-      // Agrupa por nível (0 = Truques) — já vem ordenado por carregarMagiasPreparadasMestre
       const grupos = new Map();
       magias.forEach(m => {
         const nv = m.nivel || 0;
         if (!grupos.has(nv)) grupos.set(nv, []);
         grupos.get(nv).push(m);
       });
-      wrap.innerHTML = [...grupos.entries()].map(([nv, lista]) => {
+      prepWrap.innerHTML = [...grupos.entries()].map(([nv, lista]) => {
         const rotulo = nv === 0 ? 'Truques' : `${nv}° Nível`;
         const tags = lista.map(m => `<span class="magia-prep-tag" title="${escapeHtml(m.escola || '')}">${escapeHtml(m.nome)}</span>`).join('');
         return `<div class="magia-prep-grupo">
@@ -1601,35 +1520,69 @@ function criarCard(p) {
           <div class="magia-prep-grupo-tags">${tags}</div>
         </div>`;
       }).join('');
+      if (magiasTabContent) magiasTabContent.innerHTML = prepWrap.innerHTML;
     }
     carregarMagiasPreparadasMestre(p.id).then(pintarMagias);
+
+    body.appendChild(painelMagias);
   }
 
-  // ===== EQUIPAMENTO (editável — some com o mesmo campo p.inventario da ficha) =====
-  card.appendChild(criarSecaoEquipamento(p));
+  // --- Painel Ficha (equipamento + bolsa) ---
+  const painelFicha = document.createElement('div');
+  painelFicha.className = 'tab-panel';
+  painelPorAba.ficha = painelFicha;
 
-  // ===== CONDIÇÕES =====
-  const condSection = document.createElement('div');
-  condSection.className = 'section';
-  condSection.innerHTML = `<div class="section-title">Condições</div>`;
-  const condContainer = document.createElement('div');
-  condContainer.className = 'conditions';
-  CONDICOES.forEach(cond => {
-    const tag = document.createElement('span');
-    tag.className = 'condition-tag' + (p.condicoes.includes(cond) ? ' active' : '');
-    tag.textContent = cond;
-    tag.onclick = () => {
-      if (p.condicoes.includes(cond)) p.condicoes = p.condicoes.filter(c => c !== cond);
-      else p.condicoes.push(cond);
-      salvar(p);
-      tag.classList.toggle('active', p.condicoes.includes(cond));
-    };
-    condContainer.appendChild(tag);
-  });
-  condSection.appendChild(condContainer);
-  card.appendChild(condSection);
+  const equipCount = contarEquipamento(p);
+  const equipResumo = document.createElement('div');
+  equipResumo.className = 'summary-line';
+  const inv = p.inventario || {};
+  equipResumo.innerHTML = `<span><strong>${inv.armas?.length || 0}</strong> armas</span><span><strong>${inv.armaduras?.length || 0}</strong> armaduras</span><span><strong>${inv.itens?.length || 0}</strong> itens</span>`;
+  const btnEquip = document.createElement('button');
+  btnEquip.type = 'button';
+  btnEquip.className = 'summary-btn';
+  btnEquip.textContent = 'Ver Equipamento';
+  equipResumo.appendChild(btnEquip);
+  painelFicha.appendChild(equipResumo);
 
-  // ===== AÇÕES DO CARD =====
+  const equipPanel = document.createElement('div');
+  equipPanel.style.display = 'none';
+  equipPanel.style.marginTop = '8px';
+  equipPanel.appendChild(criarSecaoEquipamento(p));
+  painelFicha.appendChild(equipPanel);
+  btnEquip.onclick = () => {
+    const abrir = equipPanel.style.display === 'none';
+    equipPanel.style.display = abrir ? 'block' : 'none';
+    btnEquip.classList.toggle('aberto', abrir);
+    btnEquip.textContent = abrir ? 'Ocultar Equipamento' : 'Ver Equipamento';
+  };
+
+  if (p.moedas && Object.values(p.moedas).some(v => +v > 0)) {
+    const moedasSection = document.createElement('div');
+    moedasSection.className = 'section';
+    moedasSection.style.marginTop = '10px';
+    moedasSection.innerHTML = `<div class="section-title">Bolsa</div>`;
+    const moedasGrid = document.createElement('div');
+    moedasGrid.className = 'moedas-grid';
+    const NOMES = { pl:'Platina', po:'Ouro', pe:'Eletro', pp:'Prata', pc:'Cobre' };
+    ['pl','po','pe','pp','pc'].forEach(k => {
+      const v = +p.moedas[k] || 0;
+      const box = document.createElement('div');
+      box.className = 'moeda-box-mestre' + (v === 0 ? ' zero' : '');
+      box.title = `${NOMES[k]}: ${v}`;
+      box.innerHTML = `<span class="m-ic moeda-dot moeda-dot--${k}" aria-hidden="true"></span><span class="m-val">${v}</span><span class="m-tag">${k.toUpperCase()}</span>`;
+      moedasGrid.appendChild(box);
+    });
+    moedasSection.appendChild(moedasGrid);
+    painelFicha.appendChild(moedasSection);
+  }
+
+  body.appendChild(painelFicha);
+
+  // --- Painel Mais ---
+  const painelMais = document.createElement('div');
+  painelMais.className = 'tab-panel';
+  painelPorAba.mais = painelMais;
+
   const actions = document.createElement('div');
   actions.className = 'card-actions';
 
@@ -1647,13 +1600,10 @@ function criarCard(p) {
     toast(`${p.nome} salvo!`);
   };
 
-  // Botão de descanso longo por card: SÓ Mestre
   let descBtn = null;
   if (ehMestre) {
     descBtn = document.createElement('button');
     descBtn.className = 'save-card';
-    descBtn.style.borderColor = 'var(--blood)';
-    descBtn.style.color = 'var(--parchment-dim)';
     descBtn.innerHTML = ico('noite') + 'Desc. Longo';
     descBtn.onclick = async () => {
       const ok = await window.Confirmar.perguntar({
@@ -1665,6 +1615,17 @@ function criarCard(p) {
       aplicarDescansoLongo(p);
       rerenderCard(p);
       toast(`${p.nome} descansou`);
+    };
+  }
+
+  let periciasBtn = null;
+  if (ehMestre) {
+    periciasBtn = document.createElement('button');
+    periciasBtn.className = 'save-card';
+    periciasBtn.innerHTML = ico('alvo') + 'Perícias';
+    periciasBtn.title = 'Dar/tirar bônus de perícia';
+    periciasBtn.onclick = () => {
+      if (window.AjustePericias) window.AjustePericias.abrir(p.id, p.nome);
     };
   }
 
@@ -1687,23 +1648,12 @@ function criarCard(p) {
     }
   };
 
-  // Botão de perícias: SÓ Mestre
-  let periciasBtn = null;
-  if (ehMestre) {
-    periciasBtn = document.createElement('button');
-    periciasBtn.className = 'save-card';
-    periciasBtn.innerHTML = ico('alvo') + 'Perícias';
-    periciasBtn.title = 'Dar/tirar bônus de perícia';
-    periciasBtn.onclick = () => {
-      if (window.AjustePericias) window.AjustePericias.abrir(p.id, p.nome);
-    };
-  }
-
   actions.appendChild(salvarBtn);
   if (descBtn) actions.appendChild(descBtn);
   if (periciasBtn) actions.appendChild(periciasBtn);
   actions.appendChild(remover);
-  card.appendChild(actions);
+  painelMais.appendChild(actions);
+  body.appendChild(painelMais);
 
   return card;
 }
@@ -1724,12 +1674,11 @@ async function adicionarCard() {
 // recursos por dia → atual=0; dado de vida → recupera metade do nível (mín 1).
 function aplicarDescansoLongo(p) {
   p.hpAtual = p.hpMax;
+  p.hpTemp = 0;
   p.exaustao = Math.max(0, (p.exaustao || 0) - 1);
   p.sucessos = 0;
   p.falhas = 0;
-  // Slots: zera os "atual" (recuperam todos no longo)
   if (p.slots) Object.keys(p.slots).forEach(nv => { p.slots[nv].atual = 0; });
-  // Recursos de classe (Canalizar Divindade, Surto de Ação, etc.)
   if (p.recursosUsados && typeof p.recursosUsados === 'object') {
     Object.keys(p.recursosUsados).forEach(k => {
       if (p.recursosUsados[k] && typeof p.recursosUsados[k].atual === 'number') {
@@ -1737,7 +1686,6 @@ function aplicarDescansoLongo(p) {
       }
     });
   }
-  // Dado de vida: recupera metade do nível (PHB), mínimo 1
   const recupera = Math.max(1, Math.floor((p.nivel || 1) / 2));
   p.dadoVidaAtual = Math.min((p.nivel || 1), (p.dadoVidaAtual || 0) + recupera);
   salvar(p);
@@ -1782,9 +1730,7 @@ async function descansoLongo() {
           const idx = estado.personagens.findIndex(x => x.id === ev.char.id);
           if (idx >= 0) estado.personagens[idx] = ev.char;
           else { estado.personagens.push(ev.char); render(); return; }
-          // Anti-eco: se foi nossa própria edição, pula o re-render (já atualizamos o DOM)
           if (ehEcoLocal(ev.char.id)) return;
-          // Update externo: re-renderiza só o card afetado
           rerenderCard(ev.char);
         } else if (ev.tipo === 'delete') {
           estado.personagens = estado.personagens.filter(x => x.id !== ev.id);
@@ -1793,7 +1739,6 @@ async function descansoLongo() {
       }
     });
     ehMestre = r.ehMestre;
-    // Botões exclusivos do Mestre na toolbar
     if (ehMestre) {
       ['btn-adicionar','btn-descanso-global','btn-notas-mestre','link-vilao','link-reloaded'].forEach(id => {
         const el = document.getElementById(id);

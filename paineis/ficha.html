@@ -780,6 +780,17 @@
     width: 32px; background: transparent; border: none;
     color: var(--gold-light); font-weight: 700; text-align: center;
   }
+  .exaustao-aviso {
+    margin-top: 8px; padding: 6px 10px; border-radius: 4px;
+    background: rgba(107,16,16,0.25); border: 1px solid var(--blood);
+    color: #f4b8a8; font-size: 11px; text-align: center;
+  }
+  .exaustao-resumo-txt {
+    margin: -10px 0 18px; padding: 8px 10px;
+    border-radius: 6px; background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(139,29,29,0.4); color: var(--text-dim);
+    font-size: 11px; font-style: italic; text-align: center;
+  }
   .hp-bar {
     background: rgba(0,0,0,0.6);
     border: 1px solid rgba(139,29,29,0.5);
@@ -2048,6 +2059,7 @@
 <script src="../assets/js/efeitos.js"></script>
 <script src="../assets/js/phb_catalogo.js"></script>
 <script src="../assets/js/phb_slots.js"></script>
+<script src="../assets/js/exaustao_regras.js"></script>
 <script>
 const $ = sel => document.querySelector(sel);
 const $$ = sel => document.querySelectorAll(sel);
@@ -2584,6 +2596,7 @@ function renderCombate(c) {
         <div class="hp-temp-label" style="margin-top:8px;text-align:center">
           PV Temporários: <input name="hp_temp" type="text" inputmode="numeric" value="${c.hp_temp ?? 0}" data-validar="int" data-min="0">
         </div>
+        <div id="exaustao-hp-aviso"></div>
 
         <!-- Painel aplicar dano/cura -->
         <div class="hp-aplicar">
@@ -2625,6 +2638,7 @@ function renderCombate(c) {
         <label>Deslocamento</label>
         <input name="deslocamento" type="text" inputmode="decimal" value="${c.deslocamento ?? 9}" data-validar="num" data-min="0">
         <span class="ajuda-mini">metros · aceita decimal</span>
+        <span class="ajuda-mini" id="desloc-efetivo"></span>
       </div>
       <div class="stat-mini">
         <span class="ic">${ico('dado')}</span>
@@ -2648,6 +2662,7 @@ function renderCombate(c) {
         <span class="ajuda-mini">0 a 6</span>
       </div>
     </div>
+    <div id="exaustao-resumo"></div>
 
     <input type="hidden" name="_aba_combate" value="1">
     <h3>Salvaguardas <span style="font-size:11px;color:var(--text-dim);font-weight:normal;font-style:italic">(auto: modificador + ${bonusProf(c.nivel)} se proficiente · campo ± = bônus extra)</span></h3>
@@ -2710,6 +2725,53 @@ function renderCombate(c) {
     ${renderSlotsMagia(c, slots)}
     ` : ''}
   `;
+}
+
+// Aplica os efeitos de exaustão do PHB (2014) nos avisos da aba Combate —
+// mesmo módulo/mesmo campo `exaustao` usado pelo painel do Mestre, então
+// os efeitos batem nos dois lados automaticamente via sync do Supabase.
+function atualizarExaustaoUI() {
+  if (!window.ExaustaoRegras) return;
+  const avisoEl = document.getElementById('exaustao-hp-aviso');
+  const deslocEl = document.getElementById('desloc-efetivo');
+  const resumoEl = document.getElementById('exaustao-resumo');
+  if (!avisoEl && !deslocEl && !resumoEl) return; // não está na aba Combate
+
+  const inpExaustao = document.querySelector('[name="exaustao"]');
+  const inpDeslocamento = document.querySelector('[name="deslocamento"]');
+  const inpHpMax = document.querySelector('[name="hp_max"]');
+  const nivel = inpExaustao ? parseNum(inpExaustao.value, { inteiro: true, min: 0, max: 6 }) ?? 0 : (charAtivo.exaustao ?? 0);
+  const deslocBase = inpDeslocamento ? (parseNum(inpDeslocamento.value, { min: 0 }) ?? 0) : (charAtivo.deslocamento ?? 9);
+  const hpMaxBase = inpHpMax ? (parseNum(inpHpMax.value, { inteiro: true, min: 0 }) ?? 0) : (charAtivo.hp_max ?? 0);
+  const ef = window.ExaustaoRegras.efeitos(nivel);
+
+  if (avisoEl) {
+    if (ef.morto) {
+      avisoEl.innerHTML = `<div class="exaustao-aviso">${ico('caveira') || '☠'} Exaustão nível 6 — morto</div>`;
+    } else if (ef.hpMaxMult < 1) {
+      const efetivo = window.ExaustaoRegras.hpMaxEfetivo(hpMaxBase, nivel);
+      avisoEl.innerHTML = `<div class="exaustao-aviso">${ico('aviso') || '⚠'} PV máx. efetivo (exaustão): ${efetivo}</div>`;
+    } else {
+      avisoEl.innerHTML = '';
+    }
+  }
+
+  if (deslocEl) {
+    if (ef.velocidadeMult < 1 || ef.velocidadeZero) {
+      const efetivo = window.ExaustaoRegras.velocidadeEfetiva(deslocBase, nivel);
+      deslocEl.textContent = `efetivo (exaustão): ${efetivo}m`;
+    } else {
+      deslocEl.textContent = '';
+    }
+  }
+
+  if (resumoEl) {
+    if (nivel > 0) {
+      resumoEl.innerHTML = `<div class="exaustao-resumo-txt">${ico('atordoado') || '⚠'} Exaustão ${nivel}/6 — ${ef.resumo.join(' · ')}</div>`;
+    } else {
+      resumoEl.innerHTML = '';
+    }
+  }
 }
 
 function renderSlotsMagia(c, slots) {
@@ -4674,6 +4736,13 @@ function conectarListeners() {
   // Modificadores ao vivo (e recalcula salv/perícias se a tab Combate estiver presente)
   $$('[data-attr]').forEach(inp => {
     inp.addEventListener('input', () => { validarEAtualizarMod(inp); recalcularValoresPericiasSalv(); });
+  });
+
+  // Efeitos de exaustão (PHB) ao vivo — reflete no aviso de PV, deslocamento efetivo e resumo
+  atualizarExaustaoUI();
+  ['exaustao', 'deslocamento', 'hp_max'].forEach(nomeCampo => {
+    const inp = document.querySelector(`[name="${nomeCampo}"]`);
+    if (inp) inp.addEventListener('input', atualizarExaustaoUI);
   });
   // Nível também afeta bônus de proficiência
   const inpNivel = document.querySelector('[name="nivel"]');

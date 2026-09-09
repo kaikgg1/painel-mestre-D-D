@@ -20,7 +20,14 @@
 //   nivel           → nivel
 //   hpAtual         → hp_atual
 //   hpMax           → hp_max
+//   hpTemp          → hp_temp
 //   ca              → ca
+//   iniciativa_bonus→ iniciativa_bonus (mesmo nome; usado por ficha.html)
+//   deslocamento    → deslocamento (mesmo nome; usado por ficha.html)
+//   percepcaoPassiva→ percepcao_passiva
+//   spellDC         → spell_dc
+//   spellAtk        → spell_atk
+//   concentracao    → concentracao (jsonb: {ativa, magia})
 //   inspiracao      → inspiracao
 //   exaustao        → exaustao
 //   sucessos        → morte_sucessos
@@ -51,7 +58,14 @@
     nivel: 'nivel',
     hpAtual: 'hp_atual',
     hpMax: 'hp_max',
+    hpTemp: 'hp_temp',
     ca: 'ca',
+    iniciativa_bonus: 'iniciativa_bonus',
+    deslocamento: 'deslocamento',
+    percepcaoPassiva: 'percepcao_passiva',
+    spellDC: 'spell_dc',
+    spellAtk: 'spell_atk',
+    concentracao: 'concentracao',
     inspiracao: 'inspiracao',
     exaustao: 'exaustao',
     sucessos: 'morte_sucessos',
@@ -99,7 +113,14 @@
       nivel: row.nivel ?? 1,
       hpAtual: row.hp_atual ?? 0,
       hpMax: row.hp_max ?? 0,
+      hpTemp: row.hp_temp ?? 0,
       ca: row.ca ?? 10,
+      iniciativa_bonus: row.iniciativa_bonus ?? 0,
+      deslocamento: row.deslocamento ?? 9,
+      percepcaoPassiva: row.percepcao_passiva ?? 10,
+      spellDC: row.spell_dc ?? null,
+      spellAtk: row.spell_atk ?? null,
+      concentracao: row.concentracao || { ativa: false, magia: '' },
       inspiracao: typeof row.inspiracao === 'number' ? row.inspiracao : (row.inspiracao ? 1 : 0),
       exaustao: row.exaustao ?? 0,
       sucessos: row.morte_sucessos ?? 0,
