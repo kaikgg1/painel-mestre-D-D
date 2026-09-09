@@ -1,51 +1,53 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="strahd">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Painel da campanha Maldição de Strahd — controle de status, HP, slots de magia e condições dos jogadores em Barovia.">
-<meta name="theme-color" content="#0C090B">
+<meta name="theme-color" content="#070506">
 <meta property="og:title" content="Crônicas de Barovia — Painel do Mestre">
 <meta property="og:description" content="Painel da campanha Maldição de Strahd.">
 <meta property="og:type" content="website">
 <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
 <title>Crônicas de Barovia — Painel do Mestre</title>
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/components.css">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,700;1,400&display=swap');
-
   * { box-sizing: border-box; }
 
   :root {
-    --bg-deep: #0C090B;
-    --bg-card: #171013;
-    --bg-card-elev: #1D1418;
-    --gold: #C2A15B;
-    --gold-muted: #756038;
-    --text: #E7DFD3;
-    --text-dim: #988D84;
-    --divider: #40252B;
-    --danger: #A94149;
-    --danger-dim: #6b2a2e;
-    --success: #667A58;
+    --bg-deep: #070506;
+    --bg-card: #180b0d;
+    --bg-card-elev: #211012;
+    --gold: #a8232b;
+    --gold-muted: #6b4a2a;
+    --text: #ddd0bc;
+    --text-dim: #89776d;
+    --divider: #3a1114;
+    --danger: #861820;
+    --danger-dim: #4a1014;
+    --success: #4a5233;
     --magic: #73518A;
     --shadow: #030202;
     /* mantidos por compatibilidade com módulos JS externos (efeitos.js etc.) */
-    --parchment: #E7DFD3;
-    --parchment-dim: #988D84;
-    --gold-bright: #C2A15B;
-    --blood: #40252B;
-    --blood-bright: #A94149;
-    --blood-dark: #2a1519;
-    --bone: #E7DFD3;
-    --bg-card-soft: #1D1418;
+    --parchment: #ddd0bc;
+    --parchment-dim: #89776d;
+    --gold-bright: #a8232b;
+    --blood: #3a1114;
+    --blood-bright: #861820;
+    --blood-dark: #2a0c0e;
+    --bone: #ddd0bc;
+    --bg-card-soft: #211012;
   }
 
   body {
     margin: 0;
     padding: 24px 16px 60px;
-    font-family: 'EB Garamond', Georgia, serif;
+    font-family: var(--font-body);
     background-color: var(--bg-deep);
-    background-image: radial-gradient(ellipse at top, #17101299 0%, transparent 55%);
+    background-image:
+      radial-gradient(ellipse at top, color-mix(in srgb, var(--bg-card) 60%, transparent) 0%, transparent 55%),
+      radial-gradient(ellipse at 15% 90%, color-mix(in srgb, var(--danger) 12%, transparent) 0%, transparent 50%);
     background-attachment: fixed;
     color: var(--text);
     min-height: 100vh;
@@ -120,7 +122,7 @@
   .toolbar button {
     background: var(--bg-card-elev); border: 1px solid var(--gold-muted); color: var(--text);
   }
-  .toolbar button:hover { border-color: var(--gold); background: #241a1e; transform: translateY(-1px); }
+  .toolbar button:hover { border-color: var(--gold); background: var(--bg-card-elev); transform: translateY(-1px); }
   .toolbar .back-link:active, .toolbar button:active { transform: translateY(0); }
   .toolbar .back-link:focus-visible, .toolbar button:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
   @media (max-width: 700px) { .toolbar-sep { display: none; } }

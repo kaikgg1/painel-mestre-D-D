@@ -3,33 +3,32 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0a0608">
+<meta name="theme-color" content="#0d0e0c">
 <meta name="description" content="Compêndio de Magias D&D 5e em PT-BR — 361 magias do Livro do Jogador com filtros por nível, escola e classe.">
 <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
 <title>Compêndio de Magias — D&D 5e</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<link rel="stylesheet" href="../assets/css/ui.css">
 <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
 <script src="../assets/js/icones.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
+  /* Aliases locais → tokens.css */
   :root {
-    --bg-deep: #0a0608;
-    --bg-mid: #150a0c;
-    --bg-card: #1a1018;
-    --bg-card-soft: #221520;
-    --gold: #8B6914;
-    --gold-bright: #b88a2c;
-    --gold-light: #d4a843;
-    --blood: #6b1010;
-    --blood-bright: #8b1d1d;
-    --parchment: #d4c5a0;
-    --parchment-dim: #a89878;
-    --shadow: #050304;
-    --text-dim: #8c7d5e;
-    --borda: rgba(139,105,20,0.35);
-    --borda-forte: rgba(184,138,44,0.7);
+    --bg-deep: var(--bg);
+    --bg-mid: var(--bg-soft);
+    --bg-card: var(--surface);
+    --bg-card-soft: var(--surface-raised);
+    --gold-bright: var(--gold);
+    --blood: var(--border);
+    --blood-bright: var(--bronze);
+    --parchment: var(--text);
+    --parchment-dim: var(--text-muted);
+    --borda: var(--border-soft);
+    --borda-forte: var(--border);
 
-    /* Cores por escola (texto) */
+    /* Cores por escola (texto) — mantidas vívidas de propósito (identificação rápida) */
     --e-abju: #6f9ede;
     --e-conj: #d9b24c;
     --e-adiv: #b98ee0;
@@ -42,37 +41,18 @@
   html, body {
     min-height: 100vh; min-height: 100dvh;
     background: var(--bg-deep);
-    background-image: radial-gradient(ellipse at top, #2a1518 0%, #150a0c 42%, #050304 100%);
+    background-image: radial-gradient(ellipse at top, color-mix(in srgb, var(--surface) 65%, var(--bg)) 0%, var(--bg-soft) 45%, var(--bg) 100%);
     background-attachment: fixed;
-    font-family: 'EB Garamond', Georgia, serif;
+    font-family: var(--font-body);
     color: var(--parchment);
   }
   body::before {
     content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
-    background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.5) 100%);
+    background: radial-gradient(ellipse at center, transparent 55%, rgba(0,0,0,0.45) 100%);
   }
 
-  /* ===== HEADER ===== */
-  .site-header {
-    position: sticky; top: 0; z-index: 40;
-    background: linear-gradient(180deg, rgba(15,8,10,0.97), rgba(10,6,8,0.93));
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--gold);
-    padding: 10px 18px; display: flex; align-items: center; gap: 14px;
-  }
-  .back-btn {
-    text-decoration: none; color: var(--parchment-dim); font-family: 'Cinzel', serif;
-    font-size: 11px; font-weight: 600; letter-spacing: 1.4px; text-transform: uppercase;
-    padding: 10px 18px; min-height: 40px; border: 1px solid var(--gold); border-radius: 4px;
-    transition: transform .15s, box-shadow .15s, background .15s, color .15s;
-    white-space: nowrap; display: inline-flex; align-items: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-  }
-  .back-btn:hover { background: var(--gold); color: var(--shadow); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(184,138,44,0.35); }
-  .back-btn:active { transform: translateY(0); box-shadow: 0 1px 4px rgba(0,0,0,0.5); }
-  .back-btn:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 2px; }
   .header-title {
-    font-family: 'Cinzel', serif; font-size: 14px; font-weight: 700;
+    font-family: var(--font-heading); font-size: 14px; font-weight: 700;
     color: var(--gold-bright); letter-spacing: 2px; flex: 1; text-transform: uppercase;
   }
   #auth-slot { margin-left: auto; }
@@ -92,7 +72,7 @@
 
   /* ===== PAINEL DE FILTROS ===== */
   .filtros {
-    background: linear-gradient(180deg, rgba(26,16,24,0.85), rgba(10,6,8,0.6));
+    background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 85%, transparent), color-mix(in srgb, var(--bg) 80%, transparent));
     border: 1px solid var(--borda); border-radius: 12px;
     padding: 16px 18px; margin-bottom: 26px;
   }
@@ -157,7 +137,7 @@
   /* ===== CARD ===== */
   .card {
     display: flex; align-items: center; gap: 10px;
-    background: linear-gradient(180deg, rgba(34,21,32,0.7), rgba(16,10,14,0.7));
+    background: linear-gradient(180deg, color-mix(in srgb, var(--surface-raised) 75%, transparent), color-mix(in srgb, var(--bg) 75%, transparent));
     border: 1px solid var(--borda); border-radius: 9px;
     padding: 12px 14px; cursor: pointer; transition: .16s; text-align: left;
     font-family: inherit; width: 100%;
@@ -195,7 +175,7 @@
   .modal-ov.open { display: flex; }
   .modal {
     margin: auto; width: 100%; max-width: 660px;
-    background: linear-gradient(165deg, #1c1119, #120b10);
+    background: linear-gradient(165deg, var(--surface-raised), var(--bg));
     border: 1px solid var(--borda-forte); border-radius: 14px;
     box-shadow: 0 20px 70px rgba(0,0,0,0.85);
     padding: 26px 28px; position: relative;
@@ -220,7 +200,7 @@
   .modal-props { display: grid; grid-template-columns: 1fr 1fr; gap: 9px 22px; margin-bottom: 16px; }
   .prop-nome {
     font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700;
-    letter-spacing: .8px; color: var(--blood-bright); text-transform: uppercase;
+    letter-spacing: .8px; color: var(--gold-bright); text-transform: uppercase;
     display: block; margin-bottom: 1px;
   }
   .prop-valor { font-size: 15.5px; color: var(--parchment); }
@@ -250,20 +230,20 @@
     font-family: 'Cinzel', serif; font-size: 12px; font-weight: 600; letter-spacing: .8px;
     padding: 9px 18px; border-radius: 6px; cursor: pointer; transition: .16s;
   }
-  .btn-fav:hover { background: var(--gold); color: var(--shadow); }
+  .btn-fav:hover { background: var(--gold); color: var(--bg); }
   .btn-fav.on { background: rgba(212,168,67,0.18); border-color: var(--gold-light); }
 
   /* ===== TOPO ===== */
   #ao-topo {
     position: fixed; right: 22px; bottom: 22px; z-index: 60;
     width: 46px; height: 46px; border-radius: 50%;
-    background: rgba(26,16,24,0.92); border: 1px solid var(--gold);
+    background: color-mix(in srgb, var(--surface) 92%, transparent); border: 1px solid var(--border);
     color: var(--gold-light); font-size: 19px; cursor: pointer;
     display: none; align-items: center; justify-content: center;
     transition: .18s;
   }
   #ao-topo.visible { display: flex; }
-  #ao-topo:hover { background: var(--gold); color: var(--shadow); }
+  #ao-topo:hover { background: var(--gold); color: var(--bg); }
 
   @media (max-width: 720px) {
     main { padding: 18px 12px 70px; }
@@ -280,7 +260,6 @@
     .card:hover { transform: none; }
   }
 </style>
-<link rel="stylesheet" href="../assets/css/ui.css">
 </head>
 <body data-ambiente="fagulhas">
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0a0608">
+<meta name="theme-color" content="#070506">
 <link rel="icon" type="image/svg+xml" href="../../assets/img/favicon.svg">
 <title>Ezmerelda d'Avenir — Ficha de Combate</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -13,25 +13,25 @@
 <script src="../../assets/js/icones.js"></script>
 <style>
   :root {
-    --bg-deep:#0a0608; --bg-card:#191115; --bg-card-2:#221820; --bg-card-3:#2c2029;
-    --blood:#9b1f1f; --blood-dark:#5a0e0e; --blood-bright:#d13731;
+    --bg-deep:#070506; --bg-card:#180b0d; --bg-card-2:#211012; --bg-card-3:#2a1518;
+    --blood:#861820; --blood-dark:#4a1014; --blood-bright:#d14242;
     --gold:#cbac67; --gold-bright:#f0d089; --gold-dim:#8a7340;
-    --bone:#efe6cf; --bone-dim:#c2b795; --shadow:#050203;
+    --bone:#efe6cf; --bone-dim:#c2b795; --shadow:#030202;
     --text-body:#ddd2b2; --text-muted:#948767;
-    --border:#4a3a2a; --border-soft:rgba(203,172,103,0.16); --radius:10px;
+    --border:#5f171b; --border-soft:rgba(168,35,43,0.14); --radius:10px;
     --accent:#b5643c; --accent-bright:#e59366; --accent-glow:rgba(181,100,60,0.40); --accent-soft:rgba(181,100,60,0.12);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { background: var(--bg-deep); color: var(--text-body); font-family: 'Cormorant Garamond', serif; font-size: 16px; line-height: 1.48; min-height: 100vh; -webkit-font-smoothing: antialiased; }
-  body { background: radial-gradient(ellipse at 50% -10%, var(--accent-soft), transparent 55%), radial-gradient(ellipse at 18% 4%, rgba(155,31,31,0.16), transparent 48%), radial-gradient(ellipse at 84% 96%, rgba(203,172,103,0.06), transparent 50%), var(--bg-deep); background-attachment: fixed; }
+  body { background: radial-gradient(ellipse at 50% -10%, var(--accent-soft), transparent 55%), radial-gradient(ellipse at 18% 4%, rgba(134,24,32,0.16), transparent 48%), radial-gradient(ellipse at 84% 96%, rgba(203,172,103,0.06), transparent 50%), var(--bg-deep); background-attachment: fixed; }
   body::before { content: ''; position: fixed; inset: 0; pointer-events: none; opacity: 0.3; z-index: 1; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.05 0 0 0 0 0.05 0 0 0 0.3 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>"); mix-blend-mode: overlay; }
   .container { max-width: 1100px; margin: 0 auto; padding: 20px 24px 60px; position: relative; z-index: 2; }
-  .top-bar { position: sticky; top: 0; z-index: 50; background: rgba(10,6,8,0.96); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); margin: -20px -24px 16px; padding: 12px 24px; }
+  .top-bar { position: sticky; top: 0; z-index: 50; background: rgba(7,5,6,0.96); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); margin: -20px -24px 16px; padding: 12px 24px; }
   .top-bar-inner { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; max-width: 1100px; margin: 0 auto; }
   .brand { font-family: 'Cinzel', serif; font-weight: 700; font-size: 1rem; letter-spacing: 0.18em; color: var(--bone); text-transform: uppercase; }
   .brand-sub { font-family: 'IM Fell English', serif; font-style: italic; font-size: 11px; color: var(--gold-dim); letter-spacing: 0.15em; }
   .save-controls { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
-  header { text-align: center; padding: 26px 16px 26px; margin-bottom: 18px; position: relative; border-radius: var(--radius); background: radial-gradient(ellipse at 50% 0%, var(--accent-soft), transparent 70%), linear-gradient(180deg, rgba(20,10,14,0.85), rgba(10,6,8,0.4)); border: 1px solid var(--border); box-shadow: inset 0 1px 0 rgba(240,208,137,0.06), 0 10px 40px rgba(0,0,0,0.5); overflow: hidden; }
+  header { text-align: center; padding: 26px 16px 26px; margin-bottom: 18px; position: relative; border-radius: var(--radius); background: radial-gradient(ellipse at 50% 0%, var(--accent-soft), transparent 70%), linear-gradient(180deg, rgba(20,10,14,0.85), rgba(7,5,6,0.4)); border: 1px solid var(--border); box-shadow: inset 0 1px 0 rgba(240,208,137,0.06), 0 10px 40px rgba(0,0,0,0.5); overflow: hidden; }
   header::before { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, transparent, var(--accent), transparent); height: 2px; top: 0; opacity: 0.55; }
   header::after { content: '✦'; position: absolute; bottom: -11px; left: 50%; transform: translateX(-50%); background: var(--bg-deep); padding: 0 14px; color: var(--accent); font-size: 18px; text-shadow: 0 0 12px var(--accent-glow); }
   .crest { font-size: clamp(2.4rem, 6vw, 3.4rem); line-height: 1; margin-bottom: 6px; color: var(--accent-bright); filter: drop-shadow(0 0 14px var(--accent-glow)); display: inline-block; }
@@ -41,7 +41,7 @@
   .subtitle strong { color: var(--bone); font-style: normal; }
   .combat-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
   @media (max-width: 880px) { .combat-bar { grid-template-columns: 1fr; } }
-  .panel { background: linear-gradient(180deg, var(--bg-card), rgba(10,6,8,0.5)); border: 1px solid var(--border); padding: 10px 14px; border-radius: 2px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.04); }
+  .panel { background: linear-gradient(180deg, var(--bg-card), rgba(7,5,6,0.5)); border: 1px solid var(--border); padding: 10px 14px; border-radius: 2px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.04); }
   .panel-title { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.2em; color: var(--gold); text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid var(--border-soft); padding-bottom: 6px; }
   .hp-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .hp-input { background: var(--shadow); border: 1px solid var(--blood-dark); color: var(--bone); font-family: 'Cinzel', serif; font-size: 1rem; padding: 4px 8px; width: 72px; text-align: center; border-radius: 2px; outline: none; }
@@ -62,13 +62,13 @@
   .chip:hover { border-color: var(--gold-dim); color: var(--bone-dim); transform: translateY(-1px); }
   .chip.active { background: linear-gradient(180deg, var(--blood), var(--blood-dark)); border-color: var(--blood-bright); color: var(--bone); box-shadow: 0 0 8px rgba(139,26,26,0.4); }
   .stats-bar { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 14px; background: linear-gradient(180deg, rgba(26,18,22,0.7), rgba(13,8,11,0.7)); padding: 12px 10px; border: 1px solid var(--border); border-radius: var(--radius); box-shadow: inset 0 1px 0 rgba(232,200,122,0.05); }
-  .stat { text-align: center; padding: 9px 4px 7px; background: linear-gradient(180deg, rgba(0,0,0,0.3), transparent); border: 1px solid rgba(74,58,42,0.6); border-radius: 8px; transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s; }
+  .stat { text-align: center; padding: 9px 4px 7px; background: linear-gradient(180deg, rgba(0,0,0,0.3), transparent); border: 1px solid rgba(95,23,27,0.6); border-radius: 8px; transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s; }
   .stat:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,0.4), 0 0 12px var(--accent-glow); }
   .stat-label { font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; letter-spacing: 0.22em; color: var(--gold-bright); text-shadow: 0 0 8px rgba(232,200,122,0.2); }
   .stat-value { font-family: 'IM Fell English', serif; font-size: 1.75rem; color: var(--bone); line-height: 1.05; font-weight: 600; margin-top: 3px; }
   .stat-mod { font-family: 'Cinzel', serif; font-weight: 700; font-size: 0.95rem; color: var(--accent-bright); background: rgba(0,0,0,0.35); border: 1px solid var(--accent); border-radius: 12px; padding: 1px 9px; display: inline-block; margin-top: 6px; box-shadow: 0 0 10px var(--accent-glow); }
   .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 6px; margin-bottom: 12px; }
-  .info-card { background: linear-gradient(180deg, var(--bg-card), rgba(10,6,8,0.5)); border: 1px solid var(--border); border-left: 3px solid var(--accent); padding: 8px 12px; border-radius: 6px; transition: border-color 0.2s, transform 0.15s; }
+  .info-card { background: linear-gradient(180deg, var(--bg-card), rgba(7,5,6,0.5)); border: 1px solid var(--border); border-left: 3px solid var(--accent); padding: 8px 12px; border-radius: 6px; transition: border-color 0.2s, transform 0.15s; }
   .info-card:hover { transform: translateY(-1px); border-left-color: var(--accent-bright); }
   .info-card .label { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.15em; color: var(--gold); text-transform: uppercase; }
   .info-card .value { font-family: 'IM Fell English', serif; font-size: 1.08rem; color: var(--bone); margin-top: 1px; }
@@ -76,7 +76,7 @@
   .info-card .editable:focus { border-bottom-color: var(--gold); color: var(--gold-bright); }
   .meta-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
   @media (max-width: 720px) { .meta-row { grid-template-columns: 1fr; } }
-  .meta-box { background: linear-gradient(180deg, var(--bg-card), rgba(10,6,8,0.4)); border: 1px solid var(--border); padding: 10px 14px; border-radius: 8px; }
+  .meta-box { background: linear-gradient(180deg, var(--bg-card), rgba(7,5,6,0.4)); border: 1px solid var(--border); padding: 10px 14px; border-radius: 8px; }
   .meta-title { font-family: 'Cinzel', serif; font-size: 9px; color: var(--accent-bright); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 6px; padding-bottom: 5px; border-bottom: 1px solid var(--border-soft); }
   .meta-content { font-size: 0.95rem; color: var(--text-body); line-height: 1.55; }
   .meta-content strong { color: var(--bone); font-weight: 600; }
@@ -88,7 +88,7 @@
   .section-title.lore::before { background: var(--accent); box-shadow: 0 0 8px var(--accent-glow); }
   .section-title.lore::after { background: linear-gradient(90deg, var(--accent), transparent); }
   .ability-grid { display: grid; grid-template-columns: 1fr; gap: 7px; }
-  .ability { background: linear-gradient(180deg, var(--bg-card), rgba(10,6,8,0.35)); border: 1px solid var(--border); border-left: 4px solid var(--gold-dim); border-radius: 8px; transition: border-left-color 0.15s, background 0.15s, box-shadow 0.2s, transform 0.15s; overflow: hidden; }
+  .ability { background: linear-gradient(180deg, var(--bg-card), rgba(7,5,6,0.35)); border: 1px solid var(--border); border-left: 4px solid var(--gold-dim); border-radius: 8px; transition: border-left-color 0.15s, background 0.15s, box-shadow 0.2s, transform 0.15s; overflow: hidden; }
   .ability:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.35); }
   .ability.open { box-shadow: 0 6px 22px rgba(0,0,0,0.45); }
   .ability.attack { border-left-color: var(--blood-bright); }
@@ -108,8 +108,8 @@
   .ability.open .ability-body { display: block; }
   .ability-body strong { color: var(--bone); font-weight: 600; }
   .ability-body em { color: var(--gold-bright); font-style: normal; font-weight: 500; }
-  .dmg { display: inline-block; padding: 1px 8px; background: linear-gradient(180deg, rgba(155,31,31,0.28), rgba(90,14,14,0.28)); border: 1px solid var(--blood); color: #ffd9d0; border-radius: 5px; font-family: 'IM Fell English', serif; font-size: 0.9rem; margin: 0 2px; font-weight: 600; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
-  .cd { display: inline-block; padding: 1px 8px; background: rgba(203,172,103,0.16); border: 1px solid var(--gold-dim); color: var(--gold-bright); border-radius: 5px; font-family: 'IM Fell English', serif; font-size: 0.9rem; margin: 0 2px; font-weight: 600; }
+  .dmg { display: inline-block; padding: 1px 8px; background: linear-gradient(180deg, rgba(134,24,32,0.28), rgba(90,14,14,0.28)); border: 1px solid var(--blood); color: #ffd9d0; border-radius: 5px; font-family: 'IM Fell English', serif; font-size: 0.9rem; margin: 0 2px; font-weight: 600; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
+  .cd { display: inline-block; padding: 1px 8px; background: rgba(168,35,43,0.14); border: 1px solid var(--gold-dim); color: var(--gold-bright); border-radius: 5px; font-family: 'IM Fell English', serif; font-size: 0.9rem; margin: 0 2px; font-weight: 600; }
   .insp-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
   .insp-tag { font-family: 'Cinzel', serif; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; color: var(--accent-bright); background: var(--accent-soft); border: 1px solid var(--border-soft); padding: 4px 10px; border-radius: 12px; }
   .notes-section { margin-top: 18px; background: var(--bg-card); border: 1px solid var(--border); padding: 10px 14px; border-radius: 2px; }
@@ -317,7 +317,7 @@ function updateHPBar() {
   const pct = Math.max(0, Math.min(100, (cur / max) * 100));
   hpBar.style.width = pct + '%'; hpLabel.textContent = Math.round(pct) + '%';
   if (pct > 50) hpBar.style.background = 'linear-gradient(90deg, var(--blood-dark), var(--blood))';
-  else if (pct > 25) hpBar.style.background = 'linear-gradient(90deg, #5a0e0e, #a82020)';
+  else if (pct > 25) hpBar.style.background = 'linear-gradient(90deg, #4a1014, #a82020)';
   else hpBar.style.background = 'linear-gradient(90deg, #3a0808, #6a0e0e)';
 }
 function adjustHP(delta) {

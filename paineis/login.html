@@ -4,35 +4,36 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Entrar no Painel do Mestre — D&D 5e">
-<meta name="theme-color" content="#0a0608">
+<meta name="theme-color" content="#0d0e0c">
 <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
 <title>Entrar — Painel do Mestre</title>
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<link rel="stylesheet" href="../assets/css/ui.css">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,700;1,400&display=swap');
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
+  /* Aliases locais → tokens.css. --blood/--blood-bright ficam reservados
+     só pro estado de erro real (login inválido); o card do Mestre usa
+     bronze/superfície elevada pra se diferenciar sem parecer "perigo". */
   :root {
-    --bg-deep: #0a0608;
-    --bg-card: #1a1018;
-    --bg-card-soft: #221520;
-    --gold: #8B6914;
-    --gold-bright: #b88a2c;
-    --gold-light: #d4a843;
-    --blood: #6b1010;
-    --blood-bright: #8b1d1d;
-    --parchment: #d4c5a0;
-    --parchment-dim: #a89878;
-    --shadow: #050304;
+    --bg-deep: var(--bg);
+    --bg-card: var(--surface);
+    --bg-card-soft: var(--surface-raised);
+    --gold-bright: var(--gold);
+    --blood: var(--danger);
+    --blood-bright: color-mix(in srgb, var(--danger) 80%, var(--gold-light));
+    --parchment: var(--text);
+    --parchment-dim: var(--text-muted);
   }
 
   html, body {
     min-height: 100vh; min-height: 100dvh;
     background-color: var(--bg-deep);
     background-image:
-      radial-gradient(ellipse at top, #2a1518 0%, #150a0c 40%, #050304 100%),
-      radial-gradient(circle at 15% 60%, rgba(139,29,29,0.1) 0%, transparent 45%),
-      radial-gradient(circle at 85% 40%, rgba(139,105,20,0.08) 0%, transparent 45%);
-    font-family: 'EB Garamond', Georgia, serif;
+      radial-gradient(ellipse at top, color-mix(in srgb, var(--surface) 60%, var(--bg)) 0%, var(--bg-soft) 40%, var(--bg) 100%),
+      radial-gradient(circle at 85% 40%, color-mix(in srgb, var(--gold) 10%, transparent) 0%, transparent 45%);
+    font-family: var(--font-body);
     color: var(--parchment);
     display: grid; place-items: center;
     padding: 20px 16px;
@@ -40,7 +41,7 @@
   body::before {
     content: ''; position: fixed; inset: 0; pointer-events: none;
     background:
-      radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.6) 100%),
+      radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.55) 100%),
       repeating-linear-gradient(45deg, transparent 0 3px, rgba(0,0,0,0.04) 3px 4px);
     z-index: 0;
   }
@@ -127,8 +128,8 @@
     .rodape-info {
       margin-top: 28px;
       padding: 14px 16px;
-      background: rgba(0,0,0,0.25);
-      border-left: 3px solid var(--blood);
+      background: rgba(0,0,0,0.2);
+      border-left: 3px solid var(--border);
       border-radius: 0 6px 6px 0;
       font-size: 12px; font-style: italic;
       color: var(--parchment-dim); line-height: 1.5;
@@ -152,8 +153,8 @@
     font-style: italic; font-size: 14px;
     color: var(--parchment-dim); letter-spacing: 2.5px;
   }
-  .subtitulo::before { content: '— '; color: var(--blood-bright); }
-  .subtitulo::after  { content: ' —'; color: var(--blood-bright); }
+  .subtitulo::before { content: '— '; color: var(--gold-bright); opacity: .6; }
+  .subtitulo::after  { content: ' —'; color: var(--gold-bright); opacity: .6; }
 
   /* ====== ÁREA DE SELEÇÃO ====== */
   .selecao {
@@ -191,7 +192,7 @@
   }
   .pj-card {
     position: relative;
-    background: linear-gradient(160deg, var(--bg-card-soft) 0%, var(--bg-card) 60%, #0d0709 100%);
+    background: linear-gradient(160deg, var(--bg-card-soft) 0%, var(--bg-card) 60%, var(--bg) 100%);
     border: 2px solid rgba(139,105,20,0.4);
     border-radius: 12px;
     padding: 22px 12px 18px;
@@ -229,7 +230,7 @@
     width: 72px; height: 72px;
     margin: 0 auto 12px;
     border-radius: 50%;
-    background: linear-gradient(160deg, #2a1f1c, #1a0e10);
+    background: linear-gradient(160deg, var(--surface-raised), var(--bg));
     border: 2px solid var(--gold);
     display: flex; align-items: center; justify-content: center;
     font-size: 38px;
@@ -246,7 +247,7 @@
     content: '✓';
     position: absolute; bottom: -4px; right: -4px;
     width: 24px; height: 24px;
-    background: var(--gold-light); color: var(--shadow);
+    background: var(--gold-light); color: var(--bg);
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     font-weight: 900; font-size: 14px;
@@ -260,22 +261,22 @@
   }
   .pj-card.selecionado .pj-nome { color: var(--gold-light); }
   .pj-tag {
-    font-size: 9px; color: var(--text-dim, #8c7d5e);
+    font-size: 9px; color: var(--parchment-dim);
     letter-spacing: 1.5px; text-transform: uppercase;
     font-style: italic;
   }
 
-  /* MESTRE — destaque diferente */
+  /* MESTRE — destaque diferente (superfície elevada + bronze, não "perigo") */
   .mestre-card {
     width: 100%;
-    background: linear-gradient(160deg, rgba(107,16,16,0.25), rgba(26,8,10,0.7));
-    border: 2px solid var(--blood);
+    background: linear-gradient(160deg, var(--surface-raised), var(--surface));
+    border: 2px solid var(--border);
     border-radius: 12px;
     padding: 16px 24px;
     cursor: pointer;
     transition: all 0.2s;
     display: flex; align-items: center; gap: 16px;
-    font-family: 'Cinzel', serif;
+    font-family: var(--font-heading);
     color: var(--parchment);
     overflow: hidden;
     position: relative;
@@ -283,31 +284,31 @@
   .mestre-card::before {
     content: '';
     position: absolute; inset: 0;
-    background: radial-gradient(ellipse at 50% 50%, rgba(139,29,29,0.2), transparent 60%);
+    background: radial-gradient(ellipse at 50% 50%, color-mix(in srgb, var(--bronze) 20%, transparent), transparent 60%);
     opacity: 0;
     transition: opacity 0.3s;
     pointer-events: none;
   }
   .mestre-card:hover:not(.selecionado) {
-    border-color: var(--blood-bright);
-    box-shadow: 0 10px 24px rgba(139,29,29,0.4);
+    border-color: var(--gold-bright);
+    box-shadow: 0 10px 24px var(--shadow);
     transform: translateY(-2px);
   }
   .mestre-card:hover::before { opacity: 1; }
   .mestre-card.selecionado {
-    background: linear-gradient(160deg, var(--blood-bright), #4a0808);
-    border-color: var(--blood-bright);
+    background: linear-gradient(160deg, color-mix(in srgb, var(--gold) 25%, var(--surface-raised)), var(--surface));
+    border-color: var(--gold-bright);
     color: var(--parchment);
-    box-shadow: 0 0 24px rgba(139,29,29,0.6), 0 10px 24px rgba(0,0,0,0.5);
+    box-shadow: 0 10px 24px var(--shadow);
   }
   .mestre-avatar {
     width: 56px; height: 56px;
     border-radius: 50%;
-    background: linear-gradient(160deg, #3a1014, #1a0608);
-    border: 2px solid var(--blood);
+    background: linear-gradient(160deg, var(--surface-raised), var(--bg));
+    border: 2px solid var(--border);
     display: flex; align-items: center; justify-content: center;
     font-size: 28px;
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.6);
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
     flex-shrink: 0;
     transition: all 0.2s;
   }
@@ -319,7 +320,7 @@
     content: '✓';
     position: absolute; bottom: -2px; right: -2px;
     width: 22px; height: 22px;
-    background: var(--gold-light); color: var(--shadow);
+    background: var(--gold-light); color: var(--bg);
     border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
     font-weight: 900; font-size: 13px;
@@ -342,9 +343,9 @@
     flex-direction: column;
     gap: 8px;
     padding: 14px 16px;
-    background: linear-gradient(160deg, rgba(107,16,16,0.25), rgba(26,8,10,0.7));
-    border: 1px solid var(--blood);
-    border-left: 4px solid var(--blood-bright);
+    background: linear-gradient(160deg, var(--surface-raised), var(--surface));
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--gold);
     border-radius: 8px;
     animation: fadeUp 0.3s ease-out;
   }
@@ -360,18 +361,18 @@
   .senha-input {
     width: 100%;
     padding: 14px 16px;
-    background: rgba(0,0,0,0.4);
-    border: 1px solid var(--blood-bright);
+    background: rgba(0,0,0,0.35);
+    border: 1px solid var(--border);
     border-radius: 6px;
     color: var(--parchment);
-    font-family: 'EB Garamond', serif;
+    font-family: var(--font-body);
     font-size: 16px;
     letter-spacing: 4px;
     outline: none;
     transition: all 0.2s;
     min-height: 48px;
   }
-  .senha-input::placeholder { color: var(--text-dim, #8c7d5e); letter-spacing: 1px; font-style: italic; }
+  .senha-input::placeholder { color: var(--parchment-dim); letter-spacing: 1px; font-style: italic; }
   .senha-input:focus {
     border-color: var(--gold-bright);
     background: rgba(0,0,0,0.55);
@@ -386,10 +387,10 @@
   }
   .btn-entrar {
     padding: 16px 18px;
-    background: linear-gradient(to bottom, var(--gold), #6a4f0e);
+    background: linear-gradient(to bottom, var(--gold-light), var(--gold));
     border: 2px solid var(--gold-bright);
-    color: var(--shadow);
-    font-family: 'Cinzel', serif; font-size: 14px;
+    color: var(--bg);
+    font-family: var(--font-heading); font-size: 14px;
     font-weight: 800; letter-spacing: 3px; text-transform: uppercase;
     border-radius: 6px;
     cursor: pointer;
@@ -417,7 +418,7 @@
   .btn-entrar:disabled {
     opacity: 0.25; cursor: not-allowed;
     background: var(--bg-card-soft);
-    color: var(--text-dim, #8c7d5e);
+    color: var(--parchment-dim);
     border-color: rgba(139,105,20,0.3);
   }
   .btn-entrar:disabled::after { display: none; }
@@ -470,12 +471,11 @@
   .feature-ic { color: var(--gold-bright); }
   .pj-avatar { color: var(--gold-bright); }
   .pj-card.selecionado .pj-avatar { color: var(--gold-light); }
-  .mestre-avatar { color: var(--blood-bright); }
+  .mestre-avatar { color: var(--gold-bright); }
   .mestre-card.selecionado .mestre-avatar { color: var(--gold-light); }
   .senha-label { display: flex; align-items: center; gap: 7px; }
   .senha-label iconify-icon { font-size: 14px; }
 </style>
-<link rel="stylesheet" href="../assets/css/ui.css">
 <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
 <script src="../assets/js/icones.js"></script>
 </head>

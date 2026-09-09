@@ -1,0 +1,79 @@
+/* assets/css/tokens.css
+   Sistema de design compartilhado — duas identidades visuais:
+
+   1) Tema GERAL (padrão, :root) — medieval clássico / high-fantasy:
+      couro escuro, bronze, ferro, pergaminho. Usado em todo o sistema
+      exceto o conteúdo da campanha Maldição de Strahd.
+
+   2) Tema STRAHD ([data-theme="strahd"] no <html>) — horror gótico:
+      vinho, preto, vermelho-sangue, névoa. Usado só nas páginas
+      internas da campanha (painel do Mestre "Crônicas de Barovia",
+      fichas de vilão, guia Curse of Strahd: Reloaded).
+
+   Uso: linkar este arquivo em <head>, depois de ui.css e antes do
+   <style> próprio da página. Páginas Strahd: <html data-theme="strahd">.
+   Cada página pode continuar com variáveis próprias/aliases locais
+   apontando pra estas (ex.: --parchment: var(--text)) quando o nome
+   histórico já é usado por módulos JS — não precisa renomear o JS. */
+
+:root {
+  /* Superfícies */
+  --bg: #0d0e0c;
+  --bg-soft: #151510;
+  --surface: #1c1a14;
+  --surface-raised: #242016;
+
+  /* Bordas */
+  --border: #6f5a2a;
+  --border-soft: #3d3420;
+
+  /* Bronze / dourado */
+  --bronze: #8a6a3a;
+  --gold: #c49a3a;
+  --gold-light: #dfc57a;
+
+  /* Texto */
+  --text: #e5d8b9;
+  --text-muted: #9e947c;
+
+  /* Semântico */
+  --forest: #59633d;
+  --success: #59633d;
+  --danger: #713631;
+
+  /* Sombra base (pra cards/elevação) */
+  --shadow: rgba(0, 0, 0, 0.55);
+}
+
+[data-theme="strahd"] {
+  /* Superfícies */
+  --bg: #070506;
+  --bg-soft: #100708;
+  --surface: #180b0d;
+  --surface-raised: #211012;
+
+  /* Bordas */
+  --border: #5f171b;
+  --border-soft: #3a1114;
+
+  /* Bronze / dourado — mantém pra ornamentos/elementos herdados do geral */
+  --bronze: #8a6a3a;
+  --gold: #a8232b;      /* no tema Strahd, o "elemento importante" vira vermelho-sangue */
+  --gold-light: #d14242;
+
+  /* Vermelho-sangue como accent estrutural (só aqui) */
+  --accent: #a8232b;
+  --accent-light: #d14242;
+  --blood: #861820;
+
+  /* Texto */
+  --text: #ddd0bc;
+  --text-muted: #89776d;
+
+  /* Semântico */
+  --forest: #4a5233;
+  --success: #4a5233;
+  --danger: #861820;
+
+  --shadow: rgba(0, 0, 0, 0.7);
+}

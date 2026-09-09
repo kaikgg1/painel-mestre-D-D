@@ -1,36 +1,39 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="strahd">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Maldição de Strahd — Crônicas de Barovia. Fichas dos jogadores, personagens e o guia Curse of Strahd: Reloaded.">
-<meta name="theme-color" content="#0a0608">
+<meta name="theme-color" content="#070506">
 <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
 <title>Maldição de Strahd — Painel do Mestre</title>
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<link rel="stylesheet" href="../assets/css/ui.css">
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,700;1,400&display=swap');
-
   * { box-sizing: border-box; margin: 0; padding: 0; }
 
+  /* Aliases locais → tokens.css [data-theme="strahd"] */
   :root {
-    --bg-deep: #0a0608;
-    --bg-mid: #150a0c;
-    --gold: #8B6914;
-    --gold-bright: #b88a2c;
-    --gold-light: #d4a843;
-    --blood: #6b1010;
-    --blood-bright: #8b1d1d;
-    --parchment: #d4c5a0;
-    --parchment-dim: #a89878;
-    --shadow: #050304;
+    --bg-deep: var(--bg);
+    --bg-mid: var(--bg-soft);
+    --gold: var(--bronze);
+    --gold-bright: var(--accent);
+    --gold-light: var(--accent-light);
+    --blood: var(--border);
+    --blood-bright: var(--accent);
+    --parchment: var(--text);
+    --parchment-dim: var(--text-muted);
   }
 
   html, body {
     min-height: 100vh;
     width: 100%;
     background-color: var(--bg-deep);
-    background-image: radial-gradient(ellipse at top, #2a1518 0%, #150a0c 50%, #050304 100%);
-    font-family: 'EB Garamond', Georgia, serif;
+    background-image:
+      radial-gradient(ellipse at 50% -10%, color-mix(in srgb, var(--blood) 20%, transparent), transparent 55%),
+      radial-gradient(ellipse at top, var(--bg-mid) 0%, var(--bg) 60%, #000 100%);
+    font-family: var(--font-body);
     color: var(--parchment);
     display: flex;
     flex-direction: column;
@@ -44,23 +47,11 @@
     position: fixed;
     inset: 0;
     pointer-events: none;
-    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.65) 100%);
+    background: radial-gradient(ellipse at center, transparent 35%, rgba(0,0,0,0.7) 100%);
     z-index: 0;
   }
 
-  .back-btn {
-    position: fixed; top: 16px; left: 16px; z-index: 10;
-    text-decoration: none; color: var(--parchment-dim);
-    font-family: 'Cinzel', serif; font-size: 11px;
-    font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
-    padding: 10px 18px; min-height: 40px; border: 1px solid var(--gold);
-    border-radius: 3px; transition: transform .15s, box-shadow .15s, background .15s, color .15s;
-    display: inline-flex; align-items: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.4);
-  }
-  .back-btn:hover { background: var(--gold); color: var(--shadow); transform: translateY(-1px); box-shadow: 0 4px 14px rgba(184,138,44,0.35); }
-  .back-btn:active { transform: translateY(0); box-shadow: 0 1px 4px rgba(0,0,0,0.5); }
-  .back-btn:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 2px; }
+  .back-btn { position: fixed; top: 16px; left: 16px; z-index: 10; }
 
   .wrapper {
     position: relative;
@@ -71,53 +62,44 @@
   }
 
   .crest {
-    font-size: 48px;
-    color: var(--blood-bright);
+    font-size: 44px;
+    color: var(--gold-bright);
     margin-bottom: 16px;
-    filter: drop-shadow(0 0 12px rgba(139,29,29,0.5));
-    animation: float 4s ease-in-out infinite;
+    filter: drop-shadow(0 0 10px color-mix(in srgb, var(--blood) 50%, transparent));
     display: block;
-  }
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-6px); }
   }
 
   .title {
-    font-family: 'Cinzel Decorative', serif;
-    font-size: clamp(22px, 5vw, 42px);
-    font-weight: 900;
-    letter-spacing: 4px;
-    color: var(--gold-bright);
-    text-shadow:
-      0 0 30px rgba(184,138,44,0.4),
-      2px 2px 0 var(--shadow);
+    font-family: var(--font-heading-deco);
+    font-size: clamp(22px, 5vw, 40px);
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--parchment);
     font-variant: small-caps;
     line-height: 1.2;
   }
 
   .subtitle {
-    font-family: 'EB Garamond', serif;
+    font-family: var(--font-body);
     font-style: italic;
     font-size: 16px;
     color: var(--parchment-dim);
     margin-top: 10px;
     letter-spacing: 2px;
   }
-  .subtitle::before { content: '— '; color: var(--blood-bright); }
-  .subtitle::after  { content: ' —'; color: var(--blood-bright); }
+  .subtitle::before { content: '— '; color: var(--gold-bright); }
+  .subtitle::after  { content: ' —'; color: var(--gold-bright); }
 
   .divider {
     width: 70%;
     max-width: 500px;
     height: 1px;
-    background: linear-gradient(to right, transparent, var(--gold-bright), transparent);
+    background: linear-gradient(to right, transparent, var(--blood), transparent);
     margin: 24px auto;
-    box-shadow: 0 0 6px rgba(184,138,44,0.3);
   }
 
   .prompt {
-    font-family: 'Cinzel', serif;
+    font-family: var(--font-heading);
     font-size: 13px;
     font-weight: 600;
     letter-spacing: 3px;
@@ -138,27 +120,16 @@
     flex-direction: column;
     align-items: center;
     text-decoration: none;
-    background: linear-gradient(160deg, #200e10 0%, #160a0c 60%, #0d0608 100%);
-    border: 2px solid var(--blood-bright);
-    border-radius: 4px;
-    padding: 48px 40px 40px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 44px 36px 36px;
     width: clamp(240px, 30vw, 340px);
     position: relative;
     cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow:
-      0 6px 24px rgba(0,0,0,0.7),
-      inset 0 0 30px rgba(0,0,0,0.5),
-      0 0 0 1px var(--blood) inset;
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    box-shadow: 0 4px 18px var(--shadow);
     overflow: hidden;
-  }
-
-  .campaign-card::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: radial-gradient(ellipse at 50% 0%, rgba(139,105,20,0.12) 0%, transparent 70%);
-    pointer-events: none;
   }
 
   .campaign-card::after {
@@ -167,66 +138,59 @@
     bottom: 0;
     left: 0;
     right: 0;
-    height: 3px;
-    background: linear-gradient(to right, transparent, var(--blood-bright), transparent);
+    height: 2px;
+    background: linear-gradient(to right, transparent, var(--gold-bright), transparent);
     opacity: 0;
     transition: opacity 0.3s;
   }
 
   .campaign-card:hover {
-    transform: translateY(-6px) scale(1.02);
-    border-color: var(--blood-bright);
-    box-shadow:
-      0 12px 40px rgba(0,0,0,0.8),
-      0 0 20px rgba(139,29,29,0.3),
-      inset 0 0 30px rgba(0,0,0,0.4),
-      0 0 0 1px var(--blood-bright) inset;
+    transform: translateY(-4px);
+    border-color: var(--gold-bright);
+    box-shadow: 0 16px 36px var(--shadow), 0 0 24px color-mix(in srgb, var(--blood) 30%, transparent);
   }
   .campaign-card:hover::after { opacity: 1; }
 
   .campaign-card .corner {
     position: absolute;
-    color: var(--blood);
-    font-size: 14px;
-    opacity: 0.6;
+    color: var(--border);
+    font-size: 12px;
+    opacity: 0.55;
     transition: opacity 0.3s, color 0.3s;
   }
   .campaign-card:hover .corner { opacity: 1; color: var(--gold-bright); }
-  .corner.tl { top: 6px; left: 10px; }
-  .corner.tr { top: 6px; right: 10px; }
-  .corner.bl { bottom: 6px; left: 10px; }
-  .corner.br { bottom: 6px; right: 10px; }
+  .corner.tl { top: 8px; left: 12px; }
+  .corner.tr { top: 8px; right: 12px; }
+  .corner.bl { bottom: 8px; left: 12px; }
+  .corner.br { bottom: 8px; right: 12px; }
 
   .campaign-icon {
-    font-size: 60px;
-    color: var(--blood-bright);
+    font-size: 56px;
+    color: var(--gold-bright);
     margin-bottom: 22px;
-    filter: drop-shadow(0 0 8px rgba(139,29,29,0.5));
-    transition: transform 0.3s, filter 0.3s, color 0.3s;
+    transition: transform 0.3s, color 0.3s;
     line-height: 1;
     display: flex;
     align-items: center;
     justify-content: center;
   }
   .campaign-card:hover .campaign-icon {
-    color: #c4302b;
-    transform: scale(1.1);
-    filter: drop-shadow(0 0 16px rgba(184,138,44,0.6));
+    color: var(--accent-light);
+    transform: scale(1.08);
   }
 
   .campaign-name {
-    font-family: 'Cinzel Decorative', serif;
+    font-family: var(--font-heading);
     font-size: clamp(16px, 2vw, 22px);
     font-weight: 700;
-    color: var(--gold-bright);
-    letter-spacing: 1px;
+    color: var(--parchment);
+    letter-spacing: .5px;
     line-height: 1.25;
     margin-bottom: 10px;
-    text-shadow: 1px 1px 3px var(--shadow);
   }
 
   .campaign-desc {
-    font-family: 'EB Garamond', serif;
+    font-family: var(--font-body);
     font-style: italic;
     font-size: clamp(13px, 1.4vw, 16px);
     color: var(--parchment-dim);
@@ -237,28 +201,29 @@
     margin-top: 26px;
     padding: 9px 28px;
     background: transparent;
-    border: 1px solid var(--blood-bright);
+    border: 1px solid var(--border);
     color: var(--parchment-dim);
-    font-family: 'Cinzel', serif;
+    font-family: var(--font-heading);
     font-size: clamp(10px, 1vw, 12px);
     font-weight: 600;
     letter-spacing: 2px;
     text-transform: uppercase;
-    border-radius: 2px;
+    border-radius: var(--radius-sm);
     transition: all 0.2s;
   }
   .campaign-card:hover .campaign-cta {
-    background: var(--blood-bright);
-    color: var(--parchment);
-    border-color: var(--blood-bright);
+    background: var(--gold-bright);
+    color: var(--bg);
+    border-color: var(--gold-bright);
   }
 
   .footer {
     margin-top: 52px;
-    font-family: 'EB Garamond', serif;
+    font-family: var(--font-body);
     font-style: italic;
     font-size: 13px;
-    color: rgba(168, 152, 120, 0.45);
+    color: var(--text-muted);
+    opacity: .5;
     letter-spacing: 1px;
   }
 
@@ -282,11 +247,9 @@
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .crest { animation: none; }
     .campaign-card, .campaign-card * { transition: none !important; }
   }
 </style>
-<link rel="stylesheet" href="../assets/css/ui.css">
 <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
 <script src="../assets/js/icones.js"></script>
 </head>

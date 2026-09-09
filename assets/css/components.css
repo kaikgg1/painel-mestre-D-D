@@ -1,0 +1,193 @@
+/* assets/css/components.css
+   Primitivos de UI compartilhados, construídos em cima de tokens.css.
+   Objetivo: reduzir a duplicação de CSS entre páginas (hoje .back-btn,
+   .site-header, .card, .modal e .pill eram redefinidos quase idênticos
+   em 5+ arquivos) e dar uma base visual "produto premium" consistente
+   — menos "card > seção > container > borda", mais espaçamento,
+   contraste de superfície e tipografia.
+
+   Depende de: assets/css/tokens.css (linkar antes deste arquivo).
+   Não redefine nenhuma classe usada como hook por JS (.tab, .tabbar,
+   .modal-overlay específicos de cada painel etc. continuam locais). */
+
+@import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
+
+:root {
+  --font-heading: 'Cinzel', serif;
+  --font-heading-deco: 'Cinzel Decorative', serif;
+  --font-body: 'Cormorant Garamond', 'EB Garamond', Georgia, serif;
+  --font-ui: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --radius: 8px;
+  --radius-sm: 5px;
+  --max-width: 1180px;
+}
+
+/* ===== RESET LEVE ===== */
+.ds body, body { font-family: var(--font-body); }
+
+/* ===== CABEÇALHO DE PÁGINA (site-header) ===== */
+.site-header {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 14px 22px;
+  background: linear-gradient(180deg, color-mix(in srgb, var(--bg-soft) 96%, transparent), color-mix(in srgb, var(--bg) 92%, transparent));
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border-soft);
+}
+.header-title {
+  flex: 1;
+  text-align: center;
+  font-family: var(--font-heading);
+  font-size: clamp(16px, 2.4vw, 22px);
+  font-weight: 600;
+  letter-spacing: 1.5px;
+  color: var(--gold-light);
+  text-transform: uppercase;
+}
+
+/* ===== BOTÃO VOLTAR ===== */
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  white-space: nowrap;
+  font-family: var(--font-heading);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  padding: 10px 18px;
+  min-height: 40px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-soft);
+  background: transparent;
+  transition: border-color .18s, color .18s, background-color .18s, transform .15s;
+}
+.back-btn:hover {
+  color: var(--gold-light);
+  border-color: var(--border);
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
+  transform: translateY(-1px);
+}
+.back-btn:active { transform: translateY(0); }
+.back-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+/* ===== CARD (superfície genérica) ===== */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius);
+  box-shadow: 0 2px 10px var(--shadow);
+  transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.card:hover {
+  transform: translateY(-3px);
+  border-color: var(--border);
+  box-shadow: 0 10px 24px var(--shadow);
+}
+.card-elevated { background: var(--surface-raised); }
+
+/* ===== BOTÕES ===== */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: var(--font-heading);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  color: var(--text);
+  background: var(--surface-raised);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  padding: 10px 18px;
+  min-height: 40px;
+  cursor: pointer;
+  transition: border-color .18s, background-color .18s, color .18s, transform .15s;
+}
+.btn:hover { border-color: var(--border); color: var(--gold-light); transform: translateY(-1px); }
+.btn:active { transform: translateY(0); }
+.btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+
+.btn-primary {
+  background: linear-gradient(180deg, var(--gold-light), var(--gold));
+  border-color: var(--gold);
+  color: var(--bg);
+}
+.btn-primary:hover { color: var(--bg); filter: brightness(1.08); }
+
+.btn-danger { border-color: var(--danger); color: var(--danger); }
+.btn-danger:hover { background: var(--danger); color: var(--text); border-color: var(--danger); }
+
+/* ===== PÍLULAS / FILTROS ===== */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  background: var(--surface);
+  border: 1px solid var(--border-soft);
+  border-radius: 999px;
+  padding: 6px 14px;
+  cursor: pointer;
+  transition: border-color .15s, color .15s, background-color .15s;
+}
+.pill:hover { border-color: var(--border); color: var(--text); }
+.pill.ativo, .pill[aria-pressed="true"] {
+  color: var(--gold-light);
+  border-color: var(--gold);
+  background: color-mix(in srgb, var(--gold) 12%, var(--surface));
+}
+
+/* ===== MODAL ===== */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0.65);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px;
+}
+.modal {
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 24px 60px var(--shadow);
+  max-width: 640px; width: 100%;
+  max-height: 86vh;
+  overflow: auto;
+}
+
+/* ===== DIVISÓRIA ORNAMENTAL DISCRETA ===== */
+.ornament-divider {
+  display: flex; align-items: center; gap: 12px;
+  color: var(--text-muted);
+  margin: 18px 0;
+}
+.ornament-divider::before, .ornament-divider::after {
+  content: ''; flex: 1; height: 1px;
+  background: linear-gradient(to right, transparent, var(--border), transparent);
+}
+
+/* ===== UTILITÁRIOS ===== */
+.container { max-width: var(--max-width); margin: 0 auto; padding: 0 20px; }
+
+@media (max-width: 640px) {
+  .site-header { padding: 12px 14px; }
+  .back-btn, .btn { padding: 12px 16px; min-height: 44px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card, .btn, .back-btn, .pill { transition: none; }
+}

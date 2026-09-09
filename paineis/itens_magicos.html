@@ -4,30 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Itens mágicos de D&D 5e em PT-BR — 262 itens do Guia do Mestre com raridade, sintonização e descrição.">
-<meta name="theme-color" content="#0a0608">
+<meta name="theme-color" content="#0d0e0c">
 <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/components.css">
 <link rel="stylesheet" href="../assets/css/ui.css">
 <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
 <script src="../assets/js/icones.js"></script>
 <title>Itens Mágicos — D&D 5e</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,700;1,400&display=swap');
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { min-height: 100vh; min-height: 100dvh; background: #0a0608;
-    background-image: radial-gradient(ellipse at top, #2a1518 0%, #150a0c 40%, #050304 100%);
-    font-family: 'EB Garamond', Georgia, serif; color: #d4c5a0; }
-  .site-header { position: sticky; top: 0; z-index: 30;
-    background: linear-gradient(180deg, rgba(15,8,10,0.96), rgba(10,6,8,0.92)); backdrop-filter: blur(10px);
-    border-bottom: 1px solid #8B6914; padding: 12px 20px; display: flex; align-items: center; gap: 14px; }
-  .back-btn { text-decoration: none; color: #a89878; font-family: 'Cinzel', serif; font-size: 11px; font-weight: 600;
-    letter-spacing: 1.5px; text-transform: uppercase; padding: 10px 18px; min-height: 40px; border: 1px solid #8B6914; border-radius: 3px;
-    transition: transform .15s, box-shadow .15s, background .15s, color .15s; white-space: nowrap; display: inline-flex; align-items: center;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.4); }
-  .back-btn:hover { background: #8B6914; color: #050304; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(184,138,44,0.35); }
-  .back-btn:active { transform: translateY(0); box-shadow: 0 1px 4px rgba(0,0,0,0.5); }
-  .back-btn:focus-visible { outline: 2px solid #d4a843; outline-offset: 2px; }
-  .header-title { font-family: 'Cinzel Decorative', serif; font-size: clamp(18px, 3vw, 26px); font-weight: 700;
-    color: #b88a2c; letter-spacing: 2px; text-shadow: 0 0 24px rgba(184,138,44,0.35); flex: 1; text-align: center; }
+  html, body { min-height: 100vh; min-height: 100dvh; background: var(--bg);
+    background-image: radial-gradient(ellipse at top, color-mix(in srgb, var(--surface) 65%, var(--bg)) 0%, var(--bg-soft) 45%, var(--bg) 100%);
+    font-family: var(--font-body); color: var(--text); }
+  .header-title { font-family: var(--font-heading-deco); font-size: clamp(18px, 3vw, 26px); font-weight: 700;
+    color: var(--gold); letter-spacing: 2px; flex: 1; text-align: center; }
   main { position: relative; z-index: 1; max-width: 960px; margin: 22px auto; padding: 0 16px 40px;
     display: flex; flex-direction: column; min-height: calc(100vh - 120px); }
   #cp { flex: 1; display: flex; flex-direction: column; }

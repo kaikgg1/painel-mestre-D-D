@@ -3,23 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#1c1c1e">
+<meta name="theme-color" content="#070506">
 <link rel="icon" type="image/svg+xml" href="../../assets/img/favicon.svg">
 <title>Fragmentos de Âmbar — Curse of Strahd: Reloaded</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Cinzel+Decorative:wght@700;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap');
 * { box-sizing:border-box; }
 :root {
-  --bg:#1c1c1e; --bg-sidebar:#1a1a1c; --bg-hover:#252528; --bg-card:#232325;
-  --border:#333336;
-  --gold:#e0a542; --gold-dim:#b8863a;
-  --active:#a78bfa; --active-dim:#8a6fd8;
-  --text:#dcdcdd; --text-dim:#9a9a9d; --text-faint:#6e6e72;
-  --title:#f2f1ee;
+  --bg:#070506; --bg-sidebar:#100708; --bg-hover:#211012; --bg-card:#180b0d;
+  --border:#3a1114;
+  --gold:#d14242; --gold-dim:#a8232b;
+  --active:#9a6a84; --active-dim:#6b4058;
+  --text:#ddd0bc; --text-dim:#89776d; --text-faint:#5c4f45;
+  --title:#e8ddc8;
 }
-* { scrollbar-color: #48484c var(--bg-sidebar); scrollbar-width: thin; }
+* { scrollbar-color: #5f171b var(--bg-sidebar); scrollbar-width: thin; }
 html, body { margin:0; min-height:100vh; background:var(--bg);
-  font-family:'Inter', system-ui, -apple-system, sans-serif; color:var(--text); }
+  font-family:'Cormorant Garamond', 'EB Garamond', Georgia, serif; color:var(--text); }
 a { color:var(--gold); text-decoration:none; }
 a:hover { text-decoration:underline; }
 
@@ -29,8 +29,8 @@ a:hover { text-decoration:underline; }
 .sidebar-left { width:290px; flex:0 0 290px; background:var(--bg-sidebar);
   border-right:1px solid var(--border); padding:22px 18px 40px;
   position:sticky; top:0; height:100vh; overflow-y:auto; }
-.brand { font-size:19px; font-weight:800; color:var(--gold); line-height:1.25;
-  margin-bottom:14px; text-decoration:none; display:block; }
+.brand { font-family:'Cinzel Decorative', serif; font-size:17px; font-weight:700; color:var(--gold); line-height:1.3;
+  margin-bottom:14px; text-decoration:none; display:block; letter-spacing:.3px; }
 .brand:hover { text-decoration:none; opacity:.9; }
 .search-box { position:relative; margin-bottom:16px; }
 .search-box input { width:100%; padding:8px 10px 8px 30px; border-radius:6px;
@@ -76,15 +76,15 @@ a:hover { text-decoration:underline; }
 
 /* ---------- coluna central ---------- */
 main.article { flex:1 1 auto; min-width:0; max-width:800px;
-  padding:48px 40px 100px; line-height:1.7; font-size:16.5px; }
-.page-title { font-size:clamp(28px,4vw,38px); font-weight:800; color:var(--title);
-  margin:0 0 28px; letter-spacing:-.3px; }
-main.article h1 { color:var(--gold); font-size:26px; font-weight:700;
-  margin:36px 0 14px; scroll-margin-top:24px; letter-spacing:-.2px; }
+  padding:48px 40px 100px; line-height:1.75; font-size:18.5px; }
+.page-title { font-family:'Cinzel Decorative', serif; font-size:clamp(26px,4vw,36px); font-weight:700; color:var(--title);
+  margin:0 0 28px; letter-spacing:.5px; }
+main.article h1 { font-family:'Cinzel', serif; color:var(--gold); font-size:25px; font-weight:600;
+  margin:36px 0 14px; scroll-margin-top:24px; letter-spacing:0; }
 main.article h1:first-child { margin-top:0; }
-main.article h2 { color:var(--gold); font-size:21px; font-weight:700;
+main.article h2 { font-family:'Cinzel', serif; color:var(--gold); font-size:20px; font-weight:600;
   margin:30px 0 12px; scroll-margin-top:24px; }
-main.article h3 { color:var(--title); font-size:18px; font-weight:700;
+main.article h3 { font-family:'Cinzel', serif; color:var(--title); font-size:17px; font-weight:600;
   margin:24px 0 10px; scroll-margin-top:24px; }
 main.article h4 { color:var(--text-dim); font-size:14px; font-weight:700;
   text-transform:uppercase; letter-spacing:.5px; margin:20px 0 8px; scroll-margin-top:24px; }
@@ -162,7 +162,7 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 
 /* ---------- pagina indice ---------- */
 .idx-intro { margin-bottom:8px; }
-.idx-intro h1 { font-size:clamp(26px,4vw,36px); font-weight:800; color:var(--gold); margin-bottom:10px; }
+.idx-intro h1 { font-family:'Cinzel Decorative', serif; font-size:clamp(26px,4vw,36px); font-weight:700; color:var(--gold); margin-bottom:10px; }
 .idx-intro p { color:var(--text-dim); font-size:15px; max-width:640px; }
 .idx-section { margin:34px 0; }
 .idx-section-title { font-size:13px; font-weight:700; letter-spacing:1.5px; text-transform:uppercase;

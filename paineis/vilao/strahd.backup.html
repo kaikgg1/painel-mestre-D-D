@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#0a0608">
+<meta name="theme-color" content="#070506">
 <link rel="icon" type="image/svg+xml" href="../../assets/img/favicon.svg">
 <title>Strahd von Zarovich — Ficha de Combate</title>
 <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
@@ -13,22 +13,22 @@
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg-deep:        #0a0608;
+    --bg-deep:        #070506;
     --bg-card:        #1a1216;
-    --bg-card-2:      #221820;
+    --bg-card-2:      #211012;
     --bg-card-3:      #2a1f28;
     --blood:          #8b1a1a;
-    --blood-dark:     #5a0e0e;
+    --blood-dark:     #4a1014;
     --blood-bright:   #c4302b;
     --gold:           #c9a961;
     --gold-bright:    #e8c87a;
     --gold-dim:       #8a7340;
     --bone:           #e8dfc7;
     --bone-dim:       #b8ad8e;
-    --shadow:         #050203;
+    --shadow:         #030202;
     --text-body:      #d4c8a8;
     --text-muted:     #8a7d5e;
-    --border:         #4a3a2a;
+    --border:         #5f171b;
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body {
@@ -64,7 +64,7 @@
   }
   .top-bar {
     position: sticky; top: 0; z-index: 50;
-    background: rgba(10,6,8,0.96);
+    background: rgba(7,5,6,0.96);
     backdrop-filter: blur(8px);
     border-bottom: 1px solid var(--border);
     margin: -20px -24px 16px;
@@ -224,7 +224,7 @@
     text-align: center;
     padding: 6px 4px;
     background: linear-gradient(180deg, rgba(0,0,0,0.25), transparent);
-    border: 1px solid rgba(74,58,42,0.6);
+    border: 1px solid rgba(95,23,27,0.6);
     border-radius: 4px;
     transition: border-color 0.2s, transform 0.15s;
   }
@@ -2114,7 +2114,7 @@ function updateHPBar() {
   hpBar.style.width = pct + '%';
   hpLabel.textContent = Math.round(pct) + '%';
   if (pct > 50) hpBar.style.background = 'linear-gradient(90deg, var(--blood-dark), var(--blood))';
-  else if (pct > 25) hpBar.style.background = 'linear-gradient(90deg, #5a0e0e, #a82020)';
+  else if (pct > 25) hpBar.style.background = 'linear-gradient(90deg, #4a1014, #a82020)';
   else hpBar.style.background = 'linear-gradient(90deg, #3a0808, #6a0e0e)';
 }
 
