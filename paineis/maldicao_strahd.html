@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Maldição de Strahd — Crônicas de Barovia. Fichas dos jogadores, personagens e o guia Curse of Strahd: Reloaded.">
+<meta name="theme-color" content="#0a0608">
+<link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
+<title>Maldição de Strahd — Painel do Mestre</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,700;1,400&display=swap');
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg-deep: #0a0608;
+    --bg-mid: #150a0c;
+    --gold: #8B6914;
+    --gold-bright: #b88a2c;
+    --gold-light: #d4a843;
+    --blood: #6b1010;
+    --blood-bright: #8b1d1d;
+    --parchment: #d4c5a0;
+    --parchment-dim: #a89878;
+    --shadow: #050304;
+  }
+
+  html, body {
+    min-height: 100vh;
+    width: 100%;
+    background-color: var(--bg-deep);
+    background-image: radial-gradient(ellipse at top, #2a1518 0%, #150a0c 50%, #050304 100%);
+    font-family: 'EB Garamond', Georgia, serif;
+    color: var(--parchment);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.65) 100%);
+    z-index: 0;
+  }
+
+  .back-btn {
+    position: fixed; top: 16px; left: 16px; z-index: 10;
+    text-decoration: none; color: var(--parchment-dim);
+    font-family: 'Cinzel', serif; font-size: 11px;
+    font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 8px 14px; border: 1px solid var(--gold);
+    border-radius: 3px; transition: all 0.2s;
+  }
+  .back-btn:hover { background: var(--gold); color: var(--shadow); }
+
+  .wrapper {
+    position: relative;
+    z-index: 1;
+    max-width: 1100px;
+    width: 100%;
+    text-align: center;
+  }
+
+  .crest {
+    font-size: 48px;
+    color: var(--blood-bright);
+    margin-bottom: 16px;
+    filter: drop-shadow(0 0 12px rgba(139,29,29,0.5));
+    animation: float 4s ease-in-out infinite;
+    display: block;
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-6px); }
+  }
+
+  .title {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(22px, 5vw, 42px);
+    font-weight: 900;
+    letter-spacing: 4px;
+    color: var(--gold-bright);
+    text-shadow:
+      0 0 30px rgba(184,138,44,0.4),
+      2px 2px 0 var(--shadow);
+    font-variant: small-caps;
+    line-height: 1.2;
+  }
+
+  .subtitle {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 16px;
+    color: var(--parchment-dim);
+    margin-top: 10px;
+    letter-spacing: 2px;
+  }
+  .subtitle::before { content: '— '; color: var(--blood-bright); }
+  .subtitle::after  { content: ' —'; color: var(--blood-bright); }
+
+  .divider {
+    width: 70%;
+    max-width: 500px;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--gold-bright), transparent);
+    margin: 24px auto;
+    box-shadow: 0 0 6px rgba(184,138,44,0.3);
+  }
+
+  .prompt {
+    font-family: 'Cinzel', serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--parchment-dim);
+    margin-bottom: 36px;
+  }
+
+  .campaigns {
+    display: flex;
+    gap: 32px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .campaign-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    background: linear-gradient(160deg, #200e10 0%, #160a0c 60%, #0d0608 100%);
+    border: 2px solid var(--blood-bright);
+    border-radius: 4px;
+    padding: 48px 40px 40px;
+    width: clamp(240px, 30vw, 340px);
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow:
+      0 6px 24px rgba(0,0,0,0.7),
+      inset 0 0 30px rgba(0,0,0,0.5),
+      0 0 0 1px var(--blood) inset;
+    overflow: hidden;
+  }
+
+  .campaign-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(139,105,20,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .campaign-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(to right, transparent, var(--blood-bright), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+  }
+
+  .campaign-card:hover {
+    transform: translateY(-6px) scale(1.02);
+    border-color: var(--blood-bright);
+    box-shadow:
+      0 12px 40px rgba(0,0,0,0.8),
+      0 0 20px rgba(139,29,29,0.3),
+      inset 0 0 30px rgba(0,0,0,0.4),
+      0 0 0 1px var(--blood-bright) inset;
+  }
+  .campaign-card:hover::after { opacity: 1; }
+
+  .campaign-card .corner {
+    position: absolute;
+    color: var(--blood);
+    font-size: 14px;
+    opacity: 0.6;
+    transition: opacity 0.3s, color 0.3s;
+  }
+  .campaign-card:hover .corner { opacity: 1; color: var(--gold-bright); }
+  .corner.tl { top: 6px; left: 10px; }
+  .corner.tr { top: 6px; right: 10px; }
+  .corner.bl { bottom: 6px; left: 10px; }
+  .corner.br { bottom: 6px; right: 10px; }
+
+  .campaign-icon {
+    font-size: 60px;
+    color: var(--blood-bright);
+    margin-bottom: 22px;
+    filter: drop-shadow(0 0 8px rgba(139,29,29,0.5));
+    transition: transform 0.3s, filter 0.3s, color 0.3s;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .campaign-card:hover .campaign-icon {
+    color: #c4302b;
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 16px rgba(184,138,44,0.6));
+  }
+
+  .campaign-name {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: clamp(16px, 2vw, 22px);
+    font-weight: 700;
+    color: var(--gold-bright);
+    letter-spacing: 1px;
+    line-height: 1.25;
+    margin-bottom: 10px;
+    text-shadow: 1px 1px 3px var(--shadow);
+  }
+
+  .campaign-desc {
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: clamp(13px, 1.4vw, 16px);
+    color: var(--parchment-dim);
+    line-height: 1.6;
+  }
+
+  .campaign-cta {
+    margin-top: 26px;
+    padding: 9px 28px;
+    background: transparent;
+    border: 1px solid var(--blood-bright);
+    color: var(--parchment-dim);
+    font-family: 'Cinzel', serif;
+    font-size: clamp(10px, 1vw, 12px);
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    border-radius: 2px;
+    transition: all 0.2s;
+  }
+  .campaign-card:hover .campaign-cta {
+    background: var(--blood-bright);
+    color: var(--parchment);
+    border-color: var(--blood-bright);
+  }
+
+  .footer {
+    margin-top: 52px;
+    font-family: 'EB Garamond', serif;
+    font-style: italic;
+    font-size: 13px;
+    color: rgba(168, 152, 120, 0.45);
+    letter-spacing: 1px;
+  }
+
+  @media (max-width: 1100px) and (min-width: 701px) {
+    .campaigns { gap: 24px; }
+    .campaign-card { width: clamp(220px, 30vw, 300px); padding: 40px 32px 32px; }
+    .campaign-icon { font-size: 52px; }
+  }
+
+  @media (max-width: 700px) {
+    .title { font-size: 24px; letter-spacing: 2px; }
+    .campaign-card { width: 100%; max-width: 100%; padding: 36px 28px 30px; min-height: 220px; }
+    .campaigns { gap: 20px; flex-direction: column; align-items: center; }
+    .campaign-icon { font-size: 48px; }
+    .campaign-cta { padding: 14px 28px; min-height: 44px; font-size: 12px; }
+  }
+
+  .campaign-card:focus-visible {
+    outline: 2px solid var(--gold-bright);
+    outline-offset: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .crest { animation: none; }
+    .campaign-card, .campaign-card * { transition: none !important; }
+  }
+</style>
+<link rel="stylesheet" href="../assets/css/ui.css">
+<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+<script src="../assets/js/icones.js"></script>
+</head>
+<body data-ambiente="brasas">
+
+<a href="aventuras.html" class="back-btn">← Aventuras</a>
+
+<div class="wrapper">
+
+  <span class="crest" aria-hidden="true" data-ico="vampiro"></span>
+
+  <h1 class="title">Maldição de Strahd</h1>
+  <p class="subtitle">Crônicas de Barovia</p>
+
+  <div class="divider"></div>
+
+  <p class="prompt">O que você precisa esta noite?</p>
+
+  <div class="campaigns">
+
+    <a href="painel_barovia_dnd5e.html" class="campaign-card" aria-label="Abrir fichas dos jogadores">
+      <span class="corner tl" aria-hidden="true">✠</span>
+      <span class="corner tr" aria-hidden="true">✠</span>
+      <span class="corner bl" aria-hidden="true">✠</span>
+      <span class="corner br" aria-hidden="true">✠</span>
+      <div class="campaign-icon" aria-hidden="true" data-ico="grupo"></div>
+      <div class="campaign-name">Fichas dos Jogadores</div>
+      <div class="campaign-desc">Controle de HP, condições<br>e slots do grupo em tempo real</div>
+      <div class="campaign-cta">Abrir Fichas</div>
+    </a>
+
+    <a href="vilao/index.html" class="campaign-card" aria-label="Abrir personagens">
+      <span class="corner tl" aria-hidden="true">✠</span>
+      <span class="corner tr" aria-hidden="true">✠</span>
+      <span class="corner bl" aria-hidden="true">✠</span>
+      <span class="corner br" aria-hidden="true">✠</span>
+      <div class="campaign-icon" aria-hidden="true" data-ico="personagens"></div>
+      <div class="campaign-name">Personagens</div>
+      <div class="campaign-desc">Vilões, aliados e NPCs<br>da campanha</div>
+      <div class="campaign-cta">Abrir Personagens</div>
+    </a>
+
+    <a href="reloaded/index.html" class="campaign-card" aria-label="Abrir guia Curse of Strahd: Reloaded">
+      <span class="corner tl" aria-hidden="true">✠</span>
+      <span class="corner tr" aria-hidden="true">✠</span>
+      <span class="corner bl" aria-hidden="true">✠</span>
+      <span class="corner br" aria-hidden="true">✠</span>
+      <div class="campaign-icon" aria-hidden="true" data-ico="grimorio"></div>
+      <div class="campaign-name">Curse of Strahd: Reloaded</div>
+      <div class="campaign-desc">Guia completo da campanha<br>traduzido, com sumário e busca</div>
+      <div class="campaign-cta">Abrir Guia</div>
+    </a>
+
+  </div>
+
+  <div class="footer">D&amp;D 5ª Edição · Painel do Mestre</div>
+
+</div>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="../assets/js/supabase.js"></script>
+<script src="../assets/js/auth.js"></script>
+<script>
+  (async () => {
+    const u = await window.Auth.requerLogin('login.html');
+    if (!u) return;
+  })();
+</script>
+
+<script src="../assets/js/ambiente.js"></script>
+<script src="../assets/js/polish.js"></script>
+</body>
+</html>

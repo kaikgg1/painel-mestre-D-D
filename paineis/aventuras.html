@@ -3,13 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Painel do Mestre para D&D 5e — controle de status dos jogadores e grimório completo do Livro do Jogador em português.">
+<meta name="description" content="Escolha a aventura — Painel do Mestre para D&D 5e.">
 <meta name="theme-color" content="#0a0608">
-<meta property="og:title" content="Painel do Mestre — D&D 5e">
-<meta property="og:description" content="Painel do Mestre para D&D 5e — controle de status dos jogadores e grimório completo do PHB em português.">
-<meta property="og:type" content="website">
-<link rel="icon" type="image/svg+xml" href="assets/img/favicon.svg">
-<title>Painel do Mestre — D&D 5e</title>
+<link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
+<title>Aventuras — Painel do Mestre</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cinzel:wght@500;600;700&family=EB+Garamond:ital,wght@0,400;0,700;1,400&display=swap');
 
@@ -51,6 +48,16 @@
     z-index: 0;
   }
 
+  .back-btn {
+    position: fixed; top: 16px; left: 16px; z-index: 10;
+    text-decoration: none; color: var(--parchment-dim);
+    font-family: 'Cinzel', serif; font-size: 11px;
+    font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
+    padding: 8px 14px; border: 1px solid var(--gold);
+    border-radius: 3px; transition: all 0.2s;
+  }
+  .back-btn:hover { background: var(--gold); color: var(--shadow); }
+
   .wrapper {
     position: relative;
     z-index: 1;
@@ -59,7 +66,6 @@
     text-align: center;
   }
 
-  /* ===== CABEÇALHO ===== */
   .crest {
     font-size: 48px;
     color: var(--gold-bright);
@@ -116,7 +122,6 @@
     margin-bottom: 36px;
   }
 
-  /* ===== CARDS DE CAMPANHA ===== */
   .campaigns {
     display: flex;
     gap: 32px;
@@ -125,7 +130,7 @@
   }
 
   .campaign-card {
-    display: none; /* hidden until JS reveals based on role */
+    display: flex;
     flex-direction: column;
     align-items: center;
     text-decoration: none;
@@ -143,7 +148,6 @@
       0 0 0 1px var(--blood) inset;
     overflow: hidden;
   }
-  .campaign-card.visible { display: flex; }
 
   .campaign-card::before {
     content: '';
@@ -247,7 +251,6 @@
     border-color: var(--gold-bright);
   }
 
-  /* Tema Strahd */
   .campaign-card.strahd {
     background: linear-gradient(160deg, #200e10 0%, #160a0c 60%, #0d0608 100%);
     border-color: var(--blood-bright);
@@ -270,7 +273,10 @@
     background: linear-gradient(to right, transparent, var(--blood-bright), transparent);
   }
 
-  /* ===== RODAPÉ ===== */
+  .campaign-card.locked { opacity: 0.4; cursor: not-allowed; border-style: dashed; }
+  .campaign-card.locked:hover { transform: none; box-shadow: 0 6px 24px rgba(0,0,0,0.7), inset 0 0 30px rgba(0,0,0,0.5), 0 0 0 1px var(--blood) inset; }
+  .campaign-card.locked:hover .campaign-icon { transform: none; filter: drop-shadow(0 0 8px rgba(139,29,29,0.5)); }
+
   .footer {
     margin-top: 52px;
     font-family: 'EB Garamond', serif;
@@ -280,7 +286,6 @@
     letter-spacing: 1px;
   }
 
-  /* Tablet — 2 colunas com 3º quebrando suave */
   @media (max-width: 1100px) and (min-width: 701px) {
     .campaigns { gap: 24px; }
     .campaign-card { width: clamp(240px, 42vw, 360px); padding: 40px 32px 32px; }
@@ -295,115 +300,57 @@
     .campaign-cta { padding: 14px 28px; min-height: 44px; font-size: 12px; }
   }
 
-  /* Foco visível para navegação por teclado */
   .campaign-card:focus-visible {
     outline: 2px solid var(--gold-bright);
     outline-offset: 4px;
   }
 
-  /* Barra de auth no topo */
-  .auth-bar {
-    position: fixed;
-    top: 12px; right: 16px;
-    z-index: 10;
-    display: flex; align-items: center; gap: 10px;
-    font-family: 'Cinzel', serif; font-size: 12px;
-  }
-  .auth-bar .auth-nome { color: var(--parchment-dim); letter-spacing: 1px; }
-  .auth-bar .auth-btn {
-    padding: 7px 14px;
-    background: transparent;
-    border: 1px solid var(--gold);
-    color: var(--parchment-dim);
-    border-radius: 2px;
-    font-family: 'Cinzel', serif; font-size: 11px;
-    font-weight: 600; letter-spacing: 1.5px; text-transform: uppercase;
-    text-decoration: none; cursor: pointer; transition: all 0.2s;
-  }
-  .auth-bar .auth-btn:hover { background: var(--gold); color: var(--shadow); }
-  .auth-bar .auth-btn:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 2px; }
-
-  /* Respeita preferência de redução de movimento */
   @media (prefers-reduced-motion: reduce) {
     .crest { animation: none; }
     .campaign-card, .campaign-card * { transition: none !important; }
   }
 </style>
-<link rel="stylesheet" href="assets/css/ui.css">
+<link rel="stylesheet" href="../assets/css/ui.css">
 <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
-<script src="assets/js/icones.js"></script>
+<script src="../assets/js/icones.js"></script>
 </head>
 <body data-ambiente="fagulhas">
 
-<div class="auth-bar" id="auth-slot" aria-label="Status de login"></div>
+<a href="../index.html" class="back-btn">← Início</a>
 
 <div class="wrapper">
 
-  <span class="crest" aria-hidden="true" data-ico="campanha"></span>
+  <span class="crest" aria-hidden="true" data-ico="mapa"></span>
 
-  <h1 class="title">Painel do Mestre</h1>
-  <p class="subtitle">Escolha a Campanha</p>
+  <h1 class="title">Aventuras</h1>
+  <p class="subtitle">Escolha a Aventura</p>
 
   <div class="divider"></div>
 
-  <p class="prompt">Qual aventura começa esta noite?</p>
+  <p class="prompt">Qual jornada continua esta noite?</p>
 
-  <div class="campaigns" style="max-width:1200px;margin:0 auto">
+  <div class="campaigns">
 
-    <a href="paineis/aventuras.html" class="campaign-card strahd" data-role="mestre" aria-label="Escolher aventura">
+    <a href="maldicao_strahd.html" class="campaign-card strahd" aria-label="Abrir a aventura Maldição de Strahd">
       <span class="corner tl" aria-hidden="true">✠</span>
       <span class="corner tr" aria-hidden="true">✠</span>
       <span class="corner bl" aria-hidden="true">✠</span>
       <span class="corner br" aria-hidden="true">✠</span>
+      <div class="campaign-icon" aria-hidden="true" data-ico="vampiro"></div>
+      <div class="campaign-name">Maldição de Strahd</div>
+      <div class="campaign-desc">Crônicas de Barovia<br>O Castelo Ravenloft aguarda</div>
+      <div class="campaign-cta">Entrar na Névoa</div>
+    </a>
+
+    <div class="campaign-card locked" aria-label="Novas aventuras em breve">
+      <span class="corner tl" aria-hidden="true">✦</span>
+      <span class="corner tr" aria-hidden="true">✦</span>
+      <span class="corner bl" aria-hidden="true">✦</span>
+      <span class="corner br" aria-hidden="true">✦</span>
       <div class="campaign-icon" aria-hidden="true" data-ico="mapa"></div>
-      <div class="campaign-name">Aventuras</div>
-      <div class="campaign-desc">Maldição de Strahd e futuras campanhas<br>Crônicas de Barovia — O Castelo Ravenloft aguarda</div>
-      <div class="campaign-cta">Escolher Aventura</div>
-    </a>
-
-    <a href="paineis/bestiario.html" class="campaign-card" data-role="todos" aria-label="Abrir bestiário de criaturas">
-      <span class="corner tl" aria-hidden="true">✦</span>
-      <span class="corner tr" aria-hidden="true">✦</span>
-      <span class="corner bl" aria-hidden="true">✦</span>
-      <span class="corner br" aria-hidden="true">✦</span>
-      <div class="campaign-icon" aria-hidden="true" data-ico="bestiario"></div>
-      <div class="campaign-name">Bestiário</div>
-      <div class="campaign-desc">Manual dos Monstros<br>358 criaturas com fichas e imagens</div>
-      <div class="campaign-cta">Abrir Bestiário</div>
-    </a>
-
-    <a href="paineis/itens_magicos.html" class="campaign-card" data-role="todos" aria-label="Abrir itens mágicos">
-      <span class="corner tl" aria-hidden="true">✦</span>
-      <span class="corner tr" aria-hidden="true">✦</span>
-      <span class="corner bl" aria-hidden="true">✦</span>
-      <span class="corner br" aria-hidden="true">✦</span>
-      <div class="campaign-icon" aria-hidden="true" data-ico="itens"></div>
-      <div class="campaign-name">Itens Mágicos</div>
-      <div class="campaign-desc">Guia do Mestre<br>262 itens com raridade e filtros</div>
-      <div class="campaign-cta">Abrir Itens</div>
-    </a>
-
-    <a href="paineis/magias.html" class="campaign-card" data-role="todos" aria-label="Abrir grimório de magias">
-      <span class="corner tl" aria-hidden="true">✦</span>
-      <span class="corner tr" aria-hidden="true">✦</span>
-      <span class="corner bl" aria-hidden="true">✦</span>
-      <span class="corner br" aria-hidden="true">✦</span>
-      <div class="campaign-icon" aria-hidden="true" data-ico="grimorio"></div>
-      <div class="campaign-name">Compêndio de Magias</div>
-      <div class="campaign-desc">D&amp;D 5ª Edição (2014)<br>361 magias com filtros por nível, escola e classe</div>
-      <div class="campaign-cta">Abrir Compêndio</div>
-    </a>
-
-    <a href="paineis/ficha.html" class="campaign-card" data-role="jogador" aria-label="Minha ficha de personagem">
-      <span class="corner tl" aria-hidden="true">✦</span>
-      <span class="corner tr" aria-hidden="true">✦</span>
-      <span class="corner bl" aria-hidden="true">✦</span>
-      <span class="corner br" aria-hidden="true">✦</span>
-      <div class="campaign-icon" aria-hidden="true" data-ico="ficha"></div>
-      <div class="campaign-name">Minha Ficha</div>
-      <div class="campaign-desc">Personagem do jogador<br>HP, atributos, slots, favoritas</div>
-      <div class="campaign-cta">Abrir Ficha</div>
-    </a>
+      <div class="campaign-name">Em Breve</div>
+      <div class="campaign-desc">Novas aventuras chegarão<br>a este painel no futuro</div>
+    </div>
 
   </div>
 
@@ -412,30 +359,16 @@
 </div>
 
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-<script src="assets/js/supabase.js"></script>
-<script src="assets/js/auth.js"></script>
+<script src="../assets/js/supabase.js"></script>
+<script src="../assets/js/auth.js"></script>
 <script>
-  // Gate: força login antes de ver a home + controla visibilidade por role
   (async () => {
-    const u = await window.Auth.requerLogin('paineis/login.html');
+    const u = await window.Auth.requerLogin('login.html');
     if (!u) return;
-    window.Auth.renderHeader('#auth-slot');
-
-    const mestre = await window.Auth.ehMestre();
-    document.querySelectorAll('.campaign-card').forEach(card => {
-      const role = card.dataset.role;
-      if (role === 'todos') {
-        card.classList.add('visible');
-      } else if (role === 'mestre' && mestre) {
-        card.classList.add('visible');
-      } else if (role === 'jogador' && !mestre) {
-        card.classList.add('visible');
-      }
-    });
   })();
 </script>
 
-<script src="assets/js/ambiente.js"></script>
-<script src="assets/js/polish.js"></script>
+<script src="../assets/js/ambiente.js"></script>
+<script src="../assets/js/polish.js"></script>
 </body>
 </html>
