@@ -28,6 +28,7 @@
 //   spellDC         → spell_dc
 //   spellAtk        → spell_atk
 //   concentracao    → concentracao (jsonb: {ativa, magia})
+//   atributos       → atributos (jsonb: {for,dex,con,int,sab,car} — usado p/ calcular recursos de classe)
 //   inspiracao      → inspiracao
 //   exaustao        → exaustao
 //   sucessos        → morte_sucessos
@@ -66,6 +67,7 @@
     spellDC: 'spell_dc',
     spellAtk: 'spell_atk',
     concentracao: 'concentracao',
+    atributos: 'atributos',
     inspiracao: 'inspiracao',
     exaustao: 'exaustao',
     sucessos: 'morte_sucessos',
@@ -121,6 +123,7 @@
       spellDC: row.spell_dc ?? null,
       spellAtk: row.spell_atk ?? null,
       concentracao: row.concentracao || { ativa: false, magia: '' },
+      atributos: row.atributos || { for:10, dex:10, con:10, int:10, sab:10, car:10 },
       inspiracao: typeof row.inspiracao === 'number' ? row.inspiracao : (row.inspiracao ? 1 : 0),
       exaustao: row.exaustao ?? 0,
       sucessos: row.morte_sucessos ?? 0,

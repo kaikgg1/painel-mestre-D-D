@@ -440,6 +440,14 @@
   .recurso-pip { width: 11px; height: 11px; border-radius: 3px; border: 1.5px solid var(--gold-muted); background: transparent; cursor: pointer; padding: 0; }
   .recurso-pip.gasto { background: var(--gold-muted); }
   .recurso-vazio { font-size: 11px; color: var(--text-dim); font-style: italic; }
+  .recurso-pool { display: flex; align-items: center; gap: 5px; }
+  .recurso-pool-btn {
+    width: 18px; height: 18px; border-radius: 3px; border: 1px solid var(--gold-muted);
+    background: transparent; color: var(--gold); cursor: pointer; font-size: 10px; line-height: 1; padding: 0;
+  }
+  .recurso-pool-btn:hover { background: var(--gold-muted); color: var(--bg-deep); }
+  .recurso-pool-val { font-size: 11px; color: var(--text); min-width: 34px; text-align: center; }
+  .recurso-pool-val strong { color: var(--gold); }
 
   /* ===== AÇÕES DO CARD ===== */
   .card-actions { display: flex; justify-content: space-between; align-items: center; gap: 6px; margin-top: 10px; padding-top: 8px; border-top: 1px solid var(--divider); flex-wrap: wrap; }
@@ -568,6 +576,7 @@
 <script src="../assets/js/dbsync.js"></script>
 <script src="../assets/js/phb_slots.js"></script>
 <script src="../assets/js/exaustao_regras.js"></script>
+<script src="../assets/js/recursos_classe.js"></script>
 <script src="../assets/js/master_notes.js"></script>
 <script src="../assets/js/confirmar.js"></script>
 <script src="../assets/js/pericias_mestre.js"></script>
@@ -648,6 +657,7 @@ function criarPersonagem(base = {}) {
     iniciativa_bonus: base.iniciativa_bonus ?? 0,
     deslocamento: base.deslocamento ?? 9,
     percepcaoPassiva: base.percepcaoPassiva ?? 10,
+    atributos: base.atributos || { for:10, dex:10, con:10, int:10, sab:10, car:10 },
     inspiracao: 0,
     exaustao: 0,
     sucessos: 0,
@@ -1363,41 +1373,104 @@ function criarCard(p) {
   painelCombate.className = 'tab-panel ativa';
   painelPorAba.combate = painelCombate;
 
-  // recursos de classe (recursosUsados)
+  // recursos de classe (recursosUsados) — junta o catálogo por classe/nível
+  // (Fúria, Surto de Ação, Pontos de Feitiçaria, Cura pelas Mãos etc., sempre
+  // disponível a partir de classe+nível+atributos) com quaisquer trackers
+  // livres que o jogador tenha criado na aba Habilidades da própria ficha.
   const recSection = document.createElement('div');
   recSection.className = 'section';
   recSection.innerHTML = `<div class="section-title">Recursos de Classe</div>`;
   const recBody = document.createElement('div');
-  const recursos = p.recursosUsados && typeof p.recursosUsados === 'object' ? p.recursosUsados : {};
-  const chavesRec = Object.keys(recursos).filter(k => recursos[k] && typeof recursos[k].max === 'number' && recursos[k].max > 0);
-  if (!chavesRec.length) {
-    recBody.innerHTML = `<span class="recurso-vazio">Nenhum recurso rastreado (sincroniza com a ficha do jogador).</span>`;
-  } else {
-    chavesRec.forEach(k => {
-      const r = recursos[k];
-      const row = document.createElement('div');
-      row.className = 'recurso-row';
-      const nomeSpan = document.createElement('span');
-      nomeSpan.className = 'recurso-nome';
-      nomeSpan.textContent = k.replace(/_/g, ' ');
-      const pips = document.createElement('div');
-      pips.className = 'recurso-pips';
-      for (let i = 0; i < r.max; i++) {
-        const pip = document.createElement('button');
-        pip.type = 'button';
-        pip.className = 'recurso-pip' + (i < (r.atual || 0) ? ' gasto' : '');
-        pip.onclick = () => {
-          const novo = pip.classList.contains('gasto') ? i : i + 1;
-          r.atual = Math.max(0, Math.min(r.max, novo));
-          salvar(p);
-          pips.querySelectorAll('.recurso-pip').forEach((el, idx) => el.classList.toggle('gasto', idx < r.atual));
-        };
-        pips.appendChild(pip);
-      }
-      row.appendChild(nomeSpan);
-      row.appendChild(pips);
-      recBody.appendChild(row);
-    });
+  if (!p.recursosUsados || typeof p.recursosUsados !== 'object') p.recursosUsados = {};
+  const recursos = p.recursosUsados;
+
+  const fazPips = (id, max, atual, onMudar) => {
+    const pips = document.createElement('div');
+    pips.className = 'recurso-pips';
+    for (let i = 0; i < max; i++) {
+      const pip = document.createElement('button');
+      pip.type = 'button';
+      pip.className = 'recurso-pip' + (i < atual ? ' gasto' : '');
+      pip.onclick = () => {
+        const novo = pip.classList.contains('gasto') ? i : i + 1;
+        const val = Math.max(0, Math.min(max, novo));
+        onMudar(val);
+        pips.querySelectorAll('.recurso-pip').forEach((el, idx) => el.classList.toggle('gasto', idx < val));
+      };
+      pips.appendChild(pip);
+    }
+    return pips;
+  };
+  // Pools grandes (ex.: Cura pelas Mãos) viram +/- em vez de uma fileira de pips
+  const fazPool = (max, atual, onMudar) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'recurso-pool';
+    const val = document.createElement('span');
+    val.className = 'recurso-pool-val';
+    const livre = () => Math.max(0, max - atual);
+    const render = () => { val.innerHTML = `<strong>${livre()}</strong>/${max}`; };
+    render();
+    const botao = (texto, passo, label) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'recurso-pool-btn';
+      b.textContent = texto;
+      b.setAttribute('aria-label', label);
+      b.onclick = () => {
+        atual = Math.max(0, Math.min(max, atual + passo));
+        onMudar(atual);
+        render();
+      };
+      return b;
+    };
+    wrap.appendChild(botao('−5', 5, 'Usar 5'));
+    wrap.appendChild(botao('−1', 1, 'Usar 1'));
+    wrap.appendChild(val);
+    wrap.appendChild(botao('+1', -1, 'Recuperar 1'));
+    wrap.appendChild(botao('+5', -5, 'Recuperar 5'));
+    return wrap;
+  };
+  const fazTracker = (id, max, atual, onMudar) => max > 12 ? fazPool(max, atual, onMudar) : fazPips(id, max, atual, onMudar);
+
+  const catalogo = window.RecursosClasse ? window.RecursosClasse.recursosPara(p, p.atributos) : [];
+  const idsCatalogo = new Set(catalogo.map(r => r.id));
+
+  catalogo.forEach(def => {
+    if (!(def.max > 0)) return;
+    const row = document.createElement('div');
+    row.className = 'recurso-row';
+    const nomeSpan = document.createElement('span');
+    nomeSpan.className = 'recurso-nome';
+    nomeSpan.title = def.dica || '';
+    nomeSpan.textContent = def.nome;
+    const atual = window.RecursosClasse.lerUsado(recursos, def.id);
+    row.appendChild(nomeSpan);
+    row.appendChild(fazTracker(def.id, def.max, atual, (val) => {
+      window.RecursosClasse.gravarUsado(recursos, def.id, val);
+      salvar(p);
+    }));
+    recBody.appendChild(row);
+  });
+
+  const chavesLivres = Object.keys(recursos).filter(k =>
+    !idsCatalogo.has(k) && recursos[k] && typeof recursos[k].max === 'number' && recursos[k].max > 0);
+  chavesLivres.forEach(k => {
+    const r = recursos[k];
+    const row = document.createElement('div');
+    row.className = 'recurso-row';
+    const nomeSpan = document.createElement('span');
+    nomeSpan.className = 'recurso-nome';
+    nomeSpan.textContent = k.replace(/_/g, ' ');
+    row.appendChild(nomeSpan);
+    row.appendChild(fazTracker(k, r.max, r.atual || 0, (val) => {
+      r.atual = val;
+      salvar(p);
+    }));
+    recBody.appendChild(row);
+  });
+
+  if (!catalogo.length && !chavesLivres.length) {
+    recBody.innerHTML = `<span class="recurso-vazio">Sem recursos rastreáveis pra essa classe (ou ainda não sincronizado com a ficha do jogador).</span>`;
   }
   recSection.appendChild(recBody);
   painelCombate.appendChild(recSection);
