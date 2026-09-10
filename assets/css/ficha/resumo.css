@@ -22,6 +22,17 @@
 .resumo-secao h3 { margin-top: 0; }
 .resumo-secao.resumo-status { grid-column: 1 / -1; }
 
+/* .rc-grid (sistema.css) pede no mínimo 260px por card — ótimo na aba
+   Habilidades (largura cheia), mas #recursos-classe-wrap é o MESMO id
+   reaproveitado aqui no Resumo, dentro de uma coluna estreita do
+   dashboard (minmax(280px,1fr) menos o padding do card e do painel) —
+   não sobra espaço pra isso, e o grid interno virava mais largo que a
+   própria coluna, vazando por cima da vizinha. Escopado por .resumo-secao
+   (só existe aqui) pra não afetar o layout multi-coluna da aba
+   Habilidades. Empilhado em coluna única nunca fica ruim aqui (é raro ter
+   mais de 1-2 recursos de classe ao mesmo tempo). */
+.resumo-secao #recursos-classe-wrap .rc-grid { grid-template-columns: 1fr; }
+
 /* .stat-row/.stat-card* (CA, Iniciativa, Deslocamento, Inspiração, Magia)
    moraram aqui até a Fase 4, quando Combate passou a usar a mesma peça —
    promovidos pra base.css. Só o que é específico do Resumo fica abaixo. */

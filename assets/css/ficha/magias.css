@@ -160,6 +160,9 @@
    única, concentração/ritual são toggles booleanos. .hab-filtros/.pill
    reaproveitados de habilidades.css/components.css. */
 .magia-filtros { display: flex; flex-direction: column; gap: var(--sp-2); margin-bottom: var(--sp-4); }
+/* mesmo problema do .menu-popover: display:flex sem isto vence o [hidden]
+   do user-agent (o filtro é escondido via JS quando há 0-1 magia). */
+.magia-filtros[hidden] { display: none; }
 .linha-filtro-magia { display: flex; align-items: baseline; gap: var(--sp-3); flex-wrap: wrap; }
 .linha-filtro-lbl {
   font-family: var(--f-titulo); font-size: 10px; letter-spacing: 1px;

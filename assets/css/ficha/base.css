@@ -232,6 +232,10 @@ html, body {
   box-shadow: var(--elev-3);
   display: flex; flex-direction: column; gap: 2px;
 }
+/* .menu-popover define display:flex com a mesma especificidade do [hidden]
+   do user-agent, então sem isto o atributo "hidden" (JS liga/desliga via
+   menuPop.hidden) nunca escondia o menu — ficava sempre aberto. */
+.menu-popover[hidden] { display: none; }
 .menu-item {
   display: flex; align-items: center; gap: var(--sp-2);
   width: 100%; text-align: left; background: transparent; border: none;

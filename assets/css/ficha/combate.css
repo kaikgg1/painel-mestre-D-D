@@ -197,6 +197,9 @@
   padding: var(--sp-2) var(--sp-3) var(--sp-3) 34px;
   background: var(--sf-inset); border-radius: var(--r-sm); margin: 0 0 6px;
 }
+/* mesmo problema do .menu-popover: display:flex sem isto vence o [hidden]
+   do user-agent e o editor de perícia/salvaguarda fica sempre visível. */
+.linha-editor[hidden] { display: none; }
 .editor-check { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-2); cursor: pointer; }
 .editor-bonus { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text-2); }
 .editor-bonus .bonus-input {
