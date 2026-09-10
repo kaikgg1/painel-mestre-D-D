@@ -123,8 +123,8 @@ function renderIdentidade(c, atrs) {
       ${ATRIBUTOS.map(([k, nome]) => `
         <div class="atributo">
           <span class="nome-atr">${nome.slice(0,3).toUpperCase()}</span>
-          <span class="modificador" data-mod="${k}">${fmtMod(mod(atrs[k]))}</span>
           <input type="text" inputmode="numeric" class="valor-base" name="attr_${k}" value="${atrs[k] ?? 10}" data-attr="${k}" data-validar="int" data-min="1" data-max="30" aria-label="${nome} (valor base 1-30)">
+          <span class="modificador" data-mod="${k}">${fmtMod(mod(atrs[k]))}</span>
         </div>
       `).join('')}
     </div>

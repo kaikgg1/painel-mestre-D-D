@@ -35,11 +35,23 @@ const { window } = dom;
 
 // Stubs mínimos: init() sai cedo se não houver usuário logado.
 window.Auth = { requerLogin: async () => null, renderHeader: async () => {}, ehMestre: async () => false };
+// window.__ultimoUpdatePayload grava o payload do update() mais recente —
+// usado pra inspecionar o que salvar() realmente monta e mandaria pro banco
+// (ver o teste "salvar() de verdade" mais abaixo).
+window.__ultimoUpdatePayload = null;
 window.sb = { from: () => ({
   select: () => ({ eq: () => ({ order: async () => ({ data: [], error: null }) }) }),
-  // update().eq() é chamado por salvarCondicoes/salvarRecursos etc. — sem
-  // isso a promise rejeita (unhandled rejection) mesmo sem afetar o teste.
-  update: () => ({ eq: async () => ({ error: null }) }),
+  // update().eq() é chamado por salvarCondicoes/salvarRecursos (fire-and-
+  // forget) e por salvar() (que encadeia .select().single() depois do
+  // .eq() — precisa da cadeia completa, senão o real salvar.js quebraria
+  // aqui ANTES de quebrar em produção).
+  update: (payload) => {
+    window.__ultimoUpdatePayload = payload;
+    return { eq: () => ({
+      error: null, // salvarCondicoes/salvarRecursos só fazem `await ...eq(...)` e leem `.error`
+      select: () => ({ single: async () => ({ data: { ...payload }, error: null }) }),
+    }) };
+  },
 }) };
 window.fetch = async () => { throw new Error('sem rede no smoke test'); };
 // Polyfills de coisas que o jsdom nao implementa (nao sao problema do codigo)
@@ -260,6 +272,127 @@ console.log('');
   console.log(erros.length > antesCondicao || RESUMO_CHECKS.some(([sel]) => !window.document.querySelector(sel))
     ? '  FALHOU     resumo (ver FALHAS abaixo)'
     : '  aba resumo: seções + ciclo completo de condição (adicionar/ver/remover) ok');
+
+  // Direção perigosa da guarda por aba (salvar.js): submeter a partir do
+  // Resumo (sem _aba_combate/slot_1_max no form) precisa OMITIR
+  // salvaguardas/pericias/slots_magia do payload — não mandar valor
+  // nenhum, nem vazio. Se essa guarda quebrasse, o autosave de QUALQUER
+  // campo do Resumo apagaria esses dados no banco (a causa raiz que o
+  // comentário em salvar.js documenta). Este é o teste mais importante
+  // desta fase pra essa guarda continuar de pé.
+  const antesGuarda = erros.length;
+  try {
+    window.__ultimoUpdatePayload = null;
+    window.document.getElementById('ficha-form').dispatchEvent(new window.Event('submit', { cancelable: true }));
+    const p = window.__ultimoUpdatePayload;
+    if (!p) erros.push('salvar(): window.sb.update() não foi chamado a partir do Resumo');
+    else {
+      if ('salvaguardas' in p) erros.push('salvar(): payload do Resumo NÃO deveria ter salvaguardas (guarda de aba furou)');
+      if ('pericias' in p) erros.push('salvar(): payload do Resumo NÃO deveria ter pericias (guarda de aba furou)');
+      if ('slots_magia' in p) erros.push('salvar(): payload do Resumo NÃO deveria ter slots_magia (guarda de aba furou)');
+      if (p.hp_atual !== 42) erros.push('salvar(): hp_atual do Resumo esperado 42, veio ' + p.hp_atual);
+    }
+  } catch (e) { erros.push('salvar() a partir do Resumo → ' + e.message); }
+  console.log(erros.length > antesGuarda
+    ? '  FALHOU     guarda por aba a partir do Resumo (ver FALHAS abaixo)'
+    : '  guarda por aba OK: submit do Resumo NÃO manda salvaguardas/pericias/slots_magia');
+}
+
+// Combate (Fase 4): stat-row/HP completo, salvaguardas/perícias em
+// acordeão (linha compacta ○/●/◆ que abre um editor com os MESMOS campos
+// guardados de sempre), condições reaproveitadas com um wrapId diferente
+// do Resumo, e o <details> de conjuração recolhido por padrão.
+console.log('');
+{
+  const antes = erros.length;
+  const sc = window.document.createElement('script');
+  sc.textContent = 'tabAtiva = "combate"; render();';
+  window.document.head.appendChild(sc);
+
+  const COMBATE_CHECKS = [
+    ['.stat-card.stat-hp #hp-atual-input', 'card de HP completo'],
+    ['.stat-row.combate-topo .stat-card', 'CA/Iniciativa/Deslocamento/Inspiração no stat-row'],
+    ['#combate-condicoes-wrap', 'bloco de condições (mesma função do Resumo, wrapId diferente)'],
+    ['.linha-gatilho[data-toggle-editor="per-percepcao"]', 'linha compacta de perícia'],
+    ['#editor-per-percepcao[hidden]', 'editor de perícia começa recolhido'],
+    ['.detalhes-conjuracao:not([open])', '<details> de conjuração começa recolhido'],
+    ['.detalhes-conjuracao .slot-pip', 'espaços de magia interativos dentro do <details>'],
+  ];
+  for (const [sel, rotulo] of COMBATE_CHECKS) {
+    if (!window.document.querySelector(sel)) erros.push('combate: "' + rotulo + '" (' + sel + ') não encontrado');
+  }
+
+  // Acordeão: clicar no gatilho da Percepção abre o editor e marca aria-expanded.
+  try {
+    const gatilho = window.document.querySelector('[data-toggle-editor="per-percepcao"]');
+    const editor = window.document.getElementById('editor-per-percepcao');
+    gatilho?.click();
+    if (!editor || editor.hidden) erros.push('combate: editor de Percepção não abriu ao clicar no gatilho');
+    if (gatilho?.getAttribute('aria-expanded') !== 'true') erros.push('combate: aria-expanded não virou "true" ao abrir o editor');
+  } catch (e) { erros.push('combate: toggle do acordeão → ' + e.message); }
+
+  // Símbolo ao vivo: desmarcar "Proficiente" de Intuição (o PJ de teste não
+  // tem essa perícia marcada — então MARCAR e ver o símbolo ir de ○ pra ●).
+  try {
+    const cbIntuicao = window.document.querySelector('[data-per="intuicao"]');
+    const simbIntuicao = window.document.querySelector('[data-per-simbolo="intuicao"]');
+    if (!cbIntuicao || !simbIntuicao) erros.push('combate: checkbox/símbolo de Intuição não encontrados');
+    else {
+      const antesSimbolo = simbIntuicao.textContent;
+      cbIntuicao.checked = !cbIntuicao.checked;
+      cbIntuicao.dispatchEvent(new window.Event('change', { bubbles: true }));
+      if (simbIntuicao.textContent === antesSimbolo) erros.push('combate: símbolo de Intuição não mudou ao (des)marcar Proficiente');
+    }
+  } catch (e) { erros.push('combate: símbolo ao vivo → ' + e.message); }
+
+  console.log(erros.length > antes
+    ? '  FALHOU     combate (ver FALHAS abaixo)'
+    : '  aba combate: acordeão de perícia/salvaguarda + condições reaproveitadas + símbolo ao vivo ok');
+
+  // Invariante crítica (Fase 4): campos dentro de [hidden] (editores em
+  // acordeão) e dentro de um <details> FECHADO (bloco de conjuração) ainda
+  // entram no FormData — é disso que depende salvar.js continuar salvando
+  // salvaguardas/perícias/slots mesmo com o editor/details recolhido. Não é
+  // óbvio (muita gente espera o oposto) e um refactor futuro que
+  // adicionasse `disabled` a esses campos quebraria o autosave em silêncio.
+  const antesForm = erros.length;
+  try {
+    const form = window.document.getElementById('ficha-form');
+    const fd = new window.FormData(form);
+    if (!fd.has('salv_for_bonus')) erros.push('combate: campo dentro de editor [hidden] sumiu do FormData (salv_for_bonus)');
+    if (!fd.has('slot_1_max')) erros.push('combate: campo dentro de <details> fechado sumiu do FormData (slot_1_max)');
+  } catch (e) { erros.push('combate: invariante de FormData → ' + e.message); }
+  console.log(erros.length > antesForm
+    ? '  FALHOU     invariante de FormData (ver FALHAS abaixo)'
+    : '  invariante confirmada: [hidden] e <details> fechado continuam no FormData');
+
+  // salvar() de verdade (não só a leitura de FormData acima): dispara um
+  // submit real no form da aba Combate e inspeciona o payload que
+  // window.sb.update() recebeu — confirma que a reforma visual não mudou
+  // o que de fato vai pro banco (as guardas fd.has('_aba_combate')/
+  // fd.has('slot_1_max') de salvar.js continuam vendo os campos certos).
+  const antesSalvar = erros.length;
+  try {
+    window.__ultimoUpdatePayload = null;
+    const ficha = window.document.getElementById('ficha-form');
+    // salvar() é async, mas tudo antes do único await (o próprio update())
+    // roda síncrono — dispatchEvent chama o listener na hora, então o
+    // payload já está capturado quando dispatchEvent() retorna. Sem
+    // top-level await (este arquivo é CommonJS, não módulo ES).
+    ficha.dispatchEvent(new window.Event('submit', { cancelable: true }));
+    const p = window.__ultimoUpdatePayload;
+    if (!p) erros.push('salvar(): window.sb.update() não foi chamado');
+    else {
+      if (!('salvaguardas' in p)) erros.push('salvar(): payload sem salvaguardas (guarda fd.has("_aba_combate") deveria ter deixado passar)');
+      if (!('pericias' in p)) erros.push('salvar(): payload sem pericias');
+      if (!('slots_magia' in p)) erros.push('salvar(): payload sem slots_magia (guarda fd.has("slot_1_max"))');
+      if (p.hp_atual !== 42) erros.push('salvar(): hp_atual esperado 42, veio ' + p.hp_atual);
+      if (p.ca !== 18) erros.push('salvar(): ca esperado 18, veio ' + p.ca);
+    }
+  } catch (e) { erros.push('salvar() de verdade → ' + e.message); }
+  console.log(erros.length > antesSalvar
+    ? '  FALHOU     salvar() real a partir de Combate (ver FALHAS abaixo)'
+    : '  salvar() real: submit da aba Combate grava salvaguardas/pericias/slots_magia no payload');
 }
 
 // Header (Fase 2): avatar+nome+trocador, campanha, autosave, editar/travar,

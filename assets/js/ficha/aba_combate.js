@@ -1,7 +1,14 @@
 // assets/js/ficha/aba_combate.js
-// Aba Combate: HP (barra, dano/cura), CA, iniciativa, deslocamento, dado de
-// vida, exaustão, salvaguardas, perícias, bloco de magia e espaços de magia.
-// Cálculos vêm de nucleo.js (mod/bonusProf), ExaustaoRegras e SlotsPHB.
+// Aba Combate (Fase 4 do redesign): HP (barra, dano/cura, atalhos), CA/
+// Iniciativa/Deslocamento/Inspiração num stat-row compacto, dado de vida,
+// exaustão, condições, salvaguardas e perícias (consulta compacta com
+// editor em acordeão) e um resumo de conjuração com os detalhes completos
+// recolhidos — a lista completa de magias mora na aba Magias.
+//
+// Os campos continuam os MESMOS <input name="..."> de sempre, só reorganizados
+// visualmente: o autosave guardado por aba (salvar.js, fd.has('_aba_combate'))
+// não mudou uma linha. Editores recolhidos usam [hidden], que NÃO tira o
+// campo do FormData — só escondido, ele ainda é lido e salvo normalmente.
 
 function iconeVida(pct) {
   if (pct <= 0)  return ico('caveira', { cor: '#8a8a8a' });
@@ -20,10 +27,15 @@ function renderCombate(c) {
   const pct = hpMax > 0 ? Math.max(0, Math.min(100, Math.round((hpAtual / hpMax) * 100))) : 0;
   const icone = iconeVida(pct);
   const classeBar = pct <= 15 ? 'critico' : pct <= 35 ? 'baixo' : pct <= 65 ? 'medio' : '';
+  const insp = +c.inspiracao || 0;
+  const ativas = Array.isArray(c.condicoes) ? c.condicoes : [];
+
   return `
-    <div class="combate-hero">
-      <div class="hp-wrap">
-        <div class="hp-titulo"><span class="hp-icone" id="hp-icone-atual">${icone}</span> Pontos de Vida</div>
+    <input type="hidden" name="_aba_combate" value="1">
+
+    <div class="stat-row combate-topo">
+      <div class="stat-card stat-hp">
+        <div class="stat-card-label"><span id="hp-icone-atual">${icone}</span> Pontos de Vida</div>
         <div class="hp-numero">
           <input name="hp_atual" type="text" inputmode="numeric" value="${hpAtual}" data-validar="int" id="hp-atual-input" aria-label="PV atual">
           <span class="sep">/</span>
@@ -33,14 +45,12 @@ function renderCombate(c) {
           <div class="hp-fill ${classeBar}" id="hp-fill" style="width:${pct}%"></div>
           <div class="hp-percent" id="hp-percent">${pct}%</div>
         </div>
-        <div class="hp-temp-label" style="margin-top:8px;text-align:center">
-          PV Temporários: <input name="hp_temp" type="text" inputmode="numeric" value="${c.hp_temp ?? 0}" data-validar="int" data-min="0">
+        <div class="hp-temp-label">
+          PV Temp.: <input name="hp_temp" type="text" inputmode="numeric" value="${c.hp_temp ?? 0}" data-validar="int" data-min="0">
         </div>
         <div id="exaustao-hp-aviso"></div>
 
-        <!-- Painel aplicar dano/cura -->
         <div class="hp-aplicar">
-          <div class="hp-aplicar-titulo">Aplicar Dano ou Cura</div>
           <div class="hp-aplicar-linha">
             <button type="button" class="hp-btn dano" data-aplicar="dano" aria-label="Aplicar dano">${ico('dano')} Dano</button>
             <input type="text" inputmode="numeric" id="hp-aplicar-input" value="" placeholder="0" aria-label="Quantidade">
@@ -59,27 +69,24 @@ function renderCombate(c) {
         </div>
       </div>
 
-      <div class="stat-hero">
-        <div class="stat-icone">${ico('escudo')}</div>
-        <div class="stat-titulo">Classe de Armadura</div>
-        <input name="ca" type="text" inputmode="numeric" value="${c.ca ?? 10}" data-validar="int" aria-label="CA">
-      </div>
-
-      <div class="stat-hero">
-        <div class="stat-icone">${ico('iniciativa')}</div>
-        <div class="stat-titulo">Iniciativa</div>
-        <input name="iniciativa_bonus" type="text" inputmode="numeric" value="${c.iniciativa_bonus ?? 0}" data-validar="int" aria-label="Iniciativa (bônus)">
+      <div class="stat-card"><div class="stat-card-label">${ico('escudo')} CA</div>
+        <div class="stat-card-valor"><input name="ca" type="text" inputmode="numeric" value="${c.ca ?? 10}" data-validar="int" aria-label="Classe de Armadura"></div></div>
+      <div class="stat-card"><div class="stat-card-label">${ico('iniciativa')} Iniciativa</div>
+        <div class="stat-card-valor"><input name="iniciativa_bonus" type="text" inputmode="numeric" value="${c.iniciativa_bonus ?? 0}" data-validar="int" aria-label="Iniciativa (bônus)"></div></div>
+      <div class="stat-card"><div class="stat-card-label">${ico('pegadas')} Deslocamento</div>
+        <div class="stat-card-valor"><input name="deslocamento" type="text" inputmode="decimal" value="${c.deslocamento ?? 9}" data-validar="num" data-min="0" aria-label="Deslocamento em metros"></div>
+        <div class="ajuda-mini" id="desloc-efetivo"></div></div>
+      <div class="stat-card stat-insp">
+        <div class="stat-card-label">${ico('inspiracao')} Inspiração</div>
+        <div class="resumo-insp-linha">
+          <button type="button" class="insp-btn" id="insp-menos" aria-label="Diminuir inspiração">−</button>
+          <input type="text" inputmode="numeric" name="inspiracao" id="insp-input" value="${insp}" data-validar="int" data-min="0" class="stat-card-valor resumo-insp-input" aria-label="Inspiração">
+          <button type="button" class="insp-btn" id="insp-mais" aria-label="Aumentar inspiração">+</button>
+        </div>
       </div>
     </div>
 
     <div class="stats-mini">
-      <div class="stat-mini">
-        <span class="ic">${ico('pegadas')}</span>
-        <label>Deslocamento</label>
-        <input name="deslocamento" type="text" inputmode="decimal" value="${c.deslocamento ?? 9}" data-validar="num" data-min="0">
-        <span class="ajuda-mini">metros · aceita decimal</span>
-        <span class="ajuda-mini" id="desloc-efetivo"></span>
-      </div>
       <div class="stat-mini">
         <span class="ic">${ico('dado')}</span>
         <label>Dado de Vida</label>
@@ -104,64 +111,104 @@ function renderCombate(c) {
     </div>
     <div id="exaustao-resumo"></div>
 
-    <input type="hidden" name="_aba_combate" value="1">
-    <h3>Salvaguardas <span style="font-size:11px;color:var(--text-dim);font-weight:normal;font-style:italic">(auto: modificador + ${bonusProf(c.nivel)} se proficiente · campo ± = bônus extra)</span></h3>
-    <div class="check-grid">
+    <h3>Condições</h3>
+    ${renderCondicoesBloco('combate-condicoes-wrap', ativas)}
+
+    <h3>Salvaguardas <span class="legenda-simbolos">○ sem proficiência · ● proficiência</span></h3>
+    <div class="lista-compacta">
       ${ATRIBUTOS.map(([k, nome]) => {
         const prof = salvProf(salv, k);
         const bonus = salvBonus(salv, k);
         const valor = valorSalvaguarda(c, k);
         return `
-          <div class="check-row">
-            <label><input type="checkbox" name="salv_${k}" ${prof ? 'checked' : ''} data-salv="${k}"> ${nome}</label>
-            <span class="bonus-wrap" title="Bônus extra (item, dádiva, situacional)">
-              <span class="bonus-pm">±</span>
-              <input class="bonus-input" type="text" inputmode="numeric" name="salv_${k}_bonus" value="${bonus||0}" data-salv-bonus="${k}" aria-label="Bônus extra de ${nome}">
-            </span>
-            <span class="valor-calc" data-salv-valor="${k}">${fmtMod(valor)}</span>
+          <div class="linha-compacta">
+            <button type="button" class="linha-gatilho" data-toggle-editor="salv-${k}" aria-expanded="false" aria-controls="editor-salv-${k}">
+              <span class="linha-simbolo ${prof ? 'prof' : ''}" data-salv-simbolo="${k}">${prof ? '●' : '○'}</span>
+              <span class="linha-nome">${nome}</span>
+              <span class="linha-attr">${k.toUpperCase()}</span>
+              <span class="linha-valor" data-salv-valor="${k}">${fmtMod(valor)}</span>
+            </button>
+            <div class="linha-editor" id="editor-salv-${k}" hidden>
+              <label class="editor-check"><input type="checkbox" name="salv_${k}" ${prof ? 'checked' : ''} data-salv="${k}"> Proficiente</label>
+              <label class="editor-bonus">Bônus extra
+                <input class="bonus-input" type="text" inputmode="numeric" name="salv_${k}_bonus" value="${bonus||0}" data-salv-bonus="${k}" aria-label="Bônus extra de ${nome}">
+              </label>
+            </div>
           </div>
         `;
       }).join('')}
     </div>
 
-    <h3>Perícias <span style="font-size:11px;color:var(--text-dim);font-weight:normal;font-style:italic">(P = Proficiente · E = Expertise · campo ± = bônus extra)</span></h3>
-    <div class="check-grid">
+    <h3>Perícias <span class="legenda-simbolos">○ sem proficiência · ● proficiência · ◆ expertise</span></h3>
+    <div class="lista-compacta">
       ${PERICIAS.map(([k, nome, atr]) => {
         const p = per[k] || {};
         const bonus = +p.bonus || 0;
         const valor = valorPericia(c, k, atr);
+        const simbolo = p.exp ? '◆' : p.prof ? '●' : '○';
         return `
-          <div class="check-row">
-            <label><input type="checkbox" name="per_${k}_prof" ${p.prof?'checked':''} data-per="${k}" data-atr="${atr}"> ${nome}<span class="atr-tag">${atr.toUpperCase()}</span></label>
-            <span class="exp-marker"><input type="checkbox" name="per_${k}_exp" ${p.exp?'checked':''} ${p.prof?'':'disabled'} data-per-exp="${k}"> E</span>
-            <span class="bonus-wrap" title="Bônus extra (item, dádiva, situacional)">
-              <span class="bonus-pm">±</span>
-              <input class="bonus-input" type="text" inputmode="numeric" name="per_${k}_bonus" value="${bonus||0}" data-per-bonus="${k}" aria-label="Bônus extra de ${nome}">
-            </span>
-            <span class="valor-calc" data-per-valor="${k}">${fmtMod(valor)}</span>
+          <div class="linha-compacta">
+            <button type="button" class="linha-gatilho" data-toggle-editor="per-${k}" aria-expanded="false" aria-controls="editor-per-${k}">
+              <span class="linha-simbolo ${p.exp ? 'exp' : p.prof ? 'prof' : ''}" data-per-simbolo="${k}">${simbolo}</span>
+              <span class="linha-nome">${nome}</span>
+              <span class="linha-attr">${atr.toUpperCase()}</span>
+              <span class="linha-valor" data-per-valor="${k}">${fmtMod(valor)}</span>
+            </button>
+            <div class="linha-editor" id="editor-per-${k}" hidden>
+              <label class="editor-check"><input type="checkbox" name="per_${k}_prof" ${p.prof?'checked':''} data-per="${k}" data-atr="${atr}"> Proficiente</label>
+              <label class="editor-check"><input type="checkbox" name="per_${k}_exp" ${p.exp?'checked':''} ${p.prof?'':'disabled'} data-per-exp="${k}"> Expertise</label>
+              <label class="editor-bonus">Bônus extra
+                <input class="bonus-input" type="text" inputmode="numeric" name="per_${k}_bonus" value="${bonus||0}" data-per-bonus="${k}" aria-label="Bônus extra de ${nome}">
+              </label>
+            </div>
           </div>
         `;
       }).join('')}
     </div>
 
     ${classeUsaMagia(c) ? `
-    <h3>Magia</h3>
-    <div class="grid-3">
-      <div class="campo"><label>Truques Conhecidos</label>
-        <input type="text" inputmode="numeric" name="truques_conhecidos" value="${c.truques_conhecidos ?? 0}" data-validar="int" data-min="0"></div>
-      <div class="campo"><label>Magias Conhecidas</label>
-        <input type="text" inputmode="numeric" name="magias_conhecidas" value="${c.magias_conhecidas ?? 0}" data-validar="int" data-min="0"></div>
-      <div class="campo"><label>CD de Resistência</label>
-        <input type="text" inputmode="numeric" name="cd_resistencia" value="${c.cd_resistencia ?? 8}" data-validar="int" data-min="0">
-        <span class="ajuda">8 + prof + mod do atributo de conjuração</span></div>
-      <div class="campo"><label>Bônus de Ataque de Magia</label>
-        <input type="text" inputmode="numeric" name="bonus_atq_magia" value="${c.bonus_atq_magia ?? 0}" data-validar="int"></div>
+    <h3>Conjuração</h3>
+    <div class="stat-row">
+      <div class="stat-card"><div class="stat-card-label">CD de Resistência</div><div class="stat-card-valor">${c.cd_resistencia ?? 8}</div></div>
+      <div class="stat-card"><div class="stat-card-label">Ataque Mágico</div><div class="stat-card-valor">${fmtMod(c.bonus_atq_magia ?? 0)}</div></div>
     </div>
+    ${renderSlotsResumo(c)}
+    <button type="button" class="btn no-lock" data-resumo-ir="magias">${ico('conjurar')} Ver Magias</button>
 
-    <h3>Espaços de Magia</h3>
-    ${renderSlotsMagia(c, slots)}
+    <details class="detalhes-conjuracao">
+      <summary>Editar CD, bônus e espaços de magia</summary>
+      <div class="grid-3" style="margin-top:14px">
+        <div class="campo"><label>Truques Conhecidos</label>
+          <input type="text" inputmode="numeric" name="truques_conhecidos" value="${c.truques_conhecidos ?? 0}" data-validar="int" data-min="0"></div>
+        <div class="campo"><label>Magias Conhecidas</label>
+          <input type="text" inputmode="numeric" name="magias_conhecidas" value="${c.magias_conhecidas ?? 0}" data-validar="int" data-min="0"></div>
+        <div class="campo"><label>CD de Resistência</label>
+          <input type="text" inputmode="numeric" name="cd_resistencia" value="${c.cd_resistencia ?? 8}" data-validar="int" data-min="0">
+          <span class="ajuda">8 + prof + mod do atributo de conjuração</span></div>
+        <div class="campo"><label>Bônus de Ataque de Magia</label>
+          <input type="text" inputmode="numeric" name="bonus_atq_magia" value="${c.bonus_atq_magia ?? 0}" data-validar="int"></div>
+      </div>
+      <h4 style="margin:16px 0 8px">Espaços de Magia (clique pra gastar/recuperar)</h4>
+      ${renderSlotsMagia(c, slots)}
+    </details>
     ` : ''}
   `;
+}
+
+function conectarListenersCombate() {
+  // Editores em acordeão de salvaguardas/perícias — um clique no gatilho
+  // mostra/esconde o [hidden]. Os campos continuam no form o tempo todo
+  // (escondidos não saem do FormData), então isso não muda nada em salvar().
+  document.querySelectorAll('[data-toggle-editor]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const ed = document.getElementById('editor-' + btn.dataset.toggleEditor);
+      if (!ed) return;
+      ed.hidden = !ed.hidden;
+      btn.setAttribute('aria-expanded', String(!ed.hidden));
+    });
+  });
+
+  conectarListenersCondicoes('combate-condicoes-wrap');
 }
 
 // Aplica os efeitos de exaustão do PHB (2014) nos avisos da aba Combate —
@@ -258,4 +305,3 @@ function renderSlotsMagia(c, slots) {
     }).join('')}
   </div>`;
 }
-

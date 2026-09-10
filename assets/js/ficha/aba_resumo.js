@@ -61,7 +61,7 @@ function renderResumoStatus(c) {
   const insp = +c.inspiracao || 0;
 
   return `
-    <div class="resumo-stats">
+    <div class="stat-row">
       <div class="stat-card stat-hp">
         <div class="stat-card-label"><span id="hp-icone-atual">${iconeVida(pct)}</span> Pontos de Vida</div>
         <div class="stat-hp-numero">
@@ -124,7 +124,7 @@ function renderResumoAtaques(c, atrs) {
 
 function renderResumoMagias(c) {
   return `
-    <div class="resumo-stats">
+    <div class="stat-row">
       <div class="stat-card"><div class="stat-card-label">CD de Resistência</div><div class="stat-card-valor">${c.cd_resistencia ?? 8}</div></div>
       <div class="stat-card"><div class="stat-card-label">Ataque Mágico</div><div class="stat-card-valor">${fmtMod(c.bonus_atq_magia ?? 0)}</div></div>
     </div>
@@ -163,7 +163,7 @@ function renderResumoOutros(c) {
   const salv = c.salvaguardas || {};
 
   return `
-    <div class="resumo-outros-grid">
+    <div class="stat-row resumo-outros-grid">
       <div class="stat-card">
         <div class="stat-card-label">${ico('olho')} Percepção Passiva</div>
         <div class="stat-card-valor">${percepcaoPassiva(c)}</div>
@@ -171,9 +171,7 @@ function renderResumoOutros(c) {
     </div>
 
     <h4 class="resumo-sub">Condições</h4>
-    <div class="resumo-condicoes" id="resumo-condicoes-wrap">
-      ${renderChipsCondicoes(ativas)}
-    </div>
+    ${renderCondicoesBloco('resumo-condicoes-wrap', ativas)}
 
     <h4 class="resumo-sub">Salvaguardas</h4>
     <div class="resumo-salvs">
@@ -192,6 +190,14 @@ function renderResumoOutros(c) {
       <button type="button" class="btn no-lock" data-resumo-ir="habilidades">${ico('brilho')} Habilidades</button>
     </div>
   `;
+}
+
+// Bloco de Condições compartilhado com a aba Combate (Fase 4) — o `wrapId`
+// deixa cada aba usar seu próprio container (nunca renderizados ao mesmo
+// tempo, então IDs iguais não colidiriam de qualquer forma, mas cada aba
+// mantém o nome que já usava por clareza no devtools).
+function renderCondicoesBloco(wrapId, ativas) {
+  return `<div class="resumo-condicoes" id="${wrapId}">${renderChipsCondicoes(ativas)}</div>`;
 }
 
 function renderChipsCondicoes(ativas) {
@@ -243,21 +249,23 @@ function conectarListenersResumo() {
     });
   });
 
-  conectarListenersCondicoes();
+  conectarListenersCondicoes('resumo-condicoes-wrap');
 }
 
 // Isolado de conectarListenersResumo() de propósito: toggle de condição só
-// reconstrói #resumo-condicoes-wrap e rewire SÓ esse pedaço. Se chamasse a
-// função inteira de novo, os botões de Ataques/Atalhos (que continuam no
-// DOM, não foram recriados) ganhariam um listener novo a cada toggle —
+// reconstrói o wrap (por padrão #resumo-condicoes-wrap; a aba Combate passa
+// '#combate-condicoes-wrap' — Fase 4) e rewire SÓ esse pedaço. Se chamasse
+// a função-mãe inteira de novo, os botões de Ataques/Atalhos (que continuam
+// no DOM, não foram recriados) ganhariam um listener novo a cada toggle —
 // clique acumulando toasts/navegações duplicadas.
-function conectarListenersCondicoes() {
-  const wrap = document.getElementById('resumo-condicoes-wrap');
+function conectarListenersCondicoes(wrapId) {
+  wrapId = wrapId || 'resumo-condicoes-wrap';
+  const wrap = document.getElementById(wrapId);
   if (!wrap) return;
 
   const atualizar = () => {
     wrap.innerHTML = renderChipsCondicoes(Array.isArray(charAtivo.condicoes) ? charAtivo.condicoes : []);
-    conectarListenersCondicoes();
+    conectarListenersCondicoes(wrapId);
   };
 
   wrap.querySelectorAll('[data-condicao-ver]').forEach(chip => {

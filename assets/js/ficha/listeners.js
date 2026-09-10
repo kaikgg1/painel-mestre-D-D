@@ -199,7 +199,7 @@ function conectarListeners() {
     atualizarBarraHP();
     // Efeito dinâmico (FX) no bloco de HP + contagem animada do número
     if (window.FX && mudou !== 0) {
-      const alvo = document.querySelector('.hp-wrap') || hpAtual;
+      const alvo = document.querySelector('.stat-card.stat-hp') || hpAtual;
       if (mudou < 0) FX.dano(alvo, mudou); else FX.cura(alvo, mudou);
       if (FX.contarInput) FX.contarInput(hpAtual, atual, novo);
       // Cura total → confete
@@ -256,6 +256,9 @@ function conectarListeners() {
   $$('[data-per-bonus], [data-salv-bonus]').forEach(inp => {
     inp.addEventListener('input', recalcularValoresPericiasSalv);
   });
+
+  // Combate (Fase 4): editores em acordeão de salvaguardas/perícias + condições
+  if (tabAtiva === 'combate') conectarListenersCombate();
 
   // Botões de equipamento
   if (tabAtiva === 'equipamento') conectarListenersEquipamento();
@@ -391,6 +394,9 @@ function recalcularValoresPericiasSalv() {
     const bonus = bonusEl ? (parseInt(bonusEl.value, 10) || 0) : 0;
     const m = mod(atrs[k] ?? 10);
     out.textContent = fmtMod(m + (cb.checked ? bp : 0) + bonus);
+    // Símbolo ○/● da linha compacta (Fase 4, §9) — opcional: só existe em Combate
+    const simb = document.querySelector(`[data-salv-simbolo="${k}"]`);
+    if (simb) { simb.textContent = cb.checked ? '●' : '○'; simb.classList.toggle('prof', cb.checked); }
   });
   // Perícias
   PERICIAS.forEach(([k, , atr]) => {
@@ -402,6 +408,14 @@ function recalcularValoresPericiasSalv() {
     const bonus = bonusEl ? (parseInt(bonusEl.value, 10) || 0) : 0;
     const m = mod(atrs[atr] ?? 10);
     out.textContent = fmtMod(m + (prof.checked ? bp : 0) + (exp?.checked ? bp : 0) + bonus);
+    // Símbolo ○/●/◆ da linha compacta (Fase 4, §9) — opcional: só existe em Combate
+    const simb = document.querySelector(`[data-per-simbolo="${k}"]`);
+    if (simb) {
+      const ehExp = !!exp?.checked;
+      simb.textContent = ehExp ? '◆' : prof.checked ? '●' : '○';
+      simb.classList.toggle('exp', ehExp);
+      simb.classList.toggle('prof', prof.checked && !ehExp);
+    }
   });
 }
 

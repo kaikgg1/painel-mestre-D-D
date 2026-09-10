@@ -22,23 +22,9 @@
 .resumo-secao h3 { margin-top: 0; }
 .resumo-secao.resumo-status { grid-column: 1 / -1; }
 
-/* ── Stat cards (CA, Iniciativa, Deslocamento, Inspiração, Magia) ── */
-.resumo-stats { display: flex; flex-wrap: wrap; gap: var(--sp-3); }
-.stat-card {
-  flex: 1; min-width: 108px;
-  background: var(--sf-inset); border: 1px solid var(--borda);
-  border-radius: var(--r-sm); padding: var(--sp-3);
-  text-align: center;
-}
-.stat-card-label {
-  font-family: var(--f-titulo); font-size: 10px; letter-spacing: 1px;
-  text-transform: uppercase; color: var(--text-dim);
-  display: flex; align-items: center; justify-content: center; gap: 4px;
-}
-.stat-card-valor {
-  font-family: var(--f-num); font-size: 22px; font-weight: 700;
-  color: var(--gold-light); margin-top: var(--sp-1);
-}
+/* .stat-row/.stat-card* (CA, Iniciativa, Deslocamento, Inspiração, Magia)
+   moraram aqui até a Fase 4, quando Combate passou a usar a mesma peça —
+   promovidos pra base.css. Só o que é específico do Resumo fica abaixo. */
 
 /* ── Card de HP (maior, com barra + atalhos) ── */
 .stat-card.stat-hp { flex: 2 1 220px; text-align: left; }

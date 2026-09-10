@@ -435,8 +435,6 @@ iconify-icon {
 }
 
 /* Cores por contexto (o tamanho já vem do font-size de cada container) */
-.hp-icone                        { color: var(--blood-bright); }
-.stat-hero .stat-icone           { color: var(--gold-light); }
 .stat-mini .ic                   { color: var(--gold-bright); }
 .slots-info .ic                  { color: var(--gold-bright); }
 .bloco-icone                     { color: var(--gold-light); }

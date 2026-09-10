@@ -387,32 +387,61 @@ h3:first-of-type { margin-top: 0; }
 .campo.tem-erro .erro-msg { display: block; }
 .campo select option { background: #1c1a14; color: var(--parchment); }
 
-/* ============ ATRIBUTOS ============
-   O VALOR é a informação principal; o modificador é o apoio. */
+/* ============ ATRIBUTOS (Fase 4, §7) ============
+   O VALOR é a informação principal (grande, no meio); o modificador é o
+   apoio (pill pequena embaixo) — inverteu a hierarquia de quando o
+   modificador era o número grande e o valor um campo de formulário comum. */
 .atributo {
   text-align: center;
   background: var(--sf-2); border: 1px solid var(--borda);
   border-radius: var(--r-md); padding: var(--sp-3) var(--sp-2);
-  display: flex; flex-direction: column; gap: var(--sp-2);
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
   transition: border-color .15s, background .15s;
 }
 .atributo:hover { border-color: var(--borda-forte); background: var(--sf-3); }
+.atributo:focus-within { border-color: var(--borda-ouro); }
 .atributo .nome-atr {
   font-family: var(--f-titulo); font-size: var(--fs-label);
   color: var(--text-dim); letter-spacing: 1.4px; text-transform: uppercase;
 }
-.atributo .modificador {
-  font-family: var(--f-num); font-weight: 700;
-  color: var(--gold-light); font-size: 26px; line-height: 1;
-  padding: var(--sp-1) 0;
-}
 .atributo .valor-base {
-  background: var(--sf-inset); border: 1px solid var(--borda);
-  color: var(--parchment); font-family: var(--f-ui);
-  font-size: 16px; font-weight: 600; text-align: center;
-  padding: var(--sp-2) var(--sp-1); border-radius: var(--r-sm); width: 100%;
-  min-height: 38px;
+  background: transparent; border: none;
+  color: var(--parchment); font-family: var(--f-num);
+  font-size: 30px; font-weight: 700; text-align: center;
+  padding: 0; width: 100%; line-height: 1.1;
 }
-.atributo .valor-base:focus { outline: none; border-color: var(--borda-ouro); }
+.atributo .valor-base:focus { outline: none; }
+.atributo .modificador {
+  font-family: var(--f-ui); font-weight: 700;
+  color: var(--gold-light); font-size: 13px; line-height: 1;
+  padding: 2px 10px; border-radius: var(--r-pill);
+  background: var(--sf-ouro); border: 1px solid var(--borda-ouro);
+}
+
+/* ============ STAT ROW (Fase 3/4) ============
+   Linha de "cards pequenos" pra status que cabem num relance — CA,
+   Iniciativa, Deslocamento, Inspiração no Combate; os mesmos + CD/Ataque
+   Mágico/Percepção Passiva no Resumo. Promovido de resumo.css nesta fase
+   porque Combate passou a usar a mesma peça. */
+.stat-row { display: flex; flex-wrap: wrap; gap: var(--sp-3); }
+.stat-card {
+  flex: 1; min-width: 108px;
+  background: var(--sf-inset); border: 1px solid var(--borda);
+  border-radius: var(--r-sm); padding: var(--sp-3);
+  text-align: center;
+}
+.stat-card-label {
+  font-family: var(--f-titulo); font-size: 10px; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--text-dim);
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+}
+.stat-card-valor {
+  font-family: var(--f-num); font-size: 22px; font-weight: 700;
+  color: var(--gold-light); margin-top: var(--sp-1);
+}
+.stat-card-valor input {
+  background: transparent; border: none; color: inherit; font: inherit;
+  width: 100%; text-align: center; outline: none;
+}
 /* .acoes/.status-msg de rodapé de formulário foram removidos: o autosave
    (§17) agora mora no header — ver .status-msg lá em cima, na seção HEADER. */
