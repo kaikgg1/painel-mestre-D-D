@@ -451,7 +451,7 @@ function conectarListenersTags() {
 }
 
 function conectarListenersEquipamento() {
-  // Remover item
+  // Remover item (armas/armaduras/itens — mesmo botão de sempre)
   $$('[data-rm]').forEach(b => b.addEventListener('click', e => {
     const tipo = e.currentTarget.dataset.rm;
     const idx = +e.currentTarget.dataset.idx;
@@ -462,51 +462,83 @@ function conectarListenersEquipamento() {
     render();  // re-renderiza apenas a tab
   }));
 
-  // Adicionar arma do catálogo
-  const btnArma = $('#btn-add-arma');
+  // Rolar ataque rápido de uma arma do inventário (mesma lógica do Resumo)
+  $$('[data-equip-rolar]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = +btn.dataset.equipRolar;
+      const arma = (charAtivo.inventario?.armas || [])[idx];
+      if (!arma || !window.Ataques) return;
+      const r = Ataques.rolar(arma, charAtivo.atributos, charAtivo.nivel);
+      const critico = r.critico ? ' · CRÍTICO!' : r.falhaCritica ? ' · falha crítica' : '';
+      toast(`${arma.nome}: ataque ${r.ataqueTexto}${critico} · dano ${r.danoTexto}`);
+    });
+  });
+
+  // Adicionar arma do catálogo — abre o seletor (busca + categoria) em vez
+  // do <select> nativo gigante (§14).
+  const btnArma = $('#btn-abrir-seletor-arma');
   if (btnArma) btnArma.addEventListener('click', () => {
-    const sel = $('#add-arma');
-    if (!sel.value) return;
-    try {
-      const arma = JSON.parse(sel.value);
-      const inv = charAtivo.inventario || {};
-      inv.armas = inv.armas || [];
-      inv.armas.push(arma);
-      charAtivo.inventario = inv;
-      render();
-    } catch (e) { alert('Erro: ' + e.message); }
+    UI.abrirSeletor({
+      titulo: 'Adicionar arma',
+      placeholder: 'Buscar arma…',
+      itens: window.PHB.ARMAS,
+      agrupar: a => a.categoria,
+      rotulo: a => a.nome,
+      sublabel: a => `${a.dano} ${a.tipo_dano}`,
+      recentesChave: 'ficha_recentes_armas',
+      onEscolher: (arma) => {
+        const inv = charAtivo.inventario || {};
+        inv.armas = inv.armas || [];
+        inv.armas.push(arma);
+        charAtivo.inventario = inv;
+        render();
+      },
+    });
   });
 
   // Adicionar armadura
-  const btnArm = $('#btn-add-armadura');
+  const btnArm = $('#btn-abrir-seletor-armadura');
   if (btnArm) btnArm.addEventListener('click', () => {
-    const sel = $('#add-armadura');
-    if (!sel.value) return;
-    try {
-      const arm = JSON.parse(sel.value);
-      const inv = charAtivo.inventario || {};
-      inv.armaduras = inv.armaduras || [];
-      inv.armaduras.push(arm);
-      charAtivo.inventario = inv;
-      render();
-    } catch (e) { alert('Erro: ' + e.message); }
+    UI.abrirSeletor({
+      titulo: 'Adicionar armadura',
+      placeholder: 'Buscar armadura…',
+      itens: window.PHB.ARMADURAS,
+      agrupar: a => a.tipo,
+      ordemGrupos: ['Leve', 'Média', 'Pesada', 'Escudo'],
+      rotulo: a => a.nome,
+      sublabel: a => `CA ${a.ca}`,
+      recentesChave: 'ficha_recentes_armaduras',
+      onEscolher: (armadura) => {
+        const inv = charAtivo.inventario || {};
+        inv.armaduras = inv.armaduras || [];
+        inv.armaduras.push(armadura);
+        charAtivo.inventario = inv;
+        render();
+      },
+    });
   });
 
-  // Adicionar item do catálogo
-  const btnItemCat = $('#btn-add-item-cat');
+  // Adicionar item do catálogo (armas/ferramentas juntas na mesma busca)
+  const btnItemCat = $('#btn-abrir-seletor-item');
   if (btnItemCat) btnItemCat.addEventListener('click', () => {
-    const sel = $('#add-item-catalogo');
-    const qtd = +($('#add-item-qtd').value || 1);
-    if (!sel.value) return;
-    try {
-      const it = JSON.parse(sel.value);
-      it.qtd = qtd;
-      const inv = charAtivo.inventario || {};
-      inv.itens = inv.itens || [];
-      inv.itens.push(it);
-      charAtivo.inventario = inv;
-      render();
-    } catch (e) { alert('Erro: ' + e.message); }
+    const catalogo = [...window.PHB.ITENS, ...window.PHB.FERRAMENTAS];
+    UI.abrirSeletor({
+      titulo: 'Adicionar item',
+      placeholder: 'Buscar item…',
+      itens: catalogo,
+      agrupar: it => it.categoria,
+      rotulo: it => it.nome,
+      recentesChave: 'ficha_recentes_itens',
+      onEscolher: (item) => {
+        const qtd = +($('#add-item-qtd')?.value || 1);
+        const it = { ...item, qtd };
+        const inv = charAtivo.inventario || {};
+        inv.itens = inv.itens || [];
+        inv.itens.push(it);
+        charAtivo.inventario = inv;
+        render();
+      },
+    });
   });
 
   // Item personalizado

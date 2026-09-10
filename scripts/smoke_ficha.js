@@ -30,7 +30,10 @@ const corpo = html
   .replace(/<script[\s\S]*?<\/script>/g, '')
   .replace(/<link[^>]*>/g, '');
 
-const dom = new JSDOM(corpo, { runScripts: 'dangerously', pretendToBeVisual: true });
+// url: sem isso o jsdom usa about:blank (origem opaca) e window.localStorage
+// lança SecurityError — precisamos dele de verdade pro teste de "recentes"
+// do seletor (Fase 7).
+const dom = new JSDOM(corpo, { runScripts: 'dangerously', pretendToBeVisual: true, url: 'http://localhost/paineis/ficha.html' });
 const { window } = dom;
 
 // Stubs mínimos: init() sai cedo se não houver usuário logado.
@@ -100,14 +103,17 @@ for (const m of ['icones.js','phb_catalogo.js','phb_slots.js','exaustao_regras.j
 }
 
 const ordem = [
-  'nucleo.js','render.js','header.js','nav_mobile.js','aba_resumo.js',
+  'nucleo.js','render.js','header.js','nav_mobile.js','seletor.js','aba_resumo.js',
   'aba_combate.js','recursos.js','aba_habilidades.js','aba_magias.js',
   'aba_equipamento.js','aba_aliados.js','aba_roleplay.js','lock.js',
   'listeners.js','salvar.js',
 ];
 
 const erros = [];
-window.addEventListener('error', e => erros.push(e.message || String(e.error)));
+window.addEventListener('error', e => {
+  const linha = e.error && e.error.stack ? e.error.stack.split('\n').slice(0, 4).join(' | ') : (e.message || String(e.error));
+  erros.push(linha);
+});
 const vc = dom.virtualConsole || null;
 
 // A partir daqui tudo roda dentro de uma IIFE async: a Fase 5 precisa
@@ -152,6 +158,7 @@ const esperadas = [
 const apiObjetos = [
   ['Ataques', ['calcular', 'rolar', 'ehDistancia', 'temAcuidade']],
   ['CondicoesRegras', ['descricao']],
+  ['UI', ['abrirSeletor']],
 ];
 for (const [nomeObj, metodos] of apiObjetos) {
   const obj = window[nomeObj];
@@ -645,6 +652,95 @@ console.log('');
   console.log(erros.length > antes
     ? '  FALHOU     magias (ver FALHAS abaixo)'
     : '  aba magias: filtros (nível/tipo/ritual/busca) + espaços interativos + Conjurar de verdade ok');
+}
+
+// Equipamento (Fase 7): UI.abrirSeletor() no lugar do <select> nativo —
+// abre, busca "Espada Longa" de verdade em window.PHB.ARMAS, escolhe,
+// confere o card de arma (bônus calculado por Ataques.calcular, igual ao
+// Resumo), rola o ataque, remove e confere "recentes" no localStorage.
+console.log('');
+{
+  const antes = erros.length;
+  const sc = window.document.createElement('script');
+  sc.textContent = 'charAtivo.inventario = {moedas:{},armas:[],armaduras:[],itens:[]}; tabAtiva = "equipamento"; render();';
+  window.document.head.appendChild(sc);
+
+  const EQUIP_CHECKS = [
+    ['#btn-abrir-seletor-arma', 'botão de adicionar arma'],
+    ['#btn-abrir-seletor-armadura', 'botão de adicionar armadura'],
+    ['#btn-abrir-seletor-item', 'botão de adicionar item'],
+    ['#add-item-nome', 'campo de item personalizado (preservado)'],
+  ];
+  for (const [sel, rotulo] of EQUIP_CHECKS) {
+    if (!window.document.querySelector(sel)) erros.push('equipamento: "' + rotulo + '" (' + sel + ') não encontrado');
+  }
+
+  try {
+    window.document.getElementById('btn-abrir-seletor-arma')?.click();
+    await new Promise(r => setTimeout(r, 20)); // requestAnimationFrame do abrirSeletor
+
+    const overlay = window.document.querySelector('.seletor-overlay');
+    if (!overlay) erros.push('equipamento: UI.abrirSeletor() não abriu o overlay');
+    else {
+      const busca = overlay.querySelector('.seletor-busca');
+      busca.value = 'espada longa';
+      busca.dispatchEvent(new window.Event('input', { bubbles: true }));
+      const item = Array.from(overlay.querySelectorAll('.seletor-item'))
+        .find(b => /espada longa/i.test(b.textContent));
+      if (!item) erros.push('equipamento: busca "espada longa" no seletor não achou nada');
+      else {
+        item.click();
+        if (window.document.querySelector('.seletor-overlay.open')) erros.push('equipamento: seletor não fechou ao escolher um item');
+
+        const armas = window.eval('charAtivo.inventario.armas') || [];
+        if (armas.length !== 1 || armas[0].nome !== 'Espada Longa') erros.push('equipamento: escolher no seletor não adicionou "Espada Longa" ao inventário');
+
+        const card = window.document.querySelector('.ataque-card');
+        if (!card) erros.push('equipamento: card de arma não renderizou após adicionar');
+        else {
+          // FOR 8 (mod -1) + bonusProf(9)=4 = +3 — mesma fórmula do Resumo (Fase 3)
+          if (!/\+3/.test(card.querySelector('.ataque-info')?.textContent || '')) {
+            erros.push('equipamento: bônus de ataque da Espada Longa esperado +3, card mostra "' + (card.querySelector('.ataque-info')?.textContent || '') + '"');
+          }
+          const rolarBtn = card.querySelector('[data-equip-rolar]');
+          rolarBtn?.click();
+          if (!/Espada Longa/.test(window.document.getElementById('toast-auto')?.textContent || '')) {
+            erros.push('equipamento: rolar ataque (🎲) não mostrou toast com o nome da arma');
+          }
+          card.querySelector('[data-rm="armas"]')?.click();
+          const armasDepois = window.eval('charAtivo.inventario.armas') || [];
+          if (armasDepois.length) erros.push('equipamento: remover arma não esvaziou o inventário');
+        }
+
+        // "Recentes" (localStorage) — grava o nome pra próxima vez que abrir o seletor
+        let recentes = [];
+        try { recentes = JSON.parse(window.localStorage.getItem('ficha_recentes_armas') || '[]'); } catch {}
+        if (!recentes.includes('Espada Longa')) erros.push('equipamento: "Espada Longa" não foi gravada em localStorage como recente');
+      }
+    }
+  } catch (e) { erros.push('equipamento: fluxo do seletor de armas → ' + e.message); }
+
+  // Mesmo mecanismo pras outras duas listas — só confere que abrem e
+  // adicionam (a lógica de busca/categoria já foi testada a fundo acima).
+  // Escopado ao ÚLTIMO .seletor-overlay (document.querySelectorAll(...).pop()):
+  // o overlay anterior pode ainda estar no DOM terminando sua animação de
+  // saída (fechar() só remove de verdade depois de 200ms).
+  const ultimoOverlay = () => { const all = window.document.querySelectorAll('.seletor-overlay'); return all[all.length - 1]; };
+  try {
+    window.document.getElementById('btn-abrir-seletor-armadura')?.click();
+    await new Promise(r => setTimeout(r, 20));
+    ultimoOverlay()?.querySelector('.seletor-item')?.click();
+    if (!(window.eval('charAtivo.inventario.armaduras') || []).length) erros.push('equipamento: seletor de armadura não adicionou nada');
+
+    window.document.getElementById('btn-abrir-seletor-item')?.click();
+    await new Promise(r => setTimeout(r, 20));
+    ultimoOverlay()?.querySelector('.seletor-item')?.click();
+    if (!(window.eval('charAtivo.inventario.itens') || []).length) erros.push('equipamento: seletor de item (ITENS+FERRAMENTAS) não adicionou nada');
+  } catch (e) { erros.push('equipamento: seletor de armadura/item → ' + e.message); }
+
+  console.log(erros.length > antes
+    ? '  FALHOU     equipamento (ver FALHAS abaixo)'
+    : '  aba equipamento: seletor (busca real em PHB.ARMAS) + card de arma com bônus + rolar + remover + recentes ok');
 }
 
 // Header (Fase 2): avatar+nome+trocador, campanha, autosave, editar/travar,
