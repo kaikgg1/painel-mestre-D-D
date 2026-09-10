@@ -1,44 +1,13 @@
 // assets/js/ficha/listeners.js
-// conectarListeners(): religa TUDO após cada render() — troca de personagem,
-// abas, HP ao vivo, pips de slot, inspiração, retrato, validação inline e o
-// auto-save (debounce de 800ms em input/change do #ficha-form).
+// conectarListeners(): religa TUDO após cada render() — abas, HP ao vivo,
+// pips de slot, inspiração, retrato, validação inline e o auto-save (debounce
+// de 800ms em input/change do #ficha-form).
+//
+// A troca de personagem, Novo/Duplicar/Ativo/Excluir e o toggle Editar/Travar
+// agora vivem no header (assets/js/ficha/header.js, conectarListenersHeader())
+// — render() já chama renderHeader(c) antes de reconstruir #conteudo.
 
 function conectarListeners() {
-  // Trocar personagem
-  const sel = $('#sel-char');
-  if (sel) sel.addEventListener('change', e => {
-    // Salva edições pendentes do PJ atual antes de trocar
-    const form = document.getElementById('ficha-form');
-    if (form) form.dispatchEvent(new Event('submit', { cancelable: true }));
-    charAtivo = chars.find(x => x.id === e.target.value) || chars[0];
-    render();
-  });
-  // Novo
-  const novoBtn = $('#btn-novo');
-  if (novoBtn) novoBtn.addEventListener('click', async () => {
-    const nome = prompt('Nome do novo personagem:');
-    if (nome) await criarPersonagem(nome);
-  });
-  // Deletar
-  const delBtn = $('#btn-deletar');
-  if (delBtn) delBtn.addEventListener('click', () => deletarPersonagem(charAtivo.id));
-  // Estrela ativo
-  const ativoBtn = $('#btn-ativo');
-  if (ativoBtn) ativoBtn.addEventListener('click', alternarAtivo);
-
-  // Lock toggle (modo edição global)
-  const lockBtn = $('#btn-lock-toggle');
-  if (lockBtn) {
-    aplicarEstadoLock();  // garante visual correto após render
-    lockBtn.addEventListener('click', () => {
-      const ativo = !document.body.classList.contains('modo-unlock');
-      document.body.classList.toggle('modo-unlock', ativo);
-      try { localStorage.setItem('ficha_unlock', ativo ? '1' : '0'); } catch {}
-      atualizarLockLabel();
-      aplicarTabIndexLock();
-    });
-  }
-
   // Tabs
   $$('.tab').forEach(t => t.addEventListener('click', () => {
     // Flush qualquer edição pendente antes de re-renderizar (textarea da aba

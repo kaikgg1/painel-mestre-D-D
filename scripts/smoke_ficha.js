@@ -51,9 +51,9 @@ for (const m of ['icones.js','phb_catalogo.js','phb_slots.js','exaustao_regras.j
 }
 
 const ordem = [
-  'nucleo.js','render.js','aba_combate.js','recursos.js','aba_habilidades.js',
-  'aba_magias.js','aba_equipamento.js','aba_aliados.js','aba_roleplay.js',
-  'lock.js','listeners.js','salvar.js',
+  'nucleo.js','render.js','header.js','nav_mobile.js','aba_combate.js',
+  'recursos.js','aba_habilidades.js','aba_magias.js','aba_equipamento.js',
+  'aba_aliados.js','aba_roleplay.js','lock.js','listeners.js','salvar.js',
 ];
 
 const erros = [];
@@ -84,6 +84,9 @@ const esperadas = [
   'aplicarEstadoLock','aplicarTabIndexLock','atualizarExaustaoUI',
   'recalcularValoresPericiasSalv','validarCampo','detectarUsosLimitados',
   'slugFeature','dadoVidaDaClasse','chaveDeClasse','classeUsaMagia','init','toast',
+  'renderHeader','conectarListenersHeader','avatarIniciais','corAvatar',
+  'duplicarPersonagem','deletarPersonagem','alternarAtivo','definirStatusAutosave',
+  'renderBottomNav','abrirSheetMais',
 ];
 const faltando = esperadas.filter(n => typeof window[n] !== 'function');
 if (faltando.length) erros.push('funções globais ausentes: ' + faltando.join(', '));
@@ -143,8 +146,11 @@ const PJ = {
   tracos_pessoais: 'Idolatro um herói.', ideais: 'Fé.', vinculos: 'Meu templo.',
   defeitos: 'Teimosa.', historia: 'História…', notas: 'Notas…', imagem_url: '',
 };
+// Segundo personagem só pra exercitar o ramo "há mais de 1 PJ" do trocador
+// no header (renderHeader só desenha o <select> nesse caso).
 const setup = window.document.createElement('script');
-setup.textContent = 'usuario = { id: "u" }; charAtivo = ' + JSON.stringify(PJ) + '; chars = [charAtivo];';
+setup.textContent = 'usuario = { id: "u" }; charAtivo = ' + JSON.stringify(PJ) +
+  '; chars = [charAtivo, {...charAtivo, id: "y", nome: "Segundo PJ"}];';
 window.document.head.appendChild(setup);
 
 const abas = ['identidade','combate','habilidades','magias','equipamento','aliados','roleplay'];
@@ -163,6 +169,28 @@ for (const aba of abas) {
     ? '  FALHOU     aba ' + aba
     : '  renderizou aba ' + aba + ' (' + tamanho + ' chars de HTML)');
 }
+
+// Header (Fase 2): avatar+nome+trocador, campanha, autosave, editar/travar,
+// menu ⋯, e a navegação inferior mobile — tudo populado pelo último render().
+console.log('');
+const HEADER_CHECKS = [
+  ['#hdr-id .hdr-nome', 'nome no header'],
+  ['#hdr-id .hdr-trocar-select', 'trocador de personagem (2+ PJs)'],
+  ['#hdr-id .hdr-subtitulo', 'subtítulo classe/nível'],
+  ['#hdr-meta .hdr-campanha', 'pill de campanha'],
+  ['#hdr-meta .status-msg', 'badge de autosave'],
+  ['#hdr-meta #btn-lock-toggle', 'botão editar/travar'],
+  ['#hdr-meta #btn-menu-toggle', 'botão do menu ⋯'],
+  ['#hdr-meta #menu-popover .menu-item', 'itens do menu ⋯'],
+  ['#bottom-nav .bn-item', 'itens da navegação inferior mobile'],
+];
+for (const [sel, rotulo] of HEADER_CHECKS) {
+  const achou = window.document.querySelector(sel);
+  if (!achou) erros.push('header: "' + rotulo + '" (' + sel + ') não encontrado após render()');
+}
+console.log(erros.some(e => e.startsWith('header:'))
+  ? '  FALHOU     header/nav (ver FALHAS abaixo)'
+  : '  header + nav inferior populados (' + HEADER_CHECKS.length + ' elementos conferidos)');
 
 console.log('');
 if (erros.length) { console.log('FALHAS:'); erros.forEach(e => console.log('  ✗ ' + e)); process.exit(1); }

@@ -8,48 +8,12 @@ function render() {
   const c = charAtivo;
   const atrs = c.atributos || {for:10,dex:10,con:10,int:10,sab:10,car:10};
 
-  const titulo = `${c.nome || 'Sem nome'}${c.classe ? ' · ' + c.classe : ''}${c.nivel ? ' (Nv ' + c.nivel + ')' : ''}`;
-  $('#hdr-titulo').textContent = titulo;
-
-  // Aviso de visibilidade pro Mestre
-  const temCampanha = !!c.campanha;
-  const ehAtivo    = !!c.is_active;
-  let aviso = '';
-  if (temCampanha && ehAtivo) {
-    aviso = `<div class="aviso-visibilidade ok">
-      <span class="icone" aria-hidden="true">✓</span>
-      <span>Esta ficha aparece no painel do Mestre — campanha: <strong>${escape(CAMPANHAS.find(([k]) => k === c.campanha)?.[1] || c.campanha)}</strong></span>
-    </div>`;
-  } else {
-    const problemas = [];
-    if (!temCampanha) problemas.push('vincule a uma <strong>Campanha</strong> (aba Identidade)');
-    if (!ehAtivo)     problemas.push('marque como <strong>★ Ativo</strong> (botão no topo)');
-    aviso = `<div class="aviso-visibilidade">
-      <span class="icone">${ico('aviso')}</span>
-      <span>Esta ficha <strong>não aparece pro Mestre</strong>. Para mostrar: ${problemas.join(' e ')}.</span>
-    </div>`;
-  }
+  // Header (avatar, nome, trocador, campanha, autosave, editar/travar, menu ⋯)
+  // vive em assets/js/ficha/header.js — os slots #hdr-id/#hdr-meta são
+  // estáticos em paineis/ficha.html, fora de #conteudo.
+  renderHeader(c);
 
   $('#conteudo').innerHTML = `
-    ${aviso}
-    <div class="char-bar">
-      <span class="pj-label">Personagem</span>
-      <select id="sel-char" aria-label="Selecionar personagem">
-        ${chars.map(x => `<option value="${x.id}" ${x.id===c.id?'selected':''}>${escape(x.nome)}${x.classe ? ' — ' + escape(x.classe) : ''}${x.nivel ? ' N' + x.nivel : ''}${x.is_active?' ★':''}</option>`).join('')}
-      </select>
-      <div class="char-bar-acoes">
-        <button class="btn-lock-toggle no-lock" type="button" id="btn-lock-toggle" aria-pressed="false" aria-label="Alternar modo edição">
-          <span id="lock-toggle-label">${ico('cadeado')} Editar</span>
-        </button>
-        <button class="estrela-ativo ${c.is_active?'ativo':''} no-lock" id="btn-ativo" type="button" aria-pressed="${!!c.is_active}" title="Marcar como personagem ativo (visível ao Mestre)">
-          <span aria-hidden="true">${c.is_active?'★':'☆'}</span>
-          <span class="lbl">${c.is_active?'Ativo':'Ativar'}</span>
-        </button>
-        <button class="btn no-lock" type="button" id="btn-novo">+ Novo</button>
-        <button class="btn danger no-lock" type="button" id="btn-deletar">Deletar</button>
-      </div>
-    </div>
-
     <div class="lock-banner" aria-live="polite">${ico('cadeado')} Ficha bloqueada para evitar edições acidentais — clique em <strong>Editar</strong> para desbloquear.</div>
 
     <div class="tabs-wrap" id="tabs-wrap">
@@ -66,14 +30,11 @@ function render() {
 
     <form class="tab-content" id="ficha-form" novalidate>
       ${renderTab(c, atrs)}
-      <div class="acoes">
-        <span class="status-msg" id="status" aria-live="polite">${ico('salvar')} Auto-save ativo · suas alterações salvam sozinhas</span>
-        <!-- Botão "Salvar agora" removido: auto-save cuida de tudo. O submit ainda é disparado programaticamente. -->
-      </div>
     </form>
   `;
 
   conectarListeners();
+  renderBottomNav();
 }
 
 function renderSubclasseSelect(classe, atual) {

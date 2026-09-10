@@ -305,7 +305,16 @@ async function criarPersonagem(nome, jaAtivo = false) {
 }
 
 async function deletarPersonagem(id) {
-  if (!confirm('Deletar este personagem? Suas favoritas e dados serão perdidos.')) return;
+  // Confirmar.perguntar() no lugar do confirm() nativo (assets/js/confirmar.js) —
+  // mesmo modal usado no painel do Mestre, coerente com o resto do redesign.
+  const cf = window.Confirmar
+    ? await Confirmar.perguntar({
+        titulo: 'Excluir personagem?',
+        mensagem: 'Suas favoritas e todos os dados desta ficha serão perdidos. Esta ação não pode ser desfeita.',
+        confirmar: 'Excluir', danger: true,
+      })
+    : confirm('Deletar este personagem? Suas favoritas e dados serão perdidos.');
+  if (!cf) return;
   const { error } = await window.sb.from('characters').delete().eq('id', id);
   if (error) { alert('Erro ao deletar: ' + error.message); return; }
   chars = chars.filter(c => c.id !== id);
@@ -321,6 +330,26 @@ async function deletarPersonagem(id) {
     return;
   }
   render();
+}
+
+// Clona a ficha ativa inteira (identidade, combate, magias, habilidades,
+// inventário, aliados…) num personagem novo, inativo. Útil pra testar uma
+// variação (respec, "e se") sem mexer no original.
+async function duplicarPersonagem() {
+  if (!charAtivo) return;
+  const payload = {
+    ...charAtivo,
+    user_id: usuario.id,
+    nome: (charAtivo.nome || 'Personagem') + ' (cópia)',
+    is_active: false,
+  };
+  delete payload.id; delete payload.created_at; delete payload.updated_at; delete payload.updated_by;
+  const { data, error } = await window.sb.from('characters').insert(payload).select('*').single();
+  if (error) { alert('Erro ao duplicar personagem: ' + error.message); return; }
+  chars.push(data);
+  charAtivo = data;
+  render();
+  toast('Personagem duplicado', 'salvar');
 }
 
 async function alternarAtivo() {

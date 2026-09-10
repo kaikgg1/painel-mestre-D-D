@@ -236,34 +236,10 @@
   .magia-row { grid-template-columns: 50px 1fr; row-gap: 4px; }
   .magia-escola, .magia-tags { grid-column: 2; }
 }
-@media (max-width: 600px) {
-  /* Char-bar reorganizada em mobile: select 100%, depois botões em grid */
-  .char-bar {
-    display: grid;
-    grid-template-areas: "label" "select" "acoes";
-    gap: 8px; padding: 12px;
-  }
-  .char-bar .pj-label { grid-area: label; text-align: center; }
-  .char-bar select { grid-area: select; min-width: 0; }
-  .char-bar #btn-ativo, .char-bar #btn-novo, .char-bar #btn-deletar {
-    /* todos vão pra área acoes via wrapper */
-  }
-  .char-bar-acoes {
-    grid-area: acoes;
-    display: grid; grid-template-columns: 1fr auto auto; gap: 6px;
-  }
-  /* Aviso visibilidade mais compacto */
-  .aviso-visibilidade { padding: 8px 12px; font-size: 12px; line-height: 1.4; gap: 8px; margin-bottom: 12px; }
-  .aviso-visibilidade .icone { font-size: 16px; }
-}
-
 @media (max-width: 480px) {
   /* margem lateral de main vem de base.css (§20: 16px em mobile) — não repetir aqui */
   .tab-content { padding: 14px 12px; }
-  .char-bar { padding: 10px; gap: 8px; }
-  .char-bar select { font-size: 14px; min-height: 40px; }
   .btn { min-height: 40px; padding: 10px 12px; }
-  .estrela-ativo { min-height: 44px; min-width: 60px; }
   .grid-6 { grid-template-columns: repeat(2, 1fr); }
   .atributo { padding: 14px 8px; }
   .atributo .modificador { font-size: 24px; }

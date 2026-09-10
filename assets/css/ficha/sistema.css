@@ -412,8 +412,9 @@ body:not(.modo-unlock) .tab-content [onclick] {
   .hab-pip { margin: 11px; }
   .slot-pip { margin: 11px; }
   /* Botões de ação geral (Salvar, Editar, +Novo, Deletar) */
-  .btn, .btn-lock-toggle, .estrela-ativo {
+  .btn, .btn-lock-toggle, .btn-icon {
     min-height: 44px !important;
+    min-width: 44px !important;
     padding: 10px 14px !important;
   }
   /* Estrela de favoritar magia */
@@ -434,8 +435,6 @@ iconify-icon {
 }
 
 /* Cores por contexto (o tamanho já vem do font-size de cada container) */
-.aviso-visibilidade .icone       { color: var(--erro); }
-.aviso-visibilidade.ok .icone    { color: var(--ok); }
 .hp-icone                        { color: var(--blood-bright); }
 .stat-hero .stat-icone           { color: var(--gold-light); }
 .stat-mini .ic                   { color: var(--gold-bright); }
@@ -483,7 +482,6 @@ iconify-icon {
    nativo no mobile de graça); aqui só harmonizamos a moldura
    com os demais campos da ficha.
    ============================================================ */
-.char-bar select,
 .campo select,
 .stat-mini select,
 .aliados-add select {
@@ -494,13 +492,11 @@ iconify-icon {
   letter-spacing: 0.3px;
   box-shadow: inset 0 1px 2px rgba(0,0,0,0.45);
 }
-.char-bar select:hover,
 .campo select:hover,
 .stat-mini select:hover,
 .aliados-add select:hover {
   background-color: rgba(196,154,58,0.12);
 }
-.char-bar select:focus-visible,
 .campo select:focus-visible,
 .stat-mini select:focus-visible,
 .aliados-add select:focus-visible {

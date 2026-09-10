@@ -5,6 +5,19 @@
 // cópia local desatualizada — sem elas, um auto-save de qualquer aba desfaz
 // mudanças que o Mestre fez nesse meio-tempo. Último script: termina em init().
 
+// Estados do badge de autosave no header (§17): ✓ Salvo / ••• Salvando /
+// ⚠ Erro ao salvar (+ botão Tentar novamente). Um só lugar pra montar
+// className+innerHTML+visibilidade do retry evita repetir os três em cada
+// ramo (validação, sucesso, erro de rede).
+function definirStatusAutosave(estado, msg) {
+  const status = document.getElementById('status');
+  const retry = document.getElementById('status-retry');
+  if (!status) return;
+  status.className = 'status-msg ' + estado;
+  status.innerHTML = msg;
+  if (retry) retry.hidden = estado !== 'erro';
+}
+
 async function salvar(e) {
   e.preventDefault();
   const btn = $('#btn-salvar');
@@ -14,14 +27,13 @@ async function salvar(e) {
   const invalidos = [];
   $$('[data-validar]').forEach(inp => { if (!validarCampo(inp)) invalidos.push(inp); });
   if (invalidos.length) {
-    status.className = 'status-msg erro';
-    status.textContent = `❌ ${invalidos.length} campo(s) com erro — corrija antes de salvar`;
+    definirStatusAutosave('erro', `⚠ ${invalidos.length} campo(s) com erro — corrija antes de salvar`);
     invalidos[0].focus();
     return;
   }
 
   if (btn) btn.disabled = true;
-  status.className = 'status-msg'; status.textContent = 'Salvando…';
+  definirStatusAutosave('salvando', '<span class="dots"><span>•</span><span>•</span><span>•</span></span> <span class="txt">Salvando</span>');
 
   const f = e.target;
   const fd = new FormData(f);
@@ -197,18 +209,19 @@ async function salvar(e) {
     .from('characters').update(payload).eq('id', charAtivo.id).select('*').single();
 
   if (error) {
-    status.className = 'status-msg erro';
-    status.textContent = '❌ Erro: ' + error.message;
+    definirStatusAutosave('erro', '⚠ <span class="txt">Erro ao salvar</span>');
+    console.warn('[ficha] erro ao salvar:', error);
   } else {
     _ultimoSaveLocal = Date.now();   // pra ignorar echo do nosso save no realtime
     // Atualiza CAMPO POR CAMPO em vez de substituir o objeto inteiro
     // (preserva edições em progresso de outros campos não-salvos)
     Object.assign(charAtivo, payload);
     chars = chars.map(c => c.id === charAtivo.id ? charAtivo : c);
-    status.className = 'status-msg ok';
-    status.textContent = '✓ Salvo  ·  ' + new Date().toLocaleTimeString('pt-BR');
+    definirStatusAutosave('ok', '✓ <span class="txt">Salvo · ' + new Date().toLocaleTimeString('pt-BR') + '</span>');
     if (window.FX) FX.salvo(status);
-    setTimeout(() => { if (status.classList.contains('ok')) status.innerHTML = ico('salvar') + ' Auto-save ativo'; }, 2500);
+    setTimeout(() => {
+      if (status.classList.contains('ok')) definirStatusAutosave('ok', ico('salvar') + ' <span class="txt">Auto-save ativo</span>');
+    }, 2500);
   }
   if (btn) btn.disabled = false;
 }

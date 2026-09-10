@@ -16,7 +16,9 @@
 <!-- Estilo da ficha — extraído do <style> inline (ver assets/css/ficha/).
      A ORDEM importa: estes arquivos vêm depois de components.css e antes de
      ui.css, exatamente como o bloco inline vinha. Concatenados na ordem
-     abaixo eles reproduzem o CSS original byte a byte. -->
+     abaixo eles reproduzem o CSS original byte a byte (Fase 0/1). nav.css é
+     novo (Fase 2, bottom nav mobile) e só define seletores inéditos, então
+     não precisa respeitar essa ordem — está ao fim da lista. -->
 <link rel="stylesheet" href="../assets/css/ficha/base.css">
 <link rel="stylesheet" href="../assets/css/ficha/equipamento.css">
 <link rel="stylesheet" href="../assets/css/ficha/magias.css">
@@ -25,14 +27,23 @@
 <link rel="stylesheet" href="../assets/css/ficha/personagem.css">
 <link rel="stylesheet" href="../assets/css/ficha/aliados.css">
 <link rel="stylesheet" href="../assets/css/ficha/sistema.css">
+<link rel="stylesheet" href="../assets/css/ficha/nav.css">
 <link rel="stylesheet" href="../assets/css/ui.css">
 </head>
 <body data-ambiente="fagulhas">
 
+<!-- Header (§3): duas linhas dentro do MESMO .site-header sticky.
+     #hdr-id e #hdr-meta são preenchidos por renderHeader() (header.js) a
+     cada render() — ver assets/js/ficha/header.js. -->
 <header class="site-header">
-  <a href="../index.html" class="back-btn">← Voltar</a>
-  <div class="header-title" id="hdr-titulo">Minha Ficha</div>
-  <div class="auth-slot" id="auth-slot" aria-label="Status de login"></div>
+  <div class="hdr-linha hdr-linha-principal">
+    <a href="../index.html" class="back-btn" aria-label="Voltar">
+      <span aria-hidden="true">←</span><span class="back-btn-lbl">Voltar</span>
+    </a>
+    <div class="hdr-id" id="hdr-id"></div>
+    <div class="auth-slot" id="auth-slot" aria-label="Status de login"></div>
+  </div>
+  <div class="hdr-linha hdr-linha-meta" id="hdr-meta"></div>
 </header>
 
 <main>
@@ -41,12 +52,17 @@
   </div>
 </main>
 
+<!-- Navegação inferior mobile (§18) — populada por nav_mobile.js a partir
+     das abas reais de #tabs; some em telas largas (ver nav.css). -->
+<nav class="bottom-nav" id="bottom-nav" aria-label="Navegação principal"></nav>
+
 <!-- (Removido) Toast de permissão — mudanças do Mestre agora se aplicam automaticamente -->
 <div class="toast" id="toast-auto" role="status" aria-live="polite"></div>
 
 <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
 <script src="../assets/js/supabase.js"></script>
 <script src="../assets/js/auth.js"></script>
+<script src="../assets/js/confirmar.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js" defer></script>
 <script src="../assets/js/efeitos.js"></script>
 <script src="../assets/js/phb_catalogo.js"></script>
@@ -58,9 +74,11 @@
      São scripts CLÁSSICOS (sem type="module"), como o resto do projeto: todas
      as declarações de topo compartilham o mesmo escopo global, então a ORDEM
      abaixo reproduz o script original. salvar.js é o último porque termina
-     chamando init(). -->
+     chamando init(). header.js e nav_mobile.js são novos (Fase 2). -->
 <script src="../assets/js/ficha/nucleo.js"></script>
 <script src="../assets/js/ficha/render.js"></script>
+<script src="../assets/js/ficha/header.js"></script>
+<script src="../assets/js/ficha/nav_mobile.js"></script>
 <script src="../assets/js/ficha/aba_combate.js"></script>
 <script src="../assets/js/ficha/recursos.js"></script>
 <script src="../assets/js/ficha/aba_habilidades.js"></script>

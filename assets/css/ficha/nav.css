@@ -1,0 +1,65 @@
+/* assets/css/ficha/nav.css
+   Navegação inferior fixa do mobile (§18) + o bottom sheet "Mais". Arquivo
+   novo — nenhuma classe daqui existe nos outros 7, então a posição deste
+   <link> na lista não precisa respeitar a ordem de cascata como os demais.
+   Populado por assets/js/ficha/nav_mobile.js.
+
+   Some por completo em telas largas: em desktop a navegação continua sendo
+   a aba horizontal de sempre (.tabs em base.css). */
+
+.bottom-nav {
+  display: none;
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 55;
+  background: color-mix(in srgb, var(--bg) 94%, transparent);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--borda);
+  padding: 6px max(6px, env(safe-area-inset-left)) calc(6px + env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-right));
+  gap: 2px;
+}
+@media (max-width: 768px) {
+  .bottom-nav { display: flex; }
+  /* Não deixa o conteúdo ficar escondido atrás da barra fixa */
+  main { padding-bottom: calc(var(--sp-10) + 64px + env(safe-area-inset-bottom)); }
+}
+.bn-item {
+  flex: 1; min-height: 48px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: none; border-radius: var(--r-sm);
+  color: var(--text-dim); font-family: var(--f-ui); font-size: 11px; font-weight: 600;
+  letter-spacing: .2px; cursor: pointer; padding: 4px;
+}
+.bn-item .bn-lbl { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
+.bn-item.ativa { color: var(--gold-light); background: var(--sf-ouro); }
+.bn-item:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
+
+/* ── Bottom sheet "Mais" ── */
+.sheet-overlay {
+  position: fixed; inset: 0; z-index: 90;
+  background: rgba(0,0,0,0); backdrop-filter: blur(0px);
+  display: flex; align-items: flex-end; justify-content: center;
+  transition: background-color .2s ease;
+}
+.sheet-overlay.open { background: rgba(0,0,0,0.6); backdrop-filter: blur(3px); }
+.sheet-mais {
+  width: 100%; max-width: 560px;
+  background: var(--sf-2); border: 1px solid var(--borda-forte); border-bottom: none;
+  border-radius: var(--r-lg) var(--r-lg) 0 0;
+  padding: var(--sp-2) var(--sp-3) calc(var(--sp-4) + env(safe-area-inset-bottom));
+  box-shadow: var(--elev-3);
+  transform: translateY(100%);
+  transition: transform .22s ease;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.sheet-overlay.open .sheet-mais { transform: translateY(0); }
+.sheet-handle { width: 36px; height: 4px; border-radius: var(--r-pill); background: var(--borda-forte); margin: var(--sp-2) auto var(--sp-3); }
+.sheet-item {
+  min-height: 48px; text-align: left;
+  background: transparent; border: none; border-radius: var(--r-sm);
+  color: var(--parchment); font-family: var(--f-ui); font-size: var(--fs-ui); font-weight: 600;
+  padding: 0 var(--sp-3); cursor: pointer;
+}
+.sheet-item:hover, .sheet-item:focus-visible { background: var(--sf-3); outline: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  .sheet-overlay, .sheet-mais { transition: none; }
+}
