@@ -5,27 +5,27 @@
 .magias-lista { display: flex; flex-direction: column; gap: 6px; }
 .magia-item {
   background: rgba(0,0,0,0.2);
-  border: 1px solid rgba(196,154,58,0.25);
+  border: 1px solid var(--borda);
   border-radius: 4px;
   overflow: hidden;
   transition: border-color 0.15s;
 }
-.magia-item:hover { border-color: rgba(196,154,58,0.5); }
-.magia-item.aberta { border-color: var(--gold-bright); }
+.magia-item:hover { border-color: var(--borda-forte); }
+.magia-item.aberta { border-color: var(--borda-ouro); }
 .magia-row {
   display: grid; grid-template-columns: 50px 1fr 100px 110px 28px;
   gap: 10px; align-items: center;
   padding: 10px 12px; cursor: pointer;
   user-select: none;
 }
-.magia-nivel { font-family: 'Cinzel', serif; font-weight: 700; color: var(--gold-bright); font-size: 13px; }
+.magia-nivel { font-family: var(--f-num); font-weight: 700; color: var(--gold-bright); font-size: 13px; }
 .magia-nome  { color: var(--parchment); font-size: 14px; }
 .magia-escola { font-size: 11px; color: var(--text-dim); font-style: italic; }
 .magia-tags  { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
 .magia-tags span {
   font-size: 9px; padding: 2px 6px; border-radius: 2px;
   background: rgba(138,70,64,0.3); color: #a56b5a;
-  font-family: 'Cinzel', serif; letter-spacing: 0.5px;
+  font-family: var(--f-ui); letter-spacing: 0.5px;
 }
 .magia-chevron {
   color: var(--gold); font-size: 14px; text-align: center;
@@ -35,7 +35,7 @@
 
 .magia-detalhe {
   padding: 0 14px 14px;
-  border-top: 1px solid rgba(196,154,58,0.2);
+  border-top: 1px solid var(--borda);
   margin-top: 0;
   display: none;
   background: rgba(0,0,0,0.15);
@@ -45,28 +45,28 @@
   display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
   gap: 8px 14px;
   padding: 10px 0;
-  border-bottom: 1px solid rgba(196,154,58,0.15);
+  border-bottom: 1px solid var(--borda);
   margin-bottom: 10px;
 }
 .magia-info-item { font-size: 12px; }
 .magia-info-key {
-  font-family: 'Cinzel', serif; font-size: 9px;
+  font-family: var(--f-ui); font-size: 9px;
   color: var(--gold); letter-spacing: 1px;
   text-transform: uppercase; margin-bottom: 2px;
 }
 .magia-info-val { color: var(--parchment); }
-.magia-desc { font-size: 13px; line-height: 1.6; color: var(--parchment); }
+.magia-desc { font-family: var(--f-prosa); font-size: 15px; line-height: 1.65; color: var(--parchment); }
 .magia-desc p { margin-bottom: 8px; }
 .magia-maior {
   margin-top: 10px; padding-top: 10px;
-  border-top: 1px solid rgba(196,154,58,0.2);
+  border-top: 1px solid var(--borda);
   font-size: 12px; color: var(--parchment-dim); font-style: italic;
 }
 .magia-maior strong { color: var(--gold-bright); font-style: normal; }
 
 .magia-conjurar-bar {
   margin-top: 12px; padding-top: 10px;
-  border-top: 1px solid rgba(196,154,58,0.2);
+  border-top: 1px solid var(--borda);
   display: flex; justify-content: flex-end; align-items: center; gap: 10px;
 }
 .magia-truque-info { font-size: 11px; color: var(--text-dim); font-style: italic; }
@@ -74,7 +74,7 @@
   background: linear-gradient(to bottom, #5c4a70, #4a3a58);
   border: 1px solid #7a5a94;
   color: #ddd0e8;
-  font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700;
+  font-family: var(--f-ui); font-size: 12px; font-weight: 700;
   letter-spacing: 1px; text-transform: uppercase;
   padding: 8px 16px; border-radius: 4px; cursor: pointer;
   transition: all 0.15s; min-height: 36px;
@@ -95,13 +95,13 @@
 }
 .modal-card {
   background: linear-gradient(180deg, var(--bg-card), var(--bg-card-soft));
-  border: 2px solid var(--gold); border-radius: 10px;
+  border: 2px solid var(--borda); border-radius: 10px;
   padding: 24px; max-width: 480px; width: 100%;
   box-shadow: 0 0 40px rgba(0,0,0,0.7), 0 0 20px rgba(212,175,55,0.2);
 }
 .modal-card h3 {
   color: var(--gold-bright); margin: 0 0 8px;
-  font-family: 'Cinzel Decorative', serif; font-size: 18px;
+  font-family: var(--f-display); font-size: 18px;
 }
 .modal-card h3 em { color: var(--parchment); font-style: italic; }
 .modal-slots {
@@ -110,7 +110,7 @@
 }
 .modal-slot-btn {
   background: linear-gradient(160deg, var(--bg-card-soft), var(--bg-card));
-  border: 1.5px solid var(--gold); border-radius: 6px;
+  border: 1.5px solid var(--borda); border-radius: 6px;
   padding: 10px 6px; cursor: pointer; text-align: center;
   transition: all 0.15s; min-height: 80px;
 }
@@ -121,11 +121,11 @@
 }
 .modal-slot-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 .modal-slot-nv {
-  color: var(--gold); font-family: 'Cinzel', serif; font-size: 11px;
+  color: var(--gold); font-family: var(--f-titulo); font-size: 11px;
   text-transform: uppercase; letter-spacing: 1.5px;
 }
 .modal-slot-disp {
-  color: var(--gold-bright); font-family: 'Cinzel', serif;
+  color: var(--gold-bright); font-family: var(--f-num);
   font-size: 22px; font-weight: 700; margin: 4px 0;
 }
 .modal-slot-lbl { font-size: 10px; color: var(--text-dim); font-style: italic; }

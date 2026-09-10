@@ -9,10 +9,10 @@
 .insp-btn {
   width: 44px; height: 44px;
   background: linear-gradient(160deg, var(--bg-card-soft), var(--bg-card));
-  border: 1.5px solid var(--gold);
+  border: 1.5px solid var(--borda);
   border-radius: 50%;
   color: var(--gold-bright);
-  font-family: 'Cinzel Decorative', serif;
+  font-family: var(--f-ui);
   font-size: 22px; font-weight: 900; line-height: 1;
   cursor: pointer; transition: all 0.15s;
 }
@@ -21,7 +21,7 @@
 .insp-display {
   display: flex; align-items: center; gap: 10px;
   background: linear-gradient(160deg, rgba(196,154,58,0.18), rgba(196,154,58,0.08));
-  border: 2px solid var(--gold);
+  border: 2px solid var(--borda);
   border-radius: 10px;
   padding: 10px 18px;
   min-width: 110px;
@@ -31,7 +31,7 @@
 .insp-display input {
   background: transparent; border: none;
   color: var(--gold-bright);
-  font-family: 'Cinzel Decorative', serif;
+  font-family: var(--f-num);
   font-size: 28px; font-weight: 900; text-align: center;
   width: 44px; outline: none;
 }
@@ -52,7 +52,7 @@
 .retrato-preview {
   width: 200px;
   background: linear-gradient(160deg, var(--bg-card-soft), var(--bg-card));
-  border: 2px solid var(--gold);
+  border: 2px solid var(--borda);
   border-radius: 8px;
   overflow: hidden;
   box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 2px 8px rgba(0,0,0,0.4);
@@ -78,9 +78,9 @@
   display: inline-flex; align-items: center; gap: 8px;
   padding: 10px 18px;
   background: linear-gradient(180deg, #242016 0%, #1c1a14 100%);
-  border: 1.5px solid var(--gold);
+  border: 1.5px solid var(--borda);
   color: var(--gold-bright);
-  font-family: 'Cinzel', serif; font-size: 12px;
+  font-family: var(--f-ui); font-size: 12px;
   font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase;
   border-radius: 4px; cursor: pointer;
   transition: all 0.15s;
@@ -108,7 +108,7 @@
 .rp-lock-bar {
   display: flex; align-items: center; justify-content: space-between;
   gap: 10px; flex-wrap: wrap;
-  border-top: 1px solid rgba(196,154,58,0.25);
+  border-top: 1px solid var(--borda);
   padding-top: 18px; margin-top: 18px;
 }
 .rp-lock-hint {
@@ -117,9 +117,9 @@
 }
 .btn-rp-edit {
   background: linear-gradient(to bottom, var(--gold), #5c4020);
-  border: 1px solid var(--gold-bright);
+  border: 1px solid var(--borda);
   color: var(--shadow);
-  font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700;
+  font-family: var(--f-ui); font-size: 12px; font-weight: 700;
   letter-spacing: 1px; text-transform: uppercase;
   padding: 8px 16px; border-radius: 4px; cursor: pointer;
   min-height: 36px; transition: all 0.15s;
@@ -143,7 +143,7 @@
   background: rgba(0,0,0,0.15) !important;
   color: var(--parchment-dim) !important;
   cursor: default !important;
-  border-color: rgba(196,154,58,0.18) !important;
+  border-color: var(--borda) !important;
 }
 .rp-bloqueavel.rp-locked textarea:focus,
 .rp-bloqueavel.rp-locked input:focus {

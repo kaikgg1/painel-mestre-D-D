@@ -13,10 +13,10 @@
   transform: translateX(-50%) translateY(20px);
   z-index: 250;
   background: linear-gradient(160deg, #1c1a14, #151510);
-  border: 1px solid var(--gold);
-  border-left: 3px solid var(--gold-bright);
+  border: 1px solid var(--borda);
+  border-left: 3px solid var(--borda);
   color: var(--parchment);
-  font-family: 'Cinzel', serif;
+  font-family: var(--f-ui);
   font-size: 12px;
   letter-spacing: 0.5px;
   padding: 10px 18px;
@@ -38,7 +38,7 @@
   z-index: 200;
   max-width: 360px;
   background: linear-gradient(160deg, #1c1a14, #151510);
-  border: 1.5px solid var(--gold-bright);
+  border: 1.5px solid var(--borda);
   border-radius: 6px;
   padding: 14px 16px;
   box-shadow: 0 12px 32px rgba(0,0,0,0.7), 0 0 18px rgba(196,154,58,0.3);
@@ -48,7 +48,7 @@
 .toast-externo.show { display: block; }
 @keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 .toast-externo .te-titulo {
-  font-family: 'Cinzel', serif; font-size: 12px;
+  font-family: var(--f-titulo); font-size: 12px;
   color: var(--gold-bright); letter-spacing: 1.5px;
   text-transform: uppercase; margin-bottom: 6px;
   display: flex; align-items: center; gap: 8px;
@@ -58,9 +58,9 @@
 .toast-externo button {
   padding: 6px 12px;
   background: transparent;
-  border: 1px solid var(--gold);
+  border: 1px solid var(--borda);
   color: var(--parchment-dim);
-  font-family: 'Cinzel', serif; font-size: 10px;
+  font-family: var(--f-ui); font-size: 10px;
   font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
   border-radius: 3px; cursor: pointer; transition: all 0.15s;
 }
@@ -75,7 +75,7 @@
 /* ===== RECURSOS DE CLASSE — painel personalizado por classe ===== */
 .rc-painel {
   background: linear-gradient(160deg, rgba(196,154,58,0.10), rgba(113,54,49,0.06));
-  border: 1px solid rgba(196,154,58,0.4);
+  border: 1px solid var(--borda);
   border-radius: 8px;
   padding: 14px 16px 16px;
   margin-bottom: 22px;
@@ -92,10 +92,10 @@
   display: flex; align-items: center; justify-content: space-between;
   gap: 12px; flex-wrap: wrap; margin-bottom: 12px;
   padding-bottom: 10px;
-  border-bottom: 1px dashed rgba(196,154,58,0.3);
+  border-bottom: 1px dashed var(--borda);
 }
 .rc-cabecalho h3 {
-  font-family: 'Cinzel', serif; color: var(--gold-bright);
+  font-family: var(--f-titulo); color: var(--gold-bright);
   font-size: 16px; letter-spacing: 1px;
   display: inline-flex; align-items: center; gap: 8px;
 }
@@ -111,13 +111,13 @@
 }
 .rc-card {
   background: linear-gradient(180deg, rgba(0,0,0,0.3), rgba(0,0,0,0.15));
-  border: 1px solid rgba(196,154,58,0.3);
+  border: 1px solid var(--borda);
   border-radius: 6px;
   padding: 12px;
   display: flex; flex-direction: column; gap: 9px;
   transition: border-color 0.15s, transform 0.15s;
 }
-.rc-card:hover { border-color: rgba(196,154,58,0.5); }
+.rc-card:hover { border-color: var(--borda-forte); }
 .rc-head {
   display: flex; align-items: flex-start; gap: 10px;
 }
@@ -128,7 +128,7 @@
 }
 .rc-titulo-wrap { flex: 1; min-width: 0; }
 .rc-nome {
-  font-family: 'Cinzel', serif;
+  font-family: var(--f-titulo);
   color: var(--parchment); font-weight: 700;
   font-size: 13px; letter-spacing: 0.5px;
   line-height: 1.2;
@@ -145,14 +145,14 @@
   min-width: 32px; min-height: 32px;
   transition: all 0.15s; flex-shrink: 0;
 }
-.rc-reset:hover { border-color: var(--gold-bright); color: var(--gold-bright); transform: rotate(-180deg); }
+.rc-reset:hover { border-color: var(--borda-ouro); color: var(--gold-bright); transform: rotate(-180deg); }
 .rc-pips {
   display: flex; align-items: center; flex-wrap: wrap; gap: 5px;
   padding: 4px 0;
 }
 .rc-pip {
   width: 22px; height: 22px;
-  border: 2px solid var(--gold);
+  border: 2px solid var(--borda);
   border-radius: 50%;
   cursor: pointer;
   background: radial-gradient(circle, rgba(196,154,58,0.18), rgba(0,0,0,0.4));
@@ -177,7 +177,7 @@
 }
 .rc-frac {
   margin-left: auto;
-  font-family: 'Cinzel', serif;
+  font-family: var(--f-num);
   color: var(--text-dim); font-size: 11px;
   letter-spacing: 0.5px;
 }
@@ -187,7 +187,7 @@
 .rc-pool {
   display: flex; align-items: center; gap: 6px;
   background: rgba(0,0,0,0.3);
-  border: 1px solid rgba(196,154,58,0.25);
+  border: 1px solid var(--borda);
   border-radius: 6px;
   padding: 6px 8px;
 }
@@ -195,7 +195,7 @@
   background: linear-gradient(180deg, rgba(113,54,49,0.4), rgba(56,8,8,0.6));
   border: 1px solid var(--blood);
   color: var(--parchment);
-  font-family: 'Cinzel', serif; font-weight: 700;
+  font-family: var(--f-ui); font-weight: 700;
   width: 32px; height: 32px;
   border-radius: 4px; cursor: pointer;
   font-size: 14px;
@@ -206,12 +206,12 @@
 .rc-pool-btn:hover { background: linear-gradient(180deg, var(--blood-bright), var(--blood)); transform: translateY(-1px); }
 .rc-pool-btn[data-act="mais"] {
   background: linear-gradient(180deg, rgba(196,154,58,0.4), rgba(80,60,12,0.6));
-  border-color: var(--gold);
+  border-color: var(--borda);
 }
 .rc-pool-btn[data-act="mais"]:hover { background: linear-gradient(180deg, var(--gold-bright), var(--gold)); color: var(--shadow); }
 .rc-pool-display {
   flex: 1; text-align: center;
-  font-family: 'Cinzel', serif; font-size: 15px;
+  font-family: var(--f-num); font-size: 15px;
   color: var(--parchment);
 }
 .rc-pool-livre { color: var(--gold-bright); font-weight: 700; font-size: 18px; }
@@ -221,7 +221,7 @@
   font-style: italic; color: var(--text-dim);
   font-size: 11px; line-height: 1.4;
   padding-top: 6px;
-  border-top: 1px dashed rgba(196,154,58,0.15);
+  border-top: 1px dashed var(--borda);
 }
 
 /* ===== MODAL FEITIÇARIA — Converter pontos ⇄ slots ===== */
@@ -236,7 +236,7 @@
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 .fei-modal {
   background: linear-gradient(160deg, #1c1a14 0%, #151510 100%);
-  border: 2px solid var(--gold);
+  border: 2px solid var(--borda);
   border-radius: 8px;
   max-width: 520px; width: 100%;
   max-height: 90vh; max-height: 90dvh;
@@ -257,23 +257,23 @@
 }
 .fei-close:hover { border-color: var(--blood-bright); color: var(--parchment); background: var(--blood); }
 .fei-titulo {
-  font-family: 'Cinzel Decorative', serif;
+  font-family: var(--f-display);
   font-size: 20px; color: var(--gold-bright);
   letter-spacing: 1.5px; margin-bottom: 8px;
   padding-right: 36px;
 }
 .fei-status {
-  font-family: 'Cinzel', serif; font-size: 13px;
+  font-family: var(--f-ui); font-size: 13px;
   color: var(--parchment); letter-spacing: 0.5px;
   padding: 8px 12px; border-radius: 4px;
   background: rgba(196,154,58,0.1);
-  border: 1px solid rgba(196,154,58,0.3);
+  border: 1px solid var(--borda);
   margin-bottom: 16px;
 }
 .fei-status strong { color: var(--gold-bright); font-size: 16px; }
 .fei-sec { margin-bottom: 16px; }
 .fei-sec-titulo {
-  font-family: 'Cinzel', serif; font-size: 11px;
+  font-family: var(--f-titulo); font-size: 11px;
   color: var(--gold); letter-spacing: 1.5px;
   text-transform: uppercase; margin-bottom: 8px;
 }
@@ -283,11 +283,11 @@
 }
 .fei-opt {
   background: linear-gradient(180deg, rgba(196,154,58,0.2), rgba(0,0,0,0.3));
-  border: 1px solid rgba(196,154,58,0.4);
+  border: 1px solid var(--borda);
   color: var(--parchment);
   padding: 10px 12px; border-radius: 5px;
   cursor: pointer;
-  font-family: 'Cinzel', serif; font-size: 12px;
+  font-family: var(--f-ui); font-size: 12px;
   display: flex; flex-direction: column; gap: 2px;
   transition: all 0.15s; min-height: 56px;
   align-items: center; justify-content: center;
@@ -312,7 +312,7 @@
 .fei-rodape {
   font-size: 10px; color: var(--text-dim);
   font-style: italic; padding-top: 10px;
-  border-top: 1px solid rgba(196,154,58,0.2);
+  border-top: 1px solid var(--borda);
   margin-top: 10px; line-height: 1.4;
 }
 
@@ -331,10 +331,10 @@
 .btn-lock-toggle {
   padding: 8px 12px;
   background: linear-gradient(180deg, rgba(196,154,58,0.25), rgba(113,54,49,0.2));
-  border: 1px solid var(--gold);
+  border: 1px solid var(--borda);
   color: var(--gold-bright);
   border-radius: 4px;
-  font-family: 'Cinzel', serif;
+  font-family: var(--f-ui);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 1px;
@@ -354,10 +354,10 @@ body.modo-unlock .btn-lock-toggle {
   display: none;
   padding: 9px 14px;
   background: linear-gradient(90deg, rgba(196,154,58,0.18), rgba(113,54,49,0.18), rgba(196,154,58,0.18));
-  border: 1px solid var(--gold);
+  border: 1px solid var(--borda);
   border-radius: 4px;
   color: var(--gold-bright);
-  font-family: 'Cinzel', serif;
+  font-family: var(--f-ui);
   font-size: 12px;
   letter-spacing: 0.5px;
   text-align: center;
@@ -488,7 +488,7 @@ iconify-icon {
 .stat-mini select,
 .aliados-add select {
   border-radius: 6px;
-  border: 1px solid rgba(196,154,58,0.55);
+  border: 1px solid var(--borda);
   background-color: rgba(0,0,0,0.28);
   color: var(--parchment);
   letter-spacing: 0.3px;

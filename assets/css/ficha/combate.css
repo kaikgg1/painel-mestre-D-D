@@ -18,7 +18,7 @@
   overflow: hidden;
 }
 .hp-titulo {
-  font-family: 'Cinzel', serif; font-size: 11px;
+  font-family: var(--f-titulo); font-size: 11px;
   color: var(--gold); letter-spacing: 2px;
   text-transform: uppercase; margin-bottom: 8px;
   display: flex; align-items: center; gap: 8px;
@@ -26,7 +26,7 @@
 .hp-icone { font-size: 18px; }
 .hp-numero {
   text-align: center;
-  font-family: 'Cinzel Decorative', serif;
+  font-family: var(--f-display);
   font-size: 28px; font-weight: 900;
   color: var(--gold-bright);
   margin-bottom: 8px;
@@ -37,9 +37,9 @@
   color: inherit; font-family: inherit; font-size: inherit;
   font-weight: inherit; text-align: center;
   width: 70px; outline: none;
-  border-bottom: 1px dashed rgba(196,154,58,0.3);
+  border-bottom: 1px dashed var(--borda);
 }
-.hp-numero input:focus { border-bottom-color: var(--gold-bright); }
+.hp-numero input:focus { border-bottom-color: var(--borda-ouro); }
 .hp-numero .sep { color: var(--text-dim); margin: 0 4px; font-size: 22px; }
 .hp-temp-label { font-size: 11px; color: var(--text-dim); }
 .hp-temp-label input {
@@ -76,7 +76,7 @@
 .hp-percent {
   position: absolute; inset: 0;
   display: flex; align-items: center; justify-content: center;
-  font-family: 'Cinzel', serif; font-size: 10px;
+  font-family: var(--f-ui); font-size: 10px;
   color: var(--parchment); letter-spacing: 1px;
   text-shadow: 0 1px 2px rgba(0,0,0,0.8);
 }
@@ -88,7 +88,7 @@
   border-top: 1px dashed rgba(138,70,64,0.4);
 }
 .hp-aplicar-titulo {
-  font-family: 'Cinzel', serif; font-size: 9px;
+  font-family: var(--f-ui); font-size: 9px;
   color: var(--gold); letter-spacing: 1.5px; text-transform: uppercase;
   margin-bottom: 8px; text-align: center;
 }
@@ -98,17 +98,17 @@
 }
 .hp-aplicar-linha input {
   width: 56px; padding: 8px 6px;
-  background: rgba(0,0,0,0.5); border: 1px solid var(--gold);
-  color: var(--parchment); font-family: 'Cinzel', serif;
+  background: rgba(0,0,0,0.5); border: 1px solid var(--borda);
+  color: var(--parchment); font-family: var(--f-ui);
   font-size: 16px; font-weight: 700; text-align: center;
   border-radius: 4px; outline: none;
 }
-.hp-aplicar-linha input:focus { border-color: var(--gold-bright); background: rgba(0,0,0,0.7); }
+.hp-aplicar-linha input:focus { border-color: var(--borda-ouro); background: rgba(0,0,0,0.7); }
 .hp-btn {
   padding: 8px 12px;
   border: 1px solid;
   border-radius: 4px;
-  font-family: 'Cinzel', serif; font-size: 11px;
+  font-family: var(--f-ui); font-size: 11px;
   font-weight: 700; letter-spacing: 1px;
   cursor: pointer; transition: all 0.15s;
   background: transparent;
@@ -130,9 +130,9 @@
 .hp-quick button {
   padding: 6px 4px;
   background: rgba(0,0,0,0.3);
-  border: 1px solid rgba(196,154,58,0.35);
+  border: 1px solid var(--borda);
   color: var(--parchment-dim);
-  font-family: 'Cinzel', serif; font-size: 10px;
+  font-family: var(--f-ui); font-size: 10px;
   font-weight: 700;
   border-radius: 3px;
   cursor: pointer; transition: all 0.15s;
@@ -151,33 +151,33 @@
 
 .stat-hero {
   background: rgba(0,0,0,0.3);
-  border: 1px solid rgba(196,154,58,0.4);
+  border: 1px solid var(--borda);
   border-radius: 8px;
   padding: 14px;
   text-align: center;
 }
 .stat-hero .stat-icone { font-size: 26px; line-height: 1; margin-bottom: 6px; }
 .stat-hero .stat-titulo {
-  font-family: 'Cinzel', serif; font-size: 10px;
+  font-family: var(--f-titulo); font-size: 10px;
   color: var(--gold); letter-spacing: 2px;
   text-transform: uppercase; margin-bottom: 6px;
 }
 .stat-hero input {
-  background: transparent; border: 1px solid rgba(196,154,58,0.3);
+  background: transparent; border: 1px solid var(--borda);
   color: var(--gold-bright);
-  font-family: 'Cinzel Decorative', serif;
+  font-family: var(--f-num);
   font-size: 24px; font-weight: 700; text-align: center;
   width: 100%; padding: 6px 4px; border-radius: 4px;
   outline: none;
 }
-.stat-hero input:focus { border-color: var(--gold-bright); }
+.stat-hero input:focus { border-color: var(--borda-ouro); }
 
 /* Stats menores (iniciativa, deslocamento, dado de vida, exaustão) */
 .stats-mini { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 18px; }
 @media (max-width: 700px) { .stats-mini { grid-template-columns: repeat(2, 1fr); } }
 .stat-mini {
   background: rgba(0,0,0,0.2);
-  border: 1px solid rgba(196,154,58,0.3);
+  border: 1px solid var(--borda);
   border-radius: 6px;
   padding: 10px 8px;
   text-align: center;
@@ -185,25 +185,25 @@
 .stat-mini .ic { font-size: 18px; line-height: 1; margin-bottom: 4px; display: block; }
 .stat-mini label {
   display: block;
-  font-family: 'Cinzel', serif; font-size: 9px;
+  font-family: var(--f-ui); font-size: 9px;
   color: var(--gold); letter-spacing: 1px;
   text-transform: uppercase; margin-bottom: 4px;
 }
 .stat-mini input, .stat-mini select {
   width: 100%; background: transparent;
-  border: 1px solid rgba(196,154,58,0.3); color: var(--parchment);
-  font-family: 'Cinzel', serif; font-size: 14px; font-weight: 600;
+  border: 1px solid var(--borda); color: var(--parchment);
+  font-family: var(--f-ui); font-size: 14px; font-weight: 600;
   text-align: center; padding: 6px 4px; border-radius: 3px;
   outline: none;
 }
-.stat-mini input:focus, .stat-mini select:focus { border-color: var(--gold-bright); }
+.stat-mini input:focus, .stat-mini select:focus { border-color: var(--borda-ouro); }
 .stat-mini .ajuda-mini { display: block; font-size: 9px; color: var(--text-dim); margin-top: 3px; font-style: italic; }
 .readonly-stat {
   width: 100%;
   background: rgba(196,154,58,0.12);
-  border: 1px solid rgba(196,154,58,0.4);
+  border: 1px solid var(--borda);
   color: var(--gold-bright);
-  font-family: 'Cinzel Decorative', serif; font-size: 18px; font-weight: 700;
+  font-family: var(--f-num); font-size: 18px; font-weight: 700;
   text-align: center; padding: 6px 4px; border-radius: 3px;
   cursor: help;
 }
@@ -211,13 +211,13 @@
 .lista-tags {
   display: flex; flex-wrap: wrap; gap: 4px; align-items: flex-start;
   padding: 8px; background: rgba(0,0,0,0.15);
-  border: 1px solid rgba(196,154,58,0.2); border-radius: 3px;
+  border: 1px solid var(--borda); border-radius: 3px;
   min-height: 38px;
 }
 .lista-tags .tag {
   display: inline-flex; align-items: center; gap: 4px;
   padding: 3px 8px; background: rgba(196,154,58,0.2);
-  border: 1px solid rgba(196,154,58,0.4); border-radius: 12px;
+  border: 1px solid var(--borda); border-radius: 12px;
   font-size: 12px; color: var(--parchment);
 }
 .lista-tags .tag .x {
@@ -258,7 +258,7 @@
 }
 
 @media (max-width: 480px) {
-  main { padding: 0 8px 30px; }
+  /* margem lateral de main vem de base.css (§20: 16px em mobile) — não repetir aqui */
   .tab-content { padding: 14px 12px; }
   .char-bar { padding: 10px; gap: 8px; }
   .char-bar select { font-size: 14px; min-height: 40px; }
@@ -292,7 +292,7 @@
   margin-bottom: 14px;
   padding: 10px 14px;
   background: rgba(196,154,58,0.08);
-  border: 1px dashed rgba(196,154,58,0.4);
+  border: 1px dashed var(--borda);
   border-radius: 6px;
   font-size: 13px; color: var(--parchment-dim);
   font-style: italic;
@@ -307,7 +307,7 @@
 }
 .slot-card {
   background: linear-gradient(160deg, var(--bg-card-soft), rgba(0,0,0,0.4));
-  border: 1px solid rgba(196,154,58,0.5);
+  border: 1px solid var(--borda);
   border-radius: 6px;
   padding: 12px;
   text-align: center;
@@ -316,15 +316,15 @@
 .slot-card.indisponivel {
   opacity: 0.35;
   border-style: dashed;
-  border-color: rgba(196,154,58,0.25);
+  border-color: var(--borda);
 }
 .slot-card .slot-titulo {
-  font-family: 'Cinzel', serif; font-size: 10px;
+  font-family: var(--f-titulo); font-size: 10px;
   color: var(--gold); letter-spacing: 1.5px;
   text-transform: uppercase; margin-bottom: 8px;
 }
 .slot-card .slot-max {
-  font-family: 'Cinzel Decorative', serif;
+  font-family: var(--f-num);
   font-size: 22px; color: var(--gold-bright); font-weight: 900;
   line-height: 1; margin-bottom: 8px;
   text-shadow: 0 0 8px rgba(196,154,58,0.3);
@@ -338,13 +338,13 @@
 }
 .slot-pip {
   width: 18px; height: 18px;
-  border: 1.5px solid var(--gold);
+  border: 1.5px solid var(--borda);
   border-radius: 50%;
   background: transparent;
   cursor: pointer;
   transition: all 0.15s;
 }
-.slot-pip:hover { transform: scale(1.15); border-color: var(--gold-bright); }
+.slot-pip:hover { transform: scale(1.15); border-color: var(--borda-ouro); }
 .slot-pip.gasto {
   background: var(--blood);
   border-color: var(--blood-bright);
@@ -353,7 +353,7 @@
 
 .slot-card .slot-status {
   font-size: 11px; color: var(--parchment-dim);
-  font-family: 'Cinzel', serif; letter-spacing: 0.5px;
+  font-family: var(--f-ui); letter-spacing: 0.5px;
 }
 .slot-card .slot-status strong { color: var(--gold-bright); }
 
