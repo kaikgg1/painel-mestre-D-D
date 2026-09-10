@@ -1,16 +1,152 @@
 // assets/js/ficha/aba_magias.js
-// Aba Magias: lista as magias favoritadas no Grimório (spell_lists), com
-// accordion de detalhes e o modal de Conjurar (escolha do espaço a gastar).
+// Aba Magias (Fase 6 do redesign): lista as magias favoritadas no Grimório
+// (spell_lists), agora com busca + filtros (nível, escola, tipo de ação,
+// concentração, ritual), os espaços de magia interativos no topo (mesma
+// renderSlotsMagia de Combate — Combate mantém um resumo colapsado que
+// aponta pra cá), accordion de detalhes e o modal de Conjurar.
+//
+// "Preparadas" não virou filtro: esta lista JÁ é só as magias preparadas
+// (favoritadas) — um filtro "Preparadas" aqui seria sempre verdadeiro. Isso
+// faz mais sentido no Grimório (paineis/magias.html), que mostra as 361.
 
 function renderMagias(c) {
-  // Aba que carrega assincronamente (cards das favoritas)
+  const slots = c.slots_magia || {};
   return `
-    <h3>Magias Preparadas</h3>
+    <h3>Espaços de Magia</h3>
+    ${renderSlotsMagia(c, slots)}
+
+    <h3 style="margin-top:22px">Magias Preparadas</h3>
     <p style="color:var(--text-dim);font-style:italic;margin-bottom:14px">
       Aparecem aqui as magias marcadas como favoritas no <a href="magias.html" style="color:var(--gold-bright)">Grimório</a>.
     </p>
+
+    <div class="hab-busca-wrap">
+      <input type="search" id="magia-busca" class="hab-busca-input" placeholder="Buscar magia…" aria-label="Buscar magia">
+    </div>
+    <div class="magia-filtros" id="magia-filtros" hidden>
+      <div class="linha-filtro-magia">
+        <span class="linha-filtro-lbl">Nível</span>
+        <div class="hab-filtros">
+          ${[0,1,2,3,4,5,6,7,8,9].map(n => `<button type="button" class="pill ${_magiaNiveis.has(n)?'ativo':''}" data-magia-nivel="${n}" aria-pressed="${_magiaNiveis.has(n)}">${n===0?'Truque':n+'º'}</button>`).join('')}
+        </div>
+      </div>
+      <div class="linha-filtro-magia">
+        <span class="linha-filtro-lbl">Escola</span>
+        <div class="hab-filtros" id="magia-filtro-escolas"><!-- só as escolas presentes na lista, populado no carregar --></div>
+      </div>
+      <div class="linha-filtro-magia">
+        <span class="linha-filtro-lbl">Ação</span>
+        <div class="hab-filtros">
+          ${['todas','acao','bonus','reacao','outro'].map(t => `<button type="button" class="pill ${_magiaTipo===t?'ativo':''}" data-magia-tipo="${t}" aria-pressed="${_magiaTipo===t}">${{todas:'Todas',acao:'Ação',bonus:'Ação Bônus',reacao:'Reação',outro:'Outro'}[t]}</button>`).join('')}
+        </div>
+      </div>
+      <div class="linha-filtro-magia">
+        <span class="linha-filtro-lbl">&nbsp;</span>
+        <div class="hab-filtros">
+          <button type="button" class="pill ${_magiaConcentracao?'ativo':''}" data-magia-bool="concentracao" aria-pressed="${_magiaConcentracao}">◐ Concentração</button>
+          <button type="button" class="pill ${_magiaRitual?'ativo':''}" data-magia-bool="ritual" aria-pressed="${_magiaRitual}">✦ Ritual</button>
+        </div>
+      </div>
+    </div>
+
     <div id="magias-prep">Carregando…</div>
+    <div id="magias-sem-resultados" class="item-vazio" hidden>Nenhuma magia encontrada com esse filtro/busca.</div>
   `;
+}
+
+// Deriva o tipo de ação a partir de tempoCast (campo semiestruturado dos
+// dados do Grimório: "1 ação", "1 ação bônus", "1 reação, que…", "1 minuto"
+// etc.) — mais confiável que o heurístico de Habilidades porque o campo já
+// é sobre tempo de conjuração, não uma descrição livre.
+function detectarTipoAcaoMagia(m) {
+  const t = (m.tempoCast || '').toLowerCase();
+  if (/a[çc][ãa]o\s+b[ôo]nus/.test(t)) return 'bonus';
+  if (/rea[çc][ãa]o/.test(t)) return 'reacao';
+  if (/^1\s+a[çc][ãa]o\b/.test(t)) return 'acao';
+  return 'outro';
+}
+
+// ── Estado dos filtros (sessão, não é dado do personagem) ──
+let _magiaBusca = '';
+let _magiaNiveis = new Set();   // vazio = todos os níveis
+let _magiaEscolas = new Set();  // vazio = todas as escolas
+let _magiaTipo = 'todas';
+let _magiaConcentracao = false;
+let _magiaRitual = false;
+
+function semAcentoMagia(s) { return (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase(); }
+
+function aplicarFiltroMagias() {
+  const termo = semAcentoMagia(_magiaBusca.trim());
+  let visiveis = 0;
+  document.querySelectorAll('#magias-prep .magia-item').forEach(item => {
+    const nivel = +item.dataset.magiaNivel;
+    const escola = item.dataset.magiaEscola;
+    const tipo = item.dataset.magiaTipo;
+    const conc = item.dataset.magiaConcentracao === '1';
+    const rit = item.dataset.magiaRitual === '1';
+
+    const nivelOk = !_magiaNiveis.size || _magiaNiveis.has(nivel);
+    const escolaOk = !_magiaEscolas.size || _magiaEscolas.has(escola);
+    const tipoOk = _magiaTipo === 'todas' || _magiaTipo === tipo;
+    const concOk = !_magiaConcentracao || conc;
+    const ritOk = !_magiaRitual || rit;
+    const textoOk = !termo || semAcentoMagia(item.textContent).includes(termo);
+
+    const mostrar = nivelOk && escolaOk && tipoOk && concOk && ritOk && textoOk;
+    item.hidden = !mostrar;
+    if (mostrar) visiveis++;
+  });
+  const semResultados = document.getElementById('magias-sem-resultados');
+  if (semResultados) semResultados.hidden = visiveis > 0;
+}
+
+function conectarListenersFiltroMagias() {
+  const busca = document.getElementById('magia-busca');
+  if (busca) {
+    busca.value = _magiaBusca; // reflete estado se a aba foi re-renderizada (ex.: após conjurar)
+    busca.addEventListener('input', () => { _magiaBusca = busca.value; aplicarFiltroMagias(); });
+  }
+
+  document.querySelectorAll('[data-magia-nivel]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const nv = +btn.dataset.magiaNivel;
+      if (_magiaNiveis.has(nv)) _magiaNiveis.delete(nv); else _magiaNiveis.add(nv);
+      btn.classList.toggle('ativo', _magiaNiveis.has(nv));
+      btn.setAttribute('aria-pressed', String(_magiaNiveis.has(nv)));
+      aplicarFiltroMagias();
+    });
+  });
+  document.querySelectorAll('[data-magia-escola]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const es = btn.dataset.magiaEscola;
+      if (_magiaEscolas.has(es)) _magiaEscolas.delete(es); else _magiaEscolas.add(es);
+      btn.classList.toggle('ativo', _magiaEscolas.has(es));
+      btn.setAttribute('aria-pressed', String(_magiaEscolas.has(es)));
+      aplicarFiltroMagias();
+    });
+  });
+  document.querySelectorAll('[data-magia-tipo]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      _magiaTipo = btn.dataset.magiaTipo;
+      document.querySelectorAll('[data-magia-tipo]').forEach(b => {
+        b.classList.toggle('ativo', b === btn);
+        b.setAttribute('aria-pressed', String(b === btn));
+      });
+      aplicarFiltroMagias();
+    });
+  });
+  document.querySelectorAll('[data-magia-bool]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const chave = btn.dataset.magiaBool;
+      if (chave === 'concentracao') _magiaConcentracao = !_magiaConcentracao;
+      if (chave === 'ritual') _magiaRitual = !_magiaRitual;
+      const ativo = chave === 'concentracao' ? _magiaConcentracao : _magiaRitual;
+      btn.classList.toggle('ativo', ativo);
+      btn.setAttribute('aria-pressed', String(ativo));
+      aplicarFiltroMagias();
+    });
+  });
 }
 
 async function carregarMagiasPreparadas() {
@@ -26,12 +162,23 @@ async function carregarMagiasPreparadas() {
     .sort((a,b) => a.nivel - b.nivel || a.nome.localeCompare(b.nome, 'pt'));
   if (!lista.length) { wrap.innerHTML = `<div class="item-vazio">Nenhuma magia encontrada.</div>`; return; }
 
+  // Popula os filtros de escola dinamicamente (só as escolas presentes na
+  // lista do PJ — não tem sentido oferecer "Ilusão" se ele não prepara nenhuma).
+  const filtrosWrap = document.getElementById('magia-filtros');
+  const escolaWrap = document.getElementById('magia-filtro-escolas');
+  if (escolaWrap) {
+    const escolas = [...new Set(lista.map(m => m.escola))].sort((a,b) => a.localeCompare(b, 'pt'));
+    escolaWrap.innerHTML = escolas.map(es => `<button type="button" class="pill ${_magiaEscolas.has(es)?'ativo':''}" data-magia-escola="${escape(es)}" aria-pressed="${_magiaEscolas.has(es)}">${escape(es)}</button>`).join('');
+  }
+  if (filtrosWrap) filtrosWrap.hidden = lista.length < 2; // com 0-1 magia, filtro é ruído
+
   wrap.innerHTML = `<div class="magias-lista">${lista.map((m, i) => {
     const nv = m.nivel === 0 ? 'Truque' : `${m.nivel}°`;
+    const tipoAcao = detectarTipoAcaoMagia(m);
     const tags = [m.ritual?'<span>Ritual</span>':'', m.concentracao?'<span>Conc.</span>':''].filter(Boolean).join('');
     const descHtml = (m.descricao || '').split(/\n\n+/).map(p => `<p>${escape(p.trim())}</p>`).join('');
     const comps = (m.componentes || '') + (m.material ? ` (${escape(m.material)})` : '');
-    return `<div class="magia-item" data-idx="${i}">
+    return `<div class="magia-item" data-idx="${i}" data-magia-nivel="${m.nivel}" data-magia-escola="${escape(m.escola)}" data-magia-tipo="${tipoAcao}" data-magia-concentracao="${m.concentracao ? 1 : 0}" data-magia-ritual="${m.ritual ? 1 : 0}">
       <div class="magia-row" role="button" tabindex="0" aria-expanded="false">
         <span class="magia-nivel">${nv}</span>
         <span class="magia-nome">${escape(m.nome)}</span>
@@ -77,6 +224,9 @@ async function carregarMagiasPreparadas() {
       abrirModalConjurar(nome, nv);
     });
   });
+
+  conectarListenersFiltroMagias();
+  aplicarFiltroMagias();
 }
 
 // ─── Modal de Conjurar (escolha de slot) ─────────────────────────
@@ -145,6 +295,10 @@ function abrirModalConjurar(nomeMagia, nivelMin) {
         _ultimoSaveLocal = Date.now();
         await window.sb.from('characters').update({ slots_magia: slots }).eq('id', c.id);
         mostrarToastConjurar(nomeMagia, nv);
+        // Re-renderiza a aba: o grid de Espaços de Magia no topo (renderSlotsMagia)
+        // foi montado com o slots_magia ANTIGO — sem isso ele fica com dado
+        // obsoleto até o jogador trocar de aba e voltar.
+        render();
       } catch (e) {
         alert('Erro ao gastar slot: ' + e.message);
       }
@@ -164,4 +318,3 @@ function mostrarToastConjurar(nome, nv) {
   setTimeout(() => t.classList.add('show'), 10);
   setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 2500);
 }
-

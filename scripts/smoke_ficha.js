@@ -50,20 +50,29 @@ window.__ultimoUpdatePayload = null;
 // {data,error}) OU sendo usado diretamente como promise (award direto,
 // como salvarCondicoes/salvarRecursos fazem: `await ...update(...).eq(...)`
 // sem terminal — o builder abaixo é "thenable" pra isso funcionar também).
-function construirQuery(payloadUpdate) {
+// window.__magiasFavoritasTeste: nomes que carregarFavoritasDoBanco() (que
+// consulta a tabela spell_lists) deve "achar" — setado antes do bloco de
+// testes da aba Magias, null nos demais (spell_lists vazia, como qualquer
+// outra tabela/consulta que não seja um update em characters).
+window.__magiasFavoritasTeste = null;
+function construirQuery(tabela, payloadUpdate) {
   const builder = {
     select: () => builder,
     eq: () => builder,
     order: () => builder,
-    update: (payload) => { window.__ultimoUpdatePayload = payload; return construirQuery(payload); },
+    update: (payload) => { window.__ultimoUpdatePayload = payload; return construirQuery(tabela, payload); },
     single: async () => ({ data: payloadUpdate ? { ...payloadUpdate } : {}, error: null }),
-    maybeSingle: async () => ({ data: null, error: null }),
+    maybeSingle: async () => (
+      tabela === 'spell_lists' && window.__magiasFavoritasTeste
+        ? { data: { spell_names: window.__magiasFavoritasTeste }, error: null }
+        : { data: null, error: null }
+    ),
     // Permite `await query` sem terminal explícito (uso real em salvarCondicoes etc.)
     then: (resolve) => resolve({ data: payloadUpdate ? { ...payloadUpdate } : [], error: null }),
   };
   return builder;
 }
-window.sb = { from: () => construirQuery(null) };
+window.sb = { from: (tabela) => construirQuery(tabela, null) };
 // nucleo.js faz fetch('../data/habilidades_classes.json') e
 // fetch('../data/magias_data.json') — serve os arquivos reais do disco
 // (mesmo dado que o navegador pegaria) em vez de simular "sem rede", senão
@@ -544,6 +553,98 @@ console.log('');
   console.log(erros.length > antes
     ? '  FALHOU     característica personalizada (ver FALHAS abaixo)'
     : '  característica personalizada: adicionar/favoritar/remover (com Confirmar.perguntar) ok');
+}
+
+// Magias (Fase 6): 3 magias reais de data/magias_data.json favoritadas
+// ("Bênção" 1º/Ação, "Arma Espiritual" 2º/Ação Bônus, "Augúrio" 2º/Ritual/
+// Outro) — filtros de nível/tipo/ritual isolam cada uma, e o fluxo de
+// Conjurar de verdade gasta um slot e persiste.
+console.log('');
+{
+  const antes = erros.length;
+  window.__magiasFavoritasTeste = ['Arma Espiritual', 'Bênção', 'Augúrio'];
+  const sc = window.document.createElement('script');
+  sc.textContent = 'tabAtiva = "magias"; render();';
+  window.document.head.appendChild(sc);
+
+  const magiasWrap = () => window.document.getElementById('magias-prep');
+  for (let i = 0; i < 50 && magiasWrap() && /Carregando/.test(magiasWrap().textContent); i++) {
+    await new Promise(r => setTimeout(r, 20));
+  }
+
+  const itens = () => Array.from(window.document.querySelectorAll('#magias-prep .magia-item'));
+  if (itens().length !== 3) erros.push('magias: esperava 3 magias favoritadas populadas, vieram ' + itens().length);
+
+  const MAGIA_CHECKS = [
+    ['#magia-busca', 'campo de busca'],
+    ['.slots-grid, .slot-pip', 'grid de espaços de magia no topo da aba (renderSlotsMagia reaproveitado)'],
+    ['[data-magia-nivel="1"]', 'pill de filtro por nível'],
+    ['#magia-filtro-escolas .pill', 'pills de escola (populadas a partir das magias do PJ)'],
+    ['[data-magia-bool="ritual"]', 'toggle de Ritual'],
+  ];
+  for (const [sel, rotulo] of MAGIA_CHECKS) {
+    if (!window.document.querySelector(sel)) erros.push('magias: "' + rotulo + '" (' + sel + ') não encontrado');
+  }
+
+  // Filtro por nível 1 → só "Bênção"
+  try {
+    window.document.querySelector('[data-magia-nivel="1"]')?.click();
+    const visiveis = itens().filter(el => !el.hidden);
+    if (visiveis.length !== 1 || !/Bênção/.test(visiveis[0].textContent)) erros.push('magias: filtro nível 1 deveria isolar "Bênção", achou ' + visiveis.map(v=>v.querySelector('.magia-nome')?.textContent));
+    window.document.querySelector('[data-magia-nivel="1"]')?.click(); // desliga de novo
+  } catch (e) { erros.push('magias: filtro por nível → ' + e.message); }
+
+  // Filtro por tipo "Ação Bônus" → só "Arma Espiritual"
+  try {
+    window.document.querySelector('[data-magia-tipo="bonus"]')?.click();
+    const visiveis = itens().filter(el => !el.hidden);
+    if (visiveis.length !== 1 || !/Arma Espiritual/.test(visiveis[0].textContent)) erros.push('magias: filtro "Ação Bônus" deveria isolar "Arma Espiritual"');
+    window.document.querySelector('[data-magia-tipo="todas"]')?.click();
+  } catch (e) { erros.push('magias: filtro por tipo de ação → ' + e.message); }
+
+  // Toggle Ritual → só "Augúrio"
+  try {
+    window.document.querySelector('[data-magia-bool="ritual"]')?.click();
+    const visiveis = itens().filter(el => !el.hidden);
+    if (visiveis.length !== 1 || !/Augúrio/.test(visiveis[0].textContent)) erros.push('magias: filtro Ritual deveria isolar "Augúrio"');
+    window.document.querySelector('[data-magia-bool="ritual"]')?.click();
+  } catch (e) { erros.push('magias: filtro Ritual → ' + e.message); }
+
+  // Busca por texto
+  try {
+    const busca = window.document.getElementById('magia-busca');
+    busca.value = 'espiritual';
+    busca.dispatchEvent(new window.Event('input', { bubbles: true }));
+    const visiveis = itens().filter(el => !el.hidden);
+    if (visiveis.length !== 1) erros.push('magias: busca "espiritual" deveria achar 1, achou ' + visiveis.length);
+    busca.value = ''; busca.dispatchEvent(new window.Event('input', { bubbles: true }));
+  } catch (e) { erros.push('magias: busca por texto → ' + e.message); }
+
+  // Conjurar "Bênção" (1º nível) de verdade: abre modal, clica no slot de
+  // nível 1, confere slots_magia atualizado E persistido via window.sb.update.
+  try {
+    const antesAtual = (window.eval('charAtivo.slots_magia') || {})['1']?.atual || 0;
+    const btnConjurar = Array.from(window.document.querySelectorAll('.btn-conjurar'))
+      .find(b => b.dataset.conjurarNome === 'Bênção');
+    btnConjurar?.click();
+    const slotBtn = window.document.querySelector('.modal-slot-btn[data-nv="1"]');
+    if (!slotBtn) erros.push('magias: modal de Conjurar não ofereceu o slot de nível 1');
+    else {
+      window.__ultimoUpdatePayload = null;
+      slotBtn.click();
+      await Promise.resolve().then(() => {}).then(() => {}); // deixa o await do update() (mock) resolver
+      const depoisAtual = (window.eval('charAtivo.slots_magia') || {})['1']?.atual || 0;
+      if (depoisAtual !== antesAtual + 1) erros.push('magias: conjurar não incrementou slots_magia[1].atual (antes=' + antesAtual + ' depois=' + depoisAtual + ')');
+      const p = window.__ultimoUpdatePayload;
+      if (!p || !('slots_magia' in p)) erros.push('magias: conjurar não persistiu slots_magia via window.sb.update()');
+      if (window.document.querySelector('.modal-overlay')) erros.push('magias: modal de Conjurar não fechou após escolher o slot');
+    }
+  } catch (e) { erros.push('magias: fluxo de Conjurar → ' + e.message); }
+
+  window.__magiasFavoritasTeste = null;
+  console.log(erros.length > antes
+    ? '  FALHOU     magias (ver FALHAS abaixo)'
+    : '  aba magias: filtros (nível/tipo/ritual/busca) + espaços interativos + Conjurar de verdade ok');
 }
 
 // Header (Fase 2): avatar+nome+trocador, campanha, autosave, editar/travar,
