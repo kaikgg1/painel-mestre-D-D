@@ -1,0 +1,143 @@
+/* assets/css/ficha/resumo.css
+   Aba Resumo (Fase 3) — dashboard de consulta rápida em sessão. Arquivo novo:
+   nenhuma classe daqui existe nos outros 8, então a posição deste <link> na
+   lista não precisa respeitar a ordem de cascata como os demais.
+
+   Reaproveita .hp-bar/.hp-fill/.hp-percent/.hp-icone (definidos em
+   combate.css, sempre carregado) e .rc-* (sistema.css, recursos de classe) —
+   só o que é específico do layout do Resumo mora aqui. */
+
+.resumo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: var(--sp-5);
+  align-items: start;
+}
+.resumo-secao {
+  background: var(--sf-2);
+  border: 1px solid var(--borda);
+  border-radius: var(--r-md);
+  padding: var(--sp-4);
+}
+.resumo-secao h3 { margin-top: 0; }
+.resumo-secao.resumo-status { grid-column: 1 / -1; }
+
+/* ── Stat cards (CA, Iniciativa, Deslocamento, Inspiração, Magia) ── */
+.resumo-stats { display: flex; flex-wrap: wrap; gap: var(--sp-3); }
+.stat-card {
+  flex: 1; min-width: 108px;
+  background: var(--sf-inset); border: 1px solid var(--borda);
+  border-radius: var(--r-sm); padding: var(--sp-3);
+  text-align: center;
+}
+.stat-card-label {
+  font-family: var(--f-titulo); font-size: 10px; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--text-dim);
+  display: flex; align-items: center; justify-content: center; gap: 4px;
+}
+.stat-card-valor {
+  font-family: var(--f-num); font-size: 22px; font-weight: 700;
+  color: var(--gold-light); margin-top: var(--sp-1);
+}
+
+/* ── Card de HP (maior, com barra + atalhos) ── */
+.stat-card.stat-hp { flex: 2 1 220px; text-align: left; }
+.stat-hp-numero {
+  display: flex; align-items: baseline; gap: 4px; margin: var(--sp-1) 0 var(--sp-2);
+  font-family: var(--f-num); font-size: 22px; font-weight: 700; color: var(--gold-light);
+}
+.stat-hp-numero input {
+  background: transparent; border: none; color: inherit; font: inherit;
+  width: 2.4em; text-align: center; outline: none;
+  border-bottom: 1px dashed var(--borda);
+}
+.stat-hp-numero input:focus { border-bottom-color: var(--borda-ouro); }
+.stat-hp-numero .sep { color: var(--text-dim); }
+.stat-hp-temp { font-size: 12px; font-weight: 600; color: var(--ok); margin-left: auto; }
+.resumo-hp-quick { display: flex; gap: 4px; margin-top: var(--sp-2); }
+.resumo-hp-quick button {
+  flex: 1; min-height: 32px; border-radius: var(--r-sm); cursor: pointer;
+  font-family: var(--f-ui); font-size: 12px; font-weight: 700;
+  border: 1px solid var(--borda); background: var(--sf-2); color: var(--parchment);
+}
+.resumo-hp-quick .q-dano:hover { border-color: var(--blood); color: #c08878; }
+.resumo-hp-quick .q-cura:hover { border-color: var(--ok); color: var(--ok); }
+.resumo-hp-temp-edit { font-size: 11px; color: var(--text-dim); margin-top: var(--sp-2); }
+.resumo-hp-temp-edit input {
+  width: 34px; background: var(--sf-inset); border: 1px solid var(--borda);
+  border-radius: 4px; color: var(--gold-light); font-weight: 700; text-align: center;
+}
+
+/* ── Inspiração (dentro do stat-card) ── */
+.stat-card.stat-insp { min-width: 130px; }
+.resumo-insp-linha { display: flex; align-items: center; justify-content: center; gap: var(--sp-2); margin-top: var(--sp-1); }
+.resumo-insp-input { width: 2.2em; background: transparent; border: none; padding: 0; text-align: center; }
+.resumo-insp-input:focus { outline: none; }
+
+/* ── Ataques ── */
+.resumo-ataques { display: flex; flex-direction: column; gap: var(--sp-2); }
+.ataque-card {
+  display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap;
+  background: var(--sf-inset); border: 1px solid var(--borda); border-radius: var(--r-sm);
+  padding: var(--sp-2) var(--sp-3);
+}
+.ataque-nome { font-family: var(--f-ui); font-weight: 700; color: var(--parchment); flex: 1; min-width: 100px; }
+.ataque-info { display: flex; gap: var(--sp-3); font-size: 13px; color: var(--text-2); }
+.ataque-info span { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+.resumo-ataques-nota { font-size: 11px; font-style: italic; color: var(--text-dim); margin-top: var(--sp-2); }
+
+/* ── Slots de magia (versão compacta e só-leitura) ── */
+.resumo-slots { display: flex; flex-direction: column; gap: 6px; margin: var(--sp-3) 0; }
+.resumo-slot-linha { display: flex; align-items: center; gap: var(--sp-2); font-size: 13px; }
+.resumo-slot-nv { font-family: var(--f-titulo); color: var(--text-dim); width: 24px; flex-shrink: 0; }
+.resumo-slot-pips { display: flex; gap: 3px; flex-wrap: wrap; }
+.slot-pip-mini { width: 10px; height: 10px; border-radius: 50%; border: 1px solid var(--borda-forte); background: transparent; flex-shrink: 0; }
+.slot-pip-mini.gasto { background: var(--magic); border-color: var(--magic); }
+.resumo-slot-disp { margin-left: auto; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+
+/* ── Outros: percepção, condições, salvaguardas, atalhos ── */
+.resumo-outros-grid { margin-bottom: var(--sp-4); }
+.resumo-sub {
+  margin: var(--sp-4) 0 var(--sp-2);
+  color: var(--text-dim);
+}
+.resumo-sub:first-of-type { margin-top: 0; }
+
+.resumo-condicoes { display: flex; flex-direction: column; gap: var(--sp-2); }
+.resumo-cond-lista { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.item-vazio-inline { font-size: 13px; font-style: italic; color: var(--text-dim); }
+.condicao-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  background: var(--sf-ouro); border: 1px solid var(--borda-ouro); color: var(--gold-light);
+  border-radius: var(--r-pill); padding: 4px 6px 4px 12px;
+  font-family: var(--f-ui); font-size: 12px; font-weight: 700; cursor: pointer;
+}
+.condicao-chip.aberta { background: color-mix(in srgb, var(--gold) 22%, var(--sf-2)); }
+.condicao-x {
+  width: 18px; height: 18px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center;
+  color: var(--text-dim); font-size: 11px;
+}
+.condicao-x:hover { background: rgba(0,0,0,0.3); color: var(--parchment); }
+.condicao-detalhe {
+  background: var(--sf-inset); border: 1px solid var(--borda); border-radius: var(--r-sm);
+  padding: var(--sp-3); font-size: 13px; line-height: 1.55; color: var(--text-2);
+}
+.resumo-cond-add { display: inline-block; }
+.resumo-cond-add .menu-popover { left: 0; right: auto; max-height: 260px; overflow-y: auto; }
+
+.resumo-salvs { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+.resumo-salv-chip {
+  font-family: var(--f-ui); font-size: 12px; font-weight: 700;
+  padding: 4px 10px; border-radius: var(--r-pill);
+  background: var(--sf-inset); border: 1px solid var(--borda); color: var(--text-2);
+}
+.resumo-salv-chip.prof { border-color: var(--borda-ouro); color: var(--gold-light); background: var(--sf-ouro); }
+
+.resumo-atalhos { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
+
+@media (max-width: 480px) {
+  .resumo-grid { gap: var(--sp-4); }
+  .resumo-secao { padding: var(--sp-3); }
+  .stat-card { min-width: 92px; padding: var(--sp-2); }
+  .stat-card-valor { font-size: 19px; }
+}

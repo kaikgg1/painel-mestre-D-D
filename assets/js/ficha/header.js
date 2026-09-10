@@ -28,7 +28,10 @@ function renderHeader(c) {
   if (!idEl || !metaEl) return;
 
   // ── Bloco de identidade (avatar + nome + trocador + subtítulo) ──
-  const subtitulo = [c.classe, c.nivel ? 'Nv ' + c.nivel : '', c.subclasse]
+  // Raça · Classe Nível · Subclasse — o Resumo (Fase 3) não repete essas
+  // informações no corpo da aba porque já ficam aqui, visíveis o tempo todo.
+  const classeNivel = [c.classe, c.nivel ? String(c.nivel) : ''].filter(Boolean).join(' ');
+  const subtitulo = [c.raca, classeNivel, c.subclasse]
     .filter(Boolean).join(' · ') || 'Sem classe definida';
 
   const avatarConteudo = c.imagem_url

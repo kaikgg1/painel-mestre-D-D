@@ -35,7 +35,12 @@ const { window } = dom;
 
 // Stubs mínimos: init() sai cedo se não houver usuário logado.
 window.Auth = { requerLogin: async () => null, renderHeader: async () => {}, ehMestre: async () => false };
-window.sb = { from: () => ({ select: () => ({ eq: () => ({ order: async () => ({ data: [], error: null }) }) }) }) };
+window.sb = { from: () => ({
+  select: () => ({ eq: () => ({ order: async () => ({ data: [], error: null }) }) }),
+  // update().eq() é chamado por salvarCondicoes/salvarRecursos etc. — sem
+  // isso a promise rejeita (unhandled rejection) mesmo sem afetar o teste.
+  update: () => ({ eq: async () => ({ error: null }) }),
+}) };
 window.fetch = async () => { throw new Error('sem rede no smoke test'); };
 // Polyfills de coisas que o jsdom nao implementa (nao sao problema do codigo)
 window.Element.prototype.scrollIntoView = function () {};
@@ -44,16 +49,17 @@ if (!window.CSS) window.CSS = {};
 if (!window.CSS.escape) window.CSS.escape = (s) => String(s).replace(/[^a-zA-Z0-9_-]/g, c => '\\' + c);
 
 // Modulos compartilhados que a ficha consome (PHB, slots, exaustao, recursos, icones)
-for (const m of ['icones.js','phb_catalogo.js','phb_slots.js','exaustao_regras.js','recursos_classe.js']) {
+for (const m of ['icones.js','phb_catalogo.js','phb_slots.js','exaustao_regras.js','recursos_classe.js','ataques.js','condicoes_regras.js']) {
   const el = window.document.createElement('script');
   el.textContent = fs.readFileSync(path.join(raiz, 'assets/js', m), 'utf8');
   window.document.head.appendChild(el);
 }
 
 const ordem = [
-  'nucleo.js','render.js','header.js','nav_mobile.js','aba_combate.js',
-  'recursos.js','aba_habilidades.js','aba_magias.js','aba_equipamento.js',
-  'aba_aliados.js','aba_roleplay.js','lock.js','listeners.js','salvar.js',
+  'nucleo.js','render.js','header.js','nav_mobile.js','aba_resumo.js',
+  'aba_combate.js','recursos.js','aba_habilidades.js','aba_magias.js',
+  'aba_equipamento.js','aba_aliados.js','aba_roleplay.js','lock.js',
+  'listeners.js','salvar.js',
 ];
 
 const erros = [];
@@ -86,8 +92,35 @@ const esperadas = [
   'slugFeature','dadoVidaDaClasse','chaveDeClasse','classeUsaMagia','init','toast',
   'renderHeader','conectarListenersHeader','avatarIniciais','corAvatar',
   'duplicarPersonagem','deletarPersonagem','alternarAtivo','definirStatusAutosave',
-  'renderBottomNav','abrirSheetMais',
+  'renderBottomNav','abrirSheetMais','valorSalvaguarda','valorPericia','percepcaoPassiva',
+  'renderResumo','renderResumoStatus','renderResumoAtaques','renderResumoMagias',
+  'renderSlotsResumo','renderResumoOutros','renderChipsCondicoes',
+  'conectarListenersResumo','conectarListenersCondicoes','salvarCondicoes','alternarCondicao',
 ];
+
+// Ataques.js e condicoes_regras.js expõem objetos (não funções) — checa a API.
+const apiObjetos = [
+  ['Ataques', ['calcular', 'rolar', 'ehDistancia', 'temAcuidade']],
+  ['CondicoesRegras', ['descricao']],
+];
+for (const [nomeObj, metodos] of apiObjetos) {
+  const obj = window[nomeObj];
+  if (!obj) { erros.push('objeto global ausente: ' + nomeObj); continue; }
+  for (const m of metodos) {
+    if (typeof obj[m] !== 'function') erros.push(nomeObj + '.' + m + ' não é função');
+  }
+}
+if (!Array.isArray(window.CondicoesRegras?.LISTA)) erros.push('CondicoesRegras.LISTA não é array');
+else {
+  // Mesmos 14 nomes, mesma ordem, do array CONDICOES em painel_mestre_dnd5e.html —
+  // as duas telas leem/escrevem characters.condicoes (text[]); uma lista
+  // diferente aqui quebraria a compatibilidade entre ficha e painel do Mestre.
+  const ESPERADO_MESTRE = ['Agarrado','Amedrontado','Atordoado','Caído','Cego','Enfeitiçado',
+    'Envenenado','Impedido','Incapacitado','Inconsciente','Invisível','Paralisado','Petrificado','Surdo'];
+  if (JSON.stringify(window.CondicoesRegras.LISTA) !== JSON.stringify(ESPERADO_MESTRE)) {
+    erros.push('CondicoesRegras.LISTA diverge da lista CONDICOES do painel do Mestre');
+  }
+}
 const faltando = esperadas.filter(n => typeof window[n] !== 'function');
 if (faltando.length) erros.push('funções globais ausentes: ' + faltando.join(', '));
 
@@ -112,6 +145,20 @@ const checks = [
   ['escape("<b>")', '&lt;b&gt;'],
   ['detectarUsosLimitados({nome:"Canalizar Divindade (1/descanso)",desc:""}).max', 1],
   ['slugFeature("Ação Ardilosa")', 'acao_ardilosa'],
+  // valorSalvaguarda/valorPericia (Fase 3): mesma fórmula usada em Combate
+  // (aba_combate.js) e no Resumo — travando aqui os dois nunca podem divergir.
+  ['valorSalvaguarda({nivel:9,atributos:{sab:20},salvaguardas:{sab:true}},"sab")', 9],
+  ['valorSalvaguarda({nivel:9,atributos:{car:10},salvaguardas:{car:{prof:true,bonus:1}}},"car")', 5],
+  ['valorSalvaguarda({nivel:9,atributos:{for:8},salvaguardas:{for:false}},"for")', -1],
+  ['valorPericia({nivel:9,atributos:{sab:20},pericias:{percepcao:{prof:true,exp:true}}},"percepcao","sab")', 13],
+  ['percepcaoPassiva({nivel:9,atributos:{sab:20},pericias:{percepcao:{prof:true,exp:true}}})', 23],
+  // Ataques.calcular (Fase 3): corpo-a-corpo usa FOR, à distância usa DES,
+  // Acuidade usa o melhor dos dois — travado aqui pra não regredir.
+  ['Ataques.calcular({categoria:"Marcial corpo-a-corpo",propriedades:"Versátil (1d10)"},{for:16,dex:10},5).atrKey', 'for'],
+  ['Ataques.calcular({categoria:"Simples distância",propriedades:""},{for:16,dex:10},5).atrKey', 'dex'],
+  ['Ataques.calcular({categoria:"Marcial corpo-a-corpo",propriedades:"Acuidade"},{for:10,dex:18},5).atrKey', 'dex'],
+  ['Ataques.calcular({categoria:"Marcial corpo-a-corpo",propriedades:"Acuidade"},{for:10,dex:18},5).bonusAtaque', 7],
+  ['CondicoesRegras.LISTA.length', 14],
 ];
 for (const [expr, esperado] of checks) {
   let got;
@@ -153,7 +200,7 @@ setup.textContent = 'usuario = { id: "u" }; charAtivo = ' + JSON.stringify(PJ) +
   '; chars = [charAtivo, {...charAtivo, id: "y", nome: "Segundo PJ"}];';
 window.document.head.appendChild(setup);
 
-const abas = ['identidade','combate','habilidades','magias','equipamento','aliados','roleplay'];
+const abas = ['resumo','combate','magias','habilidades','equipamento','aliados','identidade','roleplay'];
 console.log('');
 for (const aba of abas) {
   const antes = erros.length;
@@ -168,6 +215,51 @@ for (const aba of abas) {
   console.log(erros.length > antes
     ? '  FALHOU     aba ' + aba
     : '  renderizou aba ' + aba + ' (' + tamanho + ' chars de HTML)');
+}
+
+// Resumo (Fase 3): renderiza de novo explicitamente (a última aba do loop
+// acima foi 'roleplay') e confere as seções + o ciclo completo de uma
+// condição — adicionar pelo menu, ver descrição expandida, remover.
+console.log('');
+{
+  const sc = window.document.createElement('script');
+  sc.textContent = 'tabAtiva = "resumo"; charAtivo.condicoes = []; render();';
+  window.document.head.appendChild(sc);
+
+  const RESUMO_CHECKS = [
+    ['.resumo-grid', 'grid do dashboard'],
+    ['.ataque-card', 'card de ataque (arma do inventário)'],
+    ['#recursos-classe-wrap .rc-painel', 'recursos de classe reaproveitados (mesmo painel de Habilidades)'],
+    ['.resumo-slots .resumo-slot-linha', 'resumo de espaços de magia'],
+    ['.resumo-salv-chip', 'chips de salvaguarda'],
+    ['#resumo-condicoes-wrap .item-vazio-inline', 'estado vazio de condições'],
+  ];
+  for (const [sel, rotulo] of RESUMO_CHECKS) {
+    if (!window.document.querySelector(sel)) erros.push('resumo: "' + rotulo + '" (' + sel + ') não encontrado');
+  }
+
+  // Ciclo de condição: abrir o menu, adicionar "Envenenado", conferir o chip,
+  // expandir a descrição, remover — tudo via clique real (não chamada direta).
+  const antesCondicao = erros.length;
+  try {
+    window.document.getElementById('btn-add-condicao')?.click();
+    window.document.querySelector('[data-condicao-add="Envenenado"]')?.click();
+    const chip = window.document.querySelector('[data-condicao-ver="Envenenado"]');
+    if (!chip) erros.push('resumo: condição "Envenenado" não apareceu como chip após adicionar');
+    else {
+      chip.click(); // expande a descrição
+      const detalhe = window.document.querySelector('.condicao-detalhe');
+      if (!detalhe || !detalhe.textContent.trim()) erros.push('resumo: descrição da condição não expandiu');
+      window.document.querySelector('[data-condicao-remover="Envenenado"]')?.click();
+      if (window.document.querySelector('[data-condicao-ver="Envenenado"]')) erros.push('resumo: condição não foi removida ao clicar no X');
+      const condFinal = window.eval('charAtivo.condicoes');
+      if (!Array.isArray(condFinal) || condFinal.length) erros.push('resumo: charAtivo.condicoes não voltou vazio após remover');
+    }
+  } catch (e) { erros.push('resumo: ciclo de condição → ' + e.message); }
+
+  console.log(erros.length > antesCondicao || RESUMO_CHECKS.some(([sel]) => !window.document.querySelector(sel))
+    ? '  FALHOU     resumo (ver FALHAS abaixo)'
+    : '  aba resumo: seções + ciclo completo de condição (adicionar/ver/remover) ok');
 }
 
 // Header (Fase 2): avatar+nome+trocador, campanha, autosave, editar/travar,

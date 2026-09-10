@@ -75,6 +75,13 @@ function conectarListeners() {
     if (btnAdd) btnAdd.addEventListener('click', adicionarFeaturePersonalizada);
   }
 
+  // Resumo — mesmo painel de recursos de classe da aba Habilidades
+  // (renderRecursosClasse), só que dentro de #recursos-classe-wrap do Resumo.
+  if (tabAtiva === 'resumo') {
+    renderRecursosClasse(charAtivo);
+    conectarListenersResumo();
+  }
+
   // Listeners de tags (idiomas/ferramentas) — só na aba identidade
   if (tabAtiva === 'identidade') {
     conectarListenersTags();

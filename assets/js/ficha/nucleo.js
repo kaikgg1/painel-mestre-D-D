@@ -110,10 +110,32 @@ const bonusProf = nv => Math.floor(((+nv || 1) - 1) / 4) + 2;
 function salvProf(salv, k) { const v = salv?.[k]; return v === true || !!(v && v.prof); }
 function salvBonus(salv, k) { const v = salv?.[k]; return (v && typeof v === 'object' && +v.bonus) || 0; }
 
+// Valor final de salvaguarda/perícia a partir do PERSONAGEM SALVO (charAtivo).
+// Usado no primeiro render de Combate e no Resumo — mesma fórmula, um só
+// lugar, os dois nunca divergem. (Diferente de recalcularValoresPericiasSalv()
+// em listeners.js, que lê o DOM ao vivo pra refletir edições ainda não
+// salvas — proposta diferente, não dá pra unificar sem misturar as duas.)
+function valorSalvaguarda(c, atrKey) {
+  const salv = c.salvaguardas || {};
+  const m = mod((c.atributos || {})[atrKey] ?? 10);
+  return m + (salvProf(salv, atrKey) ? bonusProf(c.nivel) : 0) + salvBonus(salv, atrKey);
+}
+function valorPericia(c, periciaKey, atrKey) {
+  const p = (c.pericias || {})[periciaKey] || {};
+  const m = mod((c.atributos || {})[atrKey] ?? 10);
+  const bp = bonusProf(c.nivel);
+  return m + (p.prof ? bp : 0) + (p.exp ? bp : 0) + (+p.bonus || 0);
+}
+// Percepção passiva (10 + Percepção) — mesmo valor que a coluna percepcao_passiva
+// do banco deveria refletir pro painel do Mestre (ver salvarPercepcaoPassiva).
+function percepcaoPassiva(c) {
+  return 10 + valorPericia(c, 'percepcao', 'sab');
+}
+
 let usuario = null;
 let chars = [];
 let charAtivo = null;
-let tabAtiva = 'identidade';
+let tabAtiva = 'resumo'; // Resumo (Fase 3) é a tela principal de uso em sessão
 let _ultimoSaveLocal = 0;          // pra ignorar echo do próprio save
 let canalFicha = null;             // canal realtime
 // (mudancaPendente removido — updates externos se aplicam automaticamente)
@@ -361,6 +383,26 @@ async function alternarAtivo() {
   charAtivo.is_active = novo;
   if (novo) chars = chars.map(c => ({ ...c, is_active: c.id === charAtivo.id }));
   render();
+}
+
+// ── Condições (characters.condicoes, text[]) ────────────────────────
+// Mesma coluna que o painel do Mestre já lê/escreve (ver
+// assets/js/condicoes_regras.js) — usada primeiro no Resumo (Fase 3) e
+// depois também na aba Combate (Fase 4), por isso vive aqui em vez de
+// dentro de um aba_*.js só.
+async function salvarCondicoes() {
+  if (!charAtivo?.id) return;
+  _ultimoSaveLocal = Date.now();
+  const { error } = await window.sb.from('characters')
+    .update({ condicoes: charAtivo.condicoes || [] })
+    .eq('id', charAtivo.id);
+  if (error) console.warn('[condicoes] erro ao salvar:', error);
+}
+function alternarCondicao(nome) {
+  const atuais = new Set(charAtivo.condicoes || []);
+  if (atuais.has(nome)) atuais.delete(nome); else atuais.add(nome);
+  charAtivo.condicoes = Array.from(atuais);
+  salvarCondicoes();
 }
 
 function escape(s) {

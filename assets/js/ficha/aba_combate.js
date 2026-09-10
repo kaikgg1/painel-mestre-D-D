@@ -108,10 +108,9 @@ function renderCombate(c) {
     <h3>Salvaguardas <span style="font-size:11px;color:var(--text-dim);font-weight:normal;font-style:italic">(auto: modificador + ${bonusProf(c.nivel)} se proficiente · campo ± = bônus extra)</span></h3>
     <div class="check-grid">
       ${ATRIBUTOS.map(([k, nome]) => {
-        const m = mod((c.atributos||{})[k] ?? 10);
         const prof = salvProf(salv, k);
         const bonus = salvBonus(salv, k);
-        const valor = m + (prof ? bonusProf(c.nivel) : 0) + bonus;
+        const valor = valorSalvaguarda(c, k);
         return `
           <div class="check-row">
             <label><input type="checkbox" name="salv_${k}" ${prof ? 'checked' : ''} data-salv="${k}"> ${nome}</label>
@@ -130,9 +129,7 @@ function renderCombate(c) {
       ${PERICIAS.map(([k, nome, atr]) => {
         const p = per[k] || {};
         const bonus = +p.bonus || 0;
-        const m = mod((c.atributos||{})[atr] ?? 10);
-        const bp = bonusProf(c.nivel);
-        const valor = m + (p.prof ? bp : 0) + (p.exp ? bp : 0) + bonus;
+        const valor = valorPericia(c, k, atr);
         return `
           <div class="check-row">
             <label><input type="checkbox" name="per_${k}_prof" ${p.prof?'checked':''} data-per="${k}" data-atr="${atr}"> ${nome}<span class="atr-tag">${atr.toUpperCase()}</span></label>

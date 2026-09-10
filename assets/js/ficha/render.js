@@ -18,12 +18,20 @@ function render() {
 
     <div class="tabs-wrap" id="tabs-wrap">
       <div class="tabs" role="tablist" id="tabs">
-        <button class="tab ${tabAtiva==='identidade'?'ativa':''}" data-tab="identidade" role="tab">Identidade</button>
+        <!-- Ordem já aproxima a arquitetura-alvo do redesign (Resumo, Combate,
+             Magias, Habilidades, Equipamento, Aliados, Personagem — §1): a
+             navegação inferior mobile (nav_mobile.js) pega "as 4 primeiras
+             abas + Mais", então esta ordem já entrega Resumo/Combate/Magias/
+             Habilidades nela HOJE, antes mesmo da Fase 9 fundir Identidade+
+             Roleplay em "Personagem" (por isso as duas ficam juntas, por
+             último, no lugar que "Personagem" vai ocupar). -->
+        <button class="tab ${tabAtiva==='resumo'?'ativa':''}" data-tab="resumo" role="tab">Resumo</button>
         <button class="tab ${tabAtiva==='combate'?'ativa':''}" data-tab="combate" role="tab">Combate</button>
-        <button class="tab ${tabAtiva==='habilidades'?'ativa':''}" data-tab="habilidades" role="tab">Habilidades</button>
         ${classeUsaMagia(c) ? `<button class="tab ${tabAtiva==='magias'?'ativa':''}" data-tab="magias" role="tab">Magias</button>` : ''}
+        <button class="tab ${tabAtiva==='habilidades'?'ativa':''}" data-tab="habilidades" role="tab">Habilidades</button>
         <button class="tab ${tabAtiva==='equipamento'?'ativa':''}" data-tab="equipamento" role="tab">Equipamento</button>
         <button class="tab ${tabAtiva==='aliados'?'ativa':''}" data-tab="aliados" role="tab">Aliados</button>
+        <button class="tab ${tabAtiva==='identidade'?'ativa':''}" data-tab="identidade" role="tab">Identidade</button>
         <button class="tab ${tabAtiva==='roleplay'?'ativa':''}" data-tab="roleplay" role="tab">Roleplay</button>
       </div>
     </div>
@@ -61,15 +69,16 @@ function renderListaTags(field, label, valores) {
 }
 
 function renderTab(c, atrs) {
-  // Se PJ não usa magia e a tab "magias" estava ativa, joga pra identidade
-  if (tabAtiva === 'magias' && !classeUsaMagia(c)) tabAtiva = 'identidade';
+  // Se PJ não usa magia e a tab "magias" estava ativa, joga pro Resumo
+  if (tabAtiva === 'magias' && !classeUsaMagia(c)) tabAtiva = 'resumo';
   switch (tabAtiva) {
-    case 'identidade':  return renderIdentidade(c, atrs);
+    case 'resumo':      return renderResumo(c, atrs);
     case 'combate':     return renderCombate(c);
-    case 'habilidades': return renderHabilidades(c);
     case 'magias':      return renderMagias(c);
+    case 'habilidades': return renderHabilidades(c);
     case 'equipamento': return renderEquipamento(c);
     case 'aliados':     return renderAliados(c);
+    case 'identidade':  return renderIdentidade(c, atrs);
     case 'roleplay':    return renderRoleplay(c);
   }
 }
