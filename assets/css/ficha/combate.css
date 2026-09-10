@@ -239,6 +239,7 @@
   padding: 0 2px; border-radius: 50%;
 }
 .lista-tags .tag .x:hover { background: var(--blood-bright); color: var(--parchment); }
+.lista-tags .tag .x:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
 .lista-tags-add { display: flex; gap: 6px; margin-top: 6px; }
 .lista-tags-add input { flex: 1; }
 

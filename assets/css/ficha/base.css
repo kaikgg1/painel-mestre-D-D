@@ -191,6 +191,7 @@ html, body {
 .hdr-campanha .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); flex-shrink: 0; }
 .hdr-campanha.aviso { color: var(--gold-light); border-color: var(--borda-ouro); cursor: pointer; background: var(--sf-ouro); }
 .hdr-campanha.aviso:hover { background: color-mix(in srgb, var(--gold) 16%, var(--sf-2)); }
+.hdr-campanha.aviso:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 .hdr-campanha .lbl { overflow: hidden; text-overflow: ellipsis; }
 @media (max-width: 560px) { .hdr-campanha .lbl { display: none; } }
 

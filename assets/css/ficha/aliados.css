@@ -90,6 +90,7 @@
 }
 .criatura-img.tem { cursor: zoom-in; }
 .criatura-img:hover { border-color: var(--borda-forte); transform: scale(1.03); box-shadow: 0 4px 16px rgba(0,0,0,0.6); }
+.criatura-img:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 .criatura-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
 .criatura-img-ph { font-size: 46px; opacity: 0.45; }
 .criatura-img.erro img { display: none; }

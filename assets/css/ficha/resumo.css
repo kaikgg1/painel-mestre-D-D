@@ -104,6 +104,7 @@
   color: var(--text-dim); font-size: 11px;
 }
 .condicao-x:hover { background: rgba(0,0,0,0.3); color: var(--parchment); }
+.condicao-x:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
 .condicao-detalhe {
   background: var(--sf-inset); border: 1px solid var(--borda); border-radius: var(--r-sm);
   padding: var(--sp-3); font-size: 13px; line-height: 1.55; color: var(--text-2);

@@ -12,6 +12,7 @@
 }
 .magia-item:hover { border-color: var(--borda-forte); }
 .magia-item.aberta { border-color: var(--borda-ouro); }
+.magia-row:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
 .magia-row {
   display: grid; grid-template-columns: 50px 1fr 100px 110px 28px;
   gap: 10px; align-items: center;
