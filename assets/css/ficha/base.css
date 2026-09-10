@@ -320,6 +320,18 @@ main { max-width: var(--ficha-max); margin: var(--sp-5) auto; padding: 0 var(--s
 .tab.ativa { color: var(--gold-light); border-bottom-color: var(--gold); }
 .tab:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
 
+/* nav.css já documentava essa intenção ("desktop = .tabs, mobile =
+   .bottom-nav") mas a regra nunca existiu aqui — as duas barras ficavam
+   visíveis juntas no mobile, com a de cima obrigando um scroll horizontal
+   ruim pra alcançar as últimas abas. Mesmo breakpoint do .bottom-nav
+   (nav.css) pra trocar de uma pra outra sem sobreposição nem buraco. */
+@media (max-width: 768px) {
+  .tabs-wrap { display: none; }
+  /* sem a barra de cima, o conteúdo vira o topo do card — devolve a borda/
+     cantos que .tab-content normalmente cede pra ficar "colado" nela. */
+  .tab-content { border-top: 1px solid var(--borda); border-radius: var(--r-md); }
+}
+
 .tab-content {
   background: var(--sf-1);
   border: 1px solid var(--borda);
