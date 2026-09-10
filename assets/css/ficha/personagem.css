@@ -104,49 +104,60 @@
 .upload-status.erro  { color: var(--erro); }
 .upload-status.info  { color: var(--text-dim); }
 
-/* ===== Roleplay lock ===== */
-.rp-lock-bar {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 10px; flex-wrap: wrap;
-  border-top: 1px solid var(--borda);
-  padding-top: 18px; margin-top: 18px;
-}
-.rp-lock-hint {
-  color: var(--text-dim); font-style: italic; font-size: 12px;
-  margin: 6px 0 12px;
-}
-.btn-rp-edit {
-  background: linear-gradient(to bottom, var(--gold), #5c4020);
-  border: 1px solid var(--borda);
-  color: var(--shadow);
-  font-family: var(--f-ui); font-size: 12px; font-weight: 700;
-  letter-spacing: 1px; text-transform: uppercase;
-  padding: 8px 16px; border-radius: 4px; cursor: pointer;
-  min-height: 36px; transition: all 0.15s;
-}
-.btn-rp-edit:hover {
-  background: linear-gradient(to bottom, var(--gold-bright), var(--gold));
-  transform: translateY(-1px);
-}
-.btn-rp-edit.editando {
-  background: linear-gradient(to bottom, #59633d, #4a5233);
-  border-color: #7a8a5e; color: #fff;
-}
 @media (max-width: 600px) {
-  .rp-lock-bar { flex-direction: column; align-items: stretch; }
-  .btn-rp-edit { width: 100%; min-height: 44px; }
   .magia-conjurar-bar { justify-content: stretch; }
   .btn-conjurar { width: 100%; min-height: 44px; }
 }
-.rp-bloqueavel.rp-locked textarea,
-.rp-bloqueavel.rp-locked input {
-  background: rgba(0,0,0,0.15) !important;
-  color: var(--parchment-dim) !important;
-  cursor: default !important;
-  border-color: var(--borda) !important;
+
+/* ===== Modo leitura (Fase 9) — bloco de Identidade e cards de Roleplay ===== */
+.leitura-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: var(--sp-4, 12px) var(--sp-6, 18px);
+  margin-bottom: 18px;
 }
-.rp-bloqueavel.rp-locked textarea:focus,
-.rp-bloqueavel.rp-locked input:focus {
-  outline: none !important;
+.leitura-campo {
+  display: flex; flex-direction: column; gap: 2px;
+  min-width: 0;
+}
+.leitura-label {
+  font-family: var(--f-ui);
+  font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+  color: var(--text-dim);
+}
+.leitura-valor {
+  font-family: var(--f-prosa, inherit);
+  font-size: 15px; color: var(--parchment, #eee);
+  overflow-wrap: break-word;
+}
+.leitura-vazio {
+  color: var(--text-dim); font-style: italic;
+}
+.tag-leitura {
+  cursor: default;
+}
+.tag-leitura .x { display: none; }
+
+.roleplay-cards {
+  margin-bottom: 14px;
+}
+.roleplay-card {
+  background: linear-gradient(160deg, var(--bg-card-soft), var(--bg-card));
+  border: 1.5px solid var(--borda);
+  border-radius: 8px;
+  padding: 12px 14px;
+}
+.roleplay-card-head {
+  font-family: var(--f-ui);
+  font-size: 11px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+  color: var(--gold-bright);
+  margin-bottom: 6px;
+}
+.roleplay-card-texto {
+  font-family: var(--f-prosa, inherit);
+  font-size: 14px; line-height: 1.5;
+  color: var(--parchment, #eee);
+  font-style: italic;
+  margin: 0;
 }
 

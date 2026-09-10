@@ -83,8 +83,8 @@ function conectarListeners() {
     conectarListenersResumo();
   }
 
-  // Listeners de tags (idiomas/ferramentas) — só na aba identidade
-  if (tabAtiva === 'identidade') {
+  // Listeners de tags (idiomas/ferramentas) — só na aba Personagem
+  if (tabAtiva === 'personagem') {
     conectarListenersTags();
     // Quando a classe muda: atualiza dropdown de subclasse + dado de vida
     const selClasse = document.getElementById('sel-classe');
@@ -267,8 +267,10 @@ function conectarListeners() {
   // Aba Aliados (criaturas controladas)
   if (tabAtiva === 'aliados') conectarListenersAliados();
 
-  // Roleplay: preview + upload de retrato
-  if (tabAtiva === 'roleplay') {
+  // Roleplay (dentro da aba Personagem, Fase 9): preview + upload de retrato.
+  // Bloco separado do de cima de propósito (mesma condição, escopos
+  // isolados) — mais simples e seguro que interligar as duas const/let.
+  if (tabAtiva === 'personagem') {
     const inp = document.getElementById('input-imagem');
     const prev = document.getElementById('retrato-preview');
     const arquivo = document.getElementById('input-arquivo');

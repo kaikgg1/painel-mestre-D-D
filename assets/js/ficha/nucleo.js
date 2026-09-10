@@ -426,6 +426,15 @@ function alternarHabilidadeFavorita(slug) {
   salvarHabilidadesFavoritas();
 }
 
+// Mesma fonte de verdade que aplicarEstadoLock() (lock.js) usa — Fase 9:
+// a aba Personagem lê isso pra decidir se mostra campos de leitura (cards
+// de texto) ou o formulário de edição de sempre. Um só lugar faz a leitura
+// do localStorage; lock.js e render.js/aba_roleplay.js chamam esta função
+// em vez de repetir o try/catch.
+function estaDesbloqueado() {
+  try { return localStorage.getItem('ficha_unlock') === '1'; } catch { return false; }
+}
+
 function escape(s) {
   return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }

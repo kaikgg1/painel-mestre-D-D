@@ -1,48 +1,16 @@
 // assets/js/ficha/lock.js
 // Modo leitura × edição. body.modo-unlock (persistido em localStorage
-// "ficha_unlock") libera os campos; travado é o padrão. Também tira os campos
-// travados da ordem de tabulação (a11y). O CSS mora em assets/css/ficha/sistema.css.
-
-function aplicarBloqueioRoleplay(bloqueado) {
-  const blocos = document.querySelectorAll('[data-rp-lock]');
-  blocos.forEach(b => {
-    b.classList.toggle('rp-locked', bloqueado);
-    b.querySelectorAll('input, textarea').forEach(el => {
-      if (bloqueado) el.setAttribute('readonly', '');
-      else el.removeAttribute('readonly');
-    });
-  });
-  const btn = document.getElementById('btn-rp-toggle');
-  const lbl = document.getElementById('btn-rp-label');
-  const hint = document.getElementById('rp-lock-hint');
-  if (btn) btn.setAttribute('aria-pressed', String(!bloqueado));
-  if (lbl) lbl.textContent = bloqueado ? 'Editar' : 'Salvar e travar';
-  if (btn) btn.classList.toggle('editando', !bloqueado);
-  if (hint) hint.style.display = bloqueado ? '' : 'none';
-}
-
-// Lock genérico para qualquer bloco [data-X-lock]
-function aplicarBloqueioGenerico(blocos, btnId, lblId, hintId, bloqueado) {
-  blocos.forEach(b => {
-    b.classList.toggle('rp-locked', bloqueado);
-    b.querySelectorAll('input, textarea').forEach(el => {
-      if (bloqueado) el.setAttribute('readonly', '');
-      else el.removeAttribute('readonly');
-    });
-  });
-  const btn = document.getElementById(btnId);
-  const lbl = document.getElementById(lblId);
-  const hint = document.getElementById(hintId);
-  if (btn) btn.setAttribute('aria-pressed', String(!bloqueado));
-  if (lbl) lbl.textContent = bloqueado ? 'Editar' : 'Salvar e travar';
-  if (btn) btn.classList.toggle('editando', !bloqueado);
-  if (hint) hint.style.display = bloqueado ? '' : 'none';
-}
+// "ficha_unlock", lido via estaDesbloqueado() em nucleo.js) libera os campos;
+// travado é o padrão. Também tira os campos travados da ordem de tabulação
+// (a11y). O CSS mora em assets/css/ficha/sistema.css.
+//
+// (aplicarBloqueioRoleplay/aplicarBloqueioGenerico existiam aqui — um
+// mecanismo de trava POR AtBA que nunca chegou a ser usado por nenhum
+// render(), superado por este lock GLOBAL. Removidos na Fase 9 ao mexer
+// neste arquivo; nada no projeto os referenciava.)
 
 function aplicarEstadoLock() {
-  let unlock = false;
-  try { unlock = localStorage.getItem('ficha_unlock') === '1'; } catch {}
-  document.body.classList.toggle('modo-unlock', unlock);
+  document.body.classList.toggle('modo-unlock', estaDesbloqueado());
   atualizarLockLabel();
   aplicarTabIndexLock();
 }
@@ -83,4 +51,3 @@ function atualizarLockLabel() {
   btn.setAttribute('aria-pressed', String(unlock));
   btn.title = unlock ? 'Travar a ficha (modo somente leitura)' : 'Liberar edição da ficha';
 }
-

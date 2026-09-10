@@ -136,8 +136,8 @@ for (const arq of ordem) {
 // As funções que precisam continuar globais (inclusive as chamadas por
 // handlers inline no HTML gerado: popularHabilidades, tentarRecuperarImagemCriatura).
 const esperadas = [
-  'render','renderTab','renderIdentidade','renderCombate','renderHabilidades',
-  'renderMagias','renderEquipamento','renderAliados','renderRoleplay',
+  'render','renderTab','renderPersonagem','renderCombate','renderHabilidades',
+  'renderMagias','renderEquipamento','renderAliados','renderRoleplayBloco',
   'renderSlotsMagia','renderRecursosClasse','renderCardCriatura','renderTabelaItens',
   'popularHabilidades','popularFeaturesPersonalizadas','tentarRecuperarImagemCriatura',
   'conectarListeners','conectarListenersEquipamento','conectarListenersTags',
@@ -257,7 +257,7 @@ setup.textContent = 'usuario = { id: "u" }; charAtivo = ' + JSON.stringify(PJ) +
   '; chars = [charAtivo, {...charAtivo, id: "y", nome: "Segundo PJ"}];';
 window.document.head.appendChild(setup);
 
-const abas = ['resumo','combate','magias','habilidades','equipamento','aliados','identidade','roleplay'];
+const abas = ['resumo','combate','magias','habilidades','equipamento','aliados','personagem'];
 console.log('');
 for (const aba of abas) {
   const antes = erros.length;
@@ -275,7 +275,7 @@ for (const aba of abas) {
 }
 
 // Resumo (Fase 3): renderiza de novo explicitamente (a última aba do loop
-// acima foi 'roleplay') e confere as seções + o ciclo completo de uma
+// acima foi 'personagem') e confere as seções + o ciclo completo de uma
 // condição — adicionar pelo menu, ver descrição expandida, remover.
 console.log('');
 {
@@ -798,6 +798,59 @@ console.log('');
   console.log(erros.length > antes
     ? '  FALHOU     aliados (ver FALHAS abaixo)'
     : '  aba aliados: recolhido por padrão + resumo com PV/CA/Mov/ND + abrir/fechar + PV rápido sem fechar + nova criatura nasce expandida ok');
+}
+
+// Personagem (Fase 9): fusão Identidade+Roleplay com modo leitura × edição
+// global (mesmo botão Editar/Travar do header). Travado (padrão) mostra
+// cards de leitura; destravado mostra o formulário de sempre com os MESMOS
+// name= (a guarda de autosave em salvar.js depende disso continuar igual).
+console.log('');
+{
+  const antes = erros.length;
+  try {
+    // Garante travado, entra na aba e confere o modo leitura.
+    let sc = window.document.createElement('script');
+    sc.textContent = 'localStorage.setItem("ficha_unlock", "0"); tabAtiva = "personagem"; render();';
+    window.document.head.appendChild(sc);
+
+    if (window.document.body.classList.contains('modo-unlock')) erros.push('personagem: body deveria estar SEM modo-unlock (travado) após localStorage="0"');
+    if (window.document.querySelector('.tab-content input[name="nome"]')) erros.push('personagem: modo travado ainda renderizou o <input name="nome"> de edição (deveria ser card de leitura)');
+    const grid = window.document.querySelector('.leitura-grid');
+    if (!grid) erros.push('personagem: modo travado não renderizou .leitura-grid');
+    else if (!new RegExp(PJ.nome).test(grid.textContent)) erros.push('personagem: .leitura-grid não mostra o nome do PJ como texto');
+    if (!window.document.querySelector('.roleplay-card')) erros.push('personagem: modo travado não renderizou os cards de roleplay (.roleplay-card)');
+    if (window.document.querySelector('.tab-content textarea[name="ideais"]')) erros.push('personagem: modo travado ainda renderizou <textarea name="ideais"> (deveria ser card de leitura)');
+    // Campos sempre-interativos (§4: Inspiração não segue o lock geral).
+    const inspLocked = window.document.querySelector('input[name="inspiracao"]');
+    if (!inspLocked) erros.push('personagem: input de Inspiração não encontrado em modo travado');
+    else if (!inspLocked.closest('.no-lock')) erros.push('personagem: Inspiração deveria estar marcada .no-lock (interativa mesmo travada)');
+    // Traços raciais e Atributos ficam fora do vai-e-volta leitura/edição (§4).
+    if (!window.document.querySelector('textarea[name="tracos_raciais"]')) erros.push('personagem: <textarea name="tracos_raciais"> deveria continuar visível mesmo travado');
+    if (!window.document.querySelector('input[name="attr_for"]')) erros.push('personagem: input de atributo (attr_for) deveria continuar visível mesmo travado');
+
+    // Destrava via o MESMO fluxo do botão do header (toggle real via clique,
+    // não chamada direta a render()) — cobre o listener de header.js inteiro.
+    window.document.getElementById('btn-lock-toggle')?.click();
+
+    if (!window.document.body.classList.contains('modo-unlock')) erros.push('personagem: clicar em Editar não ativou modo-unlock');
+    if (window.localStorage.getItem('ficha_unlock') !== '1') erros.push('personagem: clicar em Editar não persistiu "ficha_unlock"="1" no localStorage');
+    const nomeInput = window.document.querySelector('.tab-content input[name="nome"]');
+    if (!nomeInput) erros.push('personagem: modo destravado não renderizou <input name="nome">');
+    else if (nomeInput.value !== PJ.nome) erros.push('personagem: <input name="nome"> destravado veio com valor errado');
+    if (!window.document.querySelector('textarea[name="ideais"]')) erros.push('personagem: modo destravado não renderizou <textarea name="ideais">');
+    if (window.document.querySelector('.leitura-grid')) erros.push('personagem: modo destravado ainda mostra .leitura-grid (deveria ter sumido)');
+    const inspUnlocked = window.document.querySelector('input[name="inspiracao"]');
+    if (!inspUnlocked || !inspUnlocked.closest('.no-lock')) erros.push('personagem: Inspiração deveria continuar .no-lock em modo destravado');
+
+    // Trava de novo pelo botão (ciclo completo) e devolve o padrão pros
+    // blocos seguintes do smoke test (header etc. esperam travado).
+    window.document.getElementById('btn-lock-toggle')?.click();
+    if (window.document.body.classList.contains('modo-unlock')) erros.push('personagem: clicar em Travar de novo não voltou ao modo travado');
+  } catch (e) { erros.push('personagem: ' + e.message); }
+
+  console.log(erros.length > antes
+    ? '  FALHOU     personagem (ver FALHAS abaixo)'
+    : '  aba personagem: leitura×edição via botão Editar/Travar + Inspiração/traços-raciais/atributos sempre visíveis ok');
 }
 
 // Header (Fase 2): avatar+nome+trocador, campanha, autosave, editar/travar,

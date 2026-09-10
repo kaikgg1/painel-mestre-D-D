@@ -1,8 +1,9 @@
 // assets/js/ficha/render.js
-// render(): reconstrói #conteudo inteiro (aviso de visibilidade, barra de
-// personagem, abas e <form>) e re-liga os listeners. Inclui o dispatcher
-// renderTab(), os helpers de select de subclasse / lista de tags, e a aba
-// Identidade.
+// render(): reconstrói #conteudo inteiro (abas e <form>) e re-liga os
+// listeners. Inclui o dispatcher renderTab(), os helpers de select de
+// subclasse / lista de tags, e o bloco de Identidade da aba Personagem
+// (Fase 9 — o resto de Personagem, roleplay/retrato/história, mora em
+// assets/js/ficha/aba_roleplay.js).
 
 function render() {
   const c = charAtivo;
@@ -18,21 +19,18 @@ function render() {
 
     <div class="tabs-wrap" id="tabs-wrap">
       <div class="tabs" role="tablist" id="tabs">
-        <!-- Ordem já aproxima a arquitetura-alvo do redesign (Resumo, Combate,
-             Magias, Habilidades, Equipamento, Aliados, Personagem — §1): a
+        <!-- Ordem final da arquitetura-alvo do redesign (§1): Resumo, Combate,
+             Magias, Habilidades, Equipamento, Aliados, Personagem — a
              navegação inferior mobile (nav_mobile.js) pega "as 4 primeiras
-             abas + Mais", então esta ordem já entrega Resumo/Combate/Magias/
-             Habilidades nela HOJE, antes mesmo da Fase 9 fundir Identidade+
-             Roleplay em "Personagem" (por isso as duas ficam juntas, por
-             último, no lugar que "Personagem" vai ocupar). -->
+             abas + Mais" automaticamente, sem precisar tocar nela. Identidade
+             e Roleplay se fundiram em "Personagem" na Fase 9. -->
         <button class="tab ${tabAtiva==='resumo'?'ativa':''}" data-tab="resumo" role="tab">Resumo</button>
         <button class="tab ${tabAtiva==='combate'?'ativa':''}" data-tab="combate" role="tab">Combate</button>
         ${classeUsaMagia(c) ? `<button class="tab ${tabAtiva==='magias'?'ativa':''}" data-tab="magias" role="tab">Magias</button>` : ''}
         <button class="tab ${tabAtiva==='habilidades'?'ativa':''}" data-tab="habilidades" role="tab">Habilidades</button>
         <button class="tab ${tabAtiva==='equipamento'?'ativa':''}" data-tab="equipamento" role="tab">Equipamento</button>
         <button class="tab ${tabAtiva==='aliados'?'ativa':''}" data-tab="aliados" role="tab">Aliados</button>
-        <button class="tab ${tabAtiva==='identidade'?'ativa':''}" data-tab="identidade" role="tab">Identidade</button>
-        <button class="tab ${tabAtiva==='roleplay'?'ativa':''}" data-tab="roleplay" role="tab">Roleplay</button>
+        <button class="tab ${tabAtiva==='personagem'?'ativa':''}" data-tab="personagem" role="tab">Personagem</button>
       </div>
     </div>
 
@@ -68,6 +66,17 @@ function renderListaTags(field, label, valores) {
     </div></div>`;
 }
 
+// Mesma lista, sem os controles de adicionar/remover — usada em modo
+// leitura (Fase 9). As tags em si continuam com a MESMA classe .tag, só
+// sem o "✕" e a barra de adicionar embaixo.
+function renderListaTagsLeitura(label, valores) {
+  const tags = (valores || []).map(v => `<span class="tag tag-leitura">${escape(v)}</span>`).join('');
+  return `<div class="campo">
+    <label>${label}</label>
+    <div class="lista-tags">${tags || '<span class="leitura-vazio" style="padding:4px">Nenhum</span>'}</div>
+  </div>`;
+}
+
 function renderTab(c, atrs) {
   // Se PJ não usa magia e a tab "magias" estava ativa, joga pro Resumo
   if (tabAtiva === 'magias' && !classeUsaMagia(c)) tabAtiva = 'resumo';
@@ -78,14 +87,76 @@ function renderTab(c, atrs) {
     case 'habilidades': return renderHabilidades(c);
     case 'equipamento': return renderEquipamento(c);
     case 'aliados':     return renderAliados(c);
-    case 'identidade':  return renderIdentidade(c, atrs);
-    case 'roleplay':    return renderRoleplay(c);
+    case 'personagem':  return renderPersonagem(c, atrs);
   }
 }
 
-function renderIdentidade(c, atrs) {
+// Aba Personagem (Fase 9, §1/§4/§16) — fusão de Identidade + Roleplay.
+// Nome/raça/classe/subclasse/origem/alinhamento/campanha/idiomas/ferramentas
+// alternam entre CARD DE LEITURA e formulário conforme o modo global
+// Editar/Travar (estaDesbloqueado(), nucleo.js — mesmo botão do header,
+// Fase 2). Características Raciais e Atributos NÃO entram nesse
+// vai-e-volta — o briefing não os lista em §4, então continuam como
+// sempre (form fields sujeitos ao lock genérico de sistema.css, igual a
+// qualquer outra aba). Retrato/História/Notas/Inspiração (aba_roleplay.js)
+// também ficam de fora — o §16 pede que continuem como estão.
+function renderPersonagem(c, atrs) {
   return `
-    <h3>Identidade</h3>
+    ${estaDesbloqueado() ? renderIdentidadeEdicao(c) : renderIdentidadeLeitura(c)}
+
+    <h3>Características Raciais</h3>
+    <div class="campo">
+      <textarea name="tracos_raciais" placeholder="Ex.: Visão no Escuro 18m, Resistência Anã, Proficiência em Machados">${escape(c.tracos_raciais||'')}</textarea>
+    </div>
+
+    <h3>Atributos</h3>
+    <div class="grid-6">
+      ${ATRIBUTOS.map(([k, nome]) => `
+        <div class="atributo">
+          <span class="nome-atr">${nome.slice(0,3).toUpperCase()}</span>
+          <input type="text" inputmode="numeric" class="valor-base" name="attr_${k}" value="${atrs[k] ?? 10}" data-attr="${k}" data-validar="int" data-min="1" data-max="30" aria-label="${nome} (valor base 1-30)">
+          <span class="modificador" data-mod="${k}">${fmtMod(mod(atrs[k]))}</span>
+        </div>
+      `).join('')}
+    </div>
+
+    ${renderRoleplayBloco(c)}
+  `;
+}
+
+// Campo de leitura genérico: rótulo pequeno + valor — o "EditableField" do
+// briefing (§22), sem esconder nada por trás de um nome de classe exato.
+function campoLeitura(label, valorTexto) {
+  const v = (valorTexto ?? '').toString().trim();
+  return `<div class="leitura-campo"><span class="leitura-label">${escape(label)}</span><span class="leitura-valor">${v ? escape(v) : '<span class="leitura-vazio">—</span>'}</span></div>`;
+}
+
+function renderIdentidadeLeitura(c) {
+  const campanhaLbl = c.campanha ? (CAMPANHAS.find(([k]) => k === c.campanha)?.[1] || c.campanha) : '';
+  return `
+    <h3>Personagem</h3>
+    <div class="leitura-grid">
+      ${campoLeitura('Nome', c.nome)}
+      ${campoLeitura('Nível', c.nivel || 1)}
+      ${campoLeitura('Raça', c.raca)}
+      ${campoLeitura('Classe', c.classe)}
+      ${campoLeitura('Subclasse', c.subclasse)}
+      ${campoLeitura('Origem', c.origem)}
+      ${campoLeitura('Alinhamento', c.alinhamento)}
+      ${campoLeitura('Campanha', campanhaLbl)}
+    </div>
+
+    <h3>Idiomas e Ferramentas</h3>
+    <div class="grid-2">
+      ${renderListaTagsLeitura('Idiomas', c.idiomas || ['Comum'])}
+      ${renderListaTagsLeitura('Proficiências em Ferramentas', c.ferramentas || [])}
+    </div>
+  `;
+}
+
+function renderIdentidadeEdicao(c) {
+  return `
+    <h3>Personagem</h3>
     <div class="grid-2">
       <div class="campo"><label>Nome do Personagem</label>
         <input name="nome" value="${escape(c.nome)}" required></div>
@@ -112,21 +183,6 @@ function renderIdentidade(c, atrs) {
     <div class="grid-2">
       ${renderListaTags('idiomas', 'Idiomas', c.idiomas || ['Comum'])}
       ${renderListaTags('ferramentas', 'Proficiências em Ferramentas', c.ferramentas || [])}
-    </div>
-    <h4 style="margin:14px 0 8px;font-family:'Cinzel',serif;font-size:13px;color:var(--gold);letter-spacing:1.5px;text-transform:uppercase">Características Raciais</h4>
-    <div class="campo">
-      <textarea name="tracos_raciais" placeholder="Ex.: Visão no Escuro 18m, Resistência Anã, Proficiência em Machados">${escape(c.tracos_raciais||'')}</textarea>
-    </div>
-
-    <h3>Atributos</h3>
-    <div class="grid-6">
-      ${ATRIBUTOS.map(([k, nome]) => `
-        <div class="atributo">
-          <span class="nome-atr">${nome.slice(0,3).toUpperCase()}</span>
-          <input type="text" inputmode="numeric" class="valor-base" name="attr_${k}" value="${atrs[k] ?? 10}" data-attr="${k}" data-validar="int" data-min="1" data-max="30" aria-label="${nome} (valor base 1-30)">
-          <span class="modificador" data-mod="${k}">${fmtMod(mod(atrs[k]))}</span>
-        </div>
-      `).join('')}
     </div>
   `;
 }

@@ -120,27 +120,31 @@ function conectarListenersHeader() {
     render();
   });
 
-  // Pill de campanha (estado de aviso): atalho pra aba onde dá pra corrigir
-  // (campo Campanha + estrela Ativo). data-tab="identidade" — quando a Fase 9
-  // fundir Identidade+Roleplay em "Personagem", ajustar aqui também.
+  // Pill de campanha (estado de aviso): atalho pra aba Personagem, onde dá
+  // pra corrigir (campo Campanha) — a estrela de Ativo mora no menu ⋯.
   const pill = document.getElementById('hdr-campanha-aviso');
   if (pill) {
     const irPraIdentidade = () => {
-      const alvo = document.querySelector('.tab[data-tab="identidade"]');
+      const alvo = document.querySelector('.tab[data-tab="personagem"]');
       if (alvo) alvo.click();
     };
     pill.addEventListener('click', irPraIdentidade);
     pill.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); irPraIdentidade(); } });
   }
 
-  // Editar / Travar (modo edição global — mesma lógica de sempre, só mudou de lugar)
+  // Editar / Travar (modo edição global). Fase 9: a aba Personagem decide
+  // ENTRE MARCAÇÕES DIFERENTES (cards de leitura vs. formulário) conforme
+  // este estado — só o toggle de classe/tabindex não bastava mais, por
+  // isso agora chama render() pra reconstruir a aba atual na hora, sem
+  // precisar trocar de aba e voltar pra ver o efeito. Flush de edição
+  // pendente antes, mesmo padrão de troca de aba/personagem.
   const lockBtn = document.getElementById('btn-lock-toggle');
   if (lockBtn) lockBtn.addEventListener('click', () => {
+    const form = document.getElementById('ficha-form');
+    if (form) form.dispatchEvent(new Event('submit', { cancelable: true }));
     const ativo = !document.body.classList.contains('modo-unlock');
-    document.body.classList.toggle('modo-unlock', ativo);
     try { localStorage.setItem('ficha_unlock', ativo ? '1' : '0'); } catch {}
-    atualizarLockLabel();
-    aplicarTabIndexLock();
+    render();
   });
 
   // Retry de autosave (aparece só quando salvar() marca erro)
