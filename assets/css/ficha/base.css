@@ -442,7 +442,7 @@ h3:first-of-type { margin-top: 0; }
    porque Combate passou a usar a mesma peça. */
 .stat-row { display: flex; flex-wrap: wrap; gap: var(--sp-3); }
 .stat-card {
-  flex: 1; min-width: 108px;
+  flex: 1; min-width: 108px; max-width: 100%;
   background: var(--sf-inset); border: 1px solid var(--borda);
   border-radius: var(--r-sm); padding: var(--sp-3);
   text-align: center;
@@ -451,6 +451,10 @@ h3:first-of-type { margin-top: 0; }
   font-family: var(--f-titulo); font-size: 10px; letter-spacing: 1px;
   text-transform: uppercase; color: var(--text-dim);
   display: flex; align-items: center; justify-content: center; gap: 4px;
+  flex-wrap: wrap; row-gap: 2px;
+  /* "DESLOCAMENTO"/"INICIATIVA" são uma palavra só — sem isto o texto não
+     tem onde quebrar linha e vazava pra fora do card em telas estreitas. */
+  overflow-wrap: anywhere;
 }
 .stat-card-valor {
   font-family: var(--f-num); font-size: 22px; font-weight: 700;
