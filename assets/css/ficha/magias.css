@@ -1,0 +1,155 @@
+/* assets/css/ficha/magias.css — lista de magias preparadas (accordion), modal de
+   Conjurar (escolha de espaço) e o toast de confirmação. */
+
+/* ============ MAGIAS PREPARADAS ============ */
+.magias-lista { display: flex; flex-direction: column; gap: 6px; }
+.magia-item {
+  background: rgba(0,0,0,0.2);
+  border: 1px solid rgba(196,154,58,0.25);
+  border-radius: 4px;
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+.magia-item:hover { border-color: rgba(196,154,58,0.5); }
+.magia-item.aberta { border-color: var(--gold-bright); }
+.magia-row {
+  display: grid; grid-template-columns: 50px 1fr 100px 110px 28px;
+  gap: 10px; align-items: center;
+  padding: 10px 12px; cursor: pointer;
+  user-select: none;
+}
+.magia-nivel { font-family: 'Cinzel', serif; font-weight: 700; color: var(--gold-bright); font-size: 13px; }
+.magia-nome  { color: var(--parchment); font-size: 14px; }
+.magia-escola { font-size: 11px; color: var(--text-dim); font-style: italic; }
+.magia-tags  { display: flex; gap: 4px; flex-wrap: wrap; justify-content: flex-end; }
+.magia-tags span {
+  font-size: 9px; padding: 2px 6px; border-radius: 2px;
+  background: rgba(138,70,64,0.3); color: #a56b5a;
+  font-family: 'Cinzel', serif; letter-spacing: 0.5px;
+}
+.magia-chevron {
+  color: var(--gold); font-size: 14px; text-align: center;
+  transition: transform 0.2s;
+}
+.magia-item.aberta .magia-chevron { transform: rotate(90deg); color: var(--gold-bright); }
+
+.magia-detalhe {
+  padding: 0 14px 14px;
+  border-top: 1px solid rgba(196,154,58,0.2);
+  margin-top: 0;
+  display: none;
+  background: rgba(0,0,0,0.15);
+}
+.magia-item.aberta .magia-detalhe { display: block; }
+.magia-info {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px 14px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(196,154,58,0.15);
+  margin-bottom: 10px;
+}
+.magia-info-item { font-size: 12px; }
+.magia-info-key {
+  font-family: 'Cinzel', serif; font-size: 9px;
+  color: var(--gold); letter-spacing: 1px;
+  text-transform: uppercase; margin-bottom: 2px;
+}
+.magia-info-val { color: var(--parchment); }
+.magia-desc { font-size: 13px; line-height: 1.6; color: var(--parchment); }
+.magia-desc p { margin-bottom: 8px; }
+.magia-maior {
+  margin-top: 10px; padding-top: 10px;
+  border-top: 1px solid rgba(196,154,58,0.2);
+  font-size: 12px; color: var(--parchment-dim); font-style: italic;
+}
+.magia-maior strong { color: var(--gold-bright); font-style: normal; }
+
+.magia-conjurar-bar {
+  margin-top: 12px; padding-top: 10px;
+  border-top: 1px solid rgba(196,154,58,0.2);
+  display: flex; justify-content: flex-end; align-items: center; gap: 10px;
+}
+.magia-truque-info { font-size: 11px; color: var(--text-dim); font-style: italic; }
+.btn-conjurar {
+  background: linear-gradient(to bottom, #5c4a70, #4a3a58);
+  border: 1px solid #7a5a94;
+  color: #ddd0e8;
+  font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700;
+  letter-spacing: 1px; text-transform: uppercase;
+  padding: 8px 16px; border-radius: 4px; cursor: pointer;
+  transition: all 0.15s; min-height: 36px;
+  box-shadow: 0 0 10px rgba(163,92,208,0.25);
+}
+.btn-conjurar:hover {
+  background: linear-gradient(to bottom, #6b5588, #5c4a70);
+  transform: translateY(-1px);
+  box-shadow: 0 0 14px rgba(163,92,208,0.5);
+}
+.btn-conjurar:active { transform: translateY(0); }
+
+/* ─── Modal Conjurar ─── */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 1000; padding: 20px; backdrop-filter: blur(3px);
+}
+.modal-card {
+  background: linear-gradient(180deg, var(--bg-card), var(--bg-card-soft));
+  border: 2px solid var(--gold); border-radius: 10px;
+  padding: 24px; max-width: 480px; width: 100%;
+  box-shadow: 0 0 40px rgba(0,0,0,0.7), 0 0 20px rgba(212,175,55,0.2);
+}
+.modal-card h3 {
+  color: var(--gold-bright); margin: 0 0 8px;
+  font-family: 'Cinzel Decorative', serif; font-size: 18px;
+}
+.modal-card h3 em { color: var(--parchment); font-style: italic; }
+.modal-slots {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 10px; margin-bottom: 18px;
+}
+.modal-slot-btn {
+  background: linear-gradient(160deg, var(--bg-card-soft), var(--bg-card));
+  border: 1.5px solid var(--gold); border-radius: 6px;
+  padding: 10px 6px; cursor: pointer; text-align: center;
+  transition: all 0.15s; min-height: 80px;
+}
+.modal-slot-btn:hover:not(:disabled) {
+  background: linear-gradient(160deg, var(--bg-card), var(--bg-card-soft));
+  border-color: var(--gold-bright);
+  box-shadow: 0 0 10px rgba(212,175,55,0.3); transform: translateY(-2px);
+}
+.modal-slot-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.modal-slot-nv {
+  color: var(--gold); font-family: 'Cinzel', serif; font-size: 11px;
+  text-transform: uppercase; letter-spacing: 1.5px;
+}
+.modal-slot-disp {
+  color: var(--gold-bright); font-family: 'Cinzel', serif;
+  font-size: 22px; font-weight: 700; margin: 4px 0;
+}
+.modal-slot-lbl { font-size: 10px; color: var(--text-dim); font-style: italic; }
+.modal-acoes { display: flex; justify-content: flex-end; gap: 10px; }
+
+.toast-conjurar {
+  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: linear-gradient(180deg, rgba(60,30,80,0.95), rgba(40,20,55,0.95));
+  border: 1.5px solid #7a5a94; border-radius: 8px;
+  padding: 12px 20px; color: #ddd0e8;
+  font-size: 13px; box-shadow: 0 4px 16px rgba(0,0,0,0.5), 0 0 12px rgba(163,92,208,0.3);
+  opacity: 0; transition: opacity 0.25s, transform 0.25s;
+  z-index: 999; pointer-events: none;
+}
+.toast-conjurar.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast-conjurar strong { color: #b8a0cc; }
+
+@media (max-width: 600px) {
+  .magia-row { grid-template-columns: 40px 1fr 24px; row-gap: 4px; }
+  .magia-escola, .magia-tags { grid-column: 2 / 4; font-size: 10px; }
+  .magia-info { grid-template-columns: 1fr 1fr; }
+  .modal-card { padding: 18px; max-width: 100%; }
+  .modal-slots { grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .modal-slot-btn { min-height: 70px; padding: 8px 4px; }
+  .modal-slot-disp { font-size: 18px; }
+}
+

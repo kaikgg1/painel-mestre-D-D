@@ -1,0 +1,279 @@
+/* assets/css/ficha/aliados.css — cards de criatura (stat block completo, HP,
+   atributos, seções) e o modal do buscador do Bestiário. */
+
+/* ===== ALIADOS / CRIATURAS ===== */
+.aliados-topo {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  gap: 14px; flex-wrap: wrap; margin-bottom: 16px;
+}
+.aliados-add { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.aliados-add #btn-buscar-monstro { white-space: nowrap; }
+.aliados-add select {
+  background: rgba(255,255,255,0.04); border: 1px solid var(--gold);
+  color: var(--parchment); border-radius: 4px; padding: 8px 10px;
+  font-family: 'EB Garamond', serif; font-size: 13px; min-height: 40px;
+}
+.criatura-card {
+  background: linear-gradient(160deg, var(--bg-card, #1c1a14), var(--bg-card-soft, #242016));
+  border: 1px solid rgba(196,154,58,0.4);
+  border-left: 3px solid var(--blood-bright, #8a4640);
+  border-radius: 8px; padding: 14px; margin-bottom: 14px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+}
+.criatura-head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; }
+.criatura-img-wrap { position: relative; flex-shrink: 0; }
+.criatura-img-edit {
+  position: absolute; bottom: 4px; right: 4px;
+  width: 28px; height: 28px; border-radius: 6px;
+  background: rgba(10,6,8,0.85); border: 1px solid var(--gold);
+  color: var(--gold-bright); cursor: pointer; font-size: 14px;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, transform 0.15s;
+}
+.criatura-img-edit:hover { background: var(--gold); color: var(--shadow); transform: scale(1.1); }
+.criatura-img {
+  flex-shrink: 0; width: 120px; height: 120px; border-radius: 10px;
+  border: 2px solid rgba(196,154,58,0.5); background: rgba(0,0,0,0.3);
+  cursor: pointer; overflow: hidden; padding: 0;
+  display: flex; align-items: center; justify-content: center;
+  transition: border-color 0.15s, transform 0.15s, box-shadow 0.15s;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+}
+.criatura-img.tem { cursor: zoom-in; }
+.criatura-img:hover { border-color: var(--gold-bright); transform: scale(1.03); box-shadow: 0 4px 16px rgba(0,0,0,0.6); }
+.criatura-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.criatura-img-ph { font-size: 46px; opacity: 0.45; }
+.criatura-img.erro img { display: none; }
+.criatura-img.erro::after { content: '⚠'; font-size: 38px; color: var(--blood-bright); }
+@media (max-width: 600px) { .criatura-img { width: 92px; height: 92px; } }
+
+/* Lightbox p/ ver a imagem da criatura em tamanho grande */
+.cr-lightbox {
+  position: fixed; inset: 0; z-index: 1000; display: none;
+  align-items: center; justify-content: center;
+  background: rgba(0,0,0,0.88); backdrop-filter: blur(4px);
+  padding: 24px; cursor: zoom-out;
+}
+.cr-lightbox.open { display: flex; }
+.cr-lightbox img {
+  max-width: 92vw; max-height: 88vh; border-radius: 10px;
+  border: 2px solid var(--gold); box-shadow: 0 8px 40px rgba(0,0,0,0.85);
+  object-fit: contain;
+}
+.cr-lb-fechar {
+  position: absolute; top: 14px; right: 20px; font-size: 32px;
+  color: var(--parchment); background: none; border: none; cursor: pointer;
+  line-height: 1; padding: 6px 12px;
+}
+.criatura-id { flex: 1; display: flex; flex-direction: column; gap: 4px; }
+.criatura-nome {
+  font-family: 'Cinzel', serif; font-weight: 700; font-size: 16px;
+  color: var(--gold-bright); background: transparent;
+  border: none; border-bottom: 1px solid transparent; padding: 2px 0; outline: none;
+}
+.criatura-nome:focus { border-bottom-color: var(--gold); }
+.criatura-tipo {
+  font-style: italic; font-size: 12px; color: var(--parchment-dim);
+  background: transparent; border: none; border-bottom: 1px solid transparent; padding: 2px 0; outline: none;
+}
+.criatura-tipo:focus { border-bottom-color: var(--gold); }
+.criatura-del {
+  background: transparent; border: 1px solid var(--blood); color: var(--parchment-dim);
+  border-radius: 5px; cursor: pointer; padding: 6px 10px; font-size: 15px;
+  min-width: 40px; min-height: 40px; transition: all 0.15s; flex-shrink: 0;
+}
+.criatura-del:hover { background: var(--blood); color: var(--parchment); }
+
+.criatura-combate {
+  display: grid; grid-template-columns: auto 1.4fr auto auto; gap: 10px;
+  margin-bottom: 12px; align-items: end;
+}
+.cc-box { display: flex; flex-direction: column; gap: 3px; }
+.cc-box label { font-family: 'Cinzel', serif; font-size: 10px; color: var(--gold); letter-spacing: 0.5px; }
+.cc-num, .cc-txt {
+  background: rgba(0,0,0,0.3); border: 1px solid rgba(196,154,58,0.4);
+  color: var(--parchment); border-radius: 4px; padding: 6px 8px;
+  font-size: 14px; outline: none; width: 100%; min-height: 38px;
+}
+.cc-num { text-align: center; width: 56px; font-weight: 700; }
+.cc-num:focus, .cc-txt:focus { border-color: var(--gold-bright); }
+.cc-hp { min-width: 0; }
+.cc-hp-row { display: flex; align-items: center; gap: 4px; }
+.cc-hp-row .cc-num { width: 52px; }
+.cc-dados { font-size: 10px; color: var(--gold-bright); font-weight: 400; letter-spacing: 0.3px; }
+.cc-rolar {
+  background: rgba(196,154,58,0.18); border: 1px solid var(--gold);
+  color: var(--gold-bright); border-radius: 5px; cursor: pointer;
+  font-size: 15px; line-height: 1; padding: 4px 7px; min-height: 36px;
+  transition: all 0.12s;
+}
+.cc-rolar:hover { background: var(--gold); color: var(--shadow); transform: scale(1.05); }
+.cc-hpbar { height: 6px; background: rgba(0,0,0,0.4); border-radius: 3px; overflow: hidden; margin-top: 4px; }
+.cc-hpfill { height: 100%; background: linear-gradient(90deg, #4a5233, #7a8a5e); transition: width 0.2s, background 0.2s; }
+.cc-hpfill.medio { background: linear-gradient(90deg, #c49a3a, #dfc57a); }
+.cc-hpfill.baixo { background: linear-gradient(90deg, #8a6a3a, #c49a3a); }
+.cc-hpfill.critico { background: linear-gradient(90deg, #8a4640, #a5433a); }
+.cc-hp-quick { display: flex; gap: 3px; margin-top: 5px; }
+.cc-hp-quick button {
+  flex: 1; background: rgba(196,154,58,0.15); border: 1px solid rgba(196,154,58,0.4);
+  color: var(--parchment); border-radius: 4px; cursor: pointer; font-size: 11px;
+  padding: 5px 0; min-height: 32px; transition: all 0.12s;
+}
+.cc-hp-quick button:hover { background: var(--gold); color: var(--shadow); }
+
+.criatura-atrs {
+  display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-bottom: 12px;
+}
+.cr-atr {
+  text-align: center; background: rgba(0,0,0,0.25);
+  border: 1px solid rgba(196,154,58,0.3); border-radius: 6px; padding: 6px 2px;
+}
+.cr-atr-lbl { display: block; font-family: 'Cinzel', serif; font-size: 9px; color: var(--gold); letter-spacing: 1px; }
+.cr-atr-val {
+  width: 100%; background: transparent; border: none; color: var(--parchment);
+  text-align: center; font-size: 15px; font-weight: 700; outline: none; margin: 2px 0;
+}
+.cr-atr-mod { display: block; font-size: 11px; color: var(--gold-bright); font-family: 'Cinzel', serif; }
+
+.criatura-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.cm-row { display: flex; flex-direction: column; gap: 2px; }
+.cm-row label { font-family: 'Cinzel', serif; font-size: 9px; color: var(--gold); letter-spacing: 0.5px; text-transform: uppercase; }
+.cm-row input {
+  background: rgba(0,0,0,0.25); border: 1px solid rgba(196,154,58,0.3);
+  color: var(--parchment); border-radius: 4px; padding: 6px 8px; font-size: 12px; outline: none; min-height: 36px;
+}
+.cm-row input:focus { border-color: var(--gold-bright); }
+.criatura-sec { margin-bottom: 10px; }
+.criatura-sec h4 {
+  font-family: 'Cinzel', serif; font-size: 11px; color: var(--gold);
+  letter-spacing: 1px; text-transform: uppercase; margin: 0 0 5px;
+  padding-bottom: 3px; border-bottom: 1px solid rgba(196,154,58,0.25);
+}
+.criatura-lista { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.5; color: var(--parchment); }
+.criatura-lista li { margin-bottom: 4px; }
+.criatura-lista strong { color: var(--gold-bright); }
+.criatura-notas {
+  width: 100%; min-height: 60px; background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(196,154,58,0.3); color: var(--parchment);
+  border-radius: 4px; padding: 8px; font-family: 'EB Garamond', serif;
+  font-size: 13px; line-height: 1.5; outline: none; resize: vertical;
+}
+.criatura-notas:focus { border-color: var(--gold-bright); }
+
+@media (max-width: 600px) {
+  .aliados-topo { flex-direction: column; }
+  .aliados-add { width: 100%; }
+  .aliados-add #btn-buscar-monstro { flex: 1 1 100%; min-height: 46px; }
+  .aliados-add select { flex: 1 1 auto; min-height: 46px; }
+  .aliados-add #btn-add-aliado { flex: 0 0 auto; min-height: 46px; }
+  .criatura-combate { grid-template-columns: 1fr 1fr; }
+  .criatura-atrs { grid-template-columns: repeat(3, 1fr); }
+  .criatura-meta { grid-template-columns: 1fr; }
+  .cc-num { width: 100%; }
+  .cc-hp-row { flex-wrap: wrap; }
+}
+
+/* ===== BUSCADOR DO BESTIÁRIO ===== */
+.bm-overlay {
+  position: fixed; inset: 0; z-index: 7000;
+  background: rgba(0,0,0,0.82);
+  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+  display: none; align-items: center; justify-content: center; padding: 16px;
+}
+.bm-overlay.open { display: flex; animation: fadeIn 0.18s ease-out; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.bm-modal {
+  background: linear-gradient(160deg, #1c1a14, #151510);
+  border: 2px solid var(--gold); border-radius: 10px;
+  max-width: 640px; width: 100%;
+  max-height: 88vh; max-height: 88dvh;
+  display: flex; flex-direction: column; overflow: hidden;
+  box-shadow: 0 0 0 1px var(--blood-bright) inset, 0 24px 70px rgba(0,0,0,0.85);
+}
+.bm-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 16px 20px 14px; border-bottom: 1px solid var(--blood);
+  background: linear-gradient(180deg, #1c1a14, #1c1a14); flex-shrink: 0;
+}
+.bm-titulo {
+  font-family: 'Cinzel Decorative', serif; font-size: 17px; font-weight: 700;
+  color: var(--gold-bright); letter-spacing: 1px; flex: 1;
+}
+.bm-close {
+  background: transparent; border: 1px solid var(--blood); color: var(--parchment);
+  padding: 8px 12px; border-radius: 4px; cursor: pointer;
+  font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; min-height: 38px;
+}
+.bm-close:hover { background: var(--blood); color: #fff; }
+.bm-search { padding: 12px 16px; border-bottom: 1px solid rgba(196,154,58,0.2); flex-shrink: 0; }
+.bm-search input {
+  width: 100%; background: rgba(0,0,0,0.4);
+  border: 1px solid var(--gold); border-radius: 6px;
+  color: var(--parchment); font-family: 'EB Garamond', serif;
+  font-size: 15px; padding: 11px 14px; outline: none; min-height: 46px;
+}
+.bm-search input:focus { border-color: var(--gold-bright); box-shadow: 0 0 0 3px rgba(196,154,58,0.15); }
+.bm-result { flex: 1; overflow-y: auto; padding: 8px 12px 14px; }
+.bm-dica { font-size: 11px; color: var(--text-dim); font-style: italic; padding: 8px 4px; text-align: center; }
+.bm-secao {
+  font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700;
+  color: var(--gold-bright); letter-spacing: 1px; text-transform: uppercase;
+  padding: 10px 4px 4px; border-bottom: 1px solid rgba(196,154,58,0.25); margin-bottom: 4px;
+}
+.bm-fav {
+  flex-shrink: 0; background: transparent; border: none; cursor: pointer;
+  color: var(--text-dim); font-size: 20px; line-height: 1; padding: 4px 6px;
+  min-width: 40px; min-height: 40px; border-radius: 6px;
+  transition: color 0.15s, transform 0.15s;
+}
+.bm-fav:hover { color: var(--gold-bright); transform: scale(1.15); }
+.bm-fav.on { color: var(--gold-bright); text-shadow: 0 0 8px rgba(196,154,58,0.5); }
+.bm-vazio { text-align: center; padding: 30px 16px; color: var(--text-dim); font-style: italic; }
+.bm-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 10px; border-radius: 6px;
+  border-bottom: 1px solid rgba(196,154,58,0.12);
+}
+.bm-item:hover { background: rgba(196,154,58,0.07); }
+.bm-thumb {
+  flex-shrink: 0; width: 52px; height: 52px; border-radius: 6px;
+  overflow: hidden; background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(196,154,58,0.3);
+  display: flex; align-items: center; justify-content: center; font-size: 22px;
+}
+.bm-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.bm-thumb-vazio { opacity: 0.4; }
+.bm-item-info { flex: 1; min-width: 0; }
+.bm-item-nome { font-family: 'Cinzel', serif; font-weight: 700; color: var(--gold-bright); font-size: 14px; }
+.bm-item-meta { font-style: italic; color: var(--parchment-dim); font-size: 11px; }
+.bm-item-stats { font-size: 11px; color: var(--text-dim); margin-top: 2px; }
+.bm-add {
+  flex-shrink: 0; background: linear-gradient(180deg, var(--gold), #5c4020);
+  border: 1px solid var(--gold-bright); color: var(--shadow);
+  font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.5px; padding: 8px 12px; border-radius: 5px; cursor: pointer;
+  min-height: 40px; white-space: nowrap; transition: all 0.15s;
+}
+.bm-add:hover { background: linear-gradient(180deg, var(--gold-bright), var(--gold)); }
+.bm-add.add-ok { background: linear-gradient(180deg, #4a5233, #3d4529); color: #fff; border-color: #7a8a5e; }
+@media (max-width: 600px) {
+  .bm-overlay { padding: 0; }
+  .bm-modal { max-width: 100%; max-height: 100vh; max-height: 100dvh; height: 100%; border-radius: 0; }
+  .bm-item { flex-wrap: wrap; }
+}
+
+/* Selo de bônus do Mestre em perícias */
+.bonus-mestre {
+  display: inline-block;
+  margin-left: 5px;
+  font-size: 9px;
+  font-weight: 700;
+  color: var(--gold-bright, #c49a3a);
+  background: rgba(196,154,58,0.15);
+  border: 1px solid rgba(196,154,58,0.45);
+  border-radius: 8px;
+  padding: 0 5px;
+  vertical-align: middle;
+  font-family: 'Cinzel', serif;
+}
+

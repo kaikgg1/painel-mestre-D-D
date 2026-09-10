@@ -13,7 +13,8 @@
     "formatar-phb": "node scripts/formatar_phb.js",
     "formatar-mestre": "node scripts/formatar_phb.js Mestre.txt",
     "setup-db": "node scripts/setup_db.js",
-    "auditoria": "node scripts/auditoria.js"
+    "auditoria": "node scripts/auditoria.js",
+    "smoke": "node scripts/smoke_ficha.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",
@@ -21,5 +22,8 @@
     "pdf2json": "^3.1.4",
     "pg": "^8.11.5",
     "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "jsdom": "^29.1.1"
   }
 }

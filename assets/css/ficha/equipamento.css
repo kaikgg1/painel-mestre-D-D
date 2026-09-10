@@ -1,0 +1,125 @@
+/* assets/css/ficha/equipamento.css — moedas, blocos de inventário, tabelas de
+   armas/armaduras/itens e a barra de adicionar do catálogo PHB. */
+
+/* ============ EQUIPAMENTO ============ */
+.bloco-equip {
+  background: linear-gradient(180deg, rgba(20,12,6,0.55) 0%, rgba(10,5,2,0.35) 100%);
+  border: 1px solid rgba(196,154,58,0.35);
+  border-radius: 8px;
+  padding: 14px 16px 16px;
+  margin-bottom: 18px;
+  box-shadow: inset 0 1px 0 rgba(212,175,55,0.07), 0 2px 8px rgba(0,0,0,0.35);
+}
+.bloco-equip-head {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(196,154,58,0.25);
+}
+.bloco-icone {
+  font-size: 20px; line-height: 1;
+  width: 32px; height: 32px;
+  display: inline-flex; align-items: center; justify-content: center;
+  background: rgba(196,154,58,0.15);
+  border: 1px solid rgba(196,154,58,0.35);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.bloco-titulo {
+  font-family: 'Cinzel', serif; font-size: 15px; font-weight: 700;
+  color: var(--gold-bright); letter-spacing: 1.5px; text-transform: uppercase;
+  margin: 0; flex: 1;
+}
+.contador-bloco {
+  background: rgba(196,154,58,0.25);
+  border: 1px solid rgba(196,154,58,0.5);
+  color: var(--gold-bright);
+  font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700;
+  padding: 2px 10px; border-radius: 12px; min-width: 28px; text-align: center;
+}
+.conv-hint {
+  margin: 10px 0 0; font-size: 11px; color: var(--text-dim);
+  font-style: italic; text-align: center; letter-spacing: 0.5px;
+}
+.moedas { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 4px; }
+.moeda-box {
+  background: linear-gradient(180deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.25) 100%);
+  border: 1px solid rgba(196,154,58,0.4);
+  border-radius: 6px; padding: 10px 6px 8px; text-align: center;
+  transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+}
+.moeda-box:hover {
+  border-color: rgba(212,175,55,0.6);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.4), inset 0 1px 0 rgba(212,175,55,0.15);
+  transform: translateY(-1px);
+}
+.moeda-ic { font-size: 18px; line-height: 1; margin-bottom: 4px; }
+.moeda-box label { font-family: 'Cinzel', serif; font-size: 11px; color: var(--gold); letter-spacing: 1px; display: block; }
+.moeda-box input { width: 100%; background: transparent; border: none; color: var(--gold-bright);
+  font-family: 'Cinzel', serif; font-size: 18px; font-weight: 700; text-align: center; margin-top: 4px; outline: none; }
+.moeda-box input:focus { background: rgba(255,255,255,0.08); border-radius: 3px; }
+
+.item-tabela {
+  width: 100%; border-collapse: collapse; margin-top: 10px;
+  background: rgba(0,0,0,0.15); border-radius: 4px; overflow: hidden;
+}
+.item-tabela th, .item-tabela td {
+  padding: 8px 10px; text-align: left; font-size: 13px;
+  border-bottom: 1px solid rgba(196,154,58,0.2);
+}
+.item-tabela th {
+  background: rgba(196,154,58,0.18); color: var(--gold-bright);
+  font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
+}
+.item-tabela tr:last-child td { border-bottom: none; }
+.item-tabela .lixo {
+  background: transparent; border: 1px solid rgba(138,70,64,0.4); color: #a56b5a;
+  padding: 3px 8px; border-radius: 2px; cursor: pointer; font-size: 12px;
+  transition: all 0.15s;
+  min-height: 28px; min-width: 28px;
+}
+.item-tabela .lixo:hover { background: var(--blood); color: var(--parchment); }
+.item-vazio { padding: 18px; text-align: center; color: var(--text-dim); font-style: italic; }
+
+/* MOBILE: tabela vira cards verticais (cada linha = um card) */
+@media (max-width: 600px) {
+  .item-tabela, .item-tabela thead, .item-tabela tbody, .item-tabela tr, .item-tabela td {
+    display: block;
+  }
+  .item-tabela { background: transparent; border: none; overflow: visible; }
+  .item-tabela thead { display: none; }
+  .item-tabela tr {
+    background: rgba(0,0,0,0.25);
+    border: 1px solid rgba(196,154,58,0.35);
+    border-radius: 6px;
+    padding: 10px 38px 10px 12px;
+    margin-bottom: 8px;
+    position: relative;
+  }
+  .item-tabela td {
+    border: none; padding: 3px 0; font-size: 13px;
+    display: flex; gap: 6px; align-items: baseline;
+  }
+  .item-tabela td::before {
+    content: attr(data-label);
+    font-family: 'Cinzel', serif; color: var(--gold);
+    font-size: 10px; letter-spacing: 1px; text-transform: uppercase;
+    min-width: 70px; flex-shrink: 0;
+  }
+  .item-tabela td:first-child {
+    font-weight: 700; color: var(--gold-bright); font-size: 15px;
+    margin-bottom: 6px; padding-bottom: 6px;
+    border-bottom: 1px dashed rgba(196,154,58,0.25);
+  }
+  .item-tabela td:first-child::before { content: ''; min-width: 0; }
+  .item-tabela td:last-child {
+    position: absolute; top: 8px; right: 8px;
+    padding: 0; margin: 0; border: none;
+  }
+  .item-tabela td:last-child::before { content: ''; min-width: 0; }
+  .item-tabela .lixo { min-height: 36px; min-width: 36px; padding: 4px 10px; font-size: 14px; }
+}
+
+.adicionar-bloco { display: flex; gap: 8px; align-items: end; margin-top: 14px; flex-wrap: wrap; }
+.adicionar-bloco .campo { flex: 1; min-width: 160px; margin: 0; }
+

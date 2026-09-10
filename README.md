@@ -25,7 +25,7 @@ Painel web para o mestre acompanhar status dos jogadores e consultar o grimório
 │
 ├── paineis/                    # Telas HTML
 │   ├── login.html              # Dropdown de 3 jogadores + Mestre
-│   ├── ficha.html              # CRUD da ficha (6 abas)
+│   ├── ficha.html              # Casca da ficha (markup + <link>/<script>)
 │   ├── magias.html             # Grimório com filtros + favoritas
 │   ├── painel_barovia_dnd5e.html
 │   └── painel_mestre_dnd5e.html
@@ -33,12 +33,34 @@ Painel web para o mestre acompanhar status dos jogadores e consultar o grimório
 ├── assets/
 │   ├── img/
 │   │   └── favicon.svg
-│   └── js/                     # Módulos JS sem build step
+│   ├── css/
+│   │   ├── tokens.css          # Tokens dos 2 temas (geral / strahd)
+│   │   ├── components.css      # Primitivos (.card, .btn, .pill, .modal)
+│   │   ├── ui.css              # Acabamento dos <select> nativos
+│   │   └── ficha/              # CSS da ficha — a ORDEM dos <link> é o contrato
+│   │       ├── base.css        # reset, header, abas, campos, atributos
+│   │       ├── equipamento.css │ magias.css │ habilidades.css
+│   │       ├── combate.css     # HP, stats, perícias + responsividade
+│   │       ├── personagem.css  # inspiração, retrato, lock de roleplay
+│   │       ├── aliados.css     # stat blocks + buscador do bestiário
+│   │       └── sistema.css     # toasts, recursos de classe, lock, ícones
+│   └── js/                     # Módulos JS sem build step (scripts clássicos)
 │       ├── supabase.js         # Cliente Supabase (window.sb)
 │       ├── auth.js             # Login, sessão, header de auth
 │       ├── dbsync.js           # CRUD characters + realtime (window.DBSync)
 │       ├── favoritas.js        # Lista de magias favoritas (100% Supabase)
-│       └── phb_catalogo.js     # Catálogo de armas/armaduras/itens PHB
+│       ├── phb_catalogo.js     # Catálogo de armas/armaduras/itens PHB
+│       ├── phb_slots.js        # Espaços de magia por classe × nível
+│       ├── recursos_classe.js  # Recursos de classe (ficha + painel do Mestre)
+│       ├── exaustao_regras.js  # Efeitos de exaustão (PHB 2014)
+│       └── ficha/              # Lógica da ficha — a ORDEM dos <script> é o contrato
+│           ├── nucleo.js       # constantes, estado, init, realtime, CRUD de PJ
+│           ├── render.js       # render(), abas, aba Identidade
+│           ├── aba_combate.js  │ recursos.js │ aba_habilidades.js
+│           ├── aba_magias.js   │ aba_equipamento.js │ aba_aliados.js
+│           ├── aba_roleplay.js │ lock.js (modo ler/editar)
+│           ├── listeners.js    # religa tudo após cada render + auto-save
+│           └── salvar.js       # payload do UPDATE (guardas por aba!) + init()
 │
 ├── data/                       # Dados estáticos (PT-BR)
 │   ├── magias.md               # Fonte editorial das magias
@@ -64,6 +86,7 @@ Painel web para o mestre acompanhar status dos jogadores e consultar o grimório
 │   ├── gerar_md.js             → npm run gerar-md
 │   ├── extrair_pdf.js          → npm run extrair-pdf
 │   ├── formatar_phb.js         → npm run formatar-phb
+│   ├── smoke_ficha.js          → npm run smoke (regressão da ficha em jsdom)
 │   └── extrair_habilidades_classes.js
 │
 └── docs/                       # Referência (gitignored — copyright)
@@ -98,6 +121,18 @@ npm run parse   # gera data/magias_data.json
 ```
 
 O front-end recarrega automaticamente.
+
+## Testando a ficha
+
+`paineis/ficha.html` é só a casca: o estilo mora em `assets/css/ficha/` e a
+lógica em `assets/js/ficha/`, carregados como scripts **clássicos** (sem
+`type="module"`). Por isso **a ordem dos `<link>` e `<script>` é o contrato** —
+todos compartilham o mesmo escopo global e a mesma cascata de CSS.
+
+```bash
+npm run smoke   # carrega os módulos em jsdom, renderiza as 7 abas
+                # e confere os cálculos de regra do PHB
+```
 
 ## Como adicionar um 4º jogador
 
