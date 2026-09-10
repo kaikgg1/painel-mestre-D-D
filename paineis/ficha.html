@@ -3917,7 +3917,7 @@ function renderCardCriatura(cr, i) {
       <div class="criatura-head">
         <div class="criatura-img-wrap">
           <div class="criatura-img no-lock ${cr.imagem ? 'tem' : ''}" data-cr-img="${i}" role="button" tabindex="0" title="${cr.imagem ? 'Clique para ampliar' : 'Adicionar imagem (URL)'}" aria-label="Imagem da criatura">
-            ${cr.imagem ? `<img src="${escape(cr.imagem)}" alt="${escape(cr.nome||'')}" onerror="this.parentElement.classList.add('erro')">` : `<span class="criatura-img-ph">${ico('retrato')}</span>`}
+            ${cr.imagem ? `<img src="${escape(cr.imagem)}" alt="${escape(cr.nome||'')}" onerror="tentarRecuperarImagemCriatura(this, ${i})">` : `<span class="criatura-img-ph">${ico('retrato')}</span>`}
           </div>
           <button type="button" class="criatura-img-edit no-lock" data-cr-img-edit="${i}" title="Trocar/remover imagem (URL)" aria-label="Editar imagem">${ico('editar')}</button>
         </div>
@@ -4014,6 +4014,31 @@ function abrirLightboxCriatura(url, nome) {
   im.src = url; im.alt = nome || '';
   lb.classList.add('open');
   document.body.style.overflow = 'hidden';
+}
+
+// Imagem quebrada (comum em aliados adicionados antes de a imagem existir
+// no bestiário, ou com URL antiga/trocada) — tenta recuperar buscando o
+// caminho ATUAL no bestiário pelo nome, e corrige o dado salvo se achar.
+// Se não achar nada melhor, mantém o aviso (⚠) já mostrado via classe .erro.
+async function tentarRecuperarImagemCriatura(imgEl, idx) {
+  const wrap = imgEl.closest('.criatura-img');
+  if (wrap) wrap.classList.add('erro');
+  try {
+    const lista = await carregarBestiario();
+    if (!lista) return;
+    const cr = _companionsAtuais()[idx];
+    if (!cr) return;
+    const alvo = semAcento(cr.nome || '');
+    if (!alvo) return;
+    const achado = lista.find(m => semAcento(m.nome || '') === alvo);
+    if (achado && achado.imagem && achado.imagem !== cr.imagem) {
+      cr.imagem = achado.imagem;
+      salvarCompanionsSeguro();
+      imgEl.onerror = () => { if (wrap) wrap.classList.add('erro'); };
+      imgEl.src = achado.imagem;
+      if (wrap) wrap.classList.remove('erro');
+    }
+  } catch (e) { /* mantém o aviso já mostrado */ }
 }
 
 // Destaca o último card de criatura (efeito "novo") após adicionar
