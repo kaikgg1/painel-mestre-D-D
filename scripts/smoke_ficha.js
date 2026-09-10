@@ -743,6 +743,63 @@ console.log('');
     : '  aba equipamento: seletor (busca real em PHB.ARMAS) + card de arma com bônus + rolar + remover + recentes ok');
 }
 
+// Aliados (Fase 8): o "Corvo" do PJ de teste começa RECOLHIDO por padrão
+// (não é o mais recente e ninguém abriu ainda); abrir mostra o stat block
+// completo; os botões −/+ de PV no resumo ajustam sem abrir o card; e uma
+// criatura ADICIONADA depois entra automaticamente expandida.
+console.log('');
+{
+  const antes = erros.length;
+  const sc = window.document.createElement('script');
+  sc.textContent = 'tabAtiva = "aliados"; render();';
+  window.document.head.appendChild(sc);
+
+  const card = () => window.document.querySelector('.criatura-card[data-cr="0"]');
+  const corpo = () => window.document.getElementById('criatura-corpo-0');
+  const resumo = () => window.document.querySelector('[data-cr-toggle="0"]');
+
+  if (!card()) erros.push('aliados: card do Corvo (companion de teste) não renderizou');
+  else {
+    if (!corpo() || !corpo().hidden) erros.push('aliados: card deveria começar RECOLHIDO por padrão');
+    if (!/Corvo/.test(resumo()?.textContent || '')) erros.push('aliados: resumo recolhido não mostra o nome da criatura');
+    if (!/PV\s*1\/1/.test((resumo()?.textContent || '').replace(/\s+/g, ' '))) erros.push('aliados: resumo recolhido não mostra PV atual/máximo');
+
+    // Abrir: clique no resumo revela o stat block completo
+    resumo()?.click();
+    if (!corpo() || corpo().hidden) erros.push('aliados: clicar no resumo não abriu o card');
+    else if (!corpo().querySelector('.criatura-atrs')) erros.push('aliados: card aberto não mostra os atributos (stat block completo)');
+    if (resumo()?.getAttribute('aria-expanded') !== 'true') erros.push('aliados: aria-expanded não virou "true" ao abrir');
+
+    // PV rápido no resumo NÃO deve fechar o card (dmg checado antes de toggle)
+    const antesHp = window.eval('charAtivo.companions[0].hp_atual');
+    resumo()?.querySelector('[data-cr-dmg="0"][data-v="-1"]')?.click();
+    const depoisHp = window.eval('charAtivo.companions[0].hp_atual');
+    if (depoisHp !== Math.max(0, antesHp - 1)) erros.push('aliados: botão −1 PV do resumo não ajustou o PV (antes=' + antesHp + ' depois=' + depoisHp + ')');
+    if (!corpo() || corpo().hidden) erros.push('aliados: ajustar PV pelo resumo fechou o card sem querer (dmg deveria ter prioridade sobre toggle)');
+
+    // Fechar de novo pra testar o próximo ponto com estado limpo
+    resumo()?.click();
+    if (!corpo() || !corpo().hidden) erros.push('aliados: clicar de novo no resumo não fechou o card');
+  }
+
+  // Adicionar uma criatura em branco → precisa nascer expandida
+  try {
+    const totalAntes = (window.eval('charAtivo.companions') || []).length;
+    window.document.getElementById('btn-add-aliado')?.click();
+    const totalDepois = (window.eval('charAtivo.companions') || []).length;
+    if (totalDepois !== totalAntes + 1) erros.push('aliados: "+ Adicionar" não criou uma criatura nova');
+    else {
+      const novoIdx = totalDepois - 1;
+      const corpoNovo = window.document.getElementById('criatura-corpo-' + novoIdx);
+      if (!corpoNovo || corpoNovo.hidden) erros.push('aliados: criatura recém-adicionada deveria nascer expandida, veio recolhida');
+    }
+  } catch (e) { erros.push('aliados: adicionar criatura em branco → ' + e.message); }
+
+  console.log(erros.length > antes
+    ? '  FALHOU     aliados (ver FALHAS abaixo)'
+    : '  aba aliados: recolhido por padrão + resumo com PV/CA/Mov/ND + abrir/fechar + PV rápido sem fechar + nova criatura nasce expandida ok');
+}
+
 // Header (Fase 2): avatar+nome+trocador, campanha, autosave, editar/travar,
 // menu ⋯, e a navegação inferior mobile — tudo populado pelo último render().
 console.log('');

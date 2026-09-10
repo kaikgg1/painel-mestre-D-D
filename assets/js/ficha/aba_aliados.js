@@ -63,6 +63,11 @@ function modCriatura(v) { return Math.floor(((+v||10) - 10) / 2); }
 
 function renderAliados(c) {
   const lista = Array.isArray(c.companions) ? c.companions : [];
+  // Uma criatura nova entra sempre expandida (você acabou de adicioná-la,
+  // faz sentido já ver/editar o stat block); o resto respeita o que o
+  // jogador escolheu (ver _criaturasExpandidas, definida em renderCardCriatura).
+  if (_criaturasUltimoTotal !== null && lista.length > _criaturasUltimoTotal) _criaturasExpandidas.add(lista.length - 1);
+  _criaturasUltimoTotal = lista.length;
   const cards = lista.map((cr, i) => renderCardCriatura(cr, i)).join('');
   return `
     <div class="aliados-topo">
@@ -88,6 +93,19 @@ function renderAliados(c) {
   `;
 }
 
+// Estado de recolhido/expandido (Fase 8, §15) — sessão apenas, não é dado
+// do personagem. Rastreado por ÍNDICE (mesma convenção de data-cr="i" que
+// o resto deste arquivo já usa pra tudo) — remover uma criatura no meio da
+// lista pode deixar o estado de expansão "deslocado" por uma renderização,
+// limitação aceita (é só preferência de UI, não perde dado nenhum).
+let _criaturasExpandidas = new Set();
+// null = "ainda não vimos a lista nenhuma vez" — distingue a PRIMEIRA
+// renderização (personagem carregado já com criaturas: não expandir nada)
+// de um item genuinamente ADICIONADO durante a sessão (aí sim expande).
+// Sem essa distinção, todo personagem com aliados já salvos abriria com o
+// último expandido só por causa do primeiro render.
+let _criaturasUltimoTotal = null;
+
 function renderCardCriatura(cr, i) {
   const a = cr.atributos || {};
   const hpMax = cr.hp_max ?? 1;
@@ -102,8 +120,30 @@ function renderCardCriatura(cr, i) {
   const crReacoes = listaCr(cr.reacoes);
   const crLend    = listaCr(cr.acoes_lendarias);
   const crCovil   = listaCr(cr.acoes_covil);
+  const aberto = _criaturasExpandidas.has(i);
+
   return `
     <div class="criatura-card" data-cr="${i}">
+      <div class="criatura-resumo no-lock" data-cr-toggle="${i}" role="button" tabindex="0" aria-expanded="${aberto}" aria-controls="criatura-corpo-${i}">
+        <div class="criatura-resumo-img" aria-hidden="true">
+          ${cr.imagem ? `<img src="${escape(cr.imagem)}" alt="" onerror="this.style.display='none'">` : ico('retrato')}
+        </div>
+        <div class="criatura-resumo-info">
+          <span class="criatura-resumo-nome">${escape(cr.nome || 'Sem nome')}</span>
+          <span class="criatura-resumo-stats">
+            <span class="cr-resumo-hp-linha no-lock">
+              <button type="button" class="cr-resumo-hp-btn no-lock" data-cr-dmg="${i}" data-v="-1" aria-label="−1 PV" title="−1 PV">−</button>
+              PV <span class="cr-resumo-hp-txt" data-cr-hp-txt="${i}">${hpAtual}/${hpMax}</span>
+              <button type="button" class="cr-resumo-hp-btn no-lock" data-cr-dmg="${i}" data-v="1" aria-label="+1 PV" title="+1 PV">+</button>
+            </span>
+            · CA ${cr.ca ?? 10} · Mov. ${escape(cr.deslocamento || '—')} · ND ${escape(cr.nd || '—')}
+          </span>
+          <span class="cr-resumo-hpbar"><span class="cc-hpfill ${classeBar}" style="width:${pct}%"></span></span>
+        </div>
+        <span class="criatura-resumo-chevron" aria-hidden="true">${aberto ? '▾' : '▸'}</span>
+      </div>
+
+      <div class="criatura-corpo" id="criatura-corpo-${i}" ${aberto ? '' : 'hidden'}>
       <div class="criatura-head">
         <div class="criatura-img-wrap">
           <div class="criatura-img no-lock ${cr.imagem ? 'tem' : ''}" data-cr-img="${i}" role="button" tabindex="0" title="${cr.imagem ? 'Clique para ampliar' : 'Adicionar imagem (URL)'}" aria-label="Imagem da criatura">
@@ -177,6 +217,7 @@ function renderCardCriatura(cr, i) {
       <div class="criatura-sec">
         <h4>Notas</h4>
         <textarea class="criatura-notas" data-cr-campo="notas" data-cr="${i}" placeholder="Anotações livres, traços/ações personalizadas…">${escape(cr.notas||'')}</textarea>
+      </div>
       </div>
     </div>
   `;
@@ -475,6 +516,18 @@ function adicionarMonstroBusca(idx, btn) {
 function conectarListenersAliados() {
   const wrap = document.getElementById('aliados-wrap');
 
+  // Teclado no resumo recolhido/expandido (div[role="button"], não <button>
+  // de verdade — precisa de Enter/Espaço manual, igual .magia-row já faz).
+  if (wrap) wrap.addEventListener('keydown', e => {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    // e.target === o próprio container (não .closest — os botões −/+ de PV
+    // já são <button> nativos lá dentro e tratam Enter/Espaço sozinhos;
+    // usar closest aqui disparava o toggle DE NOVO em cima do clique deles).
+    if (!e.target.hasAttribute('data-cr-toggle')) return;
+    e.preventDefault();
+    e.target.click();
+  });
+
   // Adicionar criatura (template rápido)
   const btnAdd = document.getElementById('btn-add-aliado');
   if (btnAdd) btnAdd.addEventListener('click', async () => {
@@ -533,7 +586,13 @@ function conectarListenersAliados() {
     agendarSalvarCompanions();
   });
 
-  // Botões de dano/cura rápida + deletar (click delegado)
+  // Recolher/expandir (Fase 8, §15) + dano/cura rápida + deletar (click delegado)
+  // data-cr-dmg vem ANTES de data-cr-toggle nesta checagem: os botões −/+ de
+  // PV do resumo ficam DENTRO do container clicável de toggle (data-cr-toggle
+  // é uma <div role="button">, não <button>, senão não poderia conter outros
+  // botões — HTML não permite <button> dentro de <button>), então um clique
+  // neles também bate no .closest('[data-cr-toggle]'). Checar dmg primeiro
+  // e dar `return` evita abrir/fechar o card sem querer ao só ajustar PV.
   wrap.addEventListener('click', e => {
     const dmg = e.target.closest('[data-cr-dmg]');
     if (dmg) {
@@ -547,6 +606,19 @@ function conectarListenersAliados() {
       if (inp) inp.value = cr.hp_atual;
       atualizarBarraHpCriatura(i);
       agendarSalvarCompanions();
+      return;
+    }
+    const toggle = e.target.closest('[data-cr-toggle]');
+    if (toggle) {
+      const i = +toggle.dataset.crToggle;
+      const corpo = document.getElementById('criatura-corpo-' + i);
+      if (!corpo) return;
+      const abrir = corpo.hidden;
+      corpo.hidden = !abrir;
+      toggle.setAttribute('aria-expanded', String(abrir));
+      const chevron = toggle.querySelector('.criatura-resumo-chevron');
+      if (chevron) chevron.textContent = abrir ? '▾' : '▸';
+      if (abrir) _criaturasExpandidas.add(i); else _criaturasExpandidas.delete(i);
       return;
     }
     const rolar = e.target.closest('[data-cr-rolar]');
@@ -635,12 +707,16 @@ function atualizarBarraHpCriatura(i) {
   const cr = _companionsAtuais()[i];
   if (!cr) return;
   const max = cr.hp_max ?? 1;
-  const pct = max > 0 ? Math.max(0, Math.min(100, Math.round((cr.hp_atual ?? max) / max * 100))) : 0;
-  const fill = document.querySelector(`.criatura-card[data-cr="${i}"] .cc-hpfill`);
-  if (fill) {
+  const atual = cr.hp_atual ?? max;
+  const pct = max > 0 ? Math.max(0, Math.min(100, Math.round(atual / max * 100))) : 0;
+  const classe = 'cc-hpfill ' + (pct <= 15 ? 'critico' : pct <= 35 ? 'baixo' : pct <= 65 ? 'medio' : '');
+  // Duas barras agora (resumo recolhido + corpo expandido) — atualiza as duas.
+  document.querySelectorAll(`.criatura-card[data-cr="${i}"] .cc-hpfill`).forEach(fill => {
     fill.style.width = pct + '%';
-    fill.className = 'cc-hpfill ' + (pct <= 15 ? 'critico' : pct <= 35 ? 'baixo' : pct <= 65 ? 'medio' : '');
-  }
+    fill.className = classe;
+  });
+  const txt = document.querySelector(`[data-cr-hp-txt="${i}"]`);
+  if (txt) txt.textContent = `${atual}/${max}`;
 }
 
 let _salvarCompTimer = null;

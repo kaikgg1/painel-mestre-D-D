@@ -17,10 +17,59 @@
   background: linear-gradient(160deg, var(--bg-card, #1c1a14), var(--bg-card-soft, #242016));
   border: 1px solid var(--borda);
   border-left: 3px solid var(--blood-bright, #8a4640);
-  border-radius: 8px; padding: 14px; margin-bottom: 14px;
+  border-radius: 8px; margin-bottom: 14px; overflow: hidden;
   box-shadow: 0 4px 14px rgba(0,0,0,0.4);
 }
-.criatura-head { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 12px; }
+/* .criatura-card não tem padding próprio (Fase 8) — o resumo e o corpo
+   controlam o seu, pra o resumo poder ser clicável de borda a borda. */
+
+/* ===== Resumo recolhido/expandido (Fase 8, §15) =====
+   Sempre visível: imagem + nome + PV/CA/Mov/ND + barra mini — o essencial
+   pra responder "como essa criatura está" num relance, mobile incluso.
+   O stat block completo (.criatura-corpo, marcação abaixo) só existe
+   quando expandido — crítico pra não empilhar 5 stat blocks inteiros
+   numa tela de celular. */
+.criatura-resumo {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; cursor: pointer; min-height: 56px;
+  transition: background-color .15s;
+}
+.criatura-resumo:hover { background: rgba(255,255,255,0.03); }
+.criatura-resumo:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
+.criatura-resumo-img {
+  width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+  overflow: hidden; display: flex; align-items: center; justify-content: center;
+  background: var(--sf-inset, rgba(0,0,0,0.3)); border: 1px solid var(--borda);
+  font-size: 18px; color: var(--text-dim);
+}
+.criatura-resumo-img img { width: 100%; height: 100%; object-fit: cover; }
+.criatura-resumo-info { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+.criatura-resumo-nome {
+  font-family: var(--f-titulo); font-weight: 700; font-size: 14px;
+  color: var(--gold-light); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.criatura-resumo-stats {
+  font-family: var(--f-ui); font-size: 12px; color: var(--text-dim);
+  display: flex; align-items: center; gap: 4px; flex-wrap: wrap;
+}
+.cr-resumo-hp-linha { display: inline-flex; align-items: center; gap: 4px; color: var(--text-2); }
+.cr-resumo-hp-txt { font-weight: 700; color: var(--parchment); font-variant-numeric: tabular-nums; }
+.cr-resumo-hp-btn {
+  width: 22px; height: 22px; border-radius: 50%; flex-shrink: 0;
+  background: var(--sf-inset, rgba(0,0,0,0.3)); border: 1px solid var(--borda);
+  color: var(--text-dim); font-size: 13px; font-weight: 700; line-height: 1;
+  cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+}
+.cr-resumo-hp-btn:hover { border-color: var(--borda-forte); color: var(--parchment); }
+.cr-resumo-hpbar {
+  display: block; height: 4px; border-radius: 2px; overflow: hidden;
+  background: rgba(0,0,0,0.5); max-width: 220px;
+}
+.cr-resumo-hpbar .cc-hpfill { display: block; height: 100%; }
+.criatura-resumo-chevron { color: var(--gold); font-size: 14px; flex-shrink: 0; transition: transform .15s; }
+
+.criatura-corpo { padding: 0 14px 14px; border-top: 1px solid var(--linha); }
+.criatura-head { display: flex; align-items: flex-start; gap: 10px; margin: 12px 0; }
 .criatura-img-wrap { position: relative; flex-shrink: 0; }
 .criatura-img-edit {
   position: absolute; bottom: 4px; right: 4px;
@@ -171,6 +220,10 @@
   .criatura-meta { grid-template-columns: 1fr; }
   .cc-num { width: 100%; }
   .cc-hp-row { flex-wrap: wrap; }
+  /* Resumo recolhido: alvo de toque maior pros botões de PV rápido */
+  .criatura-resumo { padding: 12px; min-height: 60px; }
+  .cr-resumo-hp-btn { width: 30px; height: 30px; font-size: 15px; }
+  .criatura-resumo-stats { font-size: 11px; }
 }
 
 /* ===== BUSCADOR DO BESTIÁRIO ===== */
