@@ -1,18 +1,35 @@
 // assets/js/ficha/aba_habilidades.js
-// Aba Habilidades: features fixas por classe×nível (data/habilidades_classes.json),
-// detecção de usos limitados por regex sobre o texto da feature, e as
-// características personalizadas (characters.features_personalizadas).
+// Aba Habilidades (Fase 5 do redesign): features fixas por classe×nível
+// (data/habilidades_classes.json) + características personalizadas
+// (characters.features_personalizadas), agora com busca, filtro por tipo
+// de ação, favoritar (characters.habilidades_favoritas — migration 022,
+// degrada pra "só nesta sessão" se a coluna ainda não existir) e um
+// tracker de usos redesenhado (pips + "N/M disponíveis" + período de
+// recuperação visível, no lugar de "Usos 0/1 [1]").
 
 function renderHabilidades(c) {
   return `
     <div id="recursos-classe-wrap"></div>
 
-    <h3>Habilidades de Classe</h3>
+    <h3>Habilidades</h3>
     <p style="color:var(--text-dim);font-style:italic;font-size:12px;margin-bottom:14px">
       Preenchido automaticamente com base na classe e nível.
       ${c.subclasse ? `Subclasse: <strong>${escape(c.subclasse)}</strong>` : 'Defina sua subclasse na aba <em>Identidade</em>.'}
     </p>
+
+    <div class="hab-busca-wrap">
+      <input type="search" id="hab-busca" class="hab-busca-input" placeholder="Buscar habilidade…" aria-label="Buscar habilidade">
+    </div>
+    <div class="hab-filtros" role="group" aria-label="Filtrar por tipo de ação">
+      <button type="button" class="pill ativo" data-hab-filtro="todas" aria-pressed="true">Todas</button>
+      <button type="button" class="pill" data-hab-filtro="acao" aria-pressed="false">Ações</button>
+      <button type="button" class="pill" data-hab-filtro="bonus" aria-pressed="false">Ações Bônus</button>
+      <button type="button" class="pill" data-hab-filtro="reacao" aria-pressed="false">Reações</button>
+      <button type="button" class="pill" data-hab-filtro="passiva" aria-pressed="false">Passivas</button>
+    </div>
+
     <div id="hab-wrap">Carregando…</div>
+    <div id="hab-sem-resultados" class="item-vazio" hidden>Nenhuma habilidade encontrada com esse filtro/busca.</div>
 
     <div class="hab-add-bar">
       <h3 style="margin:0">Características Personalizadas</h3>
@@ -87,6 +104,113 @@ function detectarUsosLimitados(h) {
   return null;  // passiva — sem tracker
 }
 
+// Detecta o TIPO DE AÇÃO (Fase 5, §11) por texto — a fonte de dados não tem
+// esse campo estruturado, então é um palpite best-effort igual ao de
+// detectarUsosLimitados: procura o marcador explícito "Ação bônus:"/
+// "Reação:"/"Ação:" (com dois-pontos, pra não disparar em qualquer menção
+// incidental da palavra). Sem marcador → passiva, que é o caso comum
+// (ASI, proficiências, escolha de subclasse etc. não custam ação).
+function detectarTipoAcao(h) {
+  const txt = (h.nome || '') + ' ' + (h.desc || '');
+  if (/a[çc][ãa]o\s+b[ôo]nus\s*:/i.test(txt)) return 'bonus';
+  if (/rea[çc][ãa]o\s*:/i.test(txt)) return 'reacao';
+  if (/(^|\.\s*)a[çc][ãa]o\s*:/i.test(txt)) return 'acao';
+  return 'passiva';
+}
+function rotuloTipoAcao(tipo) {
+  return { acao: 'Ação', bonus: 'Ação Bônus', reacao: 'Reação', passiva: 'Passiva' }[tipo] || 'Passiva';
+}
+
+// Lista achatada de TODAS as habilidades do PJ (catálogo de classe já
+// filtrado por nível/subclasse + características personalizadas), num
+// formato único {slug,nome,desc,tipoAcao,custom}. Usada pelo Resumo pra
+// resolver os favoritos sem duplicar a lógica de filtragem do catálogo.
+async function todasHabilidadesPJ(c) {
+  const lista = [];
+  if (c.classe) {
+    const db = await carregarHabilidadesClasses();
+    if (db) {
+      const todas = db[chaveDeClasse(c.classe)] || [];
+      const habs = todas.filter(h => h.nivel <= (c.nivel || 1) && (!h.subclasse || h.subclasse === c.subclasse));
+      for (const h of habs) {
+        lista.push({ slug: slugFeature(h.nome), nome: h.nome, desc: h.desc, tipoAcao: detectarTipoAcao(h), custom: false });
+      }
+    }
+  }
+  const custom = Array.isArray(c.features_personalizadas) ? c.features_personalizadas : [];
+  custom.forEach((f, idx) => {
+    lista.push({ slug: 'custom_' + (f.id || idx), nome: f.nome || '(sem nome)', desc: f.desc || '', tipoAcao: detectarTipoAcao(f), custom: true });
+  });
+  return lista;
+}
+
+// ── Busca + filtro por tipo de ação ──
+// Estado em módulo (não em charAtivo): preferência da sessão, não é dado
+// do personagem. Preservado entre re-renders da própria aba (pip clicado
+// não deve resetar o filtro), mas reseta ao recarregar a página.
+let _habFiltro = 'todas';
+let _habBusca = '';
+
+function semAcentoHab(s) {
+  return (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+}
+
+function aplicarFiltroHabilidades() {
+  const termo = semAcentoHab(_habBusca.trim());
+  let visiveis = 0;
+
+  document.querySelectorAll('#hab-wrap .hab-feature, #hab-custom-wrap .hab-feature').forEach(card => {
+    const tipoOk = _habFiltro === 'todas' || card.dataset.habTipo === _habFiltro;
+    const textoOk = !termo || semAcentoHab(card.textContent).includes(termo);
+    const mostrar = tipoOk && textoOk;
+    card.hidden = !mostrar;
+    if (mostrar) visiveis++;
+  });
+
+  // Esconde grupos "Nível N" que ficaram sem nenhuma feature visível
+  document.querySelectorAll('#hab-wrap .habilidade-card').forEach(grupo => {
+    const temVisivel = !!grupo.querySelector('.hab-feature:not([hidden])');
+    grupo.hidden = !temVisivel;
+  });
+
+  const semResultados = document.getElementById('hab-sem-resultados');
+  if (semResultados) semResultados.hidden = visiveis > 0;
+}
+
+function conectarListenersFiltroHabilidades() {
+  const busca = document.getElementById('hab-busca');
+  if (busca) {
+    busca.value = _habBusca;
+    busca.addEventListener('input', () => { _habBusca = busca.value; aplicarFiltroHabilidades(); });
+  }
+  document.querySelectorAll('[data-hab-filtro]').forEach(btn => {
+    btn.classList.toggle('ativo', btn.dataset.habFiltro === _habFiltro);
+    btn.setAttribute('aria-pressed', String(btn.dataset.habFiltro === _habFiltro));
+    btn.addEventListener('click', () => {
+      _habFiltro = btn.dataset.habFiltro;
+      document.querySelectorAll('[data-hab-filtro]').forEach(b => {
+        b.classList.toggle('ativo', b === btn);
+        b.setAttribute('aria-pressed', String(b === btn));
+      });
+      aplicarFiltroHabilidades();
+    });
+  });
+}
+
+// ── Tracker de usos (§11): pips + "N/M disponíveis" + período visível —
+// substitui o antigo "Usos: [pips] N/M [input]" sem rótulo de recuperação. ──
+function renderTrackerUsos(max, usos, disp, periodo, dataAttrs) {
+  if (max <= 0) return '';
+  const pips = Array.from({ length: max }).map((_, i) =>
+    `<span class="hab-pip ${i < usos ? 'gasto' : ''}" ${dataAttrs(i)} role="button" tabindex="0" aria-label="Uso ${i+1} de ${max}, ${i < usos ? 'gasto' : 'disponível'}"></span>`
+  ).join('');
+  return `
+    <span class="hab-pips">${pips}</span>
+    <span class="hab-disp"><strong>${disp}</strong>/${max} disponíveis</span>
+    ${periodo ? `<span class="hab-periodo-badge" title="Recupera em ${escape(periodo)}">↻ ${escape(periodo)}</span>` : ''}
+  `;
+}
+
 async function popularHabilidades(classe, nivel, subclasse) {
   const wrap = document.getElementById('hab-wrap');
   if (!wrap) return;
@@ -114,6 +238,7 @@ async function popularHabilidades(classe, nivel, subclasse) {
   const porNivel = {};
   for (const h of habs) (porNivel[h.nivel] = porNivel[h.nivel] || []).push(h);
   const recursos = charAtivo.recursos_usados || {};
+  const favoritas = new Set(Array.isArray(charAtivo.habilidades_favoritas) ? charAtivo.habilidades_favoritas : []);
 
   wrap.innerHTML = Object.entries(porNivel).sort(([a],[b]) => +a - +b).map(([nv, lista]) => `
     <div class="habilidade-card">
@@ -121,6 +246,7 @@ async function popularHabilidades(classe, nivel, subclasse) {
       ${lista.map(h => {
         const slug = slugFeature(h.nome);
         const detectado = detectarUsosLimitados(h);
+        const tipoAcao = detectarTipoAcao(h);
         const r = recursos[slug] || {};
         // max efetivo: o que está salvo > o detectado pelo regex
         const maxSalvo = +r.max || 0;
@@ -128,13 +254,19 @@ async function popularHabilidades(classe, nivel, subclasse) {
         const max = maxSalvo > 0 ? maxSalvo : maxDetectado;
         const usos = Math.min(+r.atual || 0, max);
         const disp = Math.max(0, max - usos);
+        const favorita = favoritas.has(slug);
+        const ehTracker = !!detectado || maxSalvo > 0;
+
+        const botaoFav = `<button type="button" class="hab-fav-btn ${favorita ? 'ativa' : ''} no-lock" data-hab-fav="${slug}" aria-pressed="${favorita}" aria-label="${favorita ? 'Remover dos favoritos' : 'Favoritar'}" title="${favorita ? 'Remover dos favoritos' : 'Favoritar — aparece no Resumo'}">${favorita ? '★' : '☆'}</button>`;
+        const badgeTipo = tipoAcao !== 'passiva' ? `<span class="hab-tipo-badge hab-tipo-${tipoAcao}">${rotuloTipoAcao(tipoAcao)}</span>` : '';
 
         // SEM tracker: feature passiva (nenhum padrão de uso detectado)
-        if (!detectado && maxSalvo === 0) {
-          return `<div class="hab-feature passiva" data-hab-slug="${slug}">
+        if (!ehTracker) {
+          return `<div class="hab-feature passiva" data-hab-slug="${slug}" data-hab-tipo="${tipoAcao}">
+            ${botaoFav}
             ${h.subclasse ? `<span class="hab-sub-tag">${escape(h.subclasse)}</span>` : ''}
             <div class="hab-feature-titulo">
-              <strong>${escape(h.nome)}.</strong>
+              <strong>${escape(h.nome)}.</strong> ${badgeTipo}
               <span class="hab-desc">${escape(h.desc || '—')}</span>
             </div>
           </div>`;
@@ -142,22 +274,16 @@ async function popularHabilidades(classe, nivel, subclasse) {
 
         // COM tracker: feature usável (limite detectado ou já configurado)
         const periodo = detectado?.periodo || 'descanso';
-        const pips = max > 0 ? Array.from({length: max}).map((_, i) =>
-          `<button type="button" class="hab-pip ${i < usos ? 'gasto' : ''}" data-hab-slug="${slug}" data-hab-idx="${i}" aria-label="Uso ${i+1} ${i < usos ? 'gasto' : 'disponível'}"></button>`
-        ).join('') : '';
-        return `<div class="hab-feature ativa" data-hab-slug="${slug}">
+        return `<div class="hab-feature ativa" data-hab-slug="${slug}" data-hab-tipo="${tipoAcao}">
+          ${botaoFav}
           ${h.subclasse ? `<span class="hab-sub-tag">${escape(h.subclasse)}</span>` : ''}
           <div class="hab-feature-head">
             <div class="hab-feature-titulo">
-              <strong>${escape(h.nome)}.</strong>
+              <strong>${escape(h.nome)}.</strong> ${badgeTipo}
               <span class="hab-desc">${escape(h.desc || '—')}</span>
             </div>
-            <div class="hab-tracker" title="Recupera em ${escape(periodo)}">
-              <label class="hab-tracker-lbl">Usos:</label>
-              ${max > 0 ? `
-                <span class="hab-pips">${pips}</span>
-                <span class="hab-disp"><strong>${disp}</strong>/${max}</span>
-              ` : ''}
+            <div class="hab-tracker">
+              ${renderTrackerUsos(max, usos, disp, periodo, i => `data-hab-slug="${slug}" data-hab-idx="${i}"`)}
               <input type="text" inputmode="numeric" class="hab-tracker-max" value="${max}" data-hab-max="${slug}" aria-label="Máximo de usos" title="Ajuste o máximo (a regra padrão é ${detectado?.max || '?'})">
             </div>
           </div>
@@ -166,21 +292,31 @@ async function popularHabilidades(classe, nivel, subclasse) {
     </div>
   `).join('');
 
-  // Listeners dos pips (toggle gasto/disponível) e do max
-  wrap.querySelectorAll('.hab-pip').forEach(pip => {
-    pip.addEventListener('click', () => {
-      const slug = pip.dataset.habSlug;
-      const idx  = +pip.dataset.habIdx;
-      const rec  = charAtivo.recursos_usados || {};
-      const cur  = rec[slug] || { atual: 0, max: 0 };
-      // Click no pip "gasto" → recupera 1; click no pip "disponível" → gasta 1
-      cur.atual = pip.classList.contains('gasto') ? idx : idx + 1;
-      cur.atual = Math.max(0, Math.min(cur.max, cur.atual));
-      rec[slug] = cur;
-      charAtivo.recursos_usados = rec;
-      salvarRecursosSeguro();
-      popularHabilidades(classe, nivel, subclasse);  // re-render
+  // Favoritar
+  wrap.querySelectorAll('[data-hab-fav]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      alternarHabilidadeFavorita(btn.dataset.habFav);
+      popularHabilidades(classe, nivel, subclasse);
     });
+  });
+
+  // Listeners dos pips (toggle gasto/disponível) e do max
+  const alternarPip = pip => {
+    const slug = pip.dataset.habSlug;
+    const idx  = +pip.dataset.habIdx;
+    const rec  = charAtivo.recursos_usados || {};
+    const cur  = rec[slug] || { atual: 0, max: 0 };
+    // Click no pip "gasto" → recupera 1; click no pip "disponível" → gasta 1
+    cur.atual = pip.classList.contains('gasto') ? idx : idx + 1;
+    cur.atual = Math.max(0, Math.min(cur.max, cur.atual));
+    rec[slug] = cur;
+    charAtivo.recursos_usados = rec;
+    salvarRecursosSeguro();
+    popularHabilidades(classe, nivel, subclasse);  // re-render
+  };
+  wrap.querySelectorAll('.hab-pip').forEach(pip => {
+    pip.addEventListener('click', () => alternarPip(pip));
+    pip.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); alternarPip(pip); } });
   });
 
   wrap.querySelectorAll('.hab-tracker-max').forEach(inp => {
@@ -197,6 +333,8 @@ async function popularHabilidades(classe, nivel, subclasse) {
       popularHabilidades(classe, nivel, subclasse);
     });
   });
+
+  aplicarFiltroHabilidades();
 }
 
 // Salva recursos_usados via UPDATE direto.
@@ -235,9 +373,11 @@ function popularFeaturesPersonalizadas() {
   const lista = Array.isArray(charAtivo.features_personalizadas) ? charAtivo.features_personalizadas : [];
   if (!lista.length) {
     wrap.innerHTML = `<div class="item-vazio" style="padding:14px">Nenhuma característica personalizada ainda. Clique <strong>+ Adicionar característica</strong> acima.</div>`;
+    aplicarFiltroHabilidades();
     return;
   }
   const recursos = charAtivo.recursos_usados || {};
+  const favoritas = new Set(Array.isArray(charAtivo.habilidades_favoritas) ? charAtivo.habilidades_favoritas : []);
   wrap.innerHTML = `<div class="habilidade-card">
     ${lista.map((f, idx) => {
       const slug = 'custom_' + (f.id || idx);
@@ -246,10 +386,10 @@ function popularFeaturesPersonalizadas() {
       const maxEfetivo = max > 0 ? max : (+r.max || 0);
       const usos = Math.min(+r.atual || 0, maxEfetivo);
       const disp = Math.max(0, maxEfetivo - usos);
-      const pips = maxEfetivo > 0 ? Array.from({length: maxEfetivo}).map((_, i) =>
-        `<button type="button" class="hab-pip ${i < usos ? 'gasto' : ''}" data-cfeat-slug="${slug}" data-cfeat-idx="${i}" aria-label="Uso ${i+1}"></button>`
-      ).join('') : '';
-      return `<div class="hab-feature ${maxEfetivo > 0 ? 'ativa' : 'passiva'}" data-cfeat-idx="${idx}">
+      const tipoAcao = detectarTipoAcao(f);
+      const favorita = favoritas.has(slug);
+      return `<div class="hab-feature ${maxEfetivo > 0 ? 'ativa' : 'passiva'}" data-cfeat-idx="${idx}" data-hab-tipo="${tipoAcao}">
+        <button type="button" class="hab-fav-btn ${favorita ? 'ativa' : ''} no-lock" data-hab-fav="${slug}" aria-pressed="${favorita}" aria-label="${favorita ? 'Remover dos favoritos' : 'Favoritar'}" title="${favorita ? 'Remover dos favoritos' : 'Favoritar — aparece no Resumo'}">${favorita ? '★' : '☆'}</button>
         <button type="button" class="cfeat-remove" data-cfeat-rm="${idx}" title="Remover" aria-label="Remover característica">✕</button>
         <div class="hab-feature-head">
           <div class="hab-feature-titulo">
@@ -257,11 +397,7 @@ function popularFeaturesPersonalizadas() {
             <textarea class="cfeat-desc" data-cfeat-field="desc" data-cfeat-idx="${idx}" placeholder="Descrição (opcional)" aria-label="Descrição">${escape(f.desc || '')}</textarea>
           </div>
           <div class="hab-tracker">
-            <label class="hab-tracker-lbl">Usos:</label>
-            ${maxEfetivo > 0 ? `
-              <span class="hab-pips">${pips}</span>
-              <span class="hab-disp"><strong>${disp}</strong>/${maxEfetivo}</span>
-            ` : ''}
+            ${renderTrackerUsos(maxEfetivo, usos, disp, null, i => `data-cfeat-slug="${slug}" data-cfeat-idx-pip="${i}"`)}
             <input type="text" inputmode="numeric" class="hab-tracker-max" value="${max}" data-cfeat-max="${idx}" title="Máximo de usos (0 = passiva, sem tracker)" aria-label="Máximo de usos">
           </div>
         </div>
@@ -269,24 +405,34 @@ function popularFeaturesPersonalizadas() {
     }).join('')}
   </div>`;
 
-  // Pip click → toggle gasto
-  wrap.querySelectorAll('.hab-pip[data-cfeat-slug]').forEach(pip => {
-    pip.addEventListener('click', () => {
-      const slug = pip.dataset.cfeatSlug;
-      const idx  = +pip.dataset.cfeatIdx;
-      const rec  = charAtivo.recursos_usados || {};
-      const featList = charAtivo.features_personalizadas || [];
-      const featIdx = featList.findIndex((f, i) => 'custom_' + (f.id || i) === slug);
-      const max = featIdx >= 0 ? (+featList[featIdx].max || 0) : 0;
-      const cur = rec[slug] || { atual: 0, max };
-      cur.max = max;
-      cur.atual = pip.classList.contains('gasto') ? idx : (idx + 1);
-      cur.atual = Math.max(0, Math.min(max, cur.atual));
-      rec[slug] = cur;
-      charAtivo.recursos_usados = rec;
-      salvarRecursosSeguro();
+  // Favoritar
+  wrap.querySelectorAll('[data-hab-fav]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      alternarHabilidadeFavorita(btn.dataset.habFav);
       popularFeaturesPersonalizadas();
     });
+  });
+
+  // Pip click → toggle gasto
+  const alternarPipCustom = pip => {
+    const slug = pip.dataset.cfeatSlug;
+    const idx  = +pip.dataset.cfeatIdxPip;
+    const rec  = charAtivo.recursos_usados || {};
+    const featList = charAtivo.features_personalizadas || [];
+    const featIdx = featList.findIndex((f, i) => 'custom_' + (f.id || i) === slug);
+    const max = featIdx >= 0 ? (+featList[featIdx].max || 0) : 0;
+    const cur = rec[slug] || { atual: 0, max };
+    cur.max = max;
+    cur.atual = pip.classList.contains('gasto') ? idx : (idx + 1);
+    cur.atual = Math.max(0, Math.min(max, cur.atual));
+    rec[slug] = cur;
+    charAtivo.recursos_usados = rec;
+    salvarRecursosSeguro();
+    popularFeaturesPersonalizadas();
+  };
+  wrap.querySelectorAll('.hab-pip[data-cfeat-slug]').forEach(pip => {
+    pip.addEventListener('click', () => alternarPipCustom(pip));
+    pip.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); alternarPipCustom(pip); } });
   });
 
   // Nome / desc / max — salva no estado
@@ -323,15 +469,22 @@ function popularFeaturesPersonalizadas() {
 
   // Remover
   wrap.querySelectorAll('[data-cfeat-rm]').forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.addEventListener('click', async () => {
       const idx = +btn.dataset.cfeatRm;
-      if (!confirm('Remover esta característica?')) return;
+      const cf = window.Confirmar
+        ? await Confirmar.perguntar({ titulo: 'Remover característica?', mensagem: 'Esta ação não pode ser desfeita.', confirmar: 'Remover', danger: true })
+        : confirm('Remover esta característica?');
+      if (!cf) return;
       const f = charAtivo.features_personalizadas[idx];
       if (f) {
         const slug = 'custom_' + (f.id || idx);
         const rec = charAtivo.recursos_usados || {};
         delete rec[slug];
         charAtivo.recursos_usados = rec;
+        if (Array.isArray(charAtivo.habilidades_favoritas)) {
+          charAtivo.habilidades_favoritas = charAtivo.habilidades_favoritas.filter(s => s !== slug);
+          salvarHabilidadesFavoritas();
+        }
       }
       charAtivo.features_personalizadas.splice(idx, 1);
       salvarFeaturesPersonalizadas();
@@ -339,6 +492,8 @@ function popularFeaturesPersonalizadas() {
       popularFeaturesPersonalizadas();
     });
   });
+
+  aplicarFiltroHabilidades();
 }
 
 function adicionarFeaturePersonalizada() {
@@ -354,4 +509,3 @@ function adicionarFeaturePersonalizada() {
     if (inputs?.length) inputs[inputs.length - 1].focus();
   }, 50);
 }
-

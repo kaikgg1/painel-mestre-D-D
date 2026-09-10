@@ -38,6 +38,8 @@ function renderResumo(c, atrs) {
         <div id="recursos-classe-wrap"></div>
       </section>
 
+      ${renderResumoFavoritas(c)}
+
       ${classeUsaMagia(c) ? `
       <section class="resumo-secao">
         <h3>Magias</h3>
@@ -156,6 +158,42 @@ function renderSlotsResumo(c) {
   </div>`;
 }
 
+// ── Favoritas (Fase 5, §11: "as habilidades favoritas podem aparecer no
+// Resumo") ── charAtivo.habilidades_favoritas (lista de slugs) já vem
+// carregado com o personagem; os NOMES/descrições, porém, dependem do
+// catálogo de classe (fetch assíncrono, cacheado em HABILIDADES_CLASSES
+// por nucleo.js) — por isso o placeholder síncrono + preenchimento async,
+// igual carregarMagiasPreparadas() faz pra #magias-prep.
+function renderResumoFavoritas(c) {
+  const favs = Array.isArray(c.habilidades_favoritas) ? c.habilidades_favoritas : [];
+  if (!favs.length) return '';
+  return `
+    <section class="resumo-secao">
+      <h3>Favoritas</h3>
+      <div id="resumo-favoritas-wrap">Carregando…</div>
+    </section>`;
+}
+
+async function carregarResumoFavoritas() {
+  const wrap = document.getElementById('resumo-favoritas-wrap');
+  if (!wrap || !charAtivo) return;
+  const favs = Array.isArray(charAtivo.habilidades_favoritas) ? charAtivo.habilidades_favoritas : [];
+  if (!favs.length) { wrap.innerHTML = ''; return; }
+  const todas = await todasHabilidadesPJ(charAtivo);
+  const porSlug = new Map(todas.map(h => [h.slug, h]));
+  const lista = favs.map(slug => porSlug.get(slug)).filter(Boolean);
+  if (!lista.length) {
+    wrap.innerHTML = `<div class="item-vazio">Habilidades favoritadas não encontradas (podem ter sido removidas).</div>`;
+    return;
+  }
+  wrap.innerHTML = lista.map(h => `
+    <div class="fav-hab-card">
+      <div class="fav-hab-nome">${escape(h.nome)}${h.tipoAcao !== 'passiva' ? ` <span class="hab-tipo-badge hab-tipo-${h.tipoAcao}">${rotuloTipoAcao(h.tipoAcao)}</span>` : ''}</div>
+      <div class="fav-hab-desc">${escape(h.desc || '—')}</div>
+    </div>
+  `).join('');
+}
+
 let _condicaoExpandida = null;
 
 function renderResumoOutros(c) {
@@ -229,6 +267,8 @@ function renderChipsCondicoes(ativas) {
 }
 
 function conectarListenersResumo() {
+  carregarResumoFavoritas(); // async — só existe #resumo-favoritas-wrap se houver favoritas
+
   // Ataques: rolar dado (toast com o resultado — não persiste nada)
   document.querySelectorAll('[data-resumo-rolar]').forEach(btn => {
     btn.addEventListener('click', () => {

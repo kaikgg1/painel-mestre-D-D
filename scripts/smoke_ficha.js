@@ -35,25 +35,48 @@ const { window } = dom;
 
 // Stubs mínimos: init() sai cedo se não houver usuário logado.
 window.Auth = { requerLogin: async () => null, renderHeader: async () => {}, ehMestre: async () => false };
+// Stub de assets/js/confirmar.js: o modal real espera clique do usuário
+// (Promise que só resolve com a interação); aqui simula "sempre confirma",
+// suficiente pra exercitar os call sites (deletarPersonagem, remover
+// característica personalizada) sem reimplementar um modal no jsdom.
+window.Confirmar = { perguntar: async () => true };
 // window.__ultimoUpdatePayload grava o payload do update() mais recente —
 // usado pra inspecionar o que salvar() realmente monta e mandaria pro banco
-// (ver o teste "salvar() de verdade" mais abaixo).
+// (ver os testes "salvar() de verdade" mais abaixo).
 window.__ultimoUpdatePayload = null;
-window.sb = { from: () => ({
-  select: () => ({ eq: () => ({ order: async () => ({ data: [], error: null }) }) }),
-  // update().eq() é chamado por salvarCondicoes/salvarRecursos (fire-and-
-  // forget) e por salvar() (que encadeia .select().single() depois do
-  // .eq() — precisa da cadeia completa, senão o real salvar.js quebraria
-  // aqui ANTES de quebrar em produção).
-  update: (payload) => {
-    window.__ultimoUpdatePayload = payload;
-    return { eq: () => ({
-      error: null, // salvarCondicoes/salvarRecursos só fazem `await ...eq(...)` e leem `.error`
-      select: () => ({ single: async () => ({ data: { ...payload }, error: null }) }),
-    }) };
-  },
-}) };
-window.fetch = async () => { throw new Error('sem rede no smoke test'); };
+// Query builder encadeável de verdade (não um objeto ad-hoc por chamada):
+// .eq()/.order() podem ser encadeados qualquer número de vezes, em
+// qualquer ordem, terminando em .single()/.maybeSingle() (promise de
+// {data,error}) OU sendo usado diretamente como promise (award direto,
+// como salvarCondicoes/salvarRecursos fazem: `await ...update(...).eq(...)`
+// sem terminal — o builder abaixo é "thenable" pra isso funcionar também).
+function construirQuery(payloadUpdate) {
+  const builder = {
+    select: () => builder,
+    eq: () => builder,
+    order: () => builder,
+    update: (payload) => { window.__ultimoUpdatePayload = payload; return construirQuery(payload); },
+    single: async () => ({ data: payloadUpdate ? { ...payloadUpdate } : {}, error: null }),
+    maybeSingle: async () => ({ data: null, error: null }),
+    // Permite `await query` sem terminal explícito (uso real em salvarCondicoes etc.)
+    then: (resolve) => resolve({ data: payloadUpdate ? { ...payloadUpdate } : [], error: null }),
+  };
+  return builder;
+}
+window.sb = { from: () => construirQuery(null) };
+// nucleo.js faz fetch('../data/habilidades_classes.json') e
+// fetch('../data/magias_data.json') — serve os arquivos reais do disco
+// (mesmo dado que o navegador pegaria) em vez de simular "sem rede", senão
+// popularHabilidades()/carregarMagiasPreparadas() nunca populam de verdade
+// e a Fase 5 (busca/filtro/favoritar sobre o catálogo) fica sem cobertura.
+window.fetch = async (url) => {
+  const arquivo = String(url).replace(/^\.\.\//, '');
+  const caminho = path.join(raiz, arquivo);
+  if (fs.existsSync(caminho) && /^data\//.test(arquivo)) {
+    return { ok: true, status: 200, json: async () => JSON.parse(fs.readFileSync(caminho, 'utf8')) };
+  }
+  throw new Error('sem rede no smoke test (' + url + ')');
+};
 // Polyfills de coisas que o jsdom nao implementa (nao sao problema do codigo)
 window.Element.prototype.scrollIntoView = function () {};
 window.HTMLCanvasElement.prototype.getContext = () => null;
@@ -77,6 +100,12 @@ const ordem = [
 const erros = [];
 window.addEventListener('error', e => erros.push(e.message || String(e.error)));
 const vc = dom.virtualConsole || null;
+
+// A partir daqui tudo roda dentro de uma IIFE async: a Fase 5 precisa
+// esperar o fetch() (agora servindo data/habilidades_classes.json de
+// verdade) resolver antes de checar o catálogo populado. Sem isso o teste
+// corria síncrono e nunca via o conteúdo real do catálogo.
+(async () => {
 
 for (const arq of ordem) {
   const src = fs.readFileSync(path.join(raiz, 'assets/js/ficha', arq), 'utf8');
@@ -395,6 +424,128 @@ console.log('');
     : '  salvar() real: submit da aba Combate grava salvaguardas/pericias/slots_magia no payload');
 }
 
+// Habilidades (Fase 5): busca, filtro por tipo de ação e favoritar — sobre
+// o CATÁLOGO DE VERDADE (data/habilidades_classes.json via o fetch mock
+// acima), não um placeholder. Clérigo nível 9 tem exatamente 1 feature
+// classificada 'acao' ("Canalizar Divindade: Expulsar Mortos-Vivos") entre
+// as 12 do nível — número travado por checagem separada em node direto.
+console.log('');
+{
+  const antes = erros.length;
+  const sc = window.document.createElement('script');
+  sc.textContent = 'tabAtiva = "habilidades"; render();';
+  window.document.head.appendChild(sc);
+
+  // popularHabilidades() é assíncrono (fetch real, mockado acima) — espera
+  // o catálogo terminar de popular #hab-wrap antes de checar qualquer coisa.
+  const habWrap = () => window.document.getElementById('hab-wrap');
+  for (let i = 0; i < 50 && habWrap() && /Carregando/.test(habWrap().textContent); i++) {
+    await new Promise(r => setTimeout(r, 20));
+  }
+
+  const featuresCatalogo = () => Array.from(window.document.querySelectorAll('#hab-wrap .hab-feature'));
+  if (!featuresCatalogo().length) erros.push('habilidades: catálogo não populou (fetch mock ou popularHabilidades quebrou)');
+
+  const HAB_CHECKS = [
+    ['#hab-busca', 'campo de busca'],
+    ['[data-hab-filtro="todas"].ativo', 'pill "Todas" ativo por padrão'],
+    ['#hab-wrap .hab-feature[data-hab-tipo="acao"]', 'feature classificada como Ação'],
+    ['#hab-wrap .hab-fav-btn', 'botão de favoritar no catálogo'],
+    ['#hab-wrap .hab-pip', 'pips de uso redesenhados'],
+    ['#hab-custom-wrap', 'wrap de características personalizadas'],
+  ];
+  for (const [sel, rotulo] of HAB_CHECKS) {
+    if (!window.document.querySelector(sel)) erros.push('habilidades: "' + rotulo + '" (' + sel + ') não encontrado');
+  }
+
+  // Filtro "Ações": só a 1 feature 'acao' deve continuar visível no catálogo.
+  try {
+    window.document.querySelector('[data-hab-filtro="acao"]')?.click();
+    const visiveis = featuresCatalogo().filter(el => !el.hidden);
+    if (visiveis.length !== 1) erros.push('habilidades: filtro "Ações" deveria deixar 1 feature visível, ficaram ' + visiveis.length);
+    else if (visiveis[0].dataset.habTipo !== 'acao') erros.push('habilidades: filtro "Ações" deixou visível uma feature do tipo ' + visiveis[0].dataset.habTipo);
+    window.document.querySelector('[data-hab-filtro="todas"]')?.click(); // volta ao normal
+  } catch (e) { erros.push('habilidades: filtro por tipo → ' + e.message); }
+
+  // Busca por texto: "aumento" só bate em "Aumento de Pontuação de Atributo".
+  try {
+    const busca = window.document.getElementById('hab-busca');
+    busca.value = 'aumento';
+    busca.dispatchEvent(new window.Event('input', { bubbles: true }));
+    const visiveis = featuresCatalogo().filter(el => !el.hidden);
+    if (!visiveis.length) erros.push('habilidades: busca "aumento" não achou nada');
+    if (visiveis.some(el => !/aumento/i.test(el.textContent))) erros.push('habilidades: busca "aumento" deixou visível algo que não bate');
+    busca.value = ''; busca.dispatchEvent(new window.Event('input', { bubbles: true })); // limpa
+  } catch (e) { erros.push('habilidades: busca por texto → ' + e.message); }
+
+  // Favoritar uma feature do catálogo → aparece em charAtivo.habilidades_favoritas
+  // → persiste (payload do update mockado) → aparece na seção Favoritas do Resumo.
+  try {
+    const primeiroFav = window.document.querySelector('#hab-wrap .hab-fav-btn');
+    const slugFavoritado = primeiroFav?.dataset.habFav;
+    window.__ultimoUpdatePayload = null;
+    primeiroFav?.click();
+    const favs = window.eval('charAtivo.habilidades_favoritas');
+    if (!Array.isArray(favs) || !favs.includes(slugFavoritado)) erros.push('habilidades: favoritar não gravou o slug em charAtivo.habilidades_favoritas');
+    const p = window.__ultimoUpdatePayload;
+    if (!p || !('habilidades_favoritas' in p)) erros.push('habilidades: favoritar não tentou persistir via window.sb.update()');
+
+    // Vai pro Resumo e confere que a favorita aparece (espera o fetch assíncrono de novo)
+    const scResumo = window.document.createElement('script');
+    scResumo.textContent = 'tabAtiva = "resumo"; render();';
+    window.document.head.appendChild(scResumo);
+    const favWrap = () => window.document.getElementById('resumo-favoritas-wrap');
+    for (let i = 0; i < 50 && favWrap() && /Carregando/.test(favWrap().textContent); i++) {
+      await new Promise(r => setTimeout(r, 20));
+    }
+    if (!favWrap() || !favWrap().querySelector('.fav-hab-card')) erros.push('resumo: seção Favoritas não mostrou a habilidade recém-favoritada');
+  } catch (e) { erros.push('habilidades: ciclo de favoritar → ' + e.message); }
+
+  console.log(erros.length > antes
+    ? '  FALHOU     habilidades (ver FALHAS abaixo)'
+    : '  aba habilidades: catálogo real + filtro por tipo + busca + favoritar (com reflexo no Resumo) ok');
+}
+
+// Característica personalizada: adicionar → nomear → favoritar → remover
+// (confirmação via o stub de Confirmar.perguntar acima). Cobre o segundo
+// tipo de habilidade (custom, não-catálogo) que compartilha os mesmos
+// data-hab-tipo/favoritar/filtro do catálogo.
+console.log('');
+{
+  const antes = erros.length;
+  const scHab = window.document.createElement('script');
+  scHab.textContent = 'tabAtiva = "habilidades"; render();';
+  window.document.head.appendChild(scHab);
+
+  try {
+    window.document.getElementById('btn-add-feature')?.click();
+    const nomeInput = window.document.querySelector('#hab-custom-wrap .cfeat-nome');
+    if (!nomeInput) erros.push('habilidades: adicionar característica personalizada não criou o input de nome');
+    else {
+      nomeInput.value = 'Dádiva de Teste';
+      nomeInput.dispatchEvent(new window.Event('input', { bubbles: true }));
+
+      const favBtn = window.document.querySelector('#hab-custom-wrap .hab-fav-btn');
+      const slugCustom = favBtn?.dataset.habFav;
+      favBtn?.click();
+      const favs = window.eval('charAtivo.habilidades_favoritas') || [];
+      if (!slugCustom || !favs.includes(slugCustom)) erros.push('habilidades: favoritar característica personalizada não gravou o slug');
+
+      const antesQtd = (window.eval('charAtivo.features_personalizadas') || []).length;
+      window.document.querySelector('#hab-custom-wrap .cfeat-remove')?.click();
+      await Promise.resolve().then(() => {}).then(() => {}); // deixa o await Confirmar.perguntar() (stub) resolver
+      const depoisQtd = (window.eval('charAtivo.features_personalizadas') || []).length;
+      if (depoisQtd !== antesQtd - 1) erros.push('habilidades: remover característica personalizada (com Confirmar.perguntar) não tirou do array — antes=' + antesQtd + ' depois=' + depoisQtd);
+      const favsDepois = window.eval('charAtivo.habilidades_favoritas') || [];
+      if (favsDepois.includes(slugCustom)) erros.push('habilidades: remover característica personalizada não limpou o favorito órfão');
+    }
+  } catch (e) { erros.push('habilidades: ciclo de característica personalizada → ' + e.message); }
+
+  console.log(erros.length > antes
+    ? '  FALHOU     característica personalizada (ver FALHAS abaixo)'
+    : '  característica personalizada: adicionar/favoritar/remover (com Confirmar.perguntar) ok');
+}
+
 // Header (Fase 2): avatar+nome+trocador, campanha, autosave, editar/travar,
 // menu ⋯, e a navegação inferior mobile — tudo populado pelo último render().
 console.log('');
@@ -423,3 +574,5 @@ console.log(`OK — ${ordem.length} módulos, ${abas.length} abas renderizadas, 
 // Saída imediata: fetch/Supabase stubados ainda têm promises pendentes,
 // que só gerariam ruído no console depois do resultado.
 process.exit(0);
+
+})().catch(e => { console.error('ERRO NAO TRATADO NO SMOKE TEST:', e); process.exit(1); });

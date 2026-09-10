@@ -261,10 +261,10 @@
   /* Tabs: scroll horizontal limpo */
   .tabs { gap: 0; padding: 0 4px; }
   .tab { padding: 14px 14px; font-size: 11px; min-height: 44px; }
-  /* Check rows: touch friendly */
-  .check-row { padding: 10px 12px; }
-  .check-row .bonus-input { width: 50px; min-height: 40px; font-size: 16px; }
-  .check-row input[type="checkbox"] { width: 22px; height: 22px; }
+  /* Linhas de salvaguarda/perícia + editor em acordeão: touch friendly */
+  .linha-gatilho { min-height: 46px; }
+  .editor-bonus .bonus-input { width: 56px; min-height: 40px; font-size: 16px; }
+  .editor-check { min-height: 40px; }
   .moedas { grid-template-columns: repeat(3, 1fr); }
   .moeda-box input { font-size: 16px; min-height: 36px; }
   /* Inputs ficam +touch */

@@ -32,6 +32,8 @@ const SCRIPTS = [
   '018_updated_by.sql',
   '019_bestiario_favoritos.sql',
   '020_jogador_guilherme.sql',
+  '021_percepcao_spell_concentracao.sql',
+  '022_habilidades_favoritas.sql',
 ];
 
 (async () => {

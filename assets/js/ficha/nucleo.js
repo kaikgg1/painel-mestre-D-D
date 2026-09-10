@@ -405,6 +405,27 @@ function alternarCondicao(nome) {
   salvarCondicoes();
 }
 
+// ── Habilidades favoritas (characters.habilidades_favoritas, Fase 5) ──
+// Mesmo padrão de salvarCondicoes, com uma diferença: a coluna vem de uma
+// migration NOVA (sql/022_habilidades_favoritas.sql) que pode ainda não
+// ter rodado no banco do usuário. Nesse caso o UPDATE falha (coluna não
+// existe) — a UI já aplicou a mudança localmente (otimista), só a
+// persistência falha silenciosamente (log de aviso, sem travar nada).
+async function salvarHabilidadesFavoritas() {
+  if (!charAtivo?.id) return;
+  _ultimoSaveLocal = Date.now();
+  const { error } = await window.sb.from('characters')
+    .update({ habilidades_favoritas: charAtivo.habilidades_favoritas || [] })
+    .eq('id', charAtivo.id);
+  if (error) console.warn('[habilidades] favoritas não persistiram (rode a migration 022_habilidades_favoritas.sql?):', error.message);
+}
+function alternarHabilidadeFavorita(slug) {
+  const atuais = new Set(Array.isArray(charAtivo.habilidades_favoritas) ? charAtivo.habilidades_favoritas : []);
+  if (atuais.has(slug)) atuais.delete(slug); else atuais.add(slug);
+  charAtivo.habilidades_favoritas = Array.from(atuais);
+  salvarHabilidadesFavoritas();
+}
+
 function escape(s) {
   return String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }

@@ -69,6 +69,7 @@ function conectarListeners() {
   // Habilidades — carrega quando entra
   if (tabAtiva === 'habilidades') {
     renderRecursosClasse(charAtivo);
+    conectarListenersFiltroHabilidades(); // busca + pills (Fase 5) — antes de popular, aplicarFiltroHabilidades() já roda no fim de cada popular*
     popularHabilidades(charAtivo.classe, charAtivo.nivel, charAtivo.subclasse);
     popularFeaturesPersonalizadas();
     const btnAdd = document.getElementById('btn-add-feature');
