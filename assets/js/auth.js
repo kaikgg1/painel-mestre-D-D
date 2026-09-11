@@ -42,9 +42,14 @@
     return !!(u && u.email === 'mestre123@mesa.local');
   }
 
-  async function entrarPorNome(nome) {
+  // senha: opcional. Os 4 jogadores usam a senha compartilhada padrão (login
+  // por nome, sem digitar nada — conveniência combinada para uma mesa privada
+  // de amigos). O Mestre é diferente: tem acesso a tudo (fichas, segredos de
+  // campanha), então login.html pede uma senha REAL, digitada, e passa ela
+  // aqui — nunca a senha compartilhada. Ver scripts/rotacionar_senha_mestre.js.
+  async function entrarPorNome(nome, senha) {
     const email = emailDoNome(nome);
-    const { data, error } = await window.sb.auth.signInWithPassword({ email, password: SENHA_PADRAO });
+    const { data, error } = await window.sb.auth.signInWithPassword({ email, password: senha || SENHA_PADRAO });
     if (error) return { ok: false, erro: error.message };
     return { ok: true, user: data.user };
   }

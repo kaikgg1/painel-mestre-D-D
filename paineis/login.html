@@ -585,8 +585,8 @@
   const senhaBox = document.getElementById('senha-bloco');
   const senhaInp = document.getElementById('senha-mestre');
 
-  // Gate UX local — segurança real é o RLS do Supabase.
-  const SENHA_MESTRE = 'Master123';
+  // A senha do Mestre é verificada de verdade pelo Supabase (Auth.entrarPorNome
+  // recebe a senha digitada aqui) — não é mais um gate decorativo em JS.
   const NOME_MESTRE  = 'Mestre123';
 
   (async () => {
@@ -624,19 +624,19 @@
     const nome = hidden.value;
     if (!nome) { erro.textContent = 'Escolha um jogador.'; erro.classList.add('show'); return; }
 
-    if (ehMestreSelecionado() && senhaInp.value !== SENHA_MESTRE) {
-      erro.textContent = 'Senha do Mestre incorreta.';
+    if (ehMestreSelecionado() && !senhaInp.value) {
+      erro.textContent = 'Digite a senha do Mestre.';
       erro.classList.add('show');
       senhaInp.focus();
-      senhaInp.select();
       return;
     }
 
     btn.disabled = true; btn.textContent = 'Entrando…';
-    const r = await window.Auth.entrarPorNome(nome);
+    const r = await window.Auth.entrarPorNome(nome, ehMestreSelecionado() ? senhaInp.value : undefined);
     if (!r.ok) {
-      erro.textContent = 'Falha ao entrar: ' + r.erro;
+      erro.textContent = ehMestreSelecionado() ? 'Senha do Mestre incorreta.' : ('Falha ao entrar: ' + r.erro);
       erro.classList.add('show');
+      if (ehMestreSelecionado()) { senhaInp.focus(); senhaInp.select(); }
       btn.disabled = false; btn.textContent = 'Entrar';
       return;
     }

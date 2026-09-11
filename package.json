@@ -13,6 +13,7 @@
     "formatar-phb": "node scripts/formatar_phb.js",
     "formatar-mestre": "node scripts/formatar_phb.js Mestre.txt",
     "setup-db": "node scripts/setup_db.js",
+    "rotacionar-senha-mestre": "node scripts/rotacionar_senha_mestre.js",
     "auditoria": "node scripts/auditoria.js",
     "smoke": "node scripts/smoke_ficha.js"
   },
