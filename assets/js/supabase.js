@@ -2,7 +2,7 @@
 // Inicializa cliente Supabase global. Carrega o SDK via CDN se ainda não foi.
 //
 // Uso no HTML:
-//   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+//   <script src="https://unpkg.com/@supabase/supabase-js@2.45.0" integrity="sha384-..." crossorigin="anonymous"></script>
 //   <script src="../assets/js/supabase.js"></script>
 // Depois disso, window.sb é o cliente.
 

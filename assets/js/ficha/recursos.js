@@ -263,7 +263,7 @@ function abrirModalConversorFeit() {
   for (let lvl = 1; lvl <= 9; lvl++) {
     const s = slotsMagia[lvl];
     if (!s) continue;
-    const livres = (s.max || 0) - (s.used || 0);
+    const livres = (s.max || 0) - (s.atual || 0);
     if (livres <= 0) continue;
     conversaoVolta += `
       <button type="button" class="fei-opt" data-fei-quebrar="${lvl}">
@@ -306,11 +306,12 @@ function abrirModalConversorFeit() {
       if (ptDef.max - usados < custo) return;
       // Garante que existe entry de slot desse nível
       const sm = charAtivo.slots_magia || {};
-      if (!sm[lvl]) sm[lvl] = { max: 0, used: 0 };
+      if (!sm[lvl]) sm[lvl] = { max: 0, atual: 0 };
       sm[lvl].max = Math.max(sm[lvl].max, 1);
-      sm[lvl].used = Math.max(0, (sm[lvl].used || 0) - 1);
-      // Se used já era 0, aumenta max (slot extra). Mais simples: max += 1, used não muda.
-      // Padrão "criou um slot novo disponível": se used > 0, decrementa; senão max += 1
+      sm[lvl].atual = Math.max(0, (sm[lvl].atual || 0) - 1);
+      // "atual" é o nº de slots GASTOS (mesmo campo lido em aba_combate.js/aba_magias.js).
+      // Criar um slot novo disponível: se atual > 0, decrementa (havia slot gasto pra "reaproveitar");
+      // senão aumenta max (slot extra de verdade).
       charAtivo.slots_magia = sm;
       rec.pontos_feiticaria = usados + custo;
       charAtivo.recursos_usados = rec;
@@ -331,8 +332,8 @@ function abrirModalConversorFeit() {
     b.onclick = () => {
       const lvl = +b.dataset.feiQuebrar;
       const sm = charAtivo.slots_magia || {};
-      if (!sm[lvl] || (sm[lvl].max - (sm[lvl].used || 0)) <= 0) return;
-      sm[lvl].used = (sm[lvl].used || 0) + 1;
+      if (!sm[lvl] || (sm[lvl].max - (sm[lvl].atual || 0)) <= 0) return;
+      sm[lvl].atual = (sm[lvl].atual || 0) + 1;
       const rec = charAtivo.recursos_usados || {};
       const usados = rec.pontos_feiticaria || 0;
       rec.pontos_feiticaria = Math.max(0, usados - lvl);

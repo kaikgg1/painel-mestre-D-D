@@ -822,7 +822,7 @@
   .moeda-dot--pc { background: linear-gradient(160deg, #e2a97b, #8a4b22); }
 </style>
 <link rel="stylesheet" href="../assets/css/ui.css">
-<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+<script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js" integrity="sha384-GPb5RlngihS9H0z1D137JsvzmeZ7tCpWEF4t5YDoTZyMsPP8S7h7vFDh4XhheU83" crossorigin="anonymous"></script>
 <script src="../assets/js/icones.js"></script>
 <script src="../assets/js/classes_tema.js"></script>
 </head>
@@ -853,7 +853,7 @@
 
 <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2.45.0" integrity="sha384-dGnL7r9uccC9TdSdE05clTJ6esxMU42XBQ1/BWLzKQOBi7qR1aCMRIi0LzUmexIg" crossorigin="anonymous"></script>
 <script src="../assets/js/supabase.js"></script>
 <script src="../assets/js/auth.js"></script>
 <script src="../assets/js/efeitos.js"></script>
@@ -1251,7 +1251,7 @@ function criarCard(p) {
 
   const raceClass = document.createElement('div');
   raceClass.className = 'race-class';
-  raceClass.innerHTML = `<span contenteditable="true" data-field="raca">${p.raca}</span> · <span contenteditable="true" data-field="classe">${p.classe}</span> · <strong>Nv <span contenteditable="true" data-field="nivel">${p.nivel}</span></strong>`;
+  raceClass.innerHTML = `<span contenteditable="true" data-field="raca">${escapeHtml(p.raca)}</span> · <span contenteditable="true" data-field="classe">${escapeHtml(p.classe)}</span> · <strong>Nv <span contenteditable="true" data-field="nivel">${escapeHtml(String(p.nivel))}</span></strong>`;
   raceClass.querySelectorAll('[contenteditable]').forEach(el => {
     const aplicar = () => {
       const field = el.dataset.field;
@@ -1662,11 +1662,9 @@ async function descansoLongo() {
   toast('Descanso longo concluído');
 }
 
-function podeEditar(p) {
-  // Mestre edita tudo; jogador só os próprios
-  return ehMestre || (DBSync && (function(){
-    return p.user_id === (DBSync._userId || null);
-  })()) || true;  // RLS no banco já bloqueia se não puder, deixa UI permissiva
+function podeEditar() {
+  // A UI não restringe edição — o RLS do Supabase é a barreira real de permissão.
+  return true;
 }
 
 

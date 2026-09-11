@@ -173,7 +173,8 @@ async function salvar(e) {
   }
 
   // Campos com save dedicado próprio (salvarRecursos, salvarFeaturesPersonalizadas,
-  // salvarCompanions, salvarFavoritosBestiario) — nunca reenviar pela cópia local
+  // salvarCompanions, salvarFavoritosBestiario, salvarCondicoes, salvarHabilidadesFavoritas)
+  // — nunca reenviar pela cópia local
   // de charAtivo aqui, senão qualquer autosave de outra aba reenvia a versão
   // desatualizada e desfaz uma mudança feita pelo Mestre/outro aparelho nesse
   // meio-tempo (mesma causa raiz do bug de slots_magia não resetar no Descanso Longo).
@@ -181,6 +182,8 @@ async function salvar(e) {
   delete payload.features_personalizadas;
   delete payload.companions;
   delete payload.bestiario_favoritos;
+  delete payload.condicoes;
+  delete payload.habilidades_favoritas;
 
   // Remove campos que não vão pro UPDATE
   delete payload.id;
