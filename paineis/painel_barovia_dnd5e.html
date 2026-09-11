@@ -1760,10 +1760,14 @@ function aplicarDescansoLongo(p) {
   p.falhas = 0;
   if (p.slots) Object.keys(p.slots).forEach(nv => { p.slots[nv].atual = 0; });
   if (p.recursosUsados && typeof p.recursosUsados === 'object') {
+    // Dois formatos coexistem em recursos_usados: {atual,max} (trackers da
+    // aba Habilidades) e número puro (RecursosClasse.gravarUsado, catálogo
+    // por classe — Fúria, Surto de Ação etc.). Faltava resetar o segundo
+    // formato, então esses recursos nunca voltavam ao normal no descanso longo.
     Object.keys(p.recursosUsados).forEach(k => {
-      if (p.recursosUsados[k] && typeof p.recursosUsados[k].atual === 'number') {
-        p.recursosUsados[k].atual = 0;
-      }
+      const v = p.recursosUsados[k];
+      if (v && typeof v === 'object' && typeof v.atual === 'number') v.atual = 0;
+      else if (typeof v === 'number') p.recursosUsados[k] = 0;
     });
   }
   const recupera = Math.max(1, Math.floor((p.nivel || 1) / 2));

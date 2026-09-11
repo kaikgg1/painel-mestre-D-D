@@ -359,6 +359,26 @@
     border-color: var(--red-dark);
     color: var(--gold);
   }
+  .exh-efeitos {
+    font-size: 11px; color: var(--red-dark); text-align: center;
+    font-style: italic; margin-top: 2px;
+  }
+
+  /* ===== RECURSOS DE CLASSE (mst-2) ===== */
+  .recurso-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 11px; }
+  .recurso-nome { color: var(--brown-soft); text-transform: capitalize; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .recurso-pips { display: flex; gap: 3px; flex-wrap: wrap; }
+  .recurso-pip { width: 11px; height: 11px; border-radius: 3px; border: 1.5px solid var(--gold-dark); background: transparent; cursor: pointer; padding: 0; }
+  .recurso-pip.gasto { background: var(--gold-dark); }
+  .recurso-vazio { font-size: 11px; color: var(--brown-soft); font-style: italic; }
+  .recurso-pool { display: flex; align-items: center; gap: 5px; }
+  .recurso-pool-btn {
+    width: 18px; height: 18px; border-radius: 3px; border: 1px solid var(--gold-dark);
+    background: transparent; color: var(--gold-dark); cursor: pointer; font-size: 10px; line-height: 1; padding: 0;
+  }
+  .recurso-pool-btn:hover { background: var(--gold-dark); color: var(--bg-parchment); }
+  .recurso-pool-val { font-size: 11px; color: var(--brown); min-width: 34px; text-align: center; }
+  .recurso-pool-val strong { color: var(--gold-dark); }
 
   /* ===== SALVAGUARDAS DE MORTE ===== */
   .death-saves {
@@ -859,6 +879,9 @@
 <script src="../assets/js/efeitos.js"></script>
 <script src="../assets/js/dbsync.js"></script>
 <script src="../assets/js/phb_slots.js"></script>
+<script src="../assets/js/exaustao_regras.js"></script>
+<script src="../assets/js/regras_base.js"></script>
+<script src="../assets/js/recursos_classe.js"></script>
 <script src="../assets/js/master_notes.js"></script>
 <script src="../assets/js/confirmar.js"></script>
 <script src="../assets/js/pericias_mestre.js"></script>
@@ -1355,7 +1378,123 @@ function criarCard(p) {
     };
     exhContainer.appendChild(pip);
   }
+  // Efeitos cumulativos do PHB (assets/js/exaustao_regras.js) — mesma regra
+  // já usada na ficha do jogador e no painel_barovia_dnd5e.html, então o que
+  // o Mestre vê aqui bate com o que o jogador vê na própria ficha.
+  const exhEfeitos = window.ExaustaoRegras ? window.ExaustaoRegras.efeitos(p.exaustao) : null;
+  if (exhEfeitos?.resumo?.length) {
+    const exhNota = document.createElement('div');
+    exhNota.className = 'exh-efeitos';
+    exhNota.textContent = exhEfeitos.resumo.join(' · ');
+    exhSection.appendChild(exhNota);
+  }
   card.appendChild(exhSection);
+
+  // === RECURSOS DE CLASSE (mst-2) === — catálogo por classe/nível/atributos
+  // (assets/js/recursos_classe.js), mesma fonte usada na ficha do jogador,
+  // então o Mestre acompanha Fúria/Surto de Ação/Pontos de Feitiçaria/etc.
+  // sem precisar perguntar ou abrir a ficha do jogador à parte.
+  if (window.RecursosClasse) {
+    const recSection = document.createElement('div');
+    recSection.className = 'section';
+    recSection.innerHTML = `<div class="section-title">Recursos de Classe</div>`;
+    const recBody = document.createElement('div');
+    if (!p.recursosUsados || typeof p.recursosUsados !== 'object') p.recursosUsados = {};
+    const recursos = p.recursosUsados;
+
+    const fazPips = (max, atual, onMudar) => {
+      const pips = document.createElement('div');
+      pips.className = 'recurso-pips';
+      for (let i = 0; i < max; i++) {
+        const pip = document.createElement('button');
+        pip.type = 'button';
+        pip.className = 'recurso-pip' + (i < atual ? ' gasto' : '');
+        pip.onclick = () => {
+          const novo = pip.classList.contains('gasto') ? i : i + 1;
+          const val = Math.max(0, Math.min(max, novo));
+          onMudar(val);
+          pips.querySelectorAll('.recurso-pip').forEach((el, idx) => el.classList.toggle('gasto', idx < val));
+        };
+        pips.appendChild(pip);
+      }
+      return pips;
+    };
+    // Pools grandes (ex.: Cura pelas Mãos) viram +/- em vez de uma fileira de pips
+    const fazPool = (max, atual, onMudar) => {
+      const wrap = document.createElement('div');
+      wrap.className = 'recurso-pool';
+      const val = document.createElement('span');
+      val.className = 'recurso-pool-val';
+      const livre = () => Math.max(0, max - atual);
+      const renderVal = () => { val.innerHTML = `<strong>${livre()}</strong>/${max}`; };
+      renderVal();
+      const botao = (texto, passo, label) => {
+        const b = document.createElement('button');
+        b.type = 'button';
+        b.className = 'recurso-pool-btn';
+        b.textContent = texto;
+        b.setAttribute('aria-label', label);
+        b.onclick = () => {
+          atual = Math.max(0, Math.min(max, atual + passo));
+          onMudar(atual);
+          renderVal();
+        };
+        return b;
+      };
+      wrap.appendChild(botao('−5', 5, 'Usar 5'));
+      wrap.appendChild(botao('−1', 1, 'Usar 1'));
+      wrap.appendChild(val);
+      wrap.appendChild(botao('+1', -1, 'Recuperar 1'));
+      wrap.appendChild(botao('+5', -5, 'Recuperar 5'));
+      return wrap;
+    };
+    const fazTracker = (max, atual, onMudar) => max > 12 ? fazPool(max, atual, onMudar) : fazPips(max, atual, onMudar);
+
+    const catalogo = window.RecursosClasse.recursosPara({ classe: p.classe, nivel: p.nivel }, p.atributos);
+    const idsCatalogo = new Set(catalogo.map(r => r.id));
+
+    catalogo.forEach(def => {
+      if (!(def.max > 0)) return;
+      const row = document.createElement('div');
+      row.className = 'recurso-row';
+      const nomeSpan = document.createElement('span');
+      nomeSpan.className = 'recurso-nome';
+      nomeSpan.title = def.dica || '';
+      nomeSpan.textContent = def.nome;
+      const atual = window.RecursosClasse.lerUsado(recursos, def.id);
+      row.appendChild(nomeSpan);
+      row.appendChild(fazTracker(def.max, atual, (val) => {
+        window.RecursosClasse.gravarUsado(recursos, def.id, val);
+        salvar(p);
+      }));
+      recBody.appendChild(row);
+    });
+
+    // Trackers livres que o jogador criou na aba Habilidades da própria
+    // ficha (características personalizadas) — mesmo formato {atual,max}.
+    const chavesLivres = Object.keys(recursos).filter(k =>
+      !idsCatalogo.has(k) && recursos[k] && typeof recursos[k].max === 'number' && recursos[k].max > 0);
+    chavesLivres.forEach(k => {
+      const r = recursos[k];
+      const row = document.createElement('div');
+      row.className = 'recurso-row';
+      const nomeSpan = document.createElement('span');
+      nomeSpan.className = 'recurso-nome';
+      nomeSpan.textContent = k.replace(/_/g, ' ');
+      row.appendChild(nomeSpan);
+      row.appendChild(fazTracker(r.max, r.atual || 0, (val) => {
+        r.atual = val;
+        salvar(p);
+      }));
+      recBody.appendChild(row);
+    });
+
+    if (!catalogo.length && !chavesLivres.length) {
+      recBody.innerHTML = `<span class="recurso-vazio">Sem recursos rastreáveis pra essa classe (ou ainda não sincronizado com a ficha do jogador).</span>`;
+    }
+    recSection.appendChild(recBody);
+    card.appendChild(recSection);
+  }
 
   // === SALVAGUARDAS DE MORTE ===
   const deathSection = document.createElement('div');
@@ -1639,10 +1778,14 @@ function aplicarDescansoLongo(p) {
   p.falhas = 0;
   if (p.slots) Object.keys(p.slots).forEach(nv => { p.slots[nv].atual = 0; });
   if (p.recursosUsados && typeof p.recursosUsados === 'object') {
+    // Dois formatos coexistem em recursos_usados: {atual,max} (trackers da
+    // aba Habilidades) e número puro (RecursosClasse.gravarUsado, catálogo
+    // por classe — Fúria, Surto de Ação etc.). Faltava resetar o segundo
+    // formato, então esses recursos nunca voltavam ao normal no descanso longo.
     Object.keys(p.recursosUsados).forEach(k => {
-      if (p.recursosUsados[k] && typeof p.recursosUsados[k].atual === 'number') {
-        p.recursosUsados[k].atual = 0;
-      }
+      const v = p.recursosUsados[k];
+      if (v && typeof v === 'object' && typeof v.atual === 'number') v.atual = 0;
+      else if (typeof v === 'number') p.recursosUsados[k] = 0;
     });
   }
   const recupera = Math.max(1, Math.floor((p.nivel || 1) / 2));
