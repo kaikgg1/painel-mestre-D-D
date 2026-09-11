@@ -10,6 +10,17 @@
 const $ = sel => document.querySelector(sel);
 const $$ = sel => document.querySelectorAll(sel);
 
+// Modo de rolagem de d20 (Normal/Vantagem/Desvantagem) — estado de sessão,
+// não persiste no personagem (é uma condição temporária de mesa, tipo "estou
+// deitado" ou "o alvo está agarrado"). Compartilhado por Ataques (Resumo) e
+// pelos botões de rolar perícia/salvaguarda (Combate) — trocar aqui afeta a
+// PRÓXIMA rolagem em qualquer aba.
+let _modoRolagem = 'normal';
+const ROTULO_MODO_ROLAGEM = { normal: 'Normal', vantagem: 'Vantagem', desvantagem: 'Desvantagem' };
+function cicloModoRolagem() {
+  _modoRolagem = _modoRolagem === 'normal' ? 'vantagem' : _modoRolagem === 'vantagem' ? 'desvantagem' : 'normal';
+}
+
 // Atalho pros ícones vetoriais (assets/js/icones.js). Devolve '' se o módulo
 // não carregou, então a ficha nunca quebra por causa de um ícone.
 const ico = (chave, opts) => (window.Icones ? window.Icones.html(chave, opts) : '');

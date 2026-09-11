@@ -189,10 +189,10 @@
    a diferença entre "editor aberto" e "editor fechado". */
 .legenda-simbolos { font-size: 11px; font-weight: normal; font-style: italic; color: var(--text-dim); }
 .lista-compacta { display: flex; flex-direction: column; }
-.linha-compacta { border-bottom: 1px solid var(--linha); }
+.linha-compacta { border-bottom: 1px solid var(--linha); display: flex; align-items: center; }
 .linha-compacta:last-child { border-bottom: none; }
 .linha-gatilho {
-  width: 100%; min-height: 40px;
+  flex: 1 1 auto; min-width: 0; min-height: 40px;
   display: flex; align-items: center; gap: var(--sp-3);
   background: transparent; border: none; cursor: pointer;
   padding: 8px 6px; font-family: var(--f-ui); color: var(--parchment);
@@ -200,6 +200,21 @@
 }
 .linha-gatilho:hover { background: var(--sf-inset); }
 .linha-gatilho:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
+.linha-rolar {
+  flex: 0 0 auto; width: 40px; height: 40px; margin-left: 4px;
+  display: flex; align-items: center; justify-content: center;
+  background: transparent; border: 1px solid var(--linha); border-radius: var(--r-sm);
+  color: var(--gold-light); cursor: pointer; font-size: 15px;
+}
+.linha-rolar:hover { background: var(--sf-inset); border-color: var(--gold-dim); }
+.linha-rolar:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
+
+.modo-rolagem-bar {
+  display: flex; align-items: center; gap: var(--sp-3); flex-wrap: wrap;
+  margin: var(--sp-4) 0 var(--sp-3);
+}
+.pill.modo-rolagem-vantagem { background: rgba(122,138,94,0.18); border-color: rgba(122,138,94,0.5); color: #a8c48a; }
+.pill.modo-rolagem-desvantagem { background: rgba(165,67,58,0.18); border-color: rgba(165,67,58,0.5); color: #d49890; }
 .linha-simbolo { width: 16px; text-align: center; color: var(--text-dim); font-size: 15px; flex-shrink: 0; }
 .linha-simbolo.prof { color: var(--gold-light); }
 .linha-simbolo.exp { color: var(--magic); }

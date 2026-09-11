@@ -57,18 +57,18 @@
     return { atrKey, modAtr, bonusProf: bp, bonusAtaque, danoBonus, danoTexto, distancia, finesse };
   }
 
-  // Rola de verdade (pro botão "🎲 Atacar" do Resumo) — 1d20 + bônus de ataque,
-  // e se acertar, o dado de dano + bônus. Usa Math.random (mesmo padrão de
-  // rolarDadosVida em aba_aliados.js — sem servidor de dados, é só pra mesa).
+  // Rola de verdade (pro botão "🎲 Atacar" do Resumo) — 1d20 + bônus de ataque
+  // (com vantagem/desvantagem opcional, ver Regras.rolarD20), e se acertar, o
+  // dado de dano + bônus. Usa Math.random (mesmo padrão de rolarDadosVida em
+  // aba_aliados.js — sem servidor de dados, é só pra mesa).
   function rolarDado(qtd, faces) {
     let total = 0;
     for (let i = 0; i < qtd; i++) total += 1 + Math.floor(Math.random() * faces);
     return total;
   }
-  function rolar(arma, atributos, nivel) {
+  function rolar(arma, atributos, nivel, modo) {
     const calc = calcular(arma, atributos, nivel);
-    const d20 = rolarDado(1, 20);
-    const ataqueTotal = d20 + calc.bonusAtaque;
+    const d20r = window.Regras.rolarD20(calc.bonusAtaque, modo);
 
     const m = String(arma?.dano || '').match(/^(\d+)d(\d+)/);
     let danoTotal = null, danoRolado = '—';
@@ -78,12 +78,12 @@
       danoRolado = `${base}${calc.danoBonus ? fmtMod(calc.danoBonus) : ''} = ${danoTotal}`;
     }
     return {
-      ataqueTexto: `d20${fmtMod(calc.bonusAtaque)} = ${ataqueTotal}`,
-      ataqueTotal,
+      ataqueTexto: `d20${fmtMod(calc.bonusAtaque)} = ${d20r.total}`,
+      ataqueTotal: d20r.total,
       danoTexto: danoRolado,
       danoTotal,
-      critico: d20 === 20,
-      falhaCritica: d20 === 1,
+      critico: d20r.critico,
+      falhaCritica: d20r.falhaCritica,
     };
   }
 

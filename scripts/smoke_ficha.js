@@ -236,6 +236,25 @@ for (const [expr, esperado] of checks) {
   if (got !== esperado) erros.push(`${expr} → ${JSON.stringify(got)} (esperado ${JSON.stringify(esperado)})`);
 }
 
+// Regras.rolarD20 (Fase 5, vantagem/desvantagem): roda várias vezes porque
+// depende de Math.random — trava o INVARIANTE (usado = maior/menor dos 2
+// dados, total = usado + bônus), não um valor fixo.
+try {
+  const falhouVantagem = window.eval(`
+    Array.from({length:30}, () => Regras.rolarD20(3, 'vantagem'))
+      .some(r => r.usado !== Math.max(r.d1, r.d2) || r.total !== r.usado + 3 || r.d2 === null)
+  `);
+  if (falhouVantagem) erros.push('Regras.rolarD20("vantagem"): usado deveria ser sempre o maior dos 2 dados');
+  const falhouDesvantagem = window.eval(`
+    Array.from({length:30}, () => Regras.rolarD20(3, 'desvantagem'))
+      .some(r => r.usado !== Math.min(r.d1, r.d2) || r.total !== r.usado + 3 || r.d2 === null)
+  `);
+  if (falhouDesvantagem) erros.push('Regras.rolarD20("desvantagem"): usado deveria ser sempre o menor dos 2 dados');
+  const normal = window.eval(`Regras.rolarD20(3, 'normal')`);
+  if (normal.d2 !== null) erros.push('Regras.rolarD20("normal") não deveria rolar um 2º dado (d2=' + normal.d2 + ')');
+} catch (e) { erros.push('Regras.rolarD20: ' + e.message);
+}
+
 // ---- Render real de todas as abas ----
 const PJ = {
   id: 'x', user_id: 'u', nome: 'Lilith Goldengrove', raca: 'Humano', classe: 'Clérigo',

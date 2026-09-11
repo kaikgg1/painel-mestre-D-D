@@ -121,6 +121,11 @@ function renderCombate(c) {
     <h3>Condições</h3>
     ${renderCondicoesBloco('combate-condicoes-wrap', ativas)}
 
+    <div class="modo-rolagem-bar">
+      <span class="ajuda-mini">Rolar perícia/salvaguarda/ataque com:</span>
+      <button type="button" class="pill modo-rolagem-${_modoRolagem} no-lock" id="btn-modo-rolagem" aria-live="polite">${ROTULO_MODO_ROLAGEM[_modoRolagem]}</button>
+    </div>
+
     <h3>Salvaguardas <span class="legenda-simbolos">○ sem proficiência · ● proficiência</span></h3>
     <div class="lista-compacta">
       ${ATRIBUTOS.map(([k, nome]) => {
@@ -135,6 +140,7 @@ function renderCombate(c) {
               <span class="linha-attr">${k.toUpperCase()}</span>
               <span class="linha-valor" data-salv-valor="${k}">${fmtMod(valor)}</span>
             </button>
+            <button type="button" class="linha-rolar no-lock" data-rolar-salv="${k}" data-rolar-nome="Salvaguarda de ${nome}" aria-label="Rolar salvaguarda de ${nome}">${ico('dado')}</button>
             <div class="linha-editor" id="editor-salv-${k}" hidden>
               <label class="editor-check"><input type="checkbox" name="salv_${k}" ${prof ? 'checked' : ''} data-salv="${k}"> Proficiente</label>
               <label class="editor-bonus">Bônus extra
@@ -161,6 +167,7 @@ function renderCombate(c) {
               <span class="linha-attr">${atr.toUpperCase()}</span>
               <span class="linha-valor" data-per-valor="${k}">${fmtMod(valor)}</span>
             </button>
+            <button type="button" class="linha-rolar no-lock" data-rolar-per="${k}" data-rolar-nome="${nome}" aria-label="Rolar ${nome}">${ico('dado')}</button>
             <div class="linha-editor" id="editor-per-${k}" hidden>
               <label class="editor-check"><input type="checkbox" name="per_${k}_prof" ${p.prof?'checked':''} data-per="${k}" data-atr="${atr}"> Proficiente</label>
               <label class="editor-check"><input type="checkbox" name="per_${k}_exp" ${p.exp?'checked':''} ${p.prof?'':'disabled'} data-per-exp="${k}"> Expertise</label>
@@ -240,6 +247,34 @@ function conectarListenersCombate() {
     encerrarConcentracao();
     toast('Concentração encerrada');
     render();
+  });
+
+  // Modo de rolagem (Normal/Vantagem/Desvantagem) — atualização direta do
+  // botão em vez de re-render completo da aba (é só um rótulo mudando).
+  const btnModo = document.getElementById('btn-modo-rolagem');
+  if (btnModo) btnModo.addEventListener('click', () => {
+    cicloModoRolagem();
+    btnModo.textContent = ROTULO_MODO_ROLAGEM[_modoRolagem];
+    btnModo.className = 'pill modo-rolagem-' + _modoRolagem + ' no-lock';
+  });
+
+  // Rolar salvaguarda/perícia (🎲), respeitando o modo de rolagem atual.
+  document.querySelectorAll('[data-rolar-salv]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const k = btn.dataset.rolarSalv;
+      const valor = valorSalvaguarda(charAtivo, k);
+      const r = window.Regras.rolarD20(valor, _modoRolagem);
+      toast(`${btn.dataset.rolarNome}: ${r.texto}${r.critico ? ' — CRÍTICO!' : r.falhaCritica ? ' — falha crítica' : ''}`, 'dado');
+    });
+  });
+  document.querySelectorAll('[data-rolar-per]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const k = btn.dataset.rolarPer;
+      const atr = PERICIAS.find(p => p[0] === k)?.[2];
+      const valor = valorPericia(charAtivo, k, atr);
+      const r = window.Regras.rolarD20(valor, _modoRolagem);
+      toast(`${btn.dataset.rolarNome}: ${r.texto}${r.critico ? ' — CRÍTICO!' : r.falhaCritica ? ' — falha crítica' : ''}`, 'dado');
+    });
   });
 }
 

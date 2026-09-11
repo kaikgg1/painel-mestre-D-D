@@ -25,5 +25,27 @@
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
   }[c]));
 
-  window.Regras = { mod, bonusProf, fmtMod, escapeHtml };
+  // Rola 1d20 (+ bônus), com suporte a vantagem/desvantagem (PHB): rola 2d20
+  // e usa o maior (vantagem) ou o menor (desvantagem). modo: 'normal' (padrão),
+  // 'vantagem' ou 'desvantagem'. Usado tanto por Ataques quanto pelos botões
+  // de rolar perícia/salvaguarda (aba_combate.js).
+  function rolarD20(bonus, modo) {
+    const d1 = 1 + Math.floor(Math.random() * 20);
+    let usado = d1, d2 = null;
+    if (modo === 'vantagem' || modo === 'desvantagem') {
+      d2 = 1 + Math.floor(Math.random() * 20);
+      usado = modo === 'vantagem' ? Math.max(d1, d2) : Math.min(d1, d2);
+    }
+    const b = +bonus || 0;
+    const total = usado + b;
+    const dados = d2 !== null ? `${d1}/${d2}→${usado}` : `${usado}`;
+    return {
+      total, usado, d1, d2, bonus: b,
+      texto: `${dados}${fmtMod(b)} = ${total}`,
+      critico: usado === 20,
+      falhaCritica: usado === 1,
+    };
+  }
+
+  window.Regras = { mod, bonusProf, fmtMod, escapeHtml, rolarD20 };
 })();

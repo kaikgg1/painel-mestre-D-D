@@ -275,7 +275,7 @@ function conectarListenersResumo() {
       const idx = +btn.dataset.resumoRolar;
       const arma = (charAtivo.inventario?.armas || [])[idx];
       if (!arma || !window.Ataques) return;
-      const r = Ataques.rolar(arma, charAtivo.atributos, charAtivo.nivel);
+      const r = Ataques.rolar(arma, charAtivo.atributos, charAtivo.nivel, _modoRolagem);
       const critico = r.critico ? ' · CRÍTICO!' : r.falhaCritica ? ' · falha crítica' : '';
       toast(`${arma.nome}: ataque ${r.ataqueTexto}${critico} · dano ${r.danoTexto}`);
     });
