@@ -48,7 +48,15 @@ create policy "master_state_delete_own" on public.master_state
   using (auth.uid() = user_id);
 
 -- Realtime (para sincronizar entre dispositivos do mestre)
-alter publication supabase_realtime add table public.master_state;
+do $$
+begin
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'master_state'
+  ) then
+    execute 'alter publication supabase_realtime add table public.master_state';
+  end if;
+end $$;
 
 -- ┌─────────────────────────────────────────────────────────────────┐
 -- │ master_notes — anotações do mestre por personagem               │
@@ -101,4 +109,12 @@ create policy "master_notes_delete_own" on public.master_notes
   for delete to authenticated
   using (auth.uid() = user_id);
 
-alter publication supabase_realtime add table public.master_notes;
+do $$
+begin
+  if not exists (
+    select 1 from pg_publication_tables
+    where pubname = 'supabase_realtime' and schemaname = 'public' and tablename = 'master_notes'
+  ) then
+    execute 'alter publication supabase_realtime add table public.master_notes';
+  end if;
+end $$;

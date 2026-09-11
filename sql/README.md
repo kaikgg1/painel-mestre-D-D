@@ -13,7 +13,9 @@ npm install
 npm run setup-db
 ```
 
-O script `scripts/setup_db.js` roda os 3 SQLs em ordem e mostra um resumo (tabelas criadas, jogadores cadastrados, policies de RLS).
+O script `scripts/setup_db.js` roda todas as migrations em ordem (ver a lista completa no próprio script) e mostra um resumo (tabelas criadas, jogadores cadastrados, policies de RLS).
+
+Os seeds de jogadores reais (nomes/e-mails) ficam à parte, em [`seeds/`](seeds/), fora da sequência numerada — são dados que mudam por mesa, não schema.
 
 ### Caminho B — Manual via SQL Editor
 
@@ -26,9 +28,9 @@ O script `scripts/setup_db.js` roda os 3 SQLs em ordem e mostra um resumo (tabel
    |---|---|---|
    | 1 | [`001_schema.sql`](001_schema.sql) | Cria tabelas `profiles`, `characters`, `spell_lists` + triggers |
    | 2 | [`002_rls.sql`](002_rls.sql) | Habilita Row Level Security e cria policies |
-   | 3 | [`003_seed_jogadores.sql`](003_seed_jogadores.sql) | Cria as 3 contas: Sabrina, Derick, Felipe |
+   | 3 | [`seeds/seed_jogadores.sql`](seeds/seed_jogadores.sql) | Cria as contas dos jogadores |
 
-3. No final do **003**, deve aparecer um resultado mostrando os 3 jogadores criados.
+3. No final do seed, deve aparecer um resultado mostrando os jogadores criados.
 
 ## Login dos jogadores
 
@@ -56,6 +58,6 @@ delete from auth.users where email like '%@mesa.local';
 
 Depois rode os 3 scripts de novo, em ordem.
 
-## Adicionar um 4º jogador
+## Adicionar um novo jogador
 
-Edite `003_seed_jogadores.sql` copiando um dos blocos `if not exists`, troque o email e o nome, e rode só essa parte.
+Edite `seeds/seed_jogadores.sql` copiando um dos blocos `if not exists`, troque o email e o nome, e rode só essa parte (ou crie um novo arquivo em `seeds/`, como já foi feito em `seeds/seed_jogador_guilherme.sql`).

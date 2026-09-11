@@ -14,10 +14,10 @@ if (!process.env.DATABASE_URL) {
 const SCRIPTS = [
   '001_schema.sql',
   '002_rls.sql',
-  '003_seed_jogadores.sql',
+  'seeds/seed_jogadores.sql',        // era 003_seed_jogadores.sql
   '004_extras_e_realtime.sql',
   '005_mestre_e_rls_restrito.sql',
-  '006_profiles_seed.sql',
+  'seeds/seed_profiles.sql',         // era 006_profiles_seed.sql
   '007_personagem_ativo_e_decimais.sql',
   '008_ficha_completa.sql',
   '009_ativar_pjs_orfaos.sql',
@@ -31,9 +31,10 @@ const SCRIPTS = [
   '017_companions.sql',
   '018_updated_by.sql',
   '019_bestiario_favoritos.sql',
-  '020_jogador_guilherme.sql',
+  'seeds/seed_jogador_guilherme.sql', // era 020_jogador_guilherme.sql
   '021_percepcao_spell_concentracao.sql',
   '022_habilidades_favoritas.sql',
+  '023_correcoes_auditoria.sql',
 ];
 
 (async () => {
