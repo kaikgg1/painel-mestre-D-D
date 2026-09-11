@@ -89,6 +89,7 @@ function renderHeader(c) {
       <button type="button" class="btn-icon" id="btn-menu-toggle" aria-haspopup="true" aria-expanded="false" aria-label="Menu de ações" title="Menu de ações">⋯</button>
       <div class="menu-popover" id="menu-popover" role="menu" hidden>
         <button type="button" class="menu-item" id="btn-novo" role="menuitem">+ Novo personagem</button>
+        <button type="button" class="menu-item" id="btn-wizard" role="menuitem">🧙 Assistente de criação</button>
         <button type="button" class="menu-item" id="btn-duplicar" role="menuitem">⧉ Duplicar personagem</button>
         <button type="button" class="menu-item" id="btn-ativo" role="menuitem" aria-pressed="${ehAtivo}">
           ${ehAtivo ? '★ Remover de ativo' : '☆ Tornar ativo'}
@@ -176,6 +177,8 @@ function conectarListenersHeader() {
     const nome = prompt('Nome do novo personagem:');
     if (nome) await criarPersonagem(nome);
   });
+  const wizardBtn = document.getElementById('btn-wizard');
+  if (wizardBtn) wizardBtn.addEventListener('click', () => { fecharMenuAcoes(); abrirWizardCriacao(); });
   const duplicarBtn = document.getElementById('btn-duplicar');
   if (duplicarBtn) duplicarBtn.addEventListener('click', async () => {
     fecharMenuAcoes();

@@ -93,6 +93,36 @@ const PERICIAS = [
   ['sobrevivencia',     'Sobrevivência',     'sab'],
 ];
 
+// Perícias e testes de resistência de classe (PHB 5e, cap. 3, "Proficiências"
+// de cada classe) — usados só pelo Assistente de Criação (jog-9) pra saber
+// QUANTAS perícias escolher e de qual lista, e quais salvaguardas marcar
+// como proficientes automaticamente. 'todas' (Bardo) = qualquer uma das 18.
+const PERICIAS_POR_CLASSE = {
+  'barbaro':     { escolhas: 2, opcoes: ['adestrar_animais','atletismo','intimidacao','natureza','percepcao','sobrevivencia'] },
+  'bardo':       { escolhas: 3, opcoes: 'todas' },
+  'bruxo':       { escolhas: 2, opcoes: ['arcanismo','enganacao','historia','intimidacao','investigacao','natureza','religiao'] },
+  'clerigo':     { escolhas: 2, opcoes: ['historia','intuicao','medicina','persuasao','religiao'] },
+  'druida':      { escolhas: 2, opcoes: ['arcanismo','adestrar_animais','intuicao','medicina','natureza','percepcao','religiao','sobrevivencia'] },
+  'feiticeiro':  { escolhas: 2, opcoes: ['arcanismo','enganacao','intuicao','intimidacao','persuasao','religiao'] },
+  'guerreiro':   { escolhas: 2, opcoes: ['acrobacia','adestrar_animais','atletismo','historia','intuicao','intimidacao','percepcao','sobrevivencia'] },
+  'ladino':      { escolhas: 4, opcoes: ['acrobacia','atletismo','atuacao','enganacao','furtividade','intimidacao','intuicao','investigacao','percepcao','persuasao','prestidigitacao'] },
+  'mago':        { escolhas: 2, opcoes: ['arcanismo','historia','intuicao','investigacao','medicina','religiao'] },
+  'monge':       { escolhas: 2, opcoes: ['acrobacia','atletismo','furtividade','historia','intuicao','religiao'] },
+  'paladino':    { escolhas: 2, opcoes: ['atletismo','intuicao','intimidacao','medicina','persuasao','religiao'] },
+  'patrulheiro': { escolhas: 3, opcoes: ['adestrar_animais','atletismo','furtividade','intuicao','investigacao','natureza','percepcao','sobrevivencia'] },
+};
+const SALVAGUARDAS_POR_CLASSE = {
+  'barbaro': ['for','con'], 'bardo': ['dex','car'], 'bruxo': ['sab','car'],
+  'clerigo': ['sab','car'], 'druida': ['int','sab'], 'feiticeiro': ['con','car'],
+  'guerreiro': ['for','con'], 'ladino': ['dex','int'], 'mago': ['int','sab'],
+  'monge': ['for','dex'], 'paladino': ['sab','car'], 'patrulheiro': ['for','dex'],
+};
+function opcoesPericiasDaClasse(classe) {
+  const def = PERICIAS_POR_CLASSE[chaveDeClasse(classe)];
+  if (!def) return null;
+  return { escolhas: def.escolhas, opcoes: def.opcoes === 'todas' ? PERICIAS.map(p => p[0]) : def.opcoes };
+}
+
 // Habilidades fixas por classe x nível (carregadas async)
 let HABILIDADES_CLASSES = null;
 async function carregarHabilidadesClasses() {

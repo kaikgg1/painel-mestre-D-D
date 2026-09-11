@@ -58,11 +58,19 @@ window.__ultimoUpdatePayload = null;
 // testes da aba Magias, null nos demais (spell_lists vazia, como qualquer
 // outra tabela/consulta que não seja um update em characters).
 window.__magiasFavoritasTeste = null;
+let __proximoIdInsert = 1;
 function construirQuery(tabela, payloadUpdate) {
   const builder = {
     select: () => builder,
     eq: () => builder,
     order: () => builder,
+    // insert(): usado por criarPersonagem()/criarPersonagemComWizard() (Assistente
+    // de Criação) — devolve o payload com um id sintético, como o Supabase faria.
+    insert: (payload) => {
+      const comId = { id: 'novo-' + (__proximoIdInsert++), ...payload };
+      window.__ultimoInsertPayload = comId;
+      return construirQuery(tabela, comId);
+    },
     update: (payload) => {
       window.__ultimoUpdatePayload = payload;
       // Além do "último" (compatibilidade com testes antigos), acumula TODOS
@@ -119,7 +127,7 @@ for (const m of ['icones.js','ui.js','regras_base.js','phb_catalogo.js','phb_slo
 }
 
 const ordem = [
-  'nucleo.js','render.js','header.js','nav_mobile.js','seletor.js','aba_resumo.js',
+  'nucleo.js','render.js','header.js','wizard_criacao.js','nav_mobile.js','seletor.js','aba_resumo.js',
   'aba_combate.js','recursos.js','aba_habilidades.js','aba_magias.js',
   'aba_equipamento.js','aba_aliados.js','aba_roleplay.js','lock.js',
   'listeners.js','salvar.js',
@@ -1258,6 +1266,113 @@ console.log('');
   console.log(erros.length > antes
     ? '  FALHOU     personagem (ver FALHAS abaixo)'
     : '  aba personagem: leitura×edição via botão Editar/Travar + Inspiração/traços-raciais/atributos sempre visíveis ok');
+}
+
+// Assistente de Criação (jog-9): 3 passos (Identidade → Atributos por
+// point-buy → Perícias) terminando num personagem novo de verdade via
+// window.sb.insert(). Roda por ÚLTIMO entre os testes de estado porque cria
+// um personagem e troca charAtivo/chars — restaura tudo ao original no final
+// pra não interferir no teste de header logo abaixo.
+console.log('');
+{
+  const antes = erros.length;
+  const charsAntes = window.eval('chars.slice()');
+  const charAtivoAntes = window.eval('charAtivo');
+  // salvar.js chama init() no fim do próprio carregamento, que faz
+  // `usuario = await window.Auth.requerLogin(...)` (stub resolve pra null) —
+  // essa atribuição assíncrona só se resolve num microtask mais adiante,
+  // sobrescrevendo o `usuario = {id:"u"}` da fixture. Nenhum teste anterior
+  // dereferenciava usuario.id, então isso nunca apareceu — reafirma aqui
+  // porque é o primeiro (criarPersonagemComWizard usa usuario.id).
+  window.eval('usuario = { id: "u" };');
+  try {
+    const { fechar } = window.abrirWizardCriacao();
+    const overlay = window.document.querySelector('.wizard-overlay');
+    if (!overlay) erros.push('wizard: modal não abriu (.wizard-overlay não encontrado)');
+    else {
+      // Passo 1 — Identidade
+      const nomeInp = overlay.querySelector('#wz-nome');
+      const classeSel = overlay.querySelector('#wz-classe');
+      if (!nomeInp || !classeSel) erros.push('wizard: campos do Passo 1 não encontrados');
+      else {
+        nomeInp.value = 'Thalindra Testválida';
+        nomeInp.dispatchEvent(new window.Event('input', { bubbles: true }));
+        classeSel.value = 'Guerreiro';
+        classeSel.dispatchEvent(new window.Event('change', { bubbles: true }));
+        const btnProximo = overlay.querySelector('#wizard-proximo');
+        if (btnProximo.disabled) erros.push('wizard: "Próximo" deveria estar habilitado com nome+raça+classe preenchidos');
+        btnProximo.click();
+
+        // Passo 2 — Atributos (point-buy): sobe Força até o limite de 15,
+        // confere que o orçamento de 27 nunca é ultrapassado.
+        for (let i = 0; i < 10; i++) {
+          const btnMais = overlay.querySelector('[data-wz-attr="for"][data-wz-delta="1"]');
+          if (!btnMais || btnMais.disabled) break;
+          btnMais.click();
+        }
+        const forValor = +overlay.querySelector('.wizard-attr-row .wizard-attr-valor')?.textContent;
+        if (forValor !== 15) erros.push('wizard: subir Força repetidamente deveria travar em 15 (custo 9/27), parou em ' + forValor);
+        const restanteTxt = overlay.querySelector('.wizard-pontos-restantes strong')?.textContent;
+        if (+restanteTxt < 0) erros.push('wizard: pontos restantes negativos — orçamento de 27 estourado (' + restanteTxt + ')');
+        overlay.querySelector('#wizard-proximo').click();
+
+        // Passo 3 — Perícias: Guerreiro escolhe 2 de 8 opções.
+        const checks = Array.from(overlay.querySelectorAll('[data-wz-pericia]'));
+        if (checks.length !== 8) erros.push('wizard: Guerreiro deveria oferecer 8 opções de perícia, veio ' + checks.length);
+        const btnCriar = overlay.querySelector('#wizard-criar');
+        if (!btnCriar.disabled) erros.push('wizard: "Criar Personagem" não deveria estar habilitado com 0 perícias escolhidas');
+        // jsdom não dispara 'change' sozinho a partir de .click() num
+        // checkbox de forma confiável — mesmo padrão já usado nos outros
+        // testes de checkbox deste arquivo (marca .checked + dispatch manual).
+        checks[0].checked = true;
+        checks[0].dispatchEvent(new window.Event('change', { bubbles: true }));
+        checks[1].checked = true;
+        checks[1].dispatchEvent(new window.Event('change', { bubbles: true }));
+        if (!btnCriar.disabled) { /* correto: com 2/2 escolhidas deveria habilitar */ } else {
+          erros.push('wizard: "Criar Personagem" continua desabilitado com 2/2 perícias escolhidas');
+        }
+        // Uma 3ª opção deveria vir travada (limite atingido) — reconsulta o
+        // DOM ao vivo, já que cada clique chama renderPasso() e troca os nós
+        // (o array "checks" capturado antes dos cliques fica com nós velhos).
+        const checksAoVivo = Array.from(overlay.querySelectorAll('[data-wz-pericia]'));
+        const naoMarcada = checksAoVivo.find(c => !c.checked);
+        if (naoMarcada && !naoMarcada.disabled) erros.push('wizard: opção de perícia além do limite deveria vir desabilitada');
+
+        window.__ultimoInsertPayload = null;
+        btnCriar.click();
+        await Promise.resolve().then(() => {}).then(() => {});
+
+        if (window.document.querySelector('.wizard-overlay')) erros.push('wizard: modal não fechou após criar o personagem');
+        const ins = window.__ultimoInsertPayload;
+        if (!ins) erros.push('wizard: "Criar Personagem" não chamou window.sb.insert()');
+        else {
+          if (ins.nome !== 'Thalindra Testválida') erros.push('wizard: nome não foi pro payload — ' + ins.nome);
+          if (ins.classe !== 'Guerreiro') erros.push('wizard: classe não foi pro payload — ' + ins.classe);
+          if (ins.nivel !== 1) erros.push('wizard: nível deveria ser 1, veio ' + ins.nivel);
+          if (ins.atributos?.for !== 15) erros.push('wizard: atributos.for deveria ser 15, veio ' + ins.atributos?.for);
+          if (ins.dado_vida_tipo !== 10) erros.push('wizard: Guerreiro usa d10, veio dado_vida_tipo=' + ins.dado_vida_tipo);
+          if (ins.hp_max !== ins.hp_atual || ins.hp_max < 1) erros.push('wizard: hp_max/hp_atual não vieram consistentes — ' + JSON.stringify({hp_max: ins.hp_max, hp_atual: ins.hp_atual}));
+          if (!ins.salvaguardas?.for || !ins.salvaguardas?.con) erros.push('wizard: salvaguardas de Guerreiro (FOR/CON) não vieram proficientes — ' + JSON.stringify(ins.salvaguardas));
+          const periciasEscolhidas = Object.keys(ins.pericias || {});
+          if (periciasEscolhidas.length !== 2) erros.push('wizard: payload deveria ter exatamente 2 perícias, veio ' + JSON.stringify(ins.pericias));
+        }
+        if (window.eval('charAtivo.nome') !== 'Thalindra Testválida') erros.push('wizard: charAtivo não foi trocado pro personagem recém-criado');
+      }
+    }
+  } catch (e) { erros.push('wizard: ' + e.message); }
+
+  // Restaura o estado global pros testes seguintes (header/nav). chars/charAtivo
+  // são `let` no escopo do script da jsdom — não viram propriedade de
+  // `window`, só dá pra mexer neles via window.eval (mesmo padrão do resto
+  // do arquivo).
+  window.__charsRestaurar = charsAntes;
+  window.__charAtivoRestaurar = charAtivoAntes;
+  window.eval('chars = window.__charsRestaurar; charAtivo = window.__charAtivoRestaurar;');
+  window.document.querySelector('.wizard-overlay')?.remove();
+
+  console.log(erros.length > antes
+    ? '  FALHOU     assistente de criação (ver FALHAS abaixo)'
+    : '  assistente de criação: identidade + point-buy (limite de 27/orçamento) + limite de perícias por classe + insert() ok');
 }
 
 // Header (Fase 2): avatar+nome+trocador, campanha, autosave, editar/travar,

@@ -512,3 +512,38 @@ iconify-icon {
 /* O select de subclasse desabilitado não deve parecer clicável */
 .campo select:disabled { background-color: rgba(0,0,0,0.35); }
 /* Travado (modo somente leitura) já é tratado por .tab-content select */
+
+/* ===== ASSISTENTE DE CRIAÇÃO (jog-9) ===== */
+.wizard-overlay .modal-card { max-width: 560px; }
+.wizard-acoes { justify-content: flex-start; }
+.wizard-pontos-restantes {
+  font-family: var(--f-ui); font-size: 14px; color: var(--parchment);
+  background: rgba(196,154,58,0.1); border: 1px solid var(--borda);
+  border-radius: 6px; padding: 8px 12px; margin-bottom: 12px;
+}
+.wizard-pontos-restantes strong { color: var(--gold-bright); font-size: 16px; }
+.wizard-pontos-restantes.negativo { border-color: rgba(165,67,58,0.6); background: rgba(107,16,16,0.12); }
+.wizard-pontos-restantes.negativo strong { color: #d49890; }
+.wizard-atributos { display: flex; flex-direction: column; gap: 6px; }
+.wizard-attr-row {
+  display: grid; grid-template-columns: 1fr 32px 32px 32px 40px auto;
+  align-items: center; gap: 8px;
+  background: rgba(0,0,0,0.18); border: 1px solid var(--borda); border-radius: 4px;
+  padding: 6px 10px;
+}
+.wizard-attr-nome { font-size: 13px; color: var(--parchment); }
+.wizard-attr-btn {
+  width: 30px; height: 30px; border-radius: 4px;
+  background: rgba(196,154,58,0.12); border: 1px solid var(--borda);
+  color: var(--gold-bright); font-size: 16px; font-weight: 700; cursor: pointer;
+}
+.wizard-attr-btn:disabled { opacity: 0.35; cursor: default; }
+.wizard-attr-btn:hover:not(:disabled) { border-color: var(--borda-ouro); background: var(--sf-ouro); }
+.wizard-attr-valor { text-align: center; font-family: var(--f-num); font-weight: 700; font-size: 15px; color: var(--parchment); }
+.wizard-attr-mod { text-align: center; font-family: var(--f-num); color: var(--gold-bright); }
+.wizard-pericias-lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 6px 12px; margin-bottom: 10px; }
+.wizard-pericia-item { font-size: 13px; }
+@media (max-width: 480px) {
+  .wizard-attr-row { grid-template-columns: 1fr 28px 28px 28px 36px; }
+  .wizard-attr-row .ajuda-mini { display: none; }
+}
