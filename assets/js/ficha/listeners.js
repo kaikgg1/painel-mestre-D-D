@@ -461,6 +461,24 @@ function conectarListenersTags() {
 }
 
 function conectarListenersEquipamento() {
+  // Carga ao vivo: moedas não disparam render() (só o autosave normal),
+  // então recalcula na hora pra barra de carga não ficar desatualizada
+  // enquanto o jogador ainda está digitando.
+  $$('.moedas input[name^="moeda_"]').forEach(inp => {
+    inp.addEventListener('input', () => {
+      const inv = charAtivo.inventario || {};
+      inv.moedas = inv.moedas || {};
+      const cod = inp.name.replace('moeda_', '');
+      inv.moedas[cod] = parseNum(inp.value, { min: 0 }) ?? 0;
+      charAtivo.inventario = inv;
+      const carga = calcularCarga(charAtivo);
+      const bar = document.getElementById('carga-bar');
+      const total = document.getElementById('carga-total');
+      if (total) total.textContent = carga.total.toFixed(1);
+      if (bar) bar.className = 'carga-bar carga-' + carga.nivel;
+    });
+  });
+
   // Remover item (armas/armaduras/itens — mesmo botão de sempre)
   $$('[data-rm]').forEach(b => b.addEventListener('click', e => {
     const tipo = e.currentTarget.dataset.rm;

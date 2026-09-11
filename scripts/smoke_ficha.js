@@ -229,6 +229,13 @@ const checks = [
   ['Ataques.calcular({categoria:"Marcial corpo-a-corpo",propriedades:"Acuidade"},{for:10,dex:18},5).atrKey', 'dex'],
   ['Ataques.calcular({categoria:"Marcial corpo-a-corpo",propriedades:"Acuidade"},{for:10,dex:18},5).bonusAtaque', 7],
   ['CondicoesRegras.LISTA.length', 14],
+  // calcularCarga (Fase 5): PHB — capacidade = 7,5x Força; sobrecarga leve
+  // acima de 2,5x, pesada acima de 5x. For 10 → capacidade 75kg.
+  ['calcularCarga({atributos:{for:10},inventario:{armas:[{peso:2}],armaduras:[],itens:[{peso:1,qtd:3}],moedas:{po:100}}}).total', 6],
+  ['calcularCarga({atributos:{for:10},inventario:{armas:[],armaduras:[],itens:[],moedas:{}}}).capacidade', 75],
+  ['calcularCarga({atributos:{for:10},inventario:{armas:[{peso:30}],armaduras:[],itens:[],moedas:{}}}).nivel', 'leve'],
+  ['calcularCarga({atributos:{for:10},inventario:{armas:[{peso:60}],armaduras:[],itens:[],moedas:{}}}).nivel', 'pesada'],
+  ['calcularCarga({atributos:{for:10},inventario:{armas:[{peso:80}],armaduras:[],itens:[],moedas:{}}}).nivel', 'excede'],
 ];
 for (const [expr, esperado] of checks) {
   let got;

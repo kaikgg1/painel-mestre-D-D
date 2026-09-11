@@ -12,6 +12,32 @@
 // MESMOS do Resumo (Fase 3), então o bônus mostrado aqui é sempre igual ao
 // de lá.
 
+// Peso total do inventário (kg) e comparação com a capacidade de carga —
+// PHB, cap. Equipamento: "sua capacidade de carga máxima é igual a 7,5
+// vezes o seu valor de Força" (regra padrão, sempre vale — acima disso
+// você simplesmente não consegue carregar). Os dois níveis intermediários
+// (2,5x e 5x, com penalidade de deslocamento/desvantagem) são a "Variação:
+// Sobrecarga" do PHB — uma regra OPCIONAL, não o padrão — por isso aparecem
+// como aviso rotulado como variação, não como penalidade automática.
+// Moedas pesam ~10g cada (100 moedas = 1kg), não importa o tipo.
+function calcularCarga(c) {
+  const inv = c.inventario || {};
+  const m = inv.moedas || {};
+  const pesoArmas = (inv.armas || []).reduce((s, a) => s + (+a.peso || 0), 0);
+  const pesoArmaduras = (inv.armaduras || []).reduce((s, a) => s + (+a.peso || 0), 0);
+  const pesoItens = (inv.itens || []).reduce((s, it) => s + (+it.peso || 0) * (+it.qtd || 1), 0);
+  const totalMoedas = ['po','pp','pe','pc','pl'].reduce((s, cod) => s + (+m[cod] || 0), 0);
+  const pesoMoedas = totalMoedas / 100;
+  const total = pesoArmas + pesoArmaduras + pesoItens + pesoMoedas;
+  const forca = Math.max(0, +c.atributos?.for || 10);
+  const capacidade = forca * 7.5;
+  let nivel = 'normal';
+  if (total > capacidade) nivel = 'excede';
+  else if (total > forca * 5) nivel = 'pesada';
+  else if (total > forca * 2.5) nivel = 'leve';
+  return { total, capacidade, nivel };
+}
+
 function renderEquipamento(c) {
   const inv = c.inventario || { moedas:{po:0,pp:0,pe:0,pc:0,pl:0}, armas:[], armaduras:[], itens:[] };
   const m = inv.moedas || {};
@@ -19,8 +45,19 @@ function renderEquipamento(c) {
   // Bolinha colorida por moeda: a COR é a informação, então vira CSS (.dot),
   // não ícone vetorial (que seria monocromático).
   const moedaDot = cod => `<span class="dot dot--${cod}"></span>`;
+  const carga = calcularCarga(c);
+  const AVISOS_CARGA = {
+    excede: `${ico('aviso')} Acima da capacidade máxima — não é possível carregar tudo isso (PHB)`,
+    pesada: `${ico('aviso')} Sobrecarga pesada (Variação opcional do PHB) — desloc. −6m e desvantagem em testes de FOR/DES/CON, ataques e resistência`,
+    leve: `${ico('aviso')} Sobrecarga (Variação opcional do PHB) — desloc. −3m`,
+  };
 
   return `
+    <div class="carga-bar carga-${carga.nivel}" id="carga-bar">
+      <span>${ico('mochila')} Carga: <strong id="carga-total">${carga.total.toFixed(1)}</strong> / ${carga.capacidade.toFixed(1)} kg</span>
+      ${AVISOS_CARGA[carga.nivel] ? `<span class="carga-aviso">${AVISOS_CARGA[carga.nivel]}</span>` : ''}
+    </div>
+
     <div class="bloco-equip">
       <div class="bloco-equip-head">
         <span class="bloco-icone">${ico('moedas')}</span>
