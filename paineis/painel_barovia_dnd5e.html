@@ -552,6 +552,7 @@
   <div class="toolbar-group">
     <button onclick="adicionarCard()" id="btn-adicionar" style="display:none" aria-label="Adicionar novo personagem"><span aria-hidden="true">⚜</span> Adicionar</button>
     <button onclick="descansoLongo()" id="btn-descanso-global" style="display:none" aria-label="Aplicar descanso longo a todos"><span data-ico="noite" aria-hidden="true"></span> Descanso Longo</button>
+    <button type="button" onclick="abrirIniciativa()" id="btn-iniciativa" style="display:none" aria-label="Abrir ordem de iniciativa"><span data-ico="iniciativa" aria-hidden="true"></span> Iniciativa</button>
     <button type="button" onclick="abrirNotasMestre({ chave: 'barovia', titulo: 'Maldição de Strahd' })" id="btn-notas-mestre" style="display:none" aria-label="Abrir anotações do mestre"><span data-ico="notas" aria-hidden="true"></span> Anotações</button>
     <button onclick="window.print()" aria-label="Imprimir painel"><span data-ico="imprimir" aria-hidden="true"></span> Imprimir</button>
   </div>
@@ -583,6 +584,7 @@
 <script src="../assets/js/master_notes.js"></script>
 <script src="../assets/js/confirmar.js"></script>
 <script src="../assets/js/rolador.js"></script>
+<script src="../assets/js/iniciativa.js"></script>
 <script src="../assets/js/pericias_mestre.js"></script>
 <script>
 const CONDICOES = [
@@ -783,6 +785,16 @@ function render() {
     estado.personagens.forEach(p => grid.appendChild(criarCard(p)));
   }
   renderPartyBar();
+}
+
+// Iniciativa (mst-3): abre com os PJs/NPCs ativos já preenchidos (bônus de
+// characters.iniciativa_bonus) — vilões abertos em outra aba não são
+// sincronizados automaticamente (cada ficha vive numa página separada, sem
+// canal em comum pra isso), então entram como combatente avulso dentro do
+// próprio modal (nome + bônus digitados na hora).
+function abrirIniciativa() {
+  if (!window.Iniciativa) return;
+  window.Iniciativa.abrir(estado.personagens.map(p => ({ nome: p.nome, bonus: +p.iniciativa_bonus || 0 })));
 }
 
 // ===== BARRA DA PARTY: resumo rápido acima dos cards =====
@@ -1825,7 +1837,7 @@ async function descansoLongo() {
     });
     ehMestre = r.ehMestre;
     if (ehMestre) {
-      ['btn-adicionar','btn-descanso-global','btn-notas-mestre','link-vilao','link-reloaded'].forEach(id => {
+      ['btn-adicionar','btn-descanso-global','btn-iniciativa','btn-notas-mestre','link-vilao','link-reloaded'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.style.display = '';
       });

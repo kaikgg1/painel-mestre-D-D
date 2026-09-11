@@ -878,6 +878,7 @@
   <a href="../index.html" class="back-link" aria-label="Voltar à tela inicial">← Voltar</a>
   <button onclick="adicionarCard()" aria-label="Adicionar novo personagem">+ Adicionar Personagem</button>
   <button onclick="descansoLongo()" aria-label="Aplicar descanso longo a todos"><span data-ico="noite" aria-hidden="true"></span> Descanso Longo</button>
+  <button type="button" onclick="abrirIniciativa()" aria-label="Abrir ordem de iniciativa"><span data-ico="iniciativa" aria-hidden="true"></span> Iniciativa</button>
   <button type="button" onclick="abrirNotasMestre({ chave: 'mestre', titulo: 'Crônica dos Aventureiros' })" aria-label="Abrir anotações do mestre"><span data-ico="notas" aria-hidden="true"></span> Anotações</button>
   <a href="vilao/index.html" class="back-link" style="text-decoration:none" aria-label="Abrir fichas de vilão"><span data-ico="vampiro" aria-hidden="true"></span> Vilões</a>
   <button onclick="window.print()" aria-label="Imprimir painel"><span data-ico="imprimir" aria-hidden="true"></span> Imprimir</button>
@@ -908,6 +909,7 @@
 <script src="../assets/js/master_notes.js"></script>
 <script src="../assets/js/confirmar.js"></script>
 <script src="../assets/js/rolador.js"></script>
+<script src="../assets/js/iniciativa.js"></script>
 <script src="../assets/js/pericias_mestre.js"></script>
 <script>
 const CONDICOES = [
@@ -1131,6 +1133,16 @@ function render() {
     estado.personagens.forEach(p => grid.appendChild(criarCard(p)));
   }
   renderPartyBar();
+}
+
+// Iniciativa (mst-3): abre com os PJs/NPCs ativos já preenchidos (bônus de
+// characters.iniciativa_bonus) — vilões abertos em outra aba não são
+// sincronizados automaticamente (cada ficha vive numa página separada, sem
+// canal em comum pra isso), então entram como combatente avulso dentro do
+// próprio modal (nome + bônus digitados na hora).
+function abrirIniciativa() {
+  if (!window.Iniciativa) return;
+  window.Iniciativa.abrir(estado.personagens.map(p => ({ nome: p.nome, bonus: +p.iniciativa_bonus || 0 })));
 }
 
 // Anti-flicker: debounce por card + skip se o usuário está editando dentro dele.
