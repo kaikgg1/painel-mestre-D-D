@@ -112,7 +112,7 @@ if (!window.CSS) window.CSS = {};
 if (!window.CSS.escape) window.CSS.escape = (s) => String(s).replace(/[^a-zA-Z0-9_-]/g, c => '\\' + c);
 
 // Modulos compartilhados que a ficha consome (PHB, slots, exaustao, recursos, icones)
-for (const m of ['icones.js','regras_base.js','phb_catalogo.js','phb_slots.js','exaustao_regras.js','recursos_classe.js','ataques.js','condicoes_regras.js']) {
+for (const m of ['icones.js','ui.js','regras_base.js','phb_catalogo.js','phb_slots.js','exaustao_regras.js','recursos_classe.js','ataques.js','condicoes_regras.js']) {
   const el = window.document.createElement('script');
   el.textContent = fs.readFileSync(path.join(raiz, 'assets/js', m), 'utf8');
   window.document.head.appendChild(el);
@@ -318,6 +318,64 @@ for (const aba of abas) {
   console.log(erros.length > antes
     ? '  FALHOU     aba ' + aba
     : '  renderizou aba ' + aba + ' (' + tamanho + ' chars de HTML)');
+}
+
+// UI.abrirModal/UI.accordion (jog-10/jog-11, assets/js/ui.js): contrato
+// genérico isolado, sem depender de nenhuma aba específica — os modais reais
+// (Conjurar, conversor de pontos de feitiçaria) e os acordeões reais (Combate,
+// Magias) são cobertos nos próprios testes de cada aba mais abaixo.
+console.log('');
+{
+  const antes = erros.length;
+  try {
+    const { overlay, card } = window.UI.abrirModal({ tituloHtml: 'Título', corpoHtml: '<p>corpo</p>' });
+    if (!window.document.body.contains(overlay)) erros.push('UI.abrirModal: overlay não foi anexado ao body');
+    if (!overlay.classList.contains('modal-overlay')) erros.push('UI.abrirModal: overlay sem a classe modal-overlay');
+    if (!card || card.textContent.indexOf('corpo') === -1) erros.push('UI.abrirModal: corpoHtml não apareceu no card');
+
+    // Clique no backdrop (dispatch direto no próprio overlay, não no card
+    // dentro dele — e.target vem como o overlay nesse caso) fecha o modal.
+    overlay.dispatchEvent(new window.MouseEvent('click', { bubbles: true }));
+    if (window.document.body.contains(overlay)) erros.push('UI.abrirModal: clique no backdrop não fechou o modal');
+  } catch (e) { erros.push('UI.abrirModal: backdrop → ' + e.message); }
+
+  // Fecha no Esc (testado num modal novo, já que o de cima pode ter fechado
+  // via backdrop dependendo do jsdom simular "target" corretamente).
+  try {
+    const { overlay, fechar } = window.UI.abrirModal({ corpoHtml: '<p>x</p>' });
+    window.document.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Escape' }));
+    if (window.document.body.contains(overlay)) erros.push('UI.abrirModal: Esc não fechou o modal');
+  } catch (e) { erros.push('UI.abrirModal: Esc → ' + e.message); }
+
+  // Fecha via fechar() explícito, e não reage mais ao Esc depois de fechado
+  // (o listener de keydown tem que ser removido, senão vaza um por modal).
+  try {
+    const { overlay, fechar } = window.UI.abrirModal({ corpoHtml: '<p>y</p>' });
+    fechar();
+    if (window.document.body.contains(overlay)) erros.push('UI.abrirModal: fechar() não removeu o overlay');
+  } catch (e) { erros.push('UI.abrirModal: fechar() → ' + e.message); }
+
+  // Accordion: gatilho <button> (sem classe → alterna .hidden) e gatilho
+  // <div role="button"> (com classe → alterna a classe no alvo).
+  try {
+    const btn = window.document.createElement('button');
+    const painel = window.document.createElement('div');
+    painel.hidden = true;
+    window.UI.accordion(btn, () => painel);
+    btn.click();
+    if (painel.hidden) erros.push('UI.accordion (button, sem classe): clique deveria desesconder o painel');
+    if (btn.getAttribute('aria-expanded') !== 'true') erros.push('UI.accordion (button): aria-expanded deveria virar "true"');
+
+    const divBtn = window.document.createElement('div');
+    const item = window.document.createElement('div');
+    window.UI.accordion(divBtn, () => item, { classe: 'aberta' });
+    divBtn.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Enter' }));
+    if (!item.classList.contains('aberta')) erros.push('UI.accordion (div role=button, classe): Enter deveria abrir (classe "aberta")');
+  } catch (e) { erros.push('UI.accordion: ' + e.message); }
+
+  console.log(erros.length > antes
+    ? '  FALHOU     UI.abrirModal/UI.accordion (ver FALHAS abaixo)'
+    : '  UI.abrirModal (overlay/backdrop/Esc/fechar) + UI.accordion (button e div role=button) ok');
 }
 
 // Resumo (Fase 3): renderiza de novo explicitamente (a última aba do loop
@@ -832,6 +890,21 @@ console.log('');
   for (const [sel, rotulo] of MAGIA_CHECKS) {
     if (!window.document.querySelector(sel)) erros.push('magias: "' + rotulo + '" (' + sel + ') não encontrado');
   }
+
+  // Expandir/recolher uma magia (UI.accordion, jog-10/jog-11): clicar na
+  // linha marca .aberta no item e aria-expanded="true" na linha.
+  try {
+    const primeiraLinha = window.document.querySelector('.magia-row');
+    const item = primeiraLinha?.closest('.magia-item');
+    if (!primeiraLinha || !item) erros.push('magias: nenhuma .magia-row encontrada pra testar o acordeão');
+    else {
+      primeiraLinha.click();
+      if (!item.classList.contains('aberta')) erros.push('magias: clicar na linha deveria abrir o item (.aberta)');
+      if (primeiraLinha.getAttribute('aria-expanded') !== 'true') erros.push('magias: aria-expanded não virou "true" ao abrir');
+      primeiraLinha.click();
+      if (item.classList.contains('aberta')) erros.push('magias: clicar de novo deveria fechar o item');
+    }
+  } catch (e) { erros.push('magias: acordeão de expandir/recolher → ' + e.message); }
 
   // Filtro por nível 1 → só "Bênção"
   try {

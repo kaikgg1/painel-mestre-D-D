@@ -205,15 +205,9 @@ async function carregarMagiasPreparadas() {
     </div>`;
   }).join('')}</div>`;
 
-  // Toggle expand
+  // Toggle expand (UI.accordion, assets/js/ui.js)
   wrap.querySelectorAll('.magia-row').forEach(row => {
-    const acao = () => {
-      const item = row.closest('.magia-item');
-      const aberto = item.classList.toggle('aberta');
-      row.setAttribute('aria-expanded', aberto);
-    };
-    row.addEventListener('click', acao);
-    row.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); acao(); } });
+    UI.accordion(row, r => r.closest('.magia-item'), { classe: 'aberta' });
   });
 
   // Botão Conjurar → abre modal de escolha de slot
@@ -290,12 +284,12 @@ function abrirModalConjurar(nomeMagia, nivelMin, ehConcentracao) {
     return;
   }
 
-  // Cria overlay
-  const overlay = document.createElement('div');
-  overlay.className = 'modal-overlay';
-  overlay.innerHTML = `
-    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
-      <h3 id="modal-titulo">${ico('conjurar')} Conjurar <em>${escape(nomeMagia)}</em></h3>
+  // Overlay/card genéricos (UI.abrirModal, assets/js/ui.js) — cuidam de
+  // criar/remover o DOM e fechar no backdrop/Esc; este modal só entra com o
+  // conteúdo e os listeners específicos dele.
+  const { overlay, fechar } = UI.abrirModal({
+    tituloHtml: `${ico('conjurar')} Conjurar <em>${escape(nomeMagia)}</em>`,
+    corpoHtml: `
       <p style="font-size:12px;color:var(--text-dim);margin-bottom:14px">
         Magia de <strong>${nivelMin}° nível</strong>. Escolha em qual espaço gastar:
       </p>
@@ -311,12 +305,8 @@ function abrirModalConjurar(nomeMagia, nivelMin, ehConcentracao) {
       <div class="modal-acoes">
         <button type="button" class="btn" id="modal-cancelar">Cancelar</button>
       </div>
-    </div>
-  `;
-  document.body.appendChild(overlay);
-
-  const fechar = () => overlay.remove();
-  overlay.addEventListener('click', (e) => { if (e.target === overlay) fechar(); });
+    `,
+  });
   overlay.querySelector('#modal-cancelar').addEventListener('click', fechar);
 
   overlay.querySelectorAll('.modal-slot-btn').forEach(btn => {
@@ -347,10 +337,6 @@ function abrirModalConjurar(nomeMagia, nivelMin, ehConcentracao) {
       }
     });
   });
-
-  // ESC fecha
-  const onKey = (e) => { if (e.key === 'Escape') { fechar(); document.removeEventListener('keydown', onKey); } };
-  document.addEventListener('keydown', onKey);
 }
 
 function mostrarToastConjurar(nome, nv) {

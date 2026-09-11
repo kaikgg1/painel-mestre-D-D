@@ -235,6 +235,13 @@
   animation: fadeIn 0.18s ease-out;
 }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+/* UI.abrirModal (assets/js/ui.js) sempre embrulha o corpo num .modal-card
+   genérico — aqui o próprio .fei-modal já traz fundo/borda/padding, então o
+   card genérico vira só um wrapper transparente por baixo dele. */
+.fei-overlay .modal-card {
+  background: none; border: none; padding: 0; box-shadow: none;
+  max-width: none; width: auto;
+}
 .fei-modal {
   background: linear-gradient(160deg, #1c1a14 0%, #151510 100%);
   border: 2px solid var(--borda);

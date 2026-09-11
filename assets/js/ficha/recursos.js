@@ -273,28 +273,29 @@ function abrirModalConversorFeit() {
   }
   if (!conversaoVolta) conversaoVolta = '<div class="fei-vazio">Nenhum slot disponível para converter.</div>';
 
-  const overlay = document.createElement('div');
-  overlay.className = 'fei-overlay';
-  overlay.innerHTML = `
-    <div class="fei-modal" role="dialog" aria-modal="true" aria-labelledby="fei-titulo">
-      <button class="fei-close" type="button" aria-label="Fechar">✕</button>
-      <div class="fei-titulo" id="fei-titulo">⇄ Fonte de Magia</div>
-      <div class="fei-status">Pontos de Feitiçaria: <strong>${ptLivres}</strong> / ${ptDef.max}</div>
-      <div class="fei-sec">
-        <div class="fei-sec-titulo">Criar slot (gasta pontos)</div>
-        <div class="fei-grid">${opcoes}</div>
-      </div>
-      <div class="fei-sec">
-        <div class="fei-sec-titulo">Quebrar slot em pontos</div>
-        <div class="fei-grid">${conversaoVolta}</div>
-      </div>
-      <div class="fei-rodape">PHB: 1 slot 1°=2 · 2°=3 · 3°=5 · 4°=6 · 5°=7. Sem conversão acima do 5° nível.</div>
-    </div>`;
-  document.body.appendChild(overlay);
-
-  const fechar = () => overlay.remove();
+  // Overlay/card genéricos (UI.abrirModal, assets/js/ui.js) — antes este
+  // modal criava seu próprio overlay sem tratar Esc; ganha isso de graça
+  // migrando pro helper compartilhado (mesmo usado pelo Conjurar de magias).
+  const { overlay, fechar } = UI.abrirModal({
+    className: 'fei-overlay',
+    corpoHtml: `
+      <div class="fei-modal">
+        <button class="fei-close" type="button" aria-label="Fechar">✕</button>
+        <div class="fei-titulo" id="fei-titulo">⇄ Fonte de Magia</div>
+        <div class="fei-status">Pontos de Feitiçaria: <strong>${ptLivres}</strong> / ${ptDef.max}</div>
+        <div class="fei-sec">
+          <div class="fei-sec-titulo">Criar slot (gasta pontos)</div>
+          <div class="fei-grid">${opcoes}</div>
+        </div>
+        <div class="fei-sec">
+          <div class="fei-sec-titulo">Quebrar slot em pontos</div>
+          <div class="fei-grid">${conversaoVolta}</div>
+        </div>
+        <div class="fei-rodape">PHB: 1 slot 1°=2 · 2°=3 · 3°=5 · 4°=6 · 5°=7. Sem conversão acima do 5° nível.</div>
+      </div>`,
+  });
+  overlay.querySelector('.modal-card')?.setAttribute('aria-labelledby', 'fei-titulo');
   overlay.querySelector('.fei-close').onclick = fechar;
-  overlay.addEventListener('click', e => { if (e.target === overlay) fechar(); });
 
   // Criar slot
   overlay.querySelectorAll('[data-fei-criar]').forEach(b => {

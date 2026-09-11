@@ -225,16 +225,12 @@ function renderConcentracaoBloco(c) {
 }
 
 function conectarListenersCombate() {
-  // Editores em acordeão de salvaguardas/perícias — um clique no gatilho
-  // mostra/esconde o [hidden]. Os campos continuam no form o tempo todo
-  // (escondidos não saem do FormData), então isso não muda nada em salvar().
+  // Editores em acordeão de salvaguardas/perícias (UI.accordion, assets/js/ui.js)
+  // — um clique no gatilho mostra/esconde o [hidden]. Os campos continuam no
+  // form o tempo todo (escondidos não saem do FormData), então isso não
+  // muda nada em salvar().
   document.querySelectorAll('[data-toggle-editor]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const ed = document.getElementById('editor-' + btn.dataset.toggleEditor);
-      if (!ed) return;
-      ed.hidden = !ed.hidden;
-      btn.setAttribute('aria-expanded', String(!ed.hidden));
-    });
+    UI.accordion(btn, b => document.getElementById('editor-' + b.dataset.toggleEditor));
   });
 
   conectarListenersCondicoes('combate-condicoes-wrap');
