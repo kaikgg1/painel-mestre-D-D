@@ -141,6 +141,27 @@
     gap: 20px;
   }
 
+  /* ===== BARRA DA PARTY (mst-6) — resumo rápido acima dos cards ===== */
+  .party-bar {
+    max-width: 1280px;
+    margin: 0 auto 22px;
+    display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+  }
+  .party-chip {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--bg-parchment); border: 1px solid var(--gold-dark); border-radius: 20px;
+    padding: 6px 14px 6px 8px; cursor: pointer; transition: border-color .15s, transform .15s;
+    min-width: 150px;
+  }
+  .party-chip:hover { border-color: var(--red); transform: translateY(-1px); }
+  .party-chip .pc-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; background: var(--tema-cor, var(--gold)); }
+  .party-chip .pc-nome { font-family: 'Cinzel', serif; font-size: 11.5px; font-weight: 600; color: var(--brown); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90px; }
+  .party-chip .pc-hp { font-size: 11px; color: var(--brown-soft); margin-left: auto; white-space: nowrap; }
+  .party-chip.critico .pc-hp { color: var(--red-dark); font-weight: 700; }
+  .party-chip.inconsciente { border-color: var(--red-dark); }
+  .party-chip.inconsciente .pc-nome { color: var(--red-dark); }
+  .party-chip .pc-flag { font-size: 12px; }
+
   /* ===== CARD ===== */
   .card {
     background: var(--bg-parchment);
@@ -795,7 +816,7 @@
     body { background: white !important; padding: 0 !important; color: #222 !important;
       background-image: none !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
     body::before { display: none !important; }
-    .toolbar, .hint, .remove-card, .toast, .auth-slot, .back-link { display: none !important; }
+    .toolbar, .hint, .remove-card, .toast, .auth-slot, .back-link, .party-bar { display: none !important; }
     .header { margin: 0 0 12px; padding: 0 0 8px; border-bottom: 2px solid #6b1010; }
     .header h1 { color: #6b1010 !important; text-shadow: none !important; font-size: 24pt; letter-spacing: 2px; }
     .header .subtitle { color: #6a4f0e !important; font-size: 11pt; }
@@ -863,6 +884,8 @@
   <span class="auth-slot" id="auth-slot" aria-label="Status de login" style="margin-left:auto;display:flex;gap:8px;align-items:center;font-family:'Cinzel',serif;font-size:11px;color:var(--red-dark)"></span>
 </nav>
 
+<div class="party-bar" id="party-bar"></div>
+
 <main class="grid" id="grid"></main>
 
 <p class="hint">
@@ -927,6 +950,7 @@ function salvar(p) {
   if (p && p.id) {
     marcarEcoLocal(p.id);
     window.DBSync.salvarCampo(p.id, p);
+    renderPartyBar();
     return;
   }
   for (const x of estado.personagens) {
@@ -935,6 +959,40 @@ function salvar(p) {
       window.DBSync.salvarCampo(x.id, x);
     }
   }
+  renderPartyBar();
+}
+
+// ===== BARRA DA PARTY (mst-6): resumo rápido acima dos cards, clicável pra
+// rolar até o card do personagem — igual ao que já existia só em
+// painel_barovia_dnd5e.html. =====
+function renderPartyBar() {
+  const bar = document.getElementById('party-bar');
+  if (!bar) return;
+  if (!estado.personagens.length) { bar.innerHTML = ''; return; }
+  bar.innerHTML = estado.personagens.map(p => {
+    const hpMax = +p.hpMax || 1;
+    const hpAtual = +p.hpAtual || 0;
+    const pct = Math.max(0, Math.min(100, (hpAtual / hpMax) * 100));
+    const inconsciente = hpAtual <= 0;
+    const critico = !inconsciente && pct <= 25;
+    const tema = window.ClasseTema ? window.ClasseTema.obter(p.classe) : null;
+    const flags = [];
+    if (inconsciente) flags.push('💀');
+    else if (p.condicoes?.length) flags.push('⚠');
+    if (p.concentracao?.ativa) flags.push('🔮');
+    return `<div class="party-chip${critico ? ' critico' : ''}${inconsciente ? ' inconsciente' : ''}" data-goto="${p.id}" title="${escapeHtml(p.nome)} — ${hpAtual}/${hpMax} PV">
+      <span class="pc-dot" style="--tema-cor:${tema ? tema.cor : 'var(--gold)'}"></span>
+      <span class="pc-nome">${escapeHtml(p.nome)}</span>
+      ${flags.map(f => `<span class="pc-flag">${f}</span>`).join('')}
+      <span class="pc-hp">${hpAtual}/${hpMax}</span>
+    </div>`;
+  }).join('');
+  bar.querySelectorAll('.party-chip').forEach(chip => {
+    chip.onclick = () => {
+      const alvo = document.querySelector(`[data-card-id="${chip.dataset.goto}"]`);
+      if (alvo) alvo.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    };
+  });
 }
 
 // Compatibilidade — função carregar() agora é no-op (init real é via DBSync)
@@ -1071,6 +1129,7 @@ function render() {
   } else {
     estado.personagens.forEach(p => grid.appendChild(criarCard(p)));
   }
+  renderPartyBar();
 }
 
 // Anti-flicker: debounce por card + skip se o usuário está editando dentro dele.
@@ -1116,6 +1175,7 @@ function _aplicarRerender(id) {
   antigo.replaceWith(novo);
   // remove o min-height na próxima frame (já assumiu nova altura natural)
   requestAnimationFrame(() => requestAnimationFrame(() => { novo.style.minHeight = ''; }));
+  renderPartyBar();
 }
 
 // Aplica cor + ícone de fundo temáticos da classe do personagem no card.
