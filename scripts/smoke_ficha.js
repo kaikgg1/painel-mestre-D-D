@@ -981,9 +981,13 @@ console.log('');
           if (!/Espada Longa/.test(window.document.getElementById('toast-auto')?.textContent || '')) {
             erros.push('equipamento: rolar ataque (🎲) não mostrou toast com o nome da arma');
           }
+          // Remover agora pede confirmação (jog-13, padronizada como
+          // companion/característica) — Confirmar.perguntar é assíncrono
+          // mesmo no stub, então precisa de um tick antes de checar.
           card.querySelector('[data-rm="armas"]')?.click();
+          await Promise.resolve().then(() => {}).then(() => {});
           const armasDepois = window.eval('charAtivo.inventario.armas') || [];
-          if (armasDepois.length) erros.push('equipamento: remover arma não esvaziou o inventário');
+          if (armasDepois.length) erros.push('equipamento: remover arma (com Confirmar.perguntar) não esvaziou o inventário');
         }
 
         // "Recentes" (localStorage) — grava o nome pra próxima vez que abrir o seletor

@@ -479,12 +479,20 @@ function conectarListenersEquipamento() {
     });
   });
 
-  // Remover item (armas/armaduras/itens — mesmo botão de sempre)
-  $$('[data-rm]').forEach(b => b.addEventListener('click', e => {
+  // Remover item (armas/armaduras/itens — mesmo botão de sempre). Confirmação
+  // padronizada (mesmo modal de remover companion/característica): um "✕" de
+  // lista é fácil de tocar sem querer, e sem isso o item some sem chance de
+  // desfazer.
+  $$('[data-rm]').forEach(b => b.addEventListener('click', async e => {
     const tipo = e.currentTarget.dataset.rm;
     const idx = +e.currentTarget.dataset.idx;
     const inv = charAtivo.inventario || {};
-    if (!inv[tipo]) return;
+    if (!inv[tipo] || !inv[tipo][idx]) return;
+    const nome = inv[tipo][idx].nome || 'este item';
+    const cf = window.Confirmar
+      ? await Confirmar.perguntar({ titulo: 'Remover item?', mensagem: `"${nome}" será removido do inventário.`, confirmar: 'Remover', danger: true })
+      : confirm(`Remover "${nome}"?`);
+    if (!cf) return;
     inv[tipo].splice(idx, 1);
     charAtivo.inventario = inv;
     render();  // re-renderiza apenas a tab
