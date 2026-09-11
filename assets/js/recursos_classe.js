@@ -10,7 +10,8 @@
 //   RecursosClasse.gravarUsado(recursos_usados, id, n)  -> muta o objeto in-place, preservando formato
 (function () {
   const ico = (chave) => (window.Icones ? window.Icones.html(chave) : '');
-  const mod = v => Math.floor(((+v || 10) - 10) / 2);
+  // Fórmula central em assets/js/regras_base.js (carregar antes deste arquivo).
+  const mod = window.Regras.mod;
   const _max1 = v => Math.max(1, v);
 
   function chaveDeClasse(classe) {

@@ -284,7 +284,12 @@
       const campos = p.campos; pendingUpdates.delete(id);
       const { data, error } = await window.sb
         .from('characters').update(campos).eq('id', id).select('*').maybeSingle();
-      if (error) console.warn('[dbsync] salvarCampo:', error);
+      if (error) {
+        console.warn('[dbsync] salvarCampo:', error);
+        // Falha silenciosa aqui significa o Mestre achar que salvou e não ter salvo —
+        // avisa quem estiver escutando (ver toast em painel_mestre/painel_barovia).
+        window.dispatchEvent(new CustomEvent('dbsync:erro', { detail: { id, error: error.message } }));
+      }
       else if (data) {
         const antigo = cache.get(id);
         data._jogador_nome = antigo?._jogador_nome || '';

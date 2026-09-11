@@ -101,10 +101,12 @@ function classeUsaMagia(c) {
   return !!tipo;
 }
 
-const mod = v => Math.floor(((+v||10) - 10) / 2);
-const fmtMod = m => (m >= 0 ? '+' : '') + m;
-// Bônus de proficiência por nível (PHB 5e): 1-4=+2, 5-8=+3, 9-12=+4, 13-16=+5, 17-20=+6
-const bonusProf = nv => Math.floor(((+nv || 1) - 1) / 4) + 2;
+// Fórmulas centrais em assets/js/regras_base.js (carregar antes deste arquivo).
+// Continuam expostas como globais soltos aqui porque TODOS os módulos de
+// assets/js/ficha/*.js já chamam mod()/fmtMod()/bonusProf() assim.
+const mod = window.Regras.mod;
+const fmtMod = window.Regras.fmtMod;
+const bonusProf = window.Regras.bonusProf;
 
 // Salvaguardas aceitam formato legado (bool = proficiência) OU objeto {prof,bonus}
 function salvProf(salv, k) { const v = salv?.[k]; return v === true || !!(v && v.prof); }

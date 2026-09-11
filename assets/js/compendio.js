@@ -13,7 +13,9 @@
   let _filtroRar = '';
 
   const norm = s => (s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
-  const esc = s => (s == null ? '' : String(s)).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  // Fonte única em assets/js/regras_base.js (também escapa aspas simples,
+  // diferente da versão anterior daqui — carregar regras_base.js antes deste arquivo).
+  const esc = window.Regras.escapeHtml;
   // "POÇÃO DE ESCALAR" -> "Poção de Escalar"
   // Não usar \b aqui: em JS ele é ASCII, então "ç"/"ã" viram fronteira de palavra
   // e o resultado sai "PoÇãO". Capitalizamos só depois de início/espaço/pontuação,
@@ -309,7 +311,7 @@
   }
   function fichaMonstro(m) {
     const a = m.atributos || {};
-    const mod = v => { const x = Math.floor(((+v || 10) - 10) / 2); return (x >= 0 ? '+' : '') + x; };
+    const mod = v => window.Regras.fmtMod(window.Regras.mod(v));
     const atr = [['FOR', a.for], ['DES', a.dex], ['CON', a.con], ['INT', a.int], ['SAB', a.sab], ['CAR', a.car]]
       .map(([l, v]) => `<div class="cp-stat"><div class="l">${l}</div><div class="v">${v ?? 10}</div><div class="l">${mod(v)}</div></div>`).join('');
     const linha = (lbl, val) => val ? `<div class="cp-linha"><b>${lbl}:</b> ${esc(val)}</div>` : '';

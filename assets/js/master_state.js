@@ -53,7 +53,14 @@
       .from('master_state')
       .upsert({ user_id: user.id, chave, dados }, { onConflict: 'user_id,chave' });
 
-    if (error) { console.warn('[MasterState] salvar:', error.message); return false; }
+    if (error) {
+      console.warn('[MasterState] salvar:', error.message);
+      // Falha silenciosa aqui significa o Mestre achar que salvou um tracker de
+      // vilão e não ter salvo. Fica salvo no localStorage (linha acima), mas
+      // avisa quem estiver escutando — ver assets/js/vilao_combate.js.
+      window.dispatchEvent(new CustomEvent('masterstate:erro', { detail: { chave, error: error.message } }));
+      return false;
+    }
     return true;
   }
 

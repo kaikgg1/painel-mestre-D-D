@@ -22,9 +22,8 @@
 //   Ataques.rolar(arma, atributos, nivel) -> { ataqueTexto, danoTexto, ataqueTotal, danoTotal }
 
 (function () {
-  const mod = v => Math.floor(((+v || 10) - 10) / 2);
-  const bonusProf = nv => Math.floor(((+nv || 1) - 1) / 4) + 2;
-  const fmtMod = m => (m >= 0 ? '+' : '') + m;
+  // Fórmulas centrais em assets/js/regras_base.js (carregar antes deste arquivo).
+  const { mod, bonusProf, fmtMod } = window.Regras;
 
   function ehDistancia(arma) {
     return /dist[âa]ncia/i.test(arma?.categoria || '');

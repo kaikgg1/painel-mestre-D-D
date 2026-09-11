@@ -925,6 +925,10 @@ function toast(msg) {
   t._timer = setTimeout(() => t.classList.remove('show'), 2000);
 }
 
+// Falha de autosave (DBSync.salvarCampo) hoje só ia pro console — o Mestre
+// achava que tinha salvo e não tinha. Avisa na tela.
+window.addEventListener('dbsync:erro', () => toast('⚠ Falha ao salvar — verifique sua conexão'));
+
 function criarPersonagem(base = {}) {
   return {
     id: Date.now() + Math.random(),

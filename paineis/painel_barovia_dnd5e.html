@@ -578,6 +578,7 @@
 <script src="../assets/js/dbsync.js"></script>
 <script src="../assets/js/phb_slots.js"></script>
 <script src="../assets/js/exaustao_regras.js"></script>
+<script src="../assets/js/regras_base.js"></script>
 <script src="../assets/js/recursos_classe.js"></script>
 <script src="../assets/js/master_notes.js"></script>
 <script src="../assets/js/confirmar.js"></script>
@@ -643,6 +644,10 @@ function toast(msg) {
   clearTimeout(t._timer);
   t._timer = setTimeout(() => t.classList.remove('show'), 2000);
 }
+
+// Falha de autosave (DBSync.salvarCampo) hoje só ia pro console — o Mestre
+// achava que tinha salvo e não tinha. Avisa na tela.
+window.addEventListener('dbsync:erro', () => toast('⚠ Falha ao salvar — verifique sua conexão'));
 
 function criarPersonagem(base = {}) {
   return {

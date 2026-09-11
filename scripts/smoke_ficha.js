@@ -96,7 +96,7 @@ if (!window.CSS) window.CSS = {};
 if (!window.CSS.escape) window.CSS.escape = (s) => String(s).replace(/[^a-zA-Z0-9_-]/g, c => '\\' + c);
 
 // Modulos compartilhados que a ficha consome (PHB, slots, exaustao, recursos, icones)
-for (const m of ['icones.js','phb_catalogo.js','phb_slots.js','exaustao_regras.js','recursos_classe.js','ataques.js','condicoes_regras.js']) {
+for (const m of ['icones.js','regras_base.js','phb_catalogo.js','phb_slots.js','exaustao_regras.js','recursos_classe.js','ataques.js','condicoes_regras.js']) {
   const el = window.document.createElement('script');
   el.textContent = fs.readFileSync(path.join(raiz, 'assets/js', m), 'utf8');
   window.document.head.appendChild(el);
