@@ -155,63 +155,9 @@
 <script src="../../assets/js/auth.js"></script>
 <script src="../../assets/js/master_state.js"></script>
 <script src="../../assets/js/rolador.js"></script>
+<script src="../../assets/js/vilao_sync_basico.js"></script>
 <script>
-const STORAGE_KEY = 'bianca_ficha_v1';
-const MS_CHAVE = 'vilao:bianca';
-let _msAplicando = false;
-function _setSyncStatus(txt, cor) { const el = document.getElementById('syncStatus'); if (el) { el.textContent = txt; el.style.color = cor || 'var(--gold-dim)'; } }
-function toggleAbility(header) { header.parentElement.classList.toggle('open'); }
-function getState() {
-  return {
-    notes: document.getElementById('notesArea').value,
-    openAbilities: Array.from(document.querySelectorAll('.ability.open')).map(a => a.querySelector('.ability-name').textContent)
-  };
-}
-function applyState(s) {
-  if (!s) return;
-  document.getElementById('notesArea').value = s.notes || '';
-  if (s.openAbilities) s.openAbilities.forEach(name => document.querySelectorAll('.ability').forEach(a => { if (a.querySelector('.ability-name').textContent === name) a.classList.add('open'); }));
-}
-function saveState(silent = false) {
-  if (_msAplicando) return;
-  try {
-    const dados = getState();
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
-    if (window.MasterState) { _setSyncStatus('⟳ sincronizando…', 'var(--gold-dim)'); window.MasterState.salvarDebounced(MS_CHAVE, dados, silent ? 600 : 0); setTimeout(() => _setSyncStatus('● sincronizado', 'var(--gold)'), silent ? 800 : 200); }
-    if (!silent) showToast('✓ Salvo');
-  } catch(e) { if (!silent) showToast('Erro ao salvar'); }
-}
-async function loadState() {
-  try {
-    let dados = null;
-    if (window.MasterState) dados = await window.MasterState.carregar(MS_CHAVE);
-    if (!dados) { const local = localStorage.getItem(STORAGE_KEY); if (local) dados = JSON.parse(local); }
-    if (!dados) { showToast('Nada salvo'); return; }
-    _msAplicando = true; applyState(dados); _msAplicando = false;
-    _setSyncStatus(window.MasterState ? '● sincronizado' : '○ local', window.MasterState ? 'var(--gold)' : 'var(--gold-dim)');
-    showToast('✓ Carregado');
-  } catch(e) { _msAplicando = false; showToast('Erro ao carregar'); }
-}
-function resetAll() {
-  if (!confirm('Limpar notas de Bianca?')) return;
-  localStorage.removeItem(STORAGE_KEY);
-  document.getElementById('notesArea').value = '';
-  document.querySelectorAll('.ability.open').forEach(a => a.classList.remove('open'));
-  showToast('✓ Resetado');
-}
-let toastTimer;
-function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 1800); }
-document.getElementById('notesArea').addEventListener('input', () => { clearTimeout(window._notesTimer); window._notesTimer = setTimeout(() => saveState(true), 600); });
-document.addEventListener('keydown', (e) => { if (e.ctrlKey && e.key === 's') { e.preventDefault(); saveState(); } });
-(async function bootstrap() {
-  if (window.Auth) {
-    const u = await window.Auth.requerLogin('../login.html'); if (!u) return;
-    const ehMestre = await window.Auth.ehMestre();
-    if (!ehMestre) { document.body.innerHTML = '<div style="padding:60px;text-align:center;color:var(--bone);font-family:Cinzel,serif"><h2>Acesso restrito ao Mestre.</h2><p style="margin-top:14px"><a href="../../index.html" style="color:var(--gold)">Voltar</a></p></div>'; return; }
-  }
-  await loadState();
-  if (window.MasterState) window.MasterState.iniciarRealtime(MS_CHAVE, dados => { if (!dados) return; _msAplicando = true; applyState(dados); _msAplicando = false; _setSyncStatus('● sincronizado', 'var(--gold)'); });
-})();
+VilaoSyncBasico.iniciar({ storageKey: 'bianca_ficha_v1', msChave: 'vilao:bianca', nomeExibicao: 'Bianca' });
 </script>
 
 <script src="../../assets/js/ambiente.js"></script>
