@@ -287,6 +287,35 @@ function conectarListeners() {
       });
     });
 
+    // Multiclasse (jog-4): adicionar/remover classe secundária. Nível total
+    // (principal + secundárias) não pode passar de 20 (PHB) — o campo de
+    // nível a adicionar é clampado no que ainda cabe.
+    const btnMcAdd = document.getElementById('btn-mc-add');
+    if (btnMcAdd) btnMcAdd.addEventListener('click', () => {
+      const selClasse = document.getElementById('mc-add-classe');
+      const inpNivel = document.getElementById('mc-add-nivel');
+      const classe = selClasse?.value;
+      if (!classe) return;
+      const restante = 20 - nivelTotalPersonagem(charAtivo);
+      if (restante < 1) { toast('Nível total já está em 20 — não dá pra adicionar mais.'); return; }
+      const nivel = Math.max(1, Math.min(restante, parseNum(inpNivel?.value, { inteiro: true, min: 1 }) ?? 1));
+      const secundarias = Array.isArray(charAtivo.classes_secundarias) ? charAtivo.classes_secundarias : [];
+      secundarias.push({ classe, nivel });
+      charAtivo.classes_secundarias = secundarias;
+      salvarClassesSecundarias();
+      render();
+    });
+    $$('[data-mc-rm]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = +btn.dataset.mcRm;
+        const secundarias = Array.isArray(charAtivo.classes_secundarias) ? charAtivo.classes_secundarias : [];
+        secundarias.splice(idx, 1);
+        charAtivo.classes_secundarias = secundarias;
+        salvarClassesSecundarias();
+        render();
+      });
+    });
+
     const inp = document.getElementById('input-imagem');
     const prev = document.getElementById('retrato-preview');
     const arquivo = document.getElementById('input-arquivo');
@@ -397,8 +426,7 @@ function validarEAtualizarMod(inp) {
 // Recalcula valores das salvaguardas e perícias on the fly (sem re-render)
 function recalcularValoresPericiasSalv() {
   const atrs = charAtivo.atributos || {};
-  const nv = +charAtivo.nivel || 1;
-  const bp = bonusProf(nv);
+  const bp = bonusProf(nivelTotalPersonagem(charAtivo));
   // Coleta inputs atuais (incluindo possíveis edições não-salvas)
   $$('[data-attr]').forEach(inp => {
     const v = parseNum(inp.value, { inteiro: true });
@@ -512,7 +540,7 @@ function conectarListenersEquipamento() {
       const idx = +btn.dataset.equipRolar;
       const arma = (charAtivo.inventario?.armas || [])[idx];
       if (!arma || !window.Ataques) return;
-      const r = Ataques.rolar(arma, charAtivo.atributos, charAtivo.nivel, _modoRolagem);
+      const r = Ataques.rolar(arma, charAtivo.atributos, nivelTotalPersonagem(charAtivo), _modoRolagem);
       const critico = r.critico ? ' · CRÍTICO!' : r.falhaCritica ? ' · falha crítica' : '';
       toast(`${arma.nome}: ataque ${r.ataqueTexto}${critico} · dano ${r.danoTexto}`);
     });

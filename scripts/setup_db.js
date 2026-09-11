@@ -35,6 +35,7 @@ const SCRIPTS = [
   '021_percepcao_spell_concentracao.sql',
   '022_habilidades_favoritas.sql',
   '023_correcoes_auditoria.sql',
+  '024_multiclasse.sql',
 ];
 
 (async () => {

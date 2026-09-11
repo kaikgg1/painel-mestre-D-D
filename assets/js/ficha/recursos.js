@@ -411,7 +411,7 @@ async function aplicarDescanso(tipo) {
   if (longo) {
     const hpMax = charAtivo.hp_max ?? charAtivo.hp_atual ?? 0;
     payload.hp_atual = hpMax;
-    const totalDados = Math.max(1, +charAtivo.nivel || 1);
+    const totalDados = Math.max(1, nivelTotalPersonagem(charAtivo));
     const recuperar = Math.max(1, Math.floor(totalDados / 2));
     payload.dado_vida_atual = Math.min(totalDados, (+charAtivo.dado_vida_atual || 0) + recuperar);
     msg += ` — PV restaurado, +${recuperar} dado${recuperar > 1 ? 's' : ''} de vida recuperado${recuperar > 1 ? 's' : ''}`;

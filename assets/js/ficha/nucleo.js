@@ -45,6 +45,16 @@ function dadoVidaDaClasse(classe) {
   return DADO_VIDA_POR_CLASSE[chaveDeClasse(classe)] || null;
 }
 
+// Multiclasse (jog-4): characters.classes_secundarias é um array opcional
+// [{classe, nivel}] além da classe principal (colunas classe/nivel de
+// sempre). PHB: bônus de proficiência usa a SOMA do nível de todas as
+// classes — sem classes secundárias, isso é exatamente c.nivel (nenhuma
+// mudança de comportamento pro personagem de classe única).
+function nivelTotalPersonagem(c) {
+  const secundarias = Array.isArray(c?.classes_secundarias) ? c.classes_secundarias : [];
+  return (+c?.nivel || 1) + secundarias.reduce((soma, cl) => soma + (Math.max(0, +cl?.nivel || 0)), 0);
+}
+
 // Subclasses oficiais do PHB 5e por classe (chave normalizada → lista)
 const SUBCLASSES_POR_CLASSE = {
   'barbaro':    ['Caminho do Furioso', 'Caminho do Guerreiro Totêmico'],
@@ -131,12 +141,12 @@ function salvBonus(salv, k) { const v = salv?.[k]; return (v && typeof v === 'ob
 function valorSalvaguarda(c, atrKey) {
   const salv = c.salvaguardas || {};
   const m = mod((c.atributos || {})[atrKey] ?? 10);
-  return m + (salvProf(salv, atrKey) ? bonusProf(c.nivel) : 0) + salvBonus(salv, atrKey);
+  return m + (salvProf(salv, atrKey) ? bonusProf(nivelTotalPersonagem(c)) : 0) + salvBonus(salv, atrKey);
 }
 function valorPericia(c, periciaKey, atrKey) {
   const p = (c.pericias || {})[periciaKey] || {};
   const m = mod((c.atributos || {})[atrKey] ?? 10);
-  const bp = bonusProf(c.nivel);
+  const bp = bonusProf(nivelTotalPersonagem(c));
   return m + (p.prof ? bp : 0) + (p.exp ? bp : 0) + (+p.bonus || 0);
 }
 // Percepção passiva (10 + Percepção) — mesmo valor que a coluna percepcao_passiva
@@ -437,6 +447,19 @@ function alternarHabilidadeFavorita(slug) {
   if (atuais.has(slug)) atuais.delete(slug); else atuais.add(slug);
   charAtivo.habilidades_favoritas = Array.from(atuais);
   salvarHabilidadesFavoritas();
+}
+
+// Multiclasse (jog-4): array próprio (não um <input name=...> do form), tem
+// save dedicado no mesmo padrão de habilidades_favoritas/features_personalizadas
+// — precisa estar em salvar.js na lista de `delete payload.X` do autosave
+// genérico, senão uma submissão de outra aba pode sobrescrever com dado velho.
+async function salvarClassesSecundarias() {
+  if (!charAtivo?.id) return;
+  _ultimoSaveLocal = Date.now();
+  const { error } = await window.sb.from('characters')
+    .update({ classes_secundarias: charAtivo.classes_secundarias || [] })
+    .eq('id', charAtivo.id);
+  if (error) console.warn('[multiclasse] não persistiu (rode a migration 024_multiclasse.sql?):', error.message);
 }
 
 // ── Concentração (characters.concentracao {ativa,magia}, migration 021) ──

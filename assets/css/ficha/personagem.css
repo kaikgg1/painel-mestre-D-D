@@ -1,6 +1,14 @@
 /* assets/css/ficha/personagem.css — inspiração, retrato do personagem e o lock
    dos blocos de roleplay. */
 
+/* ===== Multiclasse (jog-4) ===== */
+#multiclasse-lista { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+.multiclasse-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  background: rgba(0,0,0,0.2); border: 1px solid var(--borda); border-radius: 4px;
+  padding: 8px 10px; font-size: 13px;
+}
+
 /* ===== Sub-navegação (jog-15) ===== */
 .subnav-pj {
   display: flex; flex-wrap: wrap; gap: var(--sp-2, 8px);

@@ -110,7 +110,7 @@ function renderResumoAtaques(c, atrs) {
   }
   return `<div class="resumo-ataques">
     ${armas.map((arma, i) => {
-      const calc = window.Ataques ? Ataques.calcular(arma, atrs, c.nivel) : null;
+      const calc = window.Ataques ? Ataques.calcular(arma, atrs, nivelTotalPersonagem(c)) : null;
       return `<div class="ataque-card">
         <div class="ataque-nome">${escape(arma.nome || 'Arma')}</div>
         ${calc ? `<div class="ataque-info">
@@ -275,7 +275,7 @@ function conectarListenersResumo() {
       const idx = +btn.dataset.resumoRolar;
       const arma = (charAtivo.inventario?.armas || [])[idx];
       if (!arma || !window.Ataques) return;
-      const r = Ataques.rolar(arma, charAtivo.atributos, charAtivo.nivel, _modoRolagem);
+      const r = Ataques.rolar(arma, charAtivo.atributos, nivelTotalPersonagem(charAtivo), _modoRolagem);
       const critico = r.critico ? ' · CRÍTICO!' : r.falhaCritica ? ' · falha crítica' : '';
       toast(`${arma.nome}: ataque ${r.ataqueTexto}${critico} · dano ${r.danoTexto}`);
     });

@@ -1207,6 +1207,48 @@ console.log('');
     const inspUnlocked = window.document.querySelector('input[name="inspiracao"]');
     if (!inspUnlocked || !inspUnlocked.closest('.no-lock')) erros.push('personagem: Inspiração deveria continuar .no-lock em modo destravado');
 
+    // Multiclasse (jog-4): adicionar Guerreiro nível 4 a um Clérigo nível 9
+    // cruza o degrau de bônus de proficiência (9 → 13 = +4 → +5) — confere
+    // que valorSalvaguarda (que usa nivelTotalPersonagem) reflete a soma, e
+    // que remover devolve tudo exatamente ao que era antes.
+    try {
+      const salvSabAntes = window.eval('valorSalvaguarda(charAtivo, "sab")');
+      if (salvSabAntes !== 9) erros.push('multiclasse: pré-condição errada — salvaguarda de Sabedoria esperada 9 antes de multiclassar, veio ' + salvSabAntes);
+
+      const selClasse = window.document.getElementById('mc-add-classe');
+      const inpNivel = window.document.getElementById('mc-add-nivel');
+      if (!selClasse || !inpNivel) erros.push('multiclasse: campos de adicionar classe secundária não encontrados');
+      else {
+        selClasse.value = 'Guerreiro';
+        inpNivel.value = '4';
+        window.document.getElementById('btn-mc-add')?.click();
+
+        const secundarias = window.eval('charAtivo.classes_secundarias') || [];
+        if (secundarias.length !== 1 || secundarias[0].classe !== 'Guerreiro' || secundarias[0].nivel !== 4) {
+          erros.push('multiclasse: adicionar não gravou {classe:"Guerreiro",nivel:4} em charAtivo.classes_secundarias — ' + JSON.stringify(secundarias));
+        }
+        const nivelTotal = window.eval('nivelTotalPersonagem(charAtivo)');
+        if (nivelTotal !== 13) erros.push('multiclasse: nível total esperado 9+4=13, veio ' + nivelTotal);
+        const p = window.__ultimoUpdatePayload;
+        if (!p || !('classes_secundarias' in p)) erros.push('multiclasse: adicionar não persistiu via window.sb.update()');
+
+        const salvSabDepois = window.eval('valorSalvaguarda(charAtivo, "sab")');
+        if (salvSabDepois !== 10) erros.push('multiclasse: salvaguarda de Sabedoria deveria subir de 9 pra 10 (bônus prof. 13º nível), veio ' + salvSabDepois);
+
+        const item = window.document.querySelector('#multiclasse-lista .multiclasse-item');
+        if (!item || !/Guerreiro/.test(item.textContent) || !/4/.test(item.textContent)) {
+          erros.push('multiclasse: item da lista não mostra "Guerreiro"/nível 4 — ' + (item?.textContent || '(nenhum item)'));
+        }
+
+        // Remove de novo — tudo volta exatamente ao estado original.
+        window.document.querySelector('[data-mc-rm="0"]')?.click();
+        const secundariasDepois = window.eval('charAtivo.classes_secundarias') || [];
+        if (secundariasDepois.length) erros.push('multiclasse: remover não esvaziou classes_secundarias — ' + JSON.stringify(secundariasDepois));
+        const salvSabFinal = window.eval('valorSalvaguarda(charAtivo, "sab")');
+        if (salvSabFinal !== 9) erros.push('multiclasse: remover a classe secundária deveria voltar a salvaguarda de Sabedoria pra 9, veio ' + salvSabFinal);
+      }
+    } catch (e) { erros.push('multiclasse: ' + e.message); }
+
     // Trava de novo pelo botão (ciclo completo) e devolve o padrão pros
     // blocos seguintes do smoke test (header etc. esperam travado).
     window.document.getElementById('btn-lock-toggle')?.click();

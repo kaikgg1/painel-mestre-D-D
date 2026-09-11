@@ -156,6 +156,7 @@ function campoLeitura(label, valorTexto) {
 
 function renderIdentidadeLeitura(c) {
   const campanhaLbl = c.campanha ? (CAMPANHAS.find(([k]) => k === c.campanha)?.[1] || c.campanha) : '';
+  const secundarias = Array.isArray(c.classes_secundarias) ? c.classes_secundarias : [];
   return `
     <h3>Personagem</h3>
     <div class="leitura-grid">
@@ -168,6 +169,14 @@ function renderIdentidadeLeitura(c) {
       ${campoLeitura('Alinhamento', c.alinhamento)}
       ${campoLeitura('Campanha', campanhaLbl)}
     </div>
+
+    ${secundarias.length ? `
+      <h3>Multiclasse</h3>
+      <div class="leitura-grid">
+        ${secundarias.map(cl => campoLeitura(cl.classe, `Nível ${cl.nivel}`)).join('')}
+        ${campoLeitura('Nível total', nivelTotalPersonagem(c))}
+      </div>
+    ` : ''}
 
     <h3>Idiomas e Ferramentas</h3>
     <div class="grid-2">
@@ -202,11 +211,41 @@ function renderIdentidadeEdicao(c) {
         <span class="ajuda">Salve a ficha para vincular à campanha escolhida.</span></div>
     </div>
 
+    <h3>Multiclasse <span class="ajuda-mini">(opcional)</span></h3>
+    ${renderMulticlasseEdicao(c)}
+
     <h3>Idiomas e Ferramentas</h3>
     <div class="grid-2">
       ${renderListaTags('idiomas', 'Idiomas', c.idiomas || ['Comum'])}
       ${renderListaTags('ferramentas', 'Proficiências em Ferramentas', c.ferramentas || [])}
     </div>
+  `;
+}
+
+// Multiclasse (jog-4): characters.classes_secundarias, array [{classe,nivel}]
+// além da classe/nível principal de sempre — soma no nível total (bônus de
+// proficiência e Dados de Vida recuperados no Descanso Longo, ver
+// nivelTotalPersonagem() em nucleo.js). Tem save dedicado (não é um <input
+// name=...> do form) — mesmo padrão de companions/features_personalizadas.
+function renderMulticlasseEdicao(c) {
+  const secundarias = Array.isArray(c.classes_secundarias) ? c.classes_secundarias : [];
+  return `
+    <div id="multiclasse-lista">
+      ${secundarias.length ? secundarias.map((cl, idx) => `
+        <div class="multiclasse-item">
+          <span>${escape(cl.classe)} — nível ${cl.nivel}</span>
+          <button type="button" class="lixo" data-mc-rm="${idx}" aria-label="Remover ${escape(cl.classe)}">✕</button>
+        </div>
+      `).join('') : '<div class="item-vazio">Nenhuma classe secundária.</div>'}
+    </div>
+    <div class="adicionar-bloco">
+      <div class="campo"><label>Classe</label>
+        <select id="mc-add-classe">${CLASSES.filter(Boolean).map(cl => `<option>${cl}</option>`).join('')}</select></div>
+      <div class="campo" style="max-width:100px"><label>Nível</label>
+        <input type="text" inputmode="numeric" id="mc-add-nivel" value="1" data-validar="int" data-min="1" data-max="19"></div>
+      <button type="button" class="btn" id="btn-mc-add">+ Adicionar</button>
+    </div>
+    ${secundarias.length ? `<p class="ajuda-mini">Nível total (multiclasse): <strong>${nivelTotalPersonagem(c)}</strong> — usado no bônus de proficiência e na recuperação de Dados de Vida no Descanso Longo.</p>` : ''}
   `;
 }
 

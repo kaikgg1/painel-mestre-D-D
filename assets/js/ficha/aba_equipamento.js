@@ -79,7 +79,7 @@ function renderEquipamento(c) {
         <h3 class="bloco-titulo">Armas</h3>
         <span class="contador-bloco">${inv.armas?.length || 0}</span>
       </div>
-      ${renderCardsArmas(inv.armas || [], c.atributos, c.nivel)}
+      ${renderCardsArmas(inv.armas || [], c.atributos, nivelTotalPersonagem(c))}
       <div class="adicionar-bloco">
         <button class="btn no-lock" type="button" id="btn-abrir-seletor-arma">${ico('buscar')} Adicionar arma do catálogo (${window.PHB.ARMAS.length})</button>
       </div>
