@@ -703,6 +703,63 @@ console.log('');
     : '  característica personalizada: adicionar/favoritar/remover (com Confirmar.perguntar) ok');
 }
 
+// Talento (feat) como tipo estruturado: marcar "É um talento", aplicar bônus
+// de atributo, desfazer, aplicar de novo e então remover a característica
+// AINDA com o bônus aplicado — o bônus tem que ser revertido automaticamente
+// (senão fica um +N órfão em Atributos sem explicação nenhuma).
+console.log('');
+{
+  const antes = erros.length;
+  const scHab = window.document.createElement('script');
+  scHab.textContent = 'tabAtiva = "habilidades"; render();';
+  window.document.head.appendChild(scHab);
+
+  try {
+    const forAntes = window.eval('charAtivo.atributos.for');
+    window.document.getElementById('btn-add-feature')?.click();
+    const idx = (window.eval('charAtivo.features_personalizadas') || []).length - 1;
+
+    const chk = window.document.querySelector(`[data-cfeat-talento="${idx}"]`);
+    if (!chk) erros.push('talento: checkbox "É um talento" não foi renderizado');
+    else {
+      chk.checked = true;
+      chk.dispatchEvent(new window.Event('change', { bubbles: true }));
+
+      const sel = window.document.querySelector(`[data-cfeat-talento-atr="${idx}"]`);
+      const bonusInp = window.document.querySelector(`[data-cfeat-talento-bonus="${idx}"]`);
+      if (!sel || !bonusInp) erros.push('talento: mini-formulário (atributo/bônus) não apareceu após marcar o checkbox');
+      else {
+        sel.value = 'for';
+        sel.dispatchEvent(new window.Event('change', { bubbles: true }));
+        bonusInp.value = '2';
+        bonusInp.dispatchEvent(new window.Event('change', { bubbles: true }));
+
+        window.document.querySelector(`[data-cfeat-talento-aplicar="${idx}"]`)?.click();
+        const forDepoisAplicar = window.eval('charAtivo.atributos.for');
+        if (forDepoisAplicar !== forAntes + 2) erros.push(`talento: aplicar bônus não somou +2 em FOR (antes=${forAntes} depois=${forDepoisAplicar})`);
+        if (!window.eval(`charAtivo.features_personalizadas[${idx}].talentoAplicado`)) erros.push('talento: talentoAplicado não ficou true após aplicar');
+
+        // Desfazer bônus (toggle) — deve voltar ao valor original.
+        window.document.querySelector(`[data-cfeat-talento-aplicar="${idx}"]`)?.click();
+        const forDepoisDesfazer = window.eval('charAtivo.atributos.for');
+        if (forDepoisDesfazer !== forAntes) erros.push(`talento: desfazer bônus não voltou FOR ao valor original (esperado=${forAntes} obtido=${forDepoisDesfazer})`);
+
+        // Aplica de novo e remove a característica ainda aplicada — o bônus
+        // tem que ser revertido junto com a remoção (senão fica órfão).
+        window.document.querySelector(`[data-cfeat-talento-aplicar="${idx}"]`)?.click();
+        window.document.querySelector(`[data-cfeat-rm="${idx}"]`)?.click();
+        await Promise.resolve().then(() => {}).then(() => {}); // deixa o await Confirmar.perguntar() (stub) resolver
+        const forDepoisRemover = window.eval('charAtivo.atributos.for');
+        if (forDepoisRemover !== forAntes) erros.push(`talento: remover característica com bônus aplicado não reverteu FOR (esperado=${forAntes} obtido=${forDepoisRemover})`);
+      }
+    }
+  } catch (e) { erros.push('talento: ciclo de aplicar/desfazer/remover → ' + e.message); }
+
+  console.log(erros.length > antes
+    ? '  FALHOU     talento com bônus de atributo (ver FALHAS abaixo)'
+    : '  talento (feat): marcar/aplicar/desfazer bônus + reversão automática ao remover ok');
+}
+
 // Magias (Fase 6): 3 magias reais de data/magias_data.json favoritadas
 // ("Bênção" 1º/Ação, "Arma Espiritual" 2º/Ação Bônus, "Augúrio" 2º/Ritual/
 // Outro) — filtros de nível/tipo/ritual isolam cada uma, e o fluxo de

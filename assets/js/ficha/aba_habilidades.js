@@ -395,6 +395,7 @@ function popularFeaturesPersonalizadas() {
           <div class="hab-feature-titulo">
             <input type="text" class="cfeat-nome" data-cfeat-field="nome" data-cfeat-idx="${idx}" value="${escape(f.nome || '')}" placeholder="Nome da característica" aria-label="Nome">
             <textarea class="cfeat-desc" data-cfeat-field="desc" data-cfeat-idx="${idx}" placeholder="Descrição (opcional)" aria-label="Descrição">${escape(f.desc || '')}</textarea>
+            ${renderTalentoBloco(f, idx)}
           </div>
           <div class="hab-tracker">
             ${renderTrackerUsos(maxEfetivo, usos, disp, null, i => `data-cfeat-slug="${slug}" data-cfeat-idx-pip="${i}"`)}
@@ -446,6 +447,62 @@ function popularFeaturesPersonalizadas() {
     });
   });
 
+  // Talento: checkbox liga/desliga o mini-formulário de bônus de atributo
+  wrap.querySelectorAll('[data-cfeat-talento]').forEach(chk => {
+    chk.addEventListener('change', () => {
+      const idx = +chk.dataset.cfeatTalento;
+      if (!charAtivo.features_personalizadas[idx]) return;
+      charAtivo.features_personalizadas[idx].talento = chk.checked;
+      salvarFeaturesPersonalizadas();
+      popularFeaturesPersonalizadas();
+    });
+  });
+  wrap.querySelectorAll('[data-cfeat-talento-atr]').forEach(sel => {
+    sel.addEventListener('change', () => {
+      const idx = +sel.dataset.cfeatTalentoAtr;
+      if (!charAtivo.features_personalizadas[idx]) return;
+      charAtivo.features_personalizadas[idx].talentoAtributo = sel.value;
+      salvarFeaturesPersonalizadas();
+    });
+  });
+  wrap.querySelectorAll('[data-cfeat-talento-bonus]').forEach(inp => {
+    inp.addEventListener('change', () => {
+      const idx = +inp.dataset.cfeatTalentoBonus;
+      if (!charAtivo.features_personalizadas[idx]) return;
+      charAtivo.features_personalizadas[idx].talentoBonus = parseInt(inp.value, 10) || 1;
+      salvarFeaturesPersonalizadas();
+    });
+  });
+  wrap.querySelectorAll('[data-cfeat-talento-aplicar]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const idx = +btn.dataset.cfeatTalentoAplicar;
+      const f = charAtivo.features_personalizadas[idx];
+      if (!f) return;
+      const attr = f.talentoAtributo || ATRIBUTOS[0][0];
+      const valor = +f.talentoBonus || 1;
+      const atrs = charAtivo.atributos || {};
+      if (f.talentoAplicado) {
+        atrs[attr] = Math.max(1, (+atrs[attr] || 10) - valor);
+        f.talentoAplicado = false;
+        toast(`Bônus de talento desfeito: −${valor} ${attr.toUpperCase()}`);
+      } else {
+        f.talentoAtributo = attr;
+        f.talentoBonus = valor;
+        atrs[attr] = (+atrs[attr] || 10) + valor;
+        f.talentoAplicado = true;
+        toast(`Bônus de talento aplicado: +${valor} ${attr.toUpperCase()}`);
+      }
+      charAtivo.atributos = atrs;
+      salvarFeaturesPersonalizadas();
+      // Atributos não têm save dedicado — vão pelo autosave normal do form
+      // (aba Personagem); grava direto aqui pra não depender do jogador
+      // estar naquela aba nem esperar o debounce.
+      _ultimoSaveLocal = Date.now();
+      window.sb.from('characters').update({ atributos: atrs }).eq('id', charAtivo.id);
+      popularFeaturesPersonalizadas();
+    });
+  });
+
   wrap.querySelectorAll('.hab-tracker-max[data-cfeat-max]').forEach(inp => {
     inp.addEventListener('change', () => {
       const idx = +inp.dataset.cfeatMax;
@@ -485,6 +542,15 @@ function popularFeaturesPersonalizadas() {
           charAtivo.habilidades_favoritas = charAtivo.habilidades_favoritas.filter(s => s !== slug);
           salvarHabilidadesFavoritas();
         }
+        // Talento com bônus ainda aplicado: desfaz antes de apagar, senão o
+        // bônus fica "órfão" nos Atributos sem explicação nenhuma.
+        if (f.talentoAplicado) {
+          const atrs = charAtivo.atributos || {};
+          const attr = f.talentoAtributo;
+          atrs[attr] = Math.max(1, (+atrs[attr] || 10) - (+f.talentoBonus || 1));
+          charAtivo.atributos = atrs;
+          window.sb.from('characters').update({ atributos: atrs }).eq('id', charAtivo.id);
+        }
       }
       charAtivo.features_personalizadas.splice(idx, 1);
       salvarFeaturesPersonalizadas();
@@ -494,6 +560,31 @@ function popularFeaturesPersonalizadas() {
   });
 
   aplicarFiltroHabilidades();
+}
+
+// Talento (feat) como tipo estruturado — a maioria dos talentos do PHB dá
+// +1 (ou +2, alguns "Half-Feat") num atributo à escolha, além do efeito de
+// texto livre. Em vez de o jogador ter que lembrar de somar isso na aba
+// Personagem, marcar "É um talento" com um bônus escolhido soma direto em
+// characters.atributos (uma vez só — como se fosse a ASI/meio-talento sendo
+// gasta), reversível clicando de novo antes de trocar a escolha.
+function renderTalentoBloco(f, idx) {
+  const aplicado = !!f.talentoAplicado;
+  return `
+    <label class="editor-check cfeat-talento-check">
+      <input type="checkbox" ${f.talento ? 'checked' : ''} data-cfeat-talento="${idx}" ${aplicado ? 'disabled' : ''}> É um talento (feat) com bônus de atributo
+    </label>
+    ${f.talento ? `
+      <div class="cfeat-talento-bloco">
+        <select data-cfeat-talento-atr="${idx}" ${aplicado ? 'disabled' : ''} aria-label="Atributo do bônus">
+          ${ATRIBUTOS.map(([k, nome]) => `<option value="${k}" ${f.talentoAtributo === k ? 'selected' : ''}>${nome}</option>`).join('')}
+        </select>
+        <input type="text" inputmode="numeric" class="bonus-input" value="${f.talentoBonus ?? 1}" data-cfeat-talento-bonus="${idx}" ${aplicado ? 'disabled' : ''} aria-label="Valor do bônus" style="max-width:56px">
+        <button type="button" class="btn no-lock" data-cfeat-talento-aplicar="${idx}">${aplicado ? 'Desfazer bônus' : 'Aplicar bônus'}</button>
+        ${aplicado ? `<span class="ajuda-mini">+${f.talentoBonus} ${ATRIBUTOS.find(a=>a[0]===f.talentoAtributo)?.[1]||''} já somado nos Atributos</span>` : ''}
+      </div>
+    ` : ''}
+  `;
 }
 
 function adicionarFeaturePersonalizada() {
