@@ -7,6 +7,11 @@
    que é específico do HP completo (painel de dano/cura + 8 atalhos) e das
    listas compactas de salvaguardas/perícias. */
 .combate-topo { margin-bottom: var(--sp-5); }
+.descanso-bar {
+  display: flex; gap: var(--sp-3); flex-wrap: wrap;
+  margin: var(--sp-4) 0 var(--sp-5);
+}
+.descanso-bar .btn { flex: 1 1 160px; }
 .stat-card.stat-hp {
   flex: 2 1 260px; text-align: left;
   background: var(--sf-2); /* levemente elevado — é o dado mais importante da tela */

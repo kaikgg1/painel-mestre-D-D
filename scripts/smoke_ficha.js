@@ -114,6 +114,10 @@ window.addEventListener('error', e => {
   const linha = e.error && e.error.stack ? e.error.stack.split('\n').slice(0, 4).join(' | ') : (e.message || String(e.error));
   erros.push(linha);
 });
+window.addEventListener('unhandledrejection', e => {
+  const linha = e.reason && e.reason.stack ? e.reason.stack.split('\n').slice(0, 4).join(' | ') : String(e.reason);
+  erros.push('REJEIÇÃO NÃO TRATADA: ' + linha);
+});
 const vc = dom.virtualConsole || null;
 
 // A partir daqui tudo roda dentro de uma IIFE async: a Fase 5 precisa
@@ -393,6 +397,108 @@ console.log('');
   console.log(erros.length > antes
     ? '  FALHOU     combate (ver FALHAS abaixo)'
     : '  aba combate: acordeão de perícia/salvaguarda + condições reaproveitadas + símbolo ao vivo ok');
+
+  // Descanso Longo (Fase 5, correção da auditoria): clique de verdade no
+  // botão, confere que TODOS os slots de magia zeram, PV volta ao máximo,
+  // dado de vida recupera (capado no nível) e o recurso auto-detectado
+  // (Canalizar Divindade) também zera — e que tudo isso é persistido via
+  // window.sb.update (não só mutado em memória).
+  {
+    const antes = erros.length;
+    try {
+      // O teste anterior (toggle de Percepção/Intuição) disparou 'change' no
+      // form, que agenda o auto-save de verdade (debounce de 800ms,
+      // listeners.js). Drena esse auto-save ANTES de mutar nada aqui: espera
+      // o suficiente pra ele disparar e terminar (o mock de window.sb
+      // resolve na hora, então não precisa esperar 800ms de verdade — só o
+      // bastante pra qualquer requisição já EM VOO nesse instante assentar).
+      await new Promise(r => setTimeout(r, 30));
+      window.eval('if (typeof _debounceTimers !== "undefined") { _debounceTimers.forEach(t => clearTimeout(t)); _debounceTimers.clear(); }');
+      await Promise.resolve();
+
+      // Só agora, com nenhum auto-save pendente, muta o estado de teste
+      // (reduz o dado de vida artificialmente pra testar a recuperação —
+      // o PJ de teste normalmente já está com o dado de vida cheio).
+      window.eval(`
+        charAtivo.dado_vida_atual = 2; charAtivo.hp_atual = 10;
+        const _i1 = document.querySelector('[name="dado_vida_atual"]'); if (_i1) _i1.value = '2';
+        const _i2 = document.querySelector('[name="hp_atual"]'); if (_i2) _i2.value = '10';
+      `);
+      window.__ultimoUpdatePayload = null;
+      const btnLongo = window.document.querySelector('[data-descanso="longo"]');
+      if (!btnLongo) erros.push('descanso: botão "Descanso Longo" não encontrado na aba Combate');
+      else {
+        btnLongo.click();
+        // aplicarDescanso é assíncrona (fetch de habilidades_classes.json + update);
+        // dá tempo pra cadeia de promises resolver antes de checar o resultado.
+        for (let i = 0; i < 5; i++) await Promise.resolve();
+
+        const sm = window.eval('charAtivo.slots_magia');
+        const algumSlotAindaGasto = Object.values(sm).some(s => (s.atual || 0) > 0);
+        if (algumSlotAindaGasto) erros.push('descanso longo: nem todos os slots de magia zeraram — ' + JSON.stringify(sm));
+
+        const hpDepois = window.eval('charAtivo.hp_atual');
+        const hpMax = window.eval('charAtivo.hp_max');
+        if (hpDepois !== hpMax) erros.push(`descanso longo: PV não voltou ao máximo (hp_atual=${hpDepois}, hp_max=${hpMax})`);
+
+        const dvDepois = window.eval('charAtivo.dado_vida_atual');
+        // nível 9 → recupera max(1, floor(9/2))=4, de 2 pra 6 (capado em 9)
+        if (dvDepois !== 6) erros.push('descanso longo: dado de vida deveria ir de 2 pra 6, foi pra ' + dvDepois);
+
+        const canalizar = (window.eval('charAtivo.recursos_usados') || {}).canalizar_divindade;
+        const canalizarZerado = !canalizar || (typeof canalizar === 'object' ? (canalizar.atual || 0) === 0 : canalizar === 0);
+        if (!canalizarZerado) erros.push('descanso longo: Canalizar Divindade não zerou — ' + JSON.stringify(canalizar));
+
+        const p = window.__ultimoUpdatePayload;
+        if (!p || !('slots_magia' in p) || !('hp_atual' in p) || !('dado_vida_atual' in p)) {
+          erros.push('descanso longo: payload persistido incompleto — ' + JSON.stringify(p));
+        }
+      }
+    } catch (e) { erros.push('descanso longo: ' + e.message); }
+    console.log(erros.length > antes
+      ? '  FALHOU     descanso longo (ver FALHAS abaixo)'
+      : '  aba combate: botão Descanso Longo reseta slots/recursos + restaura PV + recupera dado de vida ok');
+
+    // Devolve o estado exatamente como a fixture original definiu — os
+    // testes seguintes (inclusive "salvar() real a partir de Combate",
+    // mais abaixo) esperam os valores originais do personagem de exemplo.
+    window.eval(`
+      charAtivo.hp_atual = 42;
+      charAtivo.dado_vida_atual = 9;
+      charAtivo.slots_magia = { 1:{max:4,atual:2}, 2:{max:3,atual:0}, 3:{max:3,atual:1}, 4:{max:3,atual:0}, 5:{max:1,atual:0} };
+      charAtivo.recursos_usados = { canalizar_divindade: 1 };
+      render();
+    `);
+  }
+
+  // Descanso Curto (mesma função, ramo diferente): checagem leve — não
+  // deve lançar, não deve mexer em PV/dado de vida (só o longo faz isso),
+  // e o Clérigo de teste não tem Magia do Pacto, então slots_magia não
+  // deveria mudar nesse personagem específico.
+  {
+    const antes = erros.length;
+    try {
+      await new Promise(r => setTimeout(r, 30));
+      window.eval('if (typeof _debounceTimers !== "undefined") { _debounceTimers.forEach(t => clearTimeout(t)); _debounceTimers.clear(); }');
+      await Promise.resolve();
+      window.__ultimoUpdatePayload = null;
+      const btnCurto = window.document.querySelector('[data-descanso="curto"]');
+      if (!btnCurto) erros.push('descanso: botão "Descanso Curto" não encontrado na aba Combate');
+      else {
+        btnCurto.click();
+        for (let i = 0; i < 5; i++) await Promise.resolve();
+        const hpDepois = window.eval('charAtivo.hp_atual');
+        if (hpDepois !== 42) erros.push('descanso curto: não deveria mexer em PV (hp_atual virou ' + hpDepois + ')');
+        const sm = window.eval('charAtivo.slots_magia');
+        if (sm['1'].atual !== 2) erros.push('descanso curto: não deveria mexer em slots_magia de um Clérigo (sem Magia do Pacto) — slot 1 atual=' + sm['1'].atual);
+        if (!window.__ultimoUpdatePayload) erros.push('descanso curto: não persistiu nada via window.sb.update()');
+      }
+    } catch (e) { erros.push('descanso curto: ' + e.message); }
+    console.log(erros.length > antes
+      ? '  FALHOU     descanso curto (ver FALHAS abaixo)'
+      : '  aba combate: botão Descanso Curto não mexe em PV/dado de vida/slots de classe comum ok');
+    window.eval('charAtivo.hp_atual = 42; render();');
+  }
 
   // Invariante crítica (Fase 4): campos dentro de [hidden] (editores em
   // acordeão) e dentro de um <details> FECHADO (bloco de conjuração) ainda

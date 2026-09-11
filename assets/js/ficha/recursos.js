@@ -350,3 +350,81 @@ function abrirModalConversorFeit() {
   });
 }
 
+/* ============================================================
+   DESCANSO CURTO / LONGO — aplica a regra do PHB em lote, em vez de
+   o jogador ter que clicar em cada pip de cada slot/recurso um por um.
+
+   Curto: reseta slots de Magia do Pacto (Bruxo) + recursos/habilidades
+   cujo período detectado contém "curto".
+   Longo: reseta TODOS os slots de magia + todos os recursos/habilidades
+   marcados por descanso (curto OU longo — descanso longo recupera tudo
+   que um curto recupera, e mais), restaura PV ao máximo e recupera
+   metade dos Dados de Vida (mínimo 1), arredondado pra baixo — regra
+   do PHB 2014. NÃO mexe em exaustão: no PHB 2014 (a base usada nesta
+   ficha, ver assets/js/exaustao_regras.js) um descanso longo comum não
+   reduz exaustão — isso exige magia ou repouso prolongado específico,
+   não é automático.
+   ============================================================ */
+async function aplicarDescanso(tipo) {
+  if (!charAtivo?.id) return;
+  const longo = tipo === 'longo';
+  const rec = Object.assign({}, charAtivo.recursos_usados || {});
+
+  // 1) Recursos de classe (RecursosClasse) — período já estruturado.
+  for (const r of recursosPara(charAtivo, charAtivo.atributos)) {
+    const curto = /curto/i.test(r.periodo || '');
+    if (longo || curto) gravarUsadoRecurso(rec, r.id, 0);
+  }
+
+  // 2) Habilidades de classe com tracker de uso auto-detectado (mesma
+  // detecção usada em popularHabilidades, aba_habilidades.js).
+  if (charAtivo.classe && typeof carregarHabilidadesClasses === 'function') {
+    const db = await carregarHabilidadesClasses();
+    const todas = (db && db[chaveDeClasse(charAtivo.classe)]) || [];
+    const habs = todas.filter(h => h.nivel <= (charAtivo.nivel || 1) && (!h.subclasse || h.subclasse === charAtivo.subclasse));
+    for (const h of habs) {
+      const detectado = typeof detectarUsosLimitados === 'function' ? detectarUsosLimitados(h) : null;
+      if (!detectado) continue;
+      const periodoTxt = detectado.periodo || '';
+      if (/turno/i.test(periodoTxt)) continue;  // não recupera com descanso
+      const curto = /curto/i.test(periodoTxt);
+      if (!longo && !curto) continue;
+      const slug = slugFeature(h.nome);
+      const cur = rec[slug] || { atual: 0, max: detectado.max };
+      rec[slug] = Object.assign({}, cur, { atual: 0 });
+    }
+  }
+
+  // 3) Slots de magia — descanso curto só recupera Magia do Pacto (Bruxo);
+  // descanso longo recupera todos os níveis.
+  const sm = Object.assign({}, charAtivo.slots_magia || {});
+  const tipoSlot = (window.SlotsPHB && charAtivo.classe)
+    ? window.SlotsPHB.tipoDaClasse(charAtivo.classe, charAtivo.subclasse) : null;
+  for (const lvl of Object.keys(sm)) {
+    if (longo || tipoSlot === 'pact') sm[lvl] = Object.assign({}, sm[lvl], { atual: 0 });
+  }
+
+  const payload = { recursos_usados: rec, slots_magia: sm };
+  let msg = longo ? 'Descanso longo aplicado' : 'Descanso curto aplicado';
+
+  if (longo) {
+    const hpMax = charAtivo.hp_max ?? charAtivo.hp_atual ?? 0;
+    payload.hp_atual = hpMax;
+    const totalDados = Math.max(1, +charAtivo.nivel || 1);
+    const recuperar = Math.max(1, Math.floor(totalDados / 2));
+    payload.dado_vida_atual = Math.min(totalDados, (+charAtivo.dado_vida_atual || 0) + recuperar);
+    msg += ` — PV restaurado, +${recuperar} dado${recuperar > 1 ? 's' : ''} de vida recuperado${recuperar > 1 ? 's' : ''}`;
+  }
+
+  Object.assign(charAtivo, payload);
+  _ultimoSaveLocal = Date.now();
+  const { error } = await window.sb.from('characters').update(payload).eq('id', charAtivo.id);
+  if (error) {
+    console.warn('[descanso] erro ao salvar:', error);
+    toast('⚠ Erro ao aplicar descanso — tente de novo');
+    return;
+  }
+  render();
+  toast(msg);
+}
+

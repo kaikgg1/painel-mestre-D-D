@@ -111,6 +111,11 @@ function renderCombate(c) {
     </div>
     <div id="exaustao-resumo"></div>
 
+    <div class="descanso-bar" role="group" aria-label="Aplicar descanso">
+      <button type="button" class="btn no-lock" data-descanso="curto">${ico('folego')} Descanso Curto</button>
+      <button type="button" class="btn no-lock" data-descanso="longo">${ico('descanso')} Descanso Longo</button>
+    </div>
+
     <h3>Condições</h3>
     ${renderCondicoesBloco('combate-condicoes-wrap', ativas)}
 
@@ -209,6 +214,10 @@ function conectarListenersCombate() {
   });
 
   conectarListenersCondicoes('combate-condicoes-wrap');
+
+  document.querySelectorAll('[data-descanso]').forEach(btn => {
+    btn.addEventListener('click', () => aplicarDescanso(btn.dataset.descanso));
+  });
 }
 
 // Aplica os efeitos de exaustão do PHB (2014) nos avisos da aba Combate —
