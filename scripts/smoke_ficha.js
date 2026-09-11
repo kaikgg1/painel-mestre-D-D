@@ -1106,6 +1106,20 @@ console.log('');
     if (!window.document.querySelector('textarea[name="tracos_raciais"]')) erros.push('personagem: <textarea name="tracos_raciais"> deveria continuar visível mesmo travado');
     if (!window.document.querySelector('input[name="attr_for"]')) erros.push('personagem: input de atributo (attr_for) deveria continuar visível mesmo travado');
 
+    // Sub-navegação (jog-15): 4 pills, cada uma aponta pra uma seção que
+    // existe de verdade, e clicar troca qual pill fica "ativo".
+    const pills = Array.from(window.document.querySelectorAll('[data-subnav]'));
+    if (pills.length !== 4) erros.push('personagem: sub-navegação deveria ter 4 pills, achou ' + pills.length);
+    else {
+      for (const p of pills) {
+        if (!window.document.getElementById(p.dataset.subnav)) erros.push('personagem: pill de sub-navegação aponta pra seção inexistente (#' + p.dataset.subnav + ')');
+      }
+      if (!pills[0].classList.contains('ativo')) erros.push('personagem: primeira pill (Identidade) deveria nascer "ativo"');
+      pills[1].click();
+      if (pills[0].classList.contains('ativo')) erros.push('personagem: clicar na 2ª pill deveria tirar "ativo" da 1ª');
+      if (!pills[1].classList.contains('ativo')) erros.push('personagem: clicar na 2ª pill deveria marcá-la "ativo"');
+    }
+
     // Destrava via o MESMO fluxo do botão do header (toggle real via clique,
     // não chamada direta a render()) — cobre o listener de header.js inteiro.
     window.document.getElementById('btn-lock-toggle')?.click();

@@ -100,27 +100,50 @@ function renderTab(c, atrs) {
 // sempre (form fields sujeitos ao lock genérico de sistema.css, igual a
 // qualquer outra aba). Retrato/História/Notas/Inspiração (aba_roleplay.js)
 // também ficam de fora — o §16 pede que continuem como estão.
+// Sub-navegação (jog-15): a aba Personagem reúne 4 seções bem distintas
+// (Identidade, Raciais, Atributos, Roleplay) numa rolagem só — os pills
+// abaixo só pulam pra âncora de cada uma, sem duplicar dado nenhum nem virar
+// sub-abas de verdade (tudo continua no mesmo <form>, autosave intacto).
+const SUBNAV_PERSONAGEM = [
+  ['pj-sec-identidade', 'Identidade'],
+  ['pj-sec-racial', 'Raciais'],
+  ['pj-sec-atributos', 'Atributos'],
+  ['pj-sec-roleplay', 'Roleplay'],
+];
+
 function renderPersonagem(c, atrs) {
   return `
-    ${estaDesbloqueado() ? renderIdentidadeEdicao(c) : renderIdentidadeLeitura(c)}
+    <nav class="subnav-pj" aria-label="Seções do Personagem">
+      ${SUBNAV_PERSONAGEM.map(([id, rotulo], i) => `<button type="button" class="pill ${i===0?'ativo':''}" data-subnav="${id}">${rotulo}</button>`).join('')}
+    </nav>
 
-    <h3>Características Raciais</h3>
-    <div class="campo">
-      <textarea name="tracos_raciais" placeholder="Ex.: Visão no Escuro 18m, Resistência Anã, Proficiência em Machados">${escape(c.tracos_raciais||'')}</textarea>
+    <div id="pj-sec-identidade">
+      ${estaDesbloqueado() ? renderIdentidadeEdicao(c) : renderIdentidadeLeitura(c)}
     </div>
 
-    <h3>Atributos</h3>
-    <div class="grid-6">
-      ${ATRIBUTOS.map(([k, nome]) => `
-        <div class="atributo">
-          <span class="nome-atr">${nome.slice(0,3).toUpperCase()}</span>
-          <input type="text" inputmode="numeric" class="valor-base" name="attr_${k}" value="${atrs[k] ?? 10}" data-attr="${k}" data-validar="int" data-min="1" data-max="30" aria-label="${nome} (valor base 1-30)">
-          <span class="modificador" data-mod="${k}">${fmtMod(mod(atrs[k]))}</span>
-        </div>
-      `).join('')}
+    <div id="pj-sec-racial">
+      <h3>Características Raciais</h3>
+      <div class="campo">
+        <textarea name="tracos_raciais" placeholder="Ex.: Visão no Escuro 18m, Resistência Anã, Proficiência em Machados">${escape(c.tracos_raciais||'')}</textarea>
+      </div>
     </div>
 
-    ${renderRoleplayBloco(c)}
+    <div id="pj-sec-atributos">
+      <h3>Atributos</h3>
+      <div class="grid-6">
+        ${ATRIBUTOS.map(([k, nome]) => `
+          <div class="atributo">
+            <span class="nome-atr">${nome.slice(0,3).toUpperCase()}</span>
+            <input type="text" inputmode="numeric" class="valor-base" name="attr_${k}" value="${atrs[k] ?? 10}" data-attr="${k}" data-validar="int" data-min="1" data-max="30" aria-label="${nome} (valor base 1-30)">
+            <span class="modificador" data-mod="${k}">${fmtMod(mod(atrs[k]))}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>
+
+    <div id="pj-sec-roleplay">
+      ${renderRoleplayBloco(c)}
+    </div>
   `;
 }
 

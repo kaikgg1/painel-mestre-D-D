@@ -1,6 +1,14 @@
 /* assets/css/ficha/personagem.css — inspiração, retrato do personagem e o lock
    dos blocos de roleplay. */
 
+/* ===== Sub-navegação (jog-15) ===== */
+.subnav-pj {
+  display: flex; flex-wrap: wrap; gap: var(--sp-2, 8px);
+  margin-bottom: var(--sp-5, 16px);
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--borda);
+}
+
 /* ===== Inspiração (Roleplay) ===== */
 .insp-wrap {
   display: flex; align-items: center; justify-content: center;

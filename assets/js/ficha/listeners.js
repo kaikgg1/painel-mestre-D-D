@@ -279,6 +279,14 @@ function conectarListeners() {
   // Bloco separado do de cima de propósito (mesma condição, escopos
   // isolados) — mais simples e seguro que interligar as duas const/let.
   if (tabAtiva === 'personagem') {
+    // Sub-navegação (jog-15): pill clicado rola até a seção e vira o "ativo".
+    $$('[data-subnav]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.getElementById(btn.dataset.subnav)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        $$('[data-subnav]').forEach(b => b.classList.toggle('ativo', b === btn));
+      });
+    });
+
     const inp = document.getElementById('input-imagem');
     const prev = document.getElementById('retrato-preview');
     const arquivo = document.getElementById('input-arquivo');
