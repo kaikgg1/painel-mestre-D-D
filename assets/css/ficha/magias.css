@@ -14,7 +14,7 @@
 .magia-item.aberta { border-color: var(--borda-ouro); }
 .magia-row:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
 .magia-row {
-  display: grid; grid-template-columns: 50px 1fr 100px 110px 28px;
+  display: grid; grid-template-columns: 50px 1fr 100px 110px 28px 28px;
   gap: 10px; align-items: center;
   padding: 10px 12px; cursor: pointer;
   user-select: none;
@@ -28,6 +28,15 @@
   background: rgba(138,70,64,0.3); color: #a56b5a;
   font-family: var(--f-ui); letter-spacing: 0.5px;
 }
+.magia-fav-btn {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: transparent; border: 1px solid var(--borda);
+  color: var(--gold-light); font-size: 13px; line-height: 1;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: color .15s, border-color .15s, background .15s;
+}
+.magia-fav-btn:hover { border-color: var(--borda-ouro); background: var(--sf-ouro); }
+.magia-fav-btn:disabled { opacity: 0.5; cursor: default; }
 .magia-chevron {
   color: var(--gold); font-size: 14px; text-align: center;
   transition: transform 0.2s;
@@ -145,8 +154,9 @@
 .toast-conjurar strong { color: #b8a0cc; }
 
 @media (max-width: 600px) {
-  .magia-row { grid-template-columns: 40px 1fr 24px; row-gap: 4px; }
-  .magia-escola, .magia-tags { grid-column: 2 / 4; font-size: 10px; }
+  .magia-row { grid-template-columns: 40px 1fr 24px 24px; row-gap: 4px; }
+  .magia-escola, .magia-tags { grid-column: 2 / 5; font-size: 10px; }
+  .magia-fav-btn { width: 24px; height: 24px; font-size: 12px; }
   .magia-info { grid-template-columns: 1fr 1fr; }
   .modal-card { padding: 18px; max-width: 100%; }
   .modal-slots { grid-template-columns: repeat(3, 1fr); gap: 6px; }

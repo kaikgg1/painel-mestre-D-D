@@ -71,6 +71,13 @@ function construirQuery(tabela, payloadUpdate) {
       // E concentracao em updates separados) e um teste que só olha o
       // "último" pode pegar o update errado dependendo da ordem.
       (window.__todosUpdatePayloads = window.__todosUpdatePayloads || []).push(payload);
+      // spell_lists: reflete o update no fixture de favoritas, senão um
+      // teste que remove uma favorita e depois recarrega a lista (que
+      // consulta spell_lists de novo) veria o array antigo, como se a
+      // remoção nunca tivesse sido persistida.
+      if (tabela === 'spell_lists' && Array.isArray(payload?.spell_names)) {
+        window.__magiasFavoritasTeste = payload.spell_names;
+      }
       return construirQuery(tabela, payload);
     },
     single: async () => ({ data: payloadUpdate ? { ...payloadUpdate } : {}, error: null }),
@@ -887,6 +894,33 @@ console.log('');
       if (window.document.querySelector('.modal-overlay')) erros.push('magias: modal de Conjurar não fechou após escolher o slot');
     }
   } catch (e) { erros.push('magias: fluxo de Conjurar → ' + e.message); }
+
+  // Estrela ★ (jog-12): remove uma magia das preparadas direto na ficha,
+  // sem precisar abrir o Grimório (paineis/magias.html) — persiste em
+  // spell_lists e a lista recarrega sem a magia removida.
+  try {
+    // O Conjurar de "Bênção" acima terminou com um render() completo da aba
+    // (aba_magias.js), que reagenda carregarMagiasPreparadas() de novo
+    // (listeners.js) — espera essa recarga assíncrona terminar antes de
+    // procurar o botão, senão #magias-prep ainda está em "Carregando…".
+    const magiasWrapAntes = () => window.document.getElementById('magias-prep');
+    for (let i = 0; i < 50 && magiasWrapAntes() && /Carregando/.test(magiasWrapAntes().textContent); i++) {
+      await new Promise(r => setTimeout(r, 20));
+    }
+    const btnFav = Array.from(window.document.querySelectorAll('[data-magia-fav]'))
+      .find(b => b.dataset.magiaFav === 'Augúrio');
+    if (!btnFav) erros.push('magias: botão ★ de remover das preparadas não encontrado em "Augúrio"');
+    else {
+      btnFav.click();
+      // removerMagiaFavoritaFicha() + a recarga de carregarMagiasPreparadas()
+      // que ela dispara em seguida encadeiam vários awaits reais (não só
+      // microtasks) — espera tempo real em vez de só Promise.resolve().
+      await new Promise(r => setTimeout(r, 30));
+      const nomesRestantes = itens().map(el => el.querySelector('.magia-nome')?.textContent);
+      if (nomesRestantes.includes('Augúrio')) erros.push('magias: ★ clicado em "Augúrio" mas ela continua nas preparadas — ' + JSON.stringify(nomesRestantes));
+      if (itens().length !== 2) erros.push('magias: esperava 2 magias preparadas após remover 1 de 3, ficaram ' + itens().length);
+    }
+  } catch (e) { erros.push('magias: remover favorita pela estrela → ' + e.message); }
 
   window.__magiasFavoritasTeste = null;
   console.log(erros.length > antes

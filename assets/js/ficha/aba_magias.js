@@ -184,6 +184,7 @@ async function carregarMagiasPreparadas() {
         <span class="magia-nome">${escape(m.nome)}</span>
         <span class="magia-escola">${escape(m.escola)}</span>
         <span class="magia-tags">${tags}</span>
+        <button type="button" class="magia-fav-btn no-lock" data-magia-fav="${escape(m.nome)}" aria-label="Remover das preparadas" title="Deixar de preparar (some daqui, continua no Grimório)">★</button>
         <span class="magia-chevron" aria-hidden="true">▸</span>
       </div>
       <div class="magia-detalhe">
@@ -226,8 +227,45 @@ async function carregarMagiasPreparadas() {
     });
   });
 
+  // Estrela ★: deixa de preparar sem precisar sair pro Grimório
+  // (paineis/magias.html) só pra desmarcar — a magia continua lá, só some
+  // desta lista de preparadas.
+  wrap.querySelectorAll('[data-magia-fav]').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const nome = btn.dataset.magiaFav;
+      btn.disabled = true;
+      const ok = await removerMagiaFavoritaFicha(nome);
+      if (ok) {
+        toast(`"${nome}" removida das preparadas`);
+        carregarMagiasPreparadas();
+      } else {
+        btn.disabled = false;
+        toast('Erro ao remover — tente de novo');
+      }
+    });
+  });
+
   conectarListenersFiltroMagias();
   aplicarFiltroMagias();
+}
+
+// Remove uma magia da lista "Favoritas" (spell_lists) do PJ ativo — mesma
+// tabela usada pelo Grimório (assets/js/favoritas.js), só que direto daqui
+// pra não obrigar o jogador a abrir outra página só pra desmarcar.
+async function removerMagiaFavoritaFicha(nome) {
+  if (!window.sb || !charAtivo?.id) return false;
+  const { data: existente, error: errBusca } = await window.sb
+    .from('spell_lists')
+    .select('id, spell_names')
+    .eq('character_id', charAtivo.id)
+    .eq('nome', 'Favoritas')
+    .maybeSingle();
+  if (errBusca || !existente) { console.warn('[magias] remover favorita:', errBusca?.message); return false; }
+  const novaLista = (existente.spell_names || []).filter(n => n !== nome);
+  const { error } = await window.sb.from('spell_lists').update({ spell_names: novaLista }).eq('id', existente.id);
+  if (error) { console.warn('[magias] remover favorita:', error.message); return false; }
+  return true;
 }
 
 // ─── Modal de Conjurar (escolha de slot) ─────────────────────────
