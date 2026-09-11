@@ -208,6 +208,14 @@ function conectarListeners() {
     }
     // Dispara input event para auto-save pegar (valor final)
     hpAtual.dispatchEvent(new Event('input', { bubbles: true }));
+
+    // Lembrete de teste de concentração (PHB): tomar dano enquanto
+    // concentrado exige um teste de Constituição, CD 10 ou metade do dano
+    // (o que for maior). A ficha não rola por você — só lembra a CD.
+    if (delta < 0 && charAtivo?.concentracao?.ativa) {
+      const cd = Math.max(10, Math.floor(-delta / 2));
+      toast(`◐ Teste de Constituição CD ${cd} pra manter a concentração em "${charAtivo.concentracao.magia}"`, 'encantamento');
+    }
   }
 
   document.querySelectorAll('[data-aplicar]').forEach(btn => {

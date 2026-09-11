@@ -63,7 +63,16 @@ function construirQuery(tabela, payloadUpdate) {
     select: () => builder,
     eq: () => builder,
     order: () => builder,
-    update: (payload) => { window.__ultimoUpdatePayload = payload; return construirQuery(tabela, payload); },
+    update: (payload) => {
+      window.__ultimoUpdatePayload = payload;
+      // Além do "último" (compatibilidade com testes antigos), acumula TODOS
+      // os updates desta rodada — uma ação pode disparar mais de um update
+      // encadeado (ex.: conjurar uma magia de concentração grava slots_magia
+      // E concentracao em updates separados) e um teste que só olha o
+      // "último" pode pegar o update errado dependendo da ordem.
+      (window.__todosUpdatePayloads = window.__todosUpdatePayloads || []).push(payload);
+      return construirQuery(tabela, payload);
+    },
     single: async () => ({ data: payloadUpdate ? { ...payloadUpdate } : {}, error: null }),
     maybeSingle: async () => (
       tabela === 'spell_lists' && window.__magiasFavoritasTeste
@@ -743,13 +752,20 @@ console.log('');
     const slotBtn = window.document.querySelector('.modal-slot-btn[data-nv="1"]');
     if (!slotBtn) erros.push('magias: modal de Conjurar não ofereceu o slot de nível 1');
     else {
-      window.__ultimoUpdatePayload = null;
+      window.__todosUpdatePayloads = [];
       slotBtn.click();
-      await Promise.resolve().then(() => {}).then(() => {}); // deixa o await do update() (mock) resolver
+      await Promise.resolve().then(() => {}).then(() => {}); // deixa os awaits do update() (mock) resolverem
       const depoisAtual = (window.eval('charAtivo.slots_magia') || {})['1']?.atual || 0;
       if (depoisAtual !== antesAtual + 1) erros.push('magias: conjurar não incrementou slots_magia[1].atual (antes=' + antesAtual + ' depois=' + depoisAtual + ')');
-      const p = window.__ultimoUpdatePayload;
-      if (!p || !('slots_magia' in p)) erros.push('magias: conjurar não persistiu slots_magia via window.sb.update()');
+      // "Bênção" é magia de concentração: conjurar dispara 2 updates
+      // separados (slots_magia + concentracao) — checa os dois, não só
+      // "o último" (a ordem entre updates fire-and-forget não é garantida).
+      const todos = window.__todosUpdatePayloads || [];
+      if (!todos.some(p => p && 'slots_magia' in p)) erros.push('magias: conjurar não persistiu slots_magia via window.sb.update()');
+      if (!todos.some(p => p && p.concentracao?.ativa && p.concentracao?.magia === 'Bênção')) {
+        erros.push('magias: conjurar magia de concentração não gravou characters.concentracao — ' + JSON.stringify(todos));
+      }
+      if (window.eval('charAtivo.concentracao?.magia') !== 'Bênção') erros.push('magias: charAtivo.concentracao não refletiu "Bênção" localmente');
       if (window.document.querySelector('.modal-overlay')) erros.push('magias: modal de Conjurar não fechou após escolher o slot');
     }
   } catch (e) { erros.push('magias: fluxo de Conjurar → ' + e.message); }

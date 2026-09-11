@@ -116,6 +116,8 @@ function renderCombate(c) {
       <button type="button" class="btn no-lock" data-descanso="longo">${ico('descanso')} Descanso Longo</button>
     </div>
 
+    ${renderConcentracaoBloco(c)}
+
     <h3>Condições</h3>
     ${renderCondicoesBloco('combate-condicoes-wrap', ativas)}
 
@@ -200,6 +202,20 @@ function renderCombate(c) {
   `;
 }
 
+// Estado de concentração (characters.concentracao) — a magia em si já é
+// escolhida ao conjurar (aba_magias.js); aqui só mostra o estado atual e
+// permite encerrar manualmente (ex.: falhou no teste de Constituição).
+function renderConcentracaoBloco(c) {
+  const conc = c.concentracao || {};
+  if (!conc.ativa) {
+    return `<div class="concentracao-bar concentracao-inativa">${ico('encantamento')} Sem concentração ativa</div>`;
+  }
+  return `<div class="concentracao-bar concentracao-ativa">
+    <span>${ico('encantamento')} Concentrando em <strong>${escape(conc.magia || '?')}</strong></span>
+    <button type="button" class="btn no-lock" data-concentracao-encerrar>Encerrar</button>
+  </div>`;
+}
+
 function conectarListenersCombate() {
   // Editores em acordeão de salvaguardas/perícias — um clique no gatilho
   // mostra/esconde o [hidden]. Os campos continuam no form o tempo todo
@@ -217,6 +233,13 @@ function conectarListenersCombate() {
 
   document.querySelectorAll('[data-descanso]').forEach(btn => {
     btn.addEventListener('click', () => aplicarDescanso(btn.dataset.descanso));
+  });
+
+  const btnEncerrarConc = document.querySelector('[data-concentracao-encerrar]');
+  if (btnEncerrarConc) btnEncerrarConc.addEventListener('click', () => {
+    encerrarConcentracao();
+    toast('Concentração encerrada');
+    render();
   });
 }
 

@@ -196,7 +196,7 @@ async function carregarMagiasPreparadas() {
         <div class="magia-desc">${descHtml || '<p>—</p>'}</div>
         ${m.maiorNivel ? `<div class="magia-maior"><strong>Em Níveis Superiores.</strong> ${escape(m.maiorNivel)}</div>` : ''}
         ${m.nivel > 0 ? `<div class="magia-conjurar-bar">
-          <button type="button" class="btn-conjurar" data-conjurar-nv="${m.nivel}" data-conjurar-nome="${escape(m.nome)}">
+          <button type="button" class="btn-conjurar" data-conjurar-nv="${m.nivel}" data-conjurar-nome="${escape(m.nome)}" data-conjurar-concentracao="${m.concentracao ? 1 : 0}">
             ${ico('conjurar')} Conjurar
           </button>
         </div>` : `<div class="magia-conjurar-bar"><span class="magia-truque-info">Truque — sem custo de slot</span></div>`}
@@ -221,7 +221,8 @@ async function carregarMagiasPreparadas() {
       e.stopPropagation();
       const nv = +btn.dataset.conjurarNv;
       const nome = btn.dataset.conjurarNome;
-      abrirModalConjurar(nome, nv);
+      const concentracao = btn.dataset.conjurarConcentracao === '1';
+      abrirModalConjurar(nome, nv, concentracao);
     });
   });
 
@@ -230,7 +231,7 @@ async function carregarMagiasPreparadas() {
 }
 
 // ─── Modal de Conjurar (escolha de slot) ─────────────────────────
-function abrirModalConjurar(nomeMagia, nivelMin) {
+function abrirModalConjurar(nomeMagia, nivelMin, ehConcentracao) {
   const c = charAtivo;
   const slotsClasse = (window.SlotsPHB && c.classe) ? window.SlotsPHB.porClasse(c.classe, c.nivel || 1, c.subclasse) : null;
   if (!slotsClasse) {
@@ -295,6 +296,10 @@ function abrirModalConjurar(nomeMagia, nivelMin) {
         _ultimoSaveLocal = Date.now();
         await window.sb.from('characters').update({ slots_magia: slots }).eq('id', c.id);
         mostrarToastConjurar(nomeMagia, nv);
+        if (ehConcentracao) {
+          const interrompida = iniciarConcentracao(nomeMagia);
+          if (interrompida) toast(`◐ Concentração em "${interrompida}" foi interrompida`, 'aviso');
+        }
         // Re-renderiza a aba: o grid de Espaços de Magia no topo (renderSlotsMagia)
         // foi montado com o slots_magia ANTIGO — sem isso ele fica com dado
         // obsoleto até o jogador trocar de aba e voltar.

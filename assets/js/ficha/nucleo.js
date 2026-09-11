@@ -428,6 +428,35 @@ function alternarHabilidadeFavorita(slug) {
   salvarHabilidadesFavoritas();
 }
 
+// ── Concentração (characters.concentracao {ativa,magia}, migration 021) ──
+// Coluna já existia (lida pelo painel do Mestre, painel_barovia_dnd5e.html,
+// pra mostrar "🔮 Concentrando" na barra de PJs) mas a ficha do jogador
+// nunca escrevia nela — o jogador tinha que lembrar de "concentração" só
+// de cabeça. Agora: iniciar concentração ao conjurar uma magia de
+// concentração (aba_magias.js) encerra automaticamente a anterior (regra
+// do PHB — só se concentra numa magia por vez); um botão em Combate encerra
+// manualmente (ex.: falhou no teste de Constituição); o teste de
+// Constituição em si continua manual (a ficha não rola por você) — só
+// lembra a CD (10 ou metade do dano, o que for maior) no toast de dano.
+async function salvarConcentracao() {
+  if (!charAtivo?.id) return;
+  _ultimoSaveLocal = Date.now();
+  const { error } = await window.sb.from('characters')
+    .update({ concentracao: charAtivo.concentracao || { ativa: false, magia: '' } })
+    .eq('id', charAtivo.id);
+  if (error) console.warn('[concentracao] erro ao salvar:', error);
+}
+function iniciarConcentracao(nomeMagia) {
+  const anterior = charAtivo.concentracao?.ativa ? charAtivo.concentracao.magia : null;
+  charAtivo.concentracao = { ativa: true, magia: nomeMagia };
+  salvarConcentracao();
+  return anterior && anterior !== nomeMagia ? anterior : null;
+}
+function encerrarConcentracao() {
+  charAtivo.concentracao = { ativa: false, magia: '' };
+  salvarConcentracao();
+}
+
 // Mesma fonte de verdade que aplicarEstadoLock() (lock.js) usa — Fase 9:
 // a aba Personagem lê isso pra decidir se mostra campos de leitura (cards
 // de texto) ou o formulário de edição de sempre. Um só lugar faz a leitura
