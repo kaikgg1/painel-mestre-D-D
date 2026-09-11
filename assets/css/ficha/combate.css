@@ -172,6 +172,7 @@
 }
 .stat-mini input:focus, .stat-mini select:focus { border-color: var(--borda-ouro); }
 .stat-mini .ajuda-mini { display: block; font-size: 9px; color: var(--text-dim); margin-top: 3px; font-style: italic; }
+#btn-gastar-dado-vida { width: 100%; margin-top: 6px; padding: 6px 4px; font-size: 12px; min-height: 32px; }
 .readonly-stat {
   width: 100%;
   background: var(--sf-ouro);

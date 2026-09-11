@@ -535,6 +535,41 @@ console.log('');
     window.eval('charAtivo.hp_atual = 42; render();');
   }
 
+  // Gastar Dado de Vida (jog-16, PHB "Descanso Curto"): rola o dado da
+  // classe (Clérigo = d8) + mod. de Constituição (+3, atributos.con=16),
+  // aplica no PV e desconta 1 DV — via os inputs do form (mesmo caminho de
+  // aplicarHP em listeners.js).
+  {
+    const antes = erros.length;
+    try {
+      const btnGastar = window.document.getElementById('btn-gastar-dado-vida');
+      const inpDv = window.document.getElementById('dv-atual-input');
+      const inpHp = window.document.querySelector('[name="hp_atual"]');
+      if (!btnGastar || !inpDv || !inpHp) erros.push('dado de vida: botão/inputs não encontrados na aba Combate');
+      else {
+        const dvAntes = +inpDv.value;
+        const hpAntes = +inpHp.value;
+        btnGastar.click();
+        const dvDepois = +inpDv.value;
+        const hpDepois = +inpHp.value;
+        if (dvDepois !== dvAntes - 1) erros.push(`dado de vida: DV restantes deveria cair de ${dvAntes} pra ${dvAntes - 1}, foi pra ${dvDepois}`);
+        const ganho = hpDepois - hpAntes;
+        if (ganho < 4 || ganho > 11) erros.push(`dado de vida: PV ganho fora do intervalo esperado (d8+3 → 4 a 11), foi ${ganho}`);
+
+        // Sem DV restante: botão não deve conceder PV nem descontar mais.
+        window.eval('const _i = document.getElementById("dv-atual-input"); if (_i) _i.value = "0";');
+        window.__ultimoUpdatePayload = null;
+        const hpAntesSemDv = +inpHp.value;
+        btnGastar.click();
+        if (+inpHp.value !== hpAntesSemDv) erros.push('dado de vida: com 0 DV restantes, não deveria conceder PV nenhum');
+      }
+    } catch (e) { erros.push('dado de vida: ' + e.message); }
+    console.log(erros.length > antes
+      ? '  FALHOU     gastar dado de vida (ver FALHAS abaixo)'
+      : '  aba combate: botão Gastar Dado de Vida rola d(classe)+CON e desconta 1 DV ok');
+    window.eval('charAtivo.hp_atual = 42; charAtivo.dado_vida_atual = 9; render();');
+  }
+
   // Invariante crítica (Fase 4): campos dentro de [hidden] (editores em
   // acordeão) e dentro de um <details> FECHADO (bloco de conjuração) ainda
   // entram no FormData — é disso que depende salvar.js continuar salvando

@@ -100,7 +100,8 @@ function renderCombate(c) {
       <div class="stat-mini">
         <span class="ic">${ico('tempo')}</span>
         <label>DV Restantes</label>
-        <input name="dado_vida_atual" type="text" inputmode="numeric" value="${c.dado_vida_atual ?? 1}" data-validar="int" data-min="0">
+        <input name="dado_vida_atual" type="text" inputmode="numeric" value="${c.dado_vida_atual ?? 1}" data-validar="int" data-min="0" id="dv-atual-input">
+        <button type="button" class="btn no-lock" id="btn-gastar-dado-vida" title="Gastar 1 Dado de Vida no fim de um descanso curto (PHB): rola o dado + mod. de Constituição, mínimo 0">${ico('dado')} Gastar</button>
       </div>
       <div class="stat-mini">
         <span class="ic">${ico('atordoado')}</span>
@@ -240,6 +241,32 @@ function conectarListenersCombate() {
 
   document.querySelectorAll('[data-descanso]').forEach(btn => {
     btn.addEventListener('click', () => aplicarDescanso(btn.dataset.descanso));
+  });
+
+  // Gastar 1 Dado de Vida (PHB, Descanso Curto): rola o dado da classe,
+  // soma o mod. de Constituição (mínimo 0 recuperado), aplica no PV e
+  // desconta o DV — via os próprios inputs do form, então o autosave normal
+  // da aba Combate persiste (mesmo caminho de aplicarHP em listeners.js).
+  const btnGastarDV = document.getElementById('btn-gastar-dado-vida');
+  if (btnGastarDV) btnGastarDV.addEventListener('click', () => {
+    const inpDv = document.getElementById('dv-atual-input');
+    const inpHpAtual = document.querySelector('[name="hp_atual"]');
+    const inpHpMax = document.querySelector('[name="hp_max"]');
+    if (!inpDv || !inpHpAtual) return;
+    const dvRestantes = parseNum(inpDv.value, { inteiro: true, min: 0 }) ?? 0;
+    if (dvRestantes < 1) { toast('Sem Dados de Vida disponíveis'); return; }
+    const faces = dadoVidaDaClasse(charAtivo.classe) || charAtivo.dado_vida_tipo || 8;
+    const rolagem = 1 + Math.floor(Math.random() * faces);
+    const conMod = mod(charAtivo.atributos?.con ?? 10);
+    const recuperado = Math.max(0, rolagem + conMod);
+    const hpMax = parseNum(inpHpMax?.value, { inteiro: true }) ?? charAtivo.hp_max ?? 0;
+    const hpAtual = parseNum(inpHpAtual.value, { inteiro: true }) ?? 0;
+    const novoHp = hpMax > 0 ? Math.min(hpMax, hpAtual + recuperado) : hpAtual + recuperado;
+    inpHpAtual.value = novoHp;
+    inpDv.value = dvRestantes - 1;
+    inpHpAtual.dispatchEvent(new Event('input', { bubbles: true }));
+    inpDv.dispatchEvent(new Event('input', { bubbles: true }));
+    toast(`Dado de Vida: d${faces}(${rolagem}) ${fmtMod(conMod)} = +${recuperado} PV`, 'dado');
   });
 
   const btnEncerrarConc = document.querySelector('[data-concentracao-encerrar]');
