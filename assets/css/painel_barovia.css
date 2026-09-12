@@ -26,7 +26,7 @@
     --parchment-dim: var(--text-muted);
     --gold-bright: var(--gold);
     --blood: var(--border-soft);
-    --blood-bright: var(--danger);
+    --blood-bright: var(--accent-light);
     --blood-dark: #2a0c0e;
     --bone: var(--text);
     --bg-card-soft: var(--surface-raised);
@@ -135,9 +135,9 @@
   .party-chip .pc-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; background: var(--tema-cor, var(--gold)); }
   .party-chip .pc-nome { font-family: 'Cinzel', serif; font-size: 11.5px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90px; }
   .party-chip .pc-hp { font-size: 11px; color: var(--text-dim); margin-left: auto; white-space: nowrap; }
-  .party-chip.critico .pc-hp { color: var(--danger); font-weight: 700; }
+  .party-chip.critico .pc-hp { color: var(--erro); font-weight: 700; }
   .party-chip.inconsciente { border-color: var(--danger); }
-  .party-chip.inconsciente .pc-nome { color: var(--danger); }
+  .party-chip.inconsciente .pc-nome { color: var(--erro); }
   .party-chip .pc-flag { font-size: 12px; }
   .party-bar-vazia { text-align: center; color: var(--text-dim); font-style: italic; font-size: 12px; }
 
@@ -230,7 +230,7 @@
   .hp-label { font-family: 'Cinzel', serif; font-size: 9.5px; font-weight: 700; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-right: auto; }
   .hp-nums { font-size: 16px; font-family: 'EB Garamond', serif; display: flex; align-items: baseline; gap: 2px; }
   .hp-current-input { color: var(--text); font-weight: 700; max-width: 38px; }
-  .hp-current-input.critico { color: var(--danger); }
+  .hp-current-input.critico { color: var(--erro); }
   .hp-sep { color: var(--text-dim); font-size: 13px; }
   .hp-max-input { max-width: 34px; color: var(--text-dim); }
   .hp-temp-wrap { display: flex; align-items: baseline; gap: 2px; color: var(--magic); font-size: 12px; margin-left: 4px; }
@@ -262,7 +262,7 @@
   .unconscious-badge {
     display: flex; align-items: center; gap: 6px;
     background: rgba(169,65,73,0.14); border: 1px solid var(--danger);
-    color: var(--danger); border-radius: 4px; padding: 4px 8px;
+    color: var(--erro); border-radius: 4px; padding: 4px 8px;
     font-family: 'Cinzel', serif; font-size: 10.5px; font-weight: 700;
     letter-spacing: 0.5px; text-transform: uppercase; margin: 6px 0;
   }
@@ -282,7 +282,7 @@
   .tags-row { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; }
   .condition-tag {
     background: rgba(169,65,73,0.14); border: 1px solid var(--danger);
-    color: var(--danger); padding: 3px 9px; border-radius: 10px; font-size: 10px;
+    color: var(--erro); padding: 3px 9px; border-radius: 10px; font-size: 10px;
     cursor: pointer; user-select: none; font-family: 'Cinzel', serif; font-weight: 600; letter-spacing: 0.4px;
     display: inline-flex; align-items: center; gap: 4px;
   }
@@ -304,7 +304,7 @@
     padding: 3px 9px; border-radius: 10px; font-size: 10px; cursor: pointer;
     font-family: 'Cinzel', serif; font-weight: 600; letter-spacing: 0.4px; transition: all .12s;
   }
-  .condition-picker .cp-tag.ativa { background: rgba(169,65,73,0.18); border-color: var(--danger); color: var(--danger); }
+  .condition-picker .cp-tag.ativa { background: rgba(169,65,73,0.18); border-color: var(--danger); color: var(--erro); }
   .condition-picker .cp-tag:hover { border-color: var(--gold-muted); }
 
   .concentration-badge {
@@ -339,7 +339,7 @@
 
   /* ===== SALVAGUARDAS DE MORTE ===== */
   .death-saves-inline { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: 4px; background: rgba(169,65,73,0.08); border: 1px solid var(--danger); }
-  .death-saves-inline .dsi-label { font-family: 'Cinzel', serif; font-size: 9.5px; font-weight: 700; color: var(--danger); text-transform: uppercase; letter-spacing: 0.6px; }
+  .death-saves-inline .dsi-label { font-family: 'Cinzel', serif; font-size: 9.5px; font-weight: 700; color: var(--erro); text-transform: uppercase; letter-spacing: 0.6px; }
   .death-group { display: flex; align-items: center; gap: 4px; }
   .death-pips { display: flex; gap: 4px; }
   .death-pip { width: 13px; height: 13px; border-radius: 50%; border: 1.5px solid; cursor: pointer; transition: all 0.15s; background: rgba(0,0,0,0.3); }
@@ -419,7 +419,7 @@
   .equip-tag .equip-tag-extra { color: var(--text-dim); font-size: 10px; }
   .equip-tag .equip-rm { display: none; background: none; border: none; cursor: pointer; color: var(--text-dim); font-size: 12px; line-height: 1; padding: 2px 3px; border-radius: 50%; }
   .modo-edicao .equip-tag .equip-rm { display: inline; }
-  .equip-tag .equip-rm:hover { color: var(--danger); }
+  .equip-tag .equip-rm:hover { color: var(--erro); }
   .equip-vazio { font-size: 11px; color: var(--text-dim); font-style: italic; }
   .equip-add { display: none; gap: 4px; margin-top: 5px; }
   .modo-edicao .equip-add { display: flex; }
@@ -474,7 +474,7 @@
   .save-card:hover { background: var(--gold); color: var(--bg-deep); }
   .save-card.saved { border-color: var(--success); color: var(--success); background: rgba(102,122,88,0.12); }
   .remove-card { background: transparent; border: none; color: var(--text-dim); cursor: pointer; font-size: 10px; opacity: 0.5; transition: opacity 0.15s; font-family: 'Cinzel', serif; letter-spacing: 0.4px; }
-  .remove-card:hover { opacity: 1; color: var(--danger); }
+  .remove-card:hover { opacity: 1; color: var(--erro); }
 
   /* ===== TOAST ===== */
   .toast {
@@ -540,5 +540,5 @@
 
   .toolbar iconify-icon { font-size: 14px; }
   .card-actions button iconify-icon { font-size: 13px; vertical-align: -2px; margin-right: 4px; }
-  .magia-prep-vazio iconify-icon { font-size: 14px; vertical-align: -2px; color: var(--danger); }
+  .magia-prep-vazio iconify-icon { font-size: 14px; vertical-align: -2px; color: var(--erro); }
   .grid-vazio iconify-icon { font-size: 28px; color: var(--gold); display: block; margin: 0 auto 10px; }

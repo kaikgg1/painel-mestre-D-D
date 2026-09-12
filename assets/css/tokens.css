@@ -40,6 +40,10 @@
   --forest: #59633d;
   --success: #59633d;
   --danger: #713631;
+  /* --danger é escuro demais pra funcionar como cor de TEXTO em fundo
+     escuro (lay-3 da auditoria) — --erro é a mesma família de cor, mas
+     clara o bastante pra ler. --danger continua certo pra borda/preenchimento. */
+  --erro: #c9847a;
 
   /* Sombra base (pra cards/elevação) */
   --shadow: rgba(0, 0, 0, 0.55);
@@ -74,6 +78,9 @@
   --forest: #4a5233;
   --success: #4a5233;
   --danger: #861820;
+  /* mesmo motivo do tema geral — reaproveita o vermelho-sangue claro
+     que já existe na paleta em vez de inventar mais um tom */
+  --erro: var(--accent-light);
 
   --shadow: rgba(0, 0, 0, 0.7);
 }

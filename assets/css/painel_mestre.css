@@ -6,11 +6,9 @@
      do design system; migrado pra herdar de tokens.css/components.css
      como o resto do sistema.)
 
-     Duas variáveis semânticas extras que tokens.css não define, no
-     mesmo padrão de assets/css/ficha/base.css:
+     Uma variável semântica extra que tokens.css não define:
        --on-gold  texto sobre uma superfície --gold sólida (precisa ser escuro)
-       --erro     vermelho mais claro que --danger, legível como TEXTO
-                  sobre fundo escuro (--danger é escuro demais pra isso) */
+     (--erro já vem de tokens.css desde a Fase 8/lay-3.) */
 
   @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
 
@@ -18,7 +16,6 @@
 
   :root {
     --on-gold: #17140d;
-    --erro: #c9847a;
   }
 
   body {
