@@ -138,6 +138,22 @@ npm run smoke   # carrega os módulos em jsdom, renderiza as 7 abas
 
 Edite `sql/003_seed_jogadores.sql` (copie um bloco `if not exists`), rode `npm run setup-db`, depois adicione o nome no dropdown de `paineis/login.html`.
 
+## Breakpoints responsivos
+
+Três valores oficiais (lay-6 da auditoria) — não criar um novo sem necessidade real, e ao mexer numa tela existente preferir migrar pro valor oficial mais próximo em vez de introduzir mais um:
+
+- **480px** — celular estreito (ajustes finos além do que 640px já resolve).
+- **640px** — celular/mobile em geral. É o breakpoint principal; a maioria das telas só precisa deste.
+- **1024px** — tablet / janela pequena de desktop.
+
+Usados por `assets/css/components.css`, `assets/css/ui.css`, `assets/css/painel_mestre.css`, `assets/css/painel_barovia.css` e todo `assets/css/ficha/*.css`.
+
+**Exceções conhecidas, ainda não migradas** (mudar o número exigiria reconferir o layout em cada arquivo, não é uma troca mecânica segura):
+- `assets/css/painel_barovia.css`: breakpoints extras em 700px/1280px além dos 3 oficiais.
+- `assets/css/painel_mestre.css`: uma faixa `min-width:641px / max-width:820px` própria pra tablet pequeno.
+- `paineis/vilao/*.html` (fichas de vilão): cada ficha tem seus próprios breakpoints inline, tipicamente em torno de 480/720/860/1100px.
+- `paineis/reloaded/*.html`: breakpoints inline próprios, não auditados ainda.
+
 ## Stack
 
 - **Front:** HTML + CSS + Vanilla JS (sem build, sem framework)

@@ -96,7 +96,7 @@
 .item-vazio { padding: 18px; text-align: center; color: var(--text-dim); font-style: italic; }
 
 /* MOBILE: tabela vira cards verticais (cada linha = um card) */
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .item-tabela, .item-tabela thead, .item-tabela tbody, .item-tabela tr, .item-tabela td {
     display: block;
   }

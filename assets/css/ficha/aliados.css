@@ -95,7 +95,7 @@
 .criatura-img-ph { font-size: 46px; opacity: 0.45; }
 .criatura-img.erro img { display: none; }
 .criatura-img.erro::after { content: '⚠'; font-size: 38px; color: var(--blood-bright); }
-@media (max-width: 600px) { .criatura-img { width: 92px; height: 92px; } }
+@media (max-width: 640px) { .criatura-img { width: 92px; height: 92px; } }
 
 /* Lightbox p/ ver a imagem da criatura em tamanho grande */
 .cr-lightbox {
@@ -210,7 +210,7 @@
 }
 .criatura-notas:focus { border-color: var(--borda-ouro); }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .aliados-topo { flex-direction: column; }
   .aliados-add { width: 100%; }
   .aliados-add #btn-buscar-monstro { flex: 1 1 100%; min-height: 46px; }
@@ -310,7 +310,7 @@
 }
 .bm-add:hover { background: linear-gradient(180deg, var(--gold-bright), var(--gold)); }
 .bm-add.add-ok { background: linear-gradient(180deg, #4a5233, #3d4529); color: #fff; border-color: #7a8a5e; }
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .bm-overlay { padding: 0; }
   .bm-modal { max-width: 100%; max-height: 100vh; max-height: 100dvh; height: 100%; border-radius: 0; }
   .bm-item { flex-wrap: wrap; }

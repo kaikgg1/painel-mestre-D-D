@@ -136,7 +136,7 @@ html, body {
 .back-btn:active { background: var(--sf-2); }
 .back-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 /* Mobile: só a seta — texto "Voltar" sai, o alvo de toque continua >=38px */
-@media (max-width: 600px) { .back-btn-lbl { display: none; } }
+@media (max-width: 640px) { .back-btn-lbl { display: none; } }
 
 .auth-slot { display: flex; align-items: center; gap: var(--sp-2); font-family: var(--f-ui); font-size: var(--fs-meta); flex-shrink: 0; margin-left: auto; }
 .auth-nome { color: var(--parchment-dim); }
@@ -150,7 +150,7 @@ html, body {
 }
 .auth-btn:hover { background: var(--sf-3); border-color: var(--borda-forte); color: var(--parchment); }
 .auth-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
-@media (max-width: 600px) { .auth-nome { display: none; } }
+@media (max-width: 640px) { .auth-nome { display: none; } }
 
 /* -- Identidade: avatar + nome (com trocador embutido) + subtitulo -- */
 .hdr-id { display: flex; align-items: center; gap: var(--sp-3); min-width: 0; flex: 1; }
@@ -161,7 +161,7 @@ html, body {
   color: var(--parchment); background-size: cover; background-position: center;
   border: 1px solid var(--borda-forte);
 }
-@media (max-width: 600px) { .hdr-avatar { display: none; } }
+@media (max-width: 640px) { .hdr-avatar { display: none; } }
 
 .hdr-nome-bloco { min-width: 0; }
 .hdr-nome-wrap { position: relative; display: inline-flex; align-items: baseline; gap: var(--sp-1); max-width: 100%; }
@@ -250,7 +250,7 @@ html, body {
 
 /* Editar/travar continua botao proprio e visivel (nao entra no menu):
    e a troca de MODO da ficha inteira, nao uma acao administrativa rara. */
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .hdr-linha-meta .status-msg .txt { display: none; }
 }
 
@@ -259,7 +259,7 @@ main { max-width: var(--ficha-max); margin: var(--sp-5) auto; padding: 0 var(--s
 /* Margem lateral por breakpoint (§20): 32px desktop, 24px tablet, 16px mobile.
    O valor de desktop já é o padrão acima; só os dois de baixo sobrescrevem. */
 @media (max-width: 1080px) { main { padding: 0 var(--sp-6) var(--sp-8); } }
-@media (max-width: 600px)  { main { padding: 0 var(--sp-4) var(--sp-6); } }
+@media (max-width: 640px)  { main { padding: 0 var(--sp-4) var(--sp-6); } }
 .estado { padding: var(--sp-8); text-align: center; color: var(--text-dim); font-style: italic; }
 
 /* ============ BOTÕES ============ */

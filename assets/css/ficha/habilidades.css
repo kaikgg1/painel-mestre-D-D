@@ -51,7 +51,7 @@
 .hab-pip:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 .hab-disp { font-size: 11px; color: var(--gold); font-family: var(--f-num); }
 .hab-disp strong { color: var(--gold-bright); font-size: 14px; }
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .hab-feature-head { grid-template-columns: 1fr; }
   .hab-tracker { justify-content: flex-start; }
   .hab-pip { width: 20px; height: 20px; }
@@ -150,7 +150,7 @@
 .fav-hab-nome { font-family: var(--f-ui); font-weight: 700; color: var(--gold-light); font-size: 14px; }
 .fav-hab-desc { font-family: var(--f-prosa); font-size: 14px; line-height: 1.5; color: var(--text-2); margin-top: 2px; }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .hab-busca-input { font-size: 16px; min-height: 44px; }
   .hab-fav-btn { width: 32px; height: 32px; }
   .hab-feature { padding-right: 38px; }

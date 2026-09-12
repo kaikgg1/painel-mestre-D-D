@@ -75,7 +75,7 @@ select optgroup {
 }
 
 /* Em mobile, alvos de toque maiores e fonte que evita zoom no iOS */
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   select {
     min-height: 46px !important;
     font-size: 16px !important;        /* >=16px evita auto-zoom no iOS */
@@ -180,7 +180,7 @@ select:disabled {
 }
 
 /* Mobile: reposiciona as DUAS camadas (a regra acima já usa 2 valores) */
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   select { background-position: right 14px center, center !important; }
   select:disabled { background-position: right 14px center !important; }
 }

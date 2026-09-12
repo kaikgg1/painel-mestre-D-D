@@ -59,7 +59,7 @@
   gap: 20px; align-items: start;
   margin-bottom: 14px;
 }
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .retrato-wrap { grid-template-columns: 1fr; }
   .retrato-preview { margin: 0 auto; max-width: 240px; }
 }
@@ -120,7 +120,7 @@
 .upload-status.erro  { color: var(--erro); }
 .upload-status.info  { color: var(--text-dim); }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .magia-conjurar-bar { justify-content: stretch; }
   .btn-conjurar { width: 100%; min-height: 44px; }
 }

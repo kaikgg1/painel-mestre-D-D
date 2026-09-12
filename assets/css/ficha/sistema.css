@@ -68,7 +68,7 @@
   background: var(--gold); color: var(--shadow); border-color: var(--gold-bright);
 }
 .toast-externo button:hover { background: var(--gold-bright); color: var(--shadow); }
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .toast-externo { left: 12px; right: 12px; bottom: 12px; max-width: none; }
 }
 
@@ -324,7 +324,7 @@
   margin-top: 10px; line-height: 1.4;
 }
 
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .rc-grid { grid-template-columns: 1fr; }
   .rc-pip { width: 26px; height: 26px; }
   .rc-pool-btn { width: 38px; height: 38px; }
@@ -404,7 +404,7 @@ body:not(.modo-unlock) .tab-content [onclick] {
 }
 
 /* Touch targets mínimos em mobile p/ botões pequenos (WCAG 2.5.5) */
-@media (max-width: 600px) {
+@media (max-width: 640px) {
   .contador-bloco { min-width: 44px !important; min-height: 44px !important; }
   .item-tabela .lixo,
   .cfeat-remove,
