@@ -407,152 +407,18 @@
 <script src="../../assets/js/efeitos.js"></script>
 <script src="../../assets/js/master_state.js"></script>
 <script src="../../assets/js/rolador.js"></script>
+<script src="../../assets/js/vilao_combate.js"></script>
 <script>
-const FORMAS = { 1: { nd: '4' }, 2: { nd: '4' } };
-function switchPhase(num) { switchPhaseSilent(num); saveState(true); }
-function switchPhaseSilent(num) {
-  const f = FORMAS[num] || FORMAS[1];
-  document.querySelectorAll('.phase-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.phase-content').forEach(c => c.classList.remove('active'));
-  document.querySelector(`.phase-tab[data-phase="${num}"]`).classList.add('active');
-  document.getElementById(`phase-${num}`).classList.add('active');
-  document.body.dataset.fase = num;
-  document.getElementById('ndHeader').textContent = f.nd;
-}
-
-const hpCurrent = document.getElementById('hpCurrent');
-const hpMax = document.getElementById('hpMax');
-const hpBar = document.getElementById('hpBar');
-const hpLabel = document.getElementById('hpLabel');
-function updateHPBar() {
-  const cur = parseInt(hpCurrent.value) || 0, max = parseInt(hpMax.value) || 1;
-  const pct = Math.max(0, Math.min(100, (cur / max) * 100));
-  hpBar.style.width = pct + '%'; hpLabel.textContent = Math.round(pct) + '%';
-  if (pct > 50) hpBar.style.background = 'linear-gradient(90deg, var(--blood-dark), var(--blood))';
-  else if (pct > 25) hpBar.style.background = 'linear-gradient(90deg, #4a1014, #a82020)';
-  else hpBar.style.background = 'linear-gradient(90deg, #3a0808, #6a0e0e)';
-}
-function adjustHP(delta) {
-  const max = parseInt(hpMax.value) || 1; let cur = parseInt(hpCurrent.value) || 0; const antes = cur;
-  cur = Math.max(0, Math.min(max, cur + delta)); hpCurrent.value = cur; updateHPBar();
-  const mudou = cur - antes;
-  if (window.FX && mudou !== 0) { const alvo = document.querySelector('.combat-bar .panel') || hpCurrent; if (mudou < 0) FX.dano(alvo, mudou); else FX.cura(alvo, mudou); if (FX.contarInput) FX.contarInput(hpCurrent, antes, cur); }
-  saveState(true);
-}
-function resetHP() { hpCurrent.value = hpMax.value; updateHPBar(); saveState(true); }
-function setMedia() { hpMax.value = 93; hpCurrent.value = 93; updateHPBar(); saveState(true); showToast('✓ PV na média (93)'); }
-hpCurrent.addEventListener('input', () => { updateHPBar(); saveState(true); });
-hpMax.addEventListener('input', () => { updateHPBar(); saveState(true); });
-function toggleReact(el) { el.classList.toggle('used'); saveState(true); }
-function resetReactions() { document.querySelectorAll('.react-dot').forEach(d => d.classList.remove('used')); saveState(true); }
-function adjustRound(delta) {
-  const el = document.getElementById('roundCounter'); if (!el) return;
-  let n = Math.max(1, (parseInt(el.textContent) || 1) + delta); el.textContent = n;
-  if (delta > 0) document.querySelectorAll('.react-dot').forEach(d => d.classList.remove('used'));
-  saveState(true);
-}
-function resetRound() { const el = document.getElementById('roundCounter'); if (el) el.textContent = 1; saveState(true); }
-function toggleAbility(header) { header.parentElement.classList.toggle('open'); }
-
-const STORAGE_KEY = 'fleshmound_ficha_v1';
-const MS_CHAVE = 'vilao:fleshmound';
-let _msAplicando = false;
-function _setSyncStatus(txt, cor) { const el = document.getElementById('syncStatus'); if (el) { el.textContent = txt; el.style.color = cor || 'var(--gold-dim)'; } }
-function getState() {
-  return {
-    hpCurrent: hpCurrent.value, hpMax: hpMax.value,
-    ca: Array.from(document.querySelectorAll('.ca-input')).map(i => ({ phase: i.dataset.phase, val: i.value })),
-    activePhase: document.querySelector('.phase-tab.active').dataset.phase,
-    reactions: Array.from(document.querySelectorAll('.react-dot')).map(d => d.classList.contains('used')),
-    conditions: Array.from(document.querySelectorAll('.condition-row .chip')).map(c => c.classList.contains('active')),
-    notes: document.getElementById('notesArea').value,
-    round: (document.getElementById('roundCounter')?.textContent) || '1',
-    openAbilities: Array.from(document.querySelectorAll('.ability.open')).map(a => { const p = a.closest('.phase-content'); return `${p ? p.id : 'global'}::${a.querySelector('.ability-name').textContent}`; })
-  };
-}
-function applyState(s) {
-  if (!s) return;
-  hpCurrent.value = s.hpCurrent ?? 143; hpMax.value = s.hpMax ?? 143; updateHPBar();
-  if (s.ca) s.ca.forEach(c => { const inp = document.querySelector(`.ca-input[data-phase="${c.phase}"]`); if (inp) inp.value = c.val; });
-  switchPhaseSilent(parseInt(s.activePhase) || 1);
-  (s.reactions || []).forEach((u, i) => { const d = document.querySelectorAll('.react-dot')[i]; if (d) d.classList.toggle('used', u); });
-  (s.conditions || []).forEach((u, i) => { const c = document.querySelectorAll('.condition-row .chip')[i]; if (c) c.classList.toggle('active', u); });
-  document.getElementById('notesArea').value = s.notes || '';
-  const roundEl = document.getElementById('roundCounter'); if (roundEl) roundEl.textContent = s.round || '1';
-  if (s.openAbilities) s.openAbilities.forEach(key => {
-    const [phase, name] = key.split('::');
-    const container = phase === 'global' ? document : document.getElementById(phase);
-    if (!container) return;
-    container.querySelectorAll('.ability').forEach(a => { if (a.querySelector('.ability-name').textContent === name) a.classList.add('open'); });
-  });
-}
-function saveState(silent = false) {
-  if (_msAplicando) return;
-  try {
-    const dados = getState();
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(dados));
-    if (window.MasterState) { _setSyncStatus('⟳ sincronizando…', 'var(--gold-dim)'); window.MasterState.salvarDebounced(MS_CHAVE, dados, silent ? 600 : 0); setTimeout(() => _setSyncStatus('● sincronizado', 'var(--gold)'), silent ? 800 : 200); }
-    if (!silent) showToast('✓ Salvo');
-  } catch(e) { if (!silent) showToast('Erro ao salvar'); }
-}
-async function loadState() {
-  try {
-    let dados = null;
-    if (window.MasterState) dados = await window.MasterState.carregar(MS_CHAVE);
-    if (!dados) { const local = localStorage.getItem(STORAGE_KEY); if (local) dados = JSON.parse(local); }
-    if (!dados) { showToast('Nada salvo'); return; }
-    _msAplicando = true; applyState(dados); _msAplicando = false;
-    _setSyncStatus(window.MasterState ? '● sincronizado' : '○ local', window.MasterState ? 'var(--gold)' : 'var(--gold-dim)');
-    showToast('✓ Carregado');
-  } catch(e) { _msAplicando = false; showToast('Erro ao carregar'); }
-}
-function resetAll() {
-  if (!confirm('Resetar tudo? (HP, forma, reações, condições, notas)')) return;
-  localStorage.removeItem(STORAGE_KEY);
-  hpCurrent.value = 143; hpMax.value = 143;
-  document.querySelectorAll('.ca-input').forEach(i => i.value = 15);
-  updateHPBar();
-  document.querySelectorAll('.react-dot').forEach(d => d.classList.remove('used'));
-  document.querySelectorAll('.condition-row .chip').forEach(c => c.classList.remove('active'));
-  document.querySelectorAll('.ability.open').forEach(a => a.classList.remove('open'));
-  document.getElementById('notesArea').value = '';
-  const roundEl = document.getElementById('roundCounter'); if (roundEl) roundEl.textContent = 1;
-  switchPhase(1); showToast('✓ Resetado');
-}
-function exportJSON() {
-  const blob = new Blob([JSON.stringify(getState(), null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob); const a = document.createElement('a');
-  a.href = url; a.download = `fleshmound_combate_${new Date().toISOString().slice(0,10)}.json`; a.click(); URL.revokeObjectURL(url);
-  showToast('✓ Exportado');
-}
-function importJSON(evt) {
-  const file = evt.target.files[0]; if (!file) return;
-  const reader = new FileReader();
-  reader.onload = (e) => { try { applyState(JSON.parse(e.target.result)); showToast('✓ Importado'); saveState(true); } catch (err) { showToast('Arquivo inválido'); } };
-  reader.readAsText(file); evt.target.value = '';
-}
-let toastTimer;
-function showToast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 1800); }
-document.querySelectorAll('.ca-input').forEach(inp => inp.addEventListener('input', () => saveState(true)));
-document.getElementById('notesArea').addEventListener('input', () => { clearTimeout(window._notesTimer); window._notesTimer = setTimeout(() => saveState(true), 600); });
-document.addEventListener('keydown', (e) => {
-  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') { if (e.ctrlKey && e.key === 's') { e.preventDefault(); saveState(); } return; }
-  if (e.ctrlKey && e.key === 's') { e.preventDefault(); saveState(); return; }
-  if (e.key === '1') switchPhase(1);
-  if (e.key === '2') switchPhase(2);
+VilaoCombate.iniciar({
+  storageKey: 'fleshmound_ficha_v1',
+  msChave: 'vilao:fleshmound',
+  downloadPrefix: 'fleshmound',
+  hpDefault: 143,
+  hpMedia: 93,
+  caReset: i => 15,
+  formas: { 1: { nd: '4' }, 2: { nd: '4' } },
+  onFormaChange: f => { document.getElementById('ndHeader').textContent = f.nd; },
 });
-
-switchPhaseSilent(1);
-updateHPBar();
-(async function bootstrap() {
-  if (window.Auth) {
-    const u = await window.Auth.requerLogin('../login.html'); if (!u) return;
-    const ehMestre = await window.Auth.ehMestre();
-    if (!ehMestre) { document.body.innerHTML = '<div style="padding:60px;text-align:center;color:var(--bone);font-family:Cinzel,serif"><h2>Acesso restrito ao Mestre.</h2><p style="margin-top:14px"><a href="../../index.html" style="color:var(--gold)">Voltar</a></p></div>'; return; }
-  }
-  await loadState();
-  if (window.MasterState) window.MasterState.iniciarRealtime(MS_CHAVE, dados => { if (!dados) return; _msAplicando = true; applyState(dados); _msAplicando = false; _setSyncStatus('● sincronizado', 'var(--gold)'); });
-})();
 </script>
 
 <script src="../../assets/js/ambiente.js"></script>
