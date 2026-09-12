@@ -182,8 +182,14 @@
     box-shadow:
       0 0 0 1px var(--border-soft) inset,
       0 4px 14px var(--shadow);
-    transition: border-color 0.2s;
+    transition: border-color 0.2s, transform 0.2s ease, box-shadow 0.2s ease;
   }
+  /* lay-7: sem isto, o hover genérico de .card em components.css (que este
+     arquivo herda, já que não redefine :hover) trocaria a borda dupla
+     temática por classe pela cor neutra --border — perderia a identidade
+     visual por classe. Preserva a cor, deixa o "levantar" + sombra do
+     hover de components.css valendo normalmente. */
+  .card:hover { border-color: var(--tema-cor, var(--gold)); }
 
   .card::before, .card::after {
     content: '✦';

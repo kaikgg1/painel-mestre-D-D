@@ -172,7 +172,10 @@
     position: relative;
     overflow: hidden;
     box-shadow: 0 4px 14px rgba(0,0,0,0.5);
-    transition: border-color 0.2s;
+    /* lay-7: cobre transform/box-shadow também, pra animar suave o hover
+       de .card herdado de components.css (este arquivo não redefine
+       :hover) em vez de só a borda animar e o resto saltar direto. */
+    transition: border-color 0.2s, transform 0.2s ease, box-shadow 0.2s ease;
   }
   .card.critico { border-color: var(--danger); }
   /* linha fina de cor da classe no topo — o único destaque de cor por personagem */
