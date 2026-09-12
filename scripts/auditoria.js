@@ -133,8 +133,19 @@ async function testarFluxoCompleto() {
 
   await sb.auth.signOut();
 
-  // Login como Mestre
-  r = await sb.auth.signInWithPassword({ email: 'mestre123@mesa.local', password: 'mesa-dnd-5e' });
+  // Login como Mestre — a senha do Mestre é rotacionada (não é mais a
+  // SENHA_PADRAO dos jogadores, ver Fase 3 da auditoria/segurança) e
+  // nunca fica hardcoded aqui. Sem MESTRE_SENHA_TESTE no .env local,
+  // pula esta parte em vez de falhar o script inteiro.
+  if (!process.env.MESTRE_SENHA_TESTE) {
+    info('MESTRE_SENHA_TESTE não definida no .env — pulando testes de Mestre (5b-5e)');
+    const sbCleanup = createClient(SUPABASE_URL, SUPABASE_ANON, { auth: { persistSession: false }});
+    await sbCleanup.auth.signInWithPassword({ email: 'sabrina123@mesa.local', password: 'mesa-dnd-5e' });
+    await sbCleanup.from('characters').delete().eq('id', novo.id);
+    await sbCleanup.auth.signOut();
+    return;
+  }
+  r = await sb.auth.signInWithPassword({ email: 'mestre123@mesa.local', password: process.env.MESTRE_SENHA_TESTE });
   if (r.error) { falha('login Mestre: ' + r.error.message); return; }
   ok('login como Mestre123');
 
@@ -158,10 +169,15 @@ async function testarFluxoCompleto() {
 
 async function testarRealtimeReal() {
   console.log('\n── 6. REALTIME (subscribe + INSERT) ──');
+  if (!process.env.MESTRE_SENHA_TESTE) {
+    info('MESTRE_SENHA_TESTE não definida no .env — pulando teste de realtime (depende do login do Mestre)');
+    return;
+  }
   const sb1 = createClient(SUPABASE_URL, SUPABASE_ANON, { auth: { persistSession: false }});
   const sb2 = createClient(SUPABASE_URL, SUPABASE_ANON, { auth: { persistSession: false }});
 
-  await sb2.auth.signInWithPassword({ email: 'mestre123@mesa.local', password: 'mesa-dnd-5e' });
+  const rMestre = await sb2.auth.signInWithPassword({ email: 'mestre123@mesa.local', password: process.env.MESTRE_SENHA_TESTE });
+  if (rMestre.error) { falha('login Mestre (realtime): ' + rMestre.error.message); return; }
   await sb1.auth.signInWithPassword({ email: 'sabrina123@mesa.local', password: 'mesa-dnd-5e' });
 
   let receveu = false;
