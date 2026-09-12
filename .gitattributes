@@ -1,0 +1,5 @@
+# Bibliotecas de terceiros vendorizadas (perf-4) — tratadas como binário:
+# sem conversão de fim de linha (evita qualquer risco de corromper o
+# arquivo minificado original) e sem diff line-by-line no git (é vendor,
+# não código nosso pra revisar linha a linha).
+assets/vendor/*.js binary

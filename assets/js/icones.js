@@ -5,7 +5,7 @@
 // SO/navegador) e padronizar em ícones vetoriais que herdam `currentColor`.
 //
 // Uso:
-//   <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
+//   <script src="../assets/vendor/iconify-icon-2.1.0.min.js"></script> (vendorizado, perf-4)
 //   <script src="../assets/js/icones.js"></script>
 //
 //   Icones.html('dragao')                    -> '<iconify-icon icon="game-icons:dragon-head"></iconify-icon>'
