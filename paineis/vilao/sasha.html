@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-BR" data-theme="strahd">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#070506">
 <link rel="icon" type="image/svg+xml" href="../../assets/img/favicon.svg">
+<link rel="stylesheet" href="../../assets/css/tokens.css">
 <title>Sasha Ivliskova — Ficha de Combate</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,12 +14,12 @@
 <script src="../../assets/js/icones.js"></script>
 <style>
   :root {
-    --bg-deep:#070506; --bg-card:#180b0d; --bg-card-2:#211012; --bg-card-3:#2a1518;
-    --blood:#861820; --blood-dark:#4a1014; --blood-bright:#d14242;
+    --bg-deep:var(--bg); --bg-card:var(--surface); --bg-card-2:var(--surface-raised); --bg-card-3:#2a1518;
+    --blood:var(--danger); --blood-dark:#4a1014; --blood-bright:var(--accent-light);
     --gold:#cbac67; --gold-bright:#f0d089; --gold-dim:#8a7340;
     --bone:#efe6cf; --bone-dim:#c2b795; --shadow:#030202;
-    --text-body:#ddd2b2; --text-muted:#948767;
-    --border:#5f171b; --border-soft:rgba(168,35,43,0.14); --radius:10px;
+    --text-body:var(--text);
+    --border-soft:rgba(168,35,43,0.14); --radius:10px;
     --accent:#6f9ac4; --accent-bright:#a9cdea; --accent-glow:rgba(111,154,196,0.40); --accent-soft:rgba(111,154,196,0.12);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }

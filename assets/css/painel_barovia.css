@@ -1,28 +1,35 @@
   * { box-sizing: border-box; }
 
+  /* lay-2 da auditoria: este :root duplicava em hex os mesmos valores que
+     assets/css/tokens.css já define em [data-theme="strahd"] (a página já
+     linka tokens.css + tem data-theme="strahd" no <html>). Trocado por
+     var(...) mantendo os mesmos nomes de alias — quando o alias tem o
+     MESMO nome do token (--gold/--text/--danger/--success), a declaração
+     local foi removida em vez de virar "--gold: var(--gold)" (isso seria
+     uma auto-referência cíclica de custom property — CSS inválido — já
+     que ambas as regras miram o mesmo <html>); o valor de tokens.css já
+     cascateia normalmente sem precisar de redeclaração aqui. Só os que
+     não têm equivalente exato em tokens.css (gold-muted, danger-dim,
+     magic, shadow, blood-dark) continuam hardcoded. */
   :root {
-    --bg-deep: #070506;
-    --bg-card: #180b0d;
-    --bg-card-elev: #211012;
-    --gold: #a8232b;
+    --bg-deep: var(--bg);
+    --bg-card: var(--surface);
+    --bg-card-elev: var(--surface-raised);
     --gold-muted: #6b4a2a;
-    --text: #ddd0bc;
-    --text-dim: #89776d;
-    --divider: #3a1114;
-    --danger: #861820;
+    --text-dim: var(--text-muted);
+    --divider: var(--border-soft);
     --danger-dim: #4a1014;
-    --success: #4a5233;
     --magic: #73518A;
     --shadow: #030202;
     /* mantidos por compatibilidade com módulos JS externos (efeitos.js etc.) */
-    --parchment: #ddd0bc;
-    --parchment-dim: #89776d;
-    --gold-bright: #a8232b;
-    --blood: #3a1114;
-    --blood-bright: #861820;
+    --parchment: var(--text);
+    --parchment-dim: var(--text-muted);
+    --gold-bright: var(--gold);
+    --blood: var(--border-soft);
+    --blood-bright: var(--danger);
     --blood-dark: #2a0c0e;
-    --bone: #ddd0bc;
-    --bg-card-soft: #211012;
+    --bone: var(--text);
+    --bg-card-soft: var(--surface-raised);
   }
 
   body {
