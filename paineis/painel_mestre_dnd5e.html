@@ -385,6 +385,13 @@
     font-style: italic; margin-top: 2px;
   }
 
+  /* ===== XP (mst-10) ===== */
+  .xp-input {
+    display: block; width: 100px; margin: 0 auto;
+    background: rgba(253,241,220,0.5); border: 1.5px solid var(--brown-soft) !important;
+    border-radius: 4px; padding: 4px 6px !important; font-weight: 700;
+  }
+
   /* ===== RECURSOS DE CLASSE (mst-2) ===== */
   .recurso-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 11px; }
   .recurso-nome { color: var(--brown-soft); text-transform: capitalize; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -879,6 +886,7 @@
   <button onclick="adicionarCard()" aria-label="Adicionar novo personagem">+ Adicionar Personagem</button>
   <button onclick="descansoLongo()" aria-label="Aplicar descanso longo a todos"><span data-ico="noite" aria-hidden="true"></span> Descanso Longo</button>
   <button type="button" onclick="abrirIniciativa()" aria-label="Abrir ordem de iniciativa"><span data-ico="iniciativa" aria-hidden="true"></span> Iniciativa</button>
+  <button type="button" onclick="LootXP.abrir()" aria-label="Distribuir XP ou moedas entre o grupo"><span data-ico="tesouro" aria-hidden="true"></span> XP/Loot</button>
   <button type="button" onclick="abrirNotasMestre({ chave: 'mestre', titulo: 'Crônica dos Aventureiros' })" aria-label="Abrir anotações do mestre"><span data-ico="notas" aria-hidden="true"></span> Anotações</button>
   <a href="vilao/index.html" class="back-link" style="text-decoration:none" aria-label="Abrir fichas de vilão"><span data-ico="vampiro" aria-hidden="true"></span> Vilões</a>
   <button onclick="window.print()" aria-label="Imprimir painel"><span data-ico="imprimir" aria-hidden="true"></span> Imprimir</button>
@@ -910,6 +918,7 @@
 <script src="../assets/js/confirmar.js"></script>
 <script src="../assets/js/rolador.js"></script>
 <script src="../assets/js/iniciativa.js"></script>
+<script src="../assets/js/loot_xp.js"></script>
 <script src="../assets/js/pericias_mestre.js"></script>
 <script src="../assets/js/painel_mestre_base.js"></script>
 <script>
@@ -1381,6 +1390,15 @@ function criarCard(p) {
     exhSection.appendChild(exhNota);
   }
   card.appendChild(exhSection);
+
+  // === XP (mst-10) — editável direto, e é onde "Distribuir XP/Loot" (toolbar)
+  // soma quando aplicado em lote pro grupo todo. ===
+  const xpSection = document.createElement('div');
+  xpSection.className = 'section xp-section';
+  xpSection.innerHTML = `<div class="section-title">XP</div>`;
+  const xpInput = inputNumerico(p.xp ?? 0, v => { p.xp = v; salvar(p); }, 'xp-input', 0);
+  xpSection.appendChild(xpInput);
+  card.appendChild(xpSection);
 
   // === RECURSOS DE CLASSE (mst-2) === — catálogo por classe/nível/atributos
   // (assets/js/recursos_classe.js), mesma fonte usada na ficha do jogador,

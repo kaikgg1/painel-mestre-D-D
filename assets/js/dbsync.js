@@ -37,6 +37,7 @@
 //   magias          → magias_preparadas
 //   condicoes       → condicoes (text[])
 //   inventario      → inventario (jsonb — moedas/armas/armaduras/itens, mesmo formato da ficha)
+//   xp              → xp (mst-10: distribuir XP em lote, assets/js/loot_xp.js)
 
 (function () {
   const DEBOUNCE_MS = 400;
@@ -79,6 +80,7 @@
     recursosUsados: 'recursos_usados',
     dadoVidaAtual: 'dado_vida_atual',
     inventario: 'inventario',
+    xp: 'xp',
   };
 
   function uiToDb(uiObj) {
@@ -134,6 +136,7 @@
       isActive: !!row.is_active,
       recursosUsados: row.recursos_usados || {},
       dadoVidaAtual: row.dado_vida_atual ?? 0,
+      xp: row.xp ?? 0,
       // Moedas — extraído de inventario.moedas (JSON livre na ficha)
       moedas: (row.inventario && row.inventario.moedas)
               ? { ...{ pc:0, pp:0, pe:0, po:0, pl:0 }, ...row.inventario.moedas }
