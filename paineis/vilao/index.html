@@ -91,6 +91,22 @@
     opacity: 0.5;
   }
 
+  /* ===== Ativos recentemente (mst-13/mst-15) ===== */
+  .ativos-recentes { max-width: 900px; margin: 0 auto 28px; }
+  .ativos-titulo {
+    font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase; color: var(--text-dim);
+    margin-bottom: 8px; text-align: center;
+  }
+  .ativos-lista { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+  .ativo-chip {
+    display: inline-block; padding: 6px 14px; border-radius: 20px;
+    background: var(--bg-card-soft); border: 1px solid var(--gold);
+    color: var(--parchment); font-size: 13px; text-decoration: none;
+    transition: border-color 0.15s, transform 0.15s;
+  }
+  .ativo-chip:hover { border-color: var(--gold-light); transform: translateY(-1px); }
+
   .villain-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -332,6 +348,11 @@
     <p>Selecione um personagem da campanha. Cada ficha mantém HP, condições e notas <strong style="color:var(--gold-bright)">sincronizados em tempo real</strong> entre os seus dispositivos.</p>
     <hr>
   </div>
+
+  <section class="ativos-recentes" id="ativos-recentes" hidden aria-label="Vilões ativos recentemente">
+    <div class="ativos-titulo">Ativos recentemente nesta sessão</div>
+    <div class="ativos-lista" id="ativos-lista"></div>
+  </section>
 
   <section class="filtros" aria-label="Filtros de personagens">
     <div class="busca-wrap">
@@ -1193,6 +1214,7 @@
 <script src="https://unpkg.com/@supabase/supabase-js@2.45.0" integrity="sha384-dGnL7r9uccC9TdSdE05clTJ6esxMU42XBQ1/BWLzKQOBi7qR1aCMRIi0LzUmexIg" crossorigin="anonymous"></script>
 <script src="../../assets/js/supabase.js"></script>
 <script src="../../assets/js/auth.js"></script>
+<script src="../../assets/js/vilao_atividade.js"></script>
 <script>
   (async () => {
     const u = await window.Auth.requerLogin('../login.html');
@@ -1204,7 +1226,22 @@
       return;
     }
     document.getElementById('main-content').style.display = 'block';
+    popularAtivosRecentes();
   })();
+
+  // Atalho de "vilões ativos nesta sessão" (mst-13/mst-15): lê o que as
+  // próprias fichas registraram (assets/js/vilao_atividade.js) ao salvar —
+  // é por navegador/dispositivo, não sincroniza entre Mestre e jogadores.
+  function popularAtivosRecentes() {
+    const lista = window.VilaoAtividade ? window.VilaoAtividade.listar() : [];
+    const secao = document.getElementById('ativos-recentes');
+    if (!lista.length) { secao.hidden = true; return; }
+    const escapeHtml = s => String(s || '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+    document.getElementById('ativos-lista').innerHTML = lista.map(x =>
+      `<a href="${escapeHtml(x.slug)}.html" class="ativo-chip">${escapeHtml(x.nome)}</a>`
+    ).join('');
+    secao.hidden = false;
+  }
 
   /* ===================== FILTROS DO HUB DE PERSONAGENS ===================== */
 

@@ -138,6 +138,7 @@ window.VilaoCombate = (function () {
       try {
         const dados = getState();
         localStorage.setItem(storageKey, JSON.stringify(dados));
+        window.VilaoAtividade?.registrar(storageKey.replace(/_ficha_v1$/, ''), _nomeFicha());
         if (window.MasterState) { _setSyncStatus('⟳ sincronizando…', 'var(--gold-dim)'); window.MasterState.salvarDebounced(msChave, dados, silent ? 600 : 0); setTimeout(() => _setSyncStatus('● sincronizado', 'var(--gold)'), silent ? 800 : 200); }
         if (!silent) showToast('✓ Salvo');
       } catch (e) { if (!silent) showToast('Erro ao salvar'); }
@@ -302,6 +303,7 @@ window.VilaoCombate = (function () {
       try {
         const dados = getState();
         localStorage.setItem(storageKey, JSON.stringify(dados));
+        window.VilaoAtividade?.registrar(storageKey.replace(/_ficha_v1$/, ''), _nomeFicha());
         if (window.MasterState) { _setSyncStatus('⟳ sincronizando…', 'var(--gold-dim)'); window.MasterState.salvarDebounced(msChave, dados, silent ? 600 : 0); setTimeout(() => _setSyncStatus('● sincronizado', 'var(--gold)'), silent ? 800 : 200); }
         if (!silent) showToast('✓ Salvo');
       } catch (e) { if (!silent) showToast('Erro ao salvar'); }
@@ -440,6 +442,7 @@ window.VilaoCombate = (function () {
       try {
         const dados = getState();
         localStorage.setItem(storageKey, JSON.stringify(dados));
+        window.VilaoAtividade?.registrar(storageKey.replace(/_ficha_v1$/, ''), _nomeFicha());
         if (window.MasterState) { _setSyncStatus('⟳ sincronizando…', 'var(--gold-dim)'); window.MasterState.salvarDebounced(msChave, dados, silent ? 600 : 0); setTimeout(() => _setSyncStatus('● sincronizado', 'var(--gold)'), silent ? 800 : 200); }
         if (!silent) showToast('✓ Salvo');
       } catch (e) { if (!silent) showToast('Erro ao salvar'); }
