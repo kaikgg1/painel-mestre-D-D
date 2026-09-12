@@ -18,3 +18,12 @@ package-lock.json
 # Clone local do guia original (fonte da tradução em paineis/reloaded/) —
 # repositório de terceiros, não faz parte deste projeto
 Curse-of-Strahd-Reloaded/
+
+# Fontes originais das imagens de paineis/reloaded/ (perf-2) — 702MB de
+# PNG/JPG em altíssima resolução, substituídos por .webp bem menores
+# (scripts/reprocessar_reloaded.js) que são o que as páginas realmente
+# carregam. Continuam no disco local (não versionados) só como backup caso
+# precise reprocessar com outros parâmetros no futuro.
+paineis/reloaded/img/*.png
+paineis/reloaded/img/*.jpg
+paineis/reloaded/img/*.jpeg
