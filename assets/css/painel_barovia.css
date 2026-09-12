@@ -325,7 +325,7 @@
   .exhaustion-compact .exh-dot.on { background: var(--danger); }
   .exhaustion-compact.zero { opacity: .55; }
   .exhaustion-picker {
-    display: none; gap: 5px; margin-top: 4px;
+    display: none; flex-wrap: wrap; gap: 5px; margin-top: 4px;
   }
   .exhaustion-picker.aberto { display: flex; }
   .exh-pip {
@@ -341,7 +341,7 @@
   .death-saves-inline { display: flex; align-items: center; gap: 10px; padding: 6px 8px; border-radius: 4px; background: rgba(169,65,73,0.08); border: 1px solid var(--danger); }
   .death-saves-inline .dsi-label { font-family: 'Cinzel', serif; font-size: 9.5px; font-weight: 700; color: var(--erro); text-transform: uppercase; letter-spacing: 0.6px; }
   .death-group { display: flex; align-items: center; gap: 4px; }
-  .death-pips { display: flex; gap: 4px; }
+  .death-pips { display: flex; flex-wrap: wrap; gap: 4px; }
   .death-pip { width: 13px; height: 13px; border-radius: 50%; border: 1.5px solid; cursor: pointer; transition: all 0.15s; background: rgba(0,0,0,0.3); }
   .death-group.success .death-pip { border-color: var(--success); }
   .death-group.success .death-pip.filled { background: var(--success); }
@@ -509,8 +509,10 @@
     .toolbar button, .toolbar .back-link { padding: 12px 16px; min-height: 44px; width: 100%; justify-content: center; font-size: 12px; }
     .party-chip { min-width: calc(50% - 5px); flex: 1 1 calc(50% - 5px); }
     .stat-chips { grid-template-columns: repeat(2, 1fr); }
-    .exh-pip { width: 30px; height: 30px; font-size: 12px; }
-    .death-pip { width: 20px; height: 20px; }
+    /* Pips de exaustão e salvaguarda de morte: alvo de toque de 44px (lay-5) */
+    .exh-pip { width: 44px; height: 44px; font-size: 15px; }
+    .death-pip { width: 44px; height: 44px; }
+    .hp-current-input, .hp-max-input { min-height: 44px; }
     .slot-dot { width: 18px; height: 18px; }
     .card-actions button, .card-actions .remove-card { min-height: 38px; }
   }

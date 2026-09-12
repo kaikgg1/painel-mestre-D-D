@@ -359,6 +359,7 @@
   /* ===== EXAUSTÃO ===== */
   .exhaustion {
     display: flex;
+    flex-wrap: wrap;
     gap: 5px;
     justify-content: center;
     margin: 4px 0;
@@ -434,7 +435,7 @@
   }
   .death-group.success .death-group-label { color: var(--forest); }
   .death-group.failure .death-group-label { color: var(--erro); }
-  .death-pips { display: flex; gap: 4px; }
+  .death-pips { display: flex; flex-wrap: wrap; gap: 4px; }
   .death-pip {
     width: 14px;
     height: 14px;
@@ -777,12 +778,11 @@
     .stats-row { gap: 8px; }
     .stat-box { padding: 8px 6px; }
     .stat-value { font-size: 20px; }
-    .stat-value input { font-size: 20px; min-width: 36px; }
+    .stat-value input { font-size: 20px; min-width: 36px; min-height: 44px; }
 
-    /* Pips de exaustão: maiores pra touch */
-    .exh-pip { width: 32px; height: 32px; font-size: 13px; }
-    /* Pips de salvaguarda de morte: maiores */
-    .death-pip { width: 26px; height: 26px; }
+    /* Pips de exaustão e salvaguarda de morte: alvo de toque de 44px (lay-5) */
+    .exh-pip { width: 44px; height: 44px; font-size: 15px; }
+    .death-pip { width: 44px; height: 44px; }
 
     /* Slots: 2 colunas em vez de 3 + inputs maiores */
     .spell-slots { grid-template-columns: 1fr 1fr; gap: 8px; }
