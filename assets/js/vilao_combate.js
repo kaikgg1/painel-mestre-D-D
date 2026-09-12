@@ -355,5 +355,119 @@ window.VilaoCombate = (function () {
     window.importJSON = importJSON;
   }
 
-  return { iniciar, iniciarSemFases };
+  // Variante mais leve ainda (vilnius/zorya): só HP + condições + notas +
+  // acordeão — sem CA, reações, rodada nem export/import. Mesmo motivo de
+  // duplicar a parte de HP em vez de reusar iniciar()/iniciarSemFases(): a
+  // forma do estado salvo é diferente o bastante (menos campos) pra um
+  // "modo enxuto" condicional só confundir.
+  function iniciarHpBasico(config) {
+    const { storageKey, msChave, hpMax: HP_MAX, hpMedia: HP_MEDIA } = config;
+    let _msAplicando = false;
+
+    function _setSyncStatus(txt, cor) {
+      const el = document.getElementById('syncStatus');
+      if (el) { el.textContent = txt; el.style.color = cor || 'var(--gold-dim)'; }
+    }
+
+    const hpCurrent = document.getElementById('hpCurrent');
+    const hpMax = document.getElementById('hpMax');
+    const hpBar = document.getElementById('hpBar');
+    const hpLabel = document.getElementById('hpLabel');
+    function updateHPBar() {
+      const cur = parseInt(hpCurrent.value) || 0, max = parseInt(hpMax.value) || 1;
+      const pct = Math.max(0, Math.min(100, (cur / max) * 100));
+      hpBar.style.width = pct + '%'; hpLabel.textContent = Math.round(pct) + '%';
+      if (pct > 50) hpBar.style.background = 'linear-gradient(90deg, var(--blood-dark), var(--blood))';
+      else if (pct > 25) hpBar.style.background = 'linear-gradient(90deg, #4a1014, #a82020)';
+      else hpBar.style.background = 'linear-gradient(90deg, #3a0808, #6a0e0e)';
+    }
+    function adjustHP(delta) {
+      const max = parseInt(hpMax.value) || 1; let cur = parseInt(hpCurrent.value) || 0; const antes = cur;
+      cur = Math.max(0, Math.min(max, cur + delta)); hpCurrent.value = cur; updateHPBar();
+      const mudou = cur - antes;
+      if (window.FX && mudou !== 0) { const alvo = document.querySelector('.combat-bar .panel') || hpCurrent; if (mudou < 0) FX.dano(alvo, mudou); else FX.cura(alvo, mudou); if (FX.contarInput) FX.contarInput(hpCurrent, antes, cur); }
+      saveState(true);
+    }
+    function resetHP() { hpCurrent.value = hpMax.value; updateHPBar(); saveState(true); }
+    function setMedia() { hpMax.value = HP_MEDIA; hpCurrent.value = HP_MEDIA; updateHPBar(); saveState(true); showToast(`✓ PV na média (${HP_MEDIA})`); }
+    hpCurrent.addEventListener('input', () => { updateHPBar(); saveState(true); });
+    hpMax.addEventListener('input', () => { updateHPBar(); saveState(true); });
+    function toggleAbility(header) { header.parentElement.classList.toggle('open'); }
+
+    function getState() {
+      return {
+        hpCurrent: hpCurrent.value, hpMax: hpMax.value,
+        conditions: Array.from(document.querySelectorAll('.condition-row .chip')).map(c => c.classList.contains('active')),
+        notes: document.getElementById('notesArea').value,
+        openAbilities: Array.from(document.querySelectorAll('.ability.open')).map(a => a.querySelector('.ability-name').textContent)
+      };
+    }
+    function applyState(s) {
+      if (!s) return;
+      hpCurrent.value = s.hpCurrent ?? HP_MAX; hpMax.value = s.hpMax ?? HP_MAX; updateHPBar();
+      (s.conditions || []).forEach((u, i) => { const c = document.querySelectorAll('.condition-row .chip')[i]; if (c) c.classList.toggle('active', u); });
+      document.getElementById('notesArea').value = s.notes || '';
+      if (s.openAbilities) s.openAbilities.forEach(name => document.querySelectorAll('.ability').forEach(a => { if (a.querySelector('.ability-name').textContent === name) a.classList.add('open'); }));
+    }
+    function saveState(silent = false) {
+      if (_msAplicando) return;
+      try {
+        const dados = getState();
+        localStorage.setItem(storageKey, JSON.stringify(dados));
+        if (window.MasterState) { _setSyncStatus('⟳ sincronizando…', 'var(--gold-dim)'); window.MasterState.salvarDebounced(msChave, dados, silent ? 600 : 0); setTimeout(() => _setSyncStatus('● sincronizado', 'var(--gold)'), silent ? 800 : 200); }
+        if (!silent) showToast('✓ Salvo');
+      } catch (e) { if (!silent) showToast('Erro ao salvar'); }
+    }
+    async function loadState() {
+      try {
+        let dados = null;
+        if (window.MasterState) dados = await window.MasterState.carregar(msChave);
+        if (!dados) { const local = localStorage.getItem(storageKey); if (local) dados = JSON.parse(local); }
+        if (!dados) { showToast('Nada salvo'); return; }
+        _msAplicando = true; applyState(dados); _msAplicando = false;
+        _setSyncStatus(window.MasterState ? '● sincronizado' : '○ local', window.MasterState ? 'var(--gold)' : 'var(--gold-dim)');
+        showToast('✓ Carregado');
+      } catch (e) { _msAplicando = false; showToast('Erro ao carregar'); }
+    }
+    function resetAll() {
+      if (!confirm('Resetar tudo? (HP, condições, notas)')) return;
+      localStorage.removeItem(storageKey);
+      hpCurrent.value = HP_MAX; hpMax.value = HP_MAX;
+      updateHPBar();
+      document.querySelectorAll('.condition-row .chip').forEach(c => c.classList.remove('active'));
+      document.querySelectorAll('.ability.open').forEach(a => a.classList.remove('open'));
+      document.getElementById('notesArea').value = '';
+      showToast('✓ Resetado');
+    }
+    let toastTimer;
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.classList.add('show');
+      clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+    }
+
+    document.getElementById('notesArea').addEventListener('input', () => { clearTimeout(window._notesTimer); window._notesTimer = setTimeout(() => saveState(true), 600); });
+    document.addEventListener('keydown', (e) => { if (e.ctrlKey && e.key === 's') { e.preventDefault(); saveState(); } });
+
+    updateHPBar();
+    (async function bootstrap() {
+      if (window.Auth) {
+        const u = await window.Auth.requerLogin('../login.html'); if (!u) return;
+        const ehMestre = await window.Auth.ehMestre();
+        if (!ehMestre) { document.body.innerHTML = '<div style="padding:60px;text-align:center;color:var(--bone);font-family:Cinzel,serif"><h2>Acesso restrito ao Mestre.</h2><p style="margin-top:14px"><a href="../../index.html" style="color:var(--gold)">Voltar</a></p></div>'; return; }
+      }
+      await loadState();
+      if (window.MasterState) window.MasterState.iniciarRealtime(msChave, dados => { if (!dados) return; _msAplicando = true; applyState(dados); _msAplicando = false; _setSyncStatus('● sincronizado', 'var(--gold)'); });
+    })();
+
+    window.adjustHP = adjustHP;
+    window.resetHP = resetHP;
+    window.setMedia = setMedia;
+    window.toggleAbility = toggleAbility;
+    window.saveState = saveState;
+    window.loadState = loadState;
+    window.resetAll = resetAll;
+  }
+
+  return { iniciar, iniciarSemFases, iniciarHpBasico };
 })();
