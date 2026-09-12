@@ -52,8 +52,12 @@ function criarPersonagem(base = {}) {
     sucessos: 0,
     falhas: 0,
     concentracao: base.concentracao || { ativa: false, magia: '' },
-    spellDC: base.spellDC ?? null,
-    spellAtk: base.spellAtk ?? null,
+    // cd_resistencia/bonus_atq_magia: mesma coluna que a ficha do jogador
+    // usa (assets/js/ficha/aba_combate.js) — antes lia spell_dc/spell_atk,
+    // uma coluna paralela nunca preenchida pelo jogador, por isso aparecia
+    // "—" pra quase todo mundo mesmo quem já tinha CD/Ataque na ficha.
+    cdResistencia: base.cdResistencia ?? null,
+    bonusAtqMagia: base.bonusAtqMagia ?? null,
     slots: {1:{atual:0,max:0},2:{atual:0,max:0},3:{atual:0,max:0},4:{atual:0,max:0},5:{atual:0,max:0},6:{atual:0,max:0},7:{atual:0,max:0},8:{atual:0,max:0},9:{atual:0,max:0}},
     magias: '',
     condicoes: [],
@@ -664,7 +668,7 @@ function criarCard(p) {
     dcRow.className = 'summary-line sl-magic';
     const preparadasSpan = document.createElement('span');
     preparadasSpan.textContent = 'carregando…';
-    dcRow.innerHTML = `<span>CD <strong data-dc>${p.spellDC ?? '—'}</strong></span><span>Ataque <strong data-atk>${p.spellAtk != null ? (p.spellAtk >= 0 ? '+' + p.spellAtk : p.spellAtk) : '—'}</strong></span>`;
+    dcRow.innerHTML = `<span>CD <strong data-dc>${p.cdResistencia ?? '—'}</strong></span><span>Ataque <strong data-atk>${p.bonusAtqMagia != null ? (p.bonusAtqMagia >= 0 ? '+' + p.bonusAtqMagia : p.bonusAtqMagia) : '—'}</strong></span>`;
     dcRow.appendChild(preparadasSpan);
     const btnMagias = document.createElement('button');
     btnMagias.type = 'button';
@@ -856,8 +860,8 @@ function criarCard(p) {
       item.appendChild(val);
       return item;
     };
-    metaRow.appendChild(fazMeta('CD', p.spellDC ?? '', v => { p.spellDC = v; salvar(p); rerenderCard(p); }));
-    metaRow.appendChild(fazMeta('Ataque', p.spellAtk ?? '', v => { p.spellAtk = v; salvar(p); rerenderCard(p); }));
+    metaRow.appendChild(fazMeta('CD', p.cdResistencia ?? '', v => { p.cdResistencia = v; salvar(p); rerenderCard(p); }));
+    metaRow.appendChild(fazMeta('Ataque', p.bonusAtqMagia ?? '', v => { p.bonusAtqMagia = v; salvar(p); rerenderCard(p); }));
     metaSection.appendChild(metaRow);
     painelMagias.appendChild(metaSection);
 

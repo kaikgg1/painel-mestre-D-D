@@ -25,8 +25,10 @@
 //   iniciativa_bonus→ iniciativa_bonus (mesmo nome; usado por ficha.html)
 //   deslocamento    → deslocamento (mesmo nome; usado por ficha.html)
 //   percepcaoPassiva→ percepcao_passiva
-//   spellDC         → spell_dc
-//   spellAtk        → spell_atk
+//   spellDC         → spell_dc (legado, ver cdResistencia)
+//   spellAtk        → spell_atk (legado, ver bonusAtqMagia)
+//   cdResistencia   → cd_resistencia (mesma coluna que a ficha usa)
+//   bonusAtqMagia   → bonus_atq_magia (mesma coluna que a ficha usa)
 //   concentracao    → concentracao (jsonb: {ativa, magia})
 //   atributos       → atributos (jsonb: {for,dex,con,int,sab,car} — usado p/ calcular recursos de classe)
 //   inspiracao      → inspiracao
@@ -67,6 +69,14 @@
     percepcaoPassiva: 'percepcao_passiva',
     spellDC: 'spell_dc',
     spellAtk: 'spell_atk',
+    // CD de Resistência / Ataque Mágico "de verdade": as mesmas colunas que
+    // a ficha do jogador usa (assets/js/ficha/aba_combate.js) — spell_dc/
+    // spell_atk (acima) é uma coluna paralela mais nova (sql/021) que os
+    // painéis do mestre usavam sozinhos, nunca sincronizada com o que o
+    // jogador de fato preenche na própria ficha. Corrigido nos painéis pra
+    // ler/escrever aqui em vez de spell_dc/spell_atk.
+    cdResistencia: 'cd_resistencia',
+    bonusAtqMagia: 'bonus_atq_magia',
     concentracao: 'concentracao',
     atributos: 'atributos',
     inspiracao: 'inspiracao',
@@ -124,6 +134,8 @@
       percepcaoPassiva: row.percepcao_passiva ?? 10,
       spellDC: row.spell_dc ?? null,
       spellAtk: row.spell_atk ?? null,
+      cdResistencia: row.cd_resistencia ?? null,
+      bonusAtqMagia: row.bonus_atq_magia ?? null,
       concentracao: row.concentracao || { ativa: false, magia: '' },
       atributos: row.atributos || { for:10, dex:10, con:10, int:10, sab:10, car:10 },
       inspiracao: typeof row.inspiracao === 'number' ? row.inspiracao : (row.inspiracao ? 1 : 0),

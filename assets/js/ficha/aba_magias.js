@@ -108,7 +108,15 @@ function conectarListenersFiltroMagias() {
     busca.addEventListener('input', () => { _magiaBusca = busca.value; aplicarFiltroMagias(); });
   }
 
-  document.querySelectorAll('[data-magia-nivel]').forEach(btn => {
+  // Escopado em #magia-filtros (não document inteiro): cada .magia-item
+  // TAMBÉM carrega data-magia-nivel/escola/tipo (pra esta própria função
+  // de filtro ler o dado, mais abaixo em aplicarFiltroMagias()) — sem esse
+  // escopo, um clique pra expandir uma magia (que borbulha até .magia-item)
+  // também alternava aquele nível/escola/tipo como filtro ativo.
+  const filtrosWrap = document.getElementById('magia-filtros');
+  if (!filtrosWrap) return;
+
+  filtrosWrap.querySelectorAll('[data-magia-nivel]').forEach(btn => {
     btn.addEventListener('click', () => {
       const nv = +btn.dataset.magiaNivel;
       if (_magiaNiveis.has(nv)) _magiaNiveis.delete(nv); else _magiaNiveis.add(nv);
@@ -117,7 +125,7 @@ function conectarListenersFiltroMagias() {
       aplicarFiltroMagias();
     });
   });
-  document.querySelectorAll('[data-magia-escola]').forEach(btn => {
+  filtrosWrap.querySelectorAll('[data-magia-escola]').forEach(btn => {
     btn.addEventListener('click', () => {
       const es = btn.dataset.magiaEscola;
       if (_magiaEscolas.has(es)) _magiaEscolas.delete(es); else _magiaEscolas.add(es);
@@ -126,17 +134,17 @@ function conectarListenersFiltroMagias() {
       aplicarFiltroMagias();
     });
   });
-  document.querySelectorAll('[data-magia-tipo]').forEach(btn => {
+  filtrosWrap.querySelectorAll('[data-magia-tipo]').forEach(btn => {
     btn.addEventListener('click', () => {
       _magiaTipo = btn.dataset.magiaTipo;
-      document.querySelectorAll('[data-magia-tipo]').forEach(b => {
+      filtrosWrap.querySelectorAll('[data-magia-tipo]').forEach(b => {
         b.classList.toggle('ativo', b === btn);
         b.setAttribute('aria-pressed', String(b === btn));
       });
       aplicarFiltroMagias();
     });
   });
-  document.querySelectorAll('[data-magia-bool]').forEach(btn => {
+  filtrosWrap.querySelectorAll('[data-magia-bool]').forEach(btn => {
     btn.addEventListener('click', () => {
       const chave = btn.dataset.magiaBool;
       if (chave === 'concentracao') _magiaConcentracao = !_magiaConcentracao;
@@ -240,7 +248,12 @@ async function carregarMagiasPreparadas() {
     });
   });
 
-  conectarListenersFiltroMagias();
+  // conectarListenersFiltroMagias() NÃO é chamado aqui de propósito: os
+  // pills de filtro (#magia-filtros) são estáticos, vivem fora deste
+  // wrap e não são recriados quando carregarMagiasPreparadas() roda de
+  // novo (ex.: depois de desfavoritar uma magia pelo ★). Religar aqui
+  // duplicaria o listener a cada chamada — quem chama esta função é
+  // responsável por ligar os filtros uma única vez (listeners.js).
   aplicarFiltroMagias();
 }
 

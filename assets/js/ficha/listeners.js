@@ -19,7 +19,11 @@ function conectarListeners() {
     // Transição suave de entrada do conteúdo da nova aba
     const novoForm = document.getElementById('ficha-form');
     if (novoForm) { novoForm.classList.remove('tab-anim'); void novoForm.offsetWidth; novoForm.classList.add('tab-anim'); }
-    if (tabAtiva === 'magias') carregarMagiasPreparadas();
+    // (carregarMagiasPreparadas() NÃO é chamado aqui — render() já disparou
+    // conectarListeners(), que chama isso mais abaixo. Chamar de novo aqui
+    // duplicava a religação dos pills de filtro a cada troca de aba: dois
+    // listeners no mesmo botão fazem um clique ligar E desligar o filtro
+    // na mesma hora, então Concentração/Ritual pareciam não fazer nada.)
   }));
   // Tabs scroll indicator (gradient hints)
   const tabs = document.getElementById('tabs');
@@ -63,8 +67,14 @@ function conectarListeners() {
     inp.addEventListener('blur', () => validarCampo(inp));
   });
 
-  // Carregar magias se já estiver na aba
-  if (tabAtiva === 'magias') carregarMagiasPreparadas();
+  // Carregar magias se já estiver na aba. conectarListenersFiltroMagias()
+  // liga os pills de filtro (#magia-filtros — estáticos, mas os de Escola
+  // são populados dinamicamente DENTRO de carregarMagiasPreparadas(), daí
+  // o await antes de ligar). Chamado só aqui, uma vez por render() de
+  // verdade — não dentro de carregarMagiasPreparadas(), que também é
+  // chamada sozinha (ex.: depois de desfavoritar uma magia pelo ★) e
+  // duplicaria o listener nos pills se religasse tudo de novo ali.
+  if (tabAtiva === 'magias') carregarMagiasPreparadas().then(conectarListenersFiltroMagias);
 
   // Habilidades — carrega quando entra
   if (tabAtiva === 'habilidades') {

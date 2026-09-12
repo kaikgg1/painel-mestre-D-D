@@ -876,9 +876,12 @@ console.log('');
 {
   const antes = erros.length;
   window.__magiasFavoritasTeste = ['Arma Espiritual', 'Bênção', 'Augúrio'];
-  const sc = window.document.createElement('script');
-  sc.textContent = 'tabAtiva = "magias"; render();';
-  window.document.head.appendChild(sc);
+  // Clique de verdade no botão da aba (não "tabAtiva='magias'; render()"
+  // direto) — só assim passa pelo mesmo listener de clique que o usuário
+  // real aciona. Um bug real (2 listeners duplicados religando os pills de
+  // filtro a cada troca de aba, cancelando o próprio clique) só existia
+  // nesse caminho — chamar render() direto no script escondia o problema.
+  window.document.querySelector('.tab[data-tab="magias"]')?.click();
 
   const magiasWrap = () => window.document.getElementById('magias-prep');
   for (let i = 0; i < 50 && magiasWrap() && /Carregando/.test(magiasWrap().textContent); i++) {

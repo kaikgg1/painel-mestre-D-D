@@ -272,6 +272,18 @@ function conectarListenersCombate() {
     render();
   });
 
+  // "Ver Magias" (mesmo atributo/estilo do atalho da aba Resumo, mas
+  // aba_resumo.js só liga o clique nos botões que ELA renderiza — o
+  // botão daqui, na aba Combate, nunca tinha listener nenhum. Só uma
+  // aba fica no DOM por vez (renderTab() troca o conteúdo, não empilha),
+  // então essa query não conflita com o botão do Resumo.
+  document.querySelectorAll('[data-resumo-ir]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const alvo = document.querySelector(`.tab[data-tab="${btn.dataset.resumoIr}"]`);
+      if (alvo) alvo.click();
+    });
+  });
+
   // Modo de rolagem (Normal/Vantagem/Desvantagem) — atualização direta do
   // botão em vez de re-render completo da aba (é só um rótulo mudando).
   const btnModo = document.getElementById('btn-modo-rolagem');
