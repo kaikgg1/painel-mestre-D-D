@@ -21,6 +21,27 @@
 // exportJSON/importJSON como globais soltos (window.X) — o HTML chama via
 // onclick="X(...)" inline, precisam existir nesse escopo.
 window.VilaoCombate = (function () {
+  // Nome exibido no topo de toda ficha de vilão (paineis/vilao/*.html) —
+  // usado só pro log de combate opcional (mst-9, assets/js/log_combate.js)
+  // saber de quem é o evento, sem precisar de mais um parâmetro de config.
+  function _nomeFicha() {
+    return document.querySelector('.brand')?.textContent?.trim() || 'Vilão';
+  }
+  // Liga um listener delegado (1 por página) nos chips de condição — eles
+  // já têm onclick inline (this.classList.toggle('active');saveState(true))
+  // em cada ficha; isso só ADICIONA o registro no log, sem tocar no HTML.
+  let _logCondicoesLigado = false;
+  function _ligarLogCondicoes() {
+    if (!window.LogCombate || _logCondicoesLigado) return;
+    _logCondicoesLigado = true;
+    document.addEventListener('click', e => {
+      const chip = e.target.closest('.condition-row .chip');
+      if (!chip) return;
+      const ativo = chip.classList.contains('active');
+      window.LogCombate.registrar(`${_nomeFicha()}: <strong>${chip.textContent.trim()}</strong> ${ativo ? 'ativada' : 'removida'}`);
+    });
+  }
+
   function iniciar(config) {
     const { storageKey, msChave, downloadPrefix, hpDefault, hpMedia, caReset, formas, onFormaChange } = config;
     let _msAplicando = false;
@@ -60,6 +81,7 @@ window.VilaoCombate = (function () {
       cur = Math.max(0, Math.min(max, cur + delta)); hpCurrent.value = cur; updateHPBar();
       const mudou = cur - antes;
       if (window.FX && mudou !== 0) { const alvo = document.querySelector('.combat-bar .panel') || hpCurrent; if (mudou < 0) FX.dano(alvo, mudou); else FX.cura(alvo, mudou); if (FX.contarInput) FX.contarInput(hpCurrent, antes, cur); }
+      if (mudou !== 0) window.LogCombate?.registrar(`${_nomeFicha()}: <strong>${mudou > 0 ? '+' : ''}${mudou} PV</strong> (${antes}→${cur})`);
       saveState(true);
     }
     function resetHP() { hpCurrent.value = hpMax.value; updateHPBar(); saveState(true); }
@@ -175,6 +197,7 @@ window.VilaoCombate = (function () {
 
     switchPhaseSilent(1);
     updateHPBar();
+    _ligarLogCondicoes();
     (async function bootstrap() {
       if (window.Auth) {
         const u = await window.Auth.requerLogin('../login.html'); if (!u) return;
@@ -234,6 +257,7 @@ window.VilaoCombate = (function () {
       cur = Math.max(0, Math.min(max, cur + delta)); hpCurrent.value = cur; updateHPBar();
       const mudou = cur - antes;
       if (window.FX && mudou !== 0) { const alvo = document.querySelector('.combat-bar .panel') || hpCurrent; if (mudou < 0) FX.dano(alvo, mudou); else FX.cura(alvo, mudou); if (FX.contarInput) FX.contarInput(hpCurrent, antes, cur); }
+      if (mudou !== 0) window.LogCombate?.registrar(`${_nomeFicha()}: <strong>${mudou > 0 ? '+' : ''}${mudou} PV</strong> (${antes}→${cur})`);
       saveState(true);
     }
     function resetHP() { hpCurrent.value = hpMax.value; updateHPBar(); saveState(true); }
@@ -330,6 +354,7 @@ window.VilaoCombate = (function () {
     document.addEventListener('keydown', (e) => { if (e.ctrlKey && e.key === 's') { e.preventDefault(); saveState(); } });
 
     updateHPBar();
+    _ligarLogCondicoes();
     (async function bootstrap() {
       if (window.Auth) {
         const u = await window.Auth.requerLogin('../login.html'); if (!u) return;
@@ -386,6 +411,7 @@ window.VilaoCombate = (function () {
       cur = Math.max(0, Math.min(max, cur + delta)); hpCurrent.value = cur; updateHPBar();
       const mudou = cur - antes;
       if (window.FX && mudou !== 0) { const alvo = document.querySelector('.combat-bar .panel') || hpCurrent; if (mudou < 0) FX.dano(alvo, mudou); else FX.cura(alvo, mudou); if (FX.contarInput) FX.contarInput(hpCurrent, antes, cur); }
+      if (mudou !== 0) window.LogCombate?.registrar(`${_nomeFicha()}: <strong>${mudou > 0 ? '+' : ''}${mudou} PV</strong> (${antes}→${cur})`);
       saveState(true);
     }
     function resetHP() { hpCurrent.value = hpMax.value; updateHPBar(); saveState(true); }
@@ -450,6 +476,7 @@ window.VilaoCombate = (function () {
     document.addEventListener('keydown', (e) => { if (e.ctrlKey && e.key === 's') { e.preventDefault(); saveState(); } });
 
     updateHPBar();
+    _ligarLogCondicoes();
     (async function bootstrap() {
       if (window.Auth) {
         const u = await window.Auth.requerLogin('../login.html'); if (!u) return;

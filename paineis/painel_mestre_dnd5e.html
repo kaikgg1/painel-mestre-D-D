@@ -919,6 +919,7 @@
 <script src="../assets/js/rolador.js"></script>
 <script src="../assets/js/iniciativa.js"></script>
 <script src="../assets/js/loot_xp.js"></script>
+<script src="../assets/js/log_combate.js"></script>
 <script src="../assets/js/pericias_mestre.js"></script>
 <script src="../assets/js/painel_mestre_base.js"></script>
 <script>
@@ -1313,12 +1314,14 @@ function criarCard(p) {
   const hpVal = document.createElement('div');
   hpVal.className = 'stat-value hp-grouped';
   const hpCur = inputNumerico(p.hpAtual, v => {
-    const delta = v - (p.hpAtual ?? v);
+    const antes = p.hpAtual ?? v;
+    const delta = v - antes;
     p.hpAtual = v; salvar(p); toast(`PV atualizado: ${v}`);
     if (window.FX && delta !== 0) {
       const alvo = hpCur.closest('.card') || hpCur;
       if (delta < 0) FX.dano(alvo, delta); else FX.cura(alvo, delta);
     }
+    if (delta !== 0) window.LogCombate?.registrar(`${escapeHtml(p.nome)}: <strong>${delta > 0 ? '+' : ''}${delta} PV</strong> (${antes}→${v})`);
   }, 'hp-current-input', 0);
   const hpSep = document.createElement('span');
   hpSep.className = 'hp-sep';
@@ -1692,7 +1695,9 @@ function criarCard(p) {
       if (p.condicoes.includes(cond)) p.condicoes = p.condicoes.filter(c => c !== cond);
       else p.condicoes.push(cond);
       salvar(p);
-      tag.classList.toggle('active', p.condicoes.includes(cond));
+      const ativo = p.condicoes.includes(cond);
+      tag.classList.toggle('active', ativo);
+      window.LogCombate?.registrar(`${escapeHtml(p.nome)}: <strong>${escapeHtml(cond)}</strong> ${ativo ? 'ativada' : 'removida'}`);
     };
     condContainer.appendChild(tag);
   });
