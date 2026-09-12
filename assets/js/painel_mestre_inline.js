@@ -799,8 +799,8 @@ function criarCard(p) {
 
   const descBtn = document.createElement('button');
   descBtn.className = 'save-card';
-  descBtn.style.borderColor = 'var(--red)';
-  descBtn.style.color = 'var(--red-dark)';
+  descBtn.style.borderColor = 'var(--border)';
+  descBtn.style.color = 'var(--text-muted)';
   descBtn.innerHTML = ico('noite') + 'Desc. Longo';
   descBtn.onclick = async () => {
     const ok = await window.Confirmar.perguntar({
@@ -949,7 +949,7 @@ function podeEditar() {
     ehMestre = r.ehMestre;
   } catch (e) {
     console.error(e);
-    document.getElementById('grid').innerHTML = `<div style="padding:30px;text-align:center;color:var(--text-dim,#888)">Erro ao conectar ao banco: ${e.message}</div>`;
+    document.getElementById('grid').innerHTML = `<div style="padding:30px;text-align:center;color:var(--text-muted,#888)">Erro ao conectar ao banco: ${e.message}</div>`;
     return;
   }
 

@@ -1,28 +1,35 @@
+  /* assets/css/painel_mestre.css
+     Depende de: assets/css/tokens.css + assets/css/components.css
+     (linkados antes deste arquivo em painel_mestre_dnd5e.html) — usa o
+     tema GERAL (:root), não o tema Strahd. (lay-1 da auditoria: antes
+     deste arquivo tinha seu próprio :root de "pergaminho" independente
+     do design system; migrado pra herdar de tokens.css/components.css
+     como o resto do sistema.)
+
+     Duas variáveis semânticas extras que tokens.css não define, no
+     mesmo padrão de assets/css/ficha/base.css:
+       --on-gold  texto sobre uma superfície --gold sólida (precisa ser escuro)
+       --erro     vermelho mais claro que --danger, legível como TEXTO
+                  sobre fundo escuro (--danger é escuro demais pra isso) */
+
   @import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500;600;700&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
 
   * { box-sizing: border-box; }
 
   :root {
-    --bg-page: #2a1810;
-    --bg-parchment: #FDF1DC;
-    --bg-parchment-dark: #E8D5A8;
-    --gold: #C9A24A;
-    --gold-dark: #8B6914;
-    --red: #922610;
-    --red-dark: #5C1809;
-    --brown: #3A1E0C;
-    --brown-soft: #5a3a20;
+    --on-gold: #17140d;
+    --erro: #c9847a;
   }
 
   body {
     margin: 0;
     padding: 24px 16px;
     font-family: 'Libre Baskerville', Georgia, serif;
-    background-color: var(--bg-page);
+    background-color: var(--bg);
     background-image:
-      radial-gradient(ellipse at top, #4a2818 0%, #2a1810 60%, #1a0e08 100%);
+      radial-gradient(ellipse at top, color-mix(in srgb, var(--bg-soft) 80%, transparent) 0%, transparent 60%);
     background-attachment: fixed;
-    color: var(--brown);
+    color: var(--text);
     min-height: 100vh;
   }
 
@@ -31,7 +38,7 @@
     max-width: 1280px;
     margin: 0 auto 24px;
     text-align: center;
-    color: var(--bg-parchment);
+    color: var(--text);
     position: relative;
     padding: 8px 0 20px;
   }
@@ -48,7 +55,7 @@
   .header .subtitle {
     font-style: italic;
     font-size: 14px;
-    color: #d4b88c;
+    color: var(--text-muted);
     margin-top: 6px;
     letter-spacing: 1px;
   }
@@ -74,7 +81,7 @@
     padding: 8px 14px;
     background: transparent;
     border: 1.5px solid var(--gold);
-    color: var(--red-dark);
+    color: var(--gold-light);
     border-radius: 4px;
     text-decoration: none;
     font-family: 'Cinzel', serif;
@@ -88,13 +95,13 @@
   }
   .toolbar .back-link:hover {
     background: var(--gold);
-    color: var(--bg-parchment);
+    color: var(--on-gold);
   }
   .toolbar button {
     padding: 8px 16px;
-    background: var(--bg-parchment);
+    background: var(--surface-raised);
     border: 1.5px solid var(--gold);
-    color: var(--red-dark);
+    color: var(--gold-light);
     border-radius: 4px;
     cursor: pointer;
     font-family: 'Cinzel', serif;
@@ -103,20 +110,20 @@
     letter-spacing: 0.5px;
     text-transform: uppercase;
     transition: all 0.15s;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+    box-shadow: 0 2px 6px var(--shadow);
   }
   .toolbar button:hover {
     background: var(--gold);
-    color: var(--brown);
+    color: var(--on-gold);
     transform: translateY(-1px);
   }
   .toolbar button.danger {
-    border-color: var(--red);
-    color: var(--red-dark);
+    border-color: var(--danger);
+    color: var(--erro);
   }
   .toolbar button.danger:hover {
-    background: var(--red);
-    color: var(--bg-parchment);
+    background: var(--danger);
+    color: var(--text);
   }
 
   /* ===== GRID DE CARDS ===== */
@@ -136,17 +143,17 @@
   }
   .party-chip {
     display: flex; align-items: center; gap: 8px;
-    background: var(--bg-parchment); border: 1px solid var(--gold-dark); border-radius: 20px;
+    background: var(--surface); border: 1px solid var(--bronze); border-radius: 20px;
     padding: 6px 14px 6px 8px; cursor: pointer; transition: border-color .15s, transform .15s;
     min-width: 150px;
   }
-  .party-chip:hover { border-color: var(--red); transform: translateY(-1px); }
+  .party-chip:hover { border-color: var(--danger); transform: translateY(-1px); }
   .party-chip .pc-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; background: var(--tema-cor, var(--gold)); }
-  .party-chip .pc-nome { font-family: 'Cinzel', serif; font-size: 11.5px; font-weight: 600; color: var(--brown); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90px; }
-  .party-chip .pc-hp { font-size: 11px; color: var(--brown-soft); margin-left: auto; white-space: nowrap; }
-  .party-chip.critico .pc-hp { color: var(--red-dark); font-weight: 700; }
-  .party-chip.inconsciente { border-color: var(--red-dark); }
-  .party-chip.inconsciente .pc-nome { color: var(--red-dark); }
+  .party-chip .pc-nome { font-family: 'Cinzel', serif; font-size: 11.5px; font-weight: 600; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 90px; }
+  .party-chip .pc-hp { font-size: 11px; color: var(--text-muted); margin-left: auto; white-space: nowrap; }
+  .party-chip.critico .pc-hp { color: var(--erro); font-weight: 700; }
+  .party-chip.inconsciente { border-color: var(--danger); }
+  .party-chip.inconsciente .pc-nome { color: var(--erro); }
   .party-chip .pc-flag { font-size: 12px; }
 
   /* ===== VILÕES EM JOGO (mst-7) ===== */
@@ -156,36 +163,35 @@
   }
   .vw-chip {
     display: flex; align-items: center; gap: 8px;
-    background: rgba(20,10,5,0.55); border: 1px solid var(--red-dark); border-radius: 20px;
-    padding: 6px 14px; text-decoration: none; color: var(--bg-parchment);
+    background: var(--surface); border: 1px solid var(--danger); border-radius: 20px;
+    padding: 6px 14px; text-decoration: none; color: var(--text);
     font-family: 'Cinzel', serif; font-size: 11.5px; font-weight: 600;
     transition: border-color .15s, transform .15s;
   }
   .vw-chip:hover { border-color: var(--gold); transform: translateY(-1px); }
-  .vw-hp { font-size: 11px; color: var(--gold); white-space: nowrap; }
+  .vw-hp { font-size: 11px; color: var(--gold-light); white-space: nowrap; }
 
   /* ===== CARD ===== */
   .card {
-    background: var(--bg-parchment);
+    background: var(--surface);
     background-image:
-      linear-gradient(rgba(253,241,220,0.92), rgba(253,241,220,0.92)),
-      radial-gradient(circle at 30% 20%, rgba(180,150,100,0.2) 0%, transparent 60%),
-      radial-gradient(circle at 70% 80%, rgba(160,130,80,0.15) 0%, transparent 60%);
+      radial-gradient(circle at 30% 20%, color-mix(in srgb, var(--tema-cor, var(--gold)) 10%, transparent) 0%, transparent 60%),
+      radial-gradient(circle at 70% 80%, rgba(0,0,0,0.3) 0%, transparent 60%);
     border: 3px double var(--tema-cor, var(--gold));
     border-radius: 6px;
     padding: 14px;
     position: relative;
     z-index: 0; /* contém o watermark de classe dentro deste card */
     box-shadow:
-      0 0 0 1px var(--red-dark) inset,
-      0 4px 14px rgba(0,0,0,0.4);
+      0 0 0 1px var(--border-soft) inset,
+      0 4px 14px var(--shadow);
     transition: border-color 0.2s;
   }
 
   .card::before, .card::after {
     content: '✦';
     position: absolute;
-    color: var(--tema-cor, var(--gold-dark));
+    color: var(--tema-cor, var(--bronze));
     font-size: 14px;
     opacity: 0.7;
   }
@@ -200,7 +206,7 @@
     bottom: -12px;
     font-size: 120px;
     line-height: 1;
-    color: var(--tema-cor, var(--gold-dark));
+    color: var(--tema-cor, var(--bronze));
     opacity: 0.12;
     pointer-events: none;
     transform: rotate(-6deg);
@@ -209,7 +215,7 @@
     display: inline-flex;
     vertical-align: -3px;
     margin-right: 5px;
-    color: var(--tema-cor, var(--gold-dark));
+    color: var(--tema-cor, var(--bronze));
     font-size: 13px;
   }
 
@@ -218,14 +224,14 @@
     text-align: center;
     margin-bottom: 10px;
     padding-bottom: 10px;
-    border-bottom: 1.5px solid var(--tema-cor, var(--red));
+    border-bottom: 1.5px solid var(--tema-cor, var(--border));
     position: relative;
   }
   .char-name {
     font-family: 'Cinzel', serif;
     font-size: 20px;
     font-weight: 700;
-    color: var(--red-dark);
+    color: var(--gold-light);
     font-variant: small-caps;
     letter-spacing: 1.5px;
     line-height: 1.15;
@@ -235,17 +241,17 @@
   .player-name {
     font-style: italic;
     font-size: 12px;
-    color: var(--brown-soft);
+    color: var(--text-muted);
     margin-top: 2px;
     outline: none;
   }
   .race-class {
     font-size: 13px;
-    color: var(--brown);
+    color: var(--text);
     margin-top: 4px;
     outline: none;
   }
-  .race-class strong { color: var(--red-dark); }
+  .race-class strong { color: var(--gold-light); }
 
   /* ===== INSPIRAÇÃO ===== */
   .inspiration {
@@ -255,8 +261,8 @@
     min-width: 32px;
     height: 28px;
     padding: 0 6px;
-    background: var(--bg-parchment);
-    border: 2px solid var(--gold-dark);
+    background: var(--surface-raised);
+    border: 2px solid var(--bronze);
     border-radius: 14px;
     display: flex;
     align-items: center;
@@ -266,7 +272,7 @@
     font-size: 14px;
     font-family: 'Cinzel', serif;
     font-weight: 700;
-    color: var(--brown);
+    color: var(--text);
     transition: all 0.2s;
     user-select: none;
   }
@@ -274,7 +280,7 @@
   .inspiration .qty { font-size: 13px; }
   .inspiration.active {
     background: var(--gold);
-    color: var(--red-dark);
+    color: var(--on-gold);
     box-shadow: 0 0 8px var(--gold);
   }
   .inspiration:hover { transform: scale(1.08); }
@@ -287,8 +293,8 @@
     margin-bottom: 12px;
   }
   .stat-box {
-    background: rgba(146, 38, 16, 0.08);
-    border: 1px solid var(--red);
+    background: color-mix(in srgb, var(--danger) 10%, transparent);
+    border: 1px solid var(--border);
     border-radius: 4px;
     padding: 6px 4px;
     text-align: center;
@@ -297,7 +303,7 @@
     font-family: 'Cinzel', serif;
     font-size: 10px;
     font-weight: 600;
-    color: var(--red-dark);
+    color: var(--gold-light);
     text-transform: uppercase;
     letter-spacing: 0.8px;
     margin-bottom: 2px;
@@ -305,7 +311,7 @@
   .stat-value {
     font-size: 18px;
     font-weight: 700;
-    color: var(--brown);
+    color: var(--text);
     outline: none;
     line-height: 1.1;
   }
@@ -316,7 +322,7 @@
     justify-content: center;
     gap: 2px;
   }
-  .hp-sep { color: var(--brown-soft); margin: 0 1px; }
+  .hp-sep { color: var(--text-muted); margin: 0 1px; }
 
   /* ===== INPUT NUMÉRICO (math parser) ===== */
   .stat-input {
@@ -331,10 +337,10 @@
     border-radius: 2px;
     transition: background 0.12s;
   }
-  .stat-input:focus { background: rgba(201, 162, 74, 0.2); }
-  .hp-current-input { color: var(--red-dark); font-weight: 700; max-width: 40px; }
-  .hp-max-input { max-width: 36px; color: var(--brown); }
-  .stat-input::placeholder { color: var(--brown-soft); opacity: 0.5; }
+  .stat-input:focus { background: color-mix(in srgb, var(--gold) 20%, transparent); }
+  .hp-current-input { color: var(--erro); font-weight: 700; max-width: 40px; }
+  .hp-max-input { max-width: 36px; color: var(--text); }
+  .stat-input::placeholder { color: var(--text-muted); opacity: 0.5; }
 
   /* ===== SEÇÕES ===== */
   .section { margin-top: 10px; }
@@ -342,11 +348,11 @@
     font-family: 'Cinzel', serif;
     font-size: 12px;
     font-weight: 600;
-    color: var(--red-dark);
+    color: var(--gold-light);
     text-transform: uppercase;
     letter-spacing: 1px;
     padding-bottom: 2px;
-    border-bottom: 1px solid var(--tema-cor, var(--red));
+    border-bottom: 1px solid var(--tema-cor, var(--border));
     margin-bottom: 6px;
     display: flex;
     align-items: center;
@@ -363,7 +369,7 @@
   .exh-pip {
     width: 22px;
     height: 22px;
-    border: 1.5px solid var(--brown-soft);
+    border: 1.5px solid var(--text-muted);
     border-radius: 4px;
     cursor: pointer;
     display: flex;
@@ -371,44 +377,44 @@
     justify-content: center;
     font-size: 11px;
     font-weight: 700;
-    color: var(--brown-soft);
-    background: rgba(253, 241, 220, 0.5);
+    color: var(--text-muted);
+    background: color-mix(in srgb, var(--surface) 50%, transparent);
     transition: all 0.15s;
     user-select: none;
   }
-  .exh-pip:hover { border-color: var(--red); }
+  .exh-pip:hover { border-color: var(--danger); }
   .exh-pip.filled {
-    background: var(--red-dark);
-    border-color: var(--red-dark);
-    color: var(--gold);
+    background: var(--danger);
+    border-color: var(--danger);
+    color: var(--gold-light);
   }
   .exh-efeitos {
-    font-size: 11px; color: var(--red-dark); text-align: center;
+    font-size: 11px; color: var(--erro); text-align: center;
     font-style: italic; margin-top: 2px;
   }
 
   /* ===== XP (mst-10) ===== */
   .xp-input {
     display: block; width: 100px; margin: 0 auto;
-    background: rgba(253,241,220,0.5); border: 1.5px solid var(--brown-soft) !important;
+    background: color-mix(in srgb, var(--surface) 50%, transparent); border: 1.5px solid var(--text-muted) !important;
     border-radius: 4px; padding: 4px 6px !important; font-weight: 700;
   }
 
   /* ===== RECURSOS DE CLASSE (mst-2) ===== */
   .recurso-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 11px; }
-  .recurso-nome { color: var(--brown-soft); text-transform: capitalize; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .recurso-nome { color: var(--text-muted); text-transform: capitalize; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .recurso-pips { display: flex; gap: 3px; flex-wrap: wrap; }
-  .recurso-pip { width: 11px; height: 11px; border-radius: 3px; border: 1.5px solid var(--gold-dark); background: transparent; cursor: pointer; padding: 0; }
-  .recurso-pip.gasto { background: var(--gold-dark); }
-  .recurso-vazio { font-size: 11px; color: var(--brown-soft); font-style: italic; }
+  .recurso-pip { width: 11px; height: 11px; border-radius: 3px; border: 1.5px solid var(--bronze); background: transparent; cursor: pointer; padding: 0; }
+  .recurso-pip.gasto { background: var(--bronze); }
+  .recurso-vazio { font-size: 11px; color: var(--text-muted); font-style: italic; }
   .recurso-pool { display: flex; align-items: center; gap: 5px; }
   .recurso-pool-btn {
-    width: 18px; height: 18px; border-radius: 3px; border: 1px solid var(--gold-dark);
-    background: transparent; color: var(--gold-dark); cursor: pointer; font-size: 10px; line-height: 1; padding: 0;
+    width: 18px; height: 18px; border-radius: 3px; border: 1px solid var(--bronze);
+    background: transparent; color: var(--bronze); cursor: pointer; font-size: 10px; line-height: 1; padding: 0;
   }
-  .recurso-pool-btn:hover { background: var(--gold-dark); color: var(--bg-parchment); }
-  .recurso-pool-val { font-size: 11px; color: var(--brown); min-width: 34px; text-align: center; }
-  .recurso-pool-val strong { color: var(--gold-dark); }
+  .recurso-pool-btn:hover { background: var(--bronze); color: var(--text); }
+  .recurso-pool-val { font-size: 11px; color: var(--text); min-width: 34px; text-align: center; }
+  .recurso-pool-val strong { color: var(--gold-light); }
 
   /* ===== SALVAGUARDAS DE MORTE ===== */
   .death-saves {
@@ -429,8 +435,8 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
   }
-  .death-group.success .death-group-label { color: #2d6a3e; }
-  .death-group.failure .death-group-label { color: var(--red-dark); }
+  .death-group.success .death-group-label { color: var(--forest); }
+  .death-group.failure .death-group-label { color: var(--erro); }
   .death-pips { display: flex; gap: 4px; }
   .death-pip {
     width: 14px;
@@ -440,10 +446,10 @@
     cursor: pointer;
     transition: all 0.15s;
   }
-  .death-group.success .death-pip { border-color: #2d6a3e; }
-  .death-group.success .death-pip.filled { background: #2d6a3e; }
-  .death-group.failure .death-pip { border-color: var(--red-dark); }
-  .death-group.failure .death-pip.filled { background: var(--red-dark); }
+  .death-group.success .death-pip { border-color: var(--forest); }
+  .death-group.success .death-pip.filled { background: var(--forest); }
+  .death-group.failure .death-pip { border-color: var(--danger); }
+  .death-group.failure .death-pip.filled { background: var(--danger); }
 
   /* ===== SLOTS DE MAGIA ===== */
   .spell-slots {
@@ -453,8 +459,8 @@
     font-size: 11px;
   }
   .slot-level {
-    background: linear-gradient(180deg, rgba(146, 38, 16, 0.08), rgba(146, 38, 16, 0.02));
-    border: 1px solid rgba(146, 38, 16, 0.3);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--danger) 10%, transparent), transparent);
+    border: 1px solid var(--border-soft);
     border-radius: 5px;
     padding: 6px 4px;
     text-align: center;
@@ -464,7 +470,7 @@
   .slot-level-num {
     font-family: 'Cinzel', serif;
     font-weight: 700;
-    color: var(--red-dark);
+    color: var(--gold-light);
     font-size: 10px;
     letter-spacing: 1px;
     margin-bottom: 4px;
@@ -475,23 +481,23 @@
   }
   .slot-pip-m {
     width: 14px; height: 14px;
-    border: 1.5px solid var(--red-dark);
+    border: 1.5px solid var(--bronze);
     border-radius: 50%;
-    background: var(--bg-parchment);
+    background: var(--surface);
     cursor: pointer; padding: 0;
     transition: transform 0.12s, background 0.12s;
   }
   .slot-pip-m:hover { transform: scale(1.2); }
   .slot-pip-m.gasto {
-    background: radial-gradient(circle, var(--red), var(--red-dark));
-    border-color: var(--red);
+    background: radial-gradient(circle, var(--gold), var(--bronze));
+    border-color: var(--gold);
   }
   .slot-status-m {
     font-size: 10px; font-family: 'Cinzel', serif;
-    color: var(--brown-soft); letter-spacing: 0.5px;
+    color: var(--text-muted); letter-spacing: 0.5px;
   }
-  .slot-status-m strong { color: var(--red-dark); font-size: 11px; }
-  .slot-level.indisponivel .slot-status-m { color: var(--brown-soft); }
+  .slot-status-m strong { color: var(--gold-light); font-size: 11px; }
+  .slot-level.indisponivel .slot-status-m { color: var(--text-muted); }
 
   /* ===== MAGIAS PREPARADAS (Mestre — vem do spell_lists), agrupadas por nível ===== */
   .magias-prep-mestre { padding: 2px 0; }
@@ -499,7 +505,7 @@
   .magia-prep-grupo-titulo {
     font-family: 'Cinzel', serif;
     font-size: 9.5px; font-weight: 700;
-    color: var(--tema-cor, var(--red-dark));
+    color: var(--tema-cor, var(--gold-light));
     text-transform: uppercase;
     letter-spacing: 1.2px;
     margin-bottom: 4px;
@@ -508,15 +514,15 @@
   .magia-prep-grupo-tags { display: flex; flex-wrap: wrap; gap: 4px; }
   .magia-prep-tag {
     display: inline-flex; align-items: center;
-    background: rgba(184, 138, 44, 0.15);
-    border: 1px solid rgba(146, 38, 16, 0.3);
+    background: color-mix(in srgb, var(--gold) 12%, transparent);
+    border: 1px solid var(--border-soft);
     border-radius: 10px;
     padding: 2px 9px;
     font-size: 11px;
-    color: var(--brown);
+    color: var(--text);
   }
   .magia-prep-vazio {
-    font-size: 11px; color: var(--brown-soft);
+    font-size: 11px; color: var(--text-muted);
     font-style: italic; padding: 4px 0;
   }
 
@@ -525,7 +531,7 @@
   .equip-grupo-titulo {
     font-family: 'Cinzel', serif;
     font-size: 9.5px; font-weight: 700;
-    color: var(--tema-cor, var(--red-dark));
+    color: var(--tema-cor, var(--gold-light));
     text-transform: uppercase;
     letter-spacing: 1.2px;
     margin-bottom: 4px;
@@ -534,45 +540,45 @@
   .equip-tags { display: flex; flex-wrap: wrap; gap: 4px; min-height: 4px; }
   .equip-tag {
     display: inline-flex; align-items: center; gap: 6px;
-    background: var(--bg-parchment-dark);
-    border: 1px solid var(--gold-dark);
+    background: var(--surface-raised);
+    border: 1px solid var(--bronze);
     border-radius: 10px;
     padding: 2px 6px 2px 9px;
     font-size: 11px;
-    color: var(--brown);
+    color: var(--text);
   }
-  .equip-tag .equip-tag-extra { color: var(--brown-soft); font-size: 10px; }
+  .equip-tag .equip-tag-extra { color: var(--text-muted); font-size: 10px; }
   .equip-tag .equip-rm {
     background: none; border: none; cursor: pointer;
-    color: var(--brown-soft); font-size: 12px; line-height: 1;
+    color: var(--text-muted); font-size: 12px; line-height: 1;
     padding: 2px 3px; border-radius: 50%;
   }
-  .equip-tag .equip-rm:hover { color: var(--red-dark); background: rgba(146,38,16,0.15); }
-  .equip-vazio { font-size: 11px; color: var(--brown-soft); font-style: italic; }
+  .equip-tag .equip-rm:hover { color: var(--erro); background: color-mix(in srgb, var(--danger) 15%, transparent); }
+  .equip-vazio { font-size: 11px; color: var(--text-muted); font-style: italic; }
   .equip-add { display: flex; gap: 4px; margin-top: 5px; }
   .equip-add input {
     flex: 1; min-width: 0;
-    background: var(--bg-parchment);
-    border: 1px solid var(--gold-dark);
+    background: var(--surface);
+    border: 1px solid var(--bronze);
     border-radius: 2px;
-    color: var(--brown);
+    color: var(--text);
     font-size: 11px;
     padding: 4px 6px;
     font-family: 'Libre Baskerville', serif;
   }
   .equip-add input.equip-add-extra { flex: 0 0 52px; }
-  .equip-add input::placeholder { color: var(--brown-soft); opacity: 0.6; }
+  .equip-add input::placeholder { color: var(--text-muted); opacity: 0.6; }
   .equip-add button {
-    background: rgba(201,162,74,0.2);
-    border: 1px solid var(--gold-dark);
-    color: var(--red-dark);
+    background: color-mix(in srgb, var(--gold) 20%, transparent);
+    border: 1px solid var(--bronze);
+    color: var(--gold-light);
     border-radius: 2px;
     padding: 0 10px;
     cursor: pointer;
     font-size: 13px;
     font-weight: 700;
   }
-  .equip-add button:hover { background: var(--gold); color: var(--bg-parchment); }
+  .equip-add button:hover { background: var(--gold); color: var(--on-gold); }
 
   /* ===== MOEDAS (visão do mestre — somente leitura) ===== */
   .moedas-grid {
@@ -584,8 +590,8 @@
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
     padding: 6px 4px;
-    background: linear-gradient(180deg, rgba(201,162,74,0.12), rgba(0,0,0,0.25));
-    border: 1px solid rgba(201,162,74,0.35);
+    background: linear-gradient(180deg, color-mix(in srgb, var(--gold) 12%, transparent), rgba(0,0,0,0.25));
+    border: 1px solid color-mix(in srgb, var(--gold) 35%, transparent);
     border-radius: 5px;
     transition: border-color 0.15s, transform 0.15s;
     min-height: 56px;
@@ -595,12 +601,12 @@
   .moeda-box-mestre .m-ic { font-size: 16px; line-height: 1; }
   .moeda-box-mestre .m-val {
     font-family: 'Cinzel', serif; font-weight: 700;
-    color: var(--gold); font-size: 14px; line-height: 1.1;
+    color: var(--gold-light); font-size: 14px; line-height: 1.1;
     margin-top: 3px;
   }
   .moeda-box-mestre .m-tag {
     font-family: 'Cinzel', serif; font-size: 9px;
-    color: var(--brown-soft); letter-spacing: 1px;
+    color: var(--text-muted); letter-spacing: 1px;
     margin-top: 2px;
   }
   @media (max-width: 640px) {
@@ -616,16 +622,16 @@
     font-size: 12px;
     line-height: 1.5;
     outline: none;
-    color: var(--brown);
+    color: var(--text);
     padding: 2px 4px;
     border-radius: 3px;
     transition: background 0.12s;
   }
-  .spell-list:hover { background: rgba(146,38,16,0.04); }
-  .spell-list:focus { background: rgba(146,38,16,0.08); }
+  .spell-list:hover { background: color-mix(in srgb, var(--surface-raised) 60%, transparent); }
+  .spell-list:focus { background: var(--surface-raised); }
   .spell-list:empty::before {
     content: 'Truque, Mísseis Mágicos, Escudo...';
-    color: var(--brown-soft);
+    color: var(--text-muted);
     font-style: italic;
     opacity: 0.6;
   }
@@ -638,9 +644,9 @@
     margin-top: 4px;
   }
   .condition-tag {
-    background: var(--bg-parchment-dark);
-    border: 1px solid var(--gold-dark);
-    color: var(--red-dark);
+    background: var(--surface-raised);
+    border: 1px solid var(--bronze);
+    color: var(--erro);
     padding: 2px 8px;
     border-radius: 10px;
     font-size: 10px;
@@ -653,11 +659,11 @@
     opacity: 0.45;
   }
   .condition-tag.active {
-    background: var(--red);
-    border-color: var(--red-dark);
-    color: var(--bg-parchment);
+    background: var(--danger);
+    border-color: var(--danger);
+    color: var(--text);
     opacity: 1;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.4);
   }
   .condition-tag:hover { transform: translateY(-1px); opacity: 0.85; }
   .condition-tag.active:hover { opacity: 1; }
@@ -668,8 +674,8 @@
     border-radius: 2px;
     padding: 0 2px;
   }
-  [contenteditable="true"]:hover { background: rgba(146,38,16,0.06); cursor: text; }
-  [contenteditable="true"]:focus { background: rgba(146,38,16,0.12); outline: none; }
+  [contenteditable="true"]:hover { background: color-mix(in srgb, var(--surface-raised) 60%, transparent); cursor: text; }
+  [contenteditable="true"]:focus { background: var(--surface-raised); outline: none; }
 
   /* ===== BOTÕES DE CARD ===== */
   .card-actions {
@@ -678,14 +684,14 @@
     align-items: center;
     margin-top: 12px;
     padding-top: 8px;
-    border-top: 1px solid rgba(146,38,16,0.2);
+    border-top: 1px solid var(--border-soft);
     flex-wrap: wrap;
     gap: 6px;
   }
   .save-card {
-    background: rgba(201,162,74,0.12);
+    background: color-mix(in srgb, var(--gold) 12%, transparent);
     border: 1px solid var(--gold);
-    color: var(--gold-dark);
+    color: var(--gold-light);
     cursor: pointer;
     font-size: 10px;
     font-family: 'Cinzel', serif;
@@ -696,34 +702,34 @@
     font-weight: 600;
     transition: all 0.2s;
   }
-  .save-card:hover { background: var(--gold); color: var(--brown); }
-  .save-card.saved { border-color: #2d6a3e; color: #2d6a3e; background: rgba(45,106,62,0.1); }
+  .save-card:hover { background: var(--gold); color: var(--on-gold); }
+  .save-card.saved { border-color: var(--forest); color: var(--forest); background: color-mix(in srgb, var(--forest) 15%, transparent); }
   .remove-card {
     background: transparent;
     border: none;
-    color: var(--brown-soft);
+    color: var(--text-muted);
     cursor: pointer;
     font-size: 10px;
     opacity: 0.4;
     transition: opacity 0.15s;
     font-family: 'Cinzel', serif;
   }
-  .remove-card:hover { opacity: 1; color: var(--red-dark); }
+  .remove-card:hover { opacity: 1; color: var(--erro); }
 
   /* ===== TOAST ===== */
   .toast {
     position: fixed;
     bottom: 20px;
     right: 20px;
-    background: var(--bg-parchment);
+    background: var(--surface-raised);
     border: 1.5px solid var(--gold);
-    color: var(--brown);
+    color: var(--text);
     padding: 10px 18px;
     border-radius: 4px;
     font-family: 'Cinzel', serif;
     font-size: 12px;
     letter-spacing: 1px;
-    box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+    box-shadow: 0 4px 16px var(--shadow);
     opacity: 0;
     transform: translateY(20px);
     transition: all 0.3s;
@@ -737,16 +743,16 @@
     max-width: 1280px;
     margin: 30px auto 0;
     text-align: center;
-    color: #a8845a;
+    color: var(--text-muted);
     font-size: 11px;
     font-style: italic;
     line-height: 1.7;
   }
   .hint strong { color: var(--gold); font-style: normal; font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; }
   .hint code {
-    background: rgba(0,0,0,0.1);
-    border: 1px solid var(--gold-dark);
-    color: var(--red-dark);
+    background: rgba(0,0,0,0.25);
+    border: 1px solid var(--bronze);
+    color: var(--erro);
     padding: 1px 5px;
     border-radius: 2px;
     font-family: 'Courier New', monospace;
@@ -812,7 +818,7 @@
 
   /* Foco visível */
   button:focus-visible, input:focus-visible, [contenteditable]:focus-visible, a:focus-visible {
-    outline: 2px solid var(--red-dark, #6b1010);
+    outline: 2px solid var(--gold, #c49a3a);
     outline-offset: 2px;
   }
 
@@ -820,6 +826,8 @@
     *, *::before, *::after { animation: none !important; transition: none !important; }
   }
 
+  /* Impressão: sempre em papel claro, independente do tema de tela
+     (intencional — não migra pro tema escuro). */
   @media print {
     @page { margin: 12mm; size: A4 portrait; }
     body { background: white !important; padding: 0 !important; color: #222 !important;
@@ -856,10 +864,12 @@
   .toolbar iconify-icon { font-size: 15px; }
   .header .subtitle iconify-icon { font-size: 15px; vertical-align: -2px; color: var(--gold); }
   .card-actions button iconify-icon { font-size: 14px; vertical-align: -2px; margin-right: 5px; }
-  .magia-prep-vazio iconify-icon { font-size: 15px; vertical-align: -2px; color: var(--red); }
+  .magia-prep-vazio iconify-icon { font-size: 15px; vertical-align: -2px; color: var(--erro); }
   .grid-vazio iconify-icon { font-size: 30px; color: var(--gold); display: block; margin: 0 auto 10px; }
 
-  /* Moedas: a COR é a informação, então continua um círculo CSS (não vira ícone) */
+  /* Moedas: a COR é a informação, então continua um círculo CSS (não vira ícone).
+     Cores de material realista (platina/ouro/electrum/prata/cobre) — intencionalmente
+     fixas, não fazem parte da paleta de tema. */
   .moeda-box-mestre .m-ic.moeda-dot {
     width: 15px; height: 15px; border-radius: 50%;
     border: 1px solid rgba(0,0,0,0.35);

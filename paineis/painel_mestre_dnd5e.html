@@ -4,12 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="Painel do Mestre da campanha principal — controle de status, HP, slots de magia e condições dos jogadores em D&D 5e.">
-<meta name="theme-color" content="#1a0e10">
+<meta name="theme-color" content="#0d0e0c">
 <meta property="og:title" content="Painel do Mestre — D&D 5e">
 <meta property="og:description" content="Painel da campanha principal.">
 <meta property="og:type" content="website">
 <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
 <title>Painel do Mestre — D&D 5e</title>
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/components.css">
 <link rel="stylesheet" href="../assets/css/painel_mestre.css">
 <link rel="stylesheet" href="../assets/css/ui.css">
 <script src="../assets/vendor/iconify-icon-2.1.0.min.js"></script>
@@ -32,7 +34,7 @@
   <button type="button" onclick="abrirNotasMestre({ chave: 'mestre', titulo: 'Crônica dos Aventureiros' })" aria-label="Abrir anotações do mestre"><span data-ico="notas" aria-hidden="true"></span> Anotações</button>
   <a href="vilao/index.html" class="back-link" style="text-decoration:none" aria-label="Abrir fichas de vilão"><span data-ico="vampiro" aria-hidden="true"></span> Vilões</a>
   <button onclick="window.print()" aria-label="Imprimir painel"><span data-ico="imprimir" aria-hidden="true"></span> Imprimir</button>
-  <span class="auth-slot" id="auth-slot" aria-label="Status de login" style="margin-left:auto;display:flex;gap:8px;align-items:center;font-family:'Cinzel',serif;font-size:11px;color:var(--red-dark)"></span>
+  <span class="auth-slot" id="auth-slot" aria-label="Status de login" style="margin-left:auto;display:flex;gap:8px;align-items:center;font-family:'Cinzel',serif;font-size:11px"></span>
 </nav>
 
 <div class="party-bar" id="party-bar"></div>
