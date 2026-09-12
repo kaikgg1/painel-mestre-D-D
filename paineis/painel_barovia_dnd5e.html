@@ -149,6 +149,21 @@
   .party-chip .pc-flag { font-size: 12px; }
   .party-bar-vazia { text-align: center; color: var(--text-dim); font-style: italic; font-size: 12px; }
 
+  /* ===== VILÕES EM JOGO (mst-7) ===== */
+  .vilao-widget-bar {
+    max-width: 1320px; margin: 0 auto 22px;
+    display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+  }
+  .vw-chip {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--bg-card); border: 1px solid var(--danger); border-radius: 20px;
+    padding: 6px 14px; text-decoration: none; color: var(--text);
+    font-family: 'Cinzel', serif; font-size: 11.5px; font-weight: 600;
+    transition: border-color .15s, transform .15s;
+  }
+  .vw-chip:hover { border-color: var(--gold-muted); transform: translateY(-1px); }
+  .vw-hp { font-size: 11px; color: var(--gold-muted); white-space: nowrap; }
+
   /* ===== GRID DE CARDS ===== */
   .grid {
     max-width: 1320px; margin: 0 auto;
@@ -517,7 +532,7 @@
     @page { margin: 12mm; size: A4 portrait; }
     body { background: white !important; padding: 0 !important; color: #222 !important; background-image: none !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
     body::before { display: none !important; }
-    .toolbar, .hint, .remove-card, .toast, .auth-slot, .back-link, .party-bar, .tabbar, .edit-toggle, .summary-btn { display: none !important; }
+    .toolbar, .hint, .remove-card, .toast, .auth-slot, .back-link, .party-bar, .vilao-widget-bar, .tabbar, .edit-toggle, .summary-btn { display: none !important; }
     .header { margin: 0 0 12px; padding: 0 0 8px; border-bottom: 2px solid #6b1010; }
     .header h1 { color: #6b1010 !important; text-shadow: none !important; font-size: 24pt; letter-spacing: 2px; }
     .header .subtitle { color: #6a4f0e !important; font-size: 11pt; }
@@ -567,6 +582,7 @@
 </nav>
 
 <div class="party-bar" id="party-bar"></div>
+<div class="vilao-widget-bar" id="vilao-widget-bar" hidden></div>
 
 <main class="grid" id="grid"></main>
 
@@ -584,6 +600,9 @@
 <script src="../assets/js/auth.js"></script>
 <script src="../assets/js/efeitos.js"></script>
 <script src="../assets/js/dbsync.js"></script>
+<script src="../assets/js/master_state.js"></script>
+<script src="../assets/js/vilao_atividade.js"></script>
+<script src="../assets/js/vilao_widget.js"></script>
 <script src="../assets/js/phb_slots.js"></script>
 <script src="../assets/js/exaustao_regras.js"></script>
 <script src="../assets/js/regras_base.js"></script>
@@ -707,6 +726,7 @@ function render() {
     estado.personagens.forEach(p => grid.appendChild(criarCard(p)));
   }
   renderPartyBar();
+  window.VilaoWidget?.montar('vilao-widget-bar');
 }
 
 // Iniciativa (mst-3): abre com os PJs/NPCs ativos já preenchidos (bônus de
