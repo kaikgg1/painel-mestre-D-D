@@ -63,16 +63,19 @@
   /* Bronze / dourado — mantém pra ornamentos/elementos herdados do geral */
   --bronze: #8a6a3a;
   --gold: #a8232b;      /* no tema Strahd, o "elemento importante" vira vermelho-sangue */
-  --gold-light: #d14242;
+  /* lay-4 da auditoria: #d14242 tinha só ~4.1:1 de contraste como texto
+     sobre --surface (abaixo de 4.5:1 pra texto normal) — clareado. */
+  --gold-light: #de5c5c;
 
   /* Vermelho-sangue como accent estrutural (só aqui) */
   --accent: #a8232b;
-  --accent-light: #d14242;
+  --accent-light: #de5c5c;
   --blood: #861820;
 
   /* Texto */
   --text: #ddd0bc;
-  --text-muted: #89776d;
+  /* lay-4: idem, #89776d tinha ~4.3:1 sobre --surface — clareado. */
+  --text-muted: #9a8879;
 
   /* Semântico */
   --forest: #4a5233;
