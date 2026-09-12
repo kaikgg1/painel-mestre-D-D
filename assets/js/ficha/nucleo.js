@@ -256,11 +256,26 @@ function _assinaturaRelevante(c) {
 let _aplicarExternoPendente = null;
 let _aplicarExternoAvisar = false;
 function onUpdateExterno(novo) {
-  // Ignora se foi nosso próprio save (echo do realtime — em até 3s, mesmo aparelho)
-  if (Date.now() - _ultimoSaveLocal < 3000) return;
-  // Atualiza chars silenciosamente sempre (mantém cache fresco)
+  // Atualiza chars silenciosamente sempre (mantém cache fresco) — mesmo
+  // durante a janela de eco abaixo, senão um update legítimo em OUTRO PJ
+  // (não o ativo) ficava perdido enquanto o jogador tinha salvo algo há
+  // pouco em qualquer PJ.
   const idx = chars.findIndex(c => c.id === novo.id);
   if (idx >= 0) chars[idx] = novo;
+
+  // Ignora só o ECO do PRÓPRIO save desta aba: mesmo autor (updated_by,
+  // trigger no banco — sql/018) E salvei há pouco. Antes o guard ignorava
+  // QUALQUER update nos 3s seguintes a um save local, sem checar quem
+  // escreveu — na prática isso descartava updates de VERDADE vindos do
+  // Mestre sempre que chegassem perto de qualquer autosave do jogador
+  // (o autosave dispara a cada ~800ms de digitação, então essa janela de
+  // 3s colidia o tempo todo numa sessão ativa). Sintoma real: o Mestre
+  // ajusta um bônus de perícia, o jogador nem vê a mudança E o próximo
+  // autosave dele reescreve a perícia inteira sem o bônus, apagando-o.
+  const meuId = usuario && usuario.id;
+  const souEuQueSalvei = !!(novo.updated_by && meuId && novo.updated_by === meuId);
+  if (souEuQueSalvei && Date.now() - _ultimoSaveLocal < 3000) return;
+
   // Só age se for o PJ ativo aberto
   if (!charAtivo || novo.id !== charAtivo.id) return;
   // Nada relevante mudou? Não re-renderiza (evita "piscar" sem motivo)
@@ -271,7 +286,6 @@ function onUpdateExterno(novo) {
   }
   // Quem alterou? Só avisa "pelo Mestre" se o autor for DIFERENTE do jogador
   // (o próprio jogador em outro aparelho NÃO deve gerar o aviso).
-  const meuId = usuario && usuario.id;
   const foiOutraPessoa = !!(novo.updated_by && meuId && novo.updated_by !== meuId);
   // Aplica automaticamente — mas não atropela o jogador se ele está digitando.
   aplicarExterno(novo, foiOutraPessoa);

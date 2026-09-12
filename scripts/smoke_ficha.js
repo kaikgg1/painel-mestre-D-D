@@ -682,6 +682,12 @@ console.log('');
       if (!('slots_magia' in p)) erros.push('salvar(): payload sem slots_magia (guarda fd.has("slot_1_max"))');
       if (p.hp_atual !== 42) erros.push('salvar(): hp_atual esperado 42, veio ' + p.hp_atual);
       if (p.ca !== 18) erros.push('salvar(): ca esperado 18, veio ' + p.ca);
+      // percepcao_passiva: nunca era gravada no banco (só calculada em
+      // memória) — o painel do mestre lia a coluna direto e ficava sempre
+      // preso no valor padrão. Confere que salvar() agora grava o mesmo
+      // valor que a própria ficha calcula e mostra pro jogador.
+      const esperadoPP = window.eval('percepcaoPassiva(charAtivo)');
+      if (p.percepcao_passiva !== esperadoPP) erros.push(`salvar(): percepcao_passiva esperado ${esperadoPP} (mesmo cálculo da ficha), veio ${p.percepcao_passiva}`);
     }
   } catch (e) { erros.push('salvar() de verdade → ' + e.message); }
   console.log(erros.length > antesSalvar
@@ -1376,6 +1382,43 @@ console.log('');
   console.log(erros.length > antes
     ? '  FALHOU     assistente de criação (ver FALHAS abaixo)'
     : '  assistente de criação: identidade + point-buy (limite de 27/orçamento) + limite de perícias por classe + insert() ok');
+}
+
+// Realtime — onUpdateExterno() (nucleo.js): o guard de eco só deve ignorar
+// o PRÓPRIO save desta aba (mesmo updated_by + salvou há pouco), não
+// QUALQUER update na janela de 3s — senão um update de verdade do Mestre
+// que chegasse perto de qualquer autosave do jogador (comuníssimo: o
+// autosave dispara a cada ~800ms de digitação) era descartado sem mais,
+// e o próximo autosave do jogador reescrevia por cima com o dado velho.
+console.log('');
+{
+  const antes = erros.length;
+  try {
+    window.eval('_ultimoSaveLocal = Date.now();'); // "acabei de salvar algo" há poucos ms
+    const base = window.eval('JSON.parse(JSON.stringify(charAtivo))');
+    base.pericias = { ...(base.pericias || {}), percepcao: { prof: true, bonus: 5 } };
+
+    // Update de OUTRA pessoa (Mestre) chegando na mesma janela de 3s —
+    // não pode ser descartado.
+    window.eval('window.document.activeElement && window.document.activeElement.blur && window.document.activeElement.blur();');
+    window.__eventoExternoTeste = { ...base, updated_by: 'mestre-outro-id' };
+    window.eval('onUpdateExterno(window.__eventoExternoTeste)');
+    const bonusAplicado = window.eval('charAtivo.pericias?.percepcao?.bonus');
+    if (bonusAplicado !== 5) erros.push(`realtime: update do Mestre dentro da janela de 3s do echo-guard foi descartado (esperava bonus=5, veio ${bonusAplicado})`);
+
+    // Update com o MESMO updated_by desta aba, na mesma janela — esse sim
+    // deve ser ignorado (eco do próprio save).
+    window.eval('_ultimoSaveLocal = Date.now();');
+    const base2 = window.eval('JSON.parse(JSON.stringify(charAtivo))');
+    base2.pericias = { ...(base2.pericias || {}), percepcao: { prof: true, bonus: 999 } };
+    window.__eventoEcoTeste = { ...base2, updated_by: 'u' }; // 'u' == usuario.id da fixture
+    window.eval('onUpdateExterno(window.__eventoEcoTeste)');
+    const bonusAposEco = window.eval('charAtivo.pericias?.percepcao?.bonus');
+    if (bonusAposEco === 999) erros.push('realtime: eco do PRÓPRIO save (mesmo updated_by) deveria ter sido ignorado, mas foi aplicado');
+  } catch (e) { erros.push('realtime: onUpdateExterno → ' + e.message); }
+  console.log(erros.length > antes
+    ? '  FALHOU     realtime: guard de eco (ver FALHAS abaixo)'
+    : '  realtime: update do Mestre não é descartado por echo-guard + eco do próprio save continua ignorado ok');
 }
 
 // Header (Fase 2): avatar+nome+trocador, campanha, autosave, editar/travar,

@@ -193,11 +193,28 @@ async function salvar(e) {
   delete payload.created_at;
   delete payload.updated_at;
 
+  // Percepção passiva (10 + perícia Percepção): SEMPRE derivada, nunca
+  // editada direto pelo jogador — mas até aqui nunca era gravada no banco,
+  // só existia calculada na hora pra exibir na própria ficha. O painel do
+  // Mestre lê characters.percepcao_passiva direto (é o único jeito de saber
+  // sem recalcular a fórmula de novo lá), então ficava sempre preso no
+  // valor padrão (10), mesmo pra PJ com Percepção/Sabedoria/proficiência
+  // configurados. Recalcula do melhor dado disponível (o que está indo
+  // neste payload agora, senão o que já tinha em charAtivo) e grava sempre
+  // — não tem "aba dona" pra isso ficar desatualizado feito slots_magia.
+  payload.percepcao_passiva = percepcaoPassiva({
+    atributos: payload.atributos ?? charAtivo.atributos,
+    pericias: payload.pericias ?? charAtivo.pericias,
+    nivel: payload.nivel ?? charAtivo.nivel,
+    classes_secundarias: charAtivo.classes_secundarias,
+  });
+
   // Coerção forçada de tipos (evita "invalid input syntax for integer: false"
   // quando algum campo veio como boolean/string do state antigo)
   const CAMPOS_INT = ['nivel','hp_atual','hp_max','hp_temp','ca','iniciativa_bonus',
     'dado_vida_tipo','dado_vida_atual','exaustao','inspiracao','morte_sucessos','morte_falhas',
-    'truques_conhecidos','magias_conhecidas','cd_resistencia','bonus_atq_magia','xp'];
+    'truques_conhecidos','magias_conhecidas','cd_resistencia','bonus_atq_magia','xp',
+    'percepcao_passiva'];
   for (const k of CAMPOS_INT) {
     if (payload[k] !== undefined && payload[k] !== null) {
       const n = +payload[k];
