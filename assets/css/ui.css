@@ -16,12 +16,6 @@ select {
   /* Popup de opções em tema escuro nativo (Chrome/Edge/Firefox/Safari) */
   color-scheme: dark;
 
-  /* Seta dourada custom (chevron) */
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23b88a2c' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") !important;
-  background-repeat: no-repeat !important;
-  background-position: right 12px center !important;
-  background-size: 14px 14px !important;
-
   /* Espaço pra seta não cobrir o texto */
   padding-right: 36px !important;
 
@@ -30,21 +24,24 @@ select {
   text-overflow: ellipsis;
   transition: border-color 0.18s, box-shadow 0.18s, background-color 0.18s;
 }
+/* A seta (background-image) fica definida só lá embaixo, no bloco
+   "acabamento dos <select>" — aqui era redeclarada com um valor mais
+   simples que o de lá sempre vencia na cascata (mesmo seletor, veio
+   depois no arquivo); virou código morto e foi removido (lay-11). */
 
 /* Hover/focus mais visíveis e consistentes */
 select:hover {
   border-color: var(--gold-bright, #b88a2c) !important;
 }
+/* --focus-visible tem valor PRÓPRIO mais abaixo (dourado mais claro,
+   pensado pra navegação por teclado) — não é duplicação, é uma segunda
+   camada de ênfase intencional só pra quem usa teclado; :focus sozinho
+   (ex.: clique de mouse em alguns navegadores) fica só com este daqui. */
 select:focus,
 select:focus-visible {
   outline: none;
   border-color: var(--gold-bright, #b88a2c) !important;
   box-shadow: 0 0 0 3px rgba(184, 138, 44, 0.18) !important;
-}
-
-/* Seta clareia no hover */
-select:hover {
-  background-image: url("data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%23d4a843' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E") !important;
 }
 
 /* Select desabilitado: seta apagada */
@@ -74,19 +71,21 @@ select optgroup {
   letter-spacing: 0.5px;
 }
 
-/* Em mobile, alvos de toque maiores e fonte que evita zoom no iOS */
+/* Em mobile, alvos de toque maiores e fonte que evita zoom no iOS.
+   (background-position pro mobile fica só no bloco de acabamento lá
+   embaixo, que redefine as 2 camadas de uma vez; redeclarar só a
+   camada da seta aqui virou código morto — lay-11.) */
 @media (max-width: 640px) {
   select {
     min-height: 46px !important;
     font-size: 16px !important;        /* >=16px evita auto-zoom no iOS */
-    background-position: right 14px center !important;
     padding-right: 40px !important;
   }
   select option { font-size: 16px; padding: 12px; }
 }
 
 /* ===================================================================== *
- * BLOCO ADITIVO — refinamento das caixas de opções (dropdowns).
+ * Refinamento das caixas de opções (dropdowns).
  * Continua usando o <select> NATIVO (acessível, navegável por teclado e
  * com o popup correto no celular); só melhora a casca visual. Nada aqui
  * define cor de fundo/borda própria — as cores de cada tela continuam
@@ -104,9 +103,9 @@ select {
   /* O popup nativo já é escuro (color-scheme: dark, acima) */
   text-shadow: none;
 }
-
-/* Alvo de toque confortável mesmo sem CSS da tela */
-select:not([size]):not([multiple]) { min-height: 42px; }
+/* (min-height:42px pro caso [size]/[multiple] foi removido aqui — o
+   bloco lá em cima já garante o mesmo valor pra QUALQUER <select>,
+   então essa restrição a mais não tinha efeito nenhum; lay-11.) */
 
 /* Estado pressionado / aberto: seta clara + leve realce, igual ao hover */
 select:active {
@@ -145,9 +144,11 @@ select option:disabled { color: #6a5a3a; font-style: italic; }
 }
 
 /* ============================================================
-   ADITIVO — acabamento dos <select> (continuam NATIVOS).
+   Acabamento dos <select> (continuam NATIVOS): a seta + o verniz.
    Só camadas de fundo/foco: não mexe em background-color, borda
    nem raio definidos por cada tela, então não conflita com elas.
+   É AQUI que a seta (background-image) é definida de verdade —
+   os blocos acima não redeclaram mais isso (lay-11).
    ============================================================ */
 
 /* Camada de brilho por cima do fundo de cada tela + a seta.

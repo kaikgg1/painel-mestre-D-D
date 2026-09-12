@@ -72,7 +72,7 @@
     font-size: 12px; color: var(--text-muted, #89776d); min-height: 34px;
   }
   .rd-resultado strong { display: block; font-size: 22px; color: var(--gold, #a8232b); }
-  .rd-historico { max-height: 90px; overflow-y: auto; font-size: 10px; color: var(--text-muted, #89776d); }
+  .rd-historico { max-height: 90px; overflow-y: auto; font-size: 11px; color: var(--text-muted, #89776d); }
   .rd-historico div { padding: 2px 0; border-bottom: 1px dashed rgba(255,255,255,0.06); }
   @media (max-width: 480px) {
     .rd-painel { right: 10px; left: 10px; width: auto; }

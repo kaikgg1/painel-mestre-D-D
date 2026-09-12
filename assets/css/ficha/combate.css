@@ -159,7 +159,7 @@
 .stat-mini .ic { font-size: 18px; line-height: 1; margin-bottom: 4px; display: block; }
 .stat-mini label {
   display: block;
-  font-family: var(--f-titulo); font-size: 9px;
+  font-family: var(--f-titulo); font-size: 11px;
   color: var(--text-dim); letter-spacing: 1px;
   text-transform: uppercase; margin-bottom: 4px;
 }
@@ -171,7 +171,7 @@
   outline: none;
 }
 .stat-mini input:focus, .stat-mini select:focus { border-color: var(--borda-ouro); }
-.stat-mini .ajuda-mini { display: block; font-size: 9px; color: var(--text-dim); margin-top: 3px; font-style: italic; }
+.stat-mini .ajuda-mini { display: block; font-size: 11px; color: var(--text-dim); margin-top: 3px; font-style: italic; }
 #btn-gastar-dado-vida { width: 100%; margin-top: 6px; padding: 6px 4px; font-size: 12px; min-height: 32px; }
 .readonly-stat {
   width: 100%;

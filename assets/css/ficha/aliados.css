@@ -150,7 +150,7 @@
 .cc-hp { min-width: 0; }
 .cc-hp-row { display: flex; align-items: center; gap: 4px; }
 .cc-hp-row .cc-num { width: 52px; }
-.cc-dados { font-size: 10px; color: var(--gold-bright); font-weight: 400; letter-spacing: 0.3px; }
+.cc-dados { font-size: 11px; color: var(--gold-bright); font-weight: 400; letter-spacing: 0.3px; }
 .cc-rolar {
   background: rgba(196,154,58,0.18); border: 1px solid var(--borda);
   color: var(--gold-bright); border-radius: 5px; cursor: pointer;

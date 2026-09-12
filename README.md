@@ -154,6 +154,32 @@ Usados por `assets/css/components.css`, `assets/css/ui.css`, `assets/css/painel_
 - `paineis/vilao/*.html` (fichas de vilão): cada ficha tem seus próprios breakpoints inline, tipicamente em torno de 480/720/860/1100px.
 - `paineis/reloaded/*.html`: breakpoints inline próprios, não auditados ainda.
 
+## Onde `assets/js/efeitos.js` é usado
+
+`window.FX` dá feedback visual leve (shake, flash de dano/cura, pulso,
+confete) e respeita `prefers-reduced-motion`. Carregar em qualquer tela
+que tenha um **rastreador de PV/dano** — é esse o critério, não a tela em
+si:
+
+- `paineis/ficha.html`, `paineis/magias.html` (favoritar/preparar magia).
+- Os 2 painéis do mestre (`painel_mestre_dnd5e.html`, `painel_barovia_dnd5e.html`).
+- Fichas de vilão que usam `assets/js/vilao_combate.js` (tracker de
+  combate com PV) — **não** as fichas simples migradas pra
+  `assets/js/vilao_sync_basico.js` (só notas/habilidades, sem PV pra
+  animar), que por isso não carregam `efeitos.js`.
+
+## Padrões de UI
+
+Uma normalização (`<select>` em `assets/css/ui.css`) cresceu por
+sucessivos acréscimos (blocos comentados como "ADITIVO") em vez de
+edição do bloco original, deixando declarações da mesma propriedade
+repetidas em pontos diferentes do arquivo — a de baixo sempre vencendo
+na cascata e a de cima virando código morto. Consolidado (lay-11): a
+"fonte da verdade" de cada propriedade (a seta/`background-image`, o
+`background-position` do mobile) agora existe numa única declaração, no
+bloco final do arquivo. Ao editar `ui.css`, evite reabrir esse padrão —
+mude a declaração existente em vez de adicionar mais uma por cima.
+
 ## Stack
 
 - **Front:** HTML + CSS + Vanilla JS (sem build, sem framework)
