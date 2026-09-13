@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Tabela de Críticos da mesa — sucessos críticos (20 natural) e falhas críticas (1 natural) por tipo de dano/ataque, d100.">
+<meta name="theme-color" content="#0d0e0c">
+<link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
+<title>Tabela de Críticos — D&D 5e</title>
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<script src="../assets/vendor/iconify-icon-2.1.0.min.js"></script>
+<script src="../assets/js/icones.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  html, body { min-height: 100vh; min-height: 100dvh; margin: 0; background: var(--bg);
+    background-image: radial-gradient(ellipse at top, color-mix(in srgb, var(--surface) 65%, var(--bg)) 0%, var(--bg-soft) 45%, var(--bg) 100%);
+    font-family: var(--font-body); color: var(--text); }
+
+  main { position: relative; z-index: 1; max-width: 980px; margin: 0 auto; padding: 22px 16px 60px; }
+
+  .subtitulo-secao { text-align: center; color: var(--text-muted); font-style: italic; font-size: 14.5px; margin: 0 0 24px; }
+
+  .explicacoes { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 22px; }
+  @media (max-width: 640px) { .explicacoes { grid-template-columns: 1fr; } }
+  .explicacao { padding: 16px 18px; border-left: 3px solid var(--gold); }
+  .explicacao.falha { border-left-color: var(--danger); }
+  .explicacao .titulo { font-family: var(--font-heading); font-size: 13px; font-weight: 700; letter-spacing: .8px;
+    text-transform: uppercase; color: var(--gold-light); margin-bottom: 8px; }
+  .explicacao.falha .titulo { color: var(--erro); }
+  .explicacao p { margin: 0; font-size: 15px; line-height: 1.55; color: var(--text-muted); }
+
+  /* ---- tabelas de d100 ---- */
+  .table-wrap { overflow-x: auto; margin: 0 0 40px; border: 1px solid var(--border-soft); border-radius: var(--radius); }
+  table.tabela-critico { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 14.5px; }
+  table.tabela-critico caption { caption-side: top; text-align: left; font-family: var(--font-heading); font-size: 12px;
+    font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--gold); background: var(--surface-raised);
+    padding: 10px 14px; border-bottom: 1px solid var(--border-soft); }
+  table.tabela-critico th, table.tabela-critico td { border: 1px solid var(--border-soft); padding: 9px 12px; text-align: left;
+    vertical-align: top; line-height: 1.45; }
+  table.tabela-critico thead th { background: var(--surface); color: var(--gold-light); font-family: var(--font-heading);
+    font-size: 12px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; position: sticky; top: 0; }
+  table.tabela-critico td:first-child, table.tabela-critico th:first-child { white-space: nowrap; font-family: var(--font-heading);
+    color: var(--gold); font-weight: 700; text-align: center; background: var(--surface); }
+  table.tabela-critico tbody tr:nth-child(even) td:not(:first-child) { background: color-mix(in srgb, var(--surface) 55%, transparent); }
+  table.tabela-critico td strong { color: var(--gold-light); font-weight: 600; }
+</style>
+</head>
+<body data-ambiente="fagulhas">
+
+<header class="site-header">
+  <a href="../index.html" class="back-btn">← Início</a>
+  <div class="header-title"><span data-ico="dado" aria-hidden="true"></span> Tabela de Críticos</div>
+  <span style="width:70px"></span>
+</header>
+
+<main>
+  <p class="subtitulo-secao">D100 — role (ou saque uma carta) toda vez que tirar 20 ou 1 natural num ataque</p>
+
+  <div class="explicacoes">
+    <div class="card explicacao">
+      <div class="titulo">✅ 20 Natural — Sucesso Crítico</div>
+      <p>Antes de calcular o dano, role mais <strong>1d100</strong> (ou saque uma carta do baralho de sucessos críticos) e use a coluna correspondente ao <strong>tipo de dano</strong> do ataque: perfurante, cortante ou contundente.</p>
+    </div>
+    <div class="card explicacao falha">
+      <div class="titulo">❌ 1 Natural — Falha Crítica</div>
+      <p>Além de errar o ataque, role mais <strong>1d100</strong> (ou saque uma carta do baralho de falhas críticas) e use a coluna correspondente ao <strong>tipo de ataque</strong>: corpo a corpo, à distância ou desarmado.</p>
+    </div>
+  </div>
+
+  <div class="table-wrap">
+    <table class="tabela-critico">
+      <caption>Tabela de Sucessos Críticos (20 Natural)</caption>
+      <thead>
+        <tr>
+          <th>d100</th>
+          <th>⚔️ Perfurante</th>
+          <th>🪓 Cortante</th>
+          <th>🔨 Contundente</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>01–05</td><td><strong>Golpe Preciso:</strong> adicione um dado de dano no valor máximo.</td><td><strong>Golpe Rasgador:</strong> adicione um dado de dano no valor máximo.</td><td><strong>Impacto Devastador:</strong> adicione um dado de dano no valor máximo.</td></tr>
+        <tr><td>06–10</td><td><strong>Perfurar o Coração:</strong> alvo testa Constituição (CD 15) ou recebe dano adicional de 10% da vida atual.</td><td><strong>Ferida Exposta:</strong> +1d10 de dano cortante no próximo turno.</td><td><strong>Fratura Grave:</strong> alvo ganha 1 nível de exaustão.</td></tr>
+        <tr><td>11–15</td><td><strong>Sangramento Interno:</strong> perde 2d6 PV/turno até ser estabilizado.</td><td><strong>Corte nos Tendões:</strong> velocidade reduzida a 0.</td><td><strong>Concussão Violenta:</strong> teste de Constituição (CD 15) ou fica atordoado.</td></tr>
+        <tr><td>16–20</td><td><strong>Fenda Arterial:</strong> desvantagem em testes de Constituição.</td><td><strong>Corte na Articulação:</strong> desvantagem em ataques corpo a corpo.</td><td><strong>Ossos Estilhaçados:</strong> -2 nos ataques.</td></tr>
+        <tr><td>21–25</td><td><strong>Atravessado:</strong> movimento reduzido a 0 até o final do próximo turno.</td><td><strong>Membro Dilacerado:</strong> desarme ou desvantagem em testes de Força.</td><td><strong>Desarme Brutal:</strong> alvo solta o objeto que segura (Força CD 15).</td></tr>
+        <tr><td>26–30</td><td><strong>Ponto Vital Atingido:</strong> dano crítico máximo.</td><td><strong>Hemorragia Intensa:</strong> 2d6 de dano/turno até estabilizar.</td><td><strong>Empurrão Brutal:</strong> alvo empurrado 3 metros.</td></tr>
+        <tr><td>31–35</td><td><strong>Derrubar Arma:</strong> desarme automático.</td><td><strong>Corte de Precisão:</strong> ignora resistência/imunidade a cortante.</td><td><strong>Tontura:</strong> desvantagem em testes de Inteligência e Sabedoria.</td></tr>
+        <tr><td>36–40</td><td><strong>Paralisia Parcial:</strong> teste de Constituição (CD 15) ou perde uma ação.</td><td><strong>Derrubado pelo Corte:</strong> alvo testa Destreza (CD 15) ou cai caído.</td><td><strong>Impacto no Joelho:</strong> deslocamento reduzido pela metade.</td></tr>
+        <tr><td>41–45</td><td><strong>Arremesso Doloroso:</strong> empurrado 1,5m e cai caído.</td><td><strong>Rasgo Vascular:</strong> sem cura mágica até o próximo turno.</td><td><strong>Choque de Corpo:</strong> desvantagem em testes de Constituição.</td></tr>
+        <tr><td>46–50</td><td><strong>Golpe Cirúrgico:</strong> ignora resistência a perfurante.</td><td><strong>Lâmina Impiedosa:</strong> dano crítico máximo.</td><td><strong>Golpe Certeiro:</strong> dano crítico máximo.</td></tr>
+        <tr><td>51–55</td><td><strong>Enfiada Certeira:</strong> ataque extra contra o mesmo alvo.</td><td><strong>Chuva de Sangue:</strong> ataque extra em inimigo adjacente.</td><td><strong>Esmagamento Parcial:</strong> dano extra igual a metade da vida atual do alvo (máx. +50).</td></tr>
+        <tr><td>56–60</td><td><strong>Torpor:</strong> alvo não pode usar reação até o final do próximo turno.</td><td><strong>Dilaceração Brutal:</strong> CA do alvo -2 até ser curado.</td><td><strong>Golpe Estonteante:</strong> alvo não pode usar reação.</td></tr>
+        <tr><td>61–65</td><td><strong>Músculo Perfurado:</strong> alvo com -2 em ataques.</td><td><strong>Ataque Fluido:</strong> mova metade do deslocamento sem provocar ataque de oportunidade.</td><td><strong>Crack!:</strong> alvo cai caído.</td></tr>
+        <tr><td>66–70</td><td><strong>Espetada Mortal:</strong> ignora cobertura de até 3/4.</td><td><strong>Perfuração Crítica:</strong> sangramento severo (3d4/turno).</td><td><strong>Quebra-Costelas:</strong> -2 na CA do alvo.</td></tr>
+        <tr><td>71–75</td><td><strong>Ferida Dolorosa:</strong> desvantagem em resistências até o próximo turno.</td><td><strong>Corte Debilitante:</strong> desvantagem em testes de Constituição/Força.</td><td><strong>Impacto Brutal:</strong> triplo de dano, ou teste de Constituição (CD 15) — na falha, inconsciente por 1 turno.</td></tr>
+        <tr><td>76–80</td><td><strong>Perfuração Tripla:</strong> duplique o dano crítico.</td><td><strong>Fratura Exposta:</strong> desvantagem em Atletismo e Acrobacia.</td><td><strong>Golpe Secundário:</strong> ataque extra contra o mesmo alvo.</td></tr>
+        <tr><td>81–85</td><td><strong>Golpe Ofensivo:</strong> vantagem no próximo ataque contra o mesmo alvo.</td><td><strong>Arrancada de Carne:</strong> -2 em ataques e testes de Força/Constituição.</td><td><strong>Esmagamento Implacável:</strong> empurra 1,5m e derruba caído.</td></tr>
+        <tr><td>86–90</td><td><strong>Sangramento Maciço:</strong> 3d4 de dano por turno até curado.</td><td><strong>Fúria Implacável:</strong> vantagem no próximo ataque.</td><td><strong>Fratura Interna:</strong> perde 1d6 PV por turno até ser curado.</td></tr>
+        <tr><td>91–95</td><td><strong>Corte na Garganta:</strong> corta as cordas vocais do alvo — ele não fala até o próximo descanso longo.</td><td><strong>Mutilação:</strong> perda do uso de um membro até ser curado.</td><td><strong>Arremesso Violento:</strong> lançado 3 metros (teste de Destreza CD 15).</td></tr>
+        <tr><td>96–100</td><td><strong>Fim Brutal:</strong> o alvo cai a 0 de vida com uma falha automática no teste de morte.</td><td><strong>Decapitação Lendária:</strong> o alvo cai a 0 de vida com uma falha automática no teste de morte.</td><td><strong>Esmagamento Fatal:</strong> o alvo cai a 0 de vida com uma falha automática no teste de morte.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="table-wrap">
+    <table class="tabela-critico">
+      <caption>Tabela de Falhas Críticas (1 Natural)</caption>
+      <thead>
+        <tr>
+          <th>d100</th>
+          <th>⚔️ Corpo a Corpo</th>
+          <th>🏹 À Distância</th>
+          <th>👊 Desarmado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>01–05</td><td><strong>Golpe no Ar:</strong> fica caído até o próximo turno.</td><td><strong>Flecha Errada:</strong> o projétil acerta um aliado.</td><td><strong>Golpe no Ar:</strong> fica caído até o próximo turno.</td></tr>
+        <tr><td>06–10</td><td><strong>Golpe Errado:</strong> atinge um aliado (1d4 de dano, Destreza CD 12 pra evitar).</td><td><strong>Flecha Perdida:</strong> o projétil acerta um aliado e ricocheteia de volta em você.</td><td><strong>Punho Atordoado:</strong> sofre 1d4 de dano.</td></tr>
+        <tr><td>11–15</td><td><strong>Desarme:</strong> a arma cai 3 metros longe. Perde o ataque e usa a próxima ação pra pegá-la.</td><td><strong>Descontrole de Arco:</strong> você lança o arco no oponente.</td><td><strong>Tornozelo Torcido:</strong> perde todo o deslocamento.</td></tr>
+        <tr><td>16–20</td><td><strong>Golpe ao Inimigo Errado:</strong> ataca um aliado, quebrando a armadura dele (-1 CA).</td><td><strong>Golpe ao Inimigo Errado:</strong> ataca um aliado. Dano reduzido pela metade (Destreza CD 12).</td><td><strong>Descontrole de Movimento:</strong> desvantagem no próximo ataque.</td></tr>
+        <tr><td>21–25</td><td><strong>Golpe Fraco:</strong> perde o ataque e sofre 1d4 de dano.</td><td><strong>Arco Travado:</strong> perde a ação pra liberar a corda do arco.</td><td><strong>Golpe Errado:</strong> sua mão dói — perde o ataque e sofre 1d6 de dano.</td></tr>
+        <tr><td>26–30</td><td><strong>Erro de Posição:</strong> derruba um aliado.</td><td><strong>Flecha Quebrada:</strong> perde uma flecha e tem desvantagem no próximo ataque.</td><td><strong>Joelho Torcido:</strong> sofre 1d10 de dano e desvantagem nos testes de movimento.</td></tr>
+        <tr><td>31–35</td><td><strong>Golpe Desviado:</strong> o próximo inimigo tem vantagem pra te atacar.</td><td><strong>Flecha Enganchada:</strong> perde o ataque e gasta a próxima ação pra desengatar.</td><td><strong>Erro de Movimento:</strong> recebe ataque de oportunidade de inimigos a até 1,5 metro.</td></tr>
+        <tr><td>36–40</td><td><strong>Deslocamento Ruim:</strong> tropeça e anda 4 metros em linha reta.</td><td><strong>Desviante de Munição:</strong> o próximo inimigo tem vantagem pra te atacar.</td><td><strong>Golpe Falhado:</strong> gasta todo o movimento e fica vulnerável.</td></tr>
+        <tr><td>41–45</td><td><strong>Golpe Falhado:</strong> perde o ataque e sua arma cai 3 metros longe.</td><td><strong>Espaço Inadequado:</strong> perde a flecha e a ação procurando ela.</td><td><strong>Desequilíbrio Total:</strong> fica em desvantagem até o próximo turno.</td></tr>
+        <tr><td>46–50</td><td><strong>Golpe Inútil:</strong> fica vulnerável até o próximo turno.</td><td><strong>Flecha Descontrolada:</strong> atinge você mesmo (1d6 de dano).</td><td><strong>Golpe Deslocado:</strong> não pode atacar no próximo turno.</td></tr>
+        <tr><td>51–55</td><td><strong>Soco Fraco:</strong> a arma escorrega — perde o ataque e sofre 1d6 de dano.</td><td><strong>Arco Tenso:</strong> fica com -2 no próximo ataque.</td><td><strong>Golpe Falhado:</strong> sofre 2d10 de dano e fica com desvantagem no próximo ataque.</td></tr>
+        <tr><td>56–60</td><td><strong>Golpe Frustrado:</strong> o próximo inimigo tem vantagem pra te atacar.</td><td><strong>Flecha Explosiva:</strong> causa 1d6 de dano em você e inimigos adjacentes.</td><td><strong>Falta de Controle:</strong> fica inconsciente até ser acordado.</td></tr>
+        <tr><td>61–65</td><td><strong>Falta de Precisão:</strong> fica com desvantagem no próximo ataque.</td><td><strong>Flecha Desviada:</strong> o alvo lança a flecha de volta pra você.</td><td><strong>Rompimento Muscular:</strong> -2 de CA até o descanso longo.</td></tr>
+        <tr><td>66–70</td><td><strong>Postura Ruim:</strong> fica vulnerável. O próximo inimigo tem vantagem.</td><td><strong>Aljava Furada:</strong> você perde 2d10 de projéteis.</td><td><strong>Golpe Errado:</strong> perde a ação e o próximo inimigo tem vantagem pra te atacar.</td></tr>
+        <tr><td>71–75</td><td><strong>Material Ruim:</strong> sua arma quebra.</td><td><strong>Golpe Mal Posicionado:</strong> o arco quebra.</td><td><strong>Câimbra:</strong> -2 pra acertar no próximo turno.</td></tr>
+        <tr><td>76–80</td><td><strong>Golpe Vulnerável:</strong> desmoraliza seus aliados (resistência de Sabedoria CD 12) — na falha, ficam com desvantagem no próximo turno.</td><td><strong>Corda do Arco Rígida:</strong> a corda bate no seu rosto causando 2d12 de dano.</td><td><strong>Golpe Vulnerável:</strong> desmoraliza seus aliados (resistência de Sabedoria CD 12) — na falha, ficam com desvantagem no próximo turno.</td></tr>
+        <tr><td>81–85</td><td><strong>Perda de Força:</strong> perde o ataque e sofre 1d10 de dano.</td><td><strong>Brisa Mortal:</strong> um cisco entra no seu olho — -2 pra acertar até tirá-lo com 1 ação.</td><td><strong>Golpe no Ar Quebrado:</strong> derruba um aliado.</td></tr>
+        <tr><td>86–90</td><td><strong>Golpe Errado:</strong> recebe ataque de oportunidade de inimigos próximos.</td><td><strong>Arco Pesado:</strong> você cai.</td><td><strong>Falta de Força:</strong> você recebe todos os ataques até o próximo turno.</td></tr>
+        <tr><td>91–95</td><td><strong>Golpe Descontrolado:</strong> o próximo inimigo te acerta automaticamente.</td><td><strong>Golpe Errado:</strong> você acerta um aliado e o derruba.</td><td><strong>Impacto Fatal:</strong> sofre 2d12 de dano e cai no chão.</td></tr>
+        <tr><td>96–100</td><td><strong>Erro Total:</strong> você perde 50% da sua vida atual (mínimo 1 PV).</td><td><strong>Erro Fatal:</strong> a flecha se quebra e os estilhaços entram no seu olho — fica cego até receber cura.</td><td><strong>Golpe Total:</strong> você quebra os dedos e fica sem ação bônus até o descanso longo.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p style="text-align:center;margin-top:10px">
+    <a href="regras_casa.html" style="color:var(--gold-light);font-family:var(--font-heading);font-size:13px;letter-spacing:.5px;text-transform:uppercase;text-decoration:none;border-bottom:1px solid var(--border)">📜 Ver Regras da Casa →</a>
+  </p>
+</main>
+
+<script src="../assets/js/ambiente.js"></script>
+<script src="../assets/js/polish.js"></script>
+</body>
+</html>
