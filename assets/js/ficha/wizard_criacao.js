@@ -324,7 +324,7 @@ function abrirWizardCriacao() {
           </fieldset>
         `).join('')}
         ${eq.fixos.length ? `<div class="wizard-equip-fixos">
-          <h5>Itens fixos</h5>
+          <h5>Você também recebe, além da escolha acima</h5>
           ${eq.fixos.map((slot, fi) => renderSlotHtml(slot, `fixo:${fi}`, state.equipClasseSlot[`fixo:${fi}`])).join('')}
         </div>` : ''}
       </div>`;
