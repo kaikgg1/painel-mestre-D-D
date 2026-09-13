@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Regras da Casa desta mesa — ajustes de descanso, morte, críticos e mais, além do livro básico.">
+<meta name="theme-color" content="#0d0e0c">
+<link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
+<title>Regras — Regras da Casa</title>
+<link rel="stylesheet" href="../assets/css/tokens.css">
+<link rel="stylesheet" href="../assets/css/components.css">
+<script src="../assets/vendor/iconify-icon-2.1.0.min.js"></script>
+<script src="../assets/js/icones.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  html, body { min-height: 100vh; min-height: 100dvh; margin: 0; background: var(--bg);
+    background-image: radial-gradient(ellipse at top, color-mix(in srgb, var(--surface) 65%, var(--bg)) 0%, var(--bg-soft) 45%, var(--bg) 100%);
+    font-family: var(--font-body); color: var(--text); }
+
+  main { position: relative; z-index: 1; max-width: 780px; margin: 0 auto; padding: 22px 16px 60px; }
+
+  .intro { font-style: italic; color: var(--text-muted); text-align: center; margin: 0 0 26px; font-size: 16px; }
+
+  .add-regra-wrap { display: flex; justify-content: center; margin: 0 0 24px; }
+
+  /* ---- cartões numerados ---- */
+  .lista-regras { display: flex; flex-direction: column; gap: 12px; }
+  .regra { padding: 16px 18px; display: flex; gap: 14px; align-items: flex-start; }
+  .regra .num { flex: 0 0 auto; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    background: color-mix(in srgb, var(--gold) 16%, transparent); border: 1px solid var(--border); color: var(--gold-light);
+    font-family: var(--font-heading); font-size: 13px; font-weight: 700; }
+  .regra .corpo { flex: 1; min-width: 0; }
+  .regra .nome { font-family: var(--font-heading); font-size: 14.5px; font-weight: 700; letter-spacing: .4px;
+    color: var(--gold-light); text-transform: uppercase; margin-bottom: 4px; }
+  .regra .desc { font-size: 16px; line-height: 1.55; color: var(--text); }
+  .regra .desc strong { color: var(--gold-light); font-weight: 600; }
+
+  .carregando, .vazio, .erro-carregar { text-align: center; color: var(--text-muted); font-style: italic; padding: 20px; }
+  .erro-carregar { color: var(--erro); }
+
+  /* ---- formulário "adicionar regra" (só Mestre) ---- */
+  #form-add-regra { padding: 20px; margin: 0 0 26px; }
+  #form-add-regra .campo { margin-bottom: 14px; }
+  #form-add-regra label { display: block; font-family: var(--font-heading); font-size: 12px; font-weight: 700;
+    letter-spacing: .6px; text-transform: uppercase; color: var(--gold-light); margin-bottom: 6px; }
+  #form-add-regra input, #form-add-regra textarea { width: 100%; padding: 10px 12px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border-soft); background: var(--bg-soft); color: var(--text); font-family: var(--font-body);
+    font-size: 16px; resize: vertical; }
+  #form-add-regra input:focus, #form-add-regra textarea:focus { outline: 2px solid var(--gold); outline-offset: 1px; border-color: var(--gold); }
+  #form-add-regra .acoes { display: flex; gap: 10px; justify-content: flex-end; }
+
+  @media (max-width: 700px) {
+    .regra { padding: 14px; gap: 10px; }
+    .regra .desc { font-size: 15px; }
+    #form-add-regra .acoes { flex-direction: column-reverse; }
+    #form-add-regra .acoes .btn { width: 100%; }
+  }
+</style>
+</head>
+<body data-ambiente="fagulhas">
+
+<header class="site-header">
+  <a href="regras_casa.html" class="back-btn">← Regras da Casa</a>
+  <div class="header-title"><span data-ico="pergaminho" aria-hidden="true"></span> Regras</div>
+  <span style="width:70px"></span>
+</header>
+
+<main>
+  <p class="intro">Regras específicas desta mesa, além do livro básico — valem pra todo mundo, jogadores e mestre.</p>
+
+  <div class="add-regra-wrap">
+    <button type="button" class="btn btn-primary" id="btn-add-regra" hidden>+ Adicionar Regra</button>
+  </div>
+
+  <form class="card" id="form-add-regra" hidden>
+    <div class="campo">
+      <label for="regra-titulo">Título</label>
+      <input type="text" id="regra-titulo" maxlength="80" required placeholder="Ex.: Ponto de Inspiração">
+    </div>
+    <div class="campo">
+      <label for="regra-descricao">Descrição</label>
+      <textarea id="regra-descricao" rows="3" maxlength="1000" required placeholder="Explique como a regra funciona…"></textarea>
+    </div>
+    <div class="acoes">
+      <button type="button" class="btn" id="btn-cancelar-regra">Cancelar</button>
+      <button type="submit" class="btn btn-primary" id="btn-salvar-regra">Salvar Regra</button>
+    </div>
+  </form>
+
+  <div class="lista-regras" id="lista-regras">
+    <p class="carregando">Carregando regras…</p>
+  </div>
+
+  <p style="text-align:center;margin-top:30px">
+    <a href="tabela_criticos.html" style="color:var(--gold-light);font-family:var(--font-heading);font-size:13px;letter-spacing:.5px;text-transform:uppercase;text-decoration:none;border-bottom:1px solid var(--border)">🎲 Ver Tabela de Críticos →</a>
+  </p>
+</main>
+
+<script src="https://unpkg.com/@supabase/supabase-js@2.45.0" integrity="sha384-dGnL7r9uccC9TdSdE05clTJ6esxMU42XBQ1/BWLzKQOBi7qR1aCMRIi0LzUmexIg" crossorigin="anonymous"></script>
+<script src="../assets/js/supabase.js"></script>
+<script src="../assets/js/auth.js"></script>
+<script>
+(async () => {
+  const u = await window.Auth.requerLogin('login.html');
+  if (!u) return;
+
+  const lista = document.getElementById('lista-regras');
+  const btnAdd = document.getElementById('btn-add-regra');
+  const formAdd = document.getElementById('form-add-regra');
+
+  const ehMestre = await window.Auth.ehMestre();
+  if (ehMestre) btnAdd.hidden = false;
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  }
+
+  function renderRegras(regras) {
+    if (!regras.length) { lista.innerHTML = '<p class="vazio">Nenhuma regra cadastrada ainda.</p>'; return; }
+    lista.innerHTML = regras.map((r, i) => `
+      <div class="card regra">
+        <div class="num">${i + 1}</div>
+        <div class="corpo">
+          <div class="nome">${escapeHtml(r.titulo)}</div>
+          <div class="desc">${escapeHtml(r.descricao).replace(/\n/g, '<br>')}</div>
+        </div>
+      </div>`).join('');
+  }
+
+  async function carregarRegras() {
+    const { data, error } = await window.sb.from('regras_casa').select('*').order('ordem', { ascending: true });
+    if (error) { lista.innerHTML = '<p class="erro-carregar">Não deu pra carregar as regras — tenta recarregar a página.</p>'; return; }
+    renderRegras(data || []);
+  }
+
+  if (btnAdd) {
+    btnAdd.addEventListener('click', () => {
+      formAdd.hidden = !formAdd.hidden;
+      if (!formAdd.hidden) document.getElementById('regra-titulo').focus();
+    });
+  }
+  document.getElementById('btn-cancelar-regra').addEventListener('click', () => {
+    formAdd.hidden = true;
+    formAdd.reset();
+  });
+  formAdd.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const titulo = document.getElementById('regra-titulo').value.trim();
+    const descricao = document.getElementById('regra-descricao').value.trim();
+    if (!titulo || !descricao) return;
+
+    const btnSalvar = document.getElementById('btn-salvar-regra');
+    btnSalvar.disabled = true;
+    btnSalvar.textContent = 'Salvando…';
+
+    const { data: ultima } = await window.sb.from('regras_casa').select('ordem').order('ordem', { ascending: false }).limit(1);
+    const proximaOrdem = (ultima && ultima[0] ? ultima[0].ordem : 0) + 1;
+
+    const { error } = await window.sb.from('regras_casa').insert({ titulo, descricao, ordem: proximaOrdem, created_by: u.id });
+
+    btnSalvar.disabled = false;
+    btnSalvar.textContent = 'Salvar Regra';
+
+    if (error) { alert('Não deu pra salvar a regra: ' + error.message); return; }
+
+    formAdd.reset();
+    formAdd.hidden = true;
+    await carregarRegras();
+  });
+
+  await carregarRegras();
+})();
+</script>
+<script src="../assets/js/ambiente.js"></script>
+<script src="../assets/js/polish.js"></script>
+</body>
+</html>
