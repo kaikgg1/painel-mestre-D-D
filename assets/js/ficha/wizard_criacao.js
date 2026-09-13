@@ -1,36 +1,33 @@
 // assets/js/ficha/wizard_criacao.js
-// Assistente de Criação de Personagem (jog-9 da auditoria) — um modal de 3
-// passos (Identidade → Atributos por point-buy → Perícias) que cria um
-// personagem NOVO já com os campos essenciais preenchidos corretamente,
-// em vez do jogador ter que descobrir sozinho o orçamento de pontos e
-// quantas/quais perícias sua classe permite escolher.
+// Assistente de Criação de Personagem (jog-9 da auditoria) — um modal de 4
+// passos (Identidade → Atributos por array padrão → Perícias → Equipamento)
+// que cria um personagem NOVO já com os campos essenciais preenchidos
+// corretamente, em vez do jogador ter que descobrir sozinho as regras do
+// PHB (array padrão, perícias por classe/raça/antecedente, equipamento
+// inicial).
 //
-// PHB 5e, "Variante: Compra de Pontos" (cap. 1): orçamento de 27 pontos,
-// custo por valor de atributo (8 a 15) abaixo. Perícias por classe e
-// salvaguardas de classe vêm de PERICIAS_POR_CLASSE/SALVAGUARDAS_POR_CLASSE
-// (nucleo.js, extraídas do capítulo de cada classe do PHB).
-//
-// Escopo deliberadamente "leve": não cobre raças com bônus de atributo
-// variável, talentos, nem equipamento inicial — isso continua editável na
-// ficha normal depois de criado, igual a qualquer outro personagem.
-
-const CUSTO_POINT_BUY = { 8: 0, 9: 1, 10: 2, 11: 3, 12: 4, 13: 5, 14: 7, 15: 9 };
-const ORCAMENTO_POINT_BUY = 27;
+// Todo campo é obrigatório: não dá pra avançar de passo (nem criar o
+// personagem) com qualquer campo em branco — inclui origem (antecedente),
+// alinhamento, os 6 atributos, todas as perícias exigidas e toda escolha
+// de equipamento (armas/armadura/pacote/foco/idiomas). Dados de regras
+// (antecedentes, perícias por raça, equipamento por classe, array padrão)
+// vêm de wizard_dados.js.
 
 function abrirWizardCriacao() {
   const state = {
     passo: 0,
     nome: '',
-    raca: RACAS[1] || '',
-    classe: CLASSES[1] || '',
+    raca: '',
+    classe: '',
     origem: '',
     alinhamento: '',
-    atributos: { for: 8, dex: 8, con: 8, int: 8, sab: 8, car: 8 },
-    pericias: new Set(),
+    atributos: { for: null, dex: null, con: null, int: null, sab: null, car: null },
+    pericias: new Set(),        // escolhas do jogador (classe + escolha livre de raça)
+    idiomasEscolhidos: [],      // array paralelo às escolhas de idioma do antecedente
+    equipBgSlot: {},            // `${tipo}:${idx}` -> nome escolhido (antecedente: ferramentas/equipamento)
+    equipClasseGrupo: {},       // idx do grupo de escolha -> idx da opção escolhida
+    equipClasseSlot: {},        // chave do slot -> nome escolhido (dentro da opção escolhida, ou fixo)
   };
-
-  const custoGasto = () => ATRIBUTOS.reduce((soma, [k]) => soma + (CUSTO_POINT_BUY[state.atributos[k]] ?? 0), 0);
-  const opcoesClasseAtual = () => opcoesPericiasDaClasse(state.classe) || { escolhas: 0, opcoes: [] };
 
   const { overlay, card, fechar } = UI.abrirModal({
     tituloHtml: `${ico('brilho')} Assistente de Criação de Personagem`,
@@ -53,124 +50,313 @@ function abrirWizardCriacao() {
   const btnAnterior = card.querySelector('#wizard-anterior');
   const btnProximo = card.querySelector('#wizard-proximo');
   const btnCriar = card.querySelector('#wizard-criar');
+  const ULTIMO_PASSO = 3;
   card.querySelector('#wizard-cancelar').addEventListener('click', fechar);
 
+  // ── Helpers de regras (perícias, equipamento) ──────────────────────
+  const opcoesClasseAtual = () => opcoesPericiasDaClasse(state.classe) || { escolhas: 0, opcoes: [] };
+  const origemAtual = () => origemPorNome(state.origem);
+  const equipClasseAtual = () => equipamentoDaClasse(state.classe);
+
+  // Combina perícias fixas (raça + antecedente) com o total de escolhas
+  // (classe + escolha livre de raça, ex. Meio-Elfo). O pool de escolha
+  // exclui as fixas — evita marcar 2x a mesma perícia (PHB: se uma perícia
+  // já vem por outra fonte, escolha outra da lista).
+  function infoPericias() {
+    const bg = origemAtual();
+    const fixasBg = bg ? bg.pericias : [];
+    const racaInfo = PERICIAS_POR_RACA[state.raca];
+    const fixasRaca = racaInfo?.fixas || [];
+    const fixas = new Set([...fixasBg, ...fixasRaca]);
+    const def = opcoesClasseAtual();
+    const racaEscolheQualquer = !!(racaInfo?.escolhas);
+    const poolNomes = racaEscolheQualquer
+      ? PERICIAS.map(p => p[0])
+      : def.opcoes;
+    const pool = Array.from(new Set(poolNomes)).filter(s => !fixas.has(s));
+    const totalEscolhas = (def.escolhas || 0) + (racaInfo?.escolhas || 0);
+    return { fixas, pool, totalEscolhas };
+  }
+
   function podeAvancar() {
-    if (state.passo === 0) return !!(state.nome.trim() && state.raca && state.classe);
-    if (state.passo === 1) return custoGasto() <= ORCAMENTO_POINT_BUY;
+    if (state.passo === 0) return !!(state.nome.trim() && state.raca && state.classe && state.origem && state.alinhamento);
+    if (state.passo === 1) return ATRIBUTOS.every(([k]) => state.atributos[k] != null);
+    if (state.passo === 2) { const info = infoPericias(); return info.totalEscolhas === 0 || state.pericias.size === info.totalEscolhas; }
+    return true;
+  }
+
+  // Todo slot/escolha de equipamento (antecedente + classe) preenchido?
+  function equipamentoCompleto() {
+    const bg = origemAtual();
+    const eq = equipClasseAtual();
+    if (!bg || !eq) return false;
+
+    const nIdiomas = bg.idiomas?.escolhas || 0;
+    if (state.idiomasEscolhidos.length !== nIdiomas || state.idiomasEscolhidos.some(v => !v)) return false;
+    if (new Set(state.idiomasEscolhidos).size !== nIdiomas) return false;
+
+    for (let i = 0; i < bg.ferramentas.length; i++) {
+      if (slotPrecisaEscolha(bg.ferramentas[i]) && !state.equipBgSlot[`ferr:${i}`]) return false;
+    }
+    for (let i = 0; i < bg.equipamento.length; i++) {
+      if (slotPrecisaEscolha(bg.equipamento[i]) && !state.equipBgSlot[`item:${i}`]) return false;
+    }
+
+    for (let gi = 0; gi < eq.escolhas.length; gi++) {
+      const oi = state.equipClasseGrupo[gi];
+      if (oi === undefined) return false;
+      const slots = eq.escolhas[gi].opcoes[oi].slots;
+      for (let si = 0; si < slots.length; si++) {
+        if (slotPrecisaEscolha(slots[si]) && !state.equipClasseSlot[`${gi}:${oi}:${si}`]) return false;
+      }
+    }
+    for (let fi = 0; fi < eq.fixos.length; fi++) {
+      if (slotPrecisaEscolha(eq.fixos[fi]) && !state.equipClasseSlot[`fixo:${fi}`]) return false;
+    }
     return true;
   }
 
   function renderPasso() {
-    const TITULOS = ['Identidade', 'Atributos (Compra de Pontos)', 'Perícias'];
-    passoLbl.textContent = `Passo ${state.passo + 1} de 3 — ${TITULOS[state.passo]}`;
+    const TITULOS = ['Identidade', 'Atributos (Array Padrão)', 'Perícias', 'Equipamento Inicial'];
+    passoLbl.textContent = `Passo ${state.passo + 1} de 4 — ${TITULOS[state.passo]}`;
 
-    if (state.passo === 0) {
-      corpo.innerHTML = `
-        <div class="campo"><label>Nome do Personagem</label>
-          <input type="text" id="wz-nome" value="${escapeHtmlWizard(state.nome)}" placeholder="Ex.: Elara Ventoluz"></div>
-        <div class="grid-2">
-          <div class="campo"><label>Raça</label>
-            <select id="wz-raca">${RACAS.filter(Boolean).map(r => `<option ${r===state.raca?'selected':''}>${r}</option>`).join('')}</select></div>
-          <div class="campo"><label>Classe</label>
-            <select id="wz-classe">${CLASSES.filter(Boolean).map(c => `<option ${c===state.classe?'selected':''}>${c}</option>`).join('')}</select></div>
-          <div class="campo"><label>Origem (Background)</label>
-            <input type="text" id="wz-origem" value="${escapeHtmlWizard(state.origem)}" placeholder="Ex.: Acólito"></div>
-          <div class="campo"><label>Alinhamento</label>
-            <select id="wz-alinhamento">${ALINHAMENTOS.map(a => `<option value="${escapeHtmlWizard(a)}" ${a===state.alinhamento?'selected':''}>${a || '—'}</option>`).join('')}</select></div>
-        </div>
-      `;
-      corpo.querySelector('#wz-nome').addEventListener('input', e => { state.nome = e.target.value; atualizarBotoes(); });
-      corpo.querySelector('#wz-raca').addEventListener('change', e => { state.raca = e.target.value; atualizarBotoes(); });
-      corpo.querySelector('#wz-classe').addEventListener('change', e => {
-        state.classe = e.target.value;
-        state.pericias.clear(); // lista de perícias válidas muda com a classe
-        atualizarBotoes();
+    if (state.passo === 0) renderPasso0();
+    if (state.passo === 1) renderPasso1();
+    if (state.passo === 2) renderPasso2();
+    if (state.passo === 3) renderPasso3();
+
+    btnAnterior.hidden = state.passo === 0;
+    btnProximo.hidden = state.passo === ULTIMO_PASSO;
+    btnCriar.hidden = state.passo !== ULTIMO_PASSO;
+    atualizarBotoes();
+  }
+
+  // ── Passo 0: Identidade ─────────────────────────────────────────────
+  function renderPasso0() {
+    corpo.innerHTML = `
+      <div class="campo"><label>Nome do Personagem *</label>
+        <input type="text" id="wz-nome" value="${escapeHtmlWizard(state.nome)}" placeholder="Ex.: Elara Ventoluz"></div>
+      <div class="grid-2">
+        <div class="campo"><label>Raça *</label>
+          <select id="wz-raca">${RACAS.map(r => `<option value="${escapeHtmlWizard(r)}" ${r===state.raca?'selected':''}>${r || '— selecione —'}</option>`).join('')}</select></div>
+        <div class="campo"><label>Classe *</label>
+          <select id="wz-classe">${CLASSES.map(c => `<option value="${escapeHtmlWizard(c)}" ${c===state.classe?'selected':''}>${c || '— selecione —'}</option>`).join('')}</select></div>
+        <div class="campo"><label>Origem (Antecedente) *</label>
+          <select id="wz-origem">
+            <option value="">— selecione —</option>
+            ${BACKGROUNDS_PHB.map(b => `<option value="${escapeHtmlWizard(b.nome)}" ${b.nome===state.origem?'selected':''}>${b.nome}</option>`).join('')}
+          </select></div>
+        <div class="campo"><label>Alinhamento *</label>
+          <select id="wz-alinhamento">${ALINHAMENTOS.map(a => `<option value="${escapeHtmlWizard(a)}" ${a===state.alinhamento?'selected':''}>${a || '— selecione —'}</option>`).join('')}</select></div>
+      </div>
+      <p class="ajuda-mini">* obrigatório — todos os campos precisam ser preenchidos para avançar.</p>
+    `;
+    corpo.querySelector('#wz-nome').addEventListener('input', e => { state.nome = e.target.value; atualizarBotoes(); });
+    corpo.querySelector('#wz-raca').addEventListener('change', e => {
+      state.raca = e.target.value;
+      resetarPericiasEEquipamento();
+      atualizarBotoes();
+    });
+    corpo.querySelector('#wz-classe').addEventListener('change', e => {
+      state.classe = e.target.value;
+      resetarPericiasEEquipamento();
+      atualizarBotoes();
+    });
+    corpo.querySelector('#wz-origem').addEventListener('change', e => {
+      state.origem = e.target.value;
+      resetarPericiasEEquipamento();
+      atualizarBotoes();
+    });
+    corpo.querySelector('#wz-alinhamento').addEventListener('change', e => { state.alinhamento = e.target.value; atualizarBotoes(); });
+  }
+  function resetarPericiasEEquipamento() {
+    // Raça/classe/antecedente determinam quais perícias e itens estão
+    // disponíveis — mudar qualquer um invalida escolhas já feitas nos
+    // passos seguintes (evita guardar uma escolha que não existe mais).
+    state.pericias.clear();
+    state.idiomasEscolhidos = [];
+    state.equipBgSlot = {};
+    state.equipClasseGrupo = {};
+    state.equipClasseSlot = {};
+  }
+
+  // ── Passo 1: Atributos (Array Padrão) ───────────────────────────────
+  function renderPasso1() {
+    corpo.innerHTML = `
+      <p class="ajuda-mini">PHB, Variante: Array Padrão — distribua ${ARRAY_PADRAO.join(', ')} entre os 6 atributos (bônus racial é somado depois, na ficha).</p>
+      <div class="wizard-atributos">
+        ${ATRIBUTOS.map(([k, nome]) => {
+          const v = state.atributos[k];
+          const usados = new Set(Object.entries(state.atributos).filter(([k2]) => k2 !== k).map(([, vv]) => vv).filter(vv => vv != null));
+          const opcoes = ARRAY_PADRAO.filter(n => n === v || !usados.has(n));
+          return `
+            <div class="wizard-attr-row">
+              <span class="wizard-attr-nome">${nome}</span>
+              <select data-wz-attr="${k}">
+                <option value="">—</option>
+                ${opcoes.map(n => `<option value="${n}" ${n===v?'selected':''}>${n}</option>`).join('')}
+              </select>
+              <span class="wizard-attr-mod">${v != null ? fmtMod(mod(v)) : '—'}</span>
+            </div>`;
+        }).join('')}
+      </div>
+    `;
+    corpo.querySelectorAll('[data-wz-attr]').forEach(sel => {
+      sel.addEventListener('change', () => {
+        const k = sel.dataset.wzAttr;
+        state.atributos[k] = sel.value ? +sel.value : null;
+        renderPasso();
       });
-      corpo.querySelector('#wz-origem').addEventListener('input', e => { state.origem = e.target.value; });
-      corpo.querySelector('#wz-alinhamento').addEventListener('change', e => { state.alinhamento = e.target.value; });
-    }
+    });
+  }
 
-    if (state.passo === 1) {
-      const gasto = custoGasto();
-      const restante = ORCAMENTO_POINT_BUY - gasto;
-      corpo.innerHTML = `
-        <p class="ajuda-mini">PHB, Variante: Compra de Pontos — ${ORCAMENTO_POINT_BUY} pontos, valores de 8 a 15 (bônus racial é somado depois, na ficha).</p>
-        <div class="wizard-pontos-restantes ${restante < 0 ? 'negativo' : ''}">Pontos restantes: <strong>${restante}</strong> / ${ORCAMENTO_POINT_BUY}</div>
-        <div class="wizard-atributos">
-          ${ATRIBUTOS.map(([k, nome]) => {
-            const v = state.atributos[k];
-            return `
-              <div class="wizard-attr-row">
-                <span class="wizard-attr-nome">${nome}</span>
-                <button type="button" class="wizard-attr-btn" data-wz-attr="${k}" data-wz-delta="-1" ${v<=8?'disabled':''} aria-label="Diminuir ${nome}">−</button>
-                <span class="wizard-attr-valor">${v}</span>
-                <button type="button" class="wizard-attr-btn" data-wz-attr="${k}" data-wz-delta="1" ${v>=15?'disabled':''} aria-label="Aumentar ${nome}">+</button>
-                <span class="wizard-attr-mod">${fmtMod(mod(v))}</span>
-                <span class="ajuda-mini">custo ${CUSTO_POINT_BUY[v]}</span>
-              </div>`;
-          }).join('')}
-        </div>
-      `;
-      corpo.querySelectorAll('[data-wz-attr]').forEach(btn => {
-        btn.addEventListener('click', () => {
-          const k = btn.dataset.wzAttr;
-          const delta = +btn.dataset.wzDelta;
-          const novo = Math.max(8, Math.min(15, state.atributos[k] + delta));
-          if (novo === state.atributos[k]) return;
-          const custoAntes = CUSTO_POINT_BUY[state.atributos[k]];
-          const custoDepois = CUSTO_POINT_BUY[novo];
-          if (delta > 0 && (custoGasto() - custoAntes + custoDepois) > ORCAMENTO_POINT_BUY) {
-            toast('Sem pontos suficientes pra esse aumento.');
-            return;
-          }
-          state.atributos[k] = novo;
-          renderPasso();
-          atualizarBotoes();
-        });
-      });
-    }
-
-    if (state.passo === 2) {
-      const def = opcoesClasseAtual();
-      corpo.innerHTML = !def.opcoes.length ? `<p class="ajuda-mini">Escolha uma classe válida no Passo 1 pra ver as perícias disponíveis.</p>` : `
-        <p class="ajuda-mini">${CLASSES.includes(state.classe) ? state.classe : 'Sua classe'}: escolha <strong>${def.escolhas}</strong> perícia${def.escolhas>1?'s':''}.</p>
+  // ── Passo 2: Perícias (classe + raça + antecedente) ─────────────────
+  function renderPasso2() {
+    const bg = origemAtual();
+    const info = infoPericias();
+    const nomePericia = slug => (PERICIAS.find(p => p[0] === slug) || [slug, slug])[1];
+    corpo.innerHTML = `
+      ${bg ? `<p class="ajuda-mini">Perícias garantidas por ${state.raca ? state.raca + ' + ' : ''}${bg.nome}: <strong>${Array.from(info.fixas).map(nomePericia).join(', ') || '—'}</strong></p>` : ''}
+      ${info.totalEscolhas > 0 ? `
+        <p class="ajuda-mini">Escolha <strong>${info.totalEscolhas}</strong> perícia${info.totalEscolhas>1?'s':''} (perícias já garantidas acima não aparecem na lista).</p>
         <div class="wizard-pericias-lista">
-          ${def.opcoes.map(slug => {
-            const p = PERICIAS.find(x => x[0] === slug);
+          ${info.pool.map(slug => {
             const marcada = state.pericias.has(slug);
-            const travarDesmarcada = !marcada && state.pericias.size >= def.escolhas;
+            const travarDesmarcada = !marcada && state.pericias.size >= info.totalEscolhas;
             return `<label class="editor-check wizard-pericia-item">
               <input type="checkbox" data-wz-pericia="${slug}" ${marcada?'checked':''} ${travarDesmarcada?'disabled':''}>
-              ${p ? p[1] : slug}
+              ${nomePericia(slug)}
             </label>`;
           }).join('')}
         </div>
-        <p class="ajuda-mini">${state.pericias.size} / ${def.escolhas} escolhidas</p>
-      `;
-      corpo.querySelectorAll('[data-wz-pericia]').forEach(cb => {
-        cb.addEventListener('change', () => {
-          const slug = cb.dataset.wzPericia;
-          if (cb.checked) state.pericias.add(slug); else state.pericias.delete(slug);
-          renderPasso();
-        });
+        <p class="ajuda-mini">${state.pericias.size} / ${info.totalEscolhas} escolhidas</p>
+      ` : `<p class="ajuda-mini">Essa combinação de raça/classe não tem mais nenhuma perícia à escolha.</p>`}
+    `;
+    corpo.querySelectorAll('[data-wz-pericia]').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const slug = cb.dataset.wzPericia;
+        if (cb.checked) state.pericias.add(slug); else state.pericias.delete(slug);
+        renderPasso();
       });
-    }
+    });
+  }
 
-    btnAnterior.hidden = state.passo === 0;
-    btnProximo.hidden = state.passo === 2;
-    btnCriar.hidden = state.passo !== 2;
-    atualizarBotoes();
+  // ── Passo 3: Equipamento Inicial (antecedente + classe) ─────────────
+  function renderSlotHtml(slot, chave, valorAtual) {
+    if (!slotPrecisaEscolha(slot)) {
+      const qtdTxt = slot.qtd && slot.qtd > 1 ? ` ×${slot.qtd}` : '';
+      return `<div class="equip-slot-fixo">• ${escapeHtmlWizard(slot.nome || slot.custom)}${qtdTxt}</div>`;
+    }
+    const opcoes = opcoesDoSlot(slot);
+    return `<div class="equip-slot-escolha">
+      <select data-slot-key="${chave}">
+        <option value="">— escolha —</option>
+        ${opcoes.map(o => `<option value="${escapeHtmlWizard(o)}" ${o===valorAtual?'selected':''}>${escapeHtmlWizard(o)}</option>`).join('')}
+      </select>
+    </div>`;
+  }
+
+  function renderPasso3() {
+    const bg = origemAtual();
+    const eq = equipClasseAtual();
+    if (!bg || !eq) { corpo.innerHTML = `<p class="ajuda-mini">Volte ao Passo 1 e escolha raça, classe e antecedente válidos.</p>`; return; }
+
+    const nIdiomas = bg.idiomas?.escolhas || 0;
+    const idiomasHtml = nIdiomas ? `
+      <div class="wizard-equip-bloco">
+        <h4>Idiomas (${nIdiomas} à escolha)</h4>
+        <div class="wizard-equip-idiomas">
+          ${Array.from({ length: nIdiomas }).map((_, i) => {
+            const usadosPorOutros = new Set(state.idiomasEscolhidos.filter((v, idx) => idx !== i && v));
+            const opcoes = IDIOMAS_PHB.filter(id => !usadosPorOutros.has(id));
+            const atual = state.idiomasEscolhidos[i] || '';
+            return `<select data-idioma-idx="${i}">
+              <option value="">— escolha —</option>
+              ${opcoes.map(id => `<option value="${id}" ${id===atual?'selected':''}>${id}</option>`).join('')}
+            </select>`;
+          }).join('')}
+        </div>
+      </div>` : '';
+
+    const bgFerramentasHtml = bg.ferramentas.length ? `
+      <div class="wizard-equip-bloco">
+        <h4>Proficiências em Ferramentas (${bg.nome})</h4>
+        ${bg.ferramentas.map((slot, i) => renderSlotHtml(slot, `ferr:${i}`, state.equipBgSlot[`ferr:${i}`])).join('')}
+      </div>` : '';
+
+    const bgItensHtml = `
+      <div class="wizard-equip-bloco">
+        <h4>Itens de ${escapeHtmlWizard(bg.nome)}</h4>
+        ${bg.equipamento.map((slot, i) => renderSlotHtml(slot, `item:${i}`, state.equipBgSlot[`item:${i}`])).join('')}
+        <p class="ajuda-mini">+ ${bg.ouro} po</p>
+      </div>`;
+
+    const classeHtml = `
+      <div class="wizard-equip-bloco">
+        <h4>Equipamento de ${escapeHtmlWizard(state.classe)}</h4>
+        ${eq.escolhas.map((grupo, gi) => `
+          <fieldset class="wizard-equip-grupo">
+            <legend>${escapeHtmlWizard(grupo.label)}</legend>
+            ${grupo.opcoes.map((opcao, oi) => {
+              const selecionada = state.equipClasseGrupo[gi] === oi;
+              return `
+                <label class="editor-check wizard-equip-opcao">
+                  <input type="radio" name="wz-grupo-${gi}" data-grupo="${gi}" data-opcao="${oi}" ${selecionada?'checked':''}>
+                  ${escapeHtmlWizard(opcao.label)}
+                </label>
+                ${selecionada ? `<div class="wizard-equip-sub">
+                  ${opcao.slots.map((slot, si) => renderSlotHtml(slot, `${gi}:${oi}:${si}`, state.equipClasseSlot[`${gi}:${oi}:${si}`])).join('')}
+                </div>` : ''}
+              `;
+            }).join('')}
+          </fieldset>
+        `).join('')}
+        ${eq.fixos.length ? `<div class="wizard-equip-fixos">
+          <h5>Itens fixos</h5>
+          ${eq.fixos.map((slot, fi) => renderSlotHtml(slot, `fixo:${fi}`, state.equipClasseSlot[`fixo:${fi}`])).join('')}
+        </div>` : ''}
+      </div>`;
+
+    corpo.innerHTML = idiomasHtml + bgFerramentasHtml + bgItensHtml + classeHtml;
+
+    corpo.querySelectorAll('[data-idioma-idx]').forEach(sel => {
+      sel.addEventListener('change', () => {
+        const i = +sel.dataset.idiomaIdx;
+        state.idiomasEscolhidos[i] = sel.value || null;
+        renderPasso();
+      });
+    });
+    corpo.querySelectorAll('[data-slot-key]').forEach(sel => {
+      sel.addEventListener('change', () => {
+        const chave = sel.dataset.slotKey;
+        if (chave.startsWith('ferr:') || chave.startsWith('item:')) {
+          state.equipBgSlot[chave] = sel.value || null;
+        } else {
+          state.equipClasseSlot[chave] = sel.value || null;
+        }
+        renderPasso();
+      });
+    });
+    corpo.querySelectorAll('[data-grupo]').forEach(radio => {
+      radio.addEventListener('change', () => {
+        const gi = +radio.dataset.grupo;
+        const oi = +radio.dataset.opcao;
+        state.equipClasseGrupo[gi] = oi;
+        // Opção trocada: limpa escolhas de sub-slot desse grupo (podiam
+        // pertencer a uma opção diferente da agora selecionada).
+        Object.keys(state.equipClasseSlot).forEach(k => { if (k.startsWith(`${gi}:`)) delete state.equipClasseSlot[k]; });
+        renderPasso();
+      });
+    });
   }
 
   function atualizarBotoes() {
     btnProximo.disabled = !podeAvancar();
-    const def = opcoesClasseAtual();
-    btnCriar.disabled = def.escolhas > 0 && state.pericias.size !== def.escolhas;
+    btnCriar.disabled = !(podeAvancar() && equipamentoCompleto());
   }
 
   btnAnterior.addEventListener('click', () => { state.passo = Math.max(0, state.passo - 1); renderPasso(); });
-  btnProximo.addEventListener('click', () => { if (podeAvancar()) { state.passo = Math.min(2, state.passo + 1); renderPasso(); } });
+  btnProximo.addEventListener('click', () => { if (podeAvancar()) { state.passo = Math.min(ULTIMO_PASSO, state.passo + 1); renderPasso(); } });
   btnCriar.addEventListener('click', () => criarPersonagemComWizard(state, fechar));
 
   renderPasso();
@@ -179,30 +365,119 @@ function abrirWizardCriacao() {
 
 function escapeHtmlWizard(s) { return window.Regras.escapeHtml(s || ''); }
 
+// Resolve um slot de equipamento (com a escolha já feita, se houver) num
+// item concreto pra guardar em characters.inventario, ou uma proficiência
+// de ferramenta pra characters.ferramentas.
+function construirItemDeSlot(slot, valorEscolhido) {
+  const qtd = slot.qtd || 1;
+  if (slot.custom) return { alvo: 'itens', item: { nome: slot.custom, qtd, peso: 0 } };
+  const nome = slot.nome || valorEscolhido;
+  if (!nome) return null;
+  if (slot.tabela === 'ARMAS') {
+    const c = resolverItemCatalogo('ARMAS', nome);
+    return { alvo: 'armas', item: { nome: c.nome, dano: c.dano, tipo_dano: c.tipo_dano, categoria: c.categoria, propriedades: c.propriedades, peso: c.peso, custo: c.custo }, qtd };
+  }
+  if (slot.tabela === 'ARMADURAS') {
+    const c = resolverItemCatalogo('ARMADURAS', nome);
+    return { alvo: 'armaduras', item: { nome: c.nome, ca: c.ca, tipo: c.tipo, furtividade: c.furtividade, forca: c.forca, peso: c.peso, custo: c.custo } };
+  }
+  if (slot.tabela === 'FERRAMENTAS') {
+    const c = resolverItemCatalogo('FERRAMENTAS', nome);
+    return { alvo: 'itens', item: { nome: c.nome, qtd, peso: c.peso } };
+  }
+  const c = resolverItemCatalogo('ITENS', nome);
+  return { alvo: 'itens', item: { nome: c.nome, qtd, peso: c.peso } };
+}
+
+// Monta characters.inventario/ferramentas a partir do antecedente escolhido
+// (jog-9): itens fixos, itens de escolha já resolvidos e ferramentas —
+// estas últimas viram TANTO um item físico quanto uma proficiência (o
+// jogador ganha o kit e sabe usá-lo).
+function montarEquipamentoOrigem(state) {
+  const bg = origemPorNome(state.origem);
+  const armas = [], armaduras = [], itens = [];
+  const ferramentasProf = [];
+  const empilhar = (resultado) => {
+    if (!resultado) return;
+    for (let i = 0; i < (resultado.qtd || 1); i++) {
+      if (resultado.alvo === 'armas') armas.push({ ...resultado.item });
+      else if (resultado.alvo === 'armaduras') armaduras.push({ ...resultado.item });
+      else itens.push({ ...resultado.item });
+    }
+  };
+  bg.ferramentas.forEach((slot, i) => {
+    const valor = state.equipBgSlot[`ferr:${i}`];
+    const nomeFinal = slot.nome || valor;
+    if (nomeFinal) ferramentasProf.push(nomeFinal);
+    empilhar(construirItemDeSlot(slot, valor));
+  });
+  bg.equipamento.forEach((slot, i) => {
+    empilhar(construirItemDeSlot(slot, state.equipBgSlot[`item:${i}`]));
+  });
+  return { armas, armaduras, itens, ferramentasProf, ouro: bg.ouro };
+}
+
+// Idem, a partir do equipamento inicial da classe.
+function montarEquipamentoClasse(state) {
+  const eq = equipamentoDaClasse(state.classe);
+  const armas = [], armaduras = [], itens = [];
+  const empilhar = (resultado) => {
+    if (!resultado) return;
+    for (let i = 0; i < (resultado.qtd || 1); i++) {
+      if (resultado.alvo === 'armas') armas.push({ ...resultado.item });
+      else if (resultado.alvo === 'armaduras') armaduras.push({ ...resultado.item });
+      else itens.push({ ...resultado.item });
+    }
+  };
+  eq.escolhas.forEach((grupo, gi) => {
+    const oi = state.equipClasseGrupo[gi];
+    const slots = grupo.opcoes[oi]?.slots || [];
+    slots.forEach((slot, si) => empilhar(construirItemDeSlot(slot, state.equipClasseSlot[`${gi}:${oi}:${si}`])));
+  });
+  eq.fixos.forEach((slot, fi) => empilhar(construirItemDeSlot(slot, state.equipClasseSlot[`fixo:${fi}`])));
+  return { armas, armaduras, itens };
+}
+
 // Monta o payload de um personagem de 1° nível já com PV, dado de vida,
-// salvaguardas de classe e perícias escolhidas — em vez do jogador ter que
-// preencher tudo isso manualmente depois de criar um personagem em branco.
+// salvaguardas de classe, perícias (classe+raça+antecedente) e equipamento
+// inicial (antecedente+classe) — em vez do jogador ter que preencher tudo
+// isso manualmente depois de criar um personagem em branco.
 async function criarPersonagemComWizard(state, fechar) {
   const dadoVida = dadoVidaDaClasse(state.classe) || 8;
   const conMod = mod(state.atributos.con);
   const hpMax = Math.max(1, dadoVida + conMod);
   const salvasClasse = SALVAGUARDAS_POR_CLASSE[chaveDeClasse(state.classe)] || [];
+  const bg = origemPorNome(state.origem);
+  const racaInfo = PERICIAS_POR_RACA[state.raca];
+  const periciasFixas = new Set([...(bg?.pericias || []), ...(racaInfo?.fixas || [])]);
+  const todasPericias = new Set([...periciasFixas, ...state.pericias]);
+
+  const origemEquip = montarEquipamentoOrigem(state);
+  const classeEquip = montarEquipamentoClasse(state);
 
   const payload = {
     user_id: usuario.id,
     nome: state.nome.trim() || 'Novo Personagem',
     raca: state.raca,
     classe: state.classe,
-    origem: state.origem.trim(),
+    origem: state.origem,
     alinhamento: state.alinhamento,
     nivel: 1,
     atributos: { ...state.atributos },
     salvaguardas: Object.fromEntries(salvasClasse.map(k => [k, true])),
-    pericias: Object.fromEntries(Array.from(state.pericias).map(k => [k, { prof: true }])),
+    pericias: Object.fromEntries(Array.from(todasPericias).map(k => [k, { prof: true }])),
+    idiomas: ['Comum', ...state.idiomasEscolhidos.filter(Boolean)],
+    ferramentas: origemEquip.ferramentasProf,
     dado_vida_tipo: dadoVida,
     dado_vida_atual: 1,
     hp_max: hpMax,
     hp_atual: hpMax,
+    inventario: {
+      moedas: { po: origemEquip.ouro, pp: 0, pe: 0, pc: 0, pl: 0 },
+      armas: [...origemEquip.armas, ...classeEquip.armas],
+      armaduras: [...origemEquip.armaduras, ...classeEquip.armaduras],
+      itens: [...origemEquip.itens, ...classeEquip.itens],
+    },
   };
 
   const { data, error } = await window.sb.from('characters').insert(payload).select('*').single();
@@ -211,5 +486,5 @@ async function criarPersonagemComWizard(state, fechar) {
   charAtivo = data;
   fechar();
   render();
-  toast(`✓ ${data.nome} criado — confira Atributos/Perícias na aba Personagem`);
+  toast(`✓ ${data.nome} criado — confira Atributos/Perícias/Equipamento na ficha`);
 }

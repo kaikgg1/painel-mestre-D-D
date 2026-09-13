@@ -1,10 +1,15 @@
-# Conteúdo do PHB / DMG — copyright Galápagos Jogos / WotC, não distribuir
+# Conteúdo do PHB / DMG — copyright Galápagos Jogos / WotC, não distribuir.
+# docs/livros/ (PDF + .txt/.md convertidos do Livro do Jogador, Mestre e
+# Manual dos Monstros) escapou dessas regras uma vez por estar numa
+# subpasta — as regras acima só pegam arquivo direto em docs/. Ignora a
+# pasta inteira agora, não só nomes específicos.
 docs/LivroDoJogador.*
 docs/Mestre.*
 docs/*.pdf
 docs/*.txt
 docs/*.md
 docs/fichas_txt/
+docs/livros/
 
 # Dependências locais (instaláveis via `npm install`)
 node_modules/

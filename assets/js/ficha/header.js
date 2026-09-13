@@ -90,6 +90,7 @@ function renderHeader(c) {
       <div class="menu-popover" id="menu-popover" role="menu" hidden>
         <button type="button" class="menu-item" id="btn-novo" role="menuitem">+ Novo personagem</button>
         <button type="button" class="menu-item" id="btn-wizard" role="menuitem">🧙 Assistente de criação</button>
+        <button type="button" class="menu-item" id="btn-exportar-pdf" role="menuitem">⬇ Exportar Ficha (PDF)</button>
         <button type="button" class="menu-item" id="btn-duplicar" role="menuitem">⧉ Duplicar personagem</button>
         <button type="button" class="menu-item" id="btn-ativo" role="menuitem" aria-pressed="${ehAtivo}">
           ${ehAtivo ? '★ Remover de ativo' : '☆ Tornar ativo'}
@@ -179,6 +180,8 @@ function conectarListenersHeader() {
   });
   const wizardBtn = document.getElementById('btn-wizard');
   if (wizardBtn) wizardBtn.addEventListener('click', () => { fecharMenuAcoes(); abrirWizardCriacao(); });
+  const exportarPdfBtn = document.getElementById('btn-exportar-pdf');
+  if (exportarPdfBtn) exportarPdfBtn.addEventListener('click', () => { fecharMenuAcoes(); exportarFichaPDF(); });
   const duplicarBtn = document.getElementById('btn-duplicar');
   if (duplicarBtn) duplicarBtn.addEventListener('click', async () => {
     fecharMenuAcoes();

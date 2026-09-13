@@ -106,18 +106,38 @@ window.sb = { from: (tabela) => construirQuery(tabela, null) };
 // popularHabilidades()/carregarMagiasPreparadas() nunca populam de verdade
 // e a Fase 5 (busca/filtro/favoritar sobre o catálogo) fica sem cobertura.
 window.fetch = async (url) => {
-  const arquivo = String(url).replace(/^\.\.\//, '');
+  const arquivo = decodeURIComponent(String(url).replace(/^\.\.\//, ''));
   const caminho = path.join(raiz, arquivo);
   if (fs.existsSync(caminho) && /^data\//.test(arquivo)) {
     return { ok: true, status: 200, json: async () => JSON.parse(fs.readFileSync(caminho, 'utf8')) };
+  }
+  // docs/fichas/*.pdf — exportarFichaPDF() (exportar_pdf.js) busca o modelo
+  // real do disco pra preencher; serve como bytes de verdade (arrayBuffer),
+  // mesmo dado que o navegador pegaria.
+  if (fs.existsSync(caminho) && /^docs\/fichas\//.test(arquivo)) {
+    const buf = fs.readFileSync(caminho);
+    // Precisa ser um ArrayBuffer do REALM da jsdom window (não do Node) —
+    // pdf-lib faz `instanceof ArrayBuffer` internamente, que falha em
+    // silêncio (erro "type NaN") pra um ArrayBuffer de outro realm.
+    return { ok: true, status: 200, arrayBuffer: async () => { const u8 = new window.Uint8Array(buf.byteLength); u8.set(buf); return u8.buffer; } };
   }
   throw new Error('sem rede no smoke test (' + url + ')');
 };
 // Polyfills de coisas que o jsdom nao implementa (nao sao problema do codigo)
 window.Element.prototype.scrollIntoView = function () {};
 window.HTMLCanvasElement.prototype.getContext = () => null;
+// jsdom tenta "navegar" quando um <a href="blob:..."> é clicado (mesmo com
+// download), o que loga "Not implemented: navigation..." — inofensivo, mas
+// suprime aqui pra manter a saída do smoke test limpa.
+window.HTMLAnchorElement.prototype.click = function () {};
 if (!window.CSS) window.CSS = {};
 if (!window.CSS.escape) window.CSS.escape = (s) => String(s).replace(/[^a-zA-Z0-9_-]/g, c => '\\' + c);
+// jsdom não implementa URL.createObjectURL — exportarFichaPDF() (exportar_pdf.js)
+// usa isso pra baixar o PDF gerado. Guarda o Blob num global pra o teste
+// poder reabrir os bytes depois (mesmo padrão de "captura o que seria
+// enviado pro browser" já usado com window.sb acima).
+window.URL.createObjectURL = (blob) => { window.__ultimoBlobPDF = blob; return 'blob:teste'; };
+window.URL.revokeObjectURL = () => {};
 
 // Modulos compartilhados que a ficha consome (PHB, slots, exaustao, recursos, icones)
 for (const m of ['icones.js','ui.js','regras_base.js','phb_catalogo.js','phb_slots.js','exaustao_regras.js','recursos_classe.js','ataques.js','condicoes_regras.js']) {
@@ -125,9 +145,14 @@ for (const m of ['icones.js','ui.js','regras_base.js','phb_catalogo.js','phb_slo
   el.textContent = fs.readFileSync(path.join(raiz, 'assets/js', m), 'utf8');
   window.document.head.appendChild(el);
 }
+{
+  const el = window.document.createElement('script');
+  el.textContent = fs.readFileSync(path.join(raiz, 'assets/vendor/pdf-lib.min.js'), 'utf8');
+  window.document.head.appendChild(el);
+}
 
 const ordem = [
-  'nucleo.js','render.js','header.js','wizard_criacao.js','nav_mobile.js','seletor.js','aba_resumo.js',
+  'nucleo.js','render.js','header.js','wizard_dados.js','wizard_criacao.js','exportar_pdf.js','nav_mobile.js','seletor.js','aba_resumo.js',
   'aba_combate.js','recursos.js','aba_habilidades.js','aba_magias.js',
   'aba_equipamento.js','aba_aliados.js','aba_roleplay.js','lock.js',
   'listeners.js','salvar.js',
@@ -1277,11 +1302,16 @@ console.log('');
     : '  aba personagem: leitura×edição via botão Editar/Travar + Inspiração/traços-raciais/atributos sempre visíveis ok');
 }
 
-// Assistente de Criação (jog-9): 3 passos (Identidade → Atributos por
-// point-buy → Perícias) terminando num personagem novo de verdade via
-// window.sb.insert(). Roda por ÚLTIMO entre os testes de estado porque cria
-// um personagem e troca charAtivo/chars — restaura tudo ao original no final
-// pra não interferir no teste de header logo abaixo.
+// Assistente de Criação (jog-9): 4 passos (Identidade → Atributos por
+// array padrão → Perícias → Equipamento Inicial) terminando num personagem
+// novo de verdade via window.sb.insert(). Usa Humano+Guerreiro+Soldado de
+// propósito: o antecedente Soldado já garante Atletismo+Intimidação, que
+// TAMBÉM estão na lista de escolha do Guerreiro — isso testa que o wizard
+// tira essas 2 da lista de escolha (sem isso o jogador podia "escolher" uma
+// perícia que já ia ganhar de graça, e o payload nunca refletia a soma
+// certa de raça+classe+antecedente). Roda por ÚLTIMO entre os testes de
+// estado porque cria um personagem e troca charAtivo/chars — restaura tudo
+// ao original no final pra não interferir no teste de header logo abaixo.
 console.log('');
 {
   const antes = erros.length;
@@ -1294,58 +1324,92 @@ console.log('');
   // dereferenciava usuario.id, então isso nunca apareceu — reafirma aqui
   // porque é o primeiro (criarPersonagemComWizard usa usuario.id).
   window.eval('usuario = { id: "u" };');
+  // jsdom não dispara 'change' sozinho a partir de .click()/.checked de forma
+  // confiável em checkbox/radio — mesmo padrão já usado no resto do arquivo:
+  // marca o estado à mão e dispara o evento manualmente.
+  const marcar = (el, checked) => { el.checked = checked; el.dispatchEvent(new window.Event('change', { bubbles: true })); };
+  const selecionar = (el, valor) => { el.value = valor; el.dispatchEvent(new window.Event('change', { bubbles: true })); };
   try {
     const { fechar } = window.abrirWizardCriacao();
     const overlay = window.document.querySelector('.wizard-overlay');
     if (!overlay) erros.push('wizard: modal não abriu (.wizard-overlay não encontrado)');
     else {
-      // Passo 1 — Identidade
+      // Passo 1 — Identidade: TODOS os campos são obrigatórios agora.
       const nomeInp = overlay.querySelector('#wz-nome');
+      const racaSel = overlay.querySelector('#wz-raca');
       const classeSel = overlay.querySelector('#wz-classe');
-      if (!nomeInp || !classeSel) erros.push('wizard: campos do Passo 1 não encontrados');
+      const origemSel = overlay.querySelector('#wz-origem');
+      const alinhamentoSel = overlay.querySelector('#wz-alinhamento');
+      if (!nomeInp || !racaSel || !classeSel || !origemSel || !alinhamentoSel) erros.push('wizard: campos do Passo 1 não encontrados');
       else {
-        nomeInp.value = 'Thalindra Testválida';
-        nomeInp.dispatchEvent(new window.Event('input', { bubbles: true }));
+        const btnProximo = overlay.querySelector('#wizard-proximo');
         classeSel.value = 'Guerreiro';
         classeSel.dispatchEvent(new window.Event('change', { bubbles: true }));
-        const btnProximo = overlay.querySelector('#wizard-proximo');
-        if (btnProximo.disabled) erros.push('wizard: "Próximo" deveria estar habilitado com nome+raça+classe preenchidos');
+        if (btnProximo.disabled === false) erros.push('wizard: "Próximo" não deveria habilitar só com classe preenchida (faltam nome/raça/origem/alinhamento)');
+        nomeInp.value = 'Thalindra Testválida';
+        nomeInp.dispatchEvent(new window.Event('input', { bubbles: true }));
+        selecionar(racaSel, 'Humano');
+        selecionar(origemSel, 'Soldado');
+        selecionar(alinhamentoSel, 'Leal e Bom');
+        if (btnProximo.disabled) erros.push('wizard: "Próximo" deveria estar habilitado com todos os campos do Passo 1 preenchidos');
         btnProximo.click();
 
-        // Passo 2 — Atributos (point-buy): sobe Força até o limite de 15,
-        // confere que o orçamento de 27 nunca é ultrapassado.
-        for (let i = 0; i < 10; i++) {
-          const btnMais = overlay.querySelector('[data-wz-attr="for"][data-wz-delta="1"]');
-          if (!btnMais || btnMais.disabled) break;
-          btnMais.click();
-        }
-        const forValor = +overlay.querySelector('.wizard-attr-row .wizard-attr-valor')?.textContent;
-        if (forValor !== 15) erros.push('wizard: subir Força repetidamente deveria travar em 15 (custo 9/27), parou em ' + forValor);
-        const restanteTxt = overlay.querySelector('.wizard-pontos-restantes strong')?.textContent;
-        if (+restanteTxt < 0) erros.push('wizard: pontos restantes negativos — orçamento de 27 estourado (' + restanteTxt + ')');
-        overlay.querySelector('#wizard-proximo').click();
+        // Passo 2 — Atributos (Array Padrão): atribui 15/14/13/12/10/8 —
+        // confere que valores já usados somem das outras opções (bijeção).
+        const ordemAtributos = ['for', 'dex', 'con', 'int', 'sab', 'car'];
+        const arrayPadrao = [15, 14, 13, 12, 10, 8];
+        const btnProximo2 = overlay.querySelector('#wizard-proximo');
+        if (btnProximo2.disabled === false) erros.push('wizard: "Próximo" não deveria habilitar antes de atribuir os 6 atributos');
+        ordemAtributos.forEach((k, i) => {
+          const sel = overlay.querySelector(`[data-wz-attr="${k}"]`);
+          selecionar(sel, String(arrayPadrao[i]));
+        });
+        const selDex = overlay.querySelector('[data-wz-attr="dex"]');
+        const valoresRestantesEmDex = Array.from(selDex.querySelectorAll('option')).map(o => o.value).filter(Boolean);
+        if (valoresRestantesEmDex.includes('15')) erros.push('wizard: valor 15 (já usado em Força) não deveria continuar disponível em Destreza');
+        if (btnProximo2.disabled) erros.push('wizard: "Próximo" deveria estar habilitado com os 6 atributos atribuídos');
+        btnProximo2.click();
 
-        // Passo 3 — Perícias: Guerreiro escolhe 2 de 8 opções.
+        // Passo 3 — Perícias: Guerreiro tem 8 opções na lista de classe, mas
+        // Soldado já garante Atletismo+Intimidação de graça — essas 2 saem
+        // do pool de escolha (6 restantes), sem reduzir as 2 escolhas.
         const checks = Array.from(overlay.querySelectorAll('[data-wz-pericia]'));
-        if (checks.length !== 8) erros.push('wizard: Guerreiro deveria oferecer 8 opções de perícia, veio ' + checks.length);
-        const btnCriar = overlay.querySelector('#wizard-criar');
-        if (!btnCriar.disabled) erros.push('wizard: "Criar Personagem" não deveria estar habilitado com 0 perícias escolhidas');
-        // jsdom não dispara 'change' sozinho a partir de .click() num
-        // checkbox de forma confiável — mesmo padrão já usado nos outros
-        // testes de checkbox deste arquivo (marca .checked + dispatch manual).
-        checks[0].checked = true;
-        checks[0].dispatchEvent(new window.Event('change', { bubbles: true }));
-        checks[1].checked = true;
-        checks[1].dispatchEvent(new window.Event('change', { bubbles: true }));
-        if (!btnCriar.disabled) { /* correto: com 2/2 escolhidas deveria habilitar */ } else {
-          erros.push('wizard: "Criar Personagem" continua desabilitado com 2/2 perícias escolhidas');
+        if (checks.length !== 6) erros.push('wizard: pool de perícias deveria vir com 6 opções (8 do Guerreiro − 2 já garantidas pelo Soldado), veio ' + checks.length);
+        if (checks.some(c => c.dataset.wzPericia === 'atletismo' || c.dataset.wzPericia === 'intimidacao')) {
+          erros.push('wizard: Atletismo/Intimidação não deveriam aparecer pra escolher — já vêm fixas do antecedente Soldado');
         }
-        // Uma 3ª opção deveria vir travada (limite atingido) — reconsulta o
-        // DOM ao vivo, já que cada clique chama renderPasso() e troca os nós
-        // (o array "checks" capturado antes dos cliques fica com nós velhos).
-        const checksAoVivo = Array.from(overlay.querySelectorAll('[data-wz-pericia]'));
-        const naoMarcada = checksAoVivo.find(c => !c.checked);
-        if (naoMarcada && !naoMarcada.disabled) erros.push('wizard: opção de perícia além do limite deveria vir desabilitada');
+        marcar(checks[0], true);
+        const checksAoVivo1 = Array.from(overlay.querySelectorAll('[data-wz-pericia]'));
+        marcar(checksAoVivo1.find(c => c.dataset.wzPericia === checks[1].dataset.wzPericia), true);
+        const btnProximo3 = overlay.querySelector('#wizard-proximo');
+        if (btnProximo3.disabled) erros.push('wizard: "Próximo" continua desabilitado com 2/2 perícias escolhidas');
+        btnProximo3.click();
+
+        // Passo 4 — Equipamento Inicial: antecedente (Soldado) + classe
+        // (Guerreiro). "Criar Personagem" deve continuar desabilitado até
+        // toda escolha (ferramenta + grupos de equipamento) ser feita.
+        const btnCriar = overlay.querySelector('#wizard-criar');
+        if (!btnCriar.disabled) erros.push('wizard: "Criar Personagem" não deveria habilitar antes de preencher o equipamento');
+
+        // Soldado: 1 kit/jogo à escolha.
+        selecionar(overlay.querySelector('[data-slot-key="ferr:0"]'), 'Jogo de Dados');
+
+        // Guerreiro, grupo 0 (Armadura) — ambas as opções já vêm fixas
+        // (sem sub-escolha), só precisa marcar o radio.
+        marcar(overlay.querySelector('[data-grupo="0"][data-opcao="0"]'), true);
+
+        // Grupo 1 (Arma principal) — opção 0 tem uma sub-escolha de arma
+        // marcial. Precisa re-renderizar antes de achar o <select> que só
+        // aparece depois do radio marcado (mesmo padrão de "nós trocam" já
+        // usado no resto deste teste).
+        marcar(overlay.querySelector('[data-grupo="1"][data-opcao="0"]'), true);
+        selecionar(overlay.querySelector('[data-slot-key="1:0:0"]'), 'Espada Longa');
+
+        // Grupos 2 (Arma secundária) e 3 (Pacote) — ambas as opções são fixas.
+        marcar(overlay.querySelector('[data-grupo="2"][data-opcao="0"]'), true);
+        marcar(overlay.querySelector('[data-grupo="3"][data-opcao="0"]'), true);
+
+        if (btnCriar.disabled) erros.push('wizard: "Criar Personagem" continua desabilitado depois de preencher toda escolha de equipamento');
 
         window.__ultimoInsertPayload = null;
         btnCriar.click();
@@ -1357,13 +1421,23 @@ console.log('');
         else {
           if (ins.nome !== 'Thalindra Testválida') erros.push('wizard: nome não foi pro payload — ' + ins.nome);
           if (ins.classe !== 'Guerreiro') erros.push('wizard: classe não foi pro payload — ' + ins.classe);
+          if (ins.origem !== 'Soldado') erros.push('wizard: origem (antecedente) não foi pro payload — ' + ins.origem);
+          if (ins.alinhamento !== 'Leal e Bom') erros.push('wizard: alinhamento não foi pro payload — ' + ins.alinhamento);
           if (ins.nivel !== 1) erros.push('wizard: nível deveria ser 1, veio ' + ins.nivel);
           if (ins.atributos?.for !== 15) erros.push('wizard: atributos.for deveria ser 15, veio ' + ins.atributos?.for);
           if (ins.dado_vida_tipo !== 10) erros.push('wizard: Guerreiro usa d10, veio dado_vida_tipo=' + ins.dado_vida_tipo);
           if (ins.hp_max !== ins.hp_atual || ins.hp_max < 1) erros.push('wizard: hp_max/hp_atual não vieram consistentes — ' + JSON.stringify({hp_max: ins.hp_max, hp_atual: ins.hp_atual}));
           if (!ins.salvaguardas?.for || !ins.salvaguardas?.con) erros.push('wizard: salvaguardas de Guerreiro (FOR/CON) não vieram proficientes — ' + JSON.stringify(ins.salvaguardas));
+          // 2 escolhidas + Atletismo/Intimidação fixas do antecedente = 4.
           const periciasEscolhidas = Object.keys(ins.pericias || {});
-          if (periciasEscolhidas.length !== 2) erros.push('wizard: payload deveria ter exatamente 2 perícias, veio ' + JSON.stringify(ins.pericias));
+          if (periciasEscolhidas.length !== 4) erros.push('wizard: payload deveria ter 4 perícias (2 escolhidas + 2 fixas do antecedente), veio ' + JSON.stringify(ins.pericias));
+          if (!ins.pericias?.atletismo?.prof || !ins.pericias?.intimidacao?.prof) erros.push('wizard: perícias fixas do antecedente Soldado (Atletismo/Intimidação) não vieram no payload — ' + JSON.stringify(ins.pericias));
+          if (!Array.isArray(ins.ferramentas) || !ins.ferramentas.includes('Jogo de Dados')) erros.push('wizard: proficiência de ferramenta escolhida (Jogo de Dados) não veio no payload — ' + JSON.stringify(ins.ferramentas));
+          if (ins.inventario?.moedas?.po !== 10) erros.push('wizard: ouro inicial do antecedente Soldado deveria ser 10 po, veio ' + JSON.stringify(ins.inventario?.moedas));
+          const nomesArmas = (ins.inventario?.armas || []).map(a => a.nome);
+          if (!nomesArmas.includes('Espada Longa')) erros.push('wizard: arma marcial escolhida (Espada Longa) não veio no inventário — ' + JSON.stringify(nomesArmas));
+          const nomesArmaduras = (ins.inventario?.armaduras || []).map(a => a.nome);
+          if (!nomesArmaduras.includes('Cota de Malha')) erros.push('wizard: armadura escolhida (Cota de Malha) não veio no inventário — ' + JSON.stringify(nomesArmaduras));
         }
         if (window.eval('charAtivo.nome') !== 'Thalindra Testválida') erros.push('wizard: charAtivo não foi trocado pro personagem recém-criado');
       }
@@ -1381,7 +1455,94 @@ console.log('');
 
   console.log(erros.length > antes
     ? '  FALHOU     assistente de criação (ver FALHAS abaixo)'
-    : '  assistente de criação: identidade + point-buy (limite de 27/orçamento) + limite de perícias por classe + insert() ok');
+    : '  assistente de criação: identidade obrigatória + array padrão + perícias sem duplicar raça/antecedente + equipamento inicial + insert() ok');
+}
+
+// Exportar Ficha em PDF (exportar_pdf.js): preenche o modelo REAL de
+// docs/fichas/*.pdf (via o fetch mock acima, que serve o arquivo de verdade
+// do disco) com a fixture Lilith Goldengrove (Clérigo 9, Domínio da Morte)
+// e reabre o PDF gerado com PDFLib pra conferir campo por campo — não basta
+// "não quebrou": um nome de campo errado silenciosamente não preenche nada,
+// então o teste precisa reabrir o resultado, não só rodar a função.
+console.log('');
+{
+  const antes = erros.length;
+  // Testes anteriores (ex.: Gastar Dado de Vida) editam #ficha-form e cada
+  // render() re-liga um autosave debounce de 800ms (listeners.js) NOVO sem
+  // cancelar o anterior (a chave do Map é a própria closure da função, que
+  // muda a cada render) — o timer antigo aponta pro <form> antigo (já fora
+  // do DOM) e, se disparar durante QUALQUER await daqui pra frente, chama
+  // salvar() nesse form desatualizado e sobrescreve charAtivo com valor
+  // velho (Object.assign em salvar.js). Zera os timers pendentes antes de
+  // montar a fixture, senão o PDF pode sair com PV/CA velhos de um teste
+  // completamente diferente.
+  window.eval('if (typeof _debounceTimers !== "undefined") { _debounceTimers.forEach(t => clearTimeout(t)); _debounceTimers.clear(); }');
+  window.eval('charAtivo = ' + JSON.stringify(PJ) + ';');
+  window.__magiasFavoritasTeste = ['Bênção', 'Arma Espiritual', 'Augúrio']; // nivel 1, 2, 2(ritual) — testa ordenação por nível
+  window.__ultimoBlobPDF = null;
+  try {
+    await window.exportarFichaPDF();
+    const blob = window.__ultimoBlobPDF;
+    if (!blob) erros.push('exportar pdf: URL.createObjectURL não foi chamado — exportarFichaPDF() não gerou/baixou nada');
+    else {
+      // Sem envolver em `new Uint8Array(...)` daqui de fora: isso criaria
+      // um typed array do realm do NODE (não da jsdom window), e pdf-lib
+      // faz `instanceof` internamente — passa o ArrayBuffer puro (já é do
+      // realm certo, veio de window.Blob.arrayBuffer()), que também é um
+      // tipo aceito por PDFDocument.load().
+      const bytes = await blob.arrayBuffer();
+      const doc = await window.PDFLib.PDFDocument.load(bytes);
+      const form = doc.getForm();
+      const texto = nome => { try { return form.getTextField(nome).getText() || ''; } catch { return undefined; } };
+      const marcado = nome => { try { return form.getCheckBox(nome).isChecked(); } catch { return undefined; } };
+
+      // Identidade + atributos + salvaguardas + perícias
+      if (texto('Front_Character Name') !== 'Lilith Goldengrove') erros.push('exportar pdf: Front_Character Name veio "' + texto('Front_Character Name') + '"');
+      if (texto('Front_Race') !== 'Humano') erros.push('exportar pdf: Front_Race veio "' + texto('Front_Race') + '"');
+      if (texto('Front_Background') !== 'Acólito') erros.push('exportar pdf: Front_Background veio "' + texto('Front_Background') + '"');
+      if (texto('Front_Level') !== '9') erros.push('exportar pdf: Front_Level veio "' + texto('Front_Level') + '"');
+      if (texto('Front_Archetype') !== 'Domínio da Morte') erros.push('exportar pdf: Front_Archetype veio "' + texto('Front_Archetype') + '"');
+      if (texto('Front_Wis Score') !== '20') erros.push('exportar pdf: Front_Wis Score veio "' + texto('Front_Wis Score') + '" (esperava 20)');
+      if (texto('Front_Wis Mod') !== '+5') erros.push('exportar pdf: Front_Wis Mod veio "' + texto('Front_Wis Mod') + '" (esperava +5)');
+      if (marcado('Front_Save Wis') !== true) erros.push('exportar pdf: Front_Save Wis deveria vir marcado (proficiente)');
+      if (texto('Front_Wis Save Throw') !== '+9') erros.push('exportar pdf: Front_Wis Save Throw veio "' + texto('Front_Wis Save Throw') + '" (esperava +9)');
+      if (texto('Front_Cha Save Throw') !== '+5') erros.push('exportar pdf: Front_Cha Save Throw veio "' + texto('Front_Cha Save Throw') + '" (esperava +5, salvaguarda com bônus manual +1)');
+      if (marcado('Front_Proficiency Religion') !== true) erros.push('exportar pdf: Front_Proficiency Religion deveria vir marcado');
+      if (texto('Front_Skill Religion') !== '+7') erros.push('exportar pdf: Front_Skill Religion veio "' + texto('Front_Skill Religion') + '" (esperava +7 — INT +1, prof +4, bônus manual +2)');
+      if (texto('Front_Passive Perception') !== '23') erros.push('exportar pdf: Front_Passive Perception veio "' + texto('Front_Passive Perception') + '" (esperava 23 — perícia com expertise)');
+
+      // Combate
+      if (texto('Front_AC') !== '18') erros.push('exportar pdf: Front_AC veio "' + texto('Front_AC') + '"');
+      if (texto('Front_Max HP') !== '67' || texto('Front_Current HP') !== '42' || texto('Front_Temp HP') !== '5') {
+        erros.push('exportar pdf: PV não veio consistente — ' + JSON.stringify({ max: texto('Front_Max HP'), atual: texto('Front_Current HP'), temp: texto('Front_Temp HP') }));
+      }
+      if (texto('Front_Weapon Name 1') !== 'Maça') erros.push('exportar pdf: Front_Weapon Name 1 veio "' + texto('Front_Weapon Name 1') + '"');
+
+      // Página 2
+      if (texto('Back_Personality Traits') !== 'Idolatro um herói.') erros.push('exportar pdf: Back_Personality Traits não veio da ficha');
+      if (texto('Back_CP') !== '8' || texto('Back_SP') !== '3' || texto('Back_GP') !== '120') {
+        erros.push('exportar pdf: moedas na página 2 vieram erradas — ' + JSON.stringify({ cp: texto('Back_CP'), sp: texto('Back_SP'), gp: texto('Back_GP') }));
+      }
+
+      // Habilidade fixa de classe + característica de SUBCLASSE (Domínio da Morte)
+      if (!/Destrui..o Inevit.vel/.test(texto('Front_Domain Feature 6') || '')) erros.push('exportar pdf: Front_Domain Feature 6 deveria citar "Destruição Inevitável", veio "' + texto('Front_Domain Feature 6') + '"');
+      if (texto('Front_Domain Feature 17')) erros.push('exportar pdf: Front_Domain Feature 17 (nível 17) não deveria vir preenchido pra um PJ de nível 9');
+      if (texto('Front_Channel Divinity Domain') !== 'Toque da Morte') erros.push('exportar pdf: Front_Channel Divinity Domain veio "' + texto('Front_Channel Divinity Domain') + '" (esperava "Toque da Morte", não a versão base de Expulsar Mortos-Vivos)');
+
+      // Conjuração: DC/ataque + lista ordenada por nível (Favoritas = spell_lists)
+      if (texto('Front_Cantrips Known') !== '4') erros.push('exportar pdf: Front_Cantrips Known veio "' + texto('Front_Cantrips Known') + '"');
+      if (texto('Front_Spell DC') !== '17') erros.push('exportar pdf: Front_Spell DC veio "' + texto('Front_Spell DC') + '"');
+      if (texto('Front_Spell Atk') !== '+9') erros.push('exportar pdf: Front_Spell Atk veio "' + texto('Front_Spell Atk') + '"');
+      if (texto('Front_Spell Level 1') !== '1' || texto('Front_Spell Name 1') !== 'Bênção') erros.push('exportar pdf: linha 1 da lista de magias deveria ser Bênção (nível 1), veio ' + JSON.stringify({ nivel: texto('Front_Spell Level 1'), nome: texto('Front_Spell Name 1') }));
+      if (texto('Front_Spell Level 2') !== '2' || texto('Front_Spell Name 2') !== 'Arma Espiritual') erros.push('exportar pdf: linha 2 deveria ser Arma Espiritual (nível 2), veio ' + JSON.stringify({ nivel: texto('Front_Spell Level 2'), nome: texto('Front_Spell Name 2') }));
+      if (texto('Front_Spell Name 3') !== 'Augúrio' || marcado('Front_Spell Ritual 3') !== true) erros.push('exportar pdf: linha 3 deveria ser Augúrio com Ritual marcado — ' + JSON.stringify({ nome: texto('Front_Spell Name 3'), ritual: marcado('Front_Spell Ritual 3') }));
+    }
+  } catch (e) { erros.push('exportar pdf: ' + e.message); }
+  window.__magiasFavoritasTeste = null;
+
+  console.log(erros.length > antes
+    ? '  FALHOU     exportar ficha em pdf (ver FALHAS abaixo)'
+    : '  exportar ficha em pdf: modelo real da classe + identidade/atributos/perícias/combate/página 2 + característica de subclasse + lista de magias ordenada ok');
 }
 
 // Realtime — onUpdateExterno() (nucleo.js): o guard de eco só deve ignorar
