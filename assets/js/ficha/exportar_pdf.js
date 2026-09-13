@@ -89,6 +89,7 @@ const PROFICIENCIAS_POR_CLASSE = {
 //   modo 'desc'       -> texto completo da descrição da regra
 //   modo 'parenteses' -> só o que está entre parênteses no nome (ex.: "Ataque Furtivo (5d6)" -> "5d6")
 //   modo 'nome'       -> nome da habilidade sem o prefixo usado pra achar
+//   modo 'nome_desc'  -> nome (sem o prefixo) + ": " + descrição completa
 const CAMPOS_HABILIDADE_TEXTO = [
   { campo: 'Front_Fighting Style',        prefixo: 'Estilo de Luta',        modo: 'desc' },
   { campo: 'Front_Action Surge',          prefixo: 'Surto de Ação',         modo: 'desc' },
@@ -102,7 +103,7 @@ const CAMPOS_HABILIDADE_TEXTO = [
   // DOMÍNIO (ex.: "Toque da Morte"), então só vale olhar habilidade marcada
   // com a subclasse do personagem — senão a versão base "vence" no empate
   // de nível e mostra a opção errada.
-  { campo: 'Front_Channel Divinity Domain', prefixo: 'Canalizar Divindade:', modo: 'nome', apenasSubclasse: true },
+  { campo: 'Front_Channel Divinity Domain', prefixo: 'Canalizar Divindade:', modo: 'nome_desc', apenasSubclasse: true },
 ];
 
 // Campos "Usado / Total" que vêm de um recurso rastreado (assets/js/recursos_classe.js)
@@ -170,21 +171,55 @@ function melhorPorPrefixo(habs, prefixo) {
 // pensados pra texto corrido (traços raciais, mochila, características de
 // classe...): com pouco texto numa caixa alta, o auto-tamanho às vezes
 // escolhe uma fonte gigante que estoura a caixa (viu isso ao vivo: "Toque
-// da Morte" ocupando a caixa inteira). Por isso esses campos passam
-// `tamanhoFonte` explícito — os numéricos continuam em auto (omitido).
+// da Morte" ocupando a caixa inteira). Um tamanho FIXO pros campos de texto
+// livre resolvia isso, mas trocava o problema de lado: texto realmente
+// longo (2 características de domínio juntas, por exemplo) num tamanho
+// fixo grande demais pra ele ficava cortado pela caixa. Por isso
+// `tamanhoFonte: 'auto'` mede de verdade (largura/altura reais do campo,
+// texto quebrado em linhas como a caixa vai quebrar) e escolhe o MAIOR
+// tamanho que cabe inteiro — os campos numéricos continuam com o auto
+// nativo do pdf-lib (tamanhoFonte omitido), que funciona bem pra eles.
+let _fonteParaMedir = null;
+function medirLinhas(font, texto, tamanho, larguraMax) {
+  const linhas = [];
+  for (const paragrafo of String(texto).split('\n')) {
+    const palavras = paragrafo.split(/\s+/).filter(Boolean);
+    let atual = '';
+    for (const p of palavras) {
+      const tentativa = atual ? atual + ' ' + p : p;
+      if (!atual || font.widthOfTextAtSize(tentativa, tamanho) <= larguraMax) atual = tentativa;
+      else { linhas.push(atual); atual = p; }
+    }
+    linhas.push(atual);
+  }
+  return linhas;
+}
+function tamanhoQueCabe(font, texto, largura, altura) {
+  const PAD = 4;
+  const larguraUtil = Math.max(10, largura - PAD * 2);
+  const alturaUtil = Math.max(8, altura - PAD * 2);
+  for (let tam = 10; tam >= 5; tam -= 0.5) {
+    if (medirLinhas(font, texto, tam, larguraUtil).length * tam * 1.25 <= alturaUtil) return tam;
+  }
+  return 5;
+}
 function setTexto(idx, nomes, valor, tamanhoFonte) {
   if (valor === null || valor === undefined || valor === '') return;
   for (const nome of (Array.isArray(nomes) ? nomes : [nomes])) {
     const campo = idx.get(nome);
     if (campo && typeof campo.setText === 'function') {
       try {
-        if (tamanhoFonte && typeof campo.setFontSize === 'function') campo.setFontSize(tamanhoFonte);
+        if (tamanhoFonte === 'auto' && _fonteParaMedir) {
+          const rect = campo.acroField.getWidgets()[0]?.getRectangle();
+          if (rect) campo.setFontSize(tamanhoQueCabe(_fonteParaMedir, String(valor), rect.width, rect.height));
+        } else if (tamanhoFonte && typeof campo.setFontSize === 'function') {
+          campo.setFontSize(tamanhoFonte);
+        }
         campo.setText(String(valor));
       } catch (e) { /* campo com fonte incompatível — ignora só esse */ }
     }
   }
 }
-const FONTE_TEXTO_LIVRE = 8;
 function setCheck(idx, nomes, marcado) {
   for (const nome of (Array.isArray(nomes) ? nomes : [nomes])) {
     const campo = idx.get(nome);
@@ -205,7 +240,7 @@ function preencherIdentidade(idx, c) {
   setTexto(idx, ['Front_Character Name', 'Back_Character Name'], c.nome);
   setTexto(idx, 'Front_Race', c.raca);
   setTexto(idx, 'Front_Background', c.origem);
-  setTexto(idx, 'Back_Background', c.origem, FONTE_TEXTO_LIVRE);
+  setTexto(idx, 'Back_Background', c.origem, 'auto');
   setTexto(idx, 'Front_Alignment', c.alinhamento);
   setTexto(idx, 'Front_XP', c.xp);
   setTexto(idx, 'Front_Level', c.nivel || 1);
@@ -215,9 +250,9 @@ function preencherIdentidade(idx, c) {
   setTexto(idx, ['Front_Passive Perception', 'Passive'], 10 + valorPericia(c, 'percepcao', 'sab'));
   setTexto(idx, 'Front_Passive Insight', 10 + valorPericia(c, 'intuicao', 'sab'));
   setTexto(idx, ['Front_Inspiration', 'Inspiration'], (+c.inspiracao || 0) > 0 ? String(+c.inspiracao) : '');
-  setTexto(idx, 'Front_Racial Traits', c.tracos_raciais, FONTE_TEXTO_LIVRE);
-  setTexto(idx, 'Front_Languages', (c.idiomas || ['Comum']).join(', '), FONTE_TEXTO_LIVRE);
-  setTexto(idx, 'Front_Tools', (c.ferramentas || []).join(', '), FONTE_TEXTO_LIVRE);
+  setTexto(idx, 'Front_Racial Traits', c.tracos_raciais, 'auto');
+  setTexto(idx, 'Front_Languages', (c.idiomas || ['Comum']).join(', '), 'auto');
+  setTexto(idx, 'Front_Tools', (c.ferramentas || []).join(', '), 'auto');
 
   const profs = PROFICIENCIAS_POR_CLASSE[chaveDeClasse(c.classe)];
   if (profs) {
@@ -276,17 +311,17 @@ function preencherCombate(idx, c) {
 }
 
 function preencherPaginaTras(idx, c) {
-  setTexto(idx, 'Back_Personality Traits', c.tracos_pessoais, FONTE_TEXTO_LIVRE);
-  setTexto(idx, 'Back_Ideals', c.ideais, FONTE_TEXTO_LIVRE);
-  setTexto(idx, 'Back_Bonds', c.vinculos, FONTE_TEXTO_LIVRE);
-  setTexto(idx, 'Back_Flaws', c.defeitos, FONTE_TEXTO_LIVRE);
+  setTexto(idx, 'Back_Personality Traits', c.tracos_pessoais, 'auto');
+  setTexto(idx, 'Back_Ideals', c.ideais, 'auto');
+  setTexto(idx, 'Back_Bonds', c.vinculos, 'auto');
+  setTexto(idx, 'Back_Flaws', c.defeitos, 'auto');
   const extras = [];
   if (c.historia) extras.push('História: ' + c.historia);
   if (c.caracteristicas_adicionais) extras.push(c.caracteristicas_adicionais);
   if (Array.isArray(c.features_personalizadas)) {
     c.features_personalizadas.forEach(f => { if (f?.nome) extras.push(`${f.nome}: ${f.desc || ''}`.trim()); });
   }
-  setTexto(idx, 'Back_Additional Features & Traits', extras.join('\n\n'), FONTE_TEXTO_LIVRE);
+  setTexto(idx, 'Back_Additional Features & Traits', extras.join('\n\n'), 'auto');
 
   const m = c.inventario?.moedas || {};
   setTexto(idx, 'Back_CP', m.pc || '');
@@ -299,7 +334,7 @@ function preencherPaginaTras(idx, c) {
   (c.inventario?.armas || []).forEach(a => linhas.push(a.nome));
   (c.inventario?.armaduras || []).forEach(a => linhas.push(a.nome));
   (c.inventario?.itens || []).forEach(it => linhas.push(it.qtd > 1 ? `${it.nome} ×${it.qtd}` : it.nome));
-  setTexto(idx, 'Back_Backpack', linhas.join('\n'), FONTE_TEXTO_LIVRE);
+  setTexto(idx, 'Back_Backpack', linhas.join('\n'), 'auto');
 }
 
 function preencherHabilidadesFixas(idx, c, HAB) {
@@ -310,9 +345,13 @@ function preencherHabilidadesFixas(idx, c, HAB) {
     const pool = def.apenasSubclasse ? habs.filter(h => h.subclasse) : habs;
     const h = melhorPorPrefixo(pool, def.prefixo);
     if (!h) continue;
-    if (def.modo === 'desc') setTexto(idx, def.campo, h.desc, FONTE_TEXTO_LIVRE);
-    else if (def.modo === 'parenteses') setTexto(idx, def.campo, extrairParenteses(h.nome), FONTE_TEXTO_LIVRE);
-    else if (def.modo === 'nome') setTexto(idx, def.campo, h.nome.slice(def.prefixo.length).trim(), FONTE_TEXTO_LIVRE);
+    if (def.modo === 'desc') setTexto(idx, def.campo, h.desc, 'auto');
+    else if (def.modo === 'parenteses') setTexto(idx, def.campo, extrairParenteses(h.nome), 'auto');
+    else if (def.modo === 'nome') setTexto(idx, def.campo, h.nome.slice(def.prefixo.length).trim(), 'auto');
+    else if (def.modo === 'nome_desc') {
+      const nome = h.nome.slice(def.prefixo.length).trim();
+      setTexto(idx, def.campo, nome + (h.desc ? ': ' + h.desc : ''), 'auto');
+    }
   }
 
   const recursos = window.RecursosClasse ? RecursosClasse.recursosPara(c, c.atributos) : [];
@@ -323,9 +362,9 @@ function preencherHabilidadesFixas(idx, c, HAB) {
     setTexto(idx, def.total, r.max);
   }
 
-  if (chave === 'barbaro') setTexto(idx, 'Front_Rage Damage', danoFuriaBarbaro(+c.nivel || 1), FONTE_TEXTO_LIVRE);
-  if (chave === 'druida') setTexto(idx, 'Front_Wild Shape Max CR', cdMaximoFormaSelvagem(+c.nivel || 1), FONTE_TEXTO_LIVRE);
-  if (chave === 'monge') setTexto(idx, 'Front_Martial Arts Die', dadoArtesMarciaisMonge(+c.nivel || 1), FONTE_TEXTO_LIVRE);
+  if (chave === 'barbaro') setTexto(idx, 'Front_Rage Damage', danoFuriaBarbaro(+c.nivel || 1), 'auto');
+  if (chave === 'druida') setTexto(idx, 'Front_Wild Shape Max CR', cdMaximoFormaSelvagem(+c.nivel || 1), 'auto');
+  if (chave === 'monge') setTexto(idx, 'Front_Martial Arts Die', dadoArtesMarciaisMonge(+c.nivel || 1), 'auto');
 
   // Características de subclasse por nível (só existem no catálogo pra
   // Domínio da Morte / Quebrador de Juramento — nas demais fica em branco).
@@ -340,7 +379,7 @@ function preencherHabilidadesFixas(idx, c, HAB) {
       porNivel.set(h.nivel, [...(porNivel.get(h.nivel) || []), texto]);
     });
     porNivel.forEach((textos, nivel) => {
-      for (const prefixoCampo of prefixosCampo) setTexto(idx, `${prefixoCampo} ${nivel}`, textos.join(' | '), FONTE_TEXTO_LIVRE);
+      for (const prefixoCampo of prefixosCampo) setTexto(idx, `${prefixoCampo} ${nivel}`, textos.join(' | '), 'auto');
     });
   }
 
@@ -354,7 +393,7 @@ function preencherHabilidadesFixas(idx, c, HAB) {
     !h.subclasse
   );
   const resumo = sobrando.map(h => `${h.nome}: ${h.desc}`).join('\n');
-  setTexto(idx, 'Front_Additional Combat Features', resumo, FONTE_TEXTO_LIVRE);
+  setTexto(idx, 'Front_Additional Combat Features', resumo, 'auto');
 }
 
 async function preencherConjuracao(idx, c) {
@@ -381,7 +420,7 @@ async function preencherConjuracao(idx, c) {
   // Lista de magias: "Favoritas" (spell_lists) é a lista de conhecidas/
   // preparadas do PJ (mesma fonte que a aba Magias usa) — cruza com o
   // catálogo (magias_data.json) pra saber nível/ritual de cada uma.
-  const nomes = Array.from(await carregarFavoritasDoBanco());
+  const nomes = Array.from(await carregarFavoritasDoBanco(c.id));
   if (!nomes.length) return;
   const catalogo = await carregarMagiasCache();
   const porNome = new Map((catalogo || []).map(m => [m.nome, m]));
@@ -400,7 +439,8 @@ async function preencherConjuracao(idx, c) {
   });
 }
 
-async function preencherFicha(idx, c) {
+async function preencherFicha(idx, c, form) {
+  _fonteParaMedir = form.getDefaultFont();
   const HAB = await carregarHabilidadesClasses();
   preencherIdentidade(idx, c);
   preencherAtributosSalvPericias(idx, c);
@@ -445,12 +485,19 @@ function carregarPDFLib() {
   return _promessaPDFLib;
 }
 
+// true enquanto uma exportação está em andamento — clicar de novo (ou
+// trocar de personagem e clicar de novo) antes dela terminar não deve
+// disparar uma 2ª exportação concorrente, que poderia terminar ANTES da
+// primeira e fazer parecer que "exportou o personagem errado".
+let _exportandoPDF = false;
 async function exportarFichaPDF() {
+  if (_exportandoPDF) { toast('Já tem uma exportação em andamento — espera terminar.'); return; }
   const c = charAtivo;
   if (!c) return;
   const arquivo = pdfDaClasse(c.classe);
   if (!arquivo) { toast(`Sem modelo de PDF pra "${c.classe || 'essa classe'}" ainda — defina a classe na aba Personagem.`); return; }
 
+  _exportandoPDF = true;
   toast('Gerando PDF…', 'salvar');
   try {
     await carregarPDFLib();
@@ -462,7 +509,7 @@ async function exportarFichaPDF() {
     const form = pdfDoc.getForm();
     const idx = new Map(form.getFields().map(f => [f.getName(), f]));
 
-    await preencherFicha(idx, c);
+    await preencherFicha(idx, c, form);
 
     const outBytes = await pdfDoc.save();
     baixarArquivoPDF(outBytes, nomeArquivoExportPDF(c));
@@ -470,5 +517,7 @@ async function exportarFichaPDF() {
   } catch (e) {
     console.error('[exportar pdf]', e);
     toast('Erro ao exportar PDF: ' + e.message);
+  } finally {
+    _exportandoPDF = false;
   }
 }

@@ -1575,7 +1575,34 @@ console.log('');
       // Habilidade fixa de classe + característica de SUBCLASSE (Domínio da Morte)
       if (!/Destrui..o Inevit.vel/.test(texto('Front_Domain Feature 6') || '')) erros.push('exportar pdf: Front_Domain Feature 6 deveria citar "Destruição Inevitável", veio "' + texto('Front_Domain Feature 6') + '"');
       if (texto('Front_Domain Feature 17')) erros.push('exportar pdf: Front_Domain Feature 17 (nível 17) não deveria vir preenchido pra um PJ de nível 9');
-      if (texto('Front_Channel Divinity Domain') !== 'Toque da Morte') erros.push('exportar pdf: Front_Channel Divinity Domain veio "' + texto('Front_Channel Divinity Domain') + '" (esperava "Toque da Morte", não a versão base de Expulsar Mortos-Vivos)');
+      const chDivDominio = texto('Front_Channel Divinity Domain') || '';
+      if (!chDivDominio.startsWith('Toque da Morte:') || chDivDominio.length < 30) erros.push('exportar pdf: Front_Channel Divinity Domain veio "' + chDivDominio + '" (esperava "Toque da Morte: <descrição completa>", não só o nome nem a versão base de Expulsar Mortos-Vivos)');
+
+      // O texto por si só não prova que RENDERIZA inteiro (getText() devolve
+      // a string mesmo que a caixa a corte visualmente) — recalcula com a
+      // MESMA lógica de medição (window.medirLinhas/tamanhoQueCabe, expostas
+      // por serem function declaration de topo num script clássico) usando
+      // o tamanho de fonte que ficou gravado no campo, e confere se aquele
+      // texto INTEIRO cabe na altura real da caixa. Pega tanto "estourou
+      // porque ficou grande demais" (bug original) quanto "cortou porque o
+      // tamanho fixo era grande demais pro texto comprido" (regressão que
+      // um 8pt fixo introduziria).
+      const fonteMedida = form.getDefaultFont();
+      const conferirCabeDeVerdade = (nomeCampo, textoEsperado) => {
+        const campo = form.getTextField(nomeCampo);
+        const da = campo.acroField.getDefaultAppearance() || '';
+        const tamanho = parseFloat((da.match(/([\d.]+)\s+Tf/) || [])[1] || '0');
+        const rect = campo.acroField.getWidgets()[0].getRectangle();
+        if (!tamanho) { erros.push(`exportar pdf: ${nomeCampo} não tem tamanho de fonte definido (DA="${da}")`); return; }
+        const linhas = window.medirLinhas(fonteMedida, textoEsperado, tamanho, rect.width - 8);
+        const alturaPrecisa = linhas.length * tamanho * 1.25;
+        if (alturaPrecisa > rect.height - 8) {
+          erros.push(`exportar pdf: ${nomeCampo} não cabe de verdade na caixa — ${linhas.length} linhas a ${tamanho}pt (~${alturaPrecisa.toFixed(0)}pt de altura) numa caixa de ${rect.height.toFixed(0)}pt`);
+        }
+      };
+      conferirCabeDeVerdade('Front_Domain Feature 1', texto('Front_Domain Feature 1'));
+      conferirCabeDeVerdade('Front_Channel Divinity Domain', chDivDominio);
+      conferirCabeDeVerdade('Front_Racial Traits', texto('Front_Racial Traits'));
 
       // Conjuração: DC/ataque + lista ordenada por nível (Favoritas = spell_lists)
       if (texto('Front_Cantrips Known') !== '4') erros.push('exportar pdf: Front_Cantrips Known veio "' + texto('Front_Cantrips Known') + '"');
@@ -1584,6 +1611,27 @@ console.log('');
       if (texto('Front_Spell Level 1') !== '1' || texto('Front_Spell Name 1') !== 'Bênção') erros.push('exportar pdf: linha 1 da lista de magias deveria ser Bênção (nível 1), veio ' + JSON.stringify({ nivel: texto('Front_Spell Level 1'), nome: texto('Front_Spell Name 1') }));
       if (texto('Front_Spell Level 2') !== '2' || texto('Front_Spell Name 2') !== 'Arma Espiritual') erros.push('exportar pdf: linha 2 deveria ser Arma Espiritual (nível 2), veio ' + JSON.stringify({ nivel: texto('Front_Spell Level 2'), nome: texto('Front_Spell Name 2') }));
       if (texto('Front_Spell Name 3') !== 'Augúrio' || marcado('Front_Spell Ritual 3') !== true) erros.push('exportar pdf: linha 3 deveria ser Augúrio com Ritual marcado — ' + JSON.stringify({ nome: texto('Front_Spell Name 3'), ritual: marcado('Front_Spell Ritual 3') }));
+    }
+
+    // Com mais de 1 personagem, trocar de PJ (mesmo caminho do <select> do
+    // header — atribui charAtivo direto) e exportar de novo tem que gerar o
+    // PDF do PJ ATUAL, não sempre o primeiro. Usa um 2º PJ de outra classe
+    // (Guerreiro) pra também confirmar que troca o MODELO de PDF certo.
+    window.__magiasFavoritasTeste = null;
+    const PJ2 = { ...PJ, id: 'z', nome: 'Aventureiro Dois', classe: 'Guerreiro', subclasse: '', nivel: 5,
+      atributos: { for: 18, dex: 12, con: 14, int: 10, sab: 10, car: 8 },
+      salvaguardas: { for: true, con: true }, pericias: { atletismo: { prof: true } },
+      dado_vida_tipo: 10, dado_vida_atual: 5,
+      inventario: { moedas: { po: 5, pp: 0, pe: 0, pc: 0, pl: 0 }, armas: [], armaduras: [], itens: [] } };
+    window.eval('chars.push(' + JSON.stringify(PJ2) + '); charAtivo = chars.find(c => c.id === "z");');
+    window.__ultimoBlobPDF = null;
+    await window.exportarFichaPDF();
+    if (!window.__ultimoBlobPDF) erros.push('exportar pdf (2º personagem): não gerou nada após trocar de PJ');
+    else {
+      const bytes2 = await window.__ultimoBlobPDF.arrayBuffer();
+      const doc2 = await window.PDFLib.PDFDocument.load(bytes2);
+      const nome2 = (() => { try { return doc2.getForm().getTextField('Front_Character Name').getText(); } catch { return undefined; } })();
+      if (nome2 !== 'Aventureiro Dois') erros.push('exportar pdf (2º personagem): depois de trocar de PJ, Front_Character Name veio "' + nome2 + '" (esperava "Aventureiro Dois" — exportou o PJ errado)');
     }
   } catch (e) { erros.push('exportar pdf: ' + e.message); }
   window.__magiasFavoritasTeste = null;

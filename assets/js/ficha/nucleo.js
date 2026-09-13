@@ -194,12 +194,19 @@ let canalFicha = null;             // canal realtime
 // (mudancaPendente removido — updates externos se aplicam automaticamente)
 
 // Favoritas: SOMENTE do banco (spell_lists do PJ ativo)
-async function carregarFavoritasDoBanco() {
-  if (!window.sb || !charAtivo?.id) return new Set();
+// characterId opcional: por padrão usa o PJ ativo (uso normal da aba
+// Magias), mas exportarFichaPDF() passa o id explícito do personagem que
+// estava sendo exportado — se ele ler charAtivo direto daqui, um troca de
+// personagem no meio de uma exportação em andamento (fetch/pdf-lib ainda
+// carregando) faria a lista de magias vir do PJ NOVO, não do que estava
+// sendo exportado.
+async function carregarFavoritasDoBanco(characterId) {
+  const id = characterId ?? charAtivo?.id;
+  if (!window.sb || !id) return new Set();
   const { data, error } = await window.sb
     .from('spell_lists')
     .select('spell_names')
-    .eq('character_id', charAtivo.id)
+    .eq('character_id', id)
     .eq('nome', 'Favoritas')
     .maybeSingle();
   if (error) { console.warn('[ficha] favoritas:', error.message); return new Set(); }
@@ -379,7 +386,11 @@ async function carregarPersonagens() {
     await criarPersonagem('Meu Personagem', true);  // novo PJ já ativo
     return;
   }
-  charAtivo = chars[0];
+  // Com mais de 1 personagem, abre no que está marcado ATIVO (o mesmo que
+  // aparece pro Mestre) — não sempre no mais antigo (chars[0]). Sem isso,
+  // quem tem 2+ fichas via exportar/editar achando que estava mexendo na
+  // corrente e na real estava no primeiro personagem que criou.
+  charAtivo = chars.find(c => c.is_active) || chars[0];
   render();
 }
 

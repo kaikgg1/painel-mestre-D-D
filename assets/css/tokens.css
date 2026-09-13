@@ -49,6 +49,29 @@
   --shadow: rgba(0, 0, 0, 0.55);
 }
 
+/* Barra de rolagem — nunca tinha estilo próprio em lugar nenhum do
+   projeto, então ficava a barra crua do navegador (clara, com botões de
+   seta ▲▼ no Windows) destoando de um sistema inteiro em tema escuro.
+   Usa as MESMAS variáveis de --bg/--border/--gold (ou os tons de sangue
+   do tema Strahd), então segue automaticamente qualquer tela que já
+   troca de tema via [data-theme]. Aplica em toda a árvore (*) — não só a
+   barra da janela, mas qualquer painel com overflow próprio (modal do
+   assistente, abas com scroll horizontal etc.) fica com a mesma barra. */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border) var(--bg-soft);
+}
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-track { background: var(--bg-soft); }
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 6px;
+  border: 2px solid var(--bg-soft);
+  background-clip: padding-box;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--gold); }
+::-webkit-scrollbar-corner { background: var(--bg-soft); }
+
 [data-theme="strahd"] {
   /* Superfícies */
   --bg: #070506;
