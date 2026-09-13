@@ -23,12 +23,18 @@
 
   .explicacoes { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 22px; }
   @media (max-width: 640px) { .explicacoes { grid-template-columns: 1fr; } }
-  .explicacao { padding: 16px 18px; border-left: 3px solid var(--gold); }
+  .explicacao { padding: 16px 18px; border-left: 3px solid var(--gold); cursor: pointer;
+    opacity: .6; transition: opacity .18s, transform .15s, box-shadow .18s; }
   .explicacao.falha { border-left-color: var(--danger); }
+  .explicacao:hover { opacity: .85; }
+  .explicacao.selecionada { opacity: 1; box-shadow: 0 0 0 1px var(--gold); }
+  .explicacao.falha.selecionada { box-shadow: 0 0 0 1px var(--danger); }
+  .explicacao:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
   .explicacao .titulo { font-family: var(--font-heading); font-size: 13px; font-weight: 700; letter-spacing: .8px;
     text-transform: uppercase; color: var(--gold-light); margin-bottom: 8px; }
   .explicacao.falha .titulo { color: var(--erro); }
   .explicacao p { margin: 0; font-size: 15px; line-height: 1.55; color: var(--text-muted); }
+  .tabela-secao[hidden] { display: none; }
 
   /* ---- tabelas de d100 ---- */
   .table-wrap { overflow-x: auto; margin: 0 0 40px; border: 1px solid var(--border-soft); border-radius: var(--radius); }
@@ -55,19 +61,20 @@
 </header>
 
 <main>
-  <p class="subtitulo-secao">D100 — role (ou saque uma carta) toda vez que tirar 20 ou 1 natural num ataque</p>
+  <p class="subtitulo-secao">D100 — clique numa opção abaixo pra ver a tabela correspondente</p>
 
   <div class="explicacoes">
-    <div class="card explicacao">
+    <div class="card explicacao selecionada" data-sel="sucesso" role="button" tabindex="0" aria-pressed="true">
       <div class="titulo">✅ 20 Natural — Sucesso Crítico</div>
       <p>Antes de calcular o dano, role mais <strong>1d100</strong> (ou saque uma carta do baralho de sucessos críticos) e use a coluna correspondente ao <strong>tipo de dano</strong> do ataque: perfurante, cortante ou contundente.</p>
     </div>
-    <div class="card explicacao falha">
+    <div class="card explicacao falha" data-sel="falha" role="button" tabindex="0" aria-pressed="false">
       <div class="titulo">❌ 1 Natural — Falha Crítica</div>
       <p>Além de errar o ataque, role mais <strong>1d100</strong> (ou saque uma carta do baralho de falhas críticas) e use a coluna correspondente ao <strong>tipo de ataque</strong>: corpo a corpo, à distância ou desarmado.</p>
     </div>
   </div>
 
+  <div class="tabela-secao" id="tabela-sucesso">
   <div class="table-wrap">
     <table class="tabela-critico">
       <caption>Tabela de Sucessos Críticos (20 Natural)</caption>
@@ -103,7 +110,9 @@
       </tbody>
     </table>
   </div>
+  </div>
 
+  <div class="tabela-secao" id="tabela-falha" hidden>
   <div class="table-wrap">
     <table class="tabela-critico">
       <caption>Tabela de Falhas Críticas (1 Natural)</caption>
@@ -139,12 +148,32 @@
       </tbody>
     </table>
   </div>
+  </div>
 
   <p style="text-align:center;margin-top:10px">
     <a href="regras_casa.html" style="color:var(--gold-light);font-family:var(--font-heading);font-size:13px;letter-spacing:.5px;text-transform:uppercase;text-decoration:none;border-bottom:1px solid var(--border)">🎲 Voltar pra Regras da Casa →</a>
   </p>
 </main>
 
+<script>
+  const explicacoes = document.querySelectorAll('.explicacao');
+  const paineis = { sucesso: document.getElementById('tabela-sucesso'), falha: document.getElementById('tabela-falha') };
+  function selecionarCritico(nome) {
+    explicacoes.forEach(el => {
+      const ativo = el.dataset.sel === nome;
+      el.classList.toggle('selecionada', ativo);
+      el.setAttribute('aria-pressed', String(ativo));
+    });
+    paineis.sucesso.hidden = nome !== 'sucesso';
+    paineis.falha.hidden = nome !== 'falha';
+  }
+  explicacoes.forEach(el => {
+    el.addEventListener('click', () => selecionarCritico(el.dataset.sel));
+    el.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selecionarCritico(el.dataset.sel); }
+    });
+  });
+</script>
 <script src="../assets/js/ambiente.js"></script>
 <script src="../assets/js/polish.js"></script>
 </body>
