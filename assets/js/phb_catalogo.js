@@ -127,15 +127,17 @@
 
   // ─── ITENS DE AVENTURA (PHB Cap. 5 – Adventuring Gear) ──────────
   const ITENS = [
-    // Pacotes de equipamento
+    // Pacotes de equipamento — desc = conteúdo (PHB 5e, cap. 5), só
+    // informativo (os itens do pacote não entram um a um no inventário,
+    // fica registrado só como "Pacote de X" — igual já era antes).
     { nome: 'Pacote de Aventureiro',          categoria: 'Pacote',  peso: 0,     custo: '10 po', desc: 'Mochila genérica' },
-    { nome: 'Pacote de Artista',              categoria: 'Pacote',  peso: 27,    custo: '40 po' },
-    { nome: 'Pacote de Diplomata',            categoria: 'Pacote',  peso: 23,    custo: '39 po' },
-    { nome: 'Pacote de Erudito',              categoria: 'Pacote',  peso: 5,     custo: '40 po' },
-    { nome: 'Pacote de Explorador',           categoria: 'Pacote',  peso: 26.5,  custo: '10 po' },
-    { nome: 'Pacote de Masmorra',             categoria: 'Pacote',  peso: 31.5,  custo: '12 po' },
-    { nome: 'Pacote de Sacerdote',            categoria: 'Pacote',  peso: 12,    custo: '19 po' },
-    { nome: 'Pacote de Saqueador',            categoria: 'Pacote',  peso: 21.5,  custo: '16 po' },
+    { nome: 'Pacote de Artista',              categoria: 'Pacote',  peso: 27,    custo: '40 po', desc: 'Mochila, saco de dormir, 2 fantasias, 5 velas, rações (5 dias), odre, kit de disfarce' },
+    { nome: 'Pacote de Diplomata',             categoria: 'Pacote',  peso: 23,    custo: '39 po', desc: 'Baú, 2 estojos p/ mapas/pergaminhos, vestes finas, tinta, pena, lanterna, 2 frascos de óleo, 5 folhas de papel, frasco de perfume, lacre, sabão' },
+    { nome: 'Pacote de Erudito',               categoria: 'Pacote',  peso: 5,     custo: '40 po', desc: 'Mochila, livro de estudo, tinta, pena, 10 folhas de pergaminho, saquinho de areia, pequena faca' },
+    { nome: 'Pacote de Explorador',            categoria: 'Pacote',  peso: 26.5,  custo: '10 po', desc: 'Mochila, saco de dormir, kit de utensílios de cozinha, pederneira e isqueiro, 10 tochas, rações (10 dias), odre, 15m de corda de cânhamo' },
+    { nome: 'Pacote de Masmorra',              categoria: 'Pacote',  peso: 31.5,  custo: '12 po', desc: 'Mochila, pé-de-cabra, martelo, 10 pitons, 10 tochas, pederneira e isqueiro, rações (10 dias), odre, 15m de corda de cânhamo' },
+    { nome: 'Pacote de Sacerdote',              categoria: 'Pacote',  peso: 12,    custo: '19 po', desc: 'Mochila, cobertor, 10 velas, pederneira e isqueiro, esmoler, 2 blocos de incenso, turíbulo, vestes religiosas, rações (2 dias), odre' },
+    { nome: 'Pacote de Saqueador',              categoria: 'Pacote',  peso: 21.5,  custo: '16 po', desc: 'Mochila, 1000 rolamentos, 3m de barbante, sino, 5 velas, pé-de-cabra, martelo, 10 pitons, lanterna furta-fogo, 2 frascos de óleo, rações (5 dias), pederneira e isqueiro, odre, 15m de corda' },
 
     // Focos
     { nome: 'Foco Arcano (bastão)',           categoria: 'Foco',    peso: 1,     custo: '5 po'  },

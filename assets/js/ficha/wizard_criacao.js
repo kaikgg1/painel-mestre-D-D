@@ -117,7 +117,7 @@ function abrirWizardCriacao() {
   }
 
   function renderPasso() {
-    const TITULOS = ['Identidade', 'Atributos (Array Padrão)', 'Perícias', 'Equipamento Inicial'];
+    const TITULOS = ['Identidade', 'Atributos', 'Perícias', 'Equipamento Inicial'];
     passoLbl.textContent = `Passo ${state.passo + 1} de 4 — ${TITULOS[state.passo]}`;
 
     if (state.passo === 0) renderPasso0();
@@ -183,7 +183,7 @@ function abrirWizardCriacao() {
   // ── Passo 1: Atributos (Array Padrão) ───────────────────────────────
   function renderPasso1() {
     corpo.innerHTML = `
-      <p class="ajuda-mini">PHB, Variante: Array Padrão — distribua ${ARRAY_PADRAO.join(', ')} entre os 6 atributos (bônus racial é somado depois, na ficha).</p>
+      <p class="ajuda-mini">Você tem esses 6 valores pra distribuir entre os atributos, um pra cada: ${ARRAY_PADRAO.join(', ')}. Escolha qual atributo recebe qual valor (o bônus da raça é somado depois, na ficha).</p>
       <div class="wizard-atributos">
         ${ATRIBUTOS.map(([k, nome]) => {
           const v = state.atributos[k];
@@ -242,17 +242,29 @@ function abrirWizardCriacao() {
   }
 
   // ── Passo 3: Equipamento Inicial (antecedente + classe) ─────────────
+  // Conteúdo de um pacote (ex.: "Pacote de Explorador") ou outra info do
+  // catálogo (assets/js/phb_catalogo.js) — pro jogador não precisar
+  // adivinhar o que "Pacote de Masmorra" quer dizer.
+  function descDoItemEscolhido(slot, nome) {
+    if (!nome || !slot.tabela) return '';
+    const item = resolverItemCatalogo(slot.tabela, nome);
+    return item?.desc || '';
+  }
   function renderSlotHtml(slot, chave, valorAtual) {
     if (!slotPrecisaEscolha(slot)) {
       const qtdTxt = slot.qtd && slot.qtd > 1 ? ` ×${slot.qtd}` : '';
-      return `<div class="equip-slot-fixo">• ${escapeHtmlWizard(slot.nome || slot.custom)}${qtdTxt}</div>`;
+      const desc = descDoItemEscolhido(slot, slot.nome);
+      return `<div class="equip-slot-fixo">• ${escapeHtmlWizard(slot.nome || slot.custom)}${qtdTxt}
+        ${desc ? `<div class="ajuda-mini equip-slot-desc">${escapeHtmlWizard(desc)}</div>` : ''}</div>`;
     }
     const opcoes = opcoesDoSlot(slot);
+    const descEscolhida = descDoItemEscolhido(slot, valorAtual);
     return `<div class="equip-slot-escolha">
       <select data-slot-key="${chave}">
         <option value="">— escolha —</option>
         ${opcoes.map(o => `<option value="${escapeHtmlWizard(o)}" ${o===valorAtual?'selected':''}>${escapeHtmlWizard(o)}</option>`).join('')}
       </select>
+      ${descEscolhida ? `<div class="ajuda-mini equip-slot-desc">${escapeHtmlWizard(descEscolhida)}</div>` : ''}
     </div>`;
   }
 

@@ -184,9 +184,16 @@
 }
 .rc-frac strong { color: var(--gold-bright); font-weight: 700; }
 
-/* Pool numérico (Cura pelas Mãos, Pontos de Feitiçaria, Chi etc.) */
+/* Pool numérico (Cura pelas Mãos, Pontos de Feitiçaria, Chi etc.) — 5
+   elementos de largura fixa (−, −5, N/max, +5, +) cabem folgado numa coluna
+   larga do .resumo-grid, mas essa grid usa auto-fit: com bastante seção na
+   tela (Status/Ataques/Recursos/Magias/Outros/Favoritas), as colunas podem
+   ficar perto do minmax mínimo (280px) — nesse ponto a linha inteira não
+   cabe mais e os botões da direita saíam cortados pra fora do card
+   (overflow sem quebra). flex-wrap resolve isso descendo pra 2ª linha em
+   vez de vazar. */
 .rc-pool {
-  display: flex; align-items: center; gap: 6px;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 6px;
   background: rgba(0,0,0,0.3);
   border: 1px solid var(--borda);
   border-radius: 6px;
@@ -546,6 +553,7 @@ iconify-icon {
 .wizard-equip-sub { margin: 4px 0 8px 22px; display: flex; flex-direction: column; gap: 4px; }
 .equip-slot-fixo { font-size: 13px; color: var(--parchment); padding: 2px 0; }
 .equip-slot-escolha { padding: 2px 0; }
+.equip-slot-desc { margin: 2px 0 4px 12px; opacity: 0.8; }
 @media (max-width: 480px) {
   .wizard-attr-row { grid-template-columns: 1fr 80px 50px; }
 }

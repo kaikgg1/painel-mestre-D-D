@@ -275,6 +275,11 @@ main { max-width: var(--ficha-max); margin: var(--sp-5) auto; padding: 0 var(--s
 }
 .btn:hover { background: var(--sf-3); border-color: var(--borda-forte); color: var(--gold-light); }
 .btn:active { background: var(--sf-2); }
+/* .btn define display:inline-flex com a mesma especificidade do [hidden]
+   nativo — sem isto, um <button class="btn" hidden> continua visível (é o
+   mesmo problema do .menu-popover/.linha-editor/.magia-filtros, só que
+   pra qualquer botão da classe .btn, não só um componente específico). */
+.btn[hidden] { display: none; }
 .btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 .btn.danger { border-color: color-mix(in srgb, var(--blood) 55%, transparent); color: #c08878; background: transparent; }
 .btn.danger:hover { background: var(--blood); color: var(--parchment); border-color: var(--blood); }

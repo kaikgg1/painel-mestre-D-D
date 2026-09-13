@@ -425,15 +425,35 @@ function nomeArquivoExportPDF(c) {
   return base.replace(/[\\/:*?"<>|]/g, '_') + '.pdf';
 }
 
+// pdf-lib (assets/vendor/pdf-lib.min.js) tem ~525KB minificado — maior que
+// TODOS os módulos da ficha somados. Carregar isso em toda visita à ficha
+// (a maioria nunca clica em "Exportar PDF") deixava o carregamento da
+// página inteira mais lento à toa. Só busca o script na hora H, e só uma
+// vez por sessão (chamadas repetidas reusam a mesma promise).
+let _promessaPDFLib = null;
+function carregarPDFLib() {
+  if (window.PDFLib) return Promise.resolve(window.PDFLib);
+  if (!_promessaPDFLib) {
+    _promessaPDFLib = new Promise((resolve, reject) => {
+      const el = document.createElement('script');
+      el.src = '../assets/vendor/pdf-lib.min.js';
+      el.onload = () => resolve(window.PDFLib);
+      el.onerror = () => reject(new Error('falha ao carregar pdf-lib.min.js'));
+      document.head.appendChild(el);
+    });
+  }
+  return _promessaPDFLib;
+}
+
 async function exportarFichaPDF() {
   const c = charAtivo;
   if (!c) return;
   const arquivo = pdfDaClasse(c.classe);
   if (!arquivo) { toast(`Sem modelo de PDF pra "${c.classe || 'essa classe'}" ainda — defina a classe na aba Personagem.`); return; }
-  if (!window.PDFLib) { toast('Biblioteca de PDF não carregou — recarregue a página.'); return; }
 
   toast('Gerando PDF…', 'salvar');
   try {
+    await carregarPDFLib();
     const resp = await fetch('../docs/fichas/' + encodeURIComponent(arquivo));
     if (!resp.ok) throw new Error('HTTP ' + resp.status);
     const bytes = await resp.arrayBuffer();
