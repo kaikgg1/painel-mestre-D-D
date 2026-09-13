@@ -1594,7 +1594,12 @@ console.log('');
         const tamanho = parseFloat((da.match(/([\d.]+)\s+Tf/) || [])[1] || '0');
         const rect = campo.acroField.getWidgets()[0].getRectangle();
         if (!tamanho) { erros.push(`exportar pdf: ${nomeCampo} não tem tamanho de fonte definido (DA="${da}")`); return; }
-        const bounds = { x: 0, y: 0, width: rect.width - 8, height: rect.height - 8 };
+        // Mesmo PAD=4 e piso Math.max(8/10, ...) que tamanhoQueCabe usa em
+        // exportar_pdf.js pra ESCOLHER o tamanho — sem o piso, caixas
+        // baixas e de 1 linha só (ex.: Domain Spells, ~10pt de altura)
+        // ficam com "altura útil" negativa/minúscula e o teste reprova um
+        // preenchimento que a produção considerou (corretamente) que cabe.
+        const bounds = { x: 0, y: 0, width: Math.max(10, rect.width - 8), height: Math.max(8, rect.height - 8) };
         const r = window.PDFLib.layoutMultilineText(textoEsperado, { alignment: window.PDFLib.TextAlignment.Left, fontSize: tamanho, font: fonteMedida, bounds });
         const alturaPrecisa = r.lines.length * r.lineHeight;
         if (alturaPrecisa > bounds.height) {
@@ -1619,6 +1624,17 @@ console.log('');
       if (texto('Front_Spell Attack Name 1') !== 'Bênção') erros.push('exportar pdf: Magias Favoritas linha 1 deveria ser Bênção, veio "' + texto('Front_Spell Attack Name 1') + '"');
       if (texto('Front_Spell Save 1') !== '17') erros.push('exportar pdf: Magias Favoritas "Resistência" deveria ser a CD do personagem (17), veio "' + texto('Front_Spell Save 1') + '"');
       if (texto('Front_Spell Attack Name 2') !== 'Arma Espiritual') erros.push('exportar pdf: Magias Favoritas linha 2 deveria ser Arma Espiritual, veio "' + texto('Front_Spell Attack Name 2') + '"');
+
+      // Magias de Domínio (jog-19): tabela fixa por subclasse (Domínio da
+      // Morte pra Lilith), independente do nível atual — as 5 linhas devem
+      // vir preenchidas e caber de verdade na caixa (mesma checagem real
+      // usada acima pro texto cortado).
+      const domSpells1 = texto('Front_Domain Spells 1st') || '';
+      const domSpells5 = texto('Front_Domain Spells 5th') || '';
+      if (!domSpells1.includes('Vitalidade Falsa') || !domSpells1.includes('Raio Adoecente')) erros.push('exportar pdf: Front_Domain Spells 1st deveria citar Vitalidade Falsa e Raio Adoecente, veio "' + domSpells1 + '"');
+      if (!domSpells5.includes('Cúpula Antivida') || !domSpells5.includes('Névoa Mortal')) erros.push('exportar pdf: Front_Domain Spells 5th deveria citar Cúpula Antivida e Névoa Mortal, veio "' + domSpells5 + '"');
+      conferirCabeDeVerdade('Front_Domain Spells 1st', domSpells1);
+      conferirCabeDeVerdade('Front_Domain Spells 5th', domSpells5);
     }
 
     // Com mais de 1 personagem, trocar de PJ (mesmo caminho do <select> do

@@ -117,6 +117,72 @@ const CAMPOS_RECURSO = [
   { recurso: 'sentido_divino',     usado: 'Front_Divine Sense Used',   total: 'Front_Divine Sense Total' },
 ];
 
+// Magias de Domínio (PHB cap. 3): cada Domínio Divino do Clérigo concede um
+// par fixo de magias sempre preparadas, ganho nos níveis 1/3/5/7/9 (um nível
+// de magia por linha — 1ª a 5ª). É regra fixa, igual pra qualquer Clérigo
+// daquele domínio, então preenche as 5 linhas de uma vez, sem depender do
+// nível atual do personagem (é referência, igual imprimiria numa ficha em
+// branco). Nomes em PT-BR batendo com data/magias_data.json.
+const DOMINIO_MAGIAS = {
+  'Domínio do Conhecimento': [
+    ['Comando', 'Identificação'],
+    ['Augúrio', 'Sugestão'],
+    ['Dificultar Detecção', 'Falar com os Mortos'],
+    ['Olho Arcano', 'Confusão'],
+    ['Conhecimento Lendário', 'Vidência'],
+  ],
+  'Domínio da Vida': [
+    ['Bênção', 'Curar Ferimentos'],
+    ['Restauração Menor', 'Arma Espiritual'],
+    ['Sinal de Esperança', 'Revivificar'],
+    ['Proteção contra a Morte', 'Guardião da Fé'],
+    ['Curar Ferimentos em Massa', 'Reviver os Mortos'],
+  ],
+  'Domínio da Luz': [
+    ['Mãos Flamejantes', 'Fogo das Fadas'],
+    ['Esfera Flamejante', 'Raio Ardente'],
+    ['Luz do Dia', 'Bola de Fogo'],
+    ['Guardião da Fé', 'Muralha de Fogo'],
+    ['Coluna de Chamas', 'Vidência'],
+  ],
+  'Domínio da Natureza': [
+    ['Amizade Animal', 'Falar com Animais'],
+    ['Pele de Árvore', 'Crescer Espinhos'],
+    ['Ampliar Plantas', 'Muralha de Vento'],
+    ['Dominar Besta', 'Vinha Esmagadora'],
+    ['Praga de Insetos', 'Teletransporte por Árvores'],
+  ],
+  'Domínio da Tempestade': [
+    ['Névoa Obscurecente', 'Onda Trovejante'],
+    ['Lufada de Vento', 'Despedaçar'],
+    ['Convocar Relâmpagos', 'Nevasca'],
+    ['Controlar a Água', 'Tempestade de Gelo'],
+    ['Onda Destrutiva', 'Praga de Insetos'],
+  ],
+  'Domínio Trapaceiro': [
+    ['Enfeitiçar Pessoa', 'Disfarçar-se'],
+    ['Reflexos', 'Passos sem Pegadas'],
+    ['Piscar', 'Dissipar Magia'],
+    ['Porta Dimensional', 'Metamorfose'],
+    ['Dominar Pessoa', 'Modificar Memória'],
+  ],
+  'Domínio da Guerra': [
+    ['Auxílio Divino', 'Escudo da Fé'],
+    ['Arma Mágica', 'Arma Espiritual'],
+    ['Manto do Cruzado', 'Espíritos Guardiões'],
+    ['Movimentação Livre', 'Pele de Pedra'],
+    ['Coluna de Chamas', 'Imobilizar Monstro'],
+  ],
+  'Domínio da Morte': [
+    ['Vitalidade Falsa', 'Raio Adoecente'],
+    ['Cegueira/Surdez', 'Raio do Enfraquecimento'],
+    ['Animar Mortos', 'Toque Vampírico'],
+    ['Praga', 'Proteção contra a Morte'],
+    ['Cúpula Antivida', 'Névoa Mortal'],
+  ],
+};
+const CAMPO_DOMINIO_MAGIAS_POR_LINHA = ['1st', '2nd', '3rd', '4th', '5th'];
+
 // Campos "Característica do Arquétipo/Domínio/Círculo/Tradição/Origem/
 // Patrono/Juramento" por nível — só preenchem quando habilidades_classes.json
 // tem texto pra ESSA subclasse específica (hoje: Domínio da Morte e
@@ -427,6 +493,13 @@ async function preencherConjuracao(idx, c, opcoes) {
   setTexto(idx, ['Front_Spells Known'], c.magias_conhecidas || '');
   setTexto(idx, ['Front_Spell DC', 'SpellSaveDC'], c.cd_resistencia != null ? c.cd_resistencia : '');
   setTexto(idx, ['Front_Spell Atk', 'SpellAtkBonus'], c.bonus_atq_magia != null ? fmtMod(c.bonus_atq_magia) : '');
+
+  // Clérigo: tabela "Magias de Domínio" (fixa por subclasse, ver DOMINIO_MAGIAS acima).
+  if (chave === 'clerigo' && c.subclasse && DOMINIO_MAGIAS[c.subclasse]) {
+    DOMINIO_MAGIAS[c.subclasse].forEach((par, i) => {
+      setTexto(idx, `Front_Domain Spells ${CAMPO_DOMINIO_MAGIAS_POR_LINHA[i]}`, par.join(', '), 'auto');
+    });
+  }
 
   // Bruxo (Magia de Pacto): pool único de espaços, todos do maior nível
   // disponível — diferente da grade de checkboxes por nível dos outros
