@@ -1579,14 +1579,14 @@ console.log('');
       if (!chDivDominio.startsWith('Toque da Morte:') || chDivDominio.length < 30) erros.push('exportar pdf: Front_Channel Divinity Domain veio "' + chDivDominio + '" (esperava "Toque da Morte: <descrição completa>", não só o nome nem a versão base de Expulsar Mortos-Vivos)');
 
       // O texto por si só não prova que RENDERIZA inteiro (getText() devolve
-      // a string mesmo que a caixa a corte visualmente) — recalcula com a
-      // MESMA lógica de medição (window.medirLinhas/tamanhoQueCabe, expostas
-      // por serem function declaration de topo num script clássico) usando
-      // o tamanho de fonte que ficou gravado no campo, e confere se aquele
-      // texto INTEIRO cabe na altura real da caixa. Pega tanto "estourou
-      // porque ficou grande demais" (bug original) quanto "cortou porque o
-      // tamanho fixo era grande demais pro texto comprido" (regressão que
-      // um 8pt fixo introduziria).
+      // a string mesmo que a caixa a corte visualmente) — recalcula com
+      // PDFLib.layoutMultilineText, a MESMA função que o pdf-lib usa por
+      // dentro quando o setText() real acontece (não uma reimplementação
+      // própria: uma reimplementação já mascarou esse bug uma vez — tinha
+      // uma suposição de altura de linha errada tanto na produção quanto
+      // aqui no teste, então os dois "concordavam" e nada acusava o corte
+      // de verdade). Usa o tamanho de fonte que ficou gravado no campo e
+      // confere se aquele texto INTEIRO cabe na altura real da caixa.
       const fonteMedida = form.getDefaultFont();
       const conferirCabeDeVerdade = (nomeCampo, textoEsperado) => {
         const campo = form.getTextField(nomeCampo);
@@ -1594,10 +1594,11 @@ console.log('');
         const tamanho = parseFloat((da.match(/([\d.]+)\s+Tf/) || [])[1] || '0');
         const rect = campo.acroField.getWidgets()[0].getRectangle();
         if (!tamanho) { erros.push(`exportar pdf: ${nomeCampo} não tem tamanho de fonte definido (DA="${da}")`); return; }
-        const linhas = window.medirLinhas(fonteMedida, textoEsperado, tamanho, rect.width - 8);
-        const alturaPrecisa = linhas.length * tamanho * 1.25;
-        if (alturaPrecisa > rect.height - 8) {
-          erros.push(`exportar pdf: ${nomeCampo} não cabe de verdade na caixa — ${linhas.length} linhas a ${tamanho}pt (~${alturaPrecisa.toFixed(0)}pt de altura) numa caixa de ${rect.height.toFixed(0)}pt`);
+        const bounds = { x: 0, y: 0, width: rect.width - 8, height: rect.height - 8 };
+        const r = window.PDFLib.layoutMultilineText(textoEsperado, { alignment: window.PDFLib.TextAlignment.Left, fontSize: tamanho, font: fonteMedida, bounds });
+        const alturaPrecisa = r.lines.length * r.lineHeight;
+        if (alturaPrecisa > bounds.height) {
+          erros.push(`exportar pdf: ${nomeCampo} não cabe de verdade na caixa — ${r.lines.length} linhas a ${tamanho}pt (~${alturaPrecisa.toFixed(0)}pt de altura) numa caixa de ${bounds.height.toFixed(0)}pt`);
         }
       };
       conferirCabeDeVerdade('Front_Domain Feature 1', texto('Front_Domain Feature 1'));
@@ -1611,6 +1612,13 @@ console.log('');
       if (texto('Front_Spell Level 1') !== '1' || texto('Front_Spell Name 1') !== 'Bênção') erros.push('exportar pdf: linha 1 da lista de magias deveria ser Bênção (nível 1), veio ' + JSON.stringify({ nivel: texto('Front_Spell Level 1'), nome: texto('Front_Spell Name 1') }));
       if (texto('Front_Spell Level 2') !== '2' || texto('Front_Spell Name 2') !== 'Arma Espiritual') erros.push('exportar pdf: linha 2 deveria ser Arma Espiritual (nível 2), veio ' + JSON.stringify({ nivel: texto('Front_Spell Level 2'), nome: texto('Front_Spell Name 2') }));
       if (texto('Front_Spell Name 3') !== 'Augúrio' || marcado('Front_Spell Ritual 3') !== true) erros.push('exportar pdf: linha 3 deveria ser Augúrio com Ritual marcado — ' + JSON.stringify({ nome: texto('Front_Spell Name 3'), ritual: marcado('Front_Spell Ritual 3') }));
+
+      // "Magias Favoritas" (mini cartão Nome/Alcance/Tempo/Resistência) —
+      // ficava em branco antes (fora do escopo original); agora reusa o
+      // topo da mesma lista ordenada. Clérigo só tem 2 linhas nesse molde.
+      if (texto('Front_Spell Attack Name 1') !== 'Bênção') erros.push('exportar pdf: Magias Favoritas linha 1 deveria ser Bênção, veio "' + texto('Front_Spell Attack Name 1') + '"');
+      if (texto('Front_Spell Save 1') !== '17') erros.push('exportar pdf: Magias Favoritas "Resistência" deveria ser a CD do personagem (17), veio "' + texto('Front_Spell Save 1') + '"');
+      if (texto('Front_Spell Attack Name 2') !== 'Arma Espiritual') erros.push('exportar pdf: Magias Favoritas linha 2 deveria ser Arma Espiritual, veio "' + texto('Front_Spell Attack Name 2') + '"');
     }
 
     // Com mais de 1 personagem, trocar de PJ (mesmo caminho do <select> do

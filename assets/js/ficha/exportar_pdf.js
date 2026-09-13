@@ -175,33 +175,36 @@ function melhorPorPrefixo(habs, prefixo) {
 // livre resolvia isso, mas trocava o problema de lado: texto realmente
 // longo (2 características de domínio juntas, por exemplo) num tamanho
 // fixo grande demais pra ele ficava cortado pela caixa. Por isso
-// `tamanhoFonte: 'auto'` mede de verdade (largura/altura reais do campo,
-// texto quebrado em linhas como a caixa vai quebrar) e escolhe o MAIOR
-// tamanho que cabe inteiro — os campos numéricos continuam com o auto
-// nativo do pdf-lib (tamanhoFonte omitido), que funciona bem pra eles.
+// `tamanhoFonte: 'auto'` mede de verdade (largura/altura reais do campo) e
+// escolhe o MAIOR tamanho que cabe inteiro — os campos numéricos continuam
+// com o auto nativo do pdf-lib (tamanhoFonte omitido), que funciona bem
+// pra eles.
+//
+// A 1ª versão disto tinha uma simulação de quebra de linha própria (conta
+// palavra por palavra até estourar a largura) — parecia certa nos testes,
+// mas ainda cortava texto longo na prática (ex.: 2 características de
+// Clérigo juntas: "Proficiência Adicional... | Ceifador..." cortava no
+// meio da 2ª frase). Causa: o pdf-lib usa uma altura de linha própria
+// (1.2 × font.heightAtSize(tamanho), NÃO tamanho×1.25 como eu supunha) —
+// então "quantas linhas cabem" dava um resultado ligeiramente diferente do
+// que o pdf-lib ia realmente desenhar, e a caixa (que recorta o que passa
+// da borda) cortava a sobra. Em vez de tentar re-simular a lógica do
+// pdf-lib de novo (e arriscar errar de outro jeito), agora chama
+// PDFLib.layoutMultilineText — a MESMA função que o pdf-lib usa por dentro
+// quando você chama campo.setText() — então "quantas linhas isso vira" é
+// sempre exatamente o que vai ser desenhado, não uma aproximação.
 let _fonteParaMedir = null;
-function medirLinhas(font, texto, tamanho, larguraMax) {
-  const linhas = [];
-  for (const paragrafo of String(texto).split('\n')) {
-    const palavras = paragrafo.split(/\s+/).filter(Boolean);
-    let atual = '';
-    for (const p of palavras) {
-      const tentativa = atual ? atual + ' ' + p : p;
-      if (!atual || font.widthOfTextAtSize(tentativa, tamanho) <= larguraMax) atual = tentativa;
-      else { linhas.push(atual); atual = p; }
-    }
-    linhas.push(atual);
-  }
-  return linhas;
-}
 function tamanhoQueCabe(font, texto, largura, altura) {
+  const { layoutMultilineText, TextAlignment } = window.PDFLib;
   const PAD = 4;
   const larguraUtil = Math.max(10, largura - PAD * 2);
   const alturaUtil = Math.max(8, altura - PAD * 2);
-  for (let tam = 10; tam >= 5; tam -= 0.5) {
-    if (medirLinhas(font, texto, tam, larguraUtil).length * tam * 1.25 <= alturaUtil) return tam;
+  const bounds = { x: 0, y: 0, width: larguraUtil, height: alturaUtil };
+  for (let tam = 10; tam >= 4; tam -= 0.5) {
+    const r = layoutMultilineText(String(texto), { alignment: TextAlignment.Left, fontSize: tam, font, bounds });
+    if (r.lines.length * r.lineHeight <= alturaUtil) return tam;
   }
-  return 5;
+  return 4;
 }
 function setTexto(idx, nomes, valor, tamanhoFonte) {
   if (valor === null || valor === undefined || valor === '') return;
@@ -459,6 +462,23 @@ async function preencherConjuracao(idx, c, opcoes) {
     setTexto(idx, `Front_Spell Name ${n}`, m.nome);
     setCheck(idx, `Front_Spell Ritual ${n}`, !!m.dados?.ritual);
     if (ehPreparador) setCheck(idx, `Front_Spell Prepared ${n}`, true);
+  });
+
+  // "Magias Favoritas" — mini cartão de referência rápida (Nome/Alcance/
+  // Tempo de Conjuração/Resistência) que ficava em branco antes: são só
+  // 2 a 6 linhas dependendo da classe, cabe o topo da mesma lista já
+  // ordenada acima. "Resistência" é o CD de resistência do PERSONAGEM —
+  // no 5e a CD é sempre a mesma não importa a magia, não é um dado por
+  // magia que o catálogo tenha. "Efeito" fica de fora: a caixa é de 1
+  // linha só, e a descrição de uma magia não cabe resumida sem arriscar
+  // mostrar um resumo errado/enganoso.
+  resolvidas.slice(0, 6).forEach((m, i) => {
+    const n = i + 1;
+    setTexto(idx, `Front_Spell Attack Name ${n}`, m.nome);
+    setTexto(idx, `Front_Spell Range ${n}`, m.dados?.alcance || '');
+    setTexto(idx, `Front_Spell Casting Time ${n}`, m.dados?.tempoCast || '');
+    setTexto(idx, `Front_Spell Save ${n}`, c.cd_resistencia != null ? c.cd_resistencia : '');
+    setCheck(idx, `Front_Spell Concentration ${n}`, !!m.dados?.concentracao);
   });
 }
 
