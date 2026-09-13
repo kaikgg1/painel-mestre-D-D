@@ -1633,6 +1633,47 @@ console.log('');
       const nome2 = (() => { try { return doc2.getForm().getTextField('Front_Character Name').getText(); } catch { return undefined; } })();
       if (nome2 !== 'Aventureiro Dois') erros.push('exportar pdf (2º personagem): depois de trocar de PJ, Front_Character Name veio "' + nome2 + '" (esperava "Aventureiro Dois" — exportou o PJ errado)');
     }
+
+    // Diálogo de opções (jog-18): desmarcar "Pontos de Vida" e "Recursos
+    // usados" tem que deixar esses campos em BRANCO no PDF (pro jogador
+    // preencher na mesa), sem afetar o resto (identidade, atributos,
+    // perícias etc. continuam vindo preenchidos igual). Bardo pra também
+    // cobrir Front_Inspiration Used/Total (CAMPOS_RECURSO).
+    const PJ3 = { ...PJ, id: 'w', nome: 'Bardo de Teste', classe: 'Bardo', subclasse: '', nivel: 4,
+      hp_atual: 20, hp_max: 28, hp_temp: 2, dado_vida_atual: 3, inspiracao: 1,
+      recursos_usados: { inspiracao_bardica: 1 },
+      atributos: { for: 8, dex: 14, con: 12, sab: 10, int: 10, car: 16 },
+      salvaguardas: { dex: true, car: true }, pericias: { persuasao: { prof: true } },
+      inventario: { moedas: { po: 0, pp: 0, pe: 0, pc: 0, pl: 0 }, armas: [], armaduras: [], itens: [] } };
+    window.eval('chars.push(' + JSON.stringify(PJ3) + '); charAtivo = chars.find(c => c.id === "w");');
+    window.__ultimoBlobPDF = null;
+    await window.exportarFichaPDF({ pv: false, recursos: false });
+    if (!window.__ultimoBlobPDF) erros.push('exportar pdf (opções desmarcadas): não gerou nada');
+    else {
+      const bytes3 = await window.__ultimoBlobPDF.arrayBuffer();
+      const form3 = (await window.PDFLib.PDFDocument.load(bytes3)).getForm();
+      const t3 = nome => { try { return form3.getTextField(nome).getText() || ''; } catch { return undefined; } };
+      if (t3('Front_Character Name') !== 'Bardo de Teste') erros.push('exportar pdf (opções desmarcadas): identidade não devia ser afetada, Front_Character Name veio "' + t3('Front_Character Name') + '"');
+      if (t3('Front_Max HP') || t3('Front_Current HP') || t3('Front_Temp HP') || t3('Front_Used Hit Dice')) {
+        erros.push('exportar pdf (opções desmarcadas): PV/Dado de Vida deveriam vir em branco com pv:false — ' + JSON.stringify({ max: t3('Front_Max HP'), atual: t3('Front_Current HP'), temp: t3('Front_Temp HP'), dvUsado: t3('Front_Used Hit Dice') }));
+      }
+      if (t3('Front_Inspiration')) erros.push('exportar pdf (opções desmarcadas): Inspiração deveria vir em branco com recursos:false, veio "' + t3('Front_Inspiration') + '"');
+      if (t3('Front_Inspiration Used')) erros.push('exportar pdf (opções desmarcadas): Front_Inspiration Used (recurso Inspiração Bárdica) deveria vir em branco com recursos:false, veio "' + t3('Front_Inspiration Used') + '"');
+      if (!t3('Front_Inspiration Total')) erros.push('exportar pdf (opções desmarcadas): Front_Inspiration Total NÃO devia ser afetado por recursos:false (só o "usado" é sessão) — veio em branco');
+    }
+
+    // Confirma que, sem passar opções (chamada direta, como o teste principal
+    // já fez lá em cima), o padrão continua sendo preencher tudo — ninguém
+    // que já usava exportarFichaPDF() direto deveria ver menos coisa agora.
+    window.eval('charAtivo = chars.find(c => c.id === "w");');
+    window.__ultimoBlobPDF = null;
+    await window.exportarFichaPDF();
+    if (window.__ultimoBlobPDF) {
+      const bytesPadrao = await window.__ultimoBlobPDF.arrayBuffer();
+      const formPadrao = (await window.PDFLib.PDFDocument.load(bytesPadrao)).getForm();
+      const hpPadrao = (() => { try { return formPadrao.getTextField('Front_Max HP').getText(); } catch { return ''; } })();
+      if (hpPadrao !== '28') erros.push('exportar pdf: chamada sem opções (padrão) deveria preencher PV normalmente, Front_Max HP veio "' + hpPadrao + '"');
+    }
   } catch (e) { erros.push('exportar pdf: ' + e.message); }
   window.__magiasFavoritasTeste = null;
 

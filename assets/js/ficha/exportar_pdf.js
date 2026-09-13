@@ -220,6 +220,19 @@ function setTexto(idx, nomes, valor, tamanhoFonte) {
     }
   }
 }
+// Diferente de setTexto (que IGNORA valor vazio de propósito, pra nunca
+// apagar o que o molde já trouxe por padrão — ex.: os campos de atributo
+// numérico têm um "-5" de exemplo do autor do PDF), limparTexto é usado
+// quando o jogador desmarcou explicitamente uma opção do diálogo de
+// exportação: aí o vazio É a intenção, então precisa forçar mesmo.
+function limparTexto(idx, nomes) {
+  for (const nome of (Array.isArray(nomes) ? nomes : [nomes])) {
+    const campo = idx.get(nome);
+    if (campo && typeof campo.setText === 'function') {
+      try { campo.setText(''); } catch (e) {}
+    }
+  }
+}
 function setCheck(idx, nomes, marcado) {
   for (const nome of (Array.isArray(nomes) ? nomes : [nomes])) {
     const campo = idx.get(nome);
@@ -236,7 +249,7 @@ function habilidadesDoPersonagem(HAB, chave, c) {
 }
 
 // ── Blocos de preenchimento ──────────────────────────────────────────
-function preencherIdentidade(idx, c) {
+function preencherIdentidade(idx, c, opcoes) {
   setTexto(idx, ['Front_Character Name', 'Back_Character Name'], c.nome);
   setTexto(idx, 'Front_Race', c.raca);
   setTexto(idx, 'Front_Background', c.origem);
@@ -249,7 +262,8 @@ function preencherIdentidade(idx, c) {
   setTexto(idx, ['Front_Proficiency', 'ProfBonus'], fmtMod(bonusProf(nivelTotal)));
   setTexto(idx, ['Front_Passive Perception', 'Passive'], 10 + valorPericia(c, 'percepcao', 'sab'));
   setTexto(idx, 'Front_Passive Insight', 10 + valorPericia(c, 'intuicao', 'sab'));
-  setTexto(idx, ['Front_Inspiration', 'Inspiration'], (+c.inspiracao || 0) > 0 ? String(+c.inspiracao) : '');
+  if (opcoes.recursos) setTexto(idx, ['Front_Inspiration', 'Inspiration'], (+c.inspiracao || 0) > 0 ? String(+c.inspiracao) : '');
+  else limparTexto(idx, ['Front_Inspiration', 'Inspiration']);
   setTexto(idx, 'Front_Racial Traits', c.tracos_raciais, 'auto');
   setTexto(idx, 'Front_Languages', (c.idiomas || ['Comum']).join(', '), 'auto');
   setTexto(idx, 'Front_Tools', (c.ferramentas || []).join(', '), 'auto');
@@ -286,17 +300,24 @@ function preencherAtributosSalvPericias(idx, c) {
   }
 }
 
-function preencherCombate(idx, c) {
+function preencherCombate(idx, c, opcoes) {
   setTexto(idx, ['Front_AC', 'AC'], c.ca);
   setTexto(idx, ['Front_Initiative', 'Initiative'], fmtMod(+c.iniciativa_bonus || 0));
   setTexto(idx, ['Front_Speed', 'Speed'], c.deslocamento != null ? `${c.deslocamento}m` : '');
-  setTexto(idx, 'Front_Max HP', c.hp_max);
-  setTexto(idx, 'Front_Current HP', c.hp_atual);
-  setTexto(idx, 'Front_Temp HP', c.hp_temp || '');
-  const totalDV = nivelTotalPersonagem(c);
-  const restanteDV = c.dado_vida_atual != null ? +c.dado_vida_atual : totalDV;
-  setTexto(idx, 'Front_Total Hit Dice', `${totalDV}d${c.dado_vida_tipo || 8}`);
-  setTexto(idx, 'Front_Used Hit Dice', Math.max(0, totalDV - restanteDV));
+  if (opcoes.pv) {
+    setTexto(idx, 'Front_Max HP', c.hp_max);
+    setTexto(idx, 'Front_Current HP', c.hp_atual);
+    setTexto(idx, 'Front_Temp HP', c.hp_temp || '');
+    const totalDV = nivelTotalPersonagem(c);
+    const restanteDV = c.dado_vida_atual != null ? +c.dado_vida_atual : totalDV;
+    setTexto(idx, 'Front_Total Hit Dice', `${totalDV}d${c.dado_vida_tipo || 8}`);
+    setTexto(idx, 'Front_Used Hit Dice', Math.max(0, totalDV - restanteDV));
+  } else {
+    // Não é só "não escrever" — o molde já vem com valor de exemplo do
+    // autor nesses campos (ex.: "16"), então fica visível igual mesmo sem
+    // preencher se não limpar de propósito.
+    limparTexto(idx, ['Front_Max HP', 'Front_Current HP', 'Front_Temp HP', 'Front_Total Hit Dice', 'Front_Used Hit Dice']);
+  }
 
   const armas = c.inventario?.armas || [];
   armas.forEach((arma, i) => {
@@ -337,7 +358,7 @@ function preencherPaginaTras(idx, c) {
   setTexto(idx, 'Back_Backpack', linhas.join('\n'), 'auto');
 }
 
-function preencherHabilidadesFixas(idx, c, HAB) {
+function preencherHabilidadesFixas(idx, c, HAB, opcoes) {
   const chave = chaveDeClasse(c.classe);
   const habs = habilidadesDoPersonagem(HAB, chave, c);
 
@@ -358,7 +379,8 @@ function preencherHabilidadesFixas(idx, c, HAB) {
   for (const def of CAMPOS_RECURSO) {
     const r = recursos.find(x => x.id === def.recurso);
     if (!r) continue;
-    setTexto(idx, def.usado, RecursosClasse.lerUsado(c.recursos_usados, def.recurso));
+    if (opcoes.recursos) setTexto(idx, def.usado, RecursosClasse.lerUsado(c.recursos_usados, def.recurso));
+    else limparTexto(idx, def.usado);
     setTexto(idx, def.total, r.max);
   }
 
@@ -396,7 +418,7 @@ function preencherHabilidadesFixas(idx, c, HAB) {
   setTexto(idx, 'Front_Additional Combat Features', resumo, 'auto');
 }
 
-async function preencherConjuracao(idx, c) {
+async function preencherConjuracao(idx, c, opcoes) {
   const chave = chaveDeClasse(c.classe);
   setTexto(idx, ['Front_Cantrips Known'], c.truques_conhecidos || '');
   setTexto(idx, ['Front_Spells Known'], c.magias_conhecidas || '');
@@ -413,7 +435,8 @@ async function preencherConjuracao(idx, c) {
     if (nivelSlot > 0) {
       setTexto(idx, 'Front_Spell Slots Level', nivelSlot);
       setTexto(idx, 'Front_Spell Slots Total', slotsClasse[nivelSlot]);
-      setTexto(idx, 'Front_Spell Slots Used', (c.slots_magia?.[nivelSlot]?.atual) || 0);
+      if (opcoes.recursos) setTexto(idx, 'Front_Spell Slots Used', (c.slots_magia?.[nivelSlot]?.atual) || 0);
+      else limparTexto(idx, 'Front_Spell Slots Used');
     }
   }
 
@@ -439,15 +462,15 @@ async function preencherConjuracao(idx, c) {
   });
 }
 
-async function preencherFicha(idx, c, form) {
+async function preencherFicha(idx, c, form, opcoes) {
   _fonteParaMedir = form.getDefaultFont();
   const HAB = await carregarHabilidadesClasses();
-  preencherIdentidade(idx, c);
+  preencherIdentidade(idx, c, opcoes);
   preencherAtributosSalvPericias(idx, c);
-  preencherCombate(idx, c);
+  preencherCombate(idx, c, opcoes);
   preencherPaginaTras(idx, c);
-  if (HAB) preencherHabilidadesFixas(idx, c, HAB);
-  if (classeUsaMagia(c)) await preencherConjuracao(idx, c);
+  if (HAB) preencherHabilidadesFixas(idx, c, HAB, opcoes);
+  if (classeUsaMagia(c)) await preencherConjuracao(idx, c, opcoes);
 }
 
 function baixarArquivoPDF(bytes, nomeArquivo) {
@@ -490,7 +513,12 @@ function carregarPDFLib() {
 // disparar uma 2ª exportação concorrente, que poderia terminar ANTES da
 // primeira e fazer parecer que "exportou o personagem errado".
 let _exportandoPDF = false;
-async function exportarFichaPDF() {
+// opcoes: { pv, recursos } — omitido/undefined = preenche tudo (chamada
+// direta, ex.: testes). O diálogo (abrirDialogoExportarPDF) é quem
+// normalmente passa isso, deixando o jogador desmarcar o que prefere
+// preencher na mesa em vez de já vir pronto.
+async function exportarFichaPDF(opcoes) {
+  const opts = { pv: true, recursos: true, ...opcoes };
   if (_exportandoPDF) { toast('Já tem uma exportação em andamento — espera terminar.'); return; }
   const c = charAtivo;
   if (!c) return;
@@ -509,7 +537,7 @@ async function exportarFichaPDF() {
     const form = pdfDoc.getForm();
     const idx = new Map(form.getFields().map(f => [f.getName(), f]));
 
-    await preencherFicha(idx, c, form);
+    await preencherFicha(idx, c, form, opts);
 
     const outBytes = await pdfDoc.save();
     baixarArquivoPDF(outBytes, nomeArquivoExportPDF(c));
@@ -520,4 +548,35 @@ async function exportarFichaPDF() {
   } finally {
     _exportandoPDF = false;
   }
+}
+
+// Diálogo antes de gerar o PDF: deixa o jogador desmarcar o que prefere
+// preencher à mão na mesa em vez de já vir pronto — PV muda toda sessão
+// (às vezes a cada rodada), então imprimir um valor que já vai estar
+// errado no primeiro combate não ajuda ninguém. Tudo marcado por padrão
+// (mesmo comportamento de antes de existir esse diálogo).
+function abrirDialogoExportarPDF() {
+  const { overlay, card, fechar } = UI.abrirModal({
+    tituloHtml: `${ico('brilho')} Exportar Ficha em PDF`,
+    corpoHtml: `
+      <p class="ajuda-mini">O resto (identidade, atributos, perícias, equipamento, magias conhecidas) sempre vai preenchido — só isso aqui muda toda sessão, então dá pra deixar em branco pra preencher na mesa.</p>
+      <label class="editor-check" style="margin-bottom:10px">
+        <input type="checkbox" id="exp-opt-pv" checked> Pontos de Vida e Dado de Vida
+      </label>
+      <label class="editor-check">
+        <input type="checkbox" id="exp-opt-recursos" checked> Recursos e Inspiração já usados (Ki, Fúria, Cura pelas Mãos, Canalizar Divindade, Magia de Pacto do Bruxo...)
+      </label>
+      <div class="modal-acoes" style="margin-top:18px">
+        <button type="button" class="btn" id="exp-opt-cancelar">Cancelar</button>
+        <button type="button" class="btn primary" id="exp-opt-confirmar">✓ Gerar PDF</button>
+      </div>
+    `,
+  });
+  card.querySelector('#exp-opt-cancelar').addEventListener('click', fechar);
+  card.querySelector('#exp-opt-confirmar').addEventListener('click', () => {
+    const pv = card.querySelector('#exp-opt-pv').checked;
+    const recursos = card.querySelector('#exp-opt-recursos').checked;
+    fechar();
+    exportarFichaPDF({ pv, recursos });
+  });
 }

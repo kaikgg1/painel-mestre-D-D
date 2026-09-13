@@ -181,7 +181,7 @@ function conectarListenersHeader() {
   const wizardBtn = document.getElementById('btn-wizard');
   if (wizardBtn) wizardBtn.addEventListener('click', () => { fecharMenuAcoes(); abrirWizardCriacao(); });
   const exportarPdfBtn = document.getElementById('btn-exportar-pdf');
-  if (exportarPdfBtn) exportarPdfBtn.addEventListener('click', () => { fecharMenuAcoes(); exportarFichaPDF(); });
+  if (exportarPdfBtn) exportarPdfBtn.addEventListener('click', () => { fecharMenuAcoes(); abrirDialogoExportarPDF(); });
   const duplicarBtn = document.getElementById('btn-duplicar');
   if (duplicarBtn) duplicarBtn.addEventListener('click', async () => {
     fecharMenuAcoes();
