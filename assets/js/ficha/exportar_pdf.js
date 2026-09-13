@@ -345,6 +345,11 @@ function preencherIdentidade(idx, c, opcoes) {
     setCheck(idx, 'Front_Shields', !!profs.armaduras.escudos);
     setCheck(idx, 'Front_Simple Weapons', !!profs.armas.simples);
     setCheck(idx, 'Front_Martial Weapons', !!profs.armas.marciais);
+    // Quadradinho "+CA do escudo" ao lado do checkbox de Escudos — 4 das 12
+    // classes usam o nome solto "ARMADURA" pra esse mesmo campo (mesma caixa,
+    // mesma posição) em vez de "Front_Shield Bonus". Escudo dá sempre +2 CA
+    // (PHB cap. 5) — só preenche pra quem tem a proficiência.
+    if (profs.armaduras.escudos) setTexto(idx, ['Front_Shield Bonus', 'ARMADURA'], 2);
   }
 }
 

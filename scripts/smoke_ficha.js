@@ -1706,6 +1706,136 @@ console.log('');
     : '  exportar ficha em pdf: modelo real da classe + identidade/atributos/perícias/combate/página 2 + característica de subclasse + lista de magias ordenada ok');
 }
 
+// Cobertura: cria e exporta a ficha de TODAS as 12 classes (jog-20). Não
+// basta "não quebrou" — pra cada PDF gerado, faz o MESMO tipo de checagem
+// real que achou o bug de hoje ("Magias de Domínio" ficou esquecido até o
+// jogador reportar): monkey-patcha PDFTextField.setText/PDFCheckBox.check
+// pra registrar todo campo que a produção TOCOU de verdade durante aquela
+// exportação, depois compara com a lista completa de campos do molde. Um
+// campo nunca tocado é candidato a "esquecido igual o de hoje" — falsos
+// positivos esperados (2ª arma, 2º idioma, feats não escolhidos etc., já
+// que a fixture é enxuta) ficam de fora via CAMPO_ESPERADO_EM_BRANCO.
+console.log('');
+{
+  const antes = erros.length;
+  const DADO_VIDA_POR_CLASSE = { barbaro: 12, bardo: 8, bruxo: 8, clerigo: 8, druida: 8, feiticeiro: 6, guerreiro: 10, ladino: 8, mago: 6, monge: 8, paladino: 10, patrulheiro: 10 };
+  const NOME_CLASSE = { barbaro: 'Bárbaro', bardo: 'Bardo', bruxo: 'Bruxo', clerigo: 'Clérigo', druida: 'Druida', feiticeiro: 'Feiticeiro', guerreiro: 'Guerreiro', ladino: 'Ladino', mago: 'Mago', monge: 'Monge', paladino: 'Paladino', patrulheiro: 'Patrulheiro' };
+  // Uma subclasse por classe — prioriza as 2 que têm texto no catálogo
+  // (habilidades_classes.json: Domínio da Morte / Quebrador de Juramento) e,
+  // pras outras, cobre os casos especiais de conjuração (1/3-caster via
+  // subclasse: Cavaleiro Místico/Trapaceiro Arcano).
+  const SUBCLASSE_POR_CLASSE = {
+    barbaro: 'Caminho do Guerreiro Totêmico', bardo: 'Colégio do Valor', bruxo: 'Patrono Grande Antigo',
+    clerigo: 'Domínio da Morte', druida: 'Círculo da Lua', feiticeiro: 'Linhagem Dracônica',
+    guerreiro: 'Cavaleiro Místico', ladino: 'Trapaceiro Arcano', mago: 'Escola de Evocação',
+    monge: 'Caminho da Mão Aberta', paladino: 'Quebrador de Juramento', patrulheiro: 'Caçador',
+  };
+  const MAGIAS_POR_CLASSE = {
+    bardo: ['Amizade', 'Acalmar Emoções'], bruxo: ['Amizade', 'Armadura de Agathys'],
+    clerigo: ['Bênção', 'Arma Espiritual'], druida: ['Amizade Animal', 'Bom Fruto'],
+    feiticeiro: ['Amizade', 'Alterar-se'], mago: ['Alarme', 'Amizade'],
+    paladino: ['Auxílio Divino', 'Ajuda'], patrulheiro: ['Alarme', 'Amizade Animal'],
+  };
+
+  // Liga o monkey-patch UMA vez (fica ligado pelo resto do processo — não
+  // tem mais nenhum outro teste de exportação depois deste bloco).
+  window.eval(`
+    (function () {
+      const origSetText = window.PDFLib.PDFTextField.prototype.setText;
+      const origCheck = window.PDFLib.PDFCheckBox.prototype.check;
+      window.__tocados = new Set();
+      window.PDFLib.PDFTextField.prototype.setText = function (v) { window.__tocados.add(this.getName()); return origSetText.call(this, v); };
+      window.PDFLib.PDFCheckBox.prototype.check = function () { window.__tocados.add(this.getName()); return origCheck.call(this); };
+    })();
+  `);
+
+  // O loop reatribui chars/charAtivo a cada classe (fixture de 1 PJ só) —
+  // sem restaurar depois, o teste de header/nav lá embaixo (que espera 2+
+  // PJs pra desenhar o <select> trocador) quebra por causa deste bloco.
+  const charsAntesCobertura = window.eval('chars.slice()');
+  const charAtivoAntesCobertura = window.eval('charAtivo');
+
+  const relatorio = {};
+  for (const chave of Object.keys(NOME_CLASSE)) {
+    const classeNome = NOME_CLASSE[chave];
+    const subclasse = SUBCLASSE_POR_CLASSE[chave];
+    const salvKeys = window.eval(`SALVAGUARDAS_POR_CLASSE['${chave}']`) || ['for', 'dex'];
+    const periciaOpcoes = window.eval(`opcoesPericiasDaClasse(${JSON.stringify(classeNome)})`);
+    const periciaEscolhidas = (periciaOpcoes?.opcoes || ['percepcao']).slice(0, 2);
+    const salvaguardas = {}; salvKeys.forEach(k => salvaguardas[k] = true);
+    const pericias = {}; periciaEscolhidas.forEach(k => pericias[k] = { prof: true });
+
+    const fixture = {
+      id: 'cov-' + chave, user_id: 'u', nome: 'Teste ' + classeNome, raca: 'Elfo',
+      classe: classeNome, subclasse, nivel: 5, origem: 'Eremita', alinhamento: 'Neutro',
+      campanha: 'barovia', is_active: true,
+      atributos: { for: 14, dex: 14, con: 14, int: 12, sab: 12, car: 10 },
+      hp_atual: 30, hp_max: 40, hp_temp: 2, ca: 15, iniciativa_bonus: 2, deslocamento: 9,
+      dado_vida_tipo: DADO_VIDA_POR_CLASSE[chave], dado_vida_atual: 4, exaustao: 0, inspiracao: 1,
+      slots_magia: { 1: { max: 4, atual: 2 }, 2: { max: 3, atual: 1 } },
+      salvaguardas, pericias,
+      truques_conhecidos: 2, magias_conhecidas: 4, cd_resistencia: 13, bonus_atq_magia: 5,
+      idiomas: ['Comum', 'Élfico'], ferramentas: ['Kit de disfarces'],
+      tracos_raciais: 'Visão no Escuro', caracteristicas_adicionais: 'Notas de teste',
+      inventario: {
+        moedas: { po: 15, pp: 2, pe: 0, pc: 5, pl: 0 },
+        armas: [{ nome: 'Espada Longa', dano: '1d8', tipo_dano: 'Cortante', propriedades: 'Versátil' }],
+        armaduras: [{ nome: 'Couro Batido', ca: '12', tipo: 'Leve', forca: '—' }],
+        itens: [{ nome: 'Corda de Cânhamo', qtd: 1, peso: 5 }],
+      },
+      recursos_usados: {},
+      features_personalizadas: [{ id: 'f1', nome: 'Traço de Teste', desc: 'teste', max: 1 }],
+      tracos_pessoais: 'Traço.', ideais: 'Ideal.', vinculos: 'Vínculo.', defeitos: 'Defeito.',
+      historia: 'História…', notas: 'Notas…', imagem_url: '',
+    };
+
+    window.__magiasFavoritasTeste = MAGIAS_POR_CLASSE[chave] || null;
+    window.eval('if (typeof _debounceTimers !== "undefined") { _debounceTimers.forEach(t => clearTimeout(t)); _debounceTimers.clear(); }');
+    window.eval('charAtivo = ' + JSON.stringify(fixture) + '; chars = [charAtivo];');
+    window.eval('window.__tocados = new Set();');
+    window.__ultimoBlobPDF = null;
+
+    try {
+      await window.exportarFichaPDF();
+    } catch (e) {
+      erros.push(`cobertura pdf (${classeNome}): exportarFichaPDF() lançou — ${e.message}`);
+      continue;
+    }
+    if (!window.__ultimoBlobPDF) { erros.push(`cobertura pdf (${classeNome}): não gerou nada`); continue; }
+
+    const bytes = await window.__ultimoBlobPDF.arrayBuffer();
+    const doc = await window.PDFLib.PDFDocument.load(bytes);
+    const form = doc.getForm();
+    const nomeGerado = (() => { try { return form.getTextField('Front_Character Name').getText(); } catch { return undefined; } })();
+    if (nomeGerado !== fixture.nome) erros.push(`cobertura pdf (${classeNome}): Front_Character Name veio "${nomeGerado}" (PDF do molde errado ou campo não bate nessa classe)`);
+
+    const tocados = window.eval('Array.from(window.__tocados)');
+    const todos = form.getFields()
+      .filter(f => f instanceof window.PDFLib.PDFTextField || f instanceof window.PDFLib.PDFCheckBox)
+      .map(f => f.getName());
+    const faltando = todos.filter(n => !tocados.includes(n));
+    relatorio[classeNome] = faltando;
+  }
+
+  window.eval('chars = ' + JSON.stringify(charsAntesCobertura) + '; charAtivo = chars.find(c => c.id === ' + JSON.stringify(charAtivoAntesCobertura.id) + ') || chars[0];');
+
+  // Só a contagem por classe — o dump campo-a-campo (achou os 2 gaps reais:
+  // "Front_Shield Bonus"/"ARMADURA" e os checkboxes de espaço de magia
+  // usado, jog-20) foi feito uma vez pra triagem manual e não compensa
+  // manter no output de toda rodada (maioria é falso positivo esperado:
+  // 2ª arma, perícia não escolhida, feat não marcado etc. — a fixture é
+  // enxuta de propósito). Se o número mudar deve MUITO de repente, vale
+  // reativar o dump (ver histórico do git) pra investigar.
+  console.log('  cobertura de exportação por classe (campo nunca tocado = candidato a "esquecido", a maioria por causa da fixture enxuta):');
+  for (const [classeNome, faltando] of Object.entries(relatorio)) {
+    console.log(`    ${classeNome}: ${faltando.length} campo(s) nunca tocado(s)`);
+  }
+
+  console.log(erros.length > antes
+    ? '  FALHOU     cobertura de exportação (ver FALHAS abaixo)'
+    : '  cobertura de exportação: as 12 classes exportam sem lançar erro e geram o PDF certo ok');
+}
+
 // Realtime — onUpdateExterno() (nucleo.js): o guard de eco só deve ignorar
 // o PRÓPRIO save desta aba (mesmo updated_by + salvou há pouco), não
 // QUALQUER update na janela de 3s — senão um update de verdade do Mestre
