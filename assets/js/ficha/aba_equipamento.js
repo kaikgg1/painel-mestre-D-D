@@ -83,6 +83,20 @@ function renderEquipamento(c) {
       <div class="adicionar-bloco">
         <button class="btn no-lock" type="button" id="btn-abrir-seletor-arma">${ico('buscar')} Adicionar arma do catálogo (${window.PHB.ARMAS.length})</button>
       </div>
+      <div class="adicionar-bloco" style="margin-top:6px">
+        <div class="campo"><label>Ou arma fora do catálogo</label><input type="text" id="add-arma-nome" placeholder="Nome da arma"></div>
+        <div class="campo" style="max-width:90px"><label>Dano</label><input type="text" id="add-arma-dano" placeholder="1d6"></div>
+        <div class="campo" style="max-width:120px"><label>Tipo de dano</label><input type="text" id="add-arma-tipodano" placeholder="Cortante"></div>
+        <div class="campo" style="max-width:130px"><label>Alcance</label>
+          <select id="add-arma-categoria">
+            <option value="Corpo a corpo">Corpo a corpo</option>
+            <option value="Distância">À distância</option>
+          </select>
+        </div>
+        <div class="campo"><label>Propriedades</label><input type="text" id="add-arma-propriedades" placeholder="Leve, Acuidade…"></div>
+        <div class="campo" style="max-width:90px"><label>Peso (kg)</label><input type="text" inputmode="decimal" id="add-arma-peso" placeholder="0"></div>
+        <button class="btn" type="button" id="btn-add-arma-custom">+ Adicionar</button>
+      </div>
     </div>
 
     <div class="bloco-equip">
@@ -94,6 +108,21 @@ function renderEquipamento(c) {
       ${renderTabelaItens('armaduras', inv.armaduras || [], ['Nome', 'CA', 'Tipo', 'Força mín.'], ['nome','ca','tipo','forca'])}
       <div class="adicionar-bloco">
         <button class="btn no-lock" type="button" id="btn-abrir-seletor-armadura">${ico('buscar')} Adicionar armadura do catálogo (${window.PHB.ARMADURAS.length})</button>
+      </div>
+      <div class="adicionar-bloco" style="margin-top:6px">
+        <div class="campo"><label>Ou armadura fora do catálogo</label><input type="text" id="add-armadura-nome" placeholder="Nome da armadura"></div>
+        <div class="campo" style="max-width:110px"><label>CA</label><input type="text" id="add-armadura-ca" placeholder="11 + DES"></div>
+        <div class="campo" style="max-width:130px"><label>Tipo</label>
+          <select id="add-armadura-tipo">
+            <option value="Leve">Leve</option>
+            <option value="Média">Média</option>
+            <option value="Pesada">Pesada</option>
+            <option value="Escudo">Escudo</option>
+          </select>
+        </div>
+        <div class="campo" style="max-width:100px"><label>Força mín.</label><input type="text" id="add-armadura-forca" placeholder="—"></div>
+        <div class="campo" style="max-width:90px"><label>Peso (kg)</label><input type="text" inputmode="decimal" id="add-armadura-peso" placeholder="0"></div>
+        <button class="btn" type="button" id="btn-add-armadura-custom">+ Adicionar</button>
       </div>
     </div>
 
@@ -109,8 +138,9 @@ function renderEquipamento(c) {
         <div class="campo" style="max-width:80px"><label>Qtd</label><input type="text" inputmode="numeric" id="add-item-qtd" value="1"></div>
       </div>
       <div class="adicionar-bloco" style="margin-top:6px">
-        <div class="campo"><label>Ou item personalizado</label><input type="text" id="add-item-nome" placeholder="Nome do item"></div>
+        <div class="campo"><label>Ou item fora do catálogo</label><input type="text" id="add-item-nome" placeholder="Nome do item"></div>
         <div class="campo" style="max-width:80px"><label>Qtd</label><input type="text" inputmode="numeric" id="add-item-qtd-custom" value="1"></div>
+        <div class="campo" style="max-width:90px"><label>Peso (kg)</label><input type="text" inputmode="decimal" id="add-item-peso-custom" placeholder="0"></div>
         <button class="btn" type="button" id="btn-add-item-custom">+ Adicionar</button>
       </div>
     </div>

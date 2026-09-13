@@ -1131,9 +1131,57 @@ console.log('');
     if (!(window.eval('charAtivo.inventario.itens') || []).length) erros.push('equipamento: seletor de item (ITENS+FERRAMENTAS) não adicionou nada');
   } catch (e) { erros.push('equipamento: seletor de armadura/item → ' + e.message); }
 
+  // Arma/armadura/item FORA do catálogo (jog-17): preenche o formulário e
+  // clica em "+ Adicionar" — confere que o peso digitado (não mais travado
+  // em "—") entra certo no inventário e soma na barra de carga.
+  try {
+    const setVal = (id, v) => { const el = window.document.getElementById(id); el.value = v; el.dispatchEvent(new window.Event('input', { bubbles: true })); };
+
+    setVal('add-arma-nome', 'Facão de Barovia');
+    setVal('add-arma-dano', '1d8');
+    setVal('add-arma-tipodano', 'Cortante');
+    window.document.getElementById('add-arma-categoria').value = 'Distância';
+    setVal('add-arma-propriedades', 'Acuidade, Arremesso');
+    setVal('add-arma-peso', '1,5');
+    window.document.getElementById('btn-add-arma-custom')?.click();
+    const armasCustom = window.eval('charAtivo.inventario.armas') || [];
+    const armaCustom = armasCustom.find(a => a.nome === 'Facão de Barovia');
+    if (!armaCustom) erros.push('equipamento: arma fora do catálogo não foi adicionada');
+    else {
+      if (armaCustom.peso !== 1.5) erros.push('equipamento: peso da arma personalizada veio "' + armaCustom.peso + '" (esperava 1.5 — aceita vírgula PT-BR)');
+      if (!window.Ataques?.ehDistancia(armaCustom)) erros.push('equipamento: categoria "Distância" da arma personalizada não foi reconhecida como arma à distância');
+    }
+
+    setVal('add-armadura-nome', 'Couraça de Vistani');
+    setVal('add-armadura-ca', '13 + DES');
+    window.document.getElementById('add-armadura-tipo').value = 'Média';
+    setVal('add-armadura-forca', 'F11');
+    setVal('add-armadura-peso', '8');
+    window.document.getElementById('btn-add-armadura-custom')?.click();
+    const armadurasCustom = window.eval('charAtivo.inventario.armaduras') || [];
+    const armaduraCustom = armadurasCustom.find(a => a.nome === 'Couraça de Vistani');
+    if (!armaduraCustom) erros.push('equipamento: armadura fora do catálogo não foi adicionada');
+    else if (armaduraCustom.peso !== 8) erros.push('equipamento: peso da armadura personalizada veio "' + armaduraCustom.peso + '" (esperava 8)');
+
+    setVal('add-item-nome', 'Amuleto de família');
+    setVal('add-item-qtd-custom', '1');
+    setVal('add-item-peso-custom', '0,3');
+    window.document.getElementById('btn-add-item-custom')?.click();
+    const itensCustom = window.eval('charAtivo.inventario.itens') || [];
+    const itemCustom = itensCustom.find(it => it.nome === 'Amuleto de família');
+    if (!itemCustom) erros.push('equipamento: item fora do catálogo não foi adicionado');
+    else if (itemCustom.peso !== 0.3) erros.push('equipamento: peso do item personalizado veio "' + itemCustom.peso + '" (esperava 0.3 — antes ficava travado em "—")');
+
+    // A barra de carga (calcularCarga) precisa refletir os 3 pesos novos —
+    // senão o peso digitado "existe" no dado mas não conta pra sobrecarga.
+    const cargaTxt = window.document.getElementById('carga-total')?.textContent || '';
+    const cargaNum = parseFloat(cargaTxt.replace(',', '.'));
+    if (!(cargaNum >= 1.5 + 8 + 0.3)) erros.push('equipamento: barra de carga (' + cargaTxt + ') não parece somar os pesos dos itens fora do catálogo');
+  } catch (e) { erros.push('equipamento: adicionar fora do catálogo (com peso) → ' + e.message); }
+
   console.log(erros.length > antes
     ? '  FALHOU     equipamento (ver FALHAS abaixo)'
-    : '  aba equipamento: seletor (busca real em PHB.ARMAS) + card de arma com bônus + rolar + remover + recentes ok');
+    : '  aba equipamento: seletor (busca real em PHB.ARMAS) + card de arma com bônus + rolar + remover + recentes + arma/armadura/item fora do catálogo com peso ok');
 }
 
 // Aliados (Fase 8): o "Corvo" do PJ de teste começa RECOLHIDO por padrão

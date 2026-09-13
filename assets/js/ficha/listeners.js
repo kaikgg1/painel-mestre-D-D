@@ -628,10 +628,46 @@ function conectarListenersEquipamento() {
   if (btnItemCustom) btnItemCustom.addEventListener('click', () => {
     const nome = $('#add-item-nome').value.trim();
     const qtd = +($('#add-item-qtd-custom').value || 1);
+    const peso = parseNum($('#add-item-peso-custom').value, { padrao: 0 }) ?? 0;
     if (!nome) return;
     const inv = charAtivo.inventario || {};
     inv.itens = inv.itens || [];
-    inv.itens.push({ nome, qtd, peso: '—' });
+    inv.itens.push({ nome, qtd, peso });
+    charAtivo.inventario = inv;
+    render();
+  });
+
+  // Arma fora do catálogo — mesmo formato de assets/js/phb_catalogo.js
+  // (Ataques.calcular() lê dano/categoria/propriedades pra achar bônus de
+  // ataque/dano e detectar arma à distância/com Acuidade).
+  const btnArmaCustom = $('#btn-add-arma-custom');
+  if (btnArmaCustom) btnArmaCustom.addEventListener('click', () => {
+    const nome = $('#add-arma-nome').value.trim();
+    if (!nome) return;
+    const dano = $('#add-arma-dano').value.trim();
+    const tipo_dano = $('#add-arma-tipodano').value.trim();
+    const categoria = $('#add-arma-categoria').value;
+    const propriedades = $('#add-arma-propriedades').value.trim();
+    const peso = parseNum($('#add-arma-peso').value, { padrao: 0 }) ?? 0;
+    const inv = charAtivo.inventario || {};
+    inv.armas = inv.armas || [];
+    inv.armas.push({ nome, dano: dano || '—', tipo_dano: tipo_dano || '—', categoria, propriedades: propriedades || '—', peso });
+    charAtivo.inventario = inv;
+    render();
+  });
+
+  // Armadura fora do catálogo
+  const btnArmaduraCustom = $('#btn-add-armadura-custom');
+  if (btnArmaduraCustom) btnArmaduraCustom.addEventListener('click', () => {
+    const nome = $('#add-armadura-nome').value.trim();
+    if (!nome) return;
+    const ca = $('#add-armadura-ca').value.trim();
+    const tipo = $('#add-armadura-tipo').value;
+    const forca = $('#add-armadura-forca').value.trim();
+    const peso = parseNum($('#add-armadura-peso').value, { padrao: 0 }) ?? 0;
+    const inv = charAtivo.inventario || {};
+    inv.armaduras = inv.armaduras || [];
+    inv.armaduras.push({ nome, ca: ca || '—', tipo, forca: forca || '—', peso });
     charAtivo.inventario = inv;
     render();
   });
