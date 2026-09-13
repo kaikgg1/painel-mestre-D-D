@@ -163,15 +163,28 @@ function melhorPorPrefixo(habs, prefixo) {
 }
 
 // ── pdf-lib: preencher por nome de campo sem quebrar se o campo não existir ──
-function setTexto(idx, nomes, valor) {
+// Todo campo de texto nesses PDFs vem com tamanho de fonte AUTOMÁTICO (0 Tf
+// no /DA) — funciona bem pros campos numéricos curtos (PV, CA, atributos:
+// pdf-lib acerta o tamanho e ainda fica com aquele efeito "número grande e
+// chamativo" que o próprio molde pretendia). Mas quebra feio em campos
+// pensados pra texto corrido (traços raciais, mochila, características de
+// classe...): com pouco texto numa caixa alta, o auto-tamanho às vezes
+// escolhe uma fonte gigante que estoura a caixa (viu isso ao vivo: "Toque
+// da Morte" ocupando a caixa inteira). Por isso esses campos passam
+// `tamanhoFonte` explícito — os numéricos continuam em auto (omitido).
+function setTexto(idx, nomes, valor, tamanhoFonte) {
   if (valor === null || valor === undefined || valor === '') return;
   for (const nome of (Array.isArray(nomes) ? nomes : [nomes])) {
     const campo = idx.get(nome);
     if (campo && typeof campo.setText === 'function') {
-      try { campo.setText(String(valor)); } catch (e) { /* campo com fonte incompatível — ignora só esse */ }
+      try {
+        if (tamanhoFonte && typeof campo.setFontSize === 'function') campo.setFontSize(tamanhoFonte);
+        campo.setText(String(valor));
+      } catch (e) { /* campo com fonte incompatível — ignora só esse */ }
     }
   }
 }
+const FONTE_TEXTO_LIVRE = 8;
 function setCheck(idx, nomes, marcado) {
   for (const nome of (Array.isArray(nomes) ? nomes : [nomes])) {
     const campo = idx.get(nome);
@@ -191,7 +204,8 @@ function habilidadesDoPersonagem(HAB, chave, c) {
 function preencherIdentidade(idx, c) {
   setTexto(idx, ['Front_Character Name', 'Back_Character Name'], c.nome);
   setTexto(idx, 'Front_Race', c.raca);
-  setTexto(idx, ['Front_Background', 'Back_Background'], c.origem);
+  setTexto(idx, 'Front_Background', c.origem);
+  setTexto(idx, 'Back_Background', c.origem, FONTE_TEXTO_LIVRE);
   setTexto(idx, 'Front_Alignment', c.alinhamento);
   setTexto(idx, 'Front_XP', c.xp);
   setTexto(idx, 'Front_Level', c.nivel || 1);
@@ -201,9 +215,9 @@ function preencherIdentidade(idx, c) {
   setTexto(idx, ['Front_Passive Perception', 'Passive'], 10 + valorPericia(c, 'percepcao', 'sab'));
   setTexto(idx, 'Front_Passive Insight', 10 + valorPericia(c, 'intuicao', 'sab'));
   setTexto(idx, ['Front_Inspiration', 'Inspiration'], (+c.inspiracao || 0) > 0 ? String(+c.inspiracao) : '');
-  setTexto(idx, 'Front_Racial Traits', c.tracos_raciais);
-  setTexto(idx, 'Front_Languages', (c.idiomas || ['Comum']).join(', '));
-  setTexto(idx, 'Front_Tools', (c.ferramentas || []).join(', '));
+  setTexto(idx, 'Front_Racial Traits', c.tracos_raciais, FONTE_TEXTO_LIVRE);
+  setTexto(idx, 'Front_Languages', (c.idiomas || ['Comum']).join(', '), FONTE_TEXTO_LIVRE);
+  setTexto(idx, 'Front_Tools', (c.ferramentas || []).join(', '), FONTE_TEXTO_LIVRE);
 
   const profs = PROFICIENCIAS_POR_CLASSE[chaveDeClasse(c.classe)];
   if (profs) {
@@ -262,17 +276,17 @@ function preencherCombate(idx, c) {
 }
 
 function preencherPaginaTras(idx, c) {
-  setTexto(idx, 'Back_Personality Traits', c.tracos_pessoais);
-  setTexto(idx, 'Back_Ideals', c.ideais);
-  setTexto(idx, 'Back_Bonds', c.vinculos);
-  setTexto(idx, 'Back_Flaws', c.defeitos);
+  setTexto(idx, 'Back_Personality Traits', c.tracos_pessoais, FONTE_TEXTO_LIVRE);
+  setTexto(idx, 'Back_Ideals', c.ideais, FONTE_TEXTO_LIVRE);
+  setTexto(idx, 'Back_Bonds', c.vinculos, FONTE_TEXTO_LIVRE);
+  setTexto(idx, 'Back_Flaws', c.defeitos, FONTE_TEXTO_LIVRE);
   const extras = [];
   if (c.historia) extras.push('História: ' + c.historia);
   if (c.caracteristicas_adicionais) extras.push(c.caracteristicas_adicionais);
   if (Array.isArray(c.features_personalizadas)) {
     c.features_personalizadas.forEach(f => { if (f?.nome) extras.push(`${f.nome}: ${f.desc || ''}`.trim()); });
   }
-  setTexto(idx, 'Back_Additional Features & Traits', extras.join('\n\n'));
+  setTexto(idx, 'Back_Additional Features & Traits', extras.join('\n\n'), FONTE_TEXTO_LIVRE);
 
   const m = c.inventario?.moedas || {};
   setTexto(idx, 'Back_CP', m.pc || '');
@@ -285,7 +299,7 @@ function preencherPaginaTras(idx, c) {
   (c.inventario?.armas || []).forEach(a => linhas.push(a.nome));
   (c.inventario?.armaduras || []).forEach(a => linhas.push(a.nome));
   (c.inventario?.itens || []).forEach(it => linhas.push(it.qtd > 1 ? `${it.nome} ×${it.qtd}` : it.nome));
-  setTexto(idx, 'Back_Backpack', linhas.join('\n'));
+  setTexto(idx, 'Back_Backpack', linhas.join('\n'), FONTE_TEXTO_LIVRE);
 }
 
 function preencherHabilidadesFixas(idx, c, HAB) {
@@ -296,9 +310,9 @@ function preencherHabilidadesFixas(idx, c, HAB) {
     const pool = def.apenasSubclasse ? habs.filter(h => h.subclasse) : habs;
     const h = melhorPorPrefixo(pool, def.prefixo);
     if (!h) continue;
-    if (def.modo === 'desc') setTexto(idx, def.campo, h.desc);
-    else if (def.modo === 'parenteses') setTexto(idx, def.campo, extrairParenteses(h.nome));
-    else if (def.modo === 'nome') setTexto(idx, def.campo, h.nome.slice(def.prefixo.length).trim());
+    if (def.modo === 'desc') setTexto(idx, def.campo, h.desc, FONTE_TEXTO_LIVRE);
+    else if (def.modo === 'parenteses') setTexto(idx, def.campo, extrairParenteses(h.nome), FONTE_TEXTO_LIVRE);
+    else if (def.modo === 'nome') setTexto(idx, def.campo, h.nome.slice(def.prefixo.length).trim(), FONTE_TEXTO_LIVRE);
   }
 
   const recursos = window.RecursosClasse ? RecursosClasse.recursosPara(c, c.atributos) : [];
@@ -309,9 +323,9 @@ function preencherHabilidadesFixas(idx, c, HAB) {
     setTexto(idx, def.total, r.max);
   }
 
-  if (chave === 'barbaro') setTexto(idx, 'Front_Rage Damage', danoFuriaBarbaro(+c.nivel || 1));
-  if (chave === 'druida') setTexto(idx, 'Front_Wild Shape Max CR', cdMaximoFormaSelvagem(+c.nivel || 1));
-  if (chave === 'monge') setTexto(idx, 'Front_Martial Arts Die', dadoArtesMarciaisMonge(+c.nivel || 1));
+  if (chave === 'barbaro') setTexto(idx, 'Front_Rage Damage', danoFuriaBarbaro(+c.nivel || 1), FONTE_TEXTO_LIVRE);
+  if (chave === 'druida') setTexto(idx, 'Front_Wild Shape Max CR', cdMaximoFormaSelvagem(+c.nivel || 1), FONTE_TEXTO_LIVRE);
+  if (chave === 'monge') setTexto(idx, 'Front_Martial Arts Die', dadoArtesMarciaisMonge(+c.nivel || 1), FONTE_TEXTO_LIVRE);
 
   // Características de subclasse por nível (só existem no catálogo pra
   // Domínio da Morte / Quebrador de Juramento — nas demais fica em branco).
@@ -326,7 +340,7 @@ function preencherHabilidadesFixas(idx, c, HAB) {
       porNivel.set(h.nivel, [...(porNivel.get(h.nivel) || []), texto]);
     });
     porNivel.forEach((textos, nivel) => {
-      for (const prefixoCampo of prefixosCampo) setTexto(idx, `${prefixoCampo} ${nivel}`, textos.join(' | '));
+      for (const prefixoCampo of prefixosCampo) setTexto(idx, `${prefixoCampo} ${nivel}`, textos.join(' | '), FONTE_TEXTO_LIVRE);
     });
   }
 
@@ -340,7 +354,7 @@ function preencherHabilidadesFixas(idx, c, HAB) {
     !h.subclasse
   );
   const resumo = sobrando.map(h => `${h.nome}: ${h.desc}`).join('\n');
-  setTexto(idx, 'Front_Additional Combat Features', resumo);
+  setTexto(idx, 'Front_Additional Combat Features', resumo, FONTE_TEXTO_LIVRE);
 }
 
 async function preencherConjuracao(idx, c) {

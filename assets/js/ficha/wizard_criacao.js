@@ -135,7 +135,7 @@ function abrirWizardCriacao() {
   function renderPasso0() {
     corpo.innerHTML = `
       <div class="campo"><label>Nome do Personagem *</label>
-        <input type="text" id="wz-nome" value="${escapeHtmlWizard(state.nome)}" placeholder="Ex.: Elara Ventoluz"></div>
+        <input type="text" id="wz-nome" autocomplete="off" value="${escapeHtmlWizard(state.nome)}" placeholder="Ex.: Elara Ventoluz"></div>
       <div class="grid-2">
         <div class="campo"><label>Raça *</label>
           <select id="wz-raca">${RACAS.map(r => `<option value="${escapeHtmlWizard(r)}" ${r===state.raca?'selected':''}>${r || '— selecione —'}</option>`).join('')}</select></div>

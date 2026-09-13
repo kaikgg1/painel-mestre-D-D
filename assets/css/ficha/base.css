@@ -388,6 +388,19 @@ h3:first-of-type { margin-top: 0; }
   border-radius: var(--r-sm); outline: none;
   transition: border-color 0.15s, background 0.15s;
 }
+/* Autofill do navegador (Chrome/Edge) pinta o campo de amarelo/branco por
+   cima de QUALQUER background-color no CSS — típico em campos de "nome"
+   assim que o navegador reconhece o padrão. O truque padrão: uma
+   box-shadow inset gigante do mesmo tom do input "tampa" o amarelo, e
+   -webkit-text-fill-color troca a cor do texto (color: sozinho não
+   funciona em campo autofilled). */
+.campo input:-webkit-autofill,
+.campo input:-webkit-autofill:hover,
+.campo input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--parchment);
+  -webkit-box-shadow: 0 0 0 1000px var(--sf-inset) inset;
+  transition: background-color 9999s ease-in-out 0s;
+}
 .campo input:hover, .campo select:hover, .campo textarea:hover { border-color: var(--borda-forte); }
 .campo input:focus, .campo select:focus, .campo textarea:focus {
   border-color: var(--borda-ouro); background: rgba(255,255,255,0.05);

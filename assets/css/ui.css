@@ -56,13 +56,25 @@ select optgroup {
   background-color: #1a1018;
   color: #d4c5a0;
   font-size: 14px;
-  padding: 10px 12px;
+  padding: 11px 14px;
   line-height: 1.5;
 }
 select option:checked,
 select option:hover {
   background-color: #2a1a28;
   color: #e8c87a;
+}
+/* Placeholder ("— selecione —", value="") visualmente diferente de uma
+   opção de verdade — itálico e mais apagado, sinaliza "nada escolhido
+   ainda" sem precisar de JS. Navegadores Chromium ainda pintam a opção
+   com foco de teclado em azul do SO dentro do popup nativo — isso não dá
+   pra sobrescrever via CSS (limitação conhecida do <select> nativo); a
+   alternativa seria abrir mão do popup nativo (perde navegação por
+   teclado/comportamento mobile correto de graça), então não vale a troca
+   só por causa da cor de destaque do teclado. */
+select option[value=""] {
+  font-style: italic;
+  color: #9a8a6a;
 }
 select optgroup {
   color: #b88a2c;
