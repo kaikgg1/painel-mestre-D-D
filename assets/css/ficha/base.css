@@ -307,7 +307,12 @@ main { max-width: var(--ficha-max); margin: var(--sp-5) auto; padding: 0 var(--s
 .tabs {
   display: flex; gap: var(--sp-1); margin-bottom: 0;
   border-bottom: 1px solid var(--borda);
-  overflow-x: auto; scrollbar-width: thin;
+  /* overflow-y precisa ser explícito: com só overflow-x:auto e o eixo Y em
+     "visible" (padrão), a spec de CSS recalcula Y pra "auto" também — daí
+     qualquer sobra mínima de altura (padding/line-height) já bastava pra
+     essa barra ganhar uma barra de rolagem VERTICAL que não faz sentido
+     nenhum numa fileira de abas que só rola de lado. */
+  overflow-x: auto; overflow-y: hidden; scrollbar-width: thin;
   scroll-snap-type: x proximity;
   -webkit-overflow-scrolling: touch;
 }
