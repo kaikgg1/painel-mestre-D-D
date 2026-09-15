@@ -176,10 +176,16 @@
     padding-right: 96px;  /* espaço das tags, que dividem a mesma área */
   }
   .magia-tags { grid-area: meta; justify-self: end; align-self: center; }
-  .magia-fav-btn { grid-area: fav; width: 40px; height: 40px; font-size: 16px; align-self: center; }
+  .magia-fav-btn { grid-area: fav; width: 44px; height: 44px; font-size: 16px; align-self: center; }
   .magia-chevron { grid-area: chev; align-self: center; }
   .magia-info { grid-template-columns: 1fr 1fr; }
   .magia-detalhe { padding: 0 12px 14px; }
+  /* Conjurar é a ação principal desta aba — 36px (herdado do desktop) é
+     pequeno demais pra tocar com confiança. Botão ocupa a largura toda
+     (mais fácil de acertar e mais visível que um botão pequeno alinhado
+     à direita). */
+  .magia-conjurar-bar { flex-wrap: wrap; }
+  .btn-conjurar { min-height: var(--touch-target-lg, 48px); width: 100%; font-size: 13px; }
   .modal-card { padding: 18px; max-width: 100%; }
   .modal-slots { grid-template-columns: repeat(3, 1fr); gap: 6px; }
   .modal-slot-btn { min-height: 70px; padding: 8px 4px; }

@@ -457,7 +457,16 @@
   .slots-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
   .slot-card { padding: 10px 8px; }
   .slot-card .slot-max { font-size: 20px; }
-  .slot-pip { width: 22px; height: 22px; }
+  /* Pip continua visualmente compacto (26px, cabem vários numa linha só) —
+     o toque real é maior graças ao ::after abaixo, sem virar uma bolinha
+     gigante. Mais gap entre pips pra essa área invisível não se sobrepor
+     demais entre pips vizinhos. */
+  .slot-pips { gap: 10px; }
+  .slot-pip { position: relative; width: 26px; height: 26px; }
+  .slot-pip::after {
+    content: ''; position: absolute; inset: 50%;
+    width: 38px; height: 38px; transform: translate(-50%, -50%);
+  }
   /* Níveis SEM espaço nenhum somem no mobile (renderSlotsMagia marca com
      data-vazio="1"). Um PJ de nível 3 via 7 cards "indisponível" ocupando
      meia tela. No desktop continuam listados — é só exibição, o cálculo de

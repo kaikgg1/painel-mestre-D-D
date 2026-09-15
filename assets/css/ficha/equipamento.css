@@ -90,13 +90,25 @@
   font-family: var(--f-ui); font-size: 11px; letter-spacing: 1px; text-transform: uppercase;
 }
 .item-tabela tr:last-child td { border-bottom: none; }
-.item-tabela .lixo {
+/* Botão de remover (✕) — círculo pequeno e discreto (não é elemento
+   principal do card, não precisa chamar atenção). Usado em .item-tabela
+   (armaduras/itens) e em .equip-arma-rm (armas, ver abaixo). */
+.lixo {
+  position: relative;
+  display: inline-flex; align-items: center; justify-content: center;
   background: transparent; border: 1px solid rgba(138,70,64,0.4); color: #a56b5a;
-  padding: 3px 8px; border-radius: 2px; cursor: pointer; font-size: 12px;
-  transition: all 0.15s;
-  min-height: 28px; min-width: 28px;
+  width: 26px; height: 26px; padding: 0; border-radius: 50%; cursor: pointer; font-size: 13px;
+  line-height: 1;
+  transition: background .15s, color .15s, border-color .15s;
 }
-.item-tabela .lixo:hover { background: var(--blood); color: var(--parchment); }
+.lixo:hover { background: var(--blood); color: var(--parchment); border-color: var(--blood); }
+/* Alvo de toque de 44px SEM aumentar o botão visualmente — pseudo-elemento
+   invisível estica a área clicável além do círculo pequeno. */
+.lixo::after {
+  content: ''; position: absolute; inset: 50%;
+  width: max(44px, 100%); height: max(44px, 100%);
+  transform: translate(-50%, -50%);
+}
 .item-vazio { padding: 18px; text-align: center; color: var(--text-dim); font-style: italic; }
 
 /* MOBILE: tabela vira cards verticais (cada linha = um card).
@@ -136,8 +148,10 @@
     padding: 0; margin: 0; border: none;
   }
   .item-tabela td:last-child::before { content: ''; min-width: 0; }
-  .item-tabela tr { padding-right: 56px; }
-  .item-tabela .lixo { min-height: 44px; min-width: 44px; padding: 4px 10px; font-size: 15px; }
+  .item-tabela tr { padding-right: 44px; }
+  /* O círculo continua pequeno (visual elegante) — só o pseudo-elemento
+     ::after (definido acima) garante os 44px de toque. */
+  .item-tabela .lixo { width: 30px; height: 30px; font-size: 14px; }
 }
 
 .adicionar-bloco { display: flex; gap: 8px; align-items: end; margin-top: 14px; flex-wrap: wrap; }
@@ -151,10 +165,7 @@
    remover, linha de propriedades) mora aqui. */
 .equip-armas-lista { margin-top: 4px; }
 .equip-armas-lista .ataque-card { position: relative; padding-right: 40px; }
-.equip-arma-rm {
-  position: absolute; top: 8px; right: 8px;
-  min-height: 28px; min-width: 28px;
-}
+.equip-arma-rm { position: absolute; top: 8px; right: 8px; }
 .equip-arma-props {
   flex-basis: 100%; font-size: 12px; color: var(--text-dim); font-style: italic;
   order: 3;
@@ -225,10 +236,11 @@
   .moeda-box { padding: 8px 4px 6px; }
   .moeda-box input { min-height: var(--touch-target); font-size: 20px; }
 
-  /* Cards de arma: botão de atacar e de remover com alvo confortável */
-  .equip-armas-lista .ataque-card { padding-right: 52px; }
+  /* Cards de arma: botão de atacar em largura confortável; o de remover
+     continua um círculo pequeno (.lixo já garante 44px de toque via ::after). */
+  .equip-armas-lista .ataque-card { padding-right: 40px; }
   .equip-armas-lista .ataque-card .btn { min-height: var(--touch-target); width: 100%; }
-  .equip-arma-rm { min-height: 40px; min-width: 40px; }
+  .equip-arma-rm { width: 30px; height: 30px; font-size: 14px; }
 
   .carga-bar { padding: 10px 12px; }
 }
