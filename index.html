@@ -297,7 +297,7 @@
 
   <span class="crest" aria-hidden="true" data-ico="campanha"></span>
 
-  <h1 class="title">Painel do Mestre</h1>
+  <h1 class="title" id="titulo-painel">Painel do Mestre</h1>
   <p class="subtitle">Escolha a Campanha</p>
 
   <div class="divider"></div>
@@ -374,7 +374,7 @@
 
   </div>
 
-  <div class="footer">D&amp;D 5ª Edição · Painel do Mestre</div>
+  <div class="footer" id="footer-painel">D&amp;D 5ª Edição · Painel do Mestre</div>
 
 </div>
 
@@ -389,6 +389,19 @@
     window.Auth.renderHeader('#auth-slot');
 
     const mestre = await window.Auth.ehMestre();
+
+    // Título/rodapé/aba mudam pra "Painel do Jogador" pra quem não é o
+    // Mestre — a tela é a mesma pros dois papéis, só o nome que fica errado
+    // (jogador via "Painel do Mestre" mesmo logado como jogador).
+    if (!mestre) {
+      const nomePainel = 'Painel do Jogador';
+      document.title = document.title.replace('Painel do Mestre', nomePainel);
+      const tituloEl = document.getElementById('titulo-painel');
+      if (tituloEl) tituloEl.textContent = nomePainel;
+      const footerEl = document.getElementById('footer-painel');
+      if (footerEl) footerEl.innerHTML = footerEl.innerHTML.replace('Painel do Mestre', nomePainel);
+    }
+
     document.querySelectorAll('.campaign-card').forEach(card => {
       const role = card.dataset.role;
       if (role === 'todos') {
