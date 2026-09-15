@@ -172,11 +172,20 @@ function conectarListenersHeader() {
     document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharMenuAcoes(); });
   }
 
+  // "+ Novo personagem" e "⧉ Duplicar" trocam `charAtivo` pra um objeto
+  // novo (mesma classe de ação que trocar de personagem no seletor ou
+  // travar/destravar) — sem dar flush primeiro, uma edição ainda não salva
+  // na ficha ATUAL (ex.: acabou de mexer no HP ou adicionar uma arma) nunca
+  // mais é enviada: o formulário some do DOM no render() seguinte antes de
+  // qualquer blur/change disparar o autosave. Mesmo padrão dos outros dois.
   const novoBtn = document.getElementById('btn-novo');
   if (novoBtn) novoBtn.addEventListener('click', async () => {
     fecharMenuAcoes();
     const nome = prompt('Nome do novo personagem:');
-    if (nome) await criarPersonagem(nome);
+    if (!nome) return;
+    const form = document.getElementById('ficha-form');
+    if (form) form.dispatchEvent(new Event('submit', { cancelable: true }));
+    await criarPersonagem(nome);
   });
   const wizardBtn = document.getElementById('btn-wizard');
   if (wizardBtn) wizardBtn.addEventListener('click', () => { fecharMenuAcoes(); abrirWizardCriacao(); });
@@ -185,6 +194,8 @@ function conectarListenersHeader() {
   const duplicarBtn = document.getElementById('btn-duplicar');
   if (duplicarBtn) duplicarBtn.addEventListener('click', async () => {
     fecharMenuAcoes();
+    const form = document.getElementById('ficha-form');
+    if (form) form.dispatchEvent(new Event('submit', { cancelable: true }));
     await duplicarPersonagem();
   });
   const ativoBtn = document.getElementById('btn-ativo');

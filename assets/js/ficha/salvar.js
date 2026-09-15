@@ -37,7 +37,15 @@ async function salvar(e) {
 
   const f = e.target;
   const fd = new FormData(f);
-  const payload = { ...charAtivo };  // começa com o estado atual (preserva tabs não-renderizadas)
+  // Captura o personagem-alvo AGORA (antes do await lá embaixo). `charAtivo`
+  // é uma variável global mutável — se o jogador trocar de personagem, criar
+  // um novo (+Novo personagem) ou destravar/travar enquanto este save ainda
+  // está em voo (rede lenta), `charAtivo` muda de objeto NO MEIO desta
+  // função. Usar `charAtivo` de novo depois do await (como este código fazia
+  // antes) aplicava o resultado no personagem ERRADO — a causa raiz de
+  // equipamento/HP de um personagem aparecerem salvos em outro.
+  const alvo = charAtivo;
+  const payload = { ...alvo };  // começa com o estado atual (preserva tabs não-renderizadas)
 
   // Helpers
   const num = (k, intt = true) => {
@@ -63,8 +71,8 @@ async function salvar(e) {
   }
   set('tracos_raciais', txt('tracos_raciais'));
   // idiomas e ferramentas (arrays) — pegam direto do estado (mantidos pelos handlers de tag)
-  if (charAtivo.idiomas !== undefined)     payload.idiomas = charAtivo.idiomas;
-  if (charAtivo.ferramentas !== undefined) payload.ferramentas = charAtivo.ferramentas;
+  if (alvo.idiomas !== undefined)     payload.idiomas = alvo.idiomas;
+  if (alvo.ferramentas !== undefined) payload.ferramentas = alvo.ferramentas;
 
   // Atributos (só se tab identidade)
   if (fd.has('attr_for')) {
@@ -81,7 +89,7 @@ async function salvar(e) {
   set('iniciativa_bonus', num('iniciativa_bonus'));
   set('deslocamento', num('deslocamento', false));  // decimal
   // Dado de vida sempre derivado da classe (não editável)
-  const dvDaClasse = dadoVidaDaClasse(payload.classe || charAtivo.classe);
+  const dvDaClasse = dadoVidaDaClasse(payload.classe || alvo.classe);
   if (dvDaClasse) payload.dado_vida_tipo = dvDaClasse;
   else set('dado_vida_tipo', num('dado_vida_tipo'));
   set('dado_vida_atual', num('dado_vida_atual'));
@@ -208,10 +216,10 @@ async function salvar(e) {
   // neste payload agora, senão o que já tinha em charAtivo) e grava sempre
   // — não tem "aba dona" pra isso ficar desatualizado feito slots_magia.
   payload.percepcao_passiva = percepcaoPassiva({
-    atributos: payload.atributos ?? charAtivo.atributos,
-    pericias: payload.pericias ?? charAtivo.pericias,
-    nivel: payload.nivel ?? charAtivo.nivel,
-    classes_secundarias: charAtivo.classes_secundarias,
+    atributos: payload.atributos ?? alvo.atributos,
+    pericias: payload.pericias ?? alvo.pericias,
+    nivel: payload.nivel ?? alvo.nivel,
+    classes_secundarias: alvo.classes_secundarias,
   });
 
   // Coerção forçada de tipos (evita "invalid input syntax for integer: false"
@@ -233,22 +241,41 @@ async function salvar(e) {
   }
 
   const { data, error } = await window.sb
-    .from('characters').update(payload).eq('id', charAtivo.id).select('*').single();
+    .from('characters').update(payload).eq('id', alvo.id).select('*').single();
 
+  // A PARTIR DAQUI o await já suspendeu a função — `charAtivo` (a variável
+  // global) pode ter mudado de objeto nesse meio-tempo (o jogador trocou de
+  // personagem, criou um novo, ou destravou/travou a ficha). É por isso que
+  // tudo abaixo usa `alvo` (capturado no início desta chamada) e NUNCA
+  // `charAtivo` de novo — usar `charAtivo` aqui era a causa raiz de HP,
+  // equipamento etc. de um personagem aparecerem salvos em outro quando dois
+  // saves se cruzavam (ex.: criar um personagem novo enquanto o autosave do
+  // anterior ainda estava em voo).
   if (error) {
-    definirStatusAutosave('erro', '⚠ <span class="txt">Erro ao salvar</span>');
+    // Só mostra erro se ainda estamos olhando pro personagem que falhou —
+    // senão a mensagem apareceria pro personagem ATUAL, sem relação com o erro.
+    if (charAtivo === alvo) {
+      definirStatusAutosave('erro', '⚠ <span class="txt">Erro ao salvar</span>');
+    }
     console.warn('[ficha] erro ao salvar:', error);
   } else {
     _ultimoSaveLocal = Date.now();   // pra ignorar echo do nosso save no realtime
     // Atualiza CAMPO POR CAMPO em vez de substituir o objeto inteiro
-    // (preserva edições em progresso de outros campos não-salvos)
-    Object.assign(charAtivo, payload);
-    chars = chars.map(c => c.id === charAtivo.id ? charAtivo : c);
-    definirStatusAutosave('ok', '✓ <span class="txt">Salvo · ' + new Date().toLocaleTimeString('pt-BR') + '</span>');
-    if (window.FX) FX.salvo(status);
-    setTimeout(() => {
-      if (status.classList.contains('ok')) definirStatusAutosave('ok', ico('salvar') + ' <span class="txt">Auto-save ativo</span>');
-    }, 2500);
+    // (preserva edições em progresso de outros campos não-salvos) — sempre
+    // no objeto `alvo` certo, nunca em quem quer que `charAtivo` seja agora.
+    Object.assign(alvo, payload);
+    chars = chars.map(c => c.id === alvo.id ? alvo : c);
+    // Feedback visual (badge "Salvo", confete etc.) só faz sentido se o
+    // personagem salvo ainda é o que está na tela — senão os elementos
+    // #status/#btn-salvar capturados lá em cima já nem existem mais no DOM
+    // (render() os substituiu quando o personagem trocou).
+    if (charAtivo === alvo) {
+      definirStatusAutosave('ok', '✓ <span class="txt">Salvo · ' + new Date().toLocaleTimeString('pt-BR') + '</span>');
+      if (window.FX) FX.salvo(status);
+      setTimeout(() => {
+        if (status.classList.contains('ok')) definirStatusAutosave('ok', ico('salvar') + ' <span class="txt">Auto-save ativo</span>');
+      }, 2500);
+    }
   }
   if (btn) btn.disabled = false;
 }
