@@ -1,17 +1,36 @@
 // assets/js/ficha/nav_mobile.js
 // Navegação inferior fixa do mobile (§18). Não hardcoda a lista de abas: lê
-// os botões .tab reais de #tabs (já renderizados por render.js) e mostra os
-// 4 primeiros + "Mais" para o resto — então esta barra se adapta sozinha
-// conforme abas são adicionadas/renomeadas em fases futuras (Resumo entra na
-// frente na Fase 3, Personagem substitui Identidade/Roleplay na Fase 9) sem
-// precisar tocar neste arquivo.
+// os botões .tab reais de #tabs (já renderizados por render.js) e monta a
+// barra a partir de uma lista de PRIORIDADE por data-tab, filtrada pelo que
+// realmente existe naquele render — então a barra se adapta sozinha quando
+// uma aba não existe (ex.: Magias só aparece pra classe conjuradora) ou
+// quando abas novas entram no futuro (caem no "Mais" sem tocar aqui).
+//
+// A ordem pedida é fixa: [Resumo] [Combate] [Magias] [Equip.] [Mais] — e
+// NÃO é a ordem do DOM das abas (onde Habilidades vem antes de Equipamento),
+// por isso a prioridade explícita em vez de "os N primeiros".
 //
 // Selecionar um item aqui dispara um click() no botão .tab correspondente —
 // reaproveita 100% da lógica de troca de aba já ligada em listeners.js
 // (flush do formulário, tabAtiva, render(), animação, carregamento assíncrono
 // da aba de magias) em vez de duplicá-la.
 
-const LIMITE_NAV_INFERIOR = 4;
+// Quem ganha lugar fixo na barra, nesta ordem. O resto vai pro "Mais".
+const PRIORIDADE_NAV_INFERIOR = ['resumo', 'combate', 'magias', 'equipamento'];
+
+// Emoji simples — o projeto já usa emoji em botões do header/menu ⋯, e um
+// <iconify-icon> por item custaria rede numa barra que aparece sempre.
+const ICONES_NAV_INFERIOR = {
+  resumo: '📋', combate: '⚔️', magias: '✨', equipamento: '🎒',
+  habilidades: '🌟', aliados: '🤝', personagem: '🧝', roleplay: '🎭',
+};
+// Rótulo curto SÓ na barra (o sheet "Mais" mostra o nome inteiro da aba).
+const ROTULOS_NAV_INFERIOR = { equipamento: 'Equip.' };
+
+function iconeNavInferior(chave) { return ICONES_NAV_INFERIOR[chave] || '•'; }
+function rotuloNavInferior(tab) {
+  return ROTULOS_NAV_INFERIOR[tab.dataset.tab] || tab.textContent.trim();
+}
 
 function renderBottomNav() {
   const nav = document.getElementById('bottom-nav');
@@ -19,15 +38,24 @@ function renderBottomNav() {
   const tabs = Array.from(document.querySelectorAll('#tabs .tab'));
   if (!tabs.length) { nav.innerHTML = ''; return; }
 
-  const principais = tabs.slice(0, LIMITE_NAV_INFERIOR);
-  const resto = tabs.slice(LIMITE_NAV_INFERIOR);
+  const principais = PRIORIDADE_NAV_INFERIOR
+    .map(chave => tabs.find(t => t.dataset.tab === chave))
+    .filter(Boolean);
+  // filter() preserva a ordem real das abas — o "Mais" lista na mesma
+  // sequência em que elas aparecem em #tabs.
+  const resto = tabs.filter(t => !principais.includes(t));
 
-  nav.innerHTML = principais.map(t => `
-      <button type="button" class="bn-item ${t.classList.contains('ativa') ? 'ativa' : ''}" data-bn-tab="${t.dataset.tab}">
-        <span class="bn-lbl">${escape(t.textContent.trim())}</span>
-      </button>`).join('')
+  nav.innerHTML = principais.map(t => {
+    const ativa = t.classList.contains('ativa');
+    return `
+      <button type="button" class="bn-item ${ativa ? 'ativa' : ''}" data-bn-tab="${t.dataset.tab}" ${ativa ? 'aria-current="page"' : ''}>
+        <span class="bn-ico" aria-hidden="true">${iconeNavInferior(t.dataset.tab)}</span>
+        <span class="bn-lbl">${escape(rotuloNavInferior(t))}</span>
+      </button>`;
+  }).join('')
     + (resto.length ? `
-      <button type="button" class="bn-item ${resto.some(t => t.classList.contains('ativa')) ? 'ativa' : ''}" id="bn-mais">
+      <button type="button" class="bn-item ${resto.some(t => t.classList.contains('ativa')) ? 'ativa' : ''}" id="bn-mais" aria-haspopup="dialog">
+        <span class="bn-ico" aria-hidden="true">⋯</span>
         <span class="bn-lbl">Mais</span>
       </button>` : '');
 
@@ -52,7 +80,10 @@ function abrirSheetMais(tabsRestantes) {
   overlay.innerHTML = `
     <div class="sheet-mais" role="dialog" aria-modal="true" aria-label="Mais opções">
       <div class="sheet-handle" aria-hidden="true"></div>
-      ${tabsRestantes.map(t => `<button type="button" class="sheet-item" data-sheet-tab="${t.dataset.tab}">${escape(t.textContent.trim())}</button>`).join('')}
+      ${tabsRestantes.map(t => `<button type="button" class="sheet-item ${t.classList.contains('ativa') ? 'ativa' : ''}" data-sheet-tab="${t.dataset.tab}">
+        <span class="sheet-ico" aria-hidden="true">${iconeNavInferior(t.dataset.tab)}</span>
+        <span>${escape(t.textContent.trim())}</span>
+      </button>`).join('')}
     </div>`;
   document.body.appendChild(overlay);
   requestAnimationFrame(() => overlay.classList.add('open'));

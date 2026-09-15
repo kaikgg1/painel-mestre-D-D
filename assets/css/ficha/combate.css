@@ -138,17 +138,26 @@
 .hp-quick button.q-dano:hover { background: rgba(138,70,64,0.3); color: var(--parchment); border-color: var(--blood-bright); }
 .hp-quick button.q-cura { border-color: rgba(46,134,46,0.5); color: #7a8a5e; }
 .hp-quick button.q-cura:hover { background: rgba(46,134,46,0.25); color: var(--parchment); border-color: #4a5233; }
-@media (max-width: 640px) {
-  .hp-aplicar-linha input { width: 70px; font-size: 17px; padding: 10px; min-height: 42px; }
-  .hp-btn { padding: 10px 14px; font-size: 12px; min-height: 42px; }
-  .hp-quick { grid-template-columns: repeat(4, 1fr); gap: 6px; }
-  .hp-quick button { font-size: 12px; padding: 10px 4px; min-height: 40px; }
+/* Mobile: [DANO] [valor] [CURA] continua a MESMA linha (só maior e com o
+   campo no meio ganhando prioridade de espaço), e os 8 atalhos quebram em
+   2 fileiras de 4 — espremer 8 botões numa faixa de 360px daria alvos de
+   ~35px, abaixo do mínimo de toque. */
+@media (max-width: 767px) {
+  .hp-aplicar-linha { gap: var(--space-2, 8px); flex-wrap: nowrap; }
+  .hp-aplicar-linha input { width: auto; flex: 1 1 60px; min-width: 56px; font-size: 17px; padding: 10px 6px; min-height: var(--touch-target-lg, 48px); }
+  .hp-btn { flex: 0 0 auto; padding: 10px 12px; font-size: 12px; min-height: var(--touch-target-lg, 48px); }
+  .hp-quick { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
+  .hp-quick button { font-size: 14px; padding: 10px 2px; min-height: var(--touch-target, 44px); }
+}
+@media (max-width: 380px) {
+  .hp-btn { padding: 10px 8px; font-size: 11px; letter-spacing: .5px; }
+  .hp-quick button { font-size: 13px; }
 }
 
 /* Stats menores (dado de vida, DV restantes, exaustão) — Deslocamento saiu
    daqui na Fase 4, foi promovido pro .stat-row do topo. */
 .stats-mini { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 0 0 var(--sp-4); }
-@media (max-width: 560px) { .stats-mini { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 767px) { .stats-mini { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-2, 8px); } }
 .stat-mini {
   background: var(--sf-inset);
   border: 1px solid var(--borda);
@@ -277,12 +286,16 @@
 .lista-tags-add input { flex: 1; }
 
 /* ============ RESPONSIVIDADE ============ */
+/* Este bloco nasceu como o "@media global" da ficha inteira, quando tudo
+   morava num <style> só. Hoje cada componente tem seu arquivo e seu próprio
+   breakpoint de mobile — e como combate.css é carregado DEPOIS de
+   equipamento.css e magias.css, as regras de .moedas/.magia-row que estavam
+   aqui venciam (por ordem de cascata) as regras mobile que aqueles arquivos
+   definem pra si. Foram removidas daqui; só sobraram os grids genéricos de
+   base.css, que não pertencem a nenhum componente. */
 @media (max-width: 800px) {
   .grid-2, .grid-3 { grid-template-columns: 1fr; }
   .grid-6 { grid-template-columns: repeat(3, 1fr); }
-  .moedas { grid-template-columns: repeat(2, 1fr); }
-  .magia-row { grid-template-columns: 50px 1fr; row-gap: 4px; }
-  .magia-escola, .magia-tags { grid-column: 2; }
 }
 @media (max-width: 480px) {
   /* margem lateral de main vem de base.css (§20: 16px em mobile) — não repetir aqui */
@@ -299,11 +312,65 @@
   .linha-gatilho { min-height: 46px; }
   .editor-bonus .bonus-input { width: 56px; min-height: 40px; font-size: 16px; }
   .editor-check { min-height: 40px; }
-  .moedas { grid-template-columns: repeat(3, 1fr); }
-  .moeda-box input { font-size: 16px; min-height: 36px; }
+  /* (.moedas/.moeda-box saíram daqui pelo mesmo motivo do bloco de 800px:
+     equipamento.css é carregado antes e perdia a disputa com estas regras.) */
   /* Inputs ficam +touch */
   .campo input, .campo select { padding: 12px; min-height: 42px; font-size: 15px; }
   .campo textarea { font-size: 14px; }
+}
+
+/* ============ COMBATE MOBILE (< 768px) ============
+   Mesma reorganização do Resumo: PV em largura cheia, e CA/Iniciativa/
+   Deslocamento/Inspiração num grid de 2 colunas em vez de uma fileira flex
+   que só cabe espremendo. */
+@media (max-width: 767px) {
+  .stat-row.combate-topo {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2, 8px);
+  }
+  /* o min-width dos cards serve ao layout flex; no grid só causaria overflow */
+  .combate-topo .stat-card { min-width: 0; flex: none; padding: var(--space-3, 12px) var(--space-2, 8px); }
+  .combate-topo .stat-card.stat-hp { grid-column: 1 / -1; padding: var(--card-padding, 16px); }
+  .combate-topo .stat-card-valor input { min-height: var(--touch-target, 44px); font-size: 19px; }
+  /* Inspiração: [−][n][+] numa coluna de ~140px. Os dois botões mantêm os
+     44px de toque (.insp-btn, personagem.css) e é o campo que cede largura;
+     flex-wrap é a rede de segurança pra telas de 320px. */
+  .combate-topo .resumo-insp-linha { gap: var(--space-1, 4px); flex-wrap: wrap; }
+  .combate-topo .resumo-insp-input { width: 1.4em; min-width: 0; }
+  .combate-topo .insp-btn { flex-shrink: 0; }
+
+  /* PV: número e barra com mais presença */
+  .combate-topo .hp-numero { font-size: 30px; }
+  .combate-topo .hp-numero input { width: 2.1em; }
+  .hp-bar { height: 20px; }
+  .hp-percent { font-size: 11px; }
+
+  /* Descanso curto/longo: dois alvos grandes, um por linha se não couberem.
+     O !important é pra vencer o `.btn { min-height: 44px !important }` genérico
+     de sistema.css (carregado depois) — mesma especificidade não bastaria. */
+  .descanso-bar { gap: var(--space-2, 8px); }
+  .descanso-bar .btn {
+    flex: 1 1 140px; font-size: 13px;
+    min-height: var(--touch-target-lg, 48px) !important;
+  }
+
+  .concentracao-bar { flex-wrap: wrap; padding: var(--space-3, 12px); }
+  .concentracao-bar .btn { min-height: var(--touch-target, 44px); }
+
+  #btn-gastar-dado-vida { min-height: var(--touch-target, 44px); font-size: 13px; }
+  .stat-mini input, .stat-mini select { min-height: var(--touch-target, 44px); font-size: 16px; }
+  .readonly-stat { min-height: var(--touch-target, 44px); display: flex; align-items: center; justify-content: center; }
+
+  /* Acordeão de salvaguardas/perícias: gatilho e dado com alvo confortável */
+  .linha-gatilho { min-height: var(--touch-target-lg, 48px); padding: 10px 6px; }
+  .linha-nome { font-size: 15px; }
+  .linha-rolar { width: var(--touch-target, 44px); height: var(--touch-target, 44px); flex-basis: var(--touch-target, 44px); }
+  .linha-editor { padding: var(--space-2, 8px) var(--space-3, 12px) var(--space-3, 12px) 28px; }
+  .editor-check, .editor-bonus { min-height: var(--touch-target, 44px); }
+
+  .detalhes-conjuracao summary { min-height: var(--touch-target, 44px); display: flex; align-items: center; }
+  .modo-rolagem-bar .pill { min-height: var(--touch-target, 44px); }
 }
 *:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 2px; }
 @media (prefers-reduced-motion: reduce) {
@@ -386,10 +453,15 @@
   color: var(--text-dim); font-style: italic;
 }
 
-@media (max-width: 640px) {
-  .slots-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+@media (max-width: 767px) {
+  .slots-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
   .slot-card { padding: 10px 8px; }
   .slot-card .slot-max { font-size: 20px; }
   .slot-pip { width: 22px; height: 22px; }
+  /* Níveis SEM espaço nenhum somem no mobile (renderSlotsMagia marca com
+     data-vazio="1"). Um PJ de nível 3 via 7 cards "indisponível" ocupando
+     meia tela. No desktop continuam listados — é só exibição, o cálculo de
+     slots não mudou, e esses cards não carregam nenhum input. */
+  .slots-grid .slot-card[data-vazio="1"] { display: none; }
 }
 

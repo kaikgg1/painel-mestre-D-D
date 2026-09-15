@@ -153,11 +153,33 @@
 .toast-conjurar.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 .toast-conjurar strong { color: #b8a0cc; }
 
-@media (max-width: 640px) {
-  .magia-row { grid-template-columns: 40px 1fr 24px 24px; row-gap: 4px; }
-  .magia-escola, .magia-tags { grid-column: 2 / 5; font-size: 10px; }
-  .magia-fav-btn { width: 24px; height: 24px; font-size: 12px; }
+/* Breakpoint do projeto: mobile < 768px (as regras abaixo eram 640px). */
+@media (max-width: 767px) {
+  /* Linha do acordeão em áreas explícitas: nível à esquerda (2 linhas),
+     nome + estrela + chevron em cima, escola/tags embaixo. Antes as 6
+     células se auto-posicionavam com só 2 delas tendo grid-column fixo, o
+     que empurrava a estrela pra uma linha própria. min-height 56px pra a
+     linha inteira ser um alvo de toque confortável. */
+  .magia-row {
+    grid-template-columns: 42px minmax(0, 1fr) 44px 26px;
+    grid-template-areas:
+      "nivel nome fav chev"
+      "nivel meta meta meta";
+    column-gap: 8px; row-gap: 2px;
+    padding: 10px 12px; min-height: 56px;
+  }
+  .magia-nivel { grid-area: nivel; align-self: center; }
+  .magia-nome  { grid-area: nome; align-self: center; }
+  .magia-escola {
+    grid-area: meta; font-size: 11px; align-self: center;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    padding-right: 96px;  /* espaço das tags, que dividem a mesma área */
+  }
+  .magia-tags { grid-area: meta; justify-self: end; align-self: center; }
+  .magia-fav-btn { grid-area: fav; width: 40px; height: 40px; font-size: 16px; align-self: center; }
+  .magia-chevron { grid-area: chev; align-self: center; }
   .magia-info { grid-template-columns: 1fr 1fr; }
+  .magia-detalhe { padding: 0 12px 14px; }
   .modal-card { padding: 18px; max-width: 100%; }
   .modal-slots { grid-template-columns: repeat(3, 1fr); gap: 6px; }
   .modal-slot-btn { min-height: 70px; padding: 8px 4px; }
@@ -177,5 +199,96 @@
 .linha-filtro-lbl {
   font-family: var(--f-titulo); font-size: 10px; letter-spacing: 1px;
   text-transform: uppercase; color: var(--text-dim); width: 46px; flex-shrink: 0;
+}
+
+/* ============ FILTROS COMO BOTTOM SHEET (mobile) ============
+   Desktop: os wrappers do sheet somem (display:contents) e as 4 linhas de
+   pills continuam sendo conteúdo normal da aba — layout idêntico ao de
+   sempre. Mobile: ~20 pills ocupavam mais de um terço da tela antes da
+   primeira magia, então viram um bottom sheet (mesma anatomia do
+   .sheet-overlay de components.css, reaproveitando .sheet-handle/.sheet-close). */
+.magia-busca-linha { display: flex; align-items: center; gap: var(--sp-2); }
+.magia-busca-linha .hab-busca-input { flex: 1; min-width: 0; }
+.magia-filtros-sheet, .magia-filtros-painel, .magia-filtros-corpo { display: contents; }
+.magia-filtros-sheet .sheet-handle,
+.magia-filtros-cab, .magia-filtros-rodape, .magia-filtros-abrir { display: none; }
+.magia-filtros-abrir[hidden] { display: none !important; }
+.magia-filtros-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 18px; height: 18px; padding: 0 5px; margin-left: 6px;
+  border-radius: var(--r-pill); background: var(--gold); color: var(--on-gold);
+  font-family: var(--f-ui); font-size: 11px; font-weight: 700;
+}
+.magia-filtros-badge[hidden] { display: none; }
+
+@media (max-width: 767px) {
+  /* .magia-busca-linha no seletor pra vencer o .btn { min-height: 40px } que
+     combate.css (carregado depois deste arquivo) aplica em < 480px. */
+  .magia-busca-linha .magia-filtros-abrir {
+    display: inline-flex; flex: none;
+    min-height: var(--touch-target); white-space: nowrap;
+  }
+
+  .magia-filtros-sheet {
+    display: none;
+    position: fixed; inset: 0; z-index: 400;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+    align-items: flex-end; justify-content: center;
+  }
+  .magia-filtros-sheet.aberto { display: flex; }
+  .magia-filtros-painel {
+    display: flex; flex-direction: column;
+    width: 100%; max-width: 640px; max-height: min(82vh, 720px);
+    background: var(--sf-2); border: 1px solid var(--borda-forte); border-bottom: none;
+    border-radius: var(--r-lg) var(--r-lg) 0 0;
+    box-shadow: var(--elev-3); overflow: hidden;
+    animation: magiaSheetSobe .22s ease-out;
+  }
+  @keyframes magiaSheetSobe { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .magia-filtros-sheet .sheet-handle { display: block; }
+  .magia-filtros-cab {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 4px 8px 10px var(--sp-4); border-bottom: 1px solid var(--linha); flex: none;
+  }
+  .magia-filtros-cab h4 {
+    font-family: var(--f-titulo); font-size: 14px; letter-spacing: .5px;
+    color: var(--gold-light); margin: 0;
+  }
+  .magia-filtros-corpo { display: block; overflow-y: auto; flex: 1 1 auto; padding: var(--sp-3) var(--sp-4); }
+  .magia-filtros { margin-bottom: 0; gap: var(--sp-3); }
+  /* Rótulo em cima dos pills (não ao lado): 46px de rótulo + pills numa
+     linha só não cabe em 360px. */
+  .linha-filtro-magia { flex-direction: column; align-items: stretch; gap: var(--sp-2); }
+  .linha-filtro-lbl { width: auto; }
+  .magia-filtros .pill { min-height: var(--touch-target); padding: 8px 14px; }
+  .magia-filtros-rodape {
+    display: flex; gap: 10px; flex: none;
+    padding: 10px var(--sp-4) calc(10px + env(safe-area-inset-bottom, 0px));
+    border-top: 1px solid var(--linha);
+  }
+  .magia-filtros-rodape .btn { flex: 1; min-height: var(--touch-target-lg, 48px); }
+}
+
+/* A busca não é dado do personagem: o modo travado (sistema.css) desliga
+   pointer-events de TODO input dentro de .tab-content, o que deixava o campo
+   de busca impossível de focar justamente no modo padrão da ficha. O id
+   ganha a especificidade necessária pra reverter só ele. */
+body:not(.modo-unlock) .tab-content input#magia-busca {
+  pointer-events: auto !important;
+  cursor: text !important;
+  border-style: solid !important;
+  background-color: var(--sf-inset) !important;
+  opacity: 1;
+}
+
+/* ============ ESPAÇOS DE MAGIA NO MOBILE ============
+   O grid de espaços no topo desta aba é o MESMO renderSlotsMagia() da aba
+   Combate (aba_combate.js), que marca com data-vazio="1" cada nível sem
+   nenhum espaço. Em telas estreitas esses cards "indisponível" só empurram
+   os níveis reais pra fora da dobra — some com eles aqui também. Desktop
+   segue mostrando a tabela completa; nada de cálculo mudou. */
+@media (max-width: 767px) {
+  .slots-grid .slot-card[data-vazio="1"] { display: none; }
 }
 

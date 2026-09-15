@@ -17,15 +17,23 @@ function renderHabilidades(c) {
       ${c.subclasse ? `Subclasse: <strong>${escape(c.subclasse)}</strong>` : 'Defina sua subclasse na aba <em>Identidade</em>.'}
     </p>
 
-    <div class="hab-busca-wrap">
+    <!-- .no-lock no wrapper: aplicarTabIndexLock() (lock.js) tira do tab
+         order todo input do .tab-content fora de um ancestral .no-lock — e
+         um campo de BUSCA não é dado do personagem, não faz sentido ele ser
+         inacessível no modo travado (que é o modo padrão da ficha). -->
+    <div class="hab-busca-wrap no-lock">
       <input type="search" id="hab-busca" class="hab-busca-input" placeholder="Buscar habilidade…" aria-label="Buscar habilidade">
     </div>
+    <!-- .no-lock nos pills: filtrar/buscar não é editar a ficha, mas o modo
+         travado (sistema.css) desliga qualquer <button> do .tab-content que
+         não seja marcado assim — sem isso os filtros só funcionavam com a
+         ficha destravada, que não é o modo padrão. -->
     <div class="hab-filtros" role="group" aria-label="Filtrar por tipo de ação">
-      <button type="button" class="pill ativo" data-hab-filtro="todas" aria-pressed="true">Todas</button>
-      <button type="button" class="pill" data-hab-filtro="acao" aria-pressed="false">Ações</button>
-      <button type="button" class="pill" data-hab-filtro="bonus" aria-pressed="false">Ações Bônus</button>
-      <button type="button" class="pill" data-hab-filtro="reacao" aria-pressed="false">Reações</button>
-      <button type="button" class="pill" data-hab-filtro="passiva" aria-pressed="false">Passivas</button>
+      <button type="button" class="pill no-lock ativo" data-hab-filtro="todas" aria-pressed="true">Todas</button>
+      <button type="button" class="pill no-lock" data-hab-filtro="acao" aria-pressed="false">Ações</button>
+      <button type="button" class="pill no-lock" data-hab-filtro="bonus" aria-pressed="false">Ações Bônus</button>
+      <button type="button" class="pill no-lock" data-hab-filtro="reacao" aria-pressed="false">Reações</button>
+      <button type="button" class="pill no-lock" data-hab-filtro="passiva" aria-pressed="false">Passivas</button>
     </div>
 
     <div id="hab-wrap">Carregando…</div>
@@ -197,6 +205,49 @@ function conectarListenersFiltroHabilidades() {
   });
 }
 
+// ── Acordeão das features do catálogo (só no mobile) ──
+// A lista de um PJ de nível alto passa de 20 features, cada uma com um
+// parágrafo inteiro de descrição: no celular vira uma rolagem infinita só
+// pra achar o nome da próxima. Em < 768px a descrição fica cortada em 2
+// linhas (CSS, habilidades.css) e o cabeçalho expande/recolhe; no desktop,
+// onde a lista já funciona bem, nada muda — a classe .aberta simplesmente
+// não tem efeito visual lá.
+const CHEVRON_HAB = '<span class="hab-chevron" aria-hidden="true">▸</span>';
+
+function ehMobileFicha() {
+  // Guarda pra ambientes sem matchMedia (ex.: o shim jsdom de
+  // scripts/smoke_ficha.js) não derrubar a aba inteira — em qualquer
+  // navegador real matchMedia sempre existe.
+  if (typeof window.matchMedia !== 'function') return false;
+  return window.matchMedia('(max-width: 767px)').matches;
+}
+
+function ligarAcordeaoHabilidades(wrap) {
+  const mobile = ehMobileFicha();
+  wrap.querySelectorAll('[data-hab-toggle]').forEach(alvo => {
+    // role/tabindex/aria-expanded só no mobile: no desktop o cabeçalho não
+    // recolhe nada, e anunciá-lo como um botão "recolhido" seria mentira.
+    if (mobile) {
+      alvo.setAttribute('role', 'button');
+      alvo.setAttribute('tabindex', '0');
+      alvo.setAttribute('aria-expanded', 'false');
+    }
+    const alternar = () => {
+      if (!ehMobileFicha()) return;
+      const feat = alvo.closest('.hab-feature');
+      if (!feat) return;
+      const aberta = feat.classList.toggle('aberta');
+      alvo.setAttribute('aria-expanded', String(aberta));
+    };
+    alvo.addEventListener('click', alternar);
+    alvo.addEventListener('keydown', e => {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      e.preventDefault();
+      alternar();
+    });
+  });
+}
+
 // ── Tracker de usos (§11): pips + "N/M disponíveis" + período visível —
 // substitui o antigo "Usos: [pips] N/M [input]" sem rótulo de recuperação. ──
 function renderTrackerUsos(max, usos, disp, periodo, dataAttrs) {
@@ -262,11 +313,11 @@ async function popularHabilidades(classe, nivel, subclasse) {
 
         // SEM tracker: feature passiva (nenhum padrão de uso detectado)
         if (!ehTracker) {
-          return `<div class="hab-feature passiva" data-hab-slug="${slug}" data-hab-tipo="${tipoAcao}">
+          return `<div class="hab-feature passiva hab-colapsavel" data-hab-slug="${slug}" data-hab-tipo="${tipoAcao}">
             ${botaoFav}
             ${h.subclasse ? `<span class="hab-sub-tag">${escape(h.subclasse)}</span>` : ''}
-            <div class="hab-feature-titulo">
-              <strong>${escape(h.nome)}.</strong> ${badgeTipo}
+            <div class="hab-feature-titulo" data-hab-toggle>
+              <strong>${escape(h.nome)}.</strong> ${badgeTipo}${CHEVRON_HAB}
               <span class="hab-desc">${escape(h.desc || '—')}</span>
             </div>
           </div>`;
@@ -274,12 +325,12 @@ async function popularHabilidades(classe, nivel, subclasse) {
 
         // COM tracker: feature usável (limite detectado ou já configurado)
         const periodo = detectado?.periodo || 'descanso';
-        return `<div class="hab-feature ativa" data-hab-slug="${slug}" data-hab-tipo="${tipoAcao}">
+        return `<div class="hab-feature ativa hab-colapsavel" data-hab-slug="${slug}" data-hab-tipo="${tipoAcao}">
           ${botaoFav}
           ${h.subclasse ? `<span class="hab-sub-tag">${escape(h.subclasse)}</span>` : ''}
           <div class="hab-feature-head">
-            <div class="hab-feature-titulo">
-              <strong>${escape(h.nome)}.</strong> ${badgeTipo}
+            <div class="hab-feature-titulo" data-hab-toggle>
+              <strong>${escape(h.nome)}.</strong> ${badgeTipo}${CHEVRON_HAB}
               <span class="hab-desc">${escape(h.desc || '—')}</span>
             </div>
             <div class="hab-tracker">
@@ -299,6 +350,8 @@ async function popularHabilidades(classe, nivel, subclasse) {
       popularHabilidades(classe, nivel, subclasse);
     });
   });
+
+  ligarAcordeaoHabilidades(wrap);
 
   // Listeners dos pips (toggle gasto/disponível) e do max
   const alternarPip = pip => {

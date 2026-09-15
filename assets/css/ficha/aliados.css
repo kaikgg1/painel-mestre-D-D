@@ -95,7 +95,7 @@
 .criatura-img-ph { font-size: 46px; opacity: 0.45; }
 .criatura-img.erro img { display: none; }
 .criatura-img.erro::after { content: '⚠'; font-size: 38px; color: var(--blood-bright); }
-@media (max-width: 640px) { .criatura-img { width: 92px; height: 92px; } }
+@media (max-width: 767px) { .criatura-img { width: 92px; height: 92px; } }
 
 /* Lightbox p/ ver a imagem da criatura em tamanho grande */
 .cr-lightbox {
@@ -210,21 +210,36 @@
 }
 .criatura-notas:focus { border-color: var(--borda-ouro); }
 
-@media (max-width: 640px) {
+/* Breakpoint do projeto: mobile < 768px (as regras abaixo eram 640px). */
+@media (max-width: 767px) {
   .aliados-topo { flex-direction: column; }
   .aliados-add { width: 100%; }
-  .aliados-add #btn-buscar-monstro { flex: 1 1 100%; min-height: 46px; }
-  .aliados-add select { flex: 1 1 auto; min-height: 46px; }
-  .aliados-add #btn-add-aliado { flex: 0 0 auto; min-height: 46px; }
+  .aliados-add #btn-buscar-monstro { flex: 1 1 100%; min-height: var(--touch-target-lg, 48px); }
+  .aliados-add select { flex: 1 1 auto; min-height: var(--touch-target-lg, 48px); font-size: 16px; }
+  .aliados-add #btn-add-aliado { flex: 0 0 auto; min-height: var(--touch-target-lg, 48px); }
   .criatura-combate { grid-template-columns: 1fr 1fr; }
-  .criatura-atrs { grid-template-columns: repeat(3, 1fr); }
+  /* 6 atributos em 3 colunas × 2 linhas: em 360px as 6 colunas davam ~38px
+     por card, sem espaço pro valor nem pro modificador. */
+  .criatura-atrs { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .cr-atr { padding: 8px 4px; }
+  .cr-atr-val { min-height: 36px; font-size: 18px; }
   .criatura-meta { grid-template-columns: 1fr; }
   .cc-num { width: 100%; }
+  .cc-num, .cc-txt { min-height: var(--touch-target); font-size: 16px; }
   .cc-hp-row { flex-wrap: wrap; }
+  .cc-rolar { min-height: var(--touch-target); min-width: var(--touch-target); }
+  .cc-hp-quick { gap: 6px; }
+  .cc-hp-quick button { min-height: 40px; font-size: 12px; }
+  .criatura-notas { font-size: 15px; }
   /* Resumo recolhido: alvo de toque maior pros botões de PV rápido */
-  .criatura-resumo { padding: 12px; min-height: 60px; }
-  .cr-resumo-hp-btn { width: 30px; height: 30px; font-size: 15px; }
-  .criatura-resumo-stats { font-size: 11px; }
+  .criatura-resumo { padding: 12px; min-height: 64px; gap: 8px; }
+  .cr-resumo-hp-btn { width: 36px; height: 36px; font-size: 17px; }
+  .criatura-resumo-stats { font-size: 11px; row-gap: 4px; }
+  .criatura-resumo-chevron { width: 28px; text-align: center; font-size: 16px; }
+  /* Cabeçalho do card expandido: apagar e trocar imagem com alvo cheio */
+  .criatura-del { min-width: var(--touch-target); min-height: var(--touch-target); }
+  .criatura-img-edit { width: 40px; height: 40px; font-size: 16px; }
+  .criatura-nome { font-size: 17px; min-height: 36px; }
 }
 
 /* ===== BUSCADOR DO BESTIÁRIO ===== */
@@ -310,10 +325,29 @@
 }
 .bm-add:hover { background: linear-gradient(180deg, var(--gold-bright), var(--gold)); }
 .bm-add.add-ok { background: linear-gradient(180deg, #4a5233, #3d4529); color: #fff; border-color: #7a8a5e; }
-@media (max-width: 640px) {
+/* Mobile: o buscador ocupa a tela inteira (fullscreen), com só a lista de
+   resultados rolando — header e busca ficam fixos no topo. */
+@media (max-width: 767px) {
   .bm-overlay { padding: 0; }
-  .bm-modal { max-width: 100%; max-height: 100vh; max-height: 100dvh; height: 100%; border-radius: 0; }
-  .bm-item { flex-wrap: wrap; }
+  .bm-modal {
+    max-width: 100%; max-height: 100vh; max-height: 100dvh; height: 100%;
+    border-radius: 0; border: none;
+  }
+  .bm-header { padding: 12px 14px 10px; }
+  .bm-titulo { font-size: 15px; }
+  .bm-close { min-height: var(--touch-target); min-width: var(--touch-target); }
+  .bm-search { padding: 10px 14px; }
+  .bm-search input { min-height: var(--touch-target-lg, 48px); font-size: 16px; }
+  .bm-result { padding: 6px 10px calc(14px + env(safe-area-inset-bottom, 0px)); }
+  /* Cada resultado: miniatura + nome/meta numa linha, ★ e "+" numa faixa
+     própria embaixo — em 360px os 4 elementos lado a lado espremiam o nome
+     em 3 linhas. */
+  .bm-item { flex-wrap: wrap; row-gap: 8px; padding: 10px 8px; min-height: 64px; }
+  .bm-item-info { flex: 1 1 60%; }
+  .bm-item-nome { font-size: 15px; }
+  .bm-fav { min-width: var(--touch-target); min-height: var(--touch-target); }
+  .bm-add { min-height: var(--touch-target); flex: 1 1 auto; justify-content: center; }
+  .bm-thumb { width: 48px; height: 48px; }
 }
 
 /* Selo de bônus do Mestre em perícias */

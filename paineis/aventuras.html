@@ -238,18 +238,71 @@
     letter-spacing: 1px;
   }
 
-  @media (max-width: 1100px) and (min-width: 701px) {
+  @media (max-width: 1100px) and (min-width: 768px) {
     .campaigns { gap: 24px; }
     .campaign-card { width: clamp(240px, 42vw, 360px); padding: 40px 32px 32px; }
     .campaign-icon { font-size: 60px; }
   }
 
-  @media (max-width: 700px) {
+  /* Mobile — mesma linha horizontal compacta do hub principal (index.html) */
+  @media (max-width: 767px) {
+    body { padding: var(--mobile-padding); padding-top: 24px; }
     .title { font-size: 24px; letter-spacing: 2px; }
-    .campaign-card { width: 100%; max-width: 100%; padding: 36px 28px 30px; min-height: 220px; }
-    .campaigns { gap: 20px; flex-direction: column; align-items: center; }
-    .campaign-icon { font-size: 52px; }
-    .campaign-cta { padding: 14px 28px; min-height: 44px; font-size: 12px; }
+    .prompt { margin-bottom: 20px; font-size: 12px; }
+
+    .campaigns { gap: 10px; flex-direction: column; align-items: stretch; }
+
+    .campaign-card {
+      flex-direction: row;
+      align-items: center;
+      text-align: left;
+      width: 100%;
+      max-width: 100%;
+      min-height: 72px;
+      padding: 12px var(--card-padding);
+      gap: 14px;
+      overflow: visible;
+    }
+    .campaign-card .corner { display: none; }
+    .campaign-card::after { display: none; }
+
+    .campaign-icon {
+      font-size: 26px;
+      margin: 0;
+      flex: 0 0 auto;
+      width: 44px; height: 44px;
+      border-radius: var(--radius-sm);
+      background: color-mix(in srgb, var(--gold-bright) 10%, transparent);
+    }
+    .campaign-card:hover .campaign-icon { transform: none; }
+
+    .campaign-text { flex: 1 1 auto; min-width: 0; }
+    .campaign-name { font-size: 16px; margin-bottom: 2px; }
+    .campaign-desc { font-size: 13px; line-height: 1.35; }
+
+    .campaign-cta {
+      flex: 0 0 auto;
+      margin-top: 0;
+      padding: 0;
+      min-height: var(--touch-target);
+      width: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: none;
+      color: var(--gold-bright);
+      font-size: 0;
+    }
+    .campaign-cta::after { content: '›'; font-size: 26px; line-height: 1; }
+    .campaign-card:hover .campaign-cta,
+    .campaign-card:active .campaign-cta {
+      background: none;
+      color: var(--gold-light);
+      border-color: transparent;
+    }
+    .campaign-card.locked .campaign-cta { display: none; }
+    .campaign-card.locked { padding: 12px var(--card-padding); }
   }
 
   .campaign-card:focus-visible {
@@ -287,8 +340,10 @@
       <span class="corner bl" aria-hidden="true">✠</span>
       <span class="corner br" aria-hidden="true">✠</span>
       <div class="campaign-icon" aria-hidden="true" data-ico="vampiro"></div>
-      <div class="campaign-name">Maldição de Strahd</div>
-      <div class="campaign-desc">Crônicas de Barovia<br>O Castelo Ravenloft aguarda</div>
+      <div class="campaign-text">
+        <div class="campaign-name">Maldição de Strahd</div>
+        <div class="campaign-desc">Crônicas de Barovia<br>O Castelo Ravenloft aguarda</div>
+      </div>
       <div class="campaign-cta">Entrar na Névoa</div>
     </a>
 
@@ -298,8 +353,10 @@
       <span class="corner bl" aria-hidden="true">✦</span>
       <span class="corner br" aria-hidden="true">✦</span>
       <div class="campaign-icon" aria-hidden="true" data-ico="mapa"></div>
-      <div class="campaign-name">Em Breve</div>
-      <div class="campaign-desc">Novas aventuras chegarão<br>a este painel no futuro</div>
+      <div class="campaign-text">
+        <div class="campaign-name">Em Breve</div>
+        <div class="campaign-desc">Novas aventuras chegarão<br>a este painel no futuro</div>
+      </div>
     </div>
 
   </div>

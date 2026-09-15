@@ -331,12 +331,21 @@
   margin-top: 10px; line-height: 1.4;
 }
 
-@media (max-width: 640px) {
+/* Breakpoint do projeto: mobile < 768px (era 640px aqui). Os botões do pool
+   (−, −5, +5, +) e o ⟲ de recuperar tudo são clicados em pleno combate, com
+   o polegar — alvo de 44px (--touch-target) em vez dos 38px de antes. */
+@media (max-width: 767px) {
   .rc-grid { grid-template-columns: 1fr; }
-  .rc-pip { width: 26px; height: 26px; }
-  .rc-pool-btn { width: 38px; height: 38px; }
-  .rc-pool-btn.rc-pool-btn-big { width: 44px; }
-  .rc-reset { min-width: 38px; min-height: 38px; }
+  .rc-pip { width: 28px; height: 28px; }
+  .rc-pips { gap: 8px; }
+  /* Com 4 botões de 44px+ não sobra largura pro "40/40" na mesma linha em
+     360px (ele vazava ou empurrava o "+" pra uma 2ª linha sozinho): o número
+     sobe pra uma linha própria e os botões ficam espalhados embaixo. */
+  .rc-pool { gap: 8px; justify-content: space-between; }
+  .rc-pool-display { flex: 1 0 100%; order: -1; }
+  .rc-pool-btn { width: var(--touch-target); height: var(--touch-target); font-size: 18px; }
+  .rc-pool-btn.rc-pool-btn-big { width: var(--touch-target-lg); font-size: 13px; }
+  .rc-reset { min-width: var(--touch-target); min-height: var(--touch-target); }
   .fei-modal { padding: 18px; }
   .fei-titulo { font-size: 17px; }
   .fei-opt { min-height: 52px; }

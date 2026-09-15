@@ -88,7 +88,9 @@
     background: rgba(255,255,255,0.04); border: 1px solid var(--borda);
     color: var(--parchment-dim); transition: .15s; user-select: none;
   }
-  .pill:hover { border-color: var(--gold-bright); color: var(--parchment); }
+  /* `:active` junto do `:hover` porque em touch não existe hover — o retorno
+     visual do toque tem que sair do mesmo lugar, sem regra duplicada. */
+  .pill:hover, .pill:active { border-color: var(--gold-bright); color: var(--parchment); }
   .pill.on {
     background: rgba(184,138,44,0.16); border-color: var(--gold-light);
     color: var(--gold-light); font-weight: 600; box-shadow: 0 0 12px rgba(184,138,44,0.2);
@@ -102,7 +104,7 @@
     border-right: 2px solid var(--gold-light); border-bottom: 2px solid var(--gold-light);
     transform: rotate(45deg); transition: border-color .15s;
   }
-  .sel-wrap:hover::after { border-color: var(--parchment); }
+  .sel-wrap:hover::after, .sel-wrap:active::after { border-color: var(--parchment); }
   .nd-range select {
     -webkit-appearance: none; -moz-appearance: none; appearance: none;
     background: linear-gradient(180deg, color-mix(in srgb, var(--surface-raised) 92%, transparent), color-mix(in srgb, var(--bg) 90%, transparent));
@@ -111,7 +113,7 @@
     padding: 9px 34px 9px 15px; border-radius: 8px; cursor: pointer;
     min-width: 96px; transition: .16s; line-height: 1.2;
   }
-  .nd-range select:hover { border-color: var(--gold-bright); color: var(--parchment); }
+  .nd-range select:hover, .nd-range select:active { border-color: var(--gold-bright); color: var(--parchment); }
   .nd-range select:focus-visible {
     outline: none; border-color: var(--gold-light);
     box-shadow: 0 0 0 3px rgba(184,138,44,0.22);
@@ -132,7 +134,40 @@
     color: var(--gold-light); font-family: 'EB Garamond', serif; font-size: 14px;
     text-decoration: underline; text-underline-offset: 3px; padding: 4px;
   }
-  .limpar:hover { color: var(--parchment); }
+  .limpar:hover, .limpar:active { color: var(--parchment); }
+
+  /* ===== BOTÃO "FILTROS" (só mobile) + BOTTOM SHEET =====
+     As MESMAS linhas de filtro (#linha-tipo/#linha-tamanho/#linha-desafio)
+     servem inline no desktop e dentro do sheet no mobile: o JS move os nós,
+     em vez de duplicar marcação/estado. */
+  .filtros-acoes { display: none; gap: var(--space-2); margin-bottom: var(--space-3); }
+  .btn-filtros { flex: 1; min-height: var(--control-height); }
+  .btn-filtros.tem-filtro { border-color: var(--gold); color: var(--gold-light); }
+  .badge-filtros {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: 19px; height: 19px; padding: 0 5px; border-radius: 999px;
+    background: var(--gold); color: var(--bg);
+    font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; letter-spacing: 0;
+  }
+  /* `display:inline-flex` acima empata com o `[hidden]` nativo e venceria por
+     vir depois — sem esta regra o selo apareceria mesmo com 0 filtros. */
+  .badge-filtros[hidden] { display: none; }
+
+  #sheet-filtros .sheet-body .linha-filtro {
+    display: flex; flex-wrap: wrap; gap: var(--space-2);
+    align-items: center; margin-bottom: var(--space-5);
+  }
+  #sheet-filtros .sheet-body .linha-filtro:last-child { margin-bottom: var(--space-1); }
+  #sheet-filtros .linha-label { min-width: 100%; margin-bottom: var(--space-1); color: var(--gold-light); }
+  #sheet-filtros .pill {
+    display: inline-flex; align-items: center; gap: 5px;
+    font-size: 14px; padding: 8px 14px; min-height: 40px;
+  }
+  #sheet-filtros .nd-range { width: 100%; }
+  #sheet-filtros .sel-wrap { flex: 1; min-width: 0; }
+  #sheet-filtros .nd-range select {
+    width: 100%; min-width: 0; min-height: var(--control-height); font-size: 14px;
+  }
 
   /* ÍNDICE A-Z */
   .indice { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 26px; }
@@ -142,7 +177,7 @@
     border-radius: 6px; text-decoration: none; color: var(--parchment-dim);
     border: 1px solid var(--borda); transition: .15s;
   }
-  .indice a:hover { background: var(--gold); color: var(--bg); border-color: var(--gold-light); }
+  .indice a:hover, .indice a:active { background: var(--gold); color: var(--bg); border-color: var(--gold-light); }
   .indice a.off { opacity: .28; pointer-events: none; }
 
   /* SEÇÕES */
@@ -166,6 +201,11 @@
     border-color: var(--borda-forte); transform: translateY(-2px);
     box-shadow: 0 6px 20px rgba(0,0,0,0.45);
   }
+  /* toque: sem "levantar" o card (não há hover pra desfazer), só destaque de borda */
+  .card:active {
+    transform: none; border-color: var(--gold);
+    background: color-mix(in srgb, var(--gold) 10%, var(--surface-raised));
+  }
   .card:focus-visible { outline: 2px solid var(--gold-light); outline-offset: 2px; }
   .thumb {
     position: relative;
@@ -188,6 +228,7 @@
   .card-nome {
     font-family: 'Cinzel', serif; font-weight: 600; font-size: 15px;
     color: var(--parchment); line-height: 1.25; margin-bottom: 2px;
+    overflow-wrap: anywhere;
   }
   .card-meta { font-size: 12.5px; color: var(--text-dim); font-style: italic; }
   .card-nd {
@@ -212,11 +253,14 @@
     padding: 26px 28px; position: relative; animation: sobe .22s ease;
   }
   @keyframes sobe { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+  /* em tela cheia o translate deixaria uma fresta no rodapé — só fade */
+  @keyframes surge { from { opacity: 0; } to { opacity: 1; } }
   .modal-x {
     position: absolute; top: 14px; right: 16px; background: none; border: none;
     color: var(--parchment-dim); font-size: 27px; cursor: pointer; line-height: 1; padding: 2px 8px;
   }
-  .modal-x:hover { color: var(--gold-light); }
+  .modal-x:hover, .modal-x:active { color: var(--gold-light); }
+  .modal-x:focus-visible { outline: 2px solid var(--gold-light); outline-offset: 2px; border-radius: 6px; }
   .modal-topo { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 14px; padding-right: 34px; }
   .modal-thumb {
     flex-shrink: 0; width: 78px; height: 78px; border-radius: 50%;
@@ -228,7 +272,8 @@
     width: 100%; height: 100%; object-fit: cover;
   }
   .modal-thumb.clicavel { cursor: zoom-in; transition: .16s; }
-  .modal-thumb.clicavel:hover { border-color: var(--gold-light); box-shadow: 0 0 16px rgba(212,168,67,0.35); }
+  .modal-thumb.clicavel:hover,
+  .modal-thumb.clicavel:active { border-color: var(--gold-light); box-shadow: 0 0 16px rgba(212,168,67,0.35); }
   .modal-thumb.clicavel::after {
     content: '⤢'; position: absolute; right: -2px; bottom: -2px;
     width: 22px; height: 22px; border-radius: 50%;
@@ -243,6 +288,9 @@
     font-size: clamp(21px, 4vw, 30px); color: var(--gold-light); line-height: 1.12; margin-bottom: 4px;
   }
   .modal-sub { font-style: italic; font-size: 15px; color: var(--parchment-dim); }
+  /* ND no cabeçalho: só no mobile (no desktop o ND já aparece logo abaixo,
+     no bloco de estatísticas, sem precisar rolar). */
+  .modal-nd { display: none; }
 
   .modal-img-grande {
     width: 100%; border-radius: 10px; border: 1px solid var(--borda);
@@ -342,7 +390,7 @@
     background: rgba(122,35,21,0.06); border: 1px solid var(--sb-border);
     color: var(--sb-label); opacity: .55; transition: .15s;
   }
-  .hp-btn:hover { opacity: .85; }
+  .hp-btn:hover, .hp-btn:active { opacity: .85; }
   .hp-btn.on { background: rgba(122,35,21,0.14); opacity: 1; }
   .hp-valor { font-variant-numeric: tabular-nums; font-weight: 700; }
 
@@ -359,20 +407,93 @@
     display: none; align-items: center; justify-content: center; transition: .18s;
   }
   #ao-topo.visible { display: flex; }
-  #ao-topo:hover { background: var(--gold); color: var(--bg); }
+  #ao-topo:hover, #ao-topo:active { background: var(--gold); color: var(--bg); }
+  #ao-topo:focus-visible { outline: 2px solid var(--gold-light); outline-offset: 2px; }
 
-  @media (max-width: 720px) {
-    main { padding: 18px 12px 70px; }
-    .filtros { padding: 13px 12px; }
-    .linha-label { min-width: 100%; margin-bottom: 2px; }
-    .pill { font-size: 13px; padding: 5px 11px; }
-    .grid { grid-template-columns: 1fr; }
-    .modal { padding: 22px 17px; }
-    .atributos { grid-template-columns: repeat(3, 1fr); }
-    .modal-topo { gap: 11px; }
-    .modal-thumb { width: 58px; height: 58px; }
+  /* ===================== MOBILE (< 768px) ===================== */
+  @media (max-width: 767px) {
+    main { padding: 18px var(--mobile-padding) 80px; }
+
+    .hero { margin-bottom: var(--space-4); }
+    .hero h1 { margin-bottom: 6px; }
+    .hero p { font-size: 14.5px; line-height: 1.5; }
+
+    /* Topo: título → busca → [Filtros] → contador → índice → lista.
+       As linhas de tipo/tamanho/desafio saem daqui (vão pro sheet, via JS). */
+    .filtros { padding: var(--space-3); margin-bottom: var(--space-4); }
+    .busca-wrap { margin-bottom: var(--space-3); }
+    #busca { min-height: var(--touch-target); padding: 12px 14px 12px 42px; }
+    .filtros-acoes { display: flex; }
+    .filtros-rodape { margin-top: 0; padding-top: 0; border-top: none; gap: var(--space-2); }
+    .contador { font-size: 13.5px; }
+    .limpar {
+      font-size: 13.5px; display: inline-flex; align-items: center;
+      min-height: var(--touch-target); padding: 4px 2px;
+    }
+    /* (tipo/tamanho/desafio não aparecem aqui — estão no sheet, estilizados
+       pelas regras `#sheet-filtros …` lá em cima) */
+
+    /* Índice A–Z vira faixa rolável horizontal (26 letras não cabem em 360px) */
+    .indice {
+      flex-wrap: nowrap; overflow-x: auto; white-space: nowrap;
+      -webkit-overflow-scrolling: touch; scrollbar-width: none;
+      gap: 6px; margin-bottom: 18px; padding-bottom: 2px;
+    }
+    .indice::-webkit-scrollbar { display: none; }
+    .indice a { flex: 0 0 auto; width: 34px; height: 34px; font-size: 14px; }
+
+    /* Lista de criaturas: 1 coluna, formato linha */
+    .secao { margin-bottom: var(--space-5); }
+    .secao-titulo { margin-bottom: 10px; }
+    .grid { grid-template-columns: 1fr; gap: var(--space-2); }
+    .card { gap: var(--space-3); padding: 10px 12px; min-height: 64px; border-radius: 10px; }
+    .thumb { width: 46px; height: 46px; }
+    .card-nome { font-size: 15.5px; }
+    .card-nd { font-size: 12.5px; }
+
+    /* Modal do monstro em tela cheia (o overlay some, o conteúdo rola dentro) */
+    .modal-ov { padding: 0; height: 100dvh; overflow: hidden; }
+    .modal {
+      margin: 0; width: 100%; max-width: none;
+      height: 100dvh; max-height: none;
+      padding: 0; border: none; border-radius: 0; box-shadow: none;
+      display: flex; flex-direction: column;
+      animation: surge .18s ease;
+    }
+    #modal-corpo {
+      flex: 1 1 auto; min-height: 0;
+      overflow-y: auto; overscroll-behavior: contain; -webkit-overflow-scrolling: touch;
+      padding: 14px 14px calc(24px + env(safe-area-inset-bottom, 0));
+    }
+    /* fica fora de #modal-corpo, então não rola junto: sempre alcançável */
+    .modal-x {
+      top: 8px; right: 8px; z-index: 5;
+      width: var(--touch-target); height: var(--touch-target); padding: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 25px; border-radius: 50%;
+      background: rgba(12,10,8,0.82); border: 1px solid var(--borda);
+      color: var(--gold-light); backdrop-filter: blur(4px);
+    }
+    .modal-topo { gap: 11px; align-items: center; padding-right: 52px; margin-bottom: var(--space-3); }
+    .modal-topo h2 { font-size: 20px; overflow-wrap: anywhere; }
+    .modal-thumb { width: 56px; height: 56px; font-size: 24px; }
+    .modal-sub { font-size: 14px; }
+    .modal-nd {
+      display: inline-flex; align-items: center; margin-top: 6px;
+      padding: 2px 10px; border-radius: 999px;
+      background: rgba(184,138,44,0.16); border: 1px solid var(--gold);
+      font-family: 'Cinzel', serif; font-size: 11.5px; font-weight: 700;
+      letter-spacing: .5px; color: var(--gold-light);
+    }
     .modal-desc { font-size: 15px; }
     .modal-desc::first-letter { font-size: 2.2em; margin-right: 5px; }
+    /* 6 atributos em 3 colunas x 2 linhas — nunca espremidos numa linha só */
+    .atributos { grid-template-columns: repeat(3, 1fr); gap: 8px 4px; }
+
+    #ao-topo {
+      right: 12px; bottom: calc(12px + env(safe-area-inset-bottom, 0));
+      width: var(--touch-target); height: var(--touch-target); font-size: 17px;
+    }
   }
   @media (prefers-reduced-motion: reduce) {
     * { animation: none !important; transition: none !important; }
@@ -399,6 +520,13 @@
       <input type="search" id="busca" placeholder="Buscar criaturas pelo nome..." autocomplete="off" aria-label="Buscar criaturas pelo nome">
     </div>
 
+    <div class="filtros-acoes" id="filtros-acoes">
+      <button class="btn btn-filtros" id="btn-abrir-filtros" type="button"
+              aria-haspopup="dialog" aria-expanded="false" aria-controls="sheet-filtros">
+        Filtros<span class="badge-filtros" id="badge-filtros" hidden>0</span>
+      </button>
+    </div>
+
     <div class="linha-filtro" id="linha-tipo">
       <span class="linha-label">Tipo:</span>
     </div>
@@ -407,7 +535,7 @@
       <span class="linha-label">Tamanho:</span>
     </div>
 
-    <div class="linha-filtro">
+    <div class="linha-filtro" id="linha-desafio">
       <span class="linha-label">Desafio:</span>
       <div class="nd-range">
         <span class="sel-wrap"><select id="nd-min" aria-label="Nível de desafio mínimo"></select></span>
@@ -428,6 +556,24 @@
 </main>
 
 <button id="ao-topo" type="button" aria-label="Voltar ao topo">↑</button>
+
+<!-- Bottom sheet de filtros (mobile). O corpo começa vazio: o JS move pra cá
+     as MESMAS linhas #linha-tipo/#linha-tamanho/#linha-desafio que o desktop
+     mostra inline, então não há estado nem listener duplicado. -->
+<div class="sheet-overlay" id="sheet-filtros" role="dialog" aria-modal="true" aria-labelledby="sheet-filtros-titulo">
+  <div class="sheet-panel">
+    <div class="sheet-handle"></div>
+    <div class="sheet-header">
+      <h4 id="sheet-filtros-titulo">Filtros</h4>
+      <button class="sheet-close" id="sheet-filtros-x" type="button" aria-label="Fechar filtros">✕</button>
+    </div>
+    <div class="sheet-body" id="sheet-filtros-corpo"></div>
+    <div class="sheet-footer">
+      <button class="btn" id="sheet-filtros-limpar" type="button">Limpar</button>
+      <button class="btn btn-primary" id="sheet-filtros-aplicar" type="button">Aplicar</button>
+    </div>
+  </div>
+</div>
 
 <div class="modal-ov" id="modal-ov" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
   <div class="modal">
@@ -517,6 +663,7 @@ function render() {
 
   document.getElementById('cont-visiveis').textContent = visiveis.length;
   document.getElementById('cont-total').textContent = CRIATURAS.length;
+  atualizarBotaoFiltros(visiveis.length);
 
   if (!visiveis.length) {
     alvo.innerHTML = `<div class="vazio">Nenhuma criatura encontrada com esses filtros.</div>`;
@@ -651,6 +798,7 @@ function abrirModal(nome) {
       <div class="modal-titulo-wrap">
         <h2 id="modal-titulo">${esc(tituloBonito(c.nome))}</h2>
         <div class="modal-sub">${esc(c.tipo || '')}</div>
+        <span class="modal-nd">ND ${esc(c._nd || '—')}</span>
       </div>
     </div>
 
@@ -718,9 +866,17 @@ function abrirModal(nome) {
 
 function fecharModal() {
   document.getElementById('modal-ov').classList.remove('open');
-  // o lightbox (assets/js/lightbox.js) restaura o overflow por conta própria;
-  // aqui só liberamos se ele não estiver aberto por cima.
-  if (!document.querySelector('.lbx-ov.aberto')) document.body.style.overflow = '';
+  liberarScroll();
+}
+
+/** Só devolve o scroll da página se nada mais estiver por cima (lightbox,
+ *  modal ou o sheet de filtros). O lightbox (assets/js/lightbox.js) também
+ *  restaura o overflow por conta própria. */
+function liberarScroll() {
+  const preso = document.querySelector('.lbx-ov.aberto')
+    || document.getElementById('modal-ov').classList.contains('open')
+    || document.getElementById('sheet-filtros').classList.contains('aberto');
+  if (!preso) document.body.style.overflow = '';
 }
 
 
@@ -790,14 +946,19 @@ document.getElementById('nd-max').addEventListener('change', e => {
   filtros.ndMax = e.target.value === '' ? null : parseInt(e.target.value, 10);
   render();
 });
-document.getElementById('btn-limpar').addEventListener('click', () => {
-  filtros.busca = ''; filtros.tipo.clear(); filtros.tamanho.clear();
+/** Reseta tipo / tamanho / ND (o que vive no sheet), sem mexer na busca. */
+function limparFiltrosAvancados() {
+  filtros.tipo.clear(); filtros.tamanho.clear();
   filtros.ndMin = null; filtros.ndMax = null;
-  document.getElementById('busca').value = '';
   document.getElementById('nd-min').value = '';
   document.getElementById('nd-max').value = '';
   document.querySelectorAll('.pill').forEach(p => p.classList.remove('on'));
   render();
+}
+document.getElementById('btn-limpar').addEventListener('click', () => {
+  filtros.busca = '';
+  document.getElementById('busca').value = '';
+  limparFiltrosAvancados();
 });
 document.getElementById('resultado').addEventListener('click', e => {
   const card = e.target.closest('.card');
@@ -809,8 +970,66 @@ document.getElementById('modal-ov').addEventListener('click', e => {
 });
 
 
+/* ===================== SHEET DE FILTROS (mobile) =====================
+   O filtro em si não muda: as pills e os selects são os MESMOS nós, só
+   mudam de lugar conforme a largura. Por isso o filtro já vale em tempo
+   real e "Aplicar" só precisa fechar o sheet. */
+const sheetOv       = document.getElementById('sheet-filtros');
+const sheetCorpo    = document.getElementById('sheet-filtros-corpo');
+const secFiltros    = document.querySelector('.filtros');
+const rodapeFiltros = document.querySelector('.filtros-rodape');
+const btnFiltros    = document.getElementById('btn-abrir-filtros');
+const badgeFiltros  = document.getElementById('badge-filtros');
+const btnAplicar    = document.getElementById('sheet-filtros-aplicar');
+const linhasFiltro  = ['linha-tipo', 'linha-tamanho', 'linha-desafio'].map(id => document.getElementById(id));
+const mqMobile      = window.matchMedia('(max-width: 767px)');
+
+function posicionarFiltros() {
+  if (mqMobile.matches) {
+    linhasFiltro.forEach(el => sheetCorpo.appendChild(el));
+  } else {
+    linhasFiltro.forEach(el => secFiltros.insertBefore(el, rodapeFiltros));
+    fecharSheet();
+  }
+}
+function abrirSheet() {
+  sheetOv.classList.add('aberto');
+  btnFiltros.setAttribute('aria-expanded', 'true');
+  document.body.style.overflow = 'hidden';
+  document.getElementById('sheet-filtros-x').focus();
+}
+function fecharSheet() {
+  if (!sheetOv.classList.contains('aberto')) return;
+  sheetOv.classList.remove('aberto');
+  btnFiltros.setAttribute('aria-expanded', 'false');
+  liberarScroll();
+  btnFiltros.focus();
+}
+/** Grupos de filtro ativos: tipo, tamanho e desafio contam 1 cada. */
+function contarFiltrosAtivos() {
+  return (filtros.tipo.size ? 1 : 0)
+       + (filtros.tamanho.size ? 1 : 0)
+       + ((filtros.ndMin != null || filtros.ndMax != null) ? 1 : 0);
+}
+function atualizarBotaoFiltros(visiveis) {
+  const n = contarFiltrosAtivos();
+  badgeFiltros.textContent = n;
+  badgeFiltros.hidden = n === 0;
+  btnFiltros.classList.toggle('tem-filtro', n > 0);
+  btnAplicar.textContent = visiveis === 1 ? 'Ver 1 criatura' : `Ver ${visiveis} criaturas`;
+}
+btnFiltros.addEventListener('click', abrirSheet);
+btnAplicar.addEventListener('click', fecharSheet);
+document.getElementById('sheet-filtros-x').addEventListener('click', fecharSheet);
+document.getElementById('sheet-filtros-limpar').addEventListener('click', limparFiltrosAvancados);
+sheetOv.addEventListener('click', e => { if (e.target === sheetOv) fecharSheet(); });
+mqMobile.addEventListener('change', posicionarFiltros);
+posicionarFiltros();
+
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') fecharModal();
+  if (e.key === 'Escape') {
+    if (sheetOv.classList.contains('aberto')) fecharSheet(); else fecharModal();
+  }
   if (e.key === '/' && document.activeElement.tagName !== 'INPUT') {
     e.preventDefault(); document.getElementById('busca').focus();
   }

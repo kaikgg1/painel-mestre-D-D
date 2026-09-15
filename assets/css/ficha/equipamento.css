@@ -55,7 +55,11 @@
   margin: 10px 0 0; font-size: 11px; color: var(--text-dim);
   font-style: italic; text-align: center; letter-spacing: 0.5px;
 }
-.moedas { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 4px; }
+/* 5 colunas quando há espaço; no mobile cai pra 3 e, como a ordem do
+   catálogo (PHB.MOEDAS) já é PC/PP/PE/PO/PL, sobra exatamente PC PP PE na
+   1ª linha e PO PL na 2ª — sem reordenar nada no HTML. minmax(0,1fr) pra um
+   valor longo (999999) não estourar a coluna. */
+.moedas { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 10px; margin-bottom: 4px; }
 .moeda-box {
   background: linear-gradient(180deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.25) 100%);
   border: 1px solid var(--borda);
@@ -95,8 +99,9 @@
 .item-tabela .lixo:hover { background: var(--blood); color: var(--parchment); }
 .item-vazio { padding: 18px; text-align: center; color: var(--text-dim); font-style: italic; }
 
-/* MOBILE: tabela vira cards verticais (cada linha = um card) */
-@media (max-width: 640px) {
+/* MOBILE: tabela vira cards verticais (cada linha = um card).
+   Breakpoint do projeto: mobile < 768px (era 640 aqui). */
+@media (max-width: 767px) {
   .item-tabela, .item-tabela thead, .item-tabela tbody, .item-tabela tr, .item-tabela td {
     display: block;
   }
@@ -131,7 +136,8 @@
     padding: 0; margin: 0; border: none;
   }
   .item-tabela td:last-child::before { content: ''; min-width: 0; }
-  .item-tabela .lixo { min-height: 36px; min-width: 36px; padding: 4px 10px; font-size: 14px; }
+  .item-tabela tr { padding-right: 56px; }
+  .item-tabela .lixo { min-height: 44px; min-width: 44px; padding: 4px 10px; font-size: 15px; }
 }
 
 .adicionar-bloco { display: flex; gap: 8px; align-items: end; margin-top: 14px; flex-wrap: wrap; }
@@ -152,5 +158,78 @@
 .equip-arma-props {
   flex-basis: 100%; font-size: 12px; color: var(--text-dim); font-style: italic;
   order: 3;
+}
+
+/* ============ FORMULÁRIO "FORA DO CATÁLOGO" ============
+   Desktop (>=768px): os wrappers do sheet somem com display:contents e o
+   formulário continua sendo um bloco inline dentro do .bloco-equip — a
+   apresentação de sempre, byte a byte. Mobile: vira bottom sheet (só abre
+   quando o jogador pede), reaproveitando .sheet-handle/.sheet-close do
+   components.css. Marcação gerada por sheetEquip() (aba_equipamento.js). */
+.equip-sheet, .equip-sheet-painel, .equip-sheet-corpo { display: contents; }
+.equip-sheet .sheet-handle, .equip-sheet-cab, .equip-sheet-abrir { display: none; }
+
+@media (max-width: 767px) {
+  /* Linha de ações do bloco: cada botão ocupa a largura toda (alvo grande),
+     com o campo de Qtd do catálogo ao lado do botão de buscar. */
+  .equip-acoes { flex-direction: column; align-items: stretch; gap: 8px; }
+  .equip-acoes .btn { width: 100%; min-width: 0; min-height: var(--touch-target-lg, 48px); }
+  /* .adicionar-bloco.equip-acoes (e não só .equip-acoes) pra vencer o
+     max-width:none das regras de formulário empilhado mais abaixo. */
+  .adicionar-bloco.equip-acoes .campo-qtd { max-width: 120px !important; }
+
+  .equip-sheet-abrir { display: inline-flex; }
+
+  .equip-sheet {
+    display: none;
+    position: fixed; inset: 0; z-index: 400;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+    align-items: flex-end; justify-content: center;
+  }
+  .equip-sheet.aberto { display: flex; }
+  .equip-sheet-painel {
+    display: flex; flex-direction: column;
+    width: 100%; max-width: 640px; max-height: min(86vh, 720px);
+    background: var(--sf-2); border: 1px solid var(--borda-forte); border-bottom: none;
+    border-radius: var(--r-lg) var(--r-lg) 0 0;
+    box-shadow: var(--elev-3); overflow: hidden;
+    animation: equipSheetSobe .22s ease-out;
+  }
+  @keyframes equipSheetSobe { from { transform: translateY(100%); } to { transform: translateY(0); } }
+  .equip-sheet .sheet-handle { display: block; }
+  .equip-sheet-cab {
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 4px 8px 10px var(--sp-4); border-bottom: 1px solid var(--linha); flex: none;
+  }
+  .equip-sheet-cab h4 {
+    font-family: var(--f-titulo); font-size: 14px; letter-spacing: .5px;
+    color: var(--gold-light); margin: 0;
+  }
+  .equip-sheet-corpo {
+    display: block; overflow-y: auto; flex: 1 1 auto;
+    padding: var(--sp-3) var(--sp-4) calc(var(--sp-4) + env(safe-area-inset-bottom, 0px));
+  }
+  .equip-sheet-corpo .adicionar-bloco { margin-top: 0 !important; }
+
+  /* Formulário empilhado: os max-width inline (90/120/130px) são de layout
+     em linha e viram campos minúsculos numa coluna só. */
+  .adicionar-bloco { flex-direction: column; align-items: stretch; gap: 10px; }
+  .adicionar-bloco .campo { min-width: 0; max-width: none !important; }
+  .adicionar-bloco .campo input,
+  .adicionar-bloco .campo select { min-height: var(--touch-target); font-size: 16px; }
+  .adicionar-bloco .btn { flex: none; width: 100%; min-width: 0; min-height: var(--touch-target-lg, 48px); }
+
+  /* Moedas: PC/PP/PE em cima, PO/PL embaixo */
+  .moedas { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .moeda-box { padding: 8px 4px 6px; }
+  .moeda-box input { min-height: var(--touch-target); font-size: 20px; }
+
+  /* Cards de arma: botão de atacar e de remover com alvo confortável */
+  .equip-armas-lista .ataque-card { padding-right: 52px; }
+  .equip-armas-lista .ataque-card .btn { min-height: var(--touch-target); width: 100%; }
+  .equip-arma-rm { min-height: 40px; min-width: 40px; }
+
+  .carga-bar { padding: 10px 12px; }
 }
 

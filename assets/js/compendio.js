@@ -152,11 +152,12 @@
   /* --- Responsivo (mobile) --------------------------------------------
      O compêndio é usado tanto em página cheia (itens_magicos.html) quanto
      em modal dentro dos painéis; estes ajustes valem para os dois. */
-  @media (max-width: 720px) {
+  @media (max-width: 767px) {
     .cp-ov { padding: 0; }
-    .cp-modal { max-width: 100%; max-height: 100vh; border-radius: 0; border-width: 0 0 1px 0; }
+    .cp-modal { max-width: 100%; max-height: 100vh; max-height: 100dvh; border-radius: 0; border-width: 0 0 1px 0; }
     .cp-head { padding: 12px 14px; }
     .cp-head h2 { font-size: 16px; }
+    .cp-x { min-width: 44px; min-height: 44px; padding: 0; }
     .cp-busca input { font-size: 16px; padding: 12px 14px; }  /* >=16px evita zoom no iOS */
     .cp-chips { gap: 5px; }
     .cp-chip { padding: 7px 12px; font-size: 11px; }          /* alvo de toque maior */
@@ -165,7 +166,8 @@
     .cp-item-nome { font-size: 16px; }
     .cp-stats { grid-template-columns: repeat(3, 1fr); }
     .cp-ficha h3 { font-size: 20px; }
-    .cp-voltar { padding: 10px 16px; font-size: 12px; }
+    /* alvo de toque: o "voltar" é o único caminho de saída da ficha */
+    .cp-voltar { padding: 10px 16px; font-size: 12px; min-height: 44px; }
   }
   @media (max-width: 420px) {
     .cp-stats { grid-template-columns: repeat(2, 1fr); }

@@ -67,7 +67,19 @@
 .seletor-item-nome { flex: 1; min-width: 0; }
 .seletor-item-sub { font-size: 12px; color: var(--text-dim); white-space: nowrap; flex-shrink: 0; }
 
-@media (min-width: 640px) {
+/* Mobile (< 768px): bottom sheet ocupando quase a tela toda, com alvos de
+   toque cheios no fechar e em cada item da lista. */
+@media (max-width: 767px) {
+  .seletor-painel { max-height: 88vh; max-height: 88dvh; }
+  .seletor-fechar { width: var(--touch-target); height: var(--touch-target); font-size: 15px; }
+  .seletor-header { padding: var(--sp-2) var(--sp-3) var(--sp-2) var(--sp-4); }
+  .seletor-item { min-height: var(--touch-target-lg, 48px); padding: var(--sp-2) var(--sp-3); font-size: 15px; }
+  .seletor-corpo { padding-bottom: calc(var(--sp-4) + env(safe-area-inset-bottom, 0px)); }
+}
+
+/* Tablet/desktop (>= 768px, o breakpoint do projeto — era 640px): popover
+   centralizado em vez de colado na base da tela. */
+@media (min-width: 768px) {
   .seletor-overlay { align-items: center; }
   .seletor-painel {
     max-height: 72vh; border-radius: var(--r-lg); border-bottom: 1px solid var(--borda-forte);

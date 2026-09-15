@@ -387,7 +387,14 @@ function renderSlotsMagia(c, slots) {
       const usados = Math.min(s.atual || 0, max);
       const disponivel = max - usados;
       if (max === 0) {
-        return `<div class="slot-card indisponivel">
+        // data-vazio="1": no mobile esses níveis somem por CSS (combate.css /
+        // magias.css). Um personagem de nível 3 não precisa rolar por 7 cards
+        // "indisponível" pra achar os slots que ele realmente tem. No desktop
+        // continuam visíveis — a informação não foi removida, só escondida
+        // onde o espaço de tela é escasso. Não há <input> aqui (os hidden
+        // slot_N_max/atual só existem quando max > 0), então esconder o card
+        // não muda nada no FormData nem no cálculo de slots.
+        return `<div class="slot-card indisponivel" data-vazio="1">
           <div class="slot-titulo">Nível ${nv}</div>
           <div class="slot-max">—</div>
           <div class="slot-status">indisponível</div>

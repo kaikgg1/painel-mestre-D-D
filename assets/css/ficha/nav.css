@@ -16,21 +16,35 @@
   padding: 6px max(6px, env(safe-area-inset-left)) calc(6px + env(safe-area-inset-bottom)) max(6px, env(safe-area-inset-right));
   gap: 2px;
 }
-@media (max-width: 768px) {
+/* Mesmo breakpoint de .tabs-wrap em base.css (mobile = < 768px): as duas
+   barras nunca ficam visíveis juntas e nunca somem juntas. */
+@media (max-width: 767px) {
   .bottom-nav { display: flex; }
-  /* Não deixa o conteúdo ficar escondido atrás da barra fixa */
-  main { padding-bottom: calc(var(--sp-10) + 64px + env(safe-area-inset-bottom)); }
+  /* Não deixa o conteúdo ficar escondido atrás da barra fixa (ícone+rótulo
+     deixaram a barra mais alta: ~56px + o padding próprio dela). */
+  main { padding-bottom: calc(var(--sp-10) + 76px + env(safe-area-inset-bottom)); }
 }
 .bn-item {
-  flex: 1; min-height: 48px;
-  display: flex; align-items: center; justify-content: center;
+  flex: 1; min-width: 0;
+  /* alvo de toque confortável (48px) — WCAG 2.5.5 pede 44 no mínimo */
+  min-height: var(--touch-target-lg, 48px);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px;
   background: transparent; border: none; border-radius: var(--r-sm);
-  color: var(--text-dim); font-family: var(--f-ui); font-size: 11px; font-weight: 600;
-  letter-spacing: .2px; cursor: pointer; padding: 4px;
+  color: var(--text-dim); font-family: var(--f-ui); font-size: 10px; font-weight: 600;
+  letter-spacing: .2px; cursor: pointer; padding: 6px 2px;
+  -webkit-tap-highlight-color: transparent;
 }
+.bn-item .bn-ico { font-size: 18px; line-height: 1; }
 .bn-item .bn-lbl { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%; }
 .bn-item.ativa { color: var(--gold-light); background: var(--sf-ouro); }
 .bn-item:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
+/* 360px: 5 itens de ~64px + gaps ainda cabem, mas o rótulo fica no limite —
+   um respiro a menos no padding lateral evita reticências em "Combate". */
+@media (max-width: 380px) {
+  .bn-item { font-size: 9.5px; padding: 6px 0; }
+  .bn-item .bn-ico { font-size: 17px; }
+}
 
 /* ── Bottom sheet "Mais" ── */
 .sheet-overlay {
@@ -53,11 +67,15 @@
 .sheet-overlay.open .sheet-mais { transform: translateY(0); }
 .sheet-handle { width: 36px; height: 4px; border-radius: var(--r-pill); background: var(--borda-forte); margin: var(--sp-2) auto var(--sp-3); }
 .sheet-item {
-  min-height: 48px; text-align: left;
+  min-height: var(--touch-target-lg, 48px); text-align: left;
+  display: flex; align-items: center; gap: var(--sp-3);
   background: transparent; border: none; border-radius: var(--r-sm);
   color: var(--parchment); font-family: var(--f-ui); font-size: var(--fs-ui); font-weight: 600;
-  padding: 0 var(--sp-3); cursor: pointer;
+  padding: var(--sp-2) var(--sp-3); cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
 }
+.sheet-item .sheet-ico { font-size: 18px; line-height: 1; width: 22px; text-align: center; flex-shrink: 0; }
+.sheet-item.ativa { color: var(--gold-light); background: var(--sf-ouro); }
 .sheet-item:hover, .sheet-item:focus-visible { background: var(--sf-3); outline: none; }
 
 @media (prefers-reduced-motion: reduce) {

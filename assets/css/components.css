@@ -175,6 +175,94 @@
   overflow: auto;
 }
 
+/* ===== BOTTOM SHEET (padrão reutilizável) =====
+   Para filtros, seletores e ações secundárias em telas < 768px: sobe da
+   base da tela, com backdrop e handle de arraste visual. Qualquer página
+   pode usar esta marcação:
+   <div class="sheet-overlay"> <div class="sheet-panel">
+     <div class="sheet-handle"></div>
+     <div class="sheet-header"><h4>Título</h4><button class="sheet-close">✕</button></div>
+     <div class="sheet-body">...</div>
+     <div class="sheet-footer">...</div>
+   </div></div>
+   Controle de exibição via classe .aberto no overlay (display:none por
+   padrão) — mesma convenção usada no restante do projeto. */
+.sheet-overlay {
+  position: fixed; inset: 0; z-index: 400;
+  display: none;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(3px);
+  align-items: flex-end;
+  justify-content: center;
+}
+.sheet-overlay.aberto { display: flex; }
+.sheet-panel {
+  width: 100%;
+  max-width: 640px;
+  max-height: min(82vh, 720px);
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-bottom: none;
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -12px 40px var(--shadow);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding-bottom: env(safe-area-inset-bottom, 0);
+  animation: sheet-sobe .22s ease-out;
+}
+@keyframes sheet-sobe {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.sheet-handle {
+  width: 40px; height: 4px;
+  background: var(--border);
+  border-radius: 999px;
+  margin: 10px auto 4px;
+  flex: none;
+}
+.sheet-header {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px;
+  padding: 6px 18px 12px;
+  border-bottom: 1px solid var(--border-soft);
+  flex: none;
+}
+.sheet-header h4 {
+  font-family: var(--font-heading);
+  font-size: 15px;
+  letter-spacing: .5px;
+  color: var(--gold-light);
+  margin: 0;
+}
+.sheet-close {
+  min-width: var(--touch-target); min-height: var(--touch-target);
+  display: inline-flex; align-items: center; justify-content: center;
+  background: transparent; border: none; color: var(--text-muted);
+  font-size: 18px; cursor: pointer; border-radius: var(--radius-sm);
+}
+.sheet-close:hover { color: var(--gold-light); }
+.sheet-close:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.sheet-body { overflow-y: auto; padding: 14px 18px; flex: 1 1 auto; }
+.sheet-footer {
+  display: flex; gap: 10px;
+  padding: 12px 18px calc(12px + env(safe-area-inset-bottom, 0));
+  border-top: 1px solid var(--border-soft);
+  flex: none;
+}
+.sheet-footer .btn { flex: 1; min-height: var(--touch-target-lg); }
+
+@media (min-width: 768px) {
+  /* Em telas de tablet/desktop, o "sheet" pode continuar sendo aberto
+     via JS só em mobile — mas se alguma página optar por reaproveitar a
+     marcação em telas largas, cai como modal central em vez de colar na
+     base, pra não parecer um bottom sheet fora de contexto num desktop. */
+  .sheet-overlay { align-items: center; padding: 20px; }
+  .sheet-panel { border-radius: var(--radius); border-bottom: 1px solid var(--border); max-height: 80vh; }
+  @keyframes sheet-sobe { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+}
+
 /* ===== DIVISÓRIA ORNAMENTAL DISCRETA ===== */
 .ornament-divider {
   display: flex; align-items: center; gap: 12px;
@@ -192,6 +280,21 @@
 @media (max-width: 640px) {
   .site-header { padding: 12px 14px; }
   .back-btn, .btn { padding: 12px 16px; min-height: 44px; }
+}
+
+/* Modal genérico (.modal-overlay/.modal) vira fullscreen em telas de
+   celular — páginas com modal próprio e mais específico (bestiário,
+   grimório) tratam isso no próprio <style>; esta regra cobre quem usa
+   o modal compartilhado (ex.: UI.abrirModal da ficha). */
+@media (max-width: 767px) {
+  .modal-overlay { padding: 0; align-items: stretch; }
+  .modal {
+    width: 100%;
+    height: 100dvh;
+    max-width: none;
+    max-height: none;
+    border-radius: 0;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

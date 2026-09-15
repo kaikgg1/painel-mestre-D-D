@@ -64,7 +64,7 @@ function renderHeader(c) {
   if (temCampanha && ehAtivo) {
     const nomeCampanha = escape(CAMPANHAS.find(([k]) => k === c.campanha)?.[1] || c.campanha);
     campanhaHtml = `<span class="hdr-campanha" title="Esta ficha aparece no painel do Mestre — campanha: ${nomeCampanha}">
-      <span class="dot" aria-hidden="true"></span><span class="lbl">Vinculado a ${nomeCampanha}</span>
+      <span class="dot" aria-hidden="true"></span><span class="lbl"><span class="lbl-prefixo">Vinculado a </span>${nomeCampanha}</span>
     </span>`;
   } else {
     const problemas = [];

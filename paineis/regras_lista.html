@@ -23,16 +23,28 @@
 
   .add-regra-wrap { display: flex; justify-content: center; margin: 0 0 24px; }
 
-  /* ---- cartões numerados ---- */
+  /* ---- cartões numerados (accordion) ---- */
   .lista-regras { display: flex; flex-direction: column; gap: 12px; }
-  .regra { padding: 16px 18px; display: flex; gap: 14px; align-items: flex-start; }
+  .regra { padding: 0; overflow: hidden; }
+
+  .regra-head { display: flex; gap: 14px; align-items: center; width: 100%;
+    min-height: var(--touch-target-lg, 48px); padding: 12px 18px; text-align: left;
+    background: none; border: 0; border-radius: inherit; color: inherit; font: inherit; cursor: pointer; }
+  .regra-head:hover .nome { color: var(--gold); }
+  .regra-head:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
+
   .regra .num { flex: 0 0 auto; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
     background: color-mix(in srgb, var(--gold) 16%, transparent); border: 1px solid var(--border); color: var(--gold-light);
     font-family: var(--font-heading); font-size: 13px; font-weight: 700; }
-  .regra .corpo { flex: 1; min-width: 0; }
-  .regra .nome { font-family: var(--font-heading); font-size: 14.5px; font-weight: 700; letter-spacing: .4px;
-    color: var(--gold-light); text-transform: uppercase; margin-bottom: 4px; }
-  .regra .desc { font-size: 16px; line-height: 1.55; color: var(--text); }
+  .regra .nome { flex: 1; min-width: 0; font-family: var(--font-heading); font-size: 14.5px; font-weight: 700; letter-spacing: .4px;
+    color: var(--gold-light); text-transform: uppercase; line-height: 1.35; transition: color .18s; }
+  .regra .chevron { flex: 0 0 auto; color: var(--text-muted); font-size: 13px; line-height: 1;
+    transition: transform .2s ease, color .2s ease; }
+  .regra.aberta .chevron { transform: rotate(180deg); color: var(--gold-light); }
+
+  .regra .desc { display: none; font-size: 16px; line-height: 1.55; color: var(--text);
+    padding: 0 18px 16px; margin-left: 46px; }
+  .regra.aberta .desc { display: block; }
   .regra .desc strong { color: var(--gold-light); font-weight: 600; }
 
   .carregando, .vazio, .erro-carregar { text-align: center; color: var(--text-muted); font-style: italic; padding: 20px; }
@@ -49,11 +61,14 @@
   #form-add-regra input:focus, #form-add-regra textarea:focus { outline: 2px solid var(--gold); outline-offset: 1px; border-color: var(--gold); }
   #form-add-regra .acoes { display: flex; gap: 10px; justify-content: flex-end; }
 
-  @media (max-width: 700px) {
-    .regra { padding: 14px; gap: 10px; }
-    .regra .desc { font-size: 15px; }
+  @media (max-width: 767px) {
+    main { padding: 18px var(--mobile-padding, 16px) 48px; }
+    .lista-regras { gap: 10px; }
+    .regra-head { gap: 10px; padding: 10px 14px; }
+    .regra .desc { font-size: 15px; padding: 0 14px 14px; margin-left: 42px; }
+    #btn-add-regra { width: 100%; min-height: var(--touch-target-lg, 48px); }
     #form-add-regra .acoes { flex-direction: column-reverse; }
-    #form-add-regra .acoes .btn { width: 100%; }
+    #form-add-regra .acoes .btn { width: 100%; min-height: var(--touch-target-lg, 48px); }
   }
 </style>
 </head>
@@ -115,17 +130,31 @@
     return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   }
 
+  // No mobile as regras nascem fechadas (accordion); em telas maiores, já abertas.
+  const mqMobile = window.matchMedia('(max-width: 767px)');
+
   function renderRegras(regras) {
     if (!regras.length) { lista.innerHTML = '<p class="vazio">Nenhuma regra cadastrada ainda.</p>'; return; }
+    const aberta = !mqMobile.matches;
     lista.innerHTML = regras.map((r, i) => `
-      <div class="card regra">
-        <div class="num">${i + 1}</div>
-        <div class="corpo">
-          <div class="nome">${escapeHtml(r.titulo)}</div>
-          <div class="desc">${escapeHtml(r.descricao).replace(/\n/g, '<br>')}</div>
-        </div>
+      <div class="card regra${aberta ? ' aberta' : ''}">
+        <button type="button" class="regra-head" aria-expanded="${aberta}" aria-controls="regra-desc-${i}">
+          <span class="num">${i + 1}</span>
+          <span class="nome">${escapeHtml(r.titulo)}</span>
+          <span class="chevron" aria-hidden="true">▾</span>
+        </button>
+        <div class="desc" id="regra-desc-${i}">${escapeHtml(r.descricao).replace(/\n/g, '<br>')}</div>
       </div>`).join('');
   }
+
+  lista.addEventListener('click', (e) => {
+    const head = e.target.closest('.regra-head');
+    if (!head || !lista.contains(head)) return;
+    const regra = head.closest('.regra');
+    const vaiAbrir = !regra.classList.contains('aberta');
+    regra.classList.toggle('aberta', vaiAbrir);
+    head.setAttribute('aria-expanded', String(vaiAbrir));
+  });
 
   async function carregarRegras() {
     const { data, error } = await window.sb.from('regras_casa').select('*').order('ordem', { ascending: true });

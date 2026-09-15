@@ -20,31 +20,56 @@ function renderMagias(c) {
       Aparecem aqui as magias marcadas como favoritas no <a href="magias.html" style="color:var(--gold-bright)">Grimório</a>.
     </p>
 
-    <div class="hab-busca-wrap">
+    <!-- .no-lock: idem aba Habilidades — busca não é dado do personagem e
+         não deve sair do tab order quando a ficha está travada. -->
+    <div class="hab-busca-wrap magia-busca-linha no-lock">
       <input type="search" id="magia-busca" class="hab-busca-input" placeholder="Buscar magia…" aria-label="Buscar magia">
+      <button type="button" class="btn no-lock magia-filtros-abrir" id="btn-magia-filtros" data-abrir-sheet="magia-filtros-sheet" aria-label="Abrir filtros">
+        Filtros<span class="magia-filtros-badge" id="magia-filtros-badge" hidden></span>
+      </button>
     </div>
-    <div class="magia-filtros" id="magia-filtros" hidden>
-      <div class="linha-filtro-magia">
-        <span class="linha-filtro-lbl">Nível</span>
-        <div class="hab-filtros">
-          ${[0,1,2,3,4,5,6,7,8,9].map(n => `<button type="button" class="pill ${_magiaNiveis.has(n)?'ativo':''}" data-magia-nivel="${n}" aria-pressed="${_magiaNiveis.has(n)}">${n===0?'Truque':n+'º'}</button>`).join('')}
+
+    <!-- Sheet de filtros: no desktop os wrappers viram display:contents e as
+         4 linhas de pills continuam sendo conteúdo normal da aba (como
+         sempre). No mobile são ~20 pills que comiam mais de um terço da tela
+         antes da primeira magia aparecer, então viram um bottom sheet. -->
+    <div class="magia-filtros-sheet" id="magia-filtros-sheet">
+      <div class="magia-filtros-painel">
+        <div class="sheet-handle" aria-hidden="true"></div>
+        <div class="magia-filtros-cab">
+          <h4>Filtrar magias</h4>
+          <button type="button" class="sheet-close no-lock" data-fechar-sheet="magia-filtros-sheet" aria-label="Fechar">✕</button>
         </div>
-      </div>
-      <div class="linha-filtro-magia">
-        <span class="linha-filtro-lbl">Escola</span>
-        <div class="hab-filtros" id="magia-filtro-escolas"><!-- só as escolas presentes na lista, populado no carregar --></div>
-      </div>
-      <div class="linha-filtro-magia">
-        <span class="linha-filtro-lbl">Ação</span>
-        <div class="hab-filtros">
-          ${['todas','acao','bonus','reacao','outro'].map(t => `<button type="button" class="pill ${_magiaTipo===t?'ativo':''}" data-magia-tipo="${t}" aria-pressed="${_magiaTipo===t}">${{todas:'Todas',acao:'Ação',bonus:'Ação Bônus',reacao:'Reação',outro:'Outro'}[t]}</button>`).join('')}
+        <div class="magia-filtros-corpo">
+          <div class="magia-filtros" id="magia-filtros" hidden>
+            <div class="linha-filtro-magia">
+              <span class="linha-filtro-lbl">Nível</span>
+              <div class="hab-filtros">
+                ${[0,1,2,3,4,5,6,7,8,9].map(n => `<button type="button" class="pill no-lock ${_magiaNiveis.has(n)?'ativo':''}" data-magia-nivel="${n}" aria-pressed="${_magiaNiveis.has(n)}">${n===0?'Truque':n+'º'}</button>`).join('')}
+              </div>
+            </div>
+            <div class="linha-filtro-magia">
+              <span class="linha-filtro-lbl">Escola</span>
+              <div class="hab-filtros" id="magia-filtro-escolas"><!-- só as escolas presentes na lista, populado no carregar --></div>
+            </div>
+            <div class="linha-filtro-magia">
+              <span class="linha-filtro-lbl">Ação</span>
+              <div class="hab-filtros">
+                ${['todas','acao','bonus','reacao','outro'].map(t => `<button type="button" class="pill no-lock ${_magiaTipo===t?'ativo':''}" data-magia-tipo="${t}" aria-pressed="${_magiaTipo===t}">${{todas:'Todas',acao:'Ação',bonus:'Ação Bônus',reacao:'Reação',outro:'Outro'}[t]}</button>`).join('')}
+              </div>
+            </div>
+            <div class="linha-filtro-magia">
+              <span class="linha-filtro-lbl">&nbsp;</span>
+              <div class="hab-filtros">
+                <button type="button" class="pill no-lock ${_magiaConcentracao?'ativo':''}" data-magia-bool="concentracao" aria-pressed="${_magiaConcentracao}">◐ Concentração</button>
+                <button type="button" class="pill no-lock ${_magiaRitual?'ativo':''}" data-magia-bool="ritual" aria-pressed="${_magiaRitual}">✦ Ritual</button>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="linha-filtro-magia">
-        <span class="linha-filtro-lbl">&nbsp;</span>
-        <div class="hab-filtros">
-          <button type="button" class="pill ${_magiaConcentracao?'ativo':''}" data-magia-bool="concentracao" aria-pressed="${_magiaConcentracao}">◐ Concentração</button>
-          <button type="button" class="pill ${_magiaRitual?'ativo':''}" data-magia-bool="ritual" aria-pressed="${_magiaRitual}">✦ Ritual</button>
+        <div class="magia-filtros-rodape">
+          <button type="button" class="btn no-lock" id="btn-magia-limpar">Limpar filtros</button>
+          <button type="button" class="btn primary no-lock" data-fechar-sheet="magia-filtros-sheet">Ver magias</button>
         </div>
       </div>
     </div>
@@ -99,6 +124,20 @@ function aplicarFiltroMagias() {
   });
   const semResultados = document.getElementById('magias-sem-resultados');
   if (semResultados) semResultados.hidden = visiveis > 0;
+  atualizarBadgeFiltrosMagia();
+}
+
+// Contador de filtros ativos no botão "Filtros" — no mobile os pills ficam
+// escondidos dentro do sheet, então sem isso não dá pra saber que a lista
+// está filtrada (só que "sumiram magias").
+function atualizarBadgeFiltrosMagia() {
+  const badge = document.getElementById('magia-filtros-badge');
+  if (!badge) return;
+  const n = _magiaNiveis.size + _magiaEscolas.size
+    + (_magiaTipo !== 'todas' ? 1 : 0)
+    + (_magiaConcentracao ? 1 : 0) + (_magiaRitual ? 1 : 0);
+  badge.textContent = n;
+  badge.hidden = n === 0;
 }
 
 function conectarListenersFiltroMagias() {
@@ -155,6 +194,23 @@ function conectarListenersFiltroMagias() {
       aplicarFiltroMagias();
     });
   });
+
+  // "Limpar filtros" (rodapé do sheet) — zera o estado e devolve todos os
+  // pills ao visual de desmarcado sem re-renderizar a aba.
+  const btnLimpar = document.getElementById('btn-magia-limpar');
+  if (btnLimpar) btnLimpar.addEventListener('click', () => {
+    _magiaNiveis.clear();
+    _magiaEscolas.clear();
+    _magiaTipo = 'todas';
+    _magiaConcentracao = false;
+    _magiaRitual = false;
+    filtrosWrap.querySelectorAll('.pill').forEach(b => {
+      const ativo = b.dataset.magiaTipo === 'todas';
+      b.classList.toggle('ativo', ativo);
+      b.setAttribute('aria-pressed', String(ativo));
+    });
+    aplicarFiltroMagias();
+  });
 }
 
 async function carregarMagiasPreparadas() {
@@ -176,9 +232,13 @@ async function carregarMagiasPreparadas() {
   const escolaWrap = document.getElementById('magia-filtro-escolas');
   if (escolaWrap) {
     const escolas = [...new Set(lista.map(m => m.escola))].sort((a,b) => a.localeCompare(b, 'pt'));
-    escolaWrap.innerHTML = escolas.map(es => `<button type="button" class="pill ${_magiaEscolas.has(es)?'ativo':''}" data-magia-escola="${escape(es)}" aria-pressed="${_magiaEscolas.has(es)}">${escape(es)}</button>`).join('');
+    escolaWrap.innerHTML = escolas.map(es => `<button type="button" class="pill no-lock ${_magiaEscolas.has(es)?'ativo':''}" data-magia-escola="${escape(es)}" aria-pressed="${_magiaEscolas.has(es)}">${escape(es)}</button>`).join('');
   }
   if (filtrosWrap) filtrosWrap.hidden = lista.length < 2; // com 0-1 magia, filtro é ruído
+  // …e o botão que abre o sheet de filtros no mobile some junto (senão abre
+  // um sheet vazio).
+  const btnFiltros = document.getElementById('btn-magia-filtros');
+  if (btnFiltros) btnFiltros.hidden = lista.length < 2;
 
   wrap.innerHTML = `<div class="magias-lista">${lista.map((m, i) => {
     const nv = m.nivel === 0 ? 'Truque' : `${m.nivel}°`;

@@ -51,11 +51,18 @@
 .stat-hp-numero input:focus { border-bottom-color: var(--borda-ouro); }
 .stat-hp-numero .sep { color: var(--text-dim); }
 .stat-hp-temp { font-size: 12px; font-weight: 600; color: var(--ok); margin-left: auto; }
-.resumo-hp-quick { display: flex; gap: 4px; margin-top: var(--sp-2); }
+/* 8 atalhos (±1/5/10/20) em 2 fileiras de 4 — grid fixo em vez de flex-wrap
+   porque assim as duas fileiras ficam sempre alinhadas, em qualquer largura
+   de card (o Resumo é um dashboard: a coluna pode ser estreita no desktop). */
+.resumo-hp-quick {
+  display: grid; grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px; margin-top: var(--sp-2);
+}
 .resumo-hp-quick button {
-  flex: 1; min-height: 32px; border-radius: var(--r-sm); cursor: pointer;
+  min-height: 34px; border-radius: var(--r-sm); cursor: pointer;
   font-family: var(--f-ui); font-size: 12px; font-weight: 700;
   border: 1px solid var(--borda); background: var(--sf-2); color: var(--parchment);
+  padding: 4px 2px;
 }
 .resumo-hp-quick .q-dano:hover { border-color: var(--blood); color: #c08878; }
 .resumo-hp-quick .q-cura:hover { border-color: var(--ok); color: var(--ok); }
@@ -133,9 +140,61 @@
 
 .resumo-atalhos { display: flex; flex-wrap: wrap; gap: var(--sp-2); }
 
-@media (max-width: 480px) {
+/* ============ RESUMO MOBILE (< 768px) ============
+   O bloco Status deixa de ser uma fileira flex que tenta caber tudo numa
+   linha e vira: PV em largura cheia (o dado mais consultado da mesa) +
+   CA/Iniciativa/Deslocamento/Inspiração num grid de 2 colunas.
+
+   As seções (Ataques/Recursos/Magias/Outros) já empilham sozinhas — o
+   auto-fit de .resumo-grid cai pra 1 coluna bem antes de 768px; aqui só
+   ajustamos folga interna e alvos de toque. */
+@media (max-width: 767px) {
   .resumo-grid { gap: var(--sp-4); }
-  .resumo-secao { padding: var(--sp-3); }
-  .stat-card { min-width: 92px; padding: var(--sp-2); }
-  .stat-card-valor { font-size: 19px; }
+  .resumo-secao { padding: var(--card-padding, 16px); }
+
+  .resumo-status .stat-row {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-2, 8px);
+  }
+  /* min-width do .stat-card (base.css) existe pro layout flex; dentro do
+     grid ele só serviria pra estourar a largura em telas de 320-360px. */
+  .resumo-status .stat-card { min-width: 0; flex: none; padding: var(--space-3, 12px) var(--space-2, 8px); }
+  .resumo-status .stat-card.stat-hp { grid-column: 1 / -1; padding: var(--card-padding, 16px); }
+  .resumo-status .stat-card-valor { font-size: 21px; }
+  /* Inspiração: [−][n][+] numa coluna de ~140px. Os botões mantêm os 44px
+     de toque (.insp-btn, personagem.css) e é o campo que cede largura;
+     flex-wrap é a rede de segurança pra telas de 320px. */
+  .resumo-status .resumo-insp-linha { gap: var(--space-1, 4px); flex-wrap: wrap; }
+  .resumo-status .resumo-insp-input { width: 1.4em; min-width: 0; }
+  .resumo-status .insp-btn { flex-shrink: 0; }
+
+  /* PV: número e barra maiores — é o destaque da tela em sessão. */
+  .resumo-status .stat-hp-numero { font-size: 28px; margin: var(--space-2, 8px) 0; }
+  .resumo-status .stat-hp-numero input { width: 2.2em; }
+  /* .hp-bar/.hp-percent já ganham altura/fonte de mobile em combate.css
+     (são a mesma peça, usada pelas duas abas) — não repetir aqui. */
+
+  /* 4 colunas × 2 fileiras, cada botão com alvo de toque real (44px). */
+  .resumo-hp-quick { gap: 6px; margin-top: var(--space-3, 12px); }
+  .resumo-hp-quick button { min-height: var(--touch-target, 44px); font-size: 14px; }
+  .resumo-hp-temp-edit { margin-top: var(--space-3, 12px); font-size: 12px; }
+  .resumo-hp-temp-edit input { width: 46px; min-height: 34px; font-size: 15px; }
+
+  /* Chips e atalhos das outras seções: nada apertado a 360px. */
+  .resumo-salv-chip { padding: 8px 12px; font-size: 13px; }
+  .condicao-chip { min-height: var(--touch-target, 44px); padding: 4px 6px 4px 14px; font-size: 13px; }
+  .condicao-x { width: 30px; height: 30px; font-size: 13px; }
+  .resumo-atalhos .btn { flex: 1 1 100%; }
+  .ataque-card { padding: var(--space-3, 12px); gap: var(--space-2, 8px); }
+  .ataque-card .btn { margin-left: auto; }
+}
+
+/* 360px: "Deslocamento"/"Iniciativa" ainda cabem em 2 colunas porque o
+   rótulo quebra (overflow-wrap:anywhere em base.css) — só o corpo do card
+   fica mais justo. */
+@media (max-width: 380px) {
+  .resumo-secao { padding: var(--space-3, 12px); }
+  .resumo-status .stat-card-valor { font-size: 19px; }
+  .resumo-hp-quick button { font-size: 13px; }
 }

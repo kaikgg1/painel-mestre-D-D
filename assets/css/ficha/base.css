@@ -135,8 +135,9 @@ html, body {
 .back-btn:hover { background: var(--sf-3); border-color: var(--borda-forte); color: var(--parchment); }
 .back-btn:active { background: var(--sf-2); }
 .back-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
-/* Mobile: só a seta — texto "Voltar" sai, o alvo de toque continua >=38px */
-@media (max-width: 640px) { .back-btn-lbl { display: none; } }
+/* Mobile: só a seta — texto "Voltar" sai, o alvo de toque vira 44px (ver o
+   bloco "HEADER MOBILE" no fim desta seção). */
+@media (max-width: 767px) { .back-btn-lbl { display: none; } }
 
 .auth-slot { display: flex; align-items: center; gap: var(--sp-2); font-family: var(--f-ui); font-size: var(--fs-meta); flex-shrink: 0; margin-left: auto; }
 .auth-nome { color: var(--parchment-dim); }
@@ -150,7 +151,7 @@ html, body {
 }
 .auth-btn:hover { background: var(--sf-3); border-color: var(--borda-forte); color: var(--parchment); }
 .auth-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
-@media (max-width: 640px) { .auth-nome { display: none; } }
+@media (max-width: 767px) { .auth-nome { display: none; } }
 
 /* -- Identidade: avatar + nome (com trocador embutido) + subtitulo -- */
 .hdr-id { display: flex; align-items: center; gap: var(--sp-3); min-width: 0; flex: 1; }
@@ -161,9 +162,14 @@ html, body {
   color: var(--parchment); background-size: cover; background-position: center;
   border: 1px solid var(--borda-forte);
 }
-@media (max-width: 640px) { .hdr-avatar { display: none; } }
+/* O avatar sumia por completo abaixo de 640px. Em teste ele ancora a linha
+   (dá de onde o nome "pendura" e onde a segunda linha do bloco recua), e
+   34px custam pouco — então em mobile ele fica, só menor. */
+@media (max-width: 767px) {
+  .hdr-avatar { width: 34px; height: 34px; font-size: 12px; }
+}
 
-.hdr-nome-bloco { min-width: 0; }
+.hdr-nome-bloco { min-width: 0; flex: 1; }
 .hdr-nome-wrap { position: relative; display: inline-flex; align-items: baseline; gap: var(--sp-1); max-width: 100%; }
 .hdr-nome {
   font-family: var(--f-display); font-size: var(--fs-display);
@@ -192,8 +198,11 @@ html, body {
 .hdr-campanha.aviso { color: var(--gold-light); border-color: var(--borda-ouro); cursor: pointer; background: var(--sf-ouro); }
 .hdr-campanha.aviso:hover { background: color-mix(in srgb, var(--gold) 16%, var(--sf-2)); }
 .hdr-campanha.aviso:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
-.hdr-campanha .lbl { overflow: hidden; text-overflow: ellipsis; }
-@media (max-width: 560px) { .hdr-campanha .lbl { display: none; } }
+.hdr-campanha .lbl { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+/* Antes o rótulo sumia inteiro abaixo de 560px e sobrava um ponto verde sem
+   significado. Agora só o prefixo "Vinculado a" sai — fica "● Maldição de
+   Strahd", que é a informação que o jogador procura, com ellipsis se longo. */
+@media (max-width: 767px) { .hdr-campanha .lbl-prefixo { display: none; } }
 
 /* -- Autosave (paragrafo 17) -- badge de estado, nao mais so texto de rodape -- */
 .autosave-status { display: inline-flex; align-items: center; gap: var(--sp-2); }
@@ -210,7 +219,16 @@ html, body {
   border-radius: var(--r-sm); padding: 3px 8px; cursor: pointer;
 }
 .status-retry:hover { background: color-mix(in srgb, var(--erro) 16%, transparent); }
-@media (max-width: 560px) { .status-msg .txt { display: none; } }
+/* Mobile: o autosave vira um sinal discreto (só o ícone) — não compete por
+   espaço com o nome do PJ nem com a campanha. A exceção é o estado de ERRO,
+   onde o texto é a única pista de que algo não salvou. */
+@media (max-width: 767px) {
+  .status-msg .txt { display: none; }
+  .status-msg.erro .txt { display: inline; font-size: var(--fs-label); }
+  .status-msg { gap: 4px; }
+  .status-msg iconify-icon { font-size: 15px; }
+  .status-retry { min-height: var(--touch-target, 44px); padding: 4px 10px; }
+}
 @media (prefers-reduced-motion: reduce) { .status-msg.salvando .dots span { animation: none; } }
 
 /* -- Menu de acoes (tres pontos) -- reune Novo/Duplicar/Ativo/Excluir -- */
@@ -250,8 +268,74 @@ html, body {
 
 /* Editar/travar continua botao proprio e visivel (nao entra no menu):
    e a troca de MODO da ficha inteira, nao uma acao administrativa rara. */
-@media (max-width: 640px) {
-  .hdr-linha-meta .status-msg .txt { display: none; }
+
+/* ============ HEADER MOBILE (< 768px) ============
+   Alvo visual:
+
+     ←  [av] VACLAV KOVÁR                 ⋮
+             Paladino 8
+     ● Maldição de Strahd              ⏺  🔒
+
+   O ⋮ precisa subir pra primeira linha, mas ele mora no #hdr-meta (segunda
+   linha) — e mover no DOM mudaria o desktop. A saída é puramente CSS: as
+   duas .hdr-linha viram `display: contents` e o próprio .site-header vira
+   um grid de 2 linhas × 4 colunas, então cada filho escolhe sua célula por
+   grid-area sem sair do lugar no HTML.
+
+   Colunas: [voltar auto] [identidade 1fr] [auth auto] [menu auto].
+   A coluna de identidade é minmax(0,1fr) — é ela que encolhe, e todo texto
+   dentro dela já tem ellipsis, então nada empurra a largura da página. */
+@media (max-width: 767px) {
+  .site-header {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    grid-template-areas:
+      "voltar   identidade auth      menu"
+      "campanha campanha   autosave  lock";
+    align-items: center;
+    column-gap: var(--space-2, 8px);
+    row-gap: var(--space-2, 8px);
+    padding: var(--space-2, 8px) var(--mobile-padding, 16px);
+  }
+  .hdr-linha-principal, .hdr-linha-meta { display: contents; }
+
+  .back-btn      { grid-area: voltar; min-height: var(--touch-target, 44px); min-width: var(--touch-target, 44px); justify-content: center; padding: 0 var(--space-2, 8px); }
+  .hdr-id        { grid-area: identidade; gap: var(--space-2, 8px); }
+  .auth-slot     { grid-area: auth; margin-left: 0; }
+  .menu-acoes    { grid-area: menu; }
+  .hdr-campanha  { grid-area: campanha; justify-self: start; min-width: 0; }
+  .autosave-status { grid-area: autosave; justify-self: end; }
+  .btn-lock-toggle { grid-area: lock; justify-self: end; }
+
+  .hdr-nome { font-size: 19px; letter-spacing: .3px; }
+  .hdr-subtitulo { font-size: 11px; }
+
+  /* Alvos de toque do header (44px). .btn-icon/.btn-lock-toggle também são
+     alvo de um `!important` genérico em sistema.css (carregado depois) — por
+     isso os seletores aqui são mais específicos, senão perdem a disputa. */
+  .site-header .btn-icon {
+    width: auto; height: auto;
+    min-width: var(--touch-target, 44px); min-height: var(--touch-target, 44px);
+    font-size: 19px; padding: 0 var(--space-2, 8px);
+  }
+  /* Cadeado vira botão de ícone: o rótulo "Editar"/"Travar" é um nó de texto
+     solto criado por atualizarLockLabel() (lock.js) — sem elemento próprio
+     pra esconder, então font-size:0 no container e tamanho explícito no
+     ícone. O title/aria-pressed continuam dizendo o estado. */
+  .site-header .btn-lock-toggle {
+    min-width: var(--touch-target, 44px); min-height: var(--touch-target, 44px);
+    padding: 0 12px;
+  }
+  .site-header .btn-lock-toggle #lock-toggle-label { font-size: 0; letter-spacing: 0; }
+  .site-header .btn-lock-toggle #lock-toggle-label iconify-icon { font-size: 18px; }
+
+  /* Menu ⋯ usável no toque: itens de 48px e nunca mais largo que a tela. */
+  .menu-popover {
+    min-width: 232px;
+    max-width: calc(100vw - 2 * var(--mobile-padding, 16px));
+    padding: var(--space-2, 8px);
+  }
+  .menu-item { min-height: var(--touch-target-lg, 48px); font-size: var(--fs-body); }
 }
 
 /* ============ MAIN ============ */
@@ -259,7 +343,7 @@ main { max-width: var(--ficha-max); margin: var(--sp-5) auto; padding: 0 var(--s
 /* Margem lateral por breakpoint (§20): 32px desktop, 24px tablet, 16px mobile.
    O valor de desktop já é o padrão acima; só os dois de baixo sobrescrevem. */
 @media (max-width: 1080px) { main { padding: 0 var(--sp-6) var(--sp-8); } }
-@media (max-width: 640px)  { main { padding: 0 var(--sp-4) var(--sp-6); } }
+@media (max-width: 767px)  { main { padding: 0 var(--mobile-padding, 16px) var(--sp-6); } }
 .estado { padding: var(--sp-8); text-align: center; color: var(--text-dim); font-style: italic; }
 
 /* ============ BOTÕES ============ */
@@ -335,7 +419,7 @@ main { max-width: var(--ficha-max); margin: var(--sp-5) auto; padding: 0 var(--s
    visíveis juntas no mobile, com a de cima obrigando um scroll horizontal
    ruim pra alcançar as últimas abas. Mesmo breakpoint do .bottom-nav
    (nav.css) pra trocar de uma pra outra sem sobreposição nem buraco. */
-@media (max-width: 768px) {
+@media (max-width: 767px) {
   .tabs-wrap { display: none; }
   /* sem a barra de cima, o conteúdo vira o topo do card — devolve a borda/
      cantos que .tab-content normalmente cede pra ficar "colado" nela. */

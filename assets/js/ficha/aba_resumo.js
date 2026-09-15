@@ -77,10 +77,14 @@ function renderResumoStatus(c) {
           <div class="hp-percent" id="hp-percent">${pct}%</div>
         </div>
         <div class="resumo-hp-quick" aria-label="Atalhos de dano/cura">
+          <button type="button" class="q-dano" data-quick="-20">-20</button>
+          <button type="button" class="q-dano" data-quick="-10">-10</button>
           <button type="button" class="q-dano" data-quick="-5">-5</button>
           <button type="button" class="q-dano" data-quick="-1">-1</button>
           <button type="button" class="q-cura" data-quick="1">+1</button>
           <button type="button" class="q-cura" data-quick="5">+5</button>
+          <button type="button" class="q-cura" data-quick="10">+10</button>
+          <button type="button" class="q-cura" data-quick="20">+20</button>
         </div>
         <div class="resumo-hp-temp-edit">
           PV temp.: <input name="hp_temp" type="text" inputmode="numeric" value="${hpTemp}" data-validar="int" data-min="0" aria-label="PV temporários">

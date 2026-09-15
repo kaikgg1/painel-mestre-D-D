@@ -64,7 +64,7 @@ function renderEquipamento(c) {
         <h3 class="bloco-titulo">Moedas</h3>
       </div>
       <div class="moedas">
-        ${window.PHB.MOEDAS.map(md => `<div class="moeda-box">
+        ${window.PHB.MOEDAS.map(md => `<div class="moeda-box" data-moeda="${md.codigo}">
           <div class="moeda-ic" aria-hidden="true">${moedaDot(md.codigo)}</div>
           <label>${md.abrev}</label>
           <input type="text" inputmode="numeric" name="moeda_${md.codigo}" value="${m[md.codigo] ?? 0}" data-validar="int" data-min="0" aria-label="${md.nome}">
@@ -80,9 +80,11 @@ function renderEquipamento(c) {
         <span class="contador-bloco">${inv.armas?.length || 0}</span>
       </div>
       ${renderCardsArmas(inv.armas || [], c.atributos, nivelTotalPersonagem(c))}
-      <div class="adicionar-bloco">
+      <div class="adicionar-bloco equip-acoes">
         <button class="btn no-lock" type="button" id="btn-abrir-seletor-arma">${ico('buscar')} Adicionar arma do catálogo (${window.PHB.ARMAS.length})</button>
+        ${botaoAbrirSheet('sheet-arma', '+ Arma fora do catálogo')}
       </div>
+      ${sheetEquip('sheet-arma', 'Arma fora do catálogo', `
       <div class="adicionar-bloco" style="margin-top:6px">
         <div class="campo"><label>Ou arma fora do catálogo</label><input type="text" id="add-arma-nome" placeholder="Nome da arma"></div>
         <div class="campo" style="max-width:90px"><label>Dano</label><input type="text" id="add-arma-dano" placeholder="1d6"></div>
@@ -96,7 +98,7 @@ function renderEquipamento(c) {
         <div class="campo"><label>Propriedades</label><input type="text" id="add-arma-propriedades" placeholder="Leve, Acuidade…"></div>
         <div class="campo" style="max-width:90px"><label>Peso (kg)</label><input type="text" inputmode="decimal" id="add-arma-peso" placeholder="0"></div>
         <button class="btn" type="button" id="btn-add-arma-custom">+ Adicionar</button>
-      </div>
+      </div>`)}
     </div>
 
     <div class="bloco-equip">
@@ -106,9 +108,11 @@ function renderEquipamento(c) {
         <span class="contador-bloco">${inv.armaduras?.length || 0}</span>
       </div>
       ${renderTabelaItens('armaduras', inv.armaduras || [], ['Nome', 'CA', 'Tipo', 'Força mín.'], ['nome','ca','tipo','forca'])}
-      <div class="adicionar-bloco">
+      <div class="adicionar-bloco equip-acoes">
         <button class="btn no-lock" type="button" id="btn-abrir-seletor-armadura">${ico('buscar')} Adicionar armadura do catálogo (${window.PHB.ARMADURAS.length})</button>
+        ${botaoAbrirSheet('sheet-armadura', '+ Armadura fora do catálogo')}
       </div>
+      ${sheetEquip('sheet-armadura', 'Armadura fora do catálogo', `
       <div class="adicionar-bloco" style="margin-top:6px">
         <div class="campo"><label>Ou armadura fora do catálogo</label><input type="text" id="add-armadura-nome" placeholder="Nome da armadura"></div>
         <div class="campo" style="max-width:110px"><label>CA</label><input type="text" id="add-armadura-ca" placeholder="11 + DES"></div>
@@ -123,7 +127,7 @@ function renderEquipamento(c) {
         <div class="campo" style="max-width:100px"><label>Força mín.</label><input type="text" id="add-armadura-forca" placeholder="—"></div>
         <div class="campo" style="max-width:90px"><label>Peso (kg)</label><input type="text" inputmode="decimal" id="add-armadura-peso" placeholder="0"></div>
         <button class="btn" type="button" id="btn-add-armadura-custom">+ Adicionar</button>
-      </div>
+      </div>`)}
     </div>
 
     <div class="bloco-equip">
@@ -133,19 +137,81 @@ function renderEquipamento(c) {
         <span class="contador-bloco">${inv.itens?.length || 0}</span>
       </div>
       ${renderTabelaItens('itens', inv.itens || [], ['Nome', 'Qtd', 'Peso (kg)'], ['nome','qtd','peso'])}
-      <div class="adicionar-bloco">
+      <div class="adicionar-bloco equip-acoes">
         <button class="btn no-lock" type="button" id="btn-abrir-seletor-item">${ico('buscar')} Adicionar item do catálogo (${window.PHB.ITENS.length + window.PHB.FERRAMENTAS.length})</button>
-        <div class="campo" style="max-width:80px"><label>Qtd</label><input type="text" inputmode="numeric" id="add-item-qtd" value="1"></div>
+        <div class="campo campo-qtd" style="max-width:80px"><label>Qtd</label><input type="text" inputmode="numeric" id="add-item-qtd" value="1"></div>
+        ${botaoAbrirSheet('sheet-item', '+ Item fora do catálogo')}
       </div>
+      ${sheetEquip('sheet-item', 'Item fora do catálogo', `
       <div class="adicionar-bloco" style="margin-top:6px">
         <div class="campo"><label>Ou item fora do catálogo</label><input type="text" id="add-item-nome" placeholder="Nome do item"></div>
         <div class="campo" style="max-width:80px"><label>Qtd</label><input type="text" inputmode="numeric" id="add-item-qtd-custom" value="1"></div>
         <div class="campo" style="max-width:90px"><label>Peso (kg)</label><input type="text" inputmode="decimal" id="add-item-peso-custom" placeholder="0"></div>
         <button class="btn" type="button" id="btn-add-item-custom">+ Adicionar</button>
-      </div>
+      </div>`)}
     </div>
   `;
 }
+
+// ─── Formulário "fora do catálogo": bloco inline no desktop, bottom sheet
+// no mobile ─────────────────────────────────────────────────────────────
+// A MARCAÇÃO é uma só (os ids dos campos continuam exatamente os mesmos que
+// listeners.js procura — #add-arma-nome, #btn-add-arma-custom etc.); quem
+// decide a apresentação é o CSS: em >=768px .equip-sheet/.equip-sheet-painel/
+// .equip-sheet-corpo viram display:contents e o formulário volta a ser um
+// bloco normal dentro do .bloco-equip, idêntico ao de sempre. Abaixo disso
+// vira um bottom sheet que só aparece quando o jogador pede — em mobile os
+// 3 formulários sempre abertos ocupavam mais tela que o próprio inventário.
+function sheetEquip(id, titulo, corpoHtml) {
+  return `<div class="equip-sheet" id="${id}">
+    <div class="equip-sheet-painel">
+      <div class="sheet-handle" aria-hidden="true"></div>
+      <div class="equip-sheet-cab">
+        <h4>${escape(titulo)}</h4>
+        <button type="button" class="sheet-close no-lock" data-fechar-sheet="${id}" aria-label="Fechar">✕</button>
+      </div>
+      <div class="equip-sheet-corpo">${corpoHtml}</div>
+    </div>
+  </div>`;
+}
+
+// Botão que abre o sheet — só existe no mobile (escondido por CSS no
+// desktop, onde o formulário já está visível inline). Sem .no-lock de
+// propósito: adicionar item é edição, então segue o modo travado como
+// qualquer outro botão da ficha.
+function botaoAbrirSheet(id, rotulo) {
+  return `<button type="button" class="btn equip-sheet-abrir" data-abrir-sheet="${id}">${escape(rotulo)}</button>`;
+}
+
+// ─── Bottom sheets da ficha (abrir/fechar) ───────────────────────────────
+// Um ÚNICO listener delegado no documento, registrado uma vez no carregamento
+// do script: os sheets são recriados a cada render(), então um listener por
+// elemento vazaria um pouco a cada re-render. Também serve o sheet de filtros
+// da aba Magias (mesmos data-abrir-sheet/data-fechar-sheet).
+(function ligarSheetsFicha() {
+  if (window.__fichaSheetsLigados) return;
+  window.__fichaSheetsLigados = true;
+  const SEL_ABERTO = '.equip-sheet.aberto, .magia-filtros-sheet.aberto';
+  const fechar = el => el && el.classList.remove('aberto');
+
+  document.addEventListener('click', e => {
+    const abrir = e.target.closest('[data-abrir-sheet]');
+    if (abrir) {
+      document.getElementById(abrir.dataset.abrirSheet)?.classList.add('aberto');
+      return;
+    }
+    const btnFechar = e.target.closest('[data-fechar-sheet]');
+    if (btnFechar) { fechar(document.getElementById(btnFechar.dataset.fecharSheet)); return; }
+    // Clique no backdrop (no overlay em si, fora do painel) fecha
+    const overlay = e.target.closest(SEL_ABERTO);
+    if (overlay && e.target === overlay) fechar(overlay);
+  });
+
+  document.addEventListener('keydown', e => {
+    if (e.key !== 'Escape') return;
+    document.querySelectorAll(SEL_ABERTO).forEach(fechar);
+  });
+})();
 
 // Cards de arma (em vez de linha de tabela) — mostram bônus de ataque e
 // dano já calculados (Ataques.calcular(), Fase 3) e um botão de rolar

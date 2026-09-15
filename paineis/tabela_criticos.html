@@ -22,7 +22,7 @@
   .subtitulo-secao { text-align: center; color: var(--text-muted); font-style: italic; font-size: 14.5px; margin: 0 0 24px; }
 
   .explicacoes { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 22px; }
-  @media (max-width: 640px) { .explicacoes { grid-template-columns: 1fr; } }
+  @media (max-width: 767px) { .explicacoes { grid-template-columns: 1fr; gap: var(--space-3, 12px); } }
   .explicacao { padding: 16px 18px; border-left: 3px solid var(--gold); cursor: pointer;
     opacity: .6; transition: opacity .18s, transform .15s, box-shadow .18s; }
   .explicacao.falha { border-left-color: var(--danger); }
@@ -50,6 +50,46 @@
     color: var(--gold); font-weight: 700; text-align: center; background: var(--surface); }
   table.tabela-critico tbody tr:nth-child(even) td:not(:first-child) { background: color-mix(in srgb, var(--surface) 55%, transparent); }
   table.tabela-critico td strong { color: var(--gold-light); font-weight: 600; }
+
+  /* ---- versão mobile: lista vertical gerada a partir da mesma tabela ---- */
+  .criticos-mobile { display: none; }
+
+  @media (max-width: 767px) {
+    main { padding: 18px var(--mobile-padding, 16px) 48px; }
+    .subtitulo-secao { margin-bottom: 18px; }
+    .explicacao { padding: var(--card-padding, 16px); }
+
+    /* no mobile a tabela larga some e dá lugar aos cartões (sem scroll horizontal) */
+    .table-wrap { display: none; }
+    .criticos-mobile { display: block; margin: 0 0 var(--space-5, 24px); }
+
+    .crit-legenda { font-family: var(--font-heading); font-size: 11.5px; font-weight: 700; letter-spacing: 1px;
+      text-transform: uppercase; color: var(--gold); margin: 0 0 var(--space-3, 12px); }
+
+    .crit-tipos { display: grid; grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+      gap: var(--space-2, 8px); margin: 0 0 var(--space-4, 16px); }
+    .crit-tipo { min-height: var(--touch-target, 44px); padding: 8px 6px; display: flex; align-items: center;
+      justify-content: center; text-align: center; cursor: pointer; background: var(--surface);
+      border: 1px solid var(--border-soft); border-radius: var(--radius-sm); color: var(--text-muted);
+      font-family: var(--font-heading); font-size: 11.5px; font-weight: 700; letter-spacing: .3px;
+      text-transform: uppercase; line-height: 1.25; transition: background .18s, border-color .18s, color .18s; }
+    .crit-tipo[aria-pressed="true"] { background: color-mix(in srgb, var(--gold) 18%, transparent);
+      border-color: var(--gold); color: var(--gold-light); }
+    .crit-tipo:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+    .crit-lista { border: 1px solid var(--border-soft); border-radius: var(--radius); overflow: hidden; }
+    .crit-item { padding: var(--card-padding, 16px); border-bottom: 1px solid var(--border-soft); }
+    .crit-item:nth-child(even) { background: color-mix(in srgb, var(--surface) 55%, transparent); }
+    .crit-item:last-child { border-bottom: 0; }
+    .crit-faixa { font-family: var(--font-heading); font-size: 12px; font-weight: 700; letter-spacing: 1.2px;
+      color: var(--gold); margin-bottom: var(--space-1, 4px); }
+    #tabela-falha .crit-faixa { color: var(--erro); }
+    .crit-nome { font-family: var(--font-heading); font-size: 14.5px; font-weight: 700; letter-spacing: .4px;
+      text-transform: uppercase; color: var(--gold-light); line-height: 1.3; margin-bottom: 6px;
+      overflow-wrap: anywhere; }
+    .crit-desc { font-size: 15px; line-height: 1.55; color: var(--text); overflow-wrap: break-word; }
+    .crit-desc strong { color: var(--gold-light); font-weight: 600; }
+  }
 </style>
 </head>
 <body data-ambiente="fagulhas">
@@ -156,6 +196,89 @@
 </main>
 
 <script>
+  /* ---- mobile: gera a lista vertical a partir da MESMA <table> (fonte única de dados) ---- */
+  document.querySelectorAll('.tabela-secao').forEach(secao => {
+    const tabela = secao.querySelector('table.tabela-critico');
+    const wrap = secao.querySelector('.table-wrap');
+    if (!tabela || !wrap) return;
+
+    // 1ª coluna = faixa de d100; demais colunas = tipos (dano no sucesso, ataque na falha)
+    const tipos = Array.from(tabela.querySelectorAll('thead th')).slice(1).map(th => th.textContent.trim());
+    const linhas = Array.from(tabela.querySelectorAll('tbody tr')).map(tr => {
+      const celulas = Array.from(tr.children);
+      return { faixa: celulas[0].textContent.trim(), colunas: celulas.slice(1) };
+    });
+    if (!tipos.length || !linhas.length) return;
+
+    const bloco = document.createElement('div');
+    bloco.className = 'criticos-mobile';
+
+    const caption = tabela.querySelector('caption');
+    if (caption) {
+      const legenda = document.createElement('p');
+      legenda.className = 'crit-legenda';
+      legenda.textContent = caption.textContent.trim();
+      bloco.appendChild(legenda);
+    }
+
+    const barra = document.createElement('div');
+    barra.className = 'crit-tipos';
+    barra.setAttribute('role', 'group');
+    barra.setAttribute('aria-label', 'Escolha o tipo');
+    bloco.appendChild(barra);
+
+    const listaEl = document.createElement('div');
+    listaEl.className = 'crit-lista';
+    bloco.appendChild(listaEl);
+
+    function mostrarTipo(idx) {
+      listaEl.innerHTML = '';
+      linhas.forEach(linha => {
+        const celula = linha.colunas[idx];
+        if (!celula) return;
+
+        const item = document.createElement('div');
+        item.className = 'crit-item';
+
+        const faixa = document.createElement('div');
+        faixa.className = 'crit-faixa';
+        faixa.textContent = linha.faixa;
+        item.appendChild(faixa);
+
+        // clona a célula pra separar "Nome:" (o <strong>) da descrição, sem alterar texto nenhum
+        const clone = celula.cloneNode(true);
+        const forte = clone.querySelector('strong');
+        if (forte) {
+          const nome = document.createElement('div');
+          nome.className = 'crit-nome';
+          nome.textContent = forte.textContent.trim().replace(/:$/, '');
+          item.appendChild(nome);
+          forte.remove();
+        }
+        const desc = document.createElement('div');
+        desc.className = 'crit-desc';
+        desc.innerHTML = clone.innerHTML.trim();
+        item.appendChild(desc);
+
+        listaEl.appendChild(item);
+      });
+      Array.from(barra.children).forEach((btn, i) => btn.setAttribute('aria-pressed', String(i === idx)));
+    }
+
+    tipos.forEach((tipo, i) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'crit-tipo';
+      btn.textContent = tipo;
+      btn.setAttribute('aria-pressed', 'false');
+      btn.addEventListener('click', () => mostrarTipo(i));
+      barra.appendChild(btn);
+    });
+
+    mostrarTipo(0);
+    wrap.insertAdjacentElement('afterend', bloco);
+  });
+
   const explicacoes = document.querySelectorAll('.explicacao');
   const paineis = { sucesso: document.getElementById('tabela-sucesso'), falha: document.getElementById('tabela-falha') };
   function selecionarCritico(nome) {

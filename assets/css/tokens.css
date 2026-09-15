@@ -47,6 +47,25 @@
 
   /* Sombra base (pra cards/elevação) */
   --shadow: rgba(0, 0, 0, 0.55);
+
+  /* Escala de espaçamento e alvos de toque — compartilhada por TODAS as
+     páginas (ver assets/css/ficha/base.css para a escala local, mais
+     granular, usada só dentro da ficha). Convenção de breakpoints do
+     projeto (não há @custom-media com suporte amplo, então documentado
+     aqui como referência p/ novas regras): mobile < 768px, tablet
+     768–1023px, desktop >= 1024px. */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  --touch-target: 44px;   /* alvo mínimo (ícone/botão pequeno) */
+  --touch-target-lg: 48px; /* alvo confortável (ação primária) */
+  --control-height: 48px;  /* altura padrão de input/select/botão em formulário mobile */
+  --mobile-padding: 16px;  /* padding lateral padrão de telas em mobile */
+  --card-padding: 16px;    /* padding interno padrão de cards em mobile */
 }
 
 /* Barra de rolagem — nunca tinha estilo próprio em lugar nenhum do

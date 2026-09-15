@@ -51,11 +51,16 @@
 .hab-pip:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 .hab-disp { font-size: 11px; color: var(--gold); font-family: var(--f-num); }
 .hab-disp strong { color: var(--gold-bright); font-size: 14px; }
-@media (max-width: 640px) {
-  .hab-feature-head { grid-template-columns: 1fr; }
-  .hab-tracker { justify-content: flex-start; }
-  .hab-pip { width: 20px; height: 20px; }
-  .hab-tracker-max { min-height: 32px; width: 42px; }
+@media (max-width: 767px) {
+  .hab-feature-head { grid-template-columns: 1fr; gap: 8px; }
+  .hab-tracker { justify-content: flex-start; min-width: 0; padding: 8px 10px; }
+  /* Pip visual de 26px + área de toque de 44px pelo ::before (sem aumentar
+     o desenho da bolinha, que numa fileira de 10 ficaria gigante). O gap
+     maior evita que as áreas de toque vizinhas se sobreponham demais. */
+  .hab-pips { gap: 10px; }
+  .hab-pip { width: 26px; height: 26px; position: relative; }
+  .hab-pip::before { content: ''; position: absolute; inset: -9px; }
+  .hab-tracker-max { min-height: var(--touch-target); width: 52px; font-size: 16px; }
 }
 
 /* Características personalizadas */
@@ -113,6 +118,10 @@
 .hab-busca-input::-webkit-search-cancel-button { cursor: pointer; }
 .hab-filtros { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-bottom: var(--sp-4); }
 
+/* Chevron do acordeão mobile (ver .hab-colapsavel abaixo) — invisível no
+   desktop, onde a descrição nunca é cortada. */
+.hab-chevron { display: none; }
+
 /* ============ FAVORITAR ============ */
 .hab-fav-btn {
   position: absolute; top: 8px; right: 0;
@@ -150,9 +159,60 @@
 .fav-hab-nome { font-family: var(--f-ui); font-weight: 700; color: var(--gold-light); font-size: 14px; }
 .fav-hab-desc { font-family: var(--f-prosa); font-size: 14px; line-height: 1.5; color: var(--text-2); margin-top: 2px; }
 
-@media (max-width: 640px) {
-  .hab-busca-input { font-size: 16px; min-height: 44px; }
-  .hab-fav-btn { width: 32px; height: 32px; }
-  .hab-feature { padding-right: 38px; }
+@media (max-width: 767px) {
+  .hab-busca-input { font-size: 16px; min-height: var(--touch-target); }
+  .hab-fav-btn { width: 40px; height: 40px; font-size: 16px; }
+  .hab-feature { padding-right: 46px; }
+
+  /* Filtros numa faixa rolável: 5 pills de 44px não cabem em 360px e, com
+     wrap, empurravam a primeira habilidade pra fora da dobra.
+     O [role="group"] limita isto à barra DESTA aba: .hab-filtros também é
+     reaproveitada nas linhas de filtro da aba Magias (dentro do bottom
+     sheet, onde quebrar linha é melhor que rolar de lado). */
+  .hab-filtros[role="group"] {
+    flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden;
+    white-space: nowrap; -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; padding-bottom: 2px;
+  }
+  .hab-filtros[role="group"]::-webkit-scrollbar { display: none; }
+  .hab-filtros .pill { flex: 0 0 auto; min-height: var(--touch-target); padding: 8px 14px; }
+
+  /* Acordeão: descrição cortada em 2 linhas até o cabeçalho ser tocado. */
+  .hab-colapsavel .hab-feature-titulo { cursor: pointer; }
+  .hab-colapsavel .hab-desc {
+    display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
+    overflow: hidden;
+  }
+  .hab-colapsavel.aberta .hab-desc { display: block; }
+  .hab-chevron {
+    display: inline-block; color: var(--gold); font-size: 12px;
+    margin-left: 4px; transition: transform .2s;
+  }
+  .hab-colapsavel.aberta .hab-chevron { transform: rotate(90deg); color: var(--gold-bright); }
+  /* Tracker recolhido junto com a descrição não: ele é o dado que o
+     jogador quer de relance, continua sempre visível. */
+
+  /* Características personalizadas: os dois botões flutuantes (favoritar e
+     remover) saem de cima dos campos e ganham uma faixa própria no topo. */
+  #hab-custom-wrap .hab-feature { padding-right: 12px; padding-top: 52px; }
+  #hab-custom-wrap .hab-fav-btn { top: 8px; right: 8px; }
+  #hab-custom-wrap .cfeat-remove { top: 8px; right: 56px; width: 40px; height: 40px; font-size: 14px; }
+  .cfeat-nome, .cfeat-desc { font-size: 16px; }
+  .cfeat-nome { min-height: var(--touch-target); }
+  .cfeat-talento-bloco { display: flex; flex-wrap: wrap; gap: 8px; }
+  .cfeat-talento-bloco select { min-height: var(--touch-target); }
+
+  .hab-add-bar .btn { width: 100%; min-height: var(--touch-target-lg, 48px); }
+}
+
+/* Mesma exceção do #magia-busca (magias.css): a busca não é dado do
+   personagem, mas o modo travado desliga pointer-events de todo input
+   dentro do .tab-content. O id dá a especificidade pra reverter só ela. */
+body:not(.modo-unlock) .tab-content input#hab-busca {
+  pointer-events: auto !important;
+  cursor: text !important;
+  border-style: solid !important;
+  background-color: var(--sf-inset) !important;
+  opacity: 1;
 }
 

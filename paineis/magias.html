@@ -122,6 +122,45 @@
   }
   .limpar:hover { color: var(--parchment); }
 
+  /* ===== GATILHO DOS FILTROS (só mobile) ===== */
+  .btn-filtros {
+    display: none; width: 100%; min-height: var(--touch-target-lg);
+    align-items: center; justify-content: center; gap: 6px;
+    margin-bottom: 4px; padding: 10px 14px;
+    background: rgba(184,138,44,0.10); border: 1px solid var(--borda-forte);
+    border-radius: 9px; color: var(--gold-light); cursor: pointer;
+    font-family: 'Cinzel', serif; font-size: 13px; font-weight: 700;
+    letter-spacing: 1.2px; text-transform: uppercase; transition: .16s;
+  }
+  .btn-filtros:hover { border-color: var(--gold-light); }
+  .btn-filtros:focus-visible { outline: 2px solid var(--gold-light); outline-offset: 2px; }
+  .btn-filtros.tem-filtro { background: rgba(184,138,44,0.2); border-color: var(--gold-light); }
+
+  /* Elementos de texto exclusivos do mobile (rótulos/sufixos). */
+  .so-mobile { display: none; }
+
+  /* ===== FILTROS AVANÇADOS: MESMO BLOCO EM 2 FORMATOS =====
+     As pílulas vivem dentro da marcação do bottom sheet (components.css) pra
+     não existirem duplicadas: em < 768px o sheet é um sheet de verdade; em
+     >= 768px ele é neutralizado e as linhas de filtro voltam ao fluxo normal
+     do painel .filtros, exatamente como antes. Assim o estado (objeto
+     `filtros`) e os listeners continuam únicos. */
+  @media (min-width: 768px) {
+    #sheet-filtros {
+      position: static; display: block; inset: auto; z-index: auto;
+      background: none; backdrop-filter: none; padding: 0;
+    }
+    #sheet-filtros .sheet-panel {
+      display: block; width: auto; max-width: none; max-height: none;
+      background: none; border: none; border-radius: 0; box-shadow: none;
+      overflow: visible; padding-bottom: 0; animation: none;
+    }
+    #sheet-filtros .sheet-handle,
+    #sheet-filtros .sheet-header,
+    #sheet-filtros .sheet-footer { display: none; }
+    #sheet-filtros .sheet-body { overflow: visible; padding: 0; }
+  }
+
   /* ===== SEÇÕES POR NÍVEL ===== */
   .secao { margin-bottom: 34px; }
   .secao-titulo {
@@ -245,15 +284,67 @@
   #ao-topo.visible { display: flex; }
   #ao-topo:hover { background: var(--gold); color: var(--bg); }
 
-  @media (max-width: 720px) {
-    main { padding: 18px 12px 70px; }
-    .filtros { padding: 13px 12px; }
-    .linha-filtro { gap: 7px; }
-    .linha-label { min-width: 100%; margin-bottom: 2px; }
-    .pill { font-size: 13px; padding: 5px 11px; }
+  @media (max-width: 767px) {
+    main { padding: 18px var(--mobile-padding) 70px; }
+    .hero { margin-bottom: 16px; }
+    .hero p { font-size: 15px; }
+    .filtros { padding: 12px; margin-bottom: 20px; }
+    .busca-wrap { margin-bottom: 10px; }
+    #busca { min-height: var(--touch-target); }
+
+    .so-mobile { display: inline; }
+    .cont-de { display: none; }
+    .btn-filtros { display: inline-flex; }
+    .filtros-rodape { margin-top: 10px; padding-top: 10px; gap: 10px; }
+    .limpar { min-height: var(--touch-target); display: inline-flex; align-items: center; }
+
+    /* Sheet de filtros: pílulas com alvo de toque confortável. */
+    #sheet-filtros .sheet-body { padding: 10px var(--mobile-padding) 14px; }
+    .linha-filtro { gap: 8px; margin-bottom: 14px; }
+    .linha-filtro:last-child { margin-bottom: 4px; }
+    .linha-label { min-width: 100%; margin-bottom: 4px; font-size: 12px; }
+    .pill {
+      display: inline-flex; align-items: center; justify-content: center; gap: 4px;
+      min-height: var(--touch-target); font-size: 14px; padding: 6px 14px;
+    }
+
     .grid { grid-template-columns: 1fr; }
-    .modal { padding: 22px 18px; }
-    .modal-props { grid-template-columns: 1fr; gap: 8px; }
+    .secao { margin-bottom: 26px; }
+    .card { padding: 13px 14px; min-height: 60px; }
+
+    /* ===== MODAL EM TELA CHEIA ===== */
+    .modal-ov { padding: 0; overflow: hidden; }
+    .modal {
+      margin: 0; width: 100%; max-width: none;
+      height: 100vh; height: 100dvh; max-height: none;
+      border: none; border-radius: 0; padding: 0;
+      display: flex; flex-direction: column;
+    }
+    .modal-x {
+      top: 6px; right: 6px;
+      width: var(--touch-target-lg); height: var(--touch-target-lg);
+      display: flex; align-items: center; justify-content: center;
+      padding: 0; font-size: 0; z-index: 3;
+    }
+    .modal-x::before { content: '←'; font-size: 26px; line-height: 1; }
+    #modal-corpo {
+      flex: 1; min-height: 0; overflow-y: auto; -webkit-overflow-scrolling: touch;
+      padding: 0 var(--mobile-padding) calc(26px + env(safe-area-inset-bottom, 0));
+    }
+    /* Nome + nível/escola/concentração ficam presos no topo enquanto rola. */
+    .modal-cabeca {
+      position: sticky; top: 0; z-index: 2;
+      margin: 0 calc(var(--mobile-padding) * -1) 14px;
+      padding: 10px var(--mobile-padding) 0;
+      background: var(--bg-card-soft);
+    }
+    .modal-topo { padding-right: var(--touch-target-lg); margin-bottom: 2px; }
+    .modal-icone { font-size: 26px; }
+    .modal-sub { font-size: 15px; margin-bottom: 10px; }
+    .modal-linha { margin-bottom: 0; }
+    .modal-props { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px 16px; }
+    .modal-acoes { margin-top: 22px; }
+    .btn-fav { flex: 1; min-height: var(--touch-target-lg); font-size: 13px; }
   }
   @media (prefers-reduced-motion: reduce) {
     * { animation: none !important; transition: none !important; }
@@ -280,6 +371,21 @@
       <span class="lupa" data-ico="buscar" aria-hidden="true"></span>
       <input type="search" id="busca" placeholder="Buscar magias pelo nome..." autocomplete="off" aria-label="Buscar magias pelo nome">
     </div>
+
+    <button class="btn-filtros" id="btn-filtros" type="button" aria-expanded="false" aria-controls="sheet-filtros">
+      Filtros<span class="n-filtros"></span>
+    </button>
+
+    <!-- Em < 768px isto é um bottom sheet; em >= 768px o CSS neutraliza o
+         overlay/painel e as linhas voltam a ficar inline no painel. -->
+    <div class="sheet-overlay" id="sheet-filtros">
+     <div class="sheet-panel">
+      <div class="sheet-handle"></div>
+      <div class="sheet-header">
+        <h4>Filtros</h4>
+        <button class="sheet-close" id="sheet-x" type="button" aria-label="Fechar filtros">✕</button>
+      </div>
+      <div class="sheet-body">
 
     <div class="linha-filtro">
       <span class="linha-label">Nível:</span>
@@ -320,14 +426,22 @@
     </div>
 
     <div class="linha-filtro">
-      <span class="linha-label"></span>
+      <span class="linha-label"><span class="so-mobile">Outros:</span></span>
       <div class="pill" data-filtro="concentracao" data-valor="1" role="button" tabindex="0">© Concentração</div>
       <div class="pill" data-filtro="ritual" data-valor="1" role="button" tabindex="0">® Ritual</div>
       <div class="pill fav" data-filtro="fav" data-valor="1" role="button" tabindex="0">★ Favoritas <span id="fav-count"></span></div>
     </div>
 
+      </div><!-- /sheet-body -->
+      <div class="sheet-footer">
+        <button class="btn" id="sheet-limpar" type="button">Limpar</button>
+        <button class="btn btn-primary" id="sheet-aplicar" type="button">Aplicar</button>
+      </div>
+     </div><!-- /sheet-panel -->
+    </div><!-- /sheet-filtros -->
+
     <div class="filtros-rodape">
-      <span class="contador"><strong id="cont-visiveis">0</strong> de <span id="cont-total">0</span> magias</span>
+      <span class="contador"><strong id="cont-visiveis">0</strong><span class="cont-de"> de <span id="cont-total">0</span></span> magias<span class="so-mobile"> encontradas</span></span>
       <button class="limpar" id="btn-limpar" type="button">Limpar filtros</button>
     </div>
   </section>
@@ -484,13 +598,17 @@ function abrirModal(nome) {
   const descHTML = String(m.descricao || '')
     .split(/\n{2,}/).map(p => `<p>${esc(p.trim())}</p>`).join('');
 
+  // .modal-cabeca agrupa nome/subtítulo/divisória: no desktop é só um <div>
+  // neutro; em < 768px vira o cabeçalho fixo (sticky) do modal em tela cheia.
   document.getElementById('modal-corpo').innerHTML = `
-    <div class="modal-topo">
-      <h2 id="modal-titulo">${esc(m.nome)}</h2>
-      <iconify-icon class="modal-icone" icon="${icone}" style="color:${cor}"></iconify-icon>
+    <div class="modal-cabeca">
+      <div class="modal-topo">
+        <h2 id="modal-titulo">${esc(m.nome)}</h2>
+        <iconify-icon class="modal-icone" icon="${icone}" style="color:${cor}"></iconify-icon>
+      </div>
+      <div class="modal-sub">${esc(sub)}</div>
+      <div class="modal-linha"></div>
     </div>
-    <div class="modal-sub">${esc(sub)}</div>
-    <div class="modal-linha"></div>
 
     <div class="modal-props">
       <div><span class="prop-nome">Tempo de Conjuração</span><span class="prop-valor">${esc(m.tempoCast)}</span></div>
@@ -541,6 +659,48 @@ document.getElementById('busca').addEventListener('input', e => {
   render();
 });
 
+/* ---- Sheet de filtros (mobile) ---------------------------------------
+   Não duplica estado: as MESMAS pílulas e o MESMO objeto `filtros` são
+   usados nos dois formatos; o sheet é só o container em telas pequenas. */
+const sheetFiltros = document.getElementById('sheet-filtros');
+const btnFiltros = document.getElementById('btn-filtros');
+const mqMobile = window.matchMedia('(max-width: 767px)');
+
+function contarFiltrosAtivos() {
+  return filtros.nivel.size + filtros.escola.size + filtros.classe.size +
+    (filtros.concentracao ? 1 : 0) + (filtros.ritual ? 1 : 0) + (filtros.fav ? 1 : 0);
+}
+function atualizarBotaoFiltros() {
+  const n = contarFiltrosAtivos();
+  btnFiltros.querySelector('.n-filtros').textContent = n ? ` (${n})` : '';
+  btnFiltros.classList.toggle('tem-filtro', n > 0);
+}
+function abrirSheet() {
+  sheetFiltros.classList.add('aberto');
+  btnFiltros.setAttribute('aria-expanded', 'true');
+  document.body.style.overflow = 'hidden';
+  const x = document.getElementById('sheet-x');
+  if (x) x.focus();
+}
+function fecharSheet() {
+  if (!sheetFiltros.classList.contains('aberto')) return;
+  // Devolve o foco pro gatilho antes de esconder o painel.
+  if (sheetFiltros.contains(document.activeElement)) btnFiltros.focus();
+  sheetFiltros.classList.remove('aberto');
+  btnFiltros.setAttribute('aria-expanded', 'false');
+  // Só libera a rolagem se o modal de detalhe não estiver aberto.
+  if (!document.getElementById('modal-ov').classList.contains('open')) {
+    document.body.style.overflow = '';
+  }
+}
+btnFiltros.addEventListener('click', abrirSheet);
+document.getElementById('sheet-x').addEventListener('click', fecharSheet);
+document.getElementById('sheet-aplicar').addEventListener('click', fecharSheet);
+sheetFiltros.addEventListener('click', e => { if (e.target === sheetFiltros) fecharSheet(); });
+// Ao passar pra tablet/desktop os filtros voltam a ser inline: fecha o sheet
+// pra não deixar a rolagem do body travada.
+mqMobile.addEventListener('change', e => { if (!e.matches) fecharSheet(); });
+
 document.querySelectorAll('.pill').forEach(pill => {
   const acionar = () => {
     const tipo = pill.dataset.filtro;
@@ -554,6 +714,7 @@ document.querySelectorAll('.pill').forEach(pill => {
       filtros[tipo] = !filtros[tipo];
       pill.classList.toggle('on', filtros[tipo]);
     }
+    atualizarBotaoFiltros();
     render();
   };
   pill.addEventListener('click', acionar);
@@ -562,14 +723,21 @@ document.querySelectorAll('.pill').forEach(pill => {
   });
 });
 
-document.getElementById('btn-limpar').addEventListener('click', () => {
-  filtros.busca = '';
+function limparFiltros(incluirBusca) {
   filtros.nivel.clear(); filtros.escola.clear(); filtros.classe.clear();
   filtros.concentracao = false; filtros.ritual = false; filtros.fav = false;
-  document.getElementById('busca').value = '';
   document.querySelectorAll('.pill').forEach(p => p.classList.remove('on'));
+  if (incluirBusca) {
+    filtros.busca = '';
+    document.getElementById('busca').value = '';
+  }
+  atualizarBotaoFiltros();
   render();
-});
+}
+// "Limpar filtros" do rodapé zera tudo (comportamento de sempre); o "Limpar"
+// do sheet zera só os filtros, preservando o que foi digitado na busca.
+document.getElementById('btn-limpar').addEventListener('click', () => limparFiltros(true));
+document.getElementById('sheet-limpar').addEventListener('click', () => limparFiltros(false));
 
 document.getElementById('resultado').addEventListener('click', e => {
   const card = e.target.closest('.card');
@@ -581,7 +749,7 @@ document.getElementById('modal-ov').addEventListener('click', e => {
   if (e.target.id === 'modal-ov') fecharModal();
 });
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') fecharModal();
+  if (e.key === 'Escape') { fecharSheet(); fecharModal(); }
   if (e.key === '/' && document.activeElement.tagName !== 'INPUT') {
     e.preventDefault();
     document.getElementById('busca').focus();

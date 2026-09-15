@@ -54,10 +54,14 @@
     border-radius: var(--radius-sm); transition: all .2s; }
   .opcao-card:hover .opcao-cta { background: var(--gold); color: var(--bg); border-color: var(--gold-light); }
 
-  @media (max-width: 700px) {
-    main { padding: 30px 16px; }
-    .opcoes { flex-direction: column; align-items: center; gap: 20px; }
-    .opcao-card { width: 100%; padding: 36px 28px 30px; }
+  @media (max-width: 767px) {
+    main { padding: 30px var(--mobile-padding, 16px); }
+    .intro { margin-bottom: 28px; }
+    .opcoes { flex-direction: column; align-items: stretch; gap: 16px; }
+    .opcao-card { width: 100%; min-height: 72px; padding: 32px 24px 28px; }
+    .opcao-icon { font-size: 44px; margin-bottom: 14px; }
+    .opcao-cta { padding: 12px 24px; min-height: var(--touch-target, 44px);
+      display: flex; align-items: center; justify-content: center; }
   }
 </style>
 </head>

@@ -16,6 +16,17 @@
   padding-bottom: 10px;
   border-bottom: 1px solid var(--borda);
 }
+/* Mobile: uma faixa rolável em vez de quebrar em 2 linhas, com cada pill
+   num alvo de toque de 44px. */
+@media (max-width: 767px) {
+  .subnav-pj {
+    flex-wrap: nowrap; overflow-x: auto; overflow-y: hidden;
+    white-space: nowrap; -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .subnav-pj::-webkit-scrollbar { display: none; }
+  .subnav-pj .pill { flex: 0 0 auto; min-height: var(--touch-target); padding: 8px 16px; }
+}
 
 /* ===== Inspiração (Roleplay) ===== */
 .insp-wrap {
@@ -59,9 +70,9 @@
   gap: 20px; align-items: start;
   margin-bottom: 14px;
 }
-@media (max-width: 640px) {
+@media (max-width: 767px) {
   .retrato-wrap { grid-template-columns: 1fr; }
-  .retrato-preview { margin: 0 auto; max-width: 240px; }
+  .retrato-preview { width: 100%; margin: 0 auto; max-width: 240px; }
 }
 /* Caixa adapta à proporção da imagem (sem bordas pretas).
    Quando não há imagem, mantém quadrado pelo aspect-ratio do placeholder. */
@@ -120,9 +131,9 @@
 .upload-status.erro  { color: var(--erro); }
 .upload-status.info  { color: var(--text-dim); }
 
-@media (max-width: 640px) {
+@media (max-width: 767px) {
   .magia-conjurar-bar { justify-content: stretch; }
-  .btn-conjurar { width: 100%; min-height: 44px; }
+  .btn-conjurar { width: 100%; min-height: var(--touch-target); }
 }
 
 /* ===== Modo leitura (Fase 9) — bloco de Identidade e cards de Roleplay ===== */
@@ -175,5 +186,60 @@
   color: var(--parchment, #eee);
   font-style: italic;
   margin: 0;
+}
+
+/* ===== ABA PERSONAGEM NO MOBILE =====
+   Vale para os DOIS modos: leitura (.leitura-grid / .roleplay-card) e edição
+   (.grid-2 de campos), que são marcações diferentes geradas por
+   render*Leitura()/render*Edicao(). O .grid-2 já cai pra 1 coluna abaixo de
+   800px (combate.css); aqui só falta o grid de leitura fazer o mesmo, pra
+   os dois modos terem exatamente a mesma pilha de campos.
+
+   Os seletores são ancorados nos ids das 4 seções (#pj-sec-*) de propósito:
+   .campo é usado na ficha inteira, e combate.css — carregado antes deste
+   arquivo — define .campo input com 42px/15px em telas pequenas. Ancorar no
+   id dá a especificidade necessária sem mexer em nenhuma outra aba. */
+@media (max-width: 767px) {
+  #pj-sec-identidade .leitura-grid { grid-template-columns: minmax(0, 1fr); gap: var(--sp-3); }
+  #pj-sec-identidade .grid-2,
+  #pj-sec-roleplay .grid-2 { grid-template-columns: minmax(0, 1fr); }
+
+  /* Um campo por linha, alvo de 48px e 16px de fonte (abaixo disso o iOS
+     dá zoom automático ao focar o campo). */
+  #pj-sec-identidade .campo input,
+  #pj-sec-identidade .campo select,
+  #pj-sec-racial .campo input,
+  #pj-sec-racial .campo select,
+  #pj-sec-atributos .campo input,
+  #pj-sec-roleplay .campo input,
+  #pj-sec-roleplay .campo select {
+    width: 100%; min-height: var(--control-height, 48px); font-size: 16px;
+  }
+  #pj-sec-identidade .campo textarea,
+  #pj-sec-racial .campo textarea,
+  #pj-sec-roleplay .campo textarea { width: 100%; font-size: 16px; }
+
+  /* Atributos: 3 colunas (2 em < 480px, via base/combate) com o valor
+     editável mantendo alvo de toque. */
+  #pj-sec-atributos .atributo .valor-base { min-height: var(--touch-target); font-size: 26px; }
+  #pj-sec-atributos .atributo .modificador { font-size: 13px; padding: 3px 12px; }
+
+  /* Idiomas/Ferramentas: o "+" e o campo de adicionar viram alvos de toque */
+  #pj-sec-identidade .lista-tags-add { gap: 8px; }
+  #pj-sec-identidade .lista-tags-add .btn { min-width: var(--touch-target); min-height: var(--control-height, 48px); }
+  #pj-sec-identidade .lista-tags .tag { padding: 6px 10px; font-size: 13px; }
+  #pj-sec-identidade .lista-tags .tag .x { min-width: 24px; text-align: center; font-size: 15px; }
+
+  /* Multiclasse */
+  .multiclasse-item { padding: 10px 12px; min-height: var(--touch-target); }
+  .multiclasse-item .lixo { min-width: var(--touch-target); min-height: var(--touch-target); }
+
+  /* Roleplay: inspiração e retrato */
+  .insp-wrap { gap: 10px; }
+  .insp-display input { width: 56px; min-height: var(--touch-target); }
+  .btn-upload { width: 100%; justify-content: center; min-height: var(--control-height, 48px); }
+  .retrato-controles .btn { width: 100%; min-height: var(--control-height, 48px); }
+  .roleplay-cards { display: grid; gap: var(--sp-3); }
+  .roleplay-card-texto { font-size: 15px; }
 }
 

@@ -19,8 +19,12 @@
     font-family: var(--font-body); color: var(--text); }
   .header-title { font-family: var(--font-heading-deco); font-size: clamp(18px, 3vw, 26px); font-weight: 700;
     color: var(--gold); letter-spacing: 2px; flex: 1; text-align: center; }
-  main { position: relative; z-index: 1; max-width: 960px; margin: 22px auto; padding: 0 16px 40px;
-    display: flex; flex-direction: column; min-height: calc(100vh - 120px); }
+  /* `dvh` acompanha a barra de endereço do Safari mobile; `vh` fica como
+     fallback pra navegadores que não conhecem a unidade (a última declaração
+     válida vence). */
+  main { position: relative; z-index: 1; max-width: 960px; margin: 22px auto; padding: 0 var(--mobile-padding) 40px;
+    display: flex; flex-direction: column;
+    min-height: calc(100vh - 120px); min-height: calc(100dvh - 120px); }
   #cp { flex: 1; display: flex; flex-direction: column; }
 </style>
 </head>
