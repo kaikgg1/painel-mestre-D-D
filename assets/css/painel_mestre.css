@@ -94,6 +94,21 @@
     background: var(--gold);
     color: var(--on-gold);
   }
+  /* Status de login (auth.js injeta .auth-nome/.auth-btn dentro de #auth-slot;
+     sem isto os dois ficam com a aparência crua do navegador). */
+  .auth-slot .auth-nome { color: var(--text-muted); letter-spacing: .5px; }
+  .auth-slot .auth-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 6px 14px; min-height: var(--touch-target, 44px);
+    background: transparent; border: 1.5px solid var(--gold);
+    color: var(--gold-light); border-radius: 4px;
+    font-family: 'Cinzel', serif; font-size: 12px; font-weight: 600;
+    letter-spacing: 1px; text-transform: uppercase;
+    text-decoration: none; cursor: pointer; transition: all .18s;
+  }
+  .auth-slot .auth-btn:hover { background: var(--gold); color: var(--on-gold); }
+  .auth-slot .auth-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+  @media (max-width: 767px) { .auth-slot .auth-nome { display: none; } }
   .toolbar button {
     padding: 8px 16px;
     background: var(--surface-raised);

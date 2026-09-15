@@ -25,6 +25,7 @@
     --blood-bright: var(--bronze);
     --parchment: var(--text);
     --parchment-dim: var(--text-muted);
+    --text-dim: var(--text-muted);
     --borda: var(--border-soft);
     --borda-forte: var(--border);
 
@@ -55,7 +56,20 @@
     font-family: var(--font-heading); font-size: 14px; font-weight: 700;
     color: var(--gold-bright); letter-spacing: 2px; flex: 1; text-transform: uppercase;
   }
-  #auth-slot { margin-left: auto; }
+  #auth-slot { display: flex; align-items: center; gap: 8px; margin-left: auto; font-family: 'Cinzel', serif; font-size: 11px; }
+  #auth-slot .auth-nome { color: var(--parchment-dim); letter-spacing: .5px; }
+  #auth-slot .auth-btn {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 6px 14px; min-height: var(--touch-target, 44px);
+    background: transparent; border: 1px solid var(--borda-forte);
+    color: var(--parchment-dim); border-radius: 6px;
+    font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+    text-decoration: none; cursor: pointer; transition: all .18s;
+  }
+  #auth-slot .auth-btn:hover { background: var(--gold); color: var(--bg-deep); border-color: var(--gold); }
+  #auth-slot .auth-btn:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 2px; }
+  @media (max-width: 767px) { #auth-slot .auth-nome { display: none; } }
 
   main { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 26px 18px 80px; }
 

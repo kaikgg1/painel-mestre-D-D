@@ -174,10 +174,15 @@ async function salvar(e) {
 
   // Campos com save dedicado próprio (salvarRecursos, salvarFeaturesPersonalizadas,
   // salvarCompanions, salvarFavoritosBestiario, salvarCondicoes, salvarHabilidadesFavoritas,
-  // salvarConcentracao, salvarClassesSecundarias) — nunca reenviar pela cópia local
-  // de charAtivo aqui, senão qualquer autosave de outra aba reenvia a versão
-  // desatualizada e desfaz uma mudança feita pelo Mestre/outro aparelho nesse
-  // meio-tempo (mesma causa raiz do bug de slots_magia não resetar no Descanso Longo).
+  // salvarConcentracao, salvarClassesSecundarias, alternarAtivo/DBSync.setAtivo) — nunca
+  // reenviar pela cópia local de charAtivo aqui, senão qualquer autosave de outra aba
+  // reenvia a versão desatualizada e desfaz uma mudança feita pelo Mestre/outro aparelho
+  // nesse meio-tempo (mesma causa raiz do bug de slots_magia não resetar no Descanso Longo).
+  // is_active em especial: se a ficha estiver aberta em 2 abas/aparelhos e uma delas
+  // carregou ANTES de alguém clicar "Tornar ativo", o próximo autosave nessa aba antiga
+  // reenviava o is_active velho (false) e desligava o personagem de novo — sem ninguém
+  // tocar no botão. Ver conversa: "ficha da Lilith fica toda hora desativando da campanha".
+  delete payload.is_active;
   delete payload.recursos_usados;
   delete payload.features_personalizadas;
   delete payload.companions;
