@@ -1,16 +1,18 @@
 // assets/js/presenca.js
-// Presença online da mesa + último login, mostrados embaixo de cada ficha
-// no Painel do Mestre.
+// Status online/offline de cada conta, mostrado embaixo de cada ficha no
+// Painel do Mestre.
 //
-// Como funciona: toda página logada entra no canal Realtime 'presenca-mesa'
-// e se anuncia com o próprio user_id (Supabase Presence). Quem está com o
-// sistema aberto aparece na lista; quem fechou some sozinho (o Realtime
-// derruba a presença quando a aba fecha/perde conexão). Nada disso escreve
-// no banco — presence vive só no canal, custo zero de escrita.
+// ONLINE = a conta está LOGADA, não "tem aba aberta": o Supabase cria uma
+// linha em auth.sessions no login e apaga no signOut(), e nesta instância a
+// sessão não expira por tempo. Então o jogador entra, fecha o navegador e
+// continua verde até clicar em Sair — que é como o Mestre pensa a coisa.
+// Quem devolve isso é public.listar_status_contas() (sql/027_status_contas.sql),
+// que também traz o último login e só responde pro Mestre.
 //
-// O "último login" (mostrado quando a pessoa está offline) vem de
-// auth.users.last_sign_in_at, exposto pela function public.listar_ultimo_login()
-// (sql/026_ultimo_login.sql) — que só devolve linhas pro Mestre.
+// Em cima disso, o Realtime Presence ('presenca-mesa') serve só pra reagir
+// na hora: quando alguém abre o sistema o badge fica verde no mesmo segundo,
+// sem esperar o ciclo de 30s que reconsulta as sessões. Presence não escreve
+// nada no banco.
 //
 // API:
 //   Presenca.entrar()            → entra no canal (chamado sozinho no load)
@@ -61,8 +63,8 @@
   }
 
   let _canal = null;
-  let _online = new Set();
-  let _ultimoLogin = null;      // Promise<Map user_id → ISO> (cache)
+  let _presentes = new Set();   // com alguma aba aberta AGORA (Realtime Presence)
+  let _contas = null;           // Promise<Map user_id → {ultimo_login, sessoes}>
   let _timerRelativo = null;
   let _ligouVisibilidade = false;
 
@@ -77,54 +79,70 @@
     return `há ${d} dia${d > 1 ? 's' : ''}`;
   }
 
+  // ONLINE = conta logada (auth.sessions tem linha; o Supabase apaga no
+  // signOut()). Não é "está com a aba aberta" — o jogador entra, fecha o
+  // navegador e continua logado até clicar em Sair, que é o que o Mestre
+  // quer enxergar. Ver sql/027_status_contas.sql.
+  //
   // Só o Mestre recebe linhas (a function filtra por is_mestre()) — pra
-  // jogador o mapa fica vazio e o badge mostra só Online/Offline, sem horário.
+  // jogador o mapa fica vazio e sobra só a presença via Realtime.
   //
   // O cache guarda a PROMISE, não o resultado: render() e rerenderCard()
   // chamam pintar() em sequência, e sem isso cada chamada dispararia um RPC
   // próprio antes do primeiro responder.
-  function carregarUltimoLogin(forcar) {
-    if (_ultimoLogin && !forcar) return _ultimoLogin;
-    _ultimoLogin = window.sb.rpc('listar_ultimo_login')
-      .then(({ data, error }) => new Map((error || !data) ? [] : data.map(r => [r.id, r.ultimo_login])))
+  function carregarContas(forcar) {
+    if (_contas && !forcar) return _contas;
+    _contas = window.sb.rpc('listar_status_contas')
+      .then(({ data, error }) => new Map((error || !data) ? [] : data.map(r => [r.id, r])))
       .catch(() => new Map());
-    return _ultimoLogin;
+    return _contas;
   }
 
   async function pintar() {
     const alvos = document.querySelectorAll('[data-presenca-user]');
     if (!alvos.length) return;
     injetarCSS();
-    const mapa = await carregarUltimoLogin();
+    const contas = await carregarContas();
     alvos.forEach(el => {
       const uid = el.dataset.presencaUser;
-      const online = !!uid && _online.has(uid);
-      const quando = uid ? mapa.get(uid) : null;
+      const conta = uid ? contas.get(uid) : null;
+      // Logado manda; a presença serve pra ficar verde na hora em que o
+      // jogador abre o sistema, sem esperar o próximo ciclo de consulta.
+      const logado = !!conta && conta.sessoes > 0;
+      const presente = !!uid && _presentes.has(uid);
+      const online = logado || presente;
+      const quando = conta?.ultimo_login;
+
       el.className = 'presenca-badge ' + (online ? 'on' : 'off');
       el.innerHTML = online
         ? `<span class="presenca-dot" aria-hidden="true"></span>Online`
         : `<span class="presenca-dot" aria-hidden="true"></span>Offline${quando ? `<span class="presenca-quando">último login ${fmtRelativo(quando)}</span>` : ''}`;
       el.title = online
-        ? 'Está com o sistema aberto agora'
-        : (quando ? `Último login: ${new Date(quando).toLocaleString('pt-BR')}` : 'Não está com o sistema aberto');
+        ? (presente ? 'Logado e com o sistema aberto agora' : 'Logado (não saiu da conta)')
+        : (quando ? `Saiu da conta · último login: ${new Date(quando).toLocaleString('pt-BR')}` : 'Não está logado');
     });
   }
 
-  // Lê o estado do canal e repinta se mudou. É a fonte de verdade local —
-  // chamada tanto pelo evento 'sync' quanto pelo timer, porque um evento
-  // perdido (socket reconectando, aba em background) deixaria a tela
-  // congelada até o F5, que foi exatamente o sintoma relatado.
-  function sincronizar({ forcarLogins = false } = {}) {
-    if (!_canal) return;
-    let estado;
-    try { estado = _canal.presenceState(); } catch { return; }
-    const agora = new Set(Object.keys(estado || {}));
-    const mudou = agora.size !== _online.size || [...agora].some(id => !_online.has(id));
-    _online = agora;
-    // Quem acabou de entrar tem um last_sign_in_at novo — rebusca em vez de
-    // mostrar o horário velho do cache.
-    if (mudou || forcarLogins) carregarUltimoLogin(true);
-    pintar();
+  // Relê o estado do canal e repinta. Chamada pelo evento 'sync' E pelo
+  // timer, porque um evento perdido (socket reconectando, aba em segundo
+  // plano) deixaria a tela congelada até o F5 — que foi o sintoma relatado.
+  // `forcarContas` rebusca quem está logado; sem isso um logout só apareceria
+  // no próximo ciclo longo.
+  function sincronizar({ forcarContas = false } = {}) {
+    let mudouPresenca = false;
+    if (_canal) {
+      let estado;
+      try { estado = _canal.presenceState(); } catch { estado = null; }
+      if (estado) {
+        const agora = new Set(Object.keys(estado));
+        mudouPresenca = agora.size !== _presentes.size || [...agora].some(id => !_presentes.has(id));
+        _presentes = agora;
+      }
+    }
+    // Alguém abriu/fechou o sistema: é o melhor momento pra reconferir as
+    // sessões (pode ter acabado de logar ou de sair).
+    if (mudouPresenca || forcarContas) carregarContas(true).then(pintar);
+    else pintar();
   }
 
   let _tentativas = 0;
@@ -158,10 +176,10 @@
     });
 
     if (!_timerRelativo) {
-      // A cada 30s confere o estado real do canal (barato, é local) e, a cada
-      // 2 min, rebusca os horários de login. Também mantém o "há X min" vivo.
-      let voltas = 0;
-      _timerRelativo = setInterval(() => sincronizar({ forcarLogins: ++voltas % 4 === 0 }), 30000);
+      // A cada 30s reconsulta quem está logado — é o que faz o "saiu da
+      // conta" virar vermelho sozinho, sem F5. São 5 linhas de retorno, custo
+      // irrelevante. Também mantém o "há X min" envelhecendo certo.
+      _timerRelativo = setInterval(() => sincronizar({ forcarContas: true }), 30000);
     }
 
     // Voltar pra aba deve mostrar o estado atual na hora, não no próximo tick.
@@ -169,14 +187,14 @@
     if (!_ligouVisibilidade) {
       _ligouVisibilidade = true;
       document.addEventListener('visibilitychange', () => {
-        if (document.visibilityState === 'visible') sincronizar({ forcarLogins: true });
+        if (document.visibilityState === 'visible') sincronizar({ forcarContas: true });
       });
     }
   }
 
-  function estaOnline(userId) { return _online.has(userId); }
+  function estaOnline(userId) { return _presentes.has(userId); }
 
-  window.Presenca = { entrar, estaOnline, pintar, recarregarLogins: () => carregarUltimoLogin(true).then(pintar) };
+  window.Presenca = { entrar, estaOnline, pintar, atualizar: () => sincronizar({ forcarContas: true }) };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', entrar);
   else entrar();

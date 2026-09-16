@@ -38,6 +38,7 @@ const SCRIPTS = [
   '024_multiclasse.sql',
   '025_regras_casa.sql',
   '026_ultimo_login.sql',
+  '027_status_contas.sql',
 ];
 
 (async () => {

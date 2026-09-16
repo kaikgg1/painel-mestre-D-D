@@ -280,8 +280,23 @@ function criarSecaoEquipamento(p) {
       lista.forEach((item, idx) => {
         const extraVal = extraCampo ? item[extraCampo.chave] : null;
         const tag = document.createElement('span');
-        tag.className = 'equip-tag';
+        tag.className = 'equip-tag dc-link';
         tag.innerHTML = `${escapeHtml(item.nome || '?')}${extraVal ? ` <span class="equip-tag-extra">(${escapeHtml(String(extraVal))})</span>` : ''}`;
+        // Clique abre dano/propriedades/peso e, se for item mágico do DMG,
+        // a descrição completa da regra.
+        tag.setAttribute('role', 'button');
+        tag.setAttribute('tabindex', '0');
+        tag.title = 'Ver detalhes';
+        const verDetalhes = e => {
+          if (e.target.closest('.equip-rm')) return;   // o ✕ remove, não abre
+          window.DetalhesCatalogo?.abrirEquipamento(item, g.tipo);
+        };
+        tag.addEventListener('click', verDetalhes);
+        tag.addEventListener('keydown', e => {
+          if (e.key !== 'Enter' && e.key !== ' ') return;
+          e.preventDefault();
+          verDetalhes(e);
+        });
         const rm = document.createElement('button');
         rm.type = 'button';
         rm.className = 'equip-rm';
