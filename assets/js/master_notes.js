@@ -88,7 +88,9 @@
   // ===== CSS =====
   const CSS = `
   .mn-overlay {
-    position: fixed; inset: 0; z-index: 5000;
+    /* 8600: acima dos FABs (rolador/log_combate = 8500) e abaixo do
+       Confirmar (9000). Mesma camada de iniciativa.js/loot_xp.js. */
+    position: fixed; inset: 0; z-index: 8600;
     background: rgba(0,0,0,0.85);
     backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
     display: none; align-items: center; justify-content: center; padding: 16px;
@@ -897,7 +899,16 @@
       div.querySelector('.mn-entry-text').innerHTML = renderTextoLeve(n.texto);
       div.querySelector('[data-act="edit"]').addEventListener('click', () => iniciarEdicao(n));
       div.querySelector('[data-act="del"]').addEventListener('click', async () => {
-        if (!confirm('Apagar esta anotação?')) return;
+        // Confirmar.perguntar() no lugar do confirm() nativo (assets/js/confirmar.js),
+        // que já é carregado nesta mesma página — mesmo padrão de aba_habilidades.js.
+        const ok = window.Confirmar
+          ? await window.Confirmar.perguntar({
+              titulo: 'Apagar anotação?',
+              mensagem: 'Esta ação não pode ser desfeita.',
+              confirmar: 'Apagar', danger: true,
+            })
+          : confirm('Apagar esta anotação?');
+        if (!ok) return;
         if (await deletarNota(n.id)) {
           await renderTimeline();
           await renderListaPj();

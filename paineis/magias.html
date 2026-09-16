@@ -158,8 +158,15 @@
      não existirem duplicadas: em < 768px o sheet é um sheet de verdade; em
      >= 768px ele é neutralizado e as linhas de filtro voltam ao fluxo normal
      do painel .filtros, exatamente como antes. Assim o estado (objeto
-     `filtros`) e os listeners continuam únicos. */
-  @media (min-width: 768px) {
+     `filtros`) e os listeners continuam únicos.
+
+     767.02px (e não 768px) fecha um buraco: em larguras fracionárias — 767.5px,
+     comum com zoom em 125% — nem `max-width: 767px` nem `min-width: 768px`
+     valiam, então o sheet ficava com o `display:none` da base e o botão
+     "Filtros" seguia escondido: sumia o painel de filtros inteiro, sem como
+     abrir. O JS (mqMobile = max-width: 767px) já trata essa faixa como
+     desktop, então os dois passam a concordar. */
+  @media (min-width: 767.02px) {
     #sheet-filtros {
       position: static; display: block; inset: auto; z-index: auto;
       background: none; backdrop-filter: none; padding: 0;
@@ -509,6 +516,10 @@ const nomeNivel = n => n === 0 ? 'Truques' : `Magias de ${n}º Nível`;
 const rotuloNivel = n => n === 0 ? 'Truque' : `${n}º nível`;
 
 /* ===================== FAVORITAS ===================== */
+/* Só existe lista de favoritas pra jogador logado — o Mestre não tem PJ.
+   Quando não há lista, escondemos o botão e a pílula em vez de deixar o
+   usuário clicar num controle que nunca funciona. */
+function favDisponivel() { return !!(window.Fav && window.Fav.disponivel && window.Fav.disponivel()); }
 function ehFavorita(nome) { return window.Fav ? window.Fav.tem(nome) : false; }
 async function alternarFavorita(nome) {
   if (!window.Fav) return false;
@@ -642,14 +653,17 @@ function abrirModal(nome) {
       <span class="rot">Em Níveis Superiores</span>${esc(m.maiorNivel)}
     </div>` : ''}
 
-    <div class="modal-acoes">
+    ${favDisponivel() ? `<div class="modal-acoes">
       <button class="btn-fav ${favOn ? 'on' : ''}" id="btn-fav-modal" type="button">
         ${favOn ? '★ Favorita' : '☆ Favoritar'}
       </button>
-    </div>`;
+    </div>` : ''}`;
 
+  // O Mestre não tem lista de favoritas (favoritas.js não cria uma pra ele):
+  // sem isto o botão aparecia, não salvava nada e voltava sozinho pra
+  // "☆ Favoritar", sem aviso nenhum.
   const btn = document.getElementById('btn-fav-modal');
-  btn.onclick = async () => {
+  if (btn) btn.onclick = async () => {
     const novo = await alternarFavorita(m.nome);
     btn.classList.toggle('on', novo);
     btn.textContent = novo ? '★ Favorita' : '☆ Favoritar';
@@ -799,9 +813,23 @@ async function carregarMagias() {
   if (!u) return;
   await window.Auth.renderHeader('#auth-slot');
   if (window.Fav) await window.Fav.carregar();
+  if (!favDisponivel()) {
+    // Sem lista (Mestre): tira a pílula "★ Favoritas" do painel de filtros.
+    const pilulaFav = document.querySelector('.pill[data-filtro="fav"]');
+    if (pilulaFav) pilulaFav.remove();
+    filtros.fav = false;
+  }
   atualizarContadorFav();
   carregarMagias();
 })();
+
+/* Favoritou em outra aba/dispositivo: favoritas.js avisa por este evento
+   (vindo do realtime do Supabase). Sem ouvi-lo, o contador e as estrelas
+   dos cards ficavam desatualizados até recarregar a página. */
+window.addEventListener('fav:atualizadas', () => {
+  atualizarContadorFav();
+  if (MAGIAS.length) render();
+});
 </script>
 <script src="../assets/js/ambiente.js"></script>
 <script src="../assets/js/polish.js"></script>

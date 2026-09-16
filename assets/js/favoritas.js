@@ -8,6 +8,10 @@
 //   await Fav.alternar(nome)      → bool: novo estado
 //   Fav.tem(nome)                 → bool (síncrono, cache)
 //   Fav.tamanho()                 → int (síncrono, cache)
+//   Fav.disponivel()              → bool (síncrono): há lista de favoritas pra
+//                                   este usuário? false para o Mestre e para
+//                                   quem não está logado. A UI usa isso pra
+//                                   esconder o botão em vez de falhar calada.
 //
 // Depende de: window.sb (Supabase) e window.Auth (login obrigatório).
 
@@ -19,6 +23,9 @@
   let listaId = null;
   let usuarioId = null;
   let channel = null;
+  // null = ainda não tentamos carregar; false = este usuário não tem lista
+  // (Mestre ou sem login) e favoritar nunca vai funcionar pra ele.
+  let habilitado = null;
 
   // Cria personagem "default" se o user não tiver nenhum
   async function garantirPersonagem(userId) {
@@ -60,19 +67,20 @@
 
   // Inicializa: requer usuário logado
   async function carregar() {
-    if (!window.sb || !window.Auth) return new Set();
+    if (!window.sb || !window.Auth) { habilitado = false; return new Set(); }
     const user = await window.Auth.getUser();
-    if (!user) return new Set();  // sem login = sem favoritas
+    if (!user) { habilitado = false; return new Set(); }  // sem login = sem favoritas
     usuarioId = user.id;
 
     // Mestre não tem PJ próprio nem favorita magias — não cria placeholder
-    if (await window.Auth.ehMestre()) return new Set();
+    if (await window.Auth.ehMestre()) { habilitado = false; return new Set(); }
 
     personagemId = await garantirPersonagem(user.id);
-    if (!personagemId) return new Set();
+    if (!personagemId) { habilitado = false; return new Set(); }
 
     const lista = await garantirLista(personagemId, user.id);
     listaId = lista?.id || null;
+    habilitado = !!listaId;
     cache = new Set(lista?.spell_names || []);
 
     // Realtime: ouve mudanças nesta lista específica
@@ -95,6 +103,9 @@
   }
 
   async function alternar(nome) {
+    // Já sabemos que este usuário não tem lista (Mestre/deslogado): não adianta
+    // recarregar — antes, cada clique disparava 2 chamadas ao Supabase à toa.
+    if (habilitado === false) return cache.has(nome);
     if (!listaId) await carregar();
     if (!listaId) return false;
 
@@ -115,6 +126,7 @@
 
   function tem(nome) { return cache.has(nome); }
   function tamanho() { return cache.size; }
+  function disponivel() { return habilitado === true; }
 
-  window.Fav = { carregar, alternar, tem, tamanho };
+  window.Fav = { carregar, alternar, tem, tamanho, disponivel };
 })();

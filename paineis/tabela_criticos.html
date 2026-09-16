@@ -37,7 +37,14 @@
   .tabela-secao[hidden] { display: none; }
 
   /* ---- tabelas de d100 ---- */
-  .table-wrap { overflow-x: auto; margin: 0 0 40px; border: 1px solid var(--border-soft); border-radius: var(--radius); }
+  /* `overflow-x: auto` já transforma o wrap em contêiner de rolagem nos DOIS
+     eixos (o overflow-y `visible` vira `auto` por especificação). Sem altura
+     limitada ele nunca rola na vertical, então o `position: sticky` do <thead>
+     não tinha contra o que grudar. A max-height dá o scrollport vertical que
+     falta — são 20 linhas de texto denso por tabela, e o cabeçalho de tipo de
+     dano é o que diz de que coluna é cada efeito. */
+  .table-wrap { overflow-x: auto; max-height: min(72vh, 760px); margin: 0 0 40px;
+    border: 1px solid var(--border-soft); border-radius: var(--radius); }
   table.tabela-critico { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 14.5px; }
   table.tabela-critico caption { caption-side: top; text-align: left; font-family: var(--font-heading); font-size: 12px;
     font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--gold); background: var(--surface-raised);
@@ -45,7 +52,8 @@
   table.tabela-critico th, table.tabela-critico td { border: 1px solid var(--border-soft); padding: 9px 12px; text-align: left;
     vertical-align: top; line-height: 1.45; }
   table.tabela-critico thead th { background: var(--surface); color: var(--gold-light); font-family: var(--font-heading);
-    font-size: 12px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; position: sticky; top: 0; }
+    font-size: 12px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase;
+    position: sticky; top: 0; z-index: 2; }
   table.tabela-critico td:first-child, table.tabela-critico th:first-child { white-space: nowrap; font-family: var(--font-heading);
     color: var(--gold); font-weight: 700; text-align: center; background: var(--surface); }
   table.tabela-critico tbody tr:nth-child(even) td:not(:first-child) { background: color-mix(in srgb, var(--surface) 55%, transparent); }

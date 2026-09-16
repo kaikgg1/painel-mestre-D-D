@@ -126,8 +126,22 @@ window.LogCombate = (function () {
     atualizarBadge();
   }
   function limpar() { _eventos = []; _naoLidos = 0; atualizarLista(); atualizarBadge(); }
-  function abrir() { montar(); document.getElementById('lc-painel').classList.add('open'); _naoLidos = 0; atualizarBadge(); }
-  function fechar() { if (_montado) document.getElementById('lc-painel').classList.remove('open'); }
+  // Esc fecha o painel, como em rolador.js/iniciativa.js/loot_xp.js. O listener
+  // só fica registrado enquanto o painel está aberto (referência estável, então
+  // add/remove repetidos não acumulam handlers).
+  function onEsc(e) { if (e.key === 'Escape') fechar(); }
+
+  function abrir() {
+    montar();
+    document.getElementById('lc-painel').classList.add('open');
+    _naoLidos = 0;
+    atualizarBadge();
+    document.addEventListener('keydown', onEsc);
+  }
+  function fechar() {
+    document.removeEventListener('keydown', onEsc);
+    if (_montado) document.getElementById('lc-painel').classList.remove('open');
+  }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', montar);
   else montar();

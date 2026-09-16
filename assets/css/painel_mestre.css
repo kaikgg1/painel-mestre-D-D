@@ -796,6 +796,8 @@
     .card { padding: 16px 14px; }
     .toolbar { flex-direction: column; align-items: stretch; gap: 8px; padding: 10px; }
     .toolbar button, .toolbar .back-link { padding: 12px 16px; min-height: 44px; width: 100%; text-align: center; font-size: 12px; }
+    /* Sem isso os chips ficam presos nos 150px do min-width e estouram a 360px */
+    .party-chip { min-width: calc(50% - 5px); flex: 1 1 calc(50% - 5px); }
 
     /* Stats: 3 colunas continua, mas com mais respiro */
     .stats-row { gap: 8px; }
@@ -822,7 +824,17 @@
     .class-watermark { font-size: 84px; }
     .magia-prep-tag { font-size: 12px; padding: 4px 10px; }
     .equip-tag { font-size: 12px; padding: 4px 8px 4px 10px; }
-    .equip-add input, .equip-add button { min-height: 34px; }
+    .equip-add input, .equip-add button { min-height: 44px; }
+    /* O ✕ de remover é propositalmente minúsculo: mantém o desenho e estica só
+       a área de toque pra 44px com um pseudo-elemento (mesmo padrão de .lixo
+       em ficha/equipamento.css). O gap maior evita sobreposição entre tags. */
+    .equip-tags { gap: 8px; }
+    .equip-tag .equip-rm { position: relative; }
+    .equip-tag .equip-rm::after {
+      content: ''; position: absolute; inset: 50%;
+      width: max(44px, 100%); height: max(44px, 100%);
+      transform: translate(-50%, -50%);
+    }
 
     /* Ações inferiores */
     .card-actions { gap: 6px; flex-wrap: wrap; }

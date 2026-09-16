@@ -162,6 +162,42 @@ function renderPartyBar() {
 // Patch cirúrgico: re-renderiza apenas o card de um personagem específico
 const _rerenderTimers = new Map();
 const _rerenderPending = new Map();
+// Um "waiter" por card aguardando ele perder o foco (ver _aguardarPerdaDeFoco).
+const _rerenderWaiters = new Map();
+
+// Segura o rerender até o card REALMENTE perder o foco.
+// Antes usava-se um focusout {once:true}: pular de um campo pro outro com Tab
+// dispara focusout sem o foco sair do card, o listener morria e o dado pendente
+// ficava preso até o próximo evento/F5. Aqui o listener fica armado e só é
+// solto quando o rerender acontece — o Map garante um único waiter por card,
+// então listeners não se acumulam a cada tecla digitada.
+function _aguardarPerdaDeFoco(id, card) {
+  const atual = _rerenderWaiters.get(id);
+  if (atual && atual.card === card) return;  // já estamos esperando neste card
+  atual?.cancelar();                         // card foi substituído: solta o antigo
+
+  let timer = null, poll = null;
+  const verificar = () => {
+    clearTimeout(timer);
+    // 250ms de folga: dá tempo do foco assentar no próximo campo (Tab) e não
+    // interrompe o auto-save que acabou de ser disparado pelo blur.
+    timer = setTimeout(() => {
+      if (card.isConnected && card.contains(document.activeElement)) return; // segue editando
+      cancelar();
+      _aplicarRerender(id);
+    }, 250);
+  };
+  const cancelar = () => {
+    clearTimeout(timer); clearInterval(poll);
+    card.removeEventListener('focusout', verificar);
+    if (_rerenderWaiters.get(id)?.cancelar === cancelar) _rerenderWaiters.delete(id);
+  };
+  card.addEventListener('focusout', verificar);
+  // Rede de segurança: se o elemento focado for removido do DOM, o focusout
+  // pode não disparar — o poll garante que o pendente não fique preso.
+  poll = setInterval(verificar, 1000);
+  _rerenderWaiters.set(id, { card, cancelar });
+}
 
 function rerenderCard(p) {
   if (!p?.id) return;
@@ -177,17 +213,12 @@ function _aplicarRerender(id) {
   const grid = document.getElementById('grid');
   if (!grid) return;
   const antigo = grid.querySelector(`[data-card-id="${id}"]`);
-  if (!antigo) { _rerenderPending.delete(id); render(); return; }
+  if (!antigo) { _rerenderWaiters.get(id)?.cancelar(); _rerenderPending.delete(id); render(); return; }
   if (antigo.contains(document.activeElement)) {
-    const handler = () => {
-      antigo.removeEventListener('focusout', handler);
-      setTimeout(() => {
-        if (!antigo.contains(document.activeElement)) _aplicarRerender(id);
-      }, 250);
-    };
-    antigo.addEventListener('focusout', handler, { once: true });
+    _aguardarPerdaDeFoco(id, antigo);
     return;
   }
+  _rerenderWaiters.get(id)?.cancelar();
   const dados = _rerenderPending.get(id);
   _rerenderPending.delete(id);
   if (!dados) return;

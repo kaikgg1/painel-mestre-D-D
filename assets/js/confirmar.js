@@ -14,6 +14,12 @@
 
 (function () {
   let _injetado = false;
+  // O overlay é um SINGLETON reutilizado. Se uma segunda perguntar() chegar com
+  // a primeira ainda aberta, ela reescreve os handlers e o `await` da primeira
+  // nunca resolveria — o fluxo que chamou travaria em silêncio. Guardamos aqui
+  // o "fechar" da chamada em aberto pra encerrá-la (como cancelada) antes de
+  // assumir o overlay.
+  let _fecharPendente = null;
 
   // Usa os tokens compartilhados (assets/css/tokens.css) com fallback pro
   // valor Strahd — hoje esse modal só é usado no painel do Mestre
@@ -129,6 +135,9 @@
 
   async function perguntar({ titulo = 'Confirmar', mensagem = '', confirmar = 'Confirmar', cancelar = 'Cancelar', danger = false } = {}) {
     montar();
+    // Resolve a chamada anterior (se houver) como cancelada ANTES de reescrever
+    // título/mensagem/handlers do overlay compartilhado.
+    if (_fecharPendente) _fecharPendente(false);
     const ov = document.getElementById('cf-overlay');
     const modal = document.getElementById('cf-modal');
     document.getElementById('cf-titulo').textContent = titulo;
@@ -145,6 +154,7 @@
       function fechar(valor) {
         if (resolvido) return;
         resolvido = true;
+        if (_fecharPendente === fechar) _fecharPendente = null;
         ov.classList.remove('open');
         ov.setAttribute('aria-hidden', 'true');
         document.removeEventListener('keydown', onKey);
@@ -159,6 +169,7 @@
       cancelBtn.onclick = () => fechar(false);
       ov.onclick = e => { if (e.target === ov) fechar(false); };
       document.addEventListener('keydown', onKey);
+      _fecharPendente = fechar;
 
       ov.classList.add('open');
       ov.setAttribute('aria-hidden', 'false');

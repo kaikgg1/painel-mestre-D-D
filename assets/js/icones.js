@@ -78,14 +78,16 @@
     exaustao:         'hourglass',
     inspiracao:       'sparkles',
     mochila:          'backpack',
-    pocao:            'health-potion',
     moedas:           'coins',
     tesouro:          'chest',
-    anel:             'ring',
     manto:            'cloak',
     bota:             'boot-prints',
-    varinha:          'quill-ink',
     pegadas:          'footprint',
+    // `pocao`, `anel` e `varinha` ficavam aqui e eram redefinidos mais abaixo,
+    // no bloco "Itens mágicos (por tipo)" — em objeto literal a 2ª chave vence,
+    // então estas nunca chegavam a desenhar nada. O único consumidor das três é
+    // assets/js/compendio.js (REGRAS_ICONE), que é justamente o catálogo de itens
+    // mágicos; a definição válida é a de lá. Removidas aqui sem mudar nada na tela.
 
     // --- Estado / ações de UI ---
     salvar:           'save',
@@ -138,8 +140,9 @@
     elfa:             'elf-helmet',        // avatar de jogadora elfa
     arqueiro:         'bowman',            // avatar de jogador arqueiro
     arma:             'sword-brandish',    // item mágico do tipo Arma
-    cajado:           'wizard-staff',      // item mágico Cajado/Bastão
     peitoral:         'breastplate',       // item mágico Armadura
+    // `cajado` saiu daqui: estava duplicado com o mesmo valor ('wizard-staff')
+    // no bloco "Itens mágicos (por tipo)", que é quem vence e quem compendio.js usa.
     // --- Condicoes e estados das fichas de personagem (verificados: HTTP 200) ---
     amedrontado:      'terror',
     luz_solar:        'sun-radiations',

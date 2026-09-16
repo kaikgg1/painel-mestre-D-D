@@ -98,7 +98,11 @@
     for (const [re, chave] of REGRAS_NOME) if (re.test(n)) return chave;
     return 'item_maravilhoso';   // genérico de último caso
   }
-  const RARIDADES = ['comum', 'incomum', 'raro', 'muito raro', 'lendário', 'artefato', 'variável'];
+  // Ordem canônica só para ORDENAR os chips. A lista de chips em si é derivada
+  // das raridades que existem de fato no JSON carregado — a lista fixa incluía
+  // 'variável', que não existe em itens_data.json, e o chip sempre dava
+  // "Nada encontrado".
+  const ORDEM_RAR = ['comum', 'incomum', 'raro', 'muito raro', 'lendário', 'artefato', 'variável'];
   const CORES_RAR = { comum: '#9aa0a6', incomum: '#4caf6a', raro: '#4a90d9', 'muito raro': '#9b59b6', 'lendário': '#d4a843', artefato: '#c0392b', 'variável': '#7f8c8d' };
 
   const CSS = `
@@ -117,18 +121,26 @@
   .cp-busca input { width: 100%; padding: 11px 14px; font-size: 16px; border-radius: 8px; background: rgba(0,0,0,0.35); border: 1px solid #8B6914; color: #f0e6cf; font-family: inherit; }
   .cp-busca input:focus { outline: none; box-shadow: 0 0 0 2px rgba(184,138,44,0.4); }
   .cp-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 4px 4px 10px; }
-  .cp-chip { font-family: 'Cinzel',serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; padding: 4px 10px; border-radius: 20px; cursor: pointer; background: rgba(255,255,255,0.05); border: 1px solid rgba(139,105,20,0.5); color: #a89878; }
+  /* <button> (não <span>) para funcionar no teclado; o reset abaixo mantém a
+     aparência que o chip já tinha. */
+  .cp-chip { display: inline-block; -webkit-appearance: none; appearance: none; line-height: 1.4; margin: 0;
+    font-family: 'Cinzel',serif; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; padding: 4px 10px; border-radius: 20px; cursor: pointer; background: rgba(255,255,255,0.05); border: 1px solid rgba(139,105,20,0.5); color: #a89878; }
+  .cp-chip:focus-visible, .cp-item:focus-visible { outline: 2px solid #d4a843; outline-offset: 2px; }
   .cp-chip.on { background: #8B6914; color: #120b10; border-color: #b88a2c; }
   .cp-corpo { flex: 1; overflow-y: auto; padding: 4px 4px 18px; }
   .cp-lista { display: grid; gap: 8px; }
-  .cp-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; cursor: pointer; background: rgba(255,255,255,0.03); border: 1px solid rgba(139,105,20,0.3); border-radius: 8px; transition: .15s; }
+  /* também <button>: a lista inteira era um <div> com onclick, inacessível
+     por teclado. width/text-align/font/color desfazem o estilo padrão do botão. */
+  .cp-item { display: flex; align-items: center; gap: 12px; padding: 10px 12px; cursor: pointer; background: rgba(255,255,255,0.03); border: 1px solid rgba(139,105,20,0.3); border-radius: 8px; transition: .15s;
+    width: 100%; text-align: left; font: inherit; color: inherit; -webkit-appearance: none; appearance: none; }
   .cp-item:hover { border-color: #b88a2c; background: rgba(184,138,44,0.08); transform: translateX(2px); }
   .cp-thumb { position: relative; flex-shrink: 0; width: 48px; height: 48px; border-radius: 6px; overflow: hidden; background: rgba(0,0,0,.35); display: flex; align-items: center; justify-content: center; font-size: 22px; color: #b88a2c; border: 1px solid rgba(139,105,20,.3); }
   /* A imagem cobre o ícone; se falhar (onerror -> remove) o ícone reaparece. */
   .cp-thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
   .cp-item-meta iconify-icon { vertical-align: -2px; margin-right: 2px; color: #b88a2c; }
-  .cp-item-nome { font-family: 'Cinzel',serif; font-weight: 700; color: #d4a843; font-size: 15px; }
-  .cp-item-meta { font-size: 12px; color: #a89878; font-style: italic; }
+  /* display:block porque agora são <span> dentro do <button> da linha */
+  .cp-item-nome { display: block; font-family: 'Cinzel',serif; font-weight: 700; color: #d4a843; font-size: 15px; }
+  .cp-item-meta { display: block; font-size: 12px; color: #a89878; font-style: italic; }
   .cp-tag { display: inline-block; font-family: 'Cinzel',serif; font-size: 9px; font-weight: 700; text-transform: uppercase; padding: 2px 7px; border-radius: 4px; margin-left: 6px; }
   .cp-vazio, .cp-dica { text-align: center; color: #8c7d5e; font-style: italic; padding: 24px 10px; }
   .cp-dica { padding: 8px; font-size: 12px; }
@@ -191,26 +203,46 @@
     return host;
   }
 
+  // Chips de raridade a partir dos DADOS: nunca oferece um filtro vazio.
+  function montarChips(chips, dados) {
+    const presentes = [...new Set(dados.map(i => i.raridade).filter(Boolean))]
+      .sort((a, b) => {
+        const ia = ORDEM_RAR.indexOf(a), ib = ORDEM_RAR.indexOf(b);
+        // raridade desconhecida vai pro fim, em ordem alfabética
+        if (ia < 0 && ib < 0) return a.localeCompare(b);
+        if (ia < 0) return 1;
+        if (ib < 0) return -1;
+        return ia - ib;
+      });
+    if (!presentes.length) { chips.style.display = 'none'; chips.innerHTML = ''; return; }
+    chips.style.display = 'flex';
+    chips.innerHTML = `<button type="button" class="cp-chip on" data-rar="" aria-pressed="true">Todos</button>` +
+      presentes.map(r => `<button type="button" class="cp-chip" data-rar="${esc(r)}" aria-pressed="false"`
+        + ` style="border-color:${CORES_RAR[r] || '#a89878'}55">${esc(titulo(r))}</button>`).join('');
+    chips.querySelectorAll('.cp-chip').forEach(c => c.addEventListener('click', () => {
+      _filtroRar = c.dataset.rar;
+      chips.querySelectorAll('.cp-chip').forEach(x => {
+        const on = x === c;
+        x.classList.toggle('on', on);
+        x.setAttribute('aria-pressed', on ? 'true' : 'false');
+      });
+      renderLista(_root.querySelector('.cp-input').value);
+    }));
+  }
+
   async function popular(tipo) {
     _tipo = tipo; _filtroRar = '';
     const inp = _root.querySelector('.cp-input');
     inp.value = ''; inp.placeholder = CFG[tipo].ph;
     const chips = _root.querySelector('.cp-chips');
-    if (tipo === 'itens') {
-      chips.style.display = 'flex';
-      chips.innerHTML = `<span class="cp-chip on" data-rar="">Todos</span>` +
-        RARIDADES.map(r => `<span class="cp-chip" data-rar="${r}" style="border-color:${CORES_RAR[r]}55">${titulo(r)}</span>`).join('');
-      chips.querySelectorAll('.cp-chip').forEach(c => c.addEventListener('click', () => {
-        _filtroRar = c.dataset.rar;
-        chips.querySelectorAll('.cp-chip').forEach(x => x.classList.toggle('on', x === c));
-        renderLista(_root.querySelector('.cp-input').value);
-      }));
-    } else { chips.style.display = 'none'; chips.innerHTML = ''; }
+    chips.style.display = 'none'; chips.innerHTML = '';
 
     const corpo = _root.querySelector('.cp-corpo');
     corpo.innerHTML = '<div class="cp-dica">Carregando…</div>';
     const dados = await carregar(tipo);
     if (!dados) { corpo.innerHTML = `<div class="cp-vazio">${ico('aviso')} Não foi possível carregar.</div>`; return; }
+    // Depois da carga: os chips dependem do conteúdo do JSON.
+    if (tipo === 'itens') montarChips(chips, dados);
     renderLista('');
     setTimeout(() => inp.focus(), 60);
   }
@@ -278,20 +310,20 @@
   function itemHTML(it, idx) {
     const cor = CORES_RAR[it.raridade] || '#a89878';
     const icone = ico(chaveIconeItem(it.tipo, it.nome));
-    return `<div class="cp-item" data-idx="${idx}">
-      <div class="cp-thumb">${icone}${it.imagem ? `<img src="${esc(it.imagem)}" alt="" loading="lazy" onerror="this.remove()">` : ''}</div>
-      <div style="flex:1;min-width:0">
-        <div class="cp-item-nome">${esc(titulo(it.nome))}<span class="cp-tag" style="background:${cor}22;color:${cor};border:1px solid ${cor}66">${esc(it.raridade)}</span></div>
-        <div class="cp-item-meta">${esc(it.tipo)}${it.sintonia ? ' · requer sintonização' : ''}</div>
-      </div></div>`;
+    return `<button type="button" class="cp-item" data-idx="${idx}">
+      <span class="cp-thumb">${icone}${it.imagem ? `<img src="${esc(it.imagem)}" alt="" loading="lazy" onerror="this.remove()">` : ''}</span>
+      <span style="flex:1;min-width:0">
+        <span class="cp-item-nome">${esc(titulo(it.nome))}<span class="cp-tag" style="background:${cor}22;color:${cor};border:1px solid ${cor}66">${esc(it.raridade)}</span></span>
+        <span class="cp-item-meta">${esc(it.tipo)}${it.sintonia ? ' · requer sintonização' : ''}</span>
+      </span></button>`;
   }
   function monstroHTML(m, idx) {
-    return `<div class="cp-item" data-idx="${idx}">
-      <div class="cp-thumb">${ico('dragao')}${m.imagem ? `<img src="${esc(m.imagem)}" alt="" loading="lazy" onerror="this.remove()">` : ''}</div>
-      <div style="flex:1;min-width:0">
-        <div class="cp-item-nome">${esc(titulo(m.nome))}</div>
-        <div class="cp-item-meta">${esc(m.tipo || '')} · ${ico('escudo', { titulo: 'Classe de Armadura' })}${m.ca} ${ico('vida', { titulo: 'Pontos de vida' })}${m.hp_max} ${ico('ataque', { titulo: 'Nível de desafio' })}${esc(m.nd || '—')}</div>
-      </div></div>`;
+    return `<button type="button" class="cp-item" data-idx="${idx}">
+      <span class="cp-thumb">${ico('dragao')}${m.imagem ? `<img src="${esc(m.imagem)}" alt="" loading="lazy" onerror="this.remove()">` : ''}</span>
+      <span style="flex:1;min-width:0">
+        <span class="cp-item-nome">${esc(titulo(m.nome))}</span>
+        <span class="cp-item-meta">${esc(m.tipo || '')} · ${ico('escudo', { titulo: 'Classe de Armadura' })}${m.ca} ${ico('vida', { titulo: 'Pontos de vida' })}${m.hp_max} ${ico('ataque', { titulo: 'Nível de desafio' })}${esc(m.nd || '—')}</span>
+      </span></button>`;
   }
 
   function abrirDetalhe(idx) {

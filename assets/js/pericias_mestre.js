@@ -38,7 +38,9 @@
 
   const CSS = `
   .ap-overlay {
-    position: fixed; inset: 0; z-index: 6000;
+    /* 8600: acima dos FABs (rolador/log_combate = 8500) e abaixo do
+       Confirmar (9000). Mesma camada de iniciativa.js/loot_xp.js. */
+    position: fixed; inset: 0; z-index: 8600;
     background: rgba(0,0,0,0.82);
     backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
     display: none; align-items: center; justify-content: center; padding: 16px;

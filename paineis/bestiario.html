@@ -491,6 +491,11 @@
     /* 6 atributos em 3 colunas x 2 linhas — nunca espremidos numa linha só */
     .atributos { grid-template-columns: repeat(3, 1fr); gap: 8px 4px; }
 
+    /* "Média"/"Máximo" do PV: no desktop são pílulas de ~18px de altura,
+       pequenas demais pro toque. Aparecem em toda ficha, então valem um
+       alvo maior aqui (o desktop segue igual). */
+    .hp-btn { min-height: 36px; padding: 6px 12px; font-size: 11px; }
+
     #ao-topo {
       right: 12px; bottom: calc(12px + env(safe-area-inset-bottom, 0));
       width: var(--touch-target); height: var(--touch-target); font-size: 17px;
@@ -630,7 +635,11 @@ function parseTipo(t) {
   const mapa = { 'media':'Médio','médio':'Médio','média':'Médio',
                  'miuda':'Miúdo','miúda':'Miúdo','miúdo':'Miúdo','miudo':'Miúdo',
                  'pequena':'Pequeno','pequeno':'Pequeno',
-                 'grande':'Grande','enorme':'Enorme','descomunal':'Descomunal' };
+                 'grande':'Grande','enorme':'Enorme','descomunal':'Descomunal',
+                 // Imenso: dragões anciões ("Dragão Imenso") e o Kraken
+                 // ("Monstruosidade Imensa (titã)") — sem isto ficavam sem
+                 // tamanho e sumiam ao marcar qualquer pílula de Tamanho.
+                 'imenso':'Imenso','imensa':'Imenso' };
   tam = mapa[norm(tam)] || mapa[tam] || '';
   return { tipo, tamanho: tam };
 }
@@ -748,7 +757,13 @@ function abrirModal(nome) {
   const fallbackIco = `<span class="thumb-fb">${iconeTipo(c._tipo, { tam: '30px' })}</span>`;
   const imgTopo = c.imagem
     ? fallbackIco + `<img src="${esc(c.imagem)}" alt="Ilustração de ${esc(tituloBonito(c.nome))}"`
-      + ` onerror="this.parentElement.classList.remove('clicavel');this.remove()">`
+      // Se a imagem falhar, a miniatura precisa deixar de ser um gatilho de
+      // lightbox: sem tirar data-lb/role/tabindex o lightbox.js ainda abria
+      // (clique ou Enter) um overlay vazio. (Aspas simples: o atributo usa duplas.)
+      + ` onerror="var p=this.parentElement;p.classList.remove('clicavel');`
+      + `p.removeAttribute('data-lb');p.removeAttribute('data-lb-nome');`
+      + `p.removeAttribute('role');p.removeAttribute('tabindex');`
+      + `p.removeAttribute('title');this.remove()">`
     : fallbackIco;
 
   const caTxt = [c.ca, c.ca_extra].filter(Boolean).join(' ');
@@ -884,7 +899,7 @@ function liberarScroll() {
 /* ===================== FILTROS DINÂMICOS ===================== */
 function montarFiltros() {
   const tipos = [...new Set(CRIATURAS.map(c => c._tipo).filter(Boolean))].sort();
-  const tams  = ['Miúdo','Pequeno','Médio','Grande','Enorme','Descomunal']
+  const tams  = ['Miúdo','Pequeno','Médio','Grande','Enorme','Descomunal','Imenso']
                 .filter(t => CRIATURAS.some(c => c._tamanho === t));
 
   const linhaTipo = document.getElementById('linha-tipo');
@@ -1048,9 +1063,17 @@ btnTopo.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smo
      bestiario.html?criatura=RUFIÃO
    Usado pelas fichas lore-only de paineis/vilao/, que sugerem um bloco
    genérico ("use o bloco de Sacerdote") e linkam pra cá. */
+/* Um "%" solto no hash (ex.: bestiario.html#100%) faz decodeURIComponent
+   lançar URIError. Como abrirPorURL() roda dentro do try da carga, esse erro
+   caía no catch e trocava a lista inteira por "Não foi possível carregar o
+   bestiário". Aqui o decode falha em silêncio e usamos o valor cru. */
+function decodeHash(bruto) {
+  try { return decodeURIComponent(bruto); } catch { return bruto; }
+}
+
 function abrirPorURL() {
   const params = new URLSearchParams(location.search);
-  const alvo = params.get('criatura') || decodeURIComponent(location.hash.slice(1));
+  const alvo = params.get('criatura') || decodeHash(location.hash.slice(1));
   if (!alvo) return;
   const chave = norm(alvo);
   const c = CRIATURAS.find(x => norm(x.nome) === chave)

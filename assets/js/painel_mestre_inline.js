@@ -156,6 +156,42 @@ function abrirIniciativa() {
 // Anti-flicker: debounce por card + skip se o usuário está editando dentro dele.
 const _rerenderTimers = new Map();
 const _rerenderPending = new Map();
+// Um "waiter" por card aguardando ele perder o foco (ver _aguardarPerdaDeFoco).
+const _rerenderWaiters = new Map();
+
+// Segura o rerender até o card REALMENTE perder o foco.
+// Antes usava-se um focusout {once:true}: pular de um campo pro outro com Tab
+// dispara focusout sem o foco sair do card, o listener morria e o dado pendente
+// ficava preso até o próximo evento/F5. Aqui o listener fica armado e só é
+// solto quando o rerender acontece — o Map garante um único waiter por card,
+// então listeners não se acumulam a cada tecla digitada.
+function _aguardarPerdaDeFoco(id, card) {
+  const atual = _rerenderWaiters.get(id);
+  if (atual && atual.card === card) return;  // já estamos esperando neste card
+  atual?.cancelar();                         // card foi substituído: solta o antigo
+
+  let timer = null, poll = null;
+  const verificar = () => {
+    clearTimeout(timer);
+    // 250ms de folga: dá tempo do foco assentar no próximo campo (Tab) e não
+    // interrompe o auto-save que acabou de ser disparado pelo blur.
+    timer = setTimeout(() => {
+      if (card.isConnected && card.contains(document.activeElement)) return; // segue editando
+      cancelar();
+      _aplicarRerender(id);
+    }, 250);
+  };
+  const cancelar = () => {
+    clearTimeout(timer); clearInterval(poll);
+    card.removeEventListener('focusout', verificar);
+    if (_rerenderWaiters.get(id)?.cancelar === cancelar) _rerenderWaiters.delete(id);
+  };
+  card.addEventListener('focusout', verificar);
+  // Rede de segurança: se o elemento focado for removido do DOM, o focusout
+  // pode não disparar — o poll garante que o pendente não fique preso.
+  poll = setInterval(verificar, 1000);
+  _rerenderWaiters.set(id, { card, cancelar });
+}
 
 function rerenderCard(p) {
   if (!p?.id) return;
@@ -173,19 +209,13 @@ function _aplicarRerender(id) {
   const grid = document.getElementById('grid');
   if (!grid) return;
   const antigo = grid.querySelector(`[data-card-id="${id}"]`);
-  if (!antigo) { _rerenderPending.delete(id); render(); return; }
+  if (!antigo) { _rerenderWaiters.get(id)?.cancelar(); _rerenderPending.delete(id); render(); return; }
   // Se há foco dentro deste card, adia até perder foco — não interrompe digitação.
   if (antigo.contains(document.activeElement)) {
-    const handler = () => {
-      antigo.removeEventListener('focusout', handler);
-      // espera 1 tick + 200ms pra não interromper auto-save subsequente
-      setTimeout(() => {
-        if (!antigo.contains(document.activeElement)) _aplicarRerender(id);
-      }, 250);
-    };
-    antigo.addEventListener('focusout', handler, { once: true });
+    _aguardarPerdaDeFoco(id, antigo);
     return;
   }
+  _rerenderWaiters.get(id)?.cancelar();
   const dados = _rerenderPending.get(id);
   _rerenderPending.delete(id);
   if (!dados) return;
@@ -198,6 +228,17 @@ function _aplicarRerender(id) {
   requestAnimationFrame(() => requestAnimationFrame(() => { novo.style.minHeight = ''; }));
   renderPartyBar();
   window.Presenca?.pintar();
+}
+
+// Único ponto de verdade pra gravar o nível: o cabeçalho (contenteditable) e o
+// stat-box "Nível" gravavam com tratamentos diferentes (um sem clamp e sem
+// rerender), deixando a tela inconsistente dependendo de onde se editava.
+// Retorna o valor já normalizado pra quem precisa refletir no input.
+function aplicarNivel(p, valor) {
+  p.nivel = Math.max(1, Math.min(20, parseInt(valor) || 1));
+  salvar(p);
+  rerenderCard(p);  // slots de magia e recursos de classe dependem do nível
+  return p.nivel;
 }
 
 // Aplica cor + ícone de fundo temáticos da classe do personagem no card.
@@ -379,9 +420,14 @@ function criarCard(p) {
   raceClass.querySelectorAll('[contenteditable]').forEach(el => {
     const aplicar = () => {
       const field = el.dataset.field;
-      p[field] = field === 'nivel' ? (parseInt(el.textContent) || 1) : (el.textContent.trim() || '?');
+      // Nível passa pelo mesmo caminho do stat-box (clamp + rerender)
+      if (field === 'nivel') { aplicarNivel(p, el.textContent); return; }
+      p[field] = el.textContent.trim() || '?';
       salvar(p);
-      if (field === 'classe') aplicarTemaClasse(card, p);
+      if (field === 'classe') {
+        aplicarTemaClasse(card, p);  // feedback imediato de cor, sem esperar o rerender
+        rerenderCard(p);             // slots de magia e recursos de classe dependem da classe
+      }
     };
     el.oninput = aplicar;
     el.onblur = aplicar;
@@ -445,10 +491,7 @@ function criarCard(p) {
   const nvVal = document.createElement('div');
   nvVal.className = 'stat-value';
   const nvInput = inputNumerico(p.nivel, v => {
-    p.nivel = Math.max(1, Math.min(20, v));
-    nvInput.value = p.nivel;
-    salvar(p);
-    rerenderCard(p);  // slots dependem do nível
+    nvInput.value = aplicarNivel(p, v);
   }, '', 1);
   nvVal.appendChild(nvInput);
   nvBox.appendChild(nvVal);

@@ -40,26 +40,50 @@ window.UI = (function () {
     }
   }
 
+  // Contador pra gerar id único do título: dois modais abertos ao mesmo tempo
+  // com o mesmo id="ui-modal-titulo" fariam o aria-labelledby apontar sempre
+  // pro primeiro (id duplicado é inválido e o leitor de tela lê o errado).
+  let _seqModal = 0;
+
   function abrirModal({ tituloHtml = '', corpoHtml = '', className = '', onFechar } = {}) {
+    const tituloId = `ui-modal-titulo-${++_seqModal}`;
+    // Guarda quem tinha o foco pra devolver no fechar (mesmo padrão de
+    // lightbox.js/confirmar.js): sem isso o foco volta pro <body> e quem usa
+    // teclado/leitor de tela perde o lugar na página.
+    const focoAnterior = document.activeElement;
+
     const overlay = document.createElement('div');
     overlay.className = className ? `modal-overlay ${className}` : 'modal-overlay';
     overlay.innerHTML = `
-      <div class="modal-card" role="dialog" aria-modal="true"${tituloHtml ? ' aria-labelledby="ui-modal-titulo"' : ''}>
-        ${tituloHtml ? `<h3 id="ui-modal-titulo">${tituloHtml}</h3>` : ''}
+      <div class="modal-card" role="dialog" aria-modal="true" tabindex="-1"${tituloHtml ? ` aria-labelledby="${tituloId}"` : ''}>
+        ${tituloHtml ? `<h3 id="${tituloId}">${tituloHtml}</h3>` : ''}
         ${corpoHtml}
       </div>`;
     document.body.appendChild(overlay);
 
+    const card = overlay.querySelector('.modal-card');
+
     const fechar = () => {
       overlay.remove();
       document.removeEventListener('keydown', onKey);
+      // Só devolve o foco se o elemento ainda existir no DOM (o modal pode ter
+      // sido aberto a partir de um botão que a re-renderização já trocou).
+      if (focoAnterior && document.contains(focoAnterior)) {
+        try { focoAnterior.focus(); } catch (e) { /* elemento não focável */ }
+      }
       if (onFechar) onFechar();
     };
     const onKey = e => { if (e.key === 'Escape') fechar(); };
     overlay.addEventListener('click', e => { if (e.target === overlay) fechar(); });
     document.addEventListener('keydown', onKey);
 
-    return { overlay, card: overlay.querySelector('.modal-card'), fechar };
+    // Foco no 1º controle do modal (ou no próprio card, que é tabindex="-1"):
+    // leva o teclado/leitor de tela pra dentro do diálogo em vez de deixá-lo
+    // preso no conteúdo do fundo.
+    const primeiro = card.querySelector('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+    (primeiro || card).focus();
+
+    return { overlay, card, fechar };
   }
 
   return { accordion, abrirModal };

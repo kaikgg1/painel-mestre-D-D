@@ -525,7 +525,26 @@
     .exh-pip { width: 44px; height: 44px; font-size: 15px; }
     .death-pip { width: 44px; height: 44px; }
     .hp-current-input, .hp-max-input { min-height: 44px; }
-    .slot-dot { width: 18px; height: 18px; }
+    /* Bolinha de slot visual de 26px + área de toque de 44px pelo ::after (sem
+       inchar o desenho, que numa fileira de 9 slots ficaria gigante). O gap
+       maior evita que as áreas vizinhas se sobreponham demais. Mesmo padrão de
+       .hab-pip em ficha/habilidades.css. */
+    .slot-row .slot-dots { gap: 10px; }
+    .slot-dot { width: 26px; height: 26px; position: relative; }
+    .slot-dot::after { content: ''; position: absolute; inset: -9px; }
+    /* O ✕ de remover equipamento é minúsculo de propósito: estica só a área de
+       toque (padrão de .lixo em ficha/equipamento.css). */
+    .equip-tags { gap: 8px; }
+    /* inline-flex (e não o `display:inline` do modo-edição) pra o ::after ter
+       uma caixa de referência previsível; o tamanho visual não muda. */
+    .modo-edicao .equip-tag .equip-rm { display: inline-flex; align-items: center; justify-content: center; }
+    .equip-tag .equip-rm { position: relative; }
+    .equip-tag .equip-rm::after {
+      content: ''; position: absolute; inset: 50%;
+      width: max(44px, 100%); height: max(44px, 100%);
+      transform: translate(-50%, -50%);
+    }
+    .equip-add input, .equip-add button { min-height: 44px; }
     .card-actions button, .card-actions .remove-card { min-height: 38px; }
   }
 

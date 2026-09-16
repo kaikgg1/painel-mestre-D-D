@@ -159,7 +159,11 @@
 
 /* ===== MODAL ===== */
 .modal-overlay {
-  position: fixed; inset: 0; z-index: 200;
+  /* 8600 = camada padrão de modal do projeto (iniciativa.js, loot_xp.js).
+     Precisa ficar ACIMA dos FABs flutuantes (rolador.js/log_combate.js, 8500),
+     senão o 🎲 e o 📜 boiam sobre o backdrop e continuam clicáveis.
+     Abaixo do Confirmar (9000), que é o diálogo que aparece por cima de tudo. */
+  position: fixed; inset: 0; z-index: 8600;
   background: rgba(0,0,0,0.65);
   backdrop-filter: blur(4px);
   display: flex; align-items: center; justify-content: center;
