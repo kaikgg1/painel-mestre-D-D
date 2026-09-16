@@ -76,7 +76,7 @@ function renderResumoStatus(c) {
           <div class="hp-fill ${classeBar}" id="hp-fill" style="width:${pct}%"></div>
           <div class="hp-percent" id="hp-percent">${pct}%</div>
         </div>
-        <div class="resumo-hp-quick" aria-label="Atalhos de dano/cura">
+        <div class="resumo-hp-quick no-lock" aria-label="Atalhos de dano/cura">
           <button type="button" class="q-dano" data-quick="-20">-20</button>
           <button type="button" class="q-dano" data-quick="-10">-10</button>
           <button type="button" class="q-dano" data-quick="-5">-5</button>
@@ -97,7 +97,7 @@ function renderResumoStatus(c) {
 
       <div class="stat-card stat-insp">
         <div class="stat-card-label">${ico('inspiracao')} Inspiração</div>
-        <div class="resumo-insp-linha">
+        <div class="resumo-insp-linha no-lock">
           <button type="button" class="insp-btn" id="insp-menos" aria-label="Diminuir inspiração">−</button>
           <input type="text" inputmode="numeric" name="inspiracao" id="insp-input" value="${insp}" data-validar="int" data-min="0" class="stat-card-valor resumo-insp-input" aria-label="Inspiração">
           <button type="button" class="insp-btn" id="insp-mais" aria-label="Aumentar inspiração">+</button>

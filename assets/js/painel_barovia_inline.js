@@ -1222,10 +1222,17 @@ async function descansoLongo() {
           }
         } else if (ev.tipo === 'update') {
           const idx = estado.personagens.findIndex(x => x.id === ev.char.id);
-          if (idx >= 0) estado.personagens[idx] = ev.char;
+          // Atualiza o objeto NO LUGAR em vez de trocar a referência: os
+          // handlers do card já montado guardam o objeto antigo na closure.
+          // Trocando a referência, o card continuava preso ao dado velho e o
+          // próximo clique do Mestre mandava esse dado velho de volta pro
+          // banco — desfazendo, sem aviso, o que o jogador tinha acabado de
+          // mudar na própria ficha. Com Object.assign o card passa a enxergar
+          // o valor novo mesmo quando o rerender é pulado logo abaixo.
+          if (idx >= 0) Object.assign(estado.personagens[idx], ev.char);
           else { estado.personagens.push(ev.char); render(); return; }
           if (ehEcoLocal(ev.char.id)) return;
-          rerenderCard(ev.char);
+          rerenderCard(estado.personagens[idx]);
         } else if (ev.tipo === 'delete') {
           estado.personagens = estado.personagens.filter(x => x.id !== ev.id);
           render();

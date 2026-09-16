@@ -50,7 +50,10 @@ function renderCombate(c) {
         </div>
         <div id="exaustao-hp-aviso"></div>
 
-        <div class="hp-aplicar">
+        <!-- .no-lock: aplicar dano/cura é ação de mesa em tempo real, não
+             edição de ficha — precisa funcionar com a ficha travada, que é
+             o estado padrão. Vale pra subárvore toda (ver sistema.css). -->
+        <div class="hp-aplicar no-lock">
           <div class="hp-aplicar-linha">
             <button type="button" class="hp-btn dano" data-aplicar="dano" aria-label="Aplicar dano">${ico('dano')} Dano</button>
             <input type="text" inputmode="numeric" id="hp-aplicar-input" value="" placeholder="0" aria-label="Quantidade">
@@ -78,7 +81,7 @@ function renderCombate(c) {
         <div class="ajuda-mini" id="desloc-efetivo"></div></div>
       <div class="stat-card stat-insp">
         <div class="stat-card-label">${ico('inspiracao')} Inspiração</div>
-        <div class="resumo-insp-linha">
+        <div class="resumo-insp-linha no-lock">
           <button type="button" class="insp-btn" id="insp-menos" aria-label="Diminuir inspiração">−</button>
           <input type="text" inputmode="numeric" name="inspiracao" id="insp-input" value="${insp}" data-validar="int" data-min="0" class="stat-card-valor resumo-insp-input" aria-label="Inspiração">
           <button type="button" class="insp-btn" id="insp-mais" aria-label="Aumentar inspiração">+</button>

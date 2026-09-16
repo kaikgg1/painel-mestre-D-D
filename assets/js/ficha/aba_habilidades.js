@@ -358,7 +358,15 @@ async function popularHabilidades(classe, nivel, subclasse) {
     const slug = pip.dataset.habSlug;
     const idx  = +pip.dataset.habIdx;
     const rec  = charAtivo.recursos_usados || {};
-    const cur  = rec[slug] || { atual: 0, max: 0 };
+    // O máximo vem da tela (um pip desenhado = um uso), não de recursos_usados:
+    // numa habilidade nunca usada ainda não existe registro salvo, e o default
+    // {max:0} fazia o clamp abaixo zerar o clique — o pip simplesmente não
+    // marcava na primeira vez, e só passava a funcionar depois de um descanso
+    // longo (que é o que gravava o max). Era a outra metade do "botão de usar
+    // habilidade não funciona".
+    const maxNaTela = pip.closest('.hab-pips')?.children.length || 0;
+    const cur  = rec[slug] || { atual: 0, max: maxNaTela };
+    if (!(cur.max > 0)) cur.max = maxNaTela;   // cura registro antigo salvo com max 0
     // Click no pip "gasto" → recupera 1; click no pip "disponível" → gasta 1
     cur.atual = pip.classList.contains('gasto') ? idx : idx + 1;
     cur.atual = Math.max(0, Math.min(cur.max, cur.atual));

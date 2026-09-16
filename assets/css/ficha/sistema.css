@@ -415,9 +415,36 @@ body:not(.modo-unlock) .tab-content button:not(.no-lock):not(.tab) {
 body:not(.modo-unlock) .tab-content .pip,
 body:not(.modo-unlock) .tab-content .contador-bloco,
 body:not(.modo-unlock) .tab-content .clickable,
-body:not(.modo-unlock) .tab-content [onclick] {
+body:not(.modo-unlock) .tab-content [onclick]:not(.no-lock) {
   pointer-events: none !important;
   opacity: 0.75;
+}
+
+/* ── Exceção do .no-lock, valendo pra DENTRO dele ──────────────────────
+   As regras acima batem por elemento (input, button, [onclick]). Marcar só
+   o container com .no-lock não bastava: os filhos continuavam bloqueados.
+   Isto restaura a subárvore inteira, que é o mesmo critério que lock.js já
+   usa pro tab order (ele ignora quem tem um ancestral .no-lock).
+
+   Sem isto, os botões de Dano/Cura e os atalhos ±1/5/10/20 ficavam mortos
+   com a ficha travada — que é o estado PADRÃO dela. Ou seja: não dava pra
+   mudar PV sem destravar a ficha a cada uso, justamente o controle mais
+   usado durante a sessão. */
+body:not(.modo-unlock) .tab-content .no-lock,
+body:not(.modo-unlock) .tab-content .no-lock * {
+  pointer-events: auto !important;
+  opacity: 1 !important;
+}
+body:not(.modo-unlock) .tab-content .no-lock button,
+body:not(.modo-unlock) .tab-content .no-lock .pip,
+body:not(.modo-unlock) .tab-content .no-lock .hab-pip,
+body:not(.modo-unlock) .tab-content .no-lock .slot-pip {
+  cursor: pointer !important;
+}
+body:not(.modo-unlock) .tab-content .no-lock input {
+  cursor: text !important;
+  border-style: solid !important;
+  background-color: var(--sf-inset) !important;
 }
 
 /* Touch targets mínimos em mobile p/ botões pequenos (WCAG 2.5.5) */
