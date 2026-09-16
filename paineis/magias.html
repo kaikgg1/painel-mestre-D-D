@@ -71,7 +71,14 @@
   #auth-slot .auth-btn:focus-visible { outline: 2px solid var(--gold-bright); outline-offset: 2px; }
   @media (max-width: 767px) { #auth-slot .auth-nome { display: none; } }
 
-  main { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 26px 18px 80px; }
+  /* z-index: auto (e não 1) de propósito: o bottom sheet dos filtros mora
+     dentro do <main> — tem que morar, porque no desktop o CSS o dissolve e as
+     pills voltam a ser inline dentro de .filtros. Com z-index numérico aqui, o
+     <main> virava contexto de empilhamento e prendia o sheet na camada 1,
+     debaixo do cabeçalho fixo. Com `auto` não há contexto novo, e o <main>
+     continua pintando acima do vinhete do body::before (z-index: 0) porque
+     vem depois dele na ordem do documento. */
+  main { position: relative; max-width: 1400px; margin: 0 auto; padding: 26px 18px 80px; }
 
   /* ===== HERO ===== */
   .hero { margin-bottom: 22px; }

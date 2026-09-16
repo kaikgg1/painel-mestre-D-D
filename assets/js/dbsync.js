@@ -171,6 +171,7 @@
     ehMestre = await window.Auth.ehMestre();
 
     await carregar();
+    desligado = false;   // um init() depois de desconectar() volta a reconectar
     iniciarRealtime();
     setupRefetchOnFocus();
     return { ehMestre, usuario: usuarioAtual };
@@ -215,13 +216,34 @@
   }
 
   // ─── Realtime ────────────────────────────────────────────────────
+  let tentativasRT = 0;
+  let desligado = false;   // desconectar() foi chamado: não reconecta
+
   function iniciarRealtime() {
-    if (listeners) listeners.unsubscribe();
+    if (listeners) { try { listeners.unsubscribe(); } catch {} }
     const filtro = campanhaAtual ? { event: '*', schema: 'public', table: 'characters', filter: `campanha=eq.${campanhaAtual}` }
                                  : { event: '*', schema: 'public', table: 'characters' };
     listeners = window.sb.channel('chars-' + (campanhaAtual || 'all'))
       .on('postgres_changes', filtro, payload => handleRealtime(payload))
-      .subscribe();
+      .subscribe(status => {
+        if (status === 'SUBSCRIBED') { tentativasRT = 0; return; }
+        // Sem isto, uma queda de conexão (wi-fi oscilando, notebook que
+        // dormiu) deixava o painel mudo: os cards continuavam na tela com os
+        // valores velhos e nada mais chegava, sem nenhum aviso. Recria o
+        // canal com backoff e refaz a carga, porque enquanto esteve fora
+        // podem ter acontecido mudanças que o canal novo não vai reenviar.
+        if (desligado) return;
+        if (status !== 'CHANNEL_ERROR' && status !== 'TIMED_OUT' && status !== 'CLOSED') return;
+        const espera = Math.min(30000, 2000 * Math.pow(2, tentativasRT++));
+        const canalMorto = listeners;
+        listeners = null;
+        setTimeout(async () => {
+          if (desligado || listeners) return;   // já reconectou por outro caminho
+          try { await window.sb.removeChannel(canalMorto); } catch {}
+          iniciarRealtime();
+          await carregar();
+        }, espera);
+      });
   }
 
   // Critério "visível": is_active OR é meu (mesmo lógica de carregar)
@@ -286,13 +308,53 @@
     return dbToUi(data);
   }
 
+  // Dois valores são "iguais" pro efeito de gravação? jsonb (atributos,
+  // slots, inventario…) precisa de comparação estrutural; o resto compara
+  // frouxo de propósito, porque o mesmo número pode voltar do banco como
+  // number e sair da UI como string ("9" vs 9) e isso não é uma mudança.
+  function mesmoValor(a, b) {
+    if (a === b) return true;
+    if (a && b && typeof a === 'object' && typeof b === 'object') {
+      try { return JSON.stringify(a) === JSON.stringify(b); } catch { return false; }
+    }
+    if (a === null || a === undefined || b === null || b === undefined) return false;
+    return String(a) === String(b);
+  }
+
   function salvarCampo(id, uiCampos) {
-    const dbCampos = uiToDb(uiCampos);
-    if (!Object.keys(dbCampos).length) return;
+    const todos = uiToDb(uiCampos);
+    if (!Object.keys(todos).length) return;
 
     let p = pendingUpdates.get(id);
     if (!p) { p = { campos: {}, timer: null }; pendingUpdates.set(id, p); }
-    Object.assign(p.campos, dbCampos);
+
+    // Só vai pro banco o que REALMENTE mudou.
+    //
+    // Antes daqui, cada clique no painel mandava o personagem inteiro — 30
+    // colunas — com os valores que ESTA tela tinha. Se outra pessoa tivesse
+    // acabado de mudar um campo diferente (o jogador ajustando a CA na
+    // própria ficha, por exemplo), o valor dela era sobrescrito de volta
+    // pelo valor velho desta tela, sem ninguém perceber. Mandando só o campo
+    // tocado, uma edição simultânea em campo diferente não se atropela mais.
+    //
+    // A base de comparação é o cache (última versão que o banco devolveu:
+    // carga, realtime ou save anterior) COM a fila por cima. A fila importa:
+    // se o valor for e voltar dentro dos 400ms do debounce, comparar só com o
+    // cache diria "não mudou" — e o valor intermediário, que já está na fila,
+    // seria gravado mesmo assim.
+    const base = { ...(cache.get(id) || {}), ...p.campos };
+    const temBase = cache.has(id);
+    let mudou = false;
+    for (const [col, val] of Object.entries(todos)) {
+      if (temBase && mesmoValor(base[col], val)) continue;
+      p.campos[col] = val;
+      mudou = true;
+    }
+    // Nada mudou: não gasta escrita nem dispara realtime pra todo mundo.
+    if (!mudou) {
+      if (!Object.keys(p.campos).length) pendingUpdates.delete(id);
+      return;
+    }
 
     if (p.timer) clearTimeout(p.timer);
     p.timer = setTimeout(async () => {
@@ -320,7 +382,8 @@
   }
 
   function desconectar() {
-    if (listeners) listeners.unsubscribe();
+    desligado = true;
+    if (listeners) { try { listeners.unsubscribe(); } catch {} }
     listeners = null;
   }
 

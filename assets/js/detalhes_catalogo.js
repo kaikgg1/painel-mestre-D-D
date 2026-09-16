@@ -358,11 +358,19 @@ window.DetalhesCatalogo = (function () {
 
   // Liga um <span> de nome de recurso ao catálogo: troca o texto pelo nome
   // real (se houver) e deixa o elemento clicável pra abrir a descrição.
-  function ligarNomeHabilidade(el, slug, classe, nomeFallback) {
+  //
+  // manterTexto = true preserva o texto que já está no elemento. Serve pros
+  // recursos que a gente mesmo nomeia em recursos_classe.js: o nome do
+  // catálogo é o da habilidade INTEIRA e não cabe na linha do tracker —
+  // "Pontos de Feitiçaria" virava "Fonte de Magia (Pontos de Feitiçaria)" e
+  // aparecia cortado na ficha do Feiticeiro. O clique pra ler a regra
+  // continua valendo; só o rótulo é que fica o nosso.
+  function ligarNomeHabilidade(el, slug, classe, nomeFallback, manterTexto) {
     if (!el) return;
     injetarCSS();
     habilidade(slug, classe).then(h => {
-      if (h) el.textContent = h.nome;
+      if (manterTexto) { /* rótulo curado: não mexe */ }
+      else if (h) el.textContent = h.nome;
       else if (nomeFallback) el.textContent = nomeFallback;
       if (!h) return;
       el.classList.add('dc-link');

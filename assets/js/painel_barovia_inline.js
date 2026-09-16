@@ -845,8 +845,9 @@ function criarCard(p) {
     nomeSpan.title = def.dica || '';
     nomeSpan.textContent = def.nome;
     // Clicável quando o recurso existe no catálogo de habilidades (abre a
-    // descrição completa da regra, sem sair do painel).
-    window.DetalhesCatalogo?.ligarNomeHabilidade(nomeSpan, window.DetalhesCatalogo.slugFeature(def.nome), p.classe, def.nome);
+    // descrição completa da regra, sem sair do painel). O rótulo continua
+    // sendo o nosso (def.nome) — ver manterTexto em detalhes_catalogo.js.
+    window.DetalhesCatalogo?.ligarNomeHabilidade(nomeSpan, window.DetalhesCatalogo.slugFeature(def.nome), p.classe, def.nome, true);
     const atual = window.RecursosClasse.lerUsado(recursos, def.id);
     row.appendChild(nomeSpan);
     row.appendChild(fazTracker(def.id, def.max, atual, (val) => {

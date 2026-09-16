@@ -166,10 +166,20 @@ function conectarListenersHeader() {
       menuPop.hidden = !abrir;
       menuBtn.setAttribute('aria-expanded', String(abrir));
     });
-    document.addEventListener('click', e => {
-      if (!menuPop.hidden && !menuPop.contains(e.target) && e.target !== menuBtn) fecharMenuAcoes();
-    });
-    document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharMenuAcoes(); });
+    // Estes dois ficam no `document`, que sobrevive ao render() — registrar
+    // aqui dentro plantava um par NOVO a cada render (trocar de aba, chegar
+    // update do realtime…), todos presos ao popover daquele render, que já
+    // saiu do DOM. Registra uma vez só e consulta os elementos na hora.
+    if (!window._menuAcoesGlobalLigado) {
+      window._menuAcoesGlobalLigado = true;
+      document.addEventListener('click', e => {
+        const pop = document.getElementById('menu-popover');
+        const btn = document.getElementById('btn-menu-toggle');
+        if (!pop || pop.hidden) return;
+        if (!pop.contains(e.target) && e.target !== btn) fecharMenuAcoes();
+      });
+      document.addEventListener('keydown', e => { if (e.key === 'Escape') fecharMenuAcoes(); });
+    }
   }
 
   // "+ Novo personagem" e "⧉ Duplicar" trocam `charAtivo` pra um objeto
