@@ -64,6 +64,7 @@
   let _online = new Set();
   let _ultimoLogin = null;      // Promise<Map user_id → ISO> (cache)
   let _timerRelativo = null;
+  let _ligouVisibilidade = false;
 
   function fmtRelativo(iso) {
     if (!iso) return '';
@@ -109,31 +110,68 @@
     });
   }
 
+  // Lê o estado do canal e repinta se mudou. É a fonte de verdade local —
+  // chamada tanto pelo evento 'sync' quanto pelo timer, porque um evento
+  // perdido (socket reconectando, aba em background) deixaria a tela
+  // congelada até o F5, que foi exatamente o sintoma relatado.
+  function sincronizar({ forcarLogins = false } = {}) {
+    if (!_canal) return;
+    let estado;
+    try { estado = _canal.presenceState(); } catch { return; }
+    const agora = new Set(Object.keys(estado || {}));
+    const mudou = agora.size !== _online.size || [...agora].some(id => !_online.has(id));
+    _online = agora;
+    // Quem acabou de entrar tem um last_sign_in_at novo — rebusca em vez de
+    // mostrar o horário velho do cache.
+    if (mudou || forcarLogins) carregarUltimoLogin(true);
+    pintar();
+  }
+
+  let _tentativas = 0;
   async function entrar() {
     if (_canal || !window.sb || !window.Auth) return;
     const u = await window.Auth.getUser();
     if (!u) return;
 
+    // presenceState() → { <user_id>: [ {...meta} ] } — a chave é o key
+    // configurado aqui, então basta olhar as chaves pra saber quem está on.
     _canal = window.sb.channel(CANAL, { config: { presence: { key: u.id } } });
-    _canal.on('presence', { event: 'sync' }, () => {
-      // presenceState() → { <user_id>: [ {...meta} ] } — a chave é o key
-      // configurado acima, então basta olhar as chaves pra saber quem está on.
-      const agora = new Set(Object.keys(_canal.presenceState()));
-      const mudou = agora.size !== _online.size || [...agora].some(id => !_online.has(id));
-      _online = agora;
-      // Alguém entrou ou saiu: o last_sign_in_at de quem acabou de entrar
-      // mudou, então busca de novo em vez de mostrar o horário velho do cache.
-      if (mudou) carregarUltimoLogin(true);
-      pintar();
-    });
+    _canal.on('presence', { event: 'sync' }, () => sincronizar());
+    _canal.on('presence', { event: 'join' }, () => sincronizar());
+    _canal.on('presence', { event: 'leave' }, () => sincronizar());
+
     _canal.subscribe(async status => {
-      if (status !== 'SUBSCRIBED') return;
-      await _canal.track({ em: location.pathname, desde: new Date().toISOString() });
+      if (status === 'SUBSCRIBED') {
+        _tentativas = 0;
+        await _canal.track({ em: location.pathname, desde: new Date().toISOString() });
+        sincronizar();
+        return;
+      }
+      // Sem isto, uma queda de conexão deixava o painel mostrando todo mundo
+      // offline pra sempre (só o F5 resolvia). Recria o canal com backoff.
+      if (status === 'CHANNEL_ERROR' || status === 'TIMED_OUT' || status === 'CLOSED') {
+        const espera = Math.min(30000, 2000 * Math.pow(2, _tentativas++));
+        try { await window.sb.removeChannel(_canal); } catch {}
+        _canal = null;
+        setTimeout(entrar, espera);
+      }
     });
 
-    // "há X min" envelhece sozinho: repinta de minuto em minuto pra não
-    // mostrar "há 2 min" meia hora depois.
-    if (!_timerRelativo) _timerRelativo = setInterval(pintar, 60000);
+    if (!_timerRelativo) {
+      // A cada 30s confere o estado real do canal (barato, é local) e, a cada
+      // 2 min, rebusca os horários de login. Também mantém o "há X min" vivo.
+      let voltas = 0;
+      _timerRelativo = setInterval(() => sincronizar({ forcarLogins: ++voltas % 4 === 0 }), 30000);
+    }
+
+    // Voltar pra aba deve mostrar o estado atual na hora, não no próximo tick.
+    // Registrado uma vez só — entrar() roda de novo a cada reconexão.
+    if (!_ligouVisibilidade) {
+      _ligouVisibilidade = true;
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') sincronizar({ forcarLogins: true });
+      });
+    }
   }
 
   function estaOnline(userId) { return _online.has(userId); }

@@ -548,6 +548,9 @@ function criarCard(p) {
       nomeSpan.className = 'recurso-nome';
       nomeSpan.title = def.dica || '';
       nomeSpan.textContent = def.nome;
+      // Clicável quando o recurso existe no catálogo de habilidades (abre a
+      // descrição completa da regra, sem sair do painel).
+      window.DetalhesCatalogo?.ligarNomeHabilidade(nomeSpan, window.DetalhesCatalogo.slugFeature(def.nome), p.classe, def.nome);
       const atual = window.RecursosClasse.lerUsado(recursos, def.id);
       row.appendChild(nomeSpan);
       row.appendChild(fazTracker(def.max, atual, (val) => {
@@ -567,7 +570,11 @@ function criarCard(p) {
       row.className = 'recurso-row';
       const nomeSpan = document.createElement('span');
       nomeSpan.className = 'recurso-nome';
+      // Fallback só até o catálogo responder: a chave crua vira "Destruir
+      // Mortos Vivos Cr 1 2"; ligarNomeHabilidade() troca pelo nome real
+      // ("Destruir Mortos-Vivos (CR 1/2)") e deixa clicável pra ler a regra.
       nomeSpan.textContent = k.replace(/_/g, ' ');
+      window.DetalhesCatalogo?.ligarNomeHabilidade(nomeSpan, k, p.classe);
       row.appendChild(nomeSpan);
       row.appendChild(fazTracker(r.max, r.atual || 0, (val) => {
         r.atual = val;
@@ -743,12 +750,36 @@ function criarCard(p) {
       });
       wrap.innerHTML = [...grupos.entries()].map(([nv, lista]) => {
         const rotulo = nv === 0 ? 'Truques' : `${nv}° Nível`;
-        const tags = lista.map(m => `<span class="magia-prep-tag" title="${escapeHtml(m.escola || '')}">${escapeHtml(m.nome)}</span>`).join('');
+        // data-magia = índice em `magias`, pra abrir a descrição completa no
+        // clique (o objeto já veio inteiro de magias_data.json).
+        const tags = lista.map(m => `<span class="magia-prep-tag dc-link" role="button" tabindex="0" data-magia="${magias.indexOf(m)}" title="Ver descrição completa${m.escola ? ' · ' + escapeHtml(m.escola) : ''}">${escapeHtml(m.nome)}</span>`).join('');
         return `<div class="magia-prep-grupo">
           <div class="magia-prep-grupo-titulo">${rotulo}</div>
           <div class="magia-prep-grupo-tags">${tags}</div>
         </div>`;
       }).join('');
+      // A lista fica NO elemento (_dcMagias), não na closure: pintarMagias()
+      // pode rodar de novo com outra lista (botão "Tentar de novo"), e o
+      // listener é registrado uma vez só (dcLigado) pra não empilhar.
+      wrap._dcMagias = magias;
+      if (!wrap.dataset.dcLigado) {
+        wrap.dataset.dcLigado = '1';
+        const abrir = alvo => {
+          const m = (wrap._dcMagias || [])[+alvo.dataset.magia];
+          if (m) window.DetalhesCatalogo?.abrirMagia(m);
+        };
+        wrap.addEventListener('click', e => {
+          const tag = e.target.closest('[data-magia]');
+          if (tag) abrir(tag);
+        });
+        wrap.addEventListener('keydown', e => {
+          if (e.key !== 'Enter' && e.key !== ' ') return;
+          const tag = e.target.closest('[data-magia]');
+          if (!tag) return;
+          e.preventDefault();
+          abrir(tag);
+        });
+      }
     }
     carregarMagiasPreparadasMestre(p.id).then(pintarMagias);
   }
