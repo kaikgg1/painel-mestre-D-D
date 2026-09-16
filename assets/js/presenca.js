@@ -2,17 +2,22 @@
 // Status online/offline de cada conta, mostrado embaixo de cada ficha no
 // Painel do Mestre.
 //
-// ONLINE = a conta está LOGADA, não "tem aba aberta": o Supabase cria uma
-// linha em auth.sessions no login e apaga no signOut(), e nesta instância a
-// sessão não expira por tempo. Então o jogador entra, fecha o navegador e
-// continua verde até clicar em Sair — que é como o Mestre pensa a coisa.
-// Quem devolve isso é public.listar_status_contas() (sql/027_status_contas.sql),
-// que também traz o último login e só responde pro Mestre.
+// ONLINE = está logado E deu sinal de vida nos últimos JANELA_ATIVO minutos.
 //
-// Em cima disso, o Realtime Presence ('presenca-mesa') serve só pra reagir
-// na hora: quando alguém abre o sistema o badge fica verde no mesmo segundo,
-// sem esperar o ciclo de 30s que reconsulta as sessões. Presence não escreve
-// nada no banco.
+// As duas metades existem por um motivo cada:
+//   - "logado" (auth.sessions): some na hora em que clica em Sair.
+//   - "sinal de vida" (profiles.ultimo_visto, gravado por marcar_visto()):
+//     resolve quem NUNCA clica em Sair e só fecha o navegador — sem isso a
+//     bolinha ficava verde pra sempre. É o timeout de inatividade que o
+//     Supabase só oferece no plano Pro, feito por nós. Ver sql/028_ultimo_visto.sql.
+//
+// A janela é de 30 min por causa do celular: tela bloqueada derruba a conexão
+// do Realtime e pausa o heartbeat, e sem essa folga o jogador sentado na mesa
+// apareceria offline entre um turno e outro.
+//
+// Por cima disso, o Realtime Presence ('presenca-mesa') deixa o badge verde no
+// mesmo segundo em que alguém abre o sistema, sem esperar o próximo ciclo.
+// Presence não escreve nada no banco.
 //
 // API:
 //   Presenca.entrar()            → entra no canal (chamado sozinho no load)
@@ -24,6 +29,13 @@
 
 (function () {
   const CANAL = 'presenca-mesa';
+  // Minutos sem sinal de vida até a conta contar como offline. Mexer aqui é
+  // suficiente — não precisa de migração no banco.
+  const JANELA_ATIVO = 30;
+  // De quanto em quanto tempo a página avisa que ainda está aberta. Bem menor
+  // que a janela, pra uma recarga de página ou uma falha de rede pontual não
+  // derrubar ninguém pra vermelho sem motivo.
+  const INTERVALO_HEARTBEAT = 2 * 60 * 1000;
   const CSS = `
   .presenca-badge {
     display: flex; align-items: center; gap: 7px;
@@ -98,6 +110,11 @@
     return _contas;
   }
 
+  function minutosDesde(iso) {
+    if (!iso) return Infinity;
+    return (Date.now() - new Date(iso).getTime()) / 60000;
+  }
+
   async function pintar() {
     const alvos = document.querySelectorAll('[data-presenca-user]');
     if (!alvos.length) return;
@@ -106,20 +123,32 @@
     alvos.forEach(el => {
       const uid = el.dataset.presencaUser;
       const conta = uid ? contas.get(uid) : null;
-      // Logado manda; a presença serve pra ficar verde na hora em que o
-      // jogador abre o sistema, sem esperar o próximo ciclo de consulta.
       const logado = !!conta && conta.sessoes > 0;
+      const ativo = minutosDesde(conta?.ultimo_visto) <= JANELA_ATIVO;
       const presente = !!uid && _presentes.has(uid);
-      const online = logado || presente;
-      const quando = conta?.ultimo_login;
+      // Presence deixa verde na hora em que abre o sistema; o par
+      // logado+ativo é o que sustenta o verde depois disso (e o que apaga
+      // quando a pessoa fecha tudo e some).
+      const online = presente || (logado && ativo);
+
+      // Offline por ter saído da conta é diferente de offline por ter
+      // sumido com a aba aberta — o texto reflete cada caso.
+      const visto = conta?.ultimo_visto;
+      const login = conta?.ultimo_login;
+      let detalhe = '';
+      if (!online) {
+        if (logado && visto) detalhe = `visto ${fmtRelativo(visto)}`;
+        else if (login) detalhe = `último login ${fmtRelativo(login)}`;
+      }
 
       el.className = 'presenca-badge ' + (online ? 'on' : 'off');
-      el.innerHTML = online
-        ? `<span class="presenca-dot" aria-hidden="true"></span>Online`
-        : `<span class="presenca-dot" aria-hidden="true"></span>Offline${quando ? `<span class="presenca-quando">último login ${fmtRelativo(quando)}</span>` : ''}`;
+      el.innerHTML = `<span class="presenca-dot" aria-hidden="true"></span>${online ? 'Online' : 'Offline'}`
+        + (detalhe ? `<span class="presenca-quando">${detalhe}</span>` : '');
       el.title = online
-        ? (presente ? 'Logado e com o sistema aberto agora' : 'Logado (não saiu da conta)')
-        : (quando ? `Saiu da conta · último login: ${new Date(quando).toLocaleString('pt-BR')}` : 'Não está logado');
+        ? (presente ? 'Com o sistema aberto agora' : `Ativo nos últimos ${JANELA_ATIVO} min`)
+        : logado
+          ? `Continua logado, mas sem sinal há mais de ${JANELA_ATIVO} min${visto ? ` · visto em ${new Date(visto).toLocaleString('pt-BR')}` : ''}`
+          : (login ? `Saiu da conta · último login: ${new Date(login).toLocaleString('pt-BR')}` : 'Não está logado');
     });
   }
 
@@ -145,11 +174,37 @@
     else pintar();
   }
 
+  // Avisa o banco que esta pessoa continua com o sistema aberto. O horário é
+  // gravado pelo relógio do servidor dentro de marcar_visto() — nada de
+  // confiar no relógio do aparelho, que pode estar errado.
+  let _timerHeartbeat = null;
+  function marcarVisto() {
+    if (!window.sb) return;
+    window.sb.rpc('marcar_visto').then(({ error }) => {
+      if (error) console.warn('[presenca] marcar_visto:', error.message);
+    }).catch(() => {});
+  }
+
+  function ligarHeartbeat() {
+    if (_timerHeartbeat) return;
+    marcarVisto();
+    _timerHeartbeat = setInterval(() => {
+      // Aba escondida não conta como uso — sem isso, uma aba esquecida
+      // aberta a semana toda deixaria a pessoa verde pra sempre, que é
+      // exatamente o problema que este heartbeat existe pra resolver.
+      if (document.visibilityState === 'visible') marcarVisto();
+    }, INTERVALO_HEARTBEAT);
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') marcarVisto();
+    });
+  }
+
   let _tentativas = 0;
   async function entrar() {
     if (_canal || !window.sb || !window.Auth) return;
     const u = await window.Auth.getUser();
     if (!u) return;
+    ligarHeartbeat();
 
     // presenceState() → { <user_id>: [ {...meta} ] } — a chave é o key
     // configurado aqui, então basta olhar as chaves pra saber quem está on.
