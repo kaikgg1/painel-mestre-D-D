@@ -470,14 +470,8 @@ function criarCard(p) {
   }
   card.appendChild(exhSection);
 
-  // === XP (mst-10) — editável direto, e é onde "Distribuir XP/Loot" (toolbar)
-  // soma quando aplicado em lote pro grupo todo. ===
-  const xpSection = document.createElement('div');
-  xpSection.className = 'section xp-section';
-  xpSection.innerHTML = `<div class="section-title">XP</div>`;
-  const xpInput = inputNumerico(p.xp ?? 0, v => { p.xp = v; salvar(p); }, 'xp-input', 0);
-  xpSection.appendChild(xpInput);
-  card.appendChild(xpSection);
+  // Sem seção de XP de propósito: esta mesa não usa XP, o Mestre sobe o
+  // nível manualmente quando decide.
 
   // === RECURSOS DE CLASSE (mst-2) === — catálogo por classe/nível/atributos
   // (assets/js/recursos_classe.js), mesma fonte usada na ficha do jogador,

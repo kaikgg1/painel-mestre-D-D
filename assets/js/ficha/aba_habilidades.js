@@ -253,7 +253,7 @@ function ligarAcordeaoHabilidades(wrap) {
 function renderTrackerUsos(max, usos, disp, periodo, dataAttrs) {
   if (max <= 0) return '';
   const pips = Array.from({ length: max }).map((_, i) =>
-    `<span class="hab-pip ${i < usos ? 'gasto' : ''}" ${dataAttrs(i)} role="button" tabindex="0" aria-label="Uso ${i+1} de ${max}, ${i < usos ? 'gasto' : 'disponível'}"></span>`
+    `<span class="hab-pip no-lock ${i < usos ? 'gasto' : ''}" ${dataAttrs(i)} role="button" tabindex="0" aria-label="Uso ${i+1} de ${max}, ${i < usos ? 'gasto' : 'disponível'}"></span>`
   ).join('');
   return `
     <span class="hab-pips">${pips}</span>

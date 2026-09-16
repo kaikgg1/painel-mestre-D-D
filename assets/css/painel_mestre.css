@@ -412,13 +412,6 @@
     font-style: italic; margin-top: 2px;
   }
 
-  /* ===== XP (mst-10) ===== */
-  .xp-input {
-    display: block; width: 100px; margin: 0 auto;
-    background: color-mix(in srgb, var(--surface) 50%, transparent); border: 1.5px solid var(--text-muted) !important;
-    border-radius: 4px; padding: 4px 6px !important; font-weight: 700;
-  }
-
   /* ===== RECURSOS DE CLASSE (mst-2) ===== */
   .recurso-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 11px; }
   .recurso-nome { color: var(--text-muted); text-transform: capitalize; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

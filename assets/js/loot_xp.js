@@ -1,7 +1,11 @@
 // assets/js/loot_xp.js
-// Ferramenta de distribuir XP/loot em lote entre os personagens ativos do
-// painel (mst-10) — sem isso o Mestre tinha que abrir card por card e somar
-// na mão toda vez que o grupo terminava um encontro.
+// Ferramenta de distribuir loot (moedas) em lote entre os personagens ativos
+// do painel — sem isso o Mestre tinha que abrir card por card e somar na mão
+// toda vez que o grupo terminava um encontro.
+//
+// Sem seção de XP de propósito: esta mesa não usa XP pra subir de nível, o
+// Mestre sobe o nível manualmente quando decide — ver conversa "tire todas
+// as opções de xp dos jogadores".
 //
 // Self-contained como confirmar.js/rolador.js/iniciativa.js (injeta seu
 // próprio CSS/DOM). Depende de `estado`/`salvar`/`toast`/`rerenderCard`
@@ -75,16 +79,8 @@ window.LootXP = (function () {
     overlay.id = 'lx-overlay';
     overlay.innerHTML = `
       <div class="lx-modal" role="dialog" aria-modal="true">
-        <div class="lx-titulo">Distribuir XP / Loot <button type="button" class="lx-fechar" id="lx-fechar" aria-label="Fechar">✕</button></div>
+        <div class="lx-titulo">Distribuir Loot <button type="button" class="lx-fechar" id="lx-fechar" aria-label="Fechar">✕</button></div>
         <div class="lx-lista" id="lx-lista"></div>
-        <div class="lx-secao">
-          <div class="lx-secao-titulo">Experiência</div>
-          <div class="lx-linha">
-            <input type="number" id="lx-xp" placeholder="Quantidade" min="0" value="0">
-            <label class="lx-check"><input type="checkbox" id="lx-xp-dividir"> Dividir entre o grupo</label>
-          </div>
-          <button type="button" class="lx-btn" id="lx-xp-aplicar">+ Adicionar XP</button>
-        </div>
         <div class="lx-secao">
           <div class="lx-secao-titulo">Moedas</div>
           <div class="lx-linha">
@@ -102,7 +98,6 @@ window.LootXP = (function () {
     document.getElementById('lx-fechar').addEventListener('click', fechar);
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && overlay.classList.contains('open')) fechar(); });
 
-    document.getElementById('lx-xp-aplicar').addEventListener('click', aplicarXP);
     document.getElementById('lx-moeda-aplicar').addEventListener('click', aplicarMoeda);
   }
 
@@ -115,18 +110,6 @@ window.LootXP = (function () {
   // do script do painel existir).
   function personagensAlvo() {
     return (typeof estado !== 'undefined' ? estado.personagens || [] : []).filter(p => p.id);
-  }
-
-  function aplicarXP() {
-    const alvo = personagensAlvo();
-    if (!alvo.length) return;
-    const total = Math.max(0, parseInt(document.getElementById('lx-xp').value, 10) || 0);
-    if (!total) return;
-    const dividir = document.getElementById('lx-xp-dividir').checked;
-    const porPersonagem = dividir ? Math.floor(total / alvo.length) : total;
-    alvo.forEach(p => { p.xp = (+p.xp || 0) + porPersonagem; salvar(p); rerenderCard?.(p); });
-    toast?.(`✓ +${porPersonagem} XP pra cada um dos ${alvo.length} personagens`);
-    fechar();
   }
 
   function aplicarMoeda() {
@@ -158,7 +141,6 @@ window.LootXP = (function () {
     lista.textContent = alvo.length
       ? `Será aplicado a: ${alvo.map(p => p.nome).join(', ')} (${alvo.length})`
       : 'Nenhum personagem ativo nesta campanha.';
-    document.getElementById('lx-xp-aplicar').disabled = !alvo.length;
     document.getElementById('lx-moeda-aplicar').disabled = !alvo.length;
     document.getElementById('lx-overlay').classList.add('open');
   }

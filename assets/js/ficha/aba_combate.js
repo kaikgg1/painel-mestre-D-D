@@ -401,7 +401,7 @@ function renderSlotsMagia(c, slots) {
         </div>`;
       }
       const pips = Array.from({length: max}).map((_, i) =>
-        `<button type="button" class="slot-pip ${i < usados ? 'gasto' : ''}" data-slot-nv="${nv}" data-slot-idx="${i}" aria-label="Slot ${nv}° nível, espaço ${i+1}, ${i < usados ? 'gasto' : 'disponível'}"></button>`
+        `<button type="button" class="slot-pip no-lock ${i < usados ? 'gasto' : ''}" data-slot-nv="${nv}" data-slot-idx="${i}" aria-label="Slot ${nv}° nível, espaço ${i+1}, ${i < usados ? 'gasto' : 'disponível'}"></button>`
       ).join('');
       return `<div class="slot-card">
         <div class="slot-titulo">Nível ${nv}</div>

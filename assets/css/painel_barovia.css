@@ -262,13 +262,6 @@
   }
   .stat-input:focus { background: rgba(194,161,91,0.15); }
   .stat-input::placeholder { color: var(--text-dim); opacity: 0.5; }
-  /* ===== XP (mst-10) ===== */
-  .xp-input {
-    display: block; width: 100px; margin: 0 auto;
-    background: rgba(0,0,0,0.25) !important; border: 1.5px solid var(--gold-muted) !important;
-    border-radius: 4px; padding: 4px 6px !important; font-weight: 700;
-  }
-
   .hp-bar-track {
     height: 6px; border-radius: 3px; background: rgba(255,255,255,0.06);
     overflow: hidden; position: relative;

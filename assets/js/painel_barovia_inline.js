@@ -826,14 +826,8 @@ function criarCard(p) {
   recSection.appendChild(recBody);
   painelCombate.appendChild(recSection);
 
-  // === XP (mst-10) — editável direto, e é onde "Distribuir XP/Loot"
-  // (toolbar) soma quando aplicado em lote pro grupo todo. ===
-  const xpSection = document.createElement('div');
-  xpSection.className = 'section xp-section';
-  xpSection.innerHTML = `<div class="section-title">XP</div>`;
-  const xpInput = inputNumerico(p.xp ?? 0, v => { p.xp = v; salvar(p); }, 'xp-input', 0);
-  xpSection.appendChild(xpInput);
-  painelCombate.appendChild(xpSection);
+  // Sem seção de XP de propósito: esta mesa não usa XP, o Mestre sobe o
+  // nível manualmente quando decide.
 
   body.appendChild(painelCombate);
 
@@ -1178,7 +1172,7 @@ async function descansoLongo() {
     });
     ehMestre = r.ehMestre;
     if (ehMestre) {
-      ['btn-adicionar','btn-descanso-global','btn-iniciativa','btn-loot-xp','btn-notas-mestre','link-vilao','link-reloaded'].forEach(id => {
+      ['btn-adicionar','btn-descanso-global','btn-iniciativa','btn-loot-xp','btn-notas-mestre','btn-contas','link-vilao','link-reloaded'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.style.display = '';
       });

@@ -407,11 +407,12 @@ body:not(.modo-unlock) .tab-content button:not(.no-lock):not(.tab) {
   cursor: not-allowed !important;
   opacity: 0.6;
 }
-/* Pips e clickable elements */
+/* Pips e clickable elements — EXCETO .hab-pip/.slot-pip/.death-pip: marcar um
+   uso de habilidade ou gastar um espaço de magia é uma ação de mesa em tempo
+   real (mesma categoria dos botões de dano/cura de PV, que já são .no-lock),
+   não "editar a ficha". Travar isso obrigava destravar a ficha toda sessão
+   só pra riscar um uso de habilidade — relatado como "botão não funciona". */
 body:not(.modo-unlock) .tab-content .pip,
-body:not(.modo-unlock) .tab-content .hab-pip,
-body:not(.modo-unlock) .tab-content .slot-pip,
-body:not(.modo-unlock) .tab-content .death-pip,
 body:not(.modo-unlock) .tab-content .contador-bloco,
 body:not(.modo-unlock) .tab-content .clickable,
 body:not(.modo-unlock) .tab-content [onclick] {
