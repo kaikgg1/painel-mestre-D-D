@@ -37,6 +37,7 @@ const SCRIPTS = [
   '023_correcoes_auditoria.sql',
   '024_multiclasse.sql',
   '025_regras_casa.sql',
+  '026_ultimo_login.sql',
 ];
 
 (async () => {
