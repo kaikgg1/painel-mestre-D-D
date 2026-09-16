@@ -7,6 +7,18 @@
 // agora vivem no header (assets/js/ficha/header.js, conectarListenersHeader())
 // — render() já chama renderHeader(c) antes de reconstruir #conteudo.
 
+// Mexeu no inventário: re-renderiza E persiste na hora.
+// Antes só chamava render(): a arma/item ficava só na memória até o próximo
+// autosave (trocar de aba, travar a ficha, editar outro campo qualquer).
+// Fechar a aba antes disso perdia o item em silêncio — e pior, um update do
+// Mestre chegando pelo realtime substitui charAtivo e levava a mudança junto.
+// O submit é disparado DEPOIS do render porque render() reconstrói o
+// #ficha-form e religa os listeners (render.js chama conectarListeners()).
+function salvarInventario() {
+  render();
+  document.getElementById('ficha-form')?.dispatchEvent(new Event('submit', { cancelable: true }));
+}
+
 function conectarListeners() {
   // Tabs
   $$('.tab').forEach(t => t.addEventListener('click', () => {
@@ -541,7 +553,7 @@ function conectarListenersEquipamento() {
     if (!cf) return;
     inv[tipo].splice(idx, 1);
     charAtivo.inventario = inv;
-    render();  // re-renderiza apenas a tab
+    salvarInventario();
   }));
 
   // Rolar ataque rápido de uma arma do inventário (mesma lógica do Resumo)
@@ -573,7 +585,7 @@ function conectarListenersEquipamento() {
         inv.armas = inv.armas || [];
         inv.armas.push(arma);
         charAtivo.inventario = inv;
-        render();
+        salvarInventario();
       },
     });
   });
@@ -595,7 +607,7 @@ function conectarListenersEquipamento() {
         inv.armaduras = inv.armaduras || [];
         inv.armaduras.push(armadura);
         charAtivo.inventario = inv;
-        render();
+        salvarInventario();
       },
     });
   });
@@ -618,7 +630,7 @@ function conectarListenersEquipamento() {
         inv.itens = inv.itens || [];
         inv.itens.push(it);
         charAtivo.inventario = inv;
-        render();
+        salvarInventario();
       },
     });
   });
@@ -634,7 +646,7 @@ function conectarListenersEquipamento() {
     inv.itens = inv.itens || [];
     inv.itens.push({ nome, qtd, peso });
     charAtivo.inventario = inv;
-    render();
+    salvarInventario();
   });
 
   // Arma fora do catálogo — mesmo formato de assets/js/phb_catalogo.js
@@ -653,7 +665,7 @@ function conectarListenersEquipamento() {
     inv.armas = inv.armas || [];
     inv.armas.push({ nome, dano: dano || '—', tipo_dano: tipo_dano || '—', categoria, propriedades: propriedades || '—', peso });
     charAtivo.inventario = inv;
-    render();
+    salvarInventario();
   });
 
   // Armadura fora do catálogo
@@ -669,7 +681,7 @@ function conectarListenersEquipamento() {
     inv.armaduras = inv.armaduras || [];
     inv.armaduras.push({ nome, ca: ca || '—', tipo, forca: forca || '—', peso });
     charAtivo.inventario = inv;
-    render();
+    salvarInventario();
   });
 }
 

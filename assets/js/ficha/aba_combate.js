@@ -383,7 +383,14 @@ function renderSlotsMagia(c, slots) {
     return cabecalho + `<div class="slots-vazio">No nível atual, esta classe ainda não tem espaços de magia.</div>`;
   }
 
-  return cabecalho + `<div class="slots-grid">
+  // Marcador da "aba dona" dos espaços de magia. A guarda do autosave
+  // (salvar.js) usava a existência de `slot_1_max` pra saber que o grid está
+  // na tela — mas o Bruxo (Magia do Pacto) não tem slot de nível 1: no nível 3
+  // ele só tem de nível 2. Sem `slot_1_max` a guarda dava falso e os espaços
+  // gastos eram DESCARTADOS no salvamento. Este marcador existe sempre que o
+  // grid é renderizado, independente de quais níveis a classe tem.
+  return cabecalho + `<input type="hidden" name="_slots_grid" value="1">
+  <div class="slots-grid">
     ${[1,2,3,4,5,6,7,8,9].map(nv => {
       const max = slotsClasse[nv] || 0;
       const s = slots[nv] || { atual: 0, max: 0 };

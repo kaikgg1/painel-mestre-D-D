@@ -111,7 +111,7 @@
   </p>
 </main>
 
-<script src="https://unpkg.com/@supabase/supabase-js@2.45.0" integrity="sha384-dGnL7r9uccC9TdSdE05clTJ6esxMU42XBQ1/BWLzKQOBi7qR1aCMRIi0LzUmexIg" crossorigin="anonymous"></script>
+<script src="../assets/vendor/supabase-js-2.45.0.min.js"></script>
 <script src="../assets/js/supabase.js"></script>
 <script src="../assets/js/auth.js"></script>
 <script>
@@ -133,7 +133,14 @@
   // No mobile as regras nascem fechadas (accordion); em telas maiores, já abertas.
   const mqMobile = window.matchMedia('(max-width: 767px)');
 
+  // Guarda a última lista pra poder redesenhar ao cruzar o breakpoint: girar
+  // o celular de retrato pra paisagem passava de <768px pra >=768px e as
+  // regras continuavam fechadas, porque o estado só era decidido no render.
+  let _ultimasRegras = [];
+  mqMobile.addEventListener('change', () => renderRegras(_ultimasRegras));
+
   function renderRegras(regras) {
+    _ultimasRegras = regras;
     if (!regras.length) { lista.innerHTML = '<p class="vazio">Nenhuma regra cadastrada ainda.</p>'; return; }
     const aberta = !mqMobile.matches;
     lista.innerHTML = regras.map((r, i) => `

@@ -589,9 +589,22 @@
   // recebe a senha digitada aqui) — não é mais um gate decorativo em JS.
   const NOME_MESTRE  = 'Mestre123';
 
+  // Destino pós-login. Só aceita caminho interno: `from` vem da URL, e sem
+  // essa checagem `?from=https://site-externo` mandaria o jogador pra fora
+  // logo após entrar (redirecionamento aberto). Barra dupla (`//host`) também
+  // é externa, por isso a segunda condição.
+  function destinoSeguro() {
+    const from = new URLSearchParams(location.search).get('from');
+    if (!from || !from.startsWith('/') || from.startsWith('//')) return '../index.html';
+    return from;
+  }
+
   (async () => {
     const u = await window.Auth.getUser();
-    if (u) location.replace('../index.html');
+    // Já logado: vai pra onde a pessoa tentou ir, não sempre pro hub — quem
+    // clicou num link de ficha e caiu aqui era jogado pro início e tinha que
+    // navegar de novo.
+    if (u) location.replace(destinoSeguro());
   })();
 
   function ehMestreSelecionado() { return hidden.value === NOME_MESTRE; }
@@ -640,9 +653,7 @@
       btn.disabled = false; btn.textContent = 'Entrar';
       return;
     }
-    const params = new URLSearchParams(location.search);
-    const from   = params.get('from');
-    location.replace(from || '../index.html');
+    location.replace(destinoSeguro());
   });
 </script>
 <script src="../assets/js/ambiente.js"></script>

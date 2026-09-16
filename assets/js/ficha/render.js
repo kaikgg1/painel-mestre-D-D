@@ -40,6 +40,13 @@ function render() {
   `;
 
   conectarListeners();
+  // Reaplica a trava DEPOIS de trocar o #conteudo. renderHeader(c) lá em cima
+  // já chamou aplicarEstadoLock(), mas naquele momento o .tab-content ainda
+  // era o ANTIGO (no primeiro render nem existia) — então os campos recém-
+  // criados nasciam sem tabindex="-1" nem aria-disabled. O CSS bloqueia o
+  // mouse, mas não o teclado: com a ficha travada dava pra chegar num campo
+  // de Atributos pelo Tab, digitar, e o autosave gravava normalmente.
+  aplicarTabIndexLock();
   renderBottomNav();
 }
 

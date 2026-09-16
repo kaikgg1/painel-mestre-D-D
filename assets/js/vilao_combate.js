@@ -85,12 +85,32 @@ window.VilaoCombate = (function () {
       saveState(true);
     }
     function resetHP() { hpCurrent.value = hpMax.value; updateHPBar(); saveState(true); }
-    // hpMedia é opcional: kiril/patrina não têm o botão "Usar média" (já
-    // mostram PV médio por fase no próprio cabeçalho via onFormaChange).
+    // hpMedia é opcional: quem tem PV por forma (kiril/patrina) usa os botões
+    // "↺ PV máx"/"Média" abaixo, que leem a forma ativa, em vez deste.
     function setMedia() {
       const v = hpMedia ?? hpDefault;
       hpMax.value = v; hpCurrent.value = v; updateHPBar(); saveState(true); showToast(`✓ PV na média (${v})`);
     }
+
+    // PV por FORMA. kiril.html e patrina.html já tinham os botões
+    // "↺ PV máx"/"Média" chamando aplicarPVForma()/aplicarMediaForma(), mas
+    // ninguém definia essas funções: só rahadin.html as tinha, inline, e o
+    // rahadin nem carrega este módulo. Resultado: os dois botões davam
+    // ReferenceError e não faziam nada. Como as duas páginas já passam
+    // `formas` na config, dá pra resolver aqui de uma vez — as outras fichas
+    // com `formas` ganham a mesma capacidade, mesmo sem ter os botões.
+    function _formaAtiva() {
+      const num = document.querySelector('.phase-tab.active')?.dataset.phase;
+      return (formas && (formas[num] || formas[1])) || null;
+    }
+    function _aplicarPV(valor, rotulo) {
+      if (!(valor > 0)) return;
+      hpMax.value = valor; hpCurrent.value = valor;
+      updateHPBar(); saveState(true);
+      showToast(`✓ PV ${rotulo} da forma (${valor})`);
+    }
+    function aplicarPVForma() { const f = _formaAtiva(); if (f) _aplicarPV(f.hp, 'no máximo'); }
+    function aplicarMediaForma() { const f = _formaAtiva(); if (f) _aplicarPV(f.media, 'na média'); }
     hpCurrent.addEventListener('input', () => { updateHPBar(); saveState(true); });
     hpMax.addEventListener('input', () => { updateHPBar(); saveState(true); });
 
@@ -213,6 +233,8 @@ window.VilaoCombate = (function () {
     window.adjustHP = adjustHP;
     window.resetHP = resetHP;
     window.setMedia = setMedia;
+    window.aplicarPVForma = aplicarPVForma;
+    window.aplicarMediaForma = aplicarMediaForma;
     window.toggleReact = toggleReact;
     window.resetReactions = resetReactions;
     window.adjustRound = adjustRound;

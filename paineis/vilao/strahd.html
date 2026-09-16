@@ -682,7 +682,10 @@
     position: fixed; inset: 0;
     background: rgba(5,2,3,0.85);
     backdrop-filter: blur(4px);
-    z-index: 100;
+    /* 8600 = camada padrão de modal do projeto. Precisa ficar acima do botão
+       flutuante de dados (rolador.js, 8500), que esta página carrega — com
+       z-index 100 o 🎲 boiava por cima do modal de magia e continuava clicável. */
+    z-index: 8600;
     display: none;
     align-items: center; justify-content: center;
     padding: 24px;

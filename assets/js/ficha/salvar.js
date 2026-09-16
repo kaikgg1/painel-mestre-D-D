@@ -1,6 +1,6 @@
 // assets/js/ficha/salvar.js
 // salvar(): monta o payload a partir do FormData e faz o UPDATE em characters.
-// ATENÇÃO: as guardas por aba (fd.has("_aba_combate"), "slot_1_max", "moeda_po",
+// ATENÇÃO: as guardas por aba (fd.has("_aba_combate"), "_slots_grid", "moeda_po",
 // "attr_for") existem para NÃO reenviar campos de abas não renderizadas com a
 // cópia local desatualizada — sem elas, um auto-save de qualquer aba desfaz
 // mudanças que o Mestre fez nesse meio-tempo. Último script: termina em init().
@@ -95,8 +95,11 @@ async function salvar(e) {
   set('dado_vida_atual', num('dado_vida_atual'));
   set('exaustao', num('exaustao'));
 
-  // Slots (apenas se tab combate ativa)
-  if (fd.has('slot_1_max')) {
+  // Slots (só quando o grid de Espaços de Magia está na tela — Combate ou
+  // Magias). O marcador `_slots_grid` vem de renderSlotsMagia(); antes a
+  // detecção era `fd.has('slot_1_max')`, que falhava justamente pro Bruxo,
+  // cuja Magia do Pacto não tem espaço de nível 1.
+  if (fd.has('_slots_grid')) {
     const slots = {};
     for (let n = 1; n <= 9; n++) {
       const max   = num(`slot_${n}_max`)   ?? 0;
