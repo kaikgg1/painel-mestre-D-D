@@ -138,6 +138,9 @@ function render() {
   }
   renderPartyBar();
   window.VilaoWidget?.montar('vilao-widget-bar');
+  // Os cards são recriados do zero aqui, então o rodapé de presença nasce
+  // vazio — repinta com quem está online agora (assets/js/presenca.js).
+  window.Presenca?.pintar();
 }
 
 // Iniciativa (mst-3): abre com os PJs/NPCs ativos já preenchidos (bônus de
@@ -194,6 +197,7 @@ function _aplicarRerender(id) {
   // remove o min-height na próxima frame (já assumiu nova altura natural)
   requestAnimationFrame(() => requestAnimationFrame(() => { novo.style.minHeight = ''; }));
   renderPartyBar();
+  window.Presenca?.pintar();
 }
 
 // Aplica cor + ícone de fundo temáticos da classe do personagem no card.
@@ -840,6 +844,13 @@ function criarCard(p) {
   actions.appendChild(periciasBtn);
   actions.appendChild(remover);
   card.appendChild(actions);
+
+  // Rodapé de presença: bolinha verde (jogador com o sistema aberto agora)
+  // ou vermelha + último login. Quem preenche é assets/js/presenca.js.
+  const presenca = document.createElement('div');
+  presenca.className = 'presenca-badge off';
+  presenca.dataset.presencaUser = p.user_id || '';
+  card.appendChild(presenca);
 
   return card;
 }

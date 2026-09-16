@@ -113,6 +113,9 @@ function render() {
   }
   renderPartyBar();
   window.VilaoWidget?.montar('vilao-widget-bar');
+  // Os cards são recriados do zero aqui, então o rodapé de presença nasce
+  // vazio — repinta com quem está online agora (assets/js/presenca.js).
+  window.Presenca?.pintar();
 }
 
 // Iniciativa (mst-3): abre com os PJs/NPCs ativos já preenchidos (bônus de
@@ -194,6 +197,7 @@ function _aplicarRerender(id) {
   antigo.replaceWith(novo);
   requestAnimationFrame(() => requestAnimationFrame(() => { novo.style.minHeight = ''; }));
   renderPartyBar();
+  window.Presenca?.pintar();
 }
 
 // Aplica cor temática da classe: uma linha fina no topo do card + ícone discreto,
@@ -1083,6 +1087,15 @@ function criarCard(p) {
   painelMais.appendChild(actions);
   body.appendChild(painelMais);
 
+  // Rodapé de presença: bolinha verde (jogador com o sistema aberto agora)
+  // ou vermelha + último login. Fica FORA do .card-body de propósito — é
+  // status do jogador, não do personagem, então não entra nas abas.
+  // Quem preenche é assets/js/presenca.js.
+  const presenca = document.createElement('div');
+  presenca.className = 'presenca-badge off';
+  presenca.dataset.presencaUser = p.user_id || '';
+  card.appendChild(presenca);
+
   return card;
 }
 
@@ -1172,7 +1185,7 @@ async function descansoLongo() {
     });
     ehMestre = r.ehMestre;
     if (ehMestre) {
-      ['btn-adicionar','btn-descanso-global','btn-iniciativa','btn-loot-xp','btn-notas-mestre','btn-contas','link-vilao','link-reloaded'].forEach(id => {
+      ['btn-adicionar','btn-descanso-global','btn-iniciativa','btn-loot-xp','btn-notas-mestre','link-vilao','link-reloaded'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.style.display = '';
       });

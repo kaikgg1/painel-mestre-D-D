@@ -16,13 +16,18 @@
 -- nenhuma, só uma lista vazia).
 -- ═══════════════════════════════════════════════════════════════════
 
-create or replace function public.listar_ultimo_login()
-returns table (nome text, email text, ultimo_login timestamptz, criado_em timestamptz)
+-- drop antes do create: a assinatura de retorno mudou (ganhou `id`), e o
+-- Postgres não deixa trocar o tipo de retorno com um create or replace.
+drop function if exists public.listar_ultimo_login();
+
+create function public.listar_ultimo_login()
+returns table (id uuid, nome text, email text, ultimo_login timestamptz, criado_em timestamptz)
 language sql
 security definer
 set search_path = public, auth
 as $$
   select
+    u.id,
     coalesce(p.nome, split_part(u.email, '@', 1)) as nome,
     u.email,
     u.last_sign_in_at as ultimo_login,

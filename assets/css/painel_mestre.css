@@ -412,6 +412,15 @@
     font-style: italic; margin-top: 2px;
   }
 
+  /* Rodapé de presença (assets/js/presenca.js): este .card tem padding
+     próprio de 14px, então a faixa sangra até as bordas pra virar um rodapé
+     de verdade em vez de um retângulo flutuando dentro do card. No painel
+     da Barovia não precisa — lá o .card tem padding 0. */
+  .card > .presenca-badge {
+    margin: 12px -14px -14px;
+    border-radius: 0 0 3px 3px;
+  }
+
   /* ===== RECURSOS DE CLASSE (mst-2) ===== */
   .recurso-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: 11px; }
   .recurso-nome { color: var(--text-muted); text-transform: capitalize; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
