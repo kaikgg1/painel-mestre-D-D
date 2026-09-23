@@ -25,6 +25,14 @@ Os PDFs ficam em `docs/` (gitignored). Esses scripts processam-no para uso inter
 | [`formatar_phb.js`](formatar_phb.js) | `npm run formatar-phb` | `LivroDoJogador.txt` → `LivroDoJogador.md` com cabeçalhos detectados, palavras hifenizadas juntadas, páginas vazias removidas. |
 | [`extrair_habilidades_classes.js`](extrair_habilidades_classes.js) | — | Tentativa de extrair tabela classe×nível do PHB. **Resultado tem ruído** — o JSON oficial [`../data/habilidades_classes.json`](../data/habilidades_classes.json) foi montado à mão a partir do PHB. Este script fica como referência. |
 
+## Guia Curse of Strahd: Reloaded (`paineis/reloaded/`)
+
+| Script | Atalho npm | O que faz |
+|---|---|---|
+| [`gerar_indice_reloaded.js`](gerar_indice_reloaded.js) | `npm run indice-reloaded` | Lê as páginas `.html` do guia e gera `busca-indice.js` (títulos + cabeçalhos) e `busca-texto.js` (corpo de cada seção) — o índice da busca da lateral. **Rode toda vez que editar ou adicionar uma página do guia**, senão a busca fica com o conteúdo velho. |
+| [`reprocessar_reloaded.js`](reprocessar_reloaded.js) | — | Converte as imagens do guia pra WebP (use `--aplicar` pra gravar). |
+| [`atualizar_referencias_reloaded.js`](atualizar_referencias_reloaded.js) | — | Atualiza os links entre as páginas do guia. |
+
 ## Fluxo típico (do zero)
 
 ```bash

@@ -594,22 +594,7 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
 </div>
 <button type="button" class="back-to-top" id="back-to-top" aria-label="Voltar ao topo">↑</button>
 <script>
-document.querySelectorAll('.search-box input').forEach(function(inp){
-  inp.addEventListener('input', function(){
-    var q = inp.value.trim().toLowerCase();
-    var sidebar = inp.closest('.sidebar-left');
-    if (!q) { sidebar.classList.remove('filtering'); return; }
-    sidebar.classList.add('filtering');
-    sidebar.querySelectorAll('.tree .leaf').forEach(function(a){
-      var hit = a.textContent.toLowerCase().indexOf(q) !== -1;
-      a.classList.toggle('match', hit);
-    });
-    sidebar.querySelectorAll('.tree > details').forEach(function(d){
-      var hasMatch = d.querySelector('.leaf.match');
-      d.classList.toggle('has-match', !!hasMatch);
-    });
-  });
-});
+// a busca (com texto completo e destaque) vive em busca.js
 var mobileBtn = document.querySelector('.mobile-topbar button');
 if (mobileBtn) {
   mobileBtn.addEventListener('click', function(){
@@ -666,5 +651,6 @@ if (mobileBtn) {
   });
 })();
 </script>
+<script src="busca.js" defer></script>
 </body>
 </html>

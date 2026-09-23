@@ -15,6 +15,7 @@
     "setup-db": "node scripts/setup_db.js",
     "rotacionar-senha-mestre": "node scripts/rotacionar_senha_mestre.js",
     "auditoria": "node scripts/auditoria.js",
+    "indice-reloaded": "node scripts/gerar_indice_reloaded.js",
     "smoke": "node scripts/smoke_ficha.js",
     "reprocessar-monstros": "node scripts/reprocessar_monstros.js --aplicar"
   },
