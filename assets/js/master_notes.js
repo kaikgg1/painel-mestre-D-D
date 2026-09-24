@@ -51,10 +51,10 @@
 
   // Templates: estrutura sugerida ao escolher certas categorias.
   // Só preenche se o textarea estiver totalmente vazio (não atrapalha quem digita).
-  // Sem emoji: as linhas terminadas em ":" já viram cabeçalho de seção no render.
+  // Em markdown: "### " vira cabeçalho de seção no render.
   const TEMPLATES = {
-    npc: 'Características:\n\nHistória:\n\nObjetivos:\n',
-    equipamento: 'Descrição:\n\nMecânica/efeito:\n\nLocalização:\n',
+    npc: '### Características\n\n\n### História\n\n\n### Objetivos\n\n',
+    equipamento: '### Descrição\n\n\n### Mecânica/efeito\n\n\n### Localização\n\n',
     historia: '',
     loot: '',
     decisao: '',
@@ -69,9 +69,9 @@
     if (!ta) return;
     if (ta.value.trim() === '') {
       ta.value = tpl;
-      // posiciona o cursor depois do primeiro ":" pra começar a digitar logo
-      const firstColon = tpl.indexOf(':');
-      const pos = firstColon >= 0 ? firstColon + 1 : tpl.length;
+      // cursor na linha em branco sob o primeiro cabeçalho, pronto pra digitar
+      const fimLinha1 = tpl.indexOf('\n');
+      const pos = fimLinha1 >= 0 ? fimLinha1 + 1 : tpl.length;
       try { ta.setSelectionRange(pos, pos); ta.focus(); } catch {}
     }
   }
@@ -96,6 +96,11 @@
     display: none; align-items: center; justify-content: center; padding: 16px;
   }
   .mn-overlay.open { display: flex; animation: mnFade 0.18s ease-out; }
+  /* O modal não depende do reset global da página: com content-box, os campos
+     de largura 100% somariam o padding e estourariam a lateral no celular. */
+  .mn-overlay, .mn-overlay *, .mn-overlay *::before, .mn-overlay *::after {
+    box-sizing: border-box;
+  }
   @keyframes mnFade { from { opacity: 0; } to { opacity: 1; } }
   .mn-modal {
     background: linear-gradient(160deg, #1f1416 0%, #160c10 100%);
@@ -227,7 +232,13 @@
   }
   .mn-pj.ativo .count { background: rgba(0,0,0,0.35); color: #fff; }
   .mn-pj-info { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
-  .mn-pj-nome { font-size: 13px; font-weight: 700; letter-spacing: 0.3px; }
+  .mn-pj-nome {
+    font-size: 13px; font-weight: 700; letter-spacing: 0.3px;
+    /* nome longo não quebra o card em duas linhas */
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  /* o card da campanha pode usar duas linhas: o título é mais longo */
+  .mn-pj.mn-campanha .mn-pj-nome { white-space: normal; }
   .mn-pj-sub {
     font-size: 9px; opacity: 0.75; font-weight: 600;
     text-transform: uppercase; letter-spacing: 0.8px;
@@ -261,35 +272,104 @@
     color: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.3);
   }
 
-  /* ===== FORM ===== */
+  /* ===== FORM (compositor) =====
+     O form tem rolagem própria e a barra de ações fica presa no rodapé: é o
+     que garante que o botão de salvar NUNCA seja empurrado fora da tela
+     quando o texto cresce (era o bug do layout quebrado). */
   .mn-form {
-    background: linear-gradient(180deg, rgba(139,105,20,0.08), rgba(0,0,0,0.2));
+    background: linear-gradient(180deg, rgba(139,105,20,0.08), rgba(0,0,0,0.22));
     border-bottom: 1px solid rgba(139,105,20,0.2);
-    padding: 14px 18px;
-    display: grid; grid-template-columns: 1fr;
-    gap: 8px;
-    flex-shrink: 0;
-  }
-  .mn-form-row {
-    display: grid; grid-template-columns: 1fr 160px auto auto;
-    gap: 8px; align-items: stretch;
-  }
-  .mn-form textarea {
-    width: 100%; min-height: 70px;
-    background: rgba(0,0,0,0.4);
-    border: 1px solid rgba(139,105,20,0.4);
-    color: #d4c5a0;
-    font-family: 'EB Garamond', serif; font-size: 14px; line-height: 1.6;
-    padding: 10px 12px; border-radius: 5px; outline: none;
-    resize: none; /* auto-grow controla a altura */
+    padding: 12px 18px 0;
+    display: flex; flex-direction: column; gap: 8px;
+    flex: 0 0 auto;
+    max-height: 62%;
+    min-height: 0;
     overflow-y: auto;
-    transition: border-color 0.15s, box-shadow 0.15s, height 0.1s;
+    overscroll-behavior: contain;
   }
-  .mn-form textarea:focus {
+  /* Nada aqui encolhe: o form rola e a barra de ações fica presa embaixo.
+     Sem isso o flex comprimia a área de escrita a duas linhas no celular. */
+  .mn-form > * { flex-shrink: 0; }
+  .mn-editor {
+    position: relative;
+    border: 1px solid rgba(139,105,20,0.4);
+    border-radius: 6px;
+    background: rgba(0,0,0,0.4);
+    display: flex; flex-direction: column;
+    min-height: 0;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .mn-editor:focus-within {
     border-color: #b88a2c;
     box-shadow: 0 0 0 3px rgba(184,138,44,0.12);
   }
+
+  /* --- barra de ferramentas do markdown --- */
+  .mn-toolbar {
+    display: flex; align-items: center; gap: 2px; flex-wrap: wrap;
+    padding: 5px 6px;
+    border-bottom: 1px solid rgba(139,105,20,0.25);
+    background: linear-gradient(180deg, rgba(139,105,20,0.12), transparent);
+    border-radius: 5px 5px 0 0;
+    flex-shrink: 0;
+  }
+  .mn-tb-btn {
+    background: transparent; border: 1px solid transparent;
+    color: #a89878; cursor: pointer;
+    min-width: 30px; height: 28px; padding: 0 7px;
+    border-radius: 4px;
+    font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: all 0.12s;
+  }
+  .mn-tb-btn:hover { background: rgba(184,138,44,0.18); color: #f4d878; border-color: rgba(184,138,44,0.35); }
+  .mn-tb-btn:active { transform: translateY(1px); }
+  .mn-tb-btn.b { font-weight: 900; }
+  .mn-tb-btn.i { font-style: italic; }
+  .mn-tb-btn.s { text-decoration: line-through; }
+  .mn-tb-sep { width: 1px; height: 18px; background: rgba(139,105,20,0.35); margin: 0 4px; flex-shrink: 0; }
+  .mn-tb-dir { margin-left: auto; display: flex; align-items: center; gap: 2px; }
+  .mn-tb-aba {
+    background: transparent; border: 1px solid rgba(139,105,20,0.3);
+    color: #a89878; cursor: pointer;
+    height: 28px; padding: 0 11px; border-radius: 14px;
+    font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700;
+    letter-spacing: 0.8px; text-transform: uppercase;
+    transition: all 0.12s;
+  }
+  .mn-tb-aba:hover { border-color: #b88a2c; color: #d4c5a0; }
+  .mn-tb-aba.ativo {
+    background: linear-gradient(180deg, #b88a2c, #8B6914);
+    color: #1a1014; border-color: #d4a843;
+  }
+
+  .mn-form textarea {
+    width: 100%; min-height: 84px;
+    background: transparent;
+    border: 0;
+    color: #d4c5a0;
+    font-family: 'EB Garamond', serif; font-size: 14.5px; line-height: 1.62;
+    padding: 11px 13px; border-radius: 0 0 5px 5px; outline: none;
+    resize: none; /* auto-grow controla a altura */
+    overflow-y: auto;
+    max-height: min(34vh, 280px);
+    transition: height 0.1s;
+  }
   .mn-form textarea::placeholder { color: #6a5a3a; font-style: italic; }
+
+  /* --- prévia renderizada --- */
+  .mn-preview {
+    padding: 11px 13px;
+    min-height: 84px;
+    max-height: min(34vh, 280px);
+    overflow-y: auto;
+    color: #d4c5a0; font-size: 14.5px; line-height: 1.62;
+    font-family: 'EB Garamond', serif;
+  }
+  .mn-preview:empty::before {
+    content: 'Nada para prever ainda.';
+    color: #6a5a3a; font-style: italic;
+  }
   .mn-titulo-input {
     width: 100%;
     background: rgba(0,0,0,0.4);
@@ -309,29 +389,122 @@
     border-left-color: #d4a843;
     box-shadow: 0 0 0 3px rgba(184,138,44,0.12);
   }
-  .mn-form select, .mn-form input[type="date"] {
+  /* ===== BARRA DE AÇÕES — sempre visível ===== */
+  .mn-form-acoes {
+    position: sticky; bottom: 0; z-index: 2;
+    display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    padding: 11px 0 12px;
+    /* fundo 100% opaco: o texto que rola por baixo não pode aparecer */
+    background: #1e1517;
+    border-top: 1px solid rgba(139,105,20,0.28);
+    box-shadow: 0 -12px 18px -10px rgba(0,0,0,0.8);
+  }
+  .mn-form-acoes .mn-flex { flex: 1 1 auto; min-width: 0; }
+
+  .mn-form select {
     background-color: rgba(0,0,0,0.4);
     border: 1px solid rgba(139,105,20,0.4);
     color: #d4c5a0;
     font-family: 'Cinzel', serif; font-size: 12px; font-weight: 600;
     letter-spacing: 0.5px;
     padding: 9px 12px; border-radius: 6px; outline: none;
-    min-height: 42px;
+    min-height: 42px; max-width: 190px;
     transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
   }
   /* O caret dourado e o padding-right vêm de assets/css/ui.css */
-  .mn-form select:hover, .mn-form input[type="date"]:hover {
-    border-color: #b88a2c;
-    background-color: rgba(0,0,0,0.55);
-  }
-  .mn-form select:focus, .mn-form select:focus-visible,
-  .mn-form input[type="date"]:focus {
+  .mn-form select:hover { border-color: #b88a2c; background-color: rgba(0,0,0,0.55); }
+  .mn-form select:focus, .mn-form select:focus-visible {
     border-color: #d4a843;
     box-shadow: 0 0 0 3px rgba(184,138,44,0.18);
   }
-  @media (max-width: 600px) {
-    .mn-form select, .mn-form input[type="date"] { min-height: 46px; font-size: 16px; }
+
+  /* ===== SELETOR DE DATA (calendário próprio, no tema) =====
+     O <input type="date"> abria o calendário claro do navegador, que destoava
+     do painel. Aqui o valor fica num input escondido e a UI é nossa. */
+  .mn-data-btn {
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(139,105,20,0.4);
+    color: #d4c5a0; cursor: pointer;
+    font-family: 'Cinzel', serif; font-size: 12px; font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 9px 13px; border-radius: 6px;
+    min-height: 42px;
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: all 0.15s;
   }
+  .mn-data-btn:hover { border-color: #b88a2c; background: rgba(0,0,0,0.55); color: #f4d878; }
+  .mn-data-btn[aria-expanded="true"] {
+    border-color: #d4a843;
+    box-shadow: 0 0 0 3px rgba(184,138,44,0.18);
+  }
+  .mn-data-btn iconify-icon { color: #b88a2c; font-size: 15px; }
+  .mn-data-rel {
+    font-size: 9px; letter-spacing: 1px; text-transform: uppercase;
+    color: #b88a2c; font-weight: 700;
+    border-left: 1px solid rgba(139,105,20,0.4); padding-left: 8px;
+  }
+
+  /* popover: position:fixed pra não ser cortado pela rolagem do form */
+  .mn-cal {
+    position: fixed; z-index: 8700;
+    width: 264px; padding: 10px;
+    background: linear-gradient(160deg, #241619 0%, #180d11 100%);
+    border: 1px solid #8B6914; border-radius: 8px;
+    box-shadow: 0 18px 44px rgba(0,0,0,0.85), 0 0 0 1px rgba(139,29,29,0.5) inset;
+    font-family: 'Cinzel', serif;
+    animation: mnFade 0.12s ease-out;
+  }
+  .mn-cal-head {
+    display: flex; align-items: center; gap: 6px;
+    margin-bottom: 8px;
+  }
+  .mn-cal-mes {
+    flex: 1; text-align: center;
+    font-size: 12px; font-weight: 700; color: #d4a843;
+    letter-spacing: 0.8px; text-transform: capitalize;
+  }
+  .mn-cal-nav {
+    background: transparent; border: 1px solid rgba(139,105,20,0.35);
+    color: #b88a2c; cursor: pointer;
+    width: 28px; height: 28px; border-radius: 4px;
+    font-size: 13px; line-height: 1;
+    display: inline-flex; align-items: center; justify-content: center;
+    transition: all 0.12s;
+  }
+  .mn-cal-nav:hover { background: rgba(184,138,44,0.2); color: #f4d878; border-color: #b88a2c; }
+  .mn-cal-grade { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+  .mn-cal-dow {
+    text-align: center; font-size: 9px; font-weight: 700;
+    color: #8c7d5e; letter-spacing: 0.5px; padding: 4px 0 6px;
+  }
+  .mn-cal-dia {
+    background: transparent; border: 1px solid transparent;
+    color: #d4c5a0; cursor: pointer;
+    height: 30px; border-radius: 4px;
+    font-family: 'EB Garamond', serif; font-size: 14px;
+    transition: all 0.1s;
+  }
+  .mn-cal-dia:hover { background: rgba(184,138,44,0.22); border-color: rgba(184,138,44,0.5); }
+  .mn-cal-dia.fora { color: #5a4a38; }
+  .mn-cal-dia.hoje { border-color: #8b1d1d; color: #f4b8a8; font-weight: 700; }
+  .mn-cal-dia.sel {
+    background: linear-gradient(180deg, #b88a2c, #8B6914);
+    border-color: #d4a843; color: #1a1014; font-weight: 700;
+  }
+  .mn-cal-pe {
+    display: flex; gap: 6px; margin-top: 9px; padding-top: 9px;
+    border-top: 1px solid rgba(139,105,20,0.25);
+  }
+  .mn-cal-atalho {
+    flex: 1;
+    background: rgba(139,105,20,0.1); border: 1px solid rgba(139,105,20,0.3);
+    color: #d4c5a0; cursor: pointer;
+    padding: 6px 4px; border-radius: 4px;
+    font-family: 'Cinzel', serif; font-size: 9.5px; font-weight: 700;
+    letter-spacing: 0.6px; text-transform: uppercase;
+    transition: all 0.12s;
+  }
+  .mn-cal-atalho:hover { background: rgba(184,138,44,0.28); color: #f4d878; border-color: #b88a2c; }
 
   /* ===== Ícones vetoriais ===== */
   .mn-title iconify-icon { color: #d4a843; font-size: 22px; }
@@ -342,17 +515,13 @@
   .mn-entry-cat iconify-icon { font-size: 12px; }
   .mn-entry-actions iconify-icon { font-size: 15px; vertical-align: -2px; }
   .mn-empty .ic iconify-icon { font-size: 38px; }
-  .mn-form input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(0.7) sepia(1) hue-rotate(15deg);
-    cursor: pointer;
-  }
   .mn-form .mn-add-btn {
     background: linear-gradient(180deg, #b88a2c, #6a4f0e);
     border: 1px solid #d4a843; color: #1a1014;
     font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700;
     letter-spacing: 1px; text-transform: uppercase;
     padding: 8px 18px; border-radius: 5px; cursor: pointer;
-    min-height: 38px; min-width: 120px;
+    min-height: 42px; min-width: 132px;
     transition: all 0.2s;
     display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   }
@@ -364,7 +533,7 @@
   .mn-form .mn-cancel-btn {
     background: transparent; border: 1px solid #6b1010; color: #d4c5a0;
     font-family: 'Cinzel', serif; font-size: 11px; padding: 8px 14px;
-    border-radius: 5px; cursor: pointer; min-height: 38px;
+    border-radius: 5px; cursor: pointer; min-height: 42px;
     transition: all 0.15s;
   }
   .mn-form .mn-cancel-btn:hover { background: #6b1010; color: #fff; }
@@ -419,27 +588,146 @@
     word-wrap: break-word;
   }
   .mn-entry-text {
-    color: #d4c5a0; font-size: 14px; line-height: 1.65;
+    color: #d4c5a0; font-size: 14.5px; line-height: 1.68;
     word-wrap: break-word; overflow-wrap: break-word;
-    max-width: 72ch;  /* limite de largura pra leitura confortável */
+    max-width: 74ch;  /* limite de largura pra leitura confortável */
   }
-  .mn-entry-text p {
-    margin: 0 0 10px;
+
+  /* ===== MARKDOWN RENDERIZADO (anotação e prévia) ===== */
+  .mn-md > :first-child { margin-top: 0 !important; }
+  .mn-md > :last-child { margin-bottom: 0 !important; }
+  .mn-md .md-p { margin: 0 0 10px; }
+  .mn-md .md-h {
+    font-family: 'Cinzel', serif;
+    color: #d4a843; font-weight: 700;
+    line-height: 1.3; letter-spacing: 0.5px;
+    margin: 18px 0 8px;
   }
-  .mn-entry-text p:last-child { margin-bottom: 0; }
-  /* Cabeçalho de seção dentro do corpo (linhas que terminam em ":") */
-  .mn-entry-text .mn-section {
+  .mn-md .md-h1 {
+    font-family: 'Cinzel Decorative', serif;
+    font-size: 19px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid rgba(212,168,67,0.32);
+  }
+  .mn-md .md-h2 {
+    font-size: 16px;
+    padding-bottom: 4px;
+    border-bottom: 1px solid rgba(212,168,67,0.18);
+  }
+  .mn-md .md-h3 { font-size: 14.5px; }
+  .mn-md .md-h4, .mn-md .md-h5, .mn-md .md-h6 {
+    font-size: 12.5px; text-transform: uppercase; letter-spacing: 1px;
+    color: #c09a4a;
+  }
+  /* Cabeçalho de seção legado (linhas que terminam em ":") */
+  .mn-md .md-secao {
     font-family: 'Cinzel', serif;
     color: #d4a843;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    margin: 14px 0 6px;
+    font-size: 12px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+    margin: 15px 0 6px;
     padding-bottom: 3px;
     border-bottom: 1px solid rgba(212,168,67,0.2);
   }
-  .mn-entry-text .mn-section:first-child { margin-top: 2px; }
+  .mn-md strong { color: #eddaa8; font-weight: 700; }
+  .mn-md em { color: #cbbf9c; }
+  .mn-md del { color: #8c7d5e; }
+  .mn-md .md-link {
+    color: #d4a843; text-decoration: none;
+    border-bottom: 1px dotted rgba(212,168,67,0.6);
+  }
+  .mn-md .md-link:hover { color: #f4d878; border-bottom-style: solid; }
+  .mn-md .md-ul, .mn-md .md-ol { margin: 0 0 10px; padding-left: 22px; }
+  .mn-md .md-ul { list-style: none; }
+  .mn-md .md-ul > li { position: relative; }
+  .mn-md .md-ul > li::before {
+    content: '';
+    position: absolute; left: -14px; top: 0.62em;
+    width: 5px; height: 5px; border-radius: 50%;
+    background: #b88a2c;
+  }
+  .mn-md .md-ul .md-ul > li::before {
+    background: transparent;
+    border: 1px solid #8c7d5e;
+    width: 4px; height: 4px;
+  }
+  .mn-md li { margin: 0 0 4px; }
+  .mn-md .md-ul .md-ul, .mn-md .md-ol .md-ol,
+  .mn-md .md-ul .md-ol, .mn-md .md-ol .md-ul { margin: 4px 0 2px; }
+  .mn-md .md-ol { list-style: decimal; }
+  .mn-md .md-ol > li::marker { color: #b88a2c; font-family: 'Cinzel', serif; font-size: 0.9em; }
+  /* checklists */
+  .mn-md li.md-tarefa { list-style: none; display: flex; gap: 8px; align-items: flex-start; }
+  .mn-md li.md-tarefa::before { display: none; }
+  .mn-md .md-caixa {
+    flex-shrink: 0; margin-top: 0.22em;
+    width: 15px; height: 15px; border-radius: 3px;
+    border: 1px solid rgba(184,138,44,0.6);
+    background: rgba(0,0,0,0.35);
+    color: #d4a843; font-size: 11px; line-height: 13px; text-align: center;
+  }
+  .mn-md li.md-tarefa.feita { color: #8c7d5e; text-decoration: line-through; }
+  .mn-md li.md-tarefa.feita .md-caixa { background: rgba(184,138,44,0.25); }
+  /* citação */
+  .mn-md .md-quote {
+    margin: 0 0 10px; padding: 8px 14px;
+    border-left: 3px solid #8b1d1d;
+    background: linear-gradient(90deg, rgba(139,29,29,0.16), transparent 80%);
+    color: #e2cfae; font-style: italic;
+    border-radius: 0 4px 4px 0;
+  }
+  .mn-md .md-quote .md-p:last-child { margin-bottom: 0; }
+  /* código */
+  .mn-md .md-code {
+    font-family: 'Consolas', 'SF Mono', monospace; font-size: 0.86em;
+    background: rgba(0,0,0,0.45); color: #e8c97a;
+    border: 1px solid rgba(139,105,20,0.3);
+    padding: 1px 5px; border-radius: 3px;
+    font-style: normal;
+  }
+  .mn-md .md-pre {
+    margin: 0 0 10px; padding: 10px 12px;
+    background: rgba(0,0,0,0.5);
+    border: 1px solid rgba(139,105,20,0.3);
+    border-left: 3px solid #8B6914;
+    border-radius: 0 5px 5px 0;
+    overflow-x: auto;
+  }
+  .mn-md .md-pre code {
+    font-family: 'Consolas', 'SF Mono', monospace;
+    font-size: 12.5px; line-height: 1.5; color: #cbbf9c;
+    white-space: pre;
+  }
+  .mn-md .md-hr {
+    border: 0; height: 1px; margin: 16px 0;
+    background: linear-gradient(to right, transparent, rgba(184,138,44,0.55), transparent);
+  }
+  /* tabela */
+  .mn-md .md-tabela-wrap { overflow-x: auto; margin: 0 0 12px; }
+  .mn-md .md-tabela {
+    border-collapse: collapse; width: 100%; font-size: 13px;
+    border: 1px solid rgba(139,105,20,0.3);
+  }
+  .mn-md .md-tabela th {
+    font-family: 'Cinzel', serif; font-size: 10.5px;
+    text-transform: uppercase; letter-spacing: 0.8px;
+    color: #d4a843; font-weight: 700;
+    background: rgba(139,105,20,0.18);
+    padding: 7px 10px; text-align: left;
+    border-bottom: 1px solid rgba(184,138,44,0.4);
+    white-space: nowrap;
+  }
+  .mn-md .md-tabela td {
+    padding: 6px 10px;
+    border-bottom: 1px solid rgba(139,105,20,0.14);
+  }
+  .mn-md .md-tabela tr:last-child td { border-bottom: 0; }
+  .mn-md .md-tabela tbody tr:nth-child(even) { background: rgba(0,0,0,0.18); }
+  .mn-md .md-img {
+    max-width: 100%; height: auto; border-radius: 5px;
+    border: 1px solid rgba(139,105,20,0.35);
+    margin: 4px 0;
+  }
 
   /* Colapso de entradas longas */
   .mn-entry.mn-colapsavel { position: relative; }
@@ -485,45 +773,82 @@
   .mn-timeline-wrap::-webkit-scrollbar-thumb { background: #8B6914; border-radius: 3px; }
 
   /* ===== RESPONSIVO ===== */
-  @media (max-width: 820px) {
-    .mn-body { grid-template-columns: 1fr; }
+  /* Tela baixa: o editor encolhe pra barra de ações e a timeline continuarem
+     visíveis. Era aqui que o botão de salvar sumia. */
+  @media (max-height: 780px) {
+    .mn-form { max-height: 58%; }
+    .mn-form textarea, .mn-preview { max-height: 26vh; }
+  }
+  @media (max-height: 620px) {
+    .mn-form { max-height: 62%; }
+    .mn-form textarea, .mn-preview { max-height: 22vh; min-height: 64px; }
+    .mn-header { padding: 10px 18px 9px; }
+    .mn-title { font-size: 16px; }
+  }
+
+  /* Sem espaço pra duas colunas: a lista vira uma faixa horizontal no topo,
+     que gasta muito menos altura do que a sidebar empilhada. */
+  @media (max-width: 880px) {
+    .mn-body { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
     .mn-sidebar {
       border-right: none;
       border-bottom: 1px solid rgba(139,105,20,0.25);
-      max-height: 30vh;
+      flex-direction: column;
     }
-    .mn-form-row { grid-template-columns: 1fr 1fr; }
-    .mn-form .mn-add-btn { grid-column: 1 / -1; }
+    .mn-sidebar-label { display: none; }
+    .mn-campanha-section { padding: 8px 12px 0; }
+    .mn-pj-list-wrap {
+      flex-direction: row; gap: 6px;
+      overflow-x: auto; overflow-y: hidden;
+      padding: 8px 12px;
+      scrollbar-width: thin;
+    }
+    .mn-pj { flex: 0 0 auto; min-width: 168px; min-height: 50px; }
+    .mn-pj:hover, .mn-pj.mn-campanha:hover { transform: none; }
+    .mn-campanha-section .mn-pj { width: 100%; }
+    .mn-entry-text { max-width: none; }
   }
+
   @media (max-width: 600px) {
     .mn-overlay { padding: 0; }
     .mn-modal {
       max-width: 100%; max-height: 100vh; max-height: 100dvh;
       height: 100%; border-radius: 0; border-left: none; border-right: none;
     }
-    .mn-header { padding: 12px 14px 10px; }
-    .mn-title { font-size: 16px; letter-spacing: 0.8px; }
-    .mn-close { padding: 8px 12px; font-size: 10px; }
-    .mn-sidebar { max-height: 32vh; }
-    .mn-sidebar-label { padding: 10px 12px 6px; font-size: 9px; }
-    .mn-pj-list-wrap {
-      flex-direction: row; gap: 6px;
-      overflow-x: auto; overflow-y: hidden;
-      padding: 8px 12px;
-    }
-    .mn-pj { flex: 0 0 auto; min-width: 160px; min-height: 52px; }
-    .mn-cats { padding: 10px 12px 8px; gap: 4px; }
+    .mn-header { padding: 11px 14px 10px; gap: 10px; }
+    .mn-title { font-size: 15px; letter-spacing: 0.6px; }
+    .mn-close { padding: 8px 11px; font-size: 10px; }
+    .mn-cats { padding: 9px 12px 8px; gap: 4px; }
     .mn-cat-pill { padding: 6px 10px; font-size: 10px; min-height: 32px; }
-    .mn-form { padding: 12px; }
-    .mn-form-row { grid-template-columns: 1fr; }
-    .mn-form .mn-add-btn,
-    .mn-form .mn-cancel-btn { width: 100%; }
-    .mn-form textarea { min-height: 80px; font-size: 15px; }
+    .mn-form { padding: 10px 12px 0; max-height: 64%; }
+    /* No celular o rótulo dos botões de marcação some e fica só o símbolo */
+    .mn-tb-btn { min-width: 34px; height: 32px; }
+    .mn-tb-sep { margin: 0 2px; }
+    /* Escrever/Prever em linha própria: no celular a barra quebraria de
+       qualquer jeito, e assim a quebra fica intencional em vez de torta. */
+    .mn-tb-dir {
+      flex: 1 1 100%; margin-left: 0; justify-content: flex-end;
+      padding-top: 4px; margin-top: 3px;
+      border-top: 1px solid rgba(139,105,20,0.18);
+    }
+    .mn-tb-aba { padding: 0 12px; height: 30px; font-size: 9px; }
+    .mn-form textarea, .mn-preview { font-size: 15.5px; max-height: 30vh; }
     .mn-titulo-input { font-size: 15px; padding: 10px 12px; }
+    /* select/data/salvar em blocos de largura cheia — nada mais é cortado */
+    .mn-form-acoes { gap: 6px; padding: 9px 0 11px; }
+    .mn-form select { flex: 1 1 100%; max-width: none; min-height: 46px; font-size: 13px; }
+    .mn-data-btn { flex: 1 1 100%; justify-content: center; min-height: 46px; }
+    .mn-form-acoes .mn-flex { display: none; }
+    .mn-form .mn-add-btn { flex: 1 1 100%; min-height: 48px; }
+    .mn-form .mn-cancel-btn { flex: 1 1 100%; min-height: 44px; }
+    .mn-cal { width: calc(100vw - 24px); max-width: 300px; }
+    .mn-cal-dia { height: 36px; font-size: 15px; }
     .mn-entry-titulo { font-size: 15px; }
     .mn-timeline-wrap { padding: 12px 12px 20px; }
     .mn-entry { padding: 10px 12px; }
-    .mn-entry-text { font-size: 13px; }
+    .mn-entry:hover { transform: none; }
+    .mn-entry-text { font-size: 14px; }
+    .mn-md .md-h1 { font-size: 17px; }
     .mn-entry-actions button { min-width: 38px; min-height: 38px; padding: 6px 10px; }
   }
   `;
@@ -558,10 +883,36 @@
             <div class="mn-cats" id="mn-cats" role="toolbar" aria-label="Filtrar e definir categoria"></div>
             <form class="mn-form" id="mn-form" autocomplete="off" novalidate>
               <input type="text" id="mn-titulo" class="mn-titulo-input" placeholder="Título  (ex.: Fiona Watcher, Bola de Fogo, Sessão 5…)" maxlength="120">
-              <textarea id="mn-texto" placeholder="Escreva a anotação…  (Ctrl+Enter para salvar)" required></textarea>
-              <div class="mn-form-row">
+              <div class="mn-editor">
+                <div class="mn-toolbar" id="mn-toolbar" role="toolbar" aria-label="Formatação (markdown)">
+                  <button type="button" class="mn-tb-btn b" data-md="negrito"   title="Negrito (Ctrl+B)"        aria-label="Negrito">B</button>
+                  <button type="button" class="mn-tb-btn i" data-md="italico"   title="Itálico (Ctrl+I)"        aria-label="Itálico">I</button>
+                  <button type="button" class="mn-tb-btn s" data-md="riscado"   title="Riscado"                 aria-label="Riscado">S</button>
+                  <span class="mn-tb-sep"></span>
+                  <button type="button" class="mn-tb-btn" data-md="titulo"      title="Título de seção"         aria-label="Título">H</button>
+                  <button type="button" class="mn-tb-btn" data-md="lista"       title="Lista"                   aria-label="Lista">•</button>
+                  <button type="button" class="mn-tb-btn" data-md="numerada"    title="Lista numerada"          aria-label="Lista numerada">1.</button>
+                  <button type="button" class="mn-tb-btn" data-md="tarefa"      title="Checklist"               aria-label="Checklist">✓</button>
+                  <span class="mn-tb-sep"></span>
+                  <button type="button" class="mn-tb-btn" data-md="citacao"     title="Citação (fala de NPC)"   aria-label="Citação">❝</button>
+                  <button type="button" class="mn-tb-btn" data-md="link"        title="Link (Ctrl+K)"           aria-label="Link">URL</button>
+                  <button type="button" class="mn-tb-btn" data-md="tabela"      title="Tabela"                  aria-label="Tabela">▦</button>
+                  <button type="button" class="mn-tb-btn" data-md="divisor"     title="Divisor"                 aria-label="Divisor">—</button>
+                  <span class="mn-tb-dir">
+                    <button type="button" class="mn-tb-aba ativo" id="mn-aba-escrever">Escrever</button>
+                    <button type="button" class="mn-tb-aba" id="mn-aba-prever">Prever</button>
+                  </span>
+                </div>
+                <textarea id="mn-texto" placeholder="Escreva a anotação…  aceita markdown: **negrito**, # título, - lista, > citação  (Ctrl+Enter salva)" required></textarea>
+                <div class="mn-preview mn-md" id="mn-preview" hidden aria-live="polite"></div>
+              </div>
+              <div class="mn-form-acoes">
                 <select id="mn-cat" aria-label="Categoria"></select>
-                <input type="date" id="mn-data" aria-label="Data da anotação">
+                <button type="button" class="mn-data-btn" id="mn-data-btn" aria-haspopup="dialog" aria-expanded="false">
+                  ${ico('calendario')}<span id="mn-data-txt">—</span>
+                </button>
+                <input type="hidden" id="mn-data">
+                <span class="mn-flex"></span>
                 <button type="button" class="mn-cancel-btn" id="mn-cancel" style="display:none">Cancelar</button>
                 <button type="submit" class="mn-add-btn" id="mn-submit">+ Adicionar</button>
               </div>
@@ -580,10 +931,27 @@
     document.getElementById('mn-cancel').addEventListener('click', cancelarEdicao);
     const taEl = document.getElementById('mn-texto');
     taEl.addEventListener('keydown', e => {
-      if (e.ctrlKey && e.key === 'Enter') { e.preventDefault(); onSubmit(e); }
+      if (e.ctrlKey && e.key === 'Enter') { e.preventDefault(); onSubmit(e); return; }
+      // Atalhos de marcação
+      if (e.ctrlKey && !e.altKey) {
+        const k = e.key.toLowerCase();
+        if (k === 'b') { e.preventDefault(); aplicarMarcacao('negrito'); return; }
+        if (k === 'i') { e.preventDefault(); aplicarMarcacao('italico'); return; }
+        if (k === 'k') { e.preventDefault(); aplicarMarcacao('link');   return; }
+      }
+      // Enter dentro de uma lista continua a lista (como num editor de verdade)
+      if (e.key === 'Enter' && !e.shiftKey && !e.ctrlKey) continuarLista(e, taEl);
     });
-    // Auto-grow: cresce com o conteúdo (até um teto generoso)
+    // Auto-grow: cresce com o conteúdo (até o teto do CSS)
     taEl.addEventListener('input', () => autoGrowTextarea(taEl));
+
+    // Barra de marcação
+    document.getElementById('mn-toolbar').addEventListener('click', e => {
+      const b = e.target.closest('[data-md]');
+      if (b) aplicarMarcacao(b.dataset.md);
+    });
+    document.getElementById('mn-aba-escrever').addEventListener('click', () => verPrevia(false));
+    document.getElementById('mn-aba-prever').addEventListener('click', () => verPrevia(true));
 
     // Templates por categoria — preenche o textarea quando o usuário muda
     // pra essa categoria E o campo está vazio (sem sobrescrever conteúdo).
@@ -592,10 +960,264 @@
       autoGrowTextarea(taEl);
     });
 
+    // Seletor de data próprio (o nativo abria o calendário claro do navegador)
+    document.getElementById('mn-data-btn').addEventListener('click', alternarCalendario);
+
     rebuildCategorias();
 
     document.addEventListener('keydown', escListener);
-    document.getElementById('mn-data').value = hojeLocal();
+    setData(hojeLocal());
+  }
+
+  // ===== MARCAÇÃO (markdown) =====
+  // Envolve a seleção, ou insere um exemplo se nada estiver selecionado.
+  function envolver(ta, antes, depois, exemplo) {
+    const ini = ta.selectionStart;
+    const fim = ta.selectionEnd;
+    const sel = ta.value.slice(ini, fim) || exemplo || '';
+    ta.value = ta.value.slice(0, ini) + antes + sel + depois + ta.value.slice(fim);
+    ta.focus();
+    ta.setSelectionRange(ini + antes.length, ini + antes.length + sel.length);
+  }
+
+  // Aplica um prefixo em cada linha selecionada (títulos, listas, citação).
+  // Clicar de novo no mesmo botão remove o prefixo (alterna).
+  function prefixarLinhas(ta, prefixo, numerada) {
+    const v = ta.value;
+    let ini = v.lastIndexOf('\n', ta.selectionStart - 1) + 1;
+    let fim = v.indexOf('\n', ta.selectionEnd);
+    if (fim === -1) fim = v.length;
+    const linhas = v.slice(ini, fim).split('\n');
+    const re = numerada ? /^\d+[.)]\s+/ : new RegExp('^' + prefixo.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    const remover = linhas.every(l => !l.trim() || re.test(l));
+    const novas = linhas.map((l, k) => {
+      if (remover) return l.replace(re, '');
+      if (!l.trim() && linhas.length > 1) return l;
+      return (numerada ? (k + 1) + '. ' : prefixo) + l;
+    });
+    const texto = novas.join('\n');
+    ta.value = v.slice(0, ini) + texto + v.slice(fim);
+    ta.focus();
+    ta.setSelectionRange(ini, ini + texto.length);
+  }
+
+  function aplicarMarcacao(tipo) {
+    const ta = document.getElementById('mn-texto');
+    if (!ta) return;
+    if (_previewAberta) verPrevia(false);   // não dá pra marcar olhando a prévia
+    switch (tipo) {
+      case 'negrito':  envolver(ta, '**', '**', 'negrito'); break;
+      case 'italico':  envolver(ta, '*', '*', 'itálico'); break;
+      case 'riscado':  envolver(ta, '~~', '~~', 'riscado'); break;
+      case 'titulo':   prefixarLinhas(ta, '## '); break;
+      case 'lista':    prefixarLinhas(ta, '- '); break;
+      case 'numerada': prefixarLinhas(ta, '1. ', true); break;
+      case 'tarefa':   prefixarLinhas(ta, '- [ ] '); break;
+      case 'citacao':  prefixarLinhas(ta, '> '); break;
+      case 'link':     envolver(ta, '[', '](https://)', 'texto do link'); break;
+      case 'divisor':  inserirBloco(ta, '\n---\n'); break;
+      case 'tabela':
+        inserirBloco(ta, '\n| Item | Valor |\n| --- | --- |\n|  |  |\n');
+        break;
+    }
+    autoGrowTextarea(ta);
+  }
+
+  // Insere um bloco em linha própria, sem colar na frase anterior.
+  function inserirBloco(ta, bloco) {
+    const ini = ta.selectionStart;
+    const antes = ta.value.slice(0, ini);
+    const pad = antes && !antes.endsWith('\n') ? '\n' : '';
+    ta.value = antes + pad + bloco + ta.value.slice(ta.selectionEnd);
+    const pos = ini + pad.length + bloco.length;
+    ta.focus();
+    ta.setSelectionRange(pos, pos);
+  }
+
+  // Enter numa linha de lista já abre o próximo item. Enter num item vazio
+  // encerra a lista (comportamento padrão de editor de markdown).
+  function continuarLista(e, ta) {
+    const ini = ta.selectionStart;
+    if (ini !== ta.selectionEnd) return;
+    const inicioLinha = ta.value.lastIndexOf('\n', ini - 1) + 1;
+    const linha = ta.value.slice(inicioLinha, ini);
+    const m = linha.match(/^(\s*)(?:([-*+])\s(\[[ xX]\]\s)?|(\d{1,9})([.)])\s)/);
+    if (!m) return;
+    const resto = linha.slice(m[0].length);
+    e.preventDefault();
+    if (!resto.trim()) {
+      // item vazio: apaga a marcação e sai da lista
+      ta.value = ta.value.slice(0, inicioLinha) + ta.value.slice(ini);
+      ta.setSelectionRange(inicioLinha, inicioLinha);
+      autoGrowTextarea(ta);
+      return;
+    }
+    const proximo = m[2]
+      ? m[1] + m[2] + ' ' + (m[3] ? '[ ] ' : '')
+      : m[1] + (parseInt(m[4], 10) + 1) + m[5] + ' ';
+    ta.value = ta.value.slice(0, ini) + '\n' + proximo + ta.value.slice(ini);
+    const pos = ini + 1 + proximo.length;
+    ta.setSelectionRange(pos, pos);
+    autoGrowTextarea(ta);
+  }
+
+  let _previewAberta = false;
+  function verPrevia(mostrar) {
+    const ta   = document.getElementById('mn-texto');
+    const prev = document.getElementById('mn-preview');
+    if (!ta || !prev) return;
+    _previewAberta = !!mostrar;
+    ta.hidden = _previewAberta;
+    prev.hidden = !_previewAberta;
+    document.getElementById('mn-aba-escrever').classList.toggle('ativo', !_previewAberta);
+    document.getElementById('mn-aba-prever').classList.toggle('ativo', _previewAberta);
+    if (_previewAberta) prev.innerHTML = renderTexto(ta.value);
+    else { ta.focus(); autoGrowTextarea(ta); }
+  }
+
+  // ===== SELETOR DE DATA =====
+  const MESES = ['janeiro','fevereiro','março','abril','maio','junho','julho',
+                 'agosto','setembro','outubro','novembro','dezembro'];
+  const DOW = ['D','S','T','Q','Q','S','S'];
+  let _calEl = null;
+  let _calMes = null;   // {ano, mes}
+
+  function getData() {
+    return document.getElementById('mn-data')?.value || '';
+  }
+
+  // Grava o valor e atualiza o rótulo do botão (com "hoje"/"ontem" quando cabe)
+  function setData(ymd) {
+    const hid = document.getElementById('mn-data');
+    const txt = document.getElementById('mn-data-txt');
+    if (!hid || !txt) return;
+    hid.value = ymd || '';
+    if (!ymd) { txt.textContent = 'Sem data'; return; }
+    const hoje = hojeLocal();
+    const rel = ymd === hoje ? 'hoje' : ymd === diasAtras(1) ? 'ontem' : '';
+    txt.innerHTML = escapeHtml(fmtData(ymd)) +
+      (rel ? `<span class="mn-data-rel">${rel}</span>` : '');
+  }
+
+  function diasAtras(n) {
+    const d = new Date();
+    d.setDate(d.getDate() - n);
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    return `${d.getFullYear()}-${m}-${String(d.getDate()).padStart(2, '0')}`;
+  }
+
+  function alternarCalendario() {
+    if (_calEl) { fecharCalendario(); return; }
+    const atual = getData() || hojeLocal();
+    const [a, m] = atual.split('-').map(Number);
+    _calMes = { ano: a, mes: m - 1 };
+
+    _calEl = document.createElement('div');
+    _calEl.className = 'mn-cal';
+    _calEl.setAttribute('role', 'dialog');
+    _calEl.setAttribute('aria-label', 'Escolher data');
+    document.getElementById('mn-overlay').appendChild(_calEl);
+    _calEl.addEventListener('click', e => e.stopPropagation());
+    document.getElementById('mn-data-btn').setAttribute('aria-expanded', 'true');
+    renderCalendario();
+    posicionarCalendario();
+    setTimeout(() => document.addEventListener('click', cliqueForaCal), 0);
+    window.addEventListener('resize', posicionarCalendario);
+    document.querySelector('.mn-form')?.addEventListener('scroll', fecharCalendario);
+  }
+
+  function cliqueForaCal(e) {
+    if (_calEl && !_calEl.contains(e.target) && !e.target.closest('#mn-data-btn')) fecharCalendario();
+  }
+
+  function fecharCalendario() {
+    if (!_calEl) return;
+    _calEl.remove();
+    _calEl = null;
+    document.getElementById('mn-data-btn')?.setAttribute('aria-expanded', 'false');
+    document.removeEventListener('click', cliqueForaCal);
+    window.removeEventListener('resize', posicionarCalendario);
+    document.querySelector('.mn-form')?.removeEventListener('scroll', fecharCalendario);
+  }
+
+  // Abre pra cima ou pra baixo, dependendo do espaço que sobra na tela.
+  function posicionarCalendario() {
+    const btn = document.getElementById('mn-data-btn');
+    if (!btn || !_calEl) return;
+    const r = btn.getBoundingClientRect();
+    const alt = _calEl.offsetHeight;
+    const larg = _calEl.offsetWidth;
+    const top = r.top - alt - 6 >= 8 ? r.top - alt - 6 : Math.min(r.bottom + 6, window.innerHeight - alt - 8);
+    _calEl.style.top = Math.max(8, top) + 'px';
+    _calEl.style.left = Math.max(8, Math.min(r.left, window.innerWidth - larg - 8)) + 'px';
+  }
+
+  function renderCalendario() {
+    if (!_calEl) return;
+    const { ano, mes } = _calMes;
+    const sel = getData();
+    const hoje = hojeLocal();
+    const primeiro = new Date(ano, mes, 1);
+    const inicio = primeiro.getDay();                   // 0 = domingo
+    const noMes = new Date(ano, mes + 1, 0).getDate();
+    const noAnterior = new Date(ano, mes, 0).getDate();
+
+    let dias = '';
+    for (let k = 0; k < 42; k++) {
+      const n = k - inicio + 1;
+      let ymd, rotulo, fora = false;
+      if (n < 1)            { ymd = ptData(ano, mes - 1, noAnterior + n); rotulo = noAnterior + n; fora = true; }
+      else if (n > noMes)   { ymd = ptData(ano, mes + 1, n - noMes);      rotulo = n - noMes;      fora = true; }
+      else                  { ymd = ptData(ano, mes, n);                  rotulo = n; }
+      if (k >= 35 && fora) continue;   // não desenha uma 6ª linha só de sobras
+      const cls = ['mn-cal-dia'];
+      if (fora) cls.push('fora');
+      if (ymd === hoje) cls.push('hoje');
+      if (ymd === sel) cls.push('sel');
+      dias += `<button type="button" class="${cls.join(' ')}" data-ymd="${ymd}"${ymd === sel ? ' aria-current="date"' : ''}>${rotulo}</button>`;
+    }
+
+    _calEl.innerHTML = `
+      <div class="mn-cal-head">
+        <button type="button" class="mn-cal-nav" data-nav="-1" aria-label="Mês anterior">‹</button>
+        <div class="mn-cal-mes">${MESES[mes]} ${ano}</div>
+        <button type="button" class="mn-cal-nav" data-nav="1" aria-label="Mês seguinte">›</button>
+      </div>
+      <div class="mn-cal-grade">
+        ${DOW.map(d => `<div class="mn-cal-dow">${d}</div>`).join('')}
+        ${dias}
+      </div>
+      <div class="mn-cal-pe">
+        <button type="button" class="mn-cal-atalho" data-atalho="hoje">Hoje</button>
+        <button type="button" class="mn-cal-atalho" data-atalho="ontem">Ontem</button>
+        <button type="button" class="mn-cal-atalho" data-atalho="7">−7 dias</button>
+      </div>`;
+
+    _calEl.querySelectorAll('[data-nav]').forEach(b => {
+      b.addEventListener('click', () => {
+        const d = new Date(_calMes.ano, _calMes.mes + Number(b.dataset.nav), 1);
+        _calMes = { ano: d.getFullYear(), mes: d.getMonth() };
+        renderCalendario();
+        posicionarCalendario();
+      });
+    });
+    _calEl.querySelectorAll('[data-ymd]').forEach(b => {
+      b.addEventListener('click', () => { setData(b.dataset.ymd); fecharCalendario(); });
+    });
+    _calEl.querySelectorAll('[data-atalho]').forEach(b => {
+      b.addEventListener('click', () => {
+        const a = b.dataset.atalho;
+        setData(a === 'hoje' ? hojeLocal() : a === 'ontem' ? diasAtras(1) : diasAtras(7));
+        fecharCalendario();
+      });
+    });
+  }
+
+  // Monta YYYY-MM-DD normalizando mês fora da faixa (-1 / 12)
+  function ptData(ano, mes, dia) {
+    const d = new Date(ano, mes, dia);
+    const m = String(d.getMonth() + 1).padStart(2, '0');
+    return `${d.getFullYear()}-${m}-${String(d.getDate()).padStart(2, '0')}`;
   }
 
   // Reconstrói o select e as pills de categoria baseado no contexto atual
@@ -647,9 +1269,11 @@
   }
 
   function escListener(e) {
-    if (e.key === 'Escape' && document.getElementById('mn-overlay')?.classList.contains('open')) {
-      fechar();
-    }
+    if (e.key !== 'Escape') return;
+    if (!document.getElementById('mn-overlay')?.classList.contains('open')) return;
+    // Esc fecha primeiro o calendário; só depois o modal.
+    if (_calEl) { fecharCalendario(); return; }
+    fechar();
   }
 
   // ===== DADOS =====
@@ -893,10 +1517,10 @@
           </span>
         </div>
         ${n.titulo ? `<div class="mn-entry-titulo"></div>` : ''}
-        <div class="mn-entry-text"></div>
+        <div class="mn-entry-text mn-md"></div>
       `;
       if (n.titulo) div.querySelector('.mn-entry-titulo').textContent = n.titulo;
-      div.querySelector('.mn-entry-text').innerHTML = renderTextoLeve(n.texto);
+      div.querySelector('.mn-entry-text').innerHTML = renderTexto(semTituloRepetido(n.texto, n.titulo));
       div.querySelector('[data-act="edit"]').addEventListener('click', () => iniciarEdicao(n));
       div.querySelector('[data-act="del"]').addEventListener('click', async () => {
         // Confirmar.perguntar() no lugar do confirm() nativo (assets/js/confirmar.js),
@@ -921,21 +1545,34 @@
 
   function iniciarEdicao(n) {
     _editandoId = n.id;
+    verPrevia(false);
     document.getElementById('mn-titulo').value = n.titulo || '';
     const ta = document.getElementById('mn-texto');
     ta.value = n.texto;
-    document.getElementById('mn-cat').value = n.categoria;
-    document.getElementById('mn-data').value = n.data_ref || hojeLocal();
+    // A categoria da nota pode não existir no contexto atual (nota antiga):
+    // adiciona a opção no select pra não trocar a categoria sem o Mestre pedir.
+    const sel = document.getElementById('mn-cat');
+    if (sel && !Array.from(sel.options).some(o => o.value === n.categoria)) {
+      const c = POR_ID[n.categoria] || POR_ID['outro'];
+      const opt = document.createElement('option');
+      opt.value = n.categoria;
+      opt.textContent = c.label;
+      sel.appendChild(opt);
+    }
+    if (sel) sel.value = n.categoria;
+    setData(n.data_ref || hojeLocal());
     document.getElementById('mn-submit').textContent = 'Salvar edição';
     document.getElementById('mn-cancel').style.display = '';
     document.getElementById('mn-titulo').focus();
     autoGrowTextarea(ta);
-    // Rola o form pra ele aparecer
-    document.querySelector('.mn-form')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const form = document.querySelector('.mn-form');
+    if (form) form.scrollTop = 0;   // o compositor volta pro começo
   }
 
   function cancelarEdicao() {
     _editandoId = null;
+    fecharCalendario();
+    verPrevia(false);
     const t = document.getElementById('mn-titulo'); if (t) t.value = '';
     const ta = document.getElementById('mn-texto'); if (ta) { ta.value = ''; autoGrowTextarea(ta); }
     const s = document.getElementById('mn-submit'); if (s) s.textContent = '+ Adicionar';
@@ -971,42 +1608,37 @@
     return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   }
 
-  // Textarea cresce com o conteúdo (até um teto pra não ocupar a tela inteira).
+  // Textarea cresce com o conteúdo até o teto definido no CSS (max-height, que
+  // muda com a altura da tela). Respeitar esse teto é o que impede o formulário
+  // de empurrar a barra de ações — e o botão de salvar — fora da tela.
   function autoGrowTextarea(el) {
-    if (!el) return;
+    if (!el || el.hidden) return;
     el.style.height = 'auto';
-    const max = 520; // px — depois disso volta a ter scroll
+    const teto = parseFloat(getComputedStyle(el).maxHeight);
+    const max = isFinite(teto) && teto > 0 ? teto : 280;
     el.style.height = Math.min(el.scrollHeight + 2, max) + 'px';
   }
 
-  // Render leve do texto: linhas curtas terminando em ':' viram cabeçalho de seção.
-  // Tudo escapado pra evitar XSS. Sem markdown completo, apenas estrutura visual.
-  function renderTextoLeve(texto) {
+  // Se a anotação começa com um título markdown igual ao campo Título, ele
+  // aparecia duas vezes na tela. Some só com essa primeira linha repetida —
+  // o texto salvo no banco continua intacto (a edição mostra ele inteiro).
+  function semTituloRepetido(texto, titulo) {
+    if (!texto || !titulo) return texto;
+    const m = String(texto).match(/^\s*#{1,6}\s+(.+?)\s*#*\s*(?:\n|$)/);
+    if (!m) return texto;
+    const norm = s => s.trim().toLowerCase().replace(/[*_`]/g, '').replace(/\s+/g, ' ');
+    if (norm(m[1]) !== norm(titulo)) return texto;
+    return texto.slice(m[0].length).replace(/^\n+/, '');
+  }
+
+  // Render do corpo da anotação em markdown (assets/js/markdown.js).
+  // `secaoDoisPontos` mantém as anotações antigas funcionando: linhas curtas
+  // terminadas em ":" continuam virando cabeçalho de seção.
+  // Sem o módulo carregado, degrada pra texto escapado com quebras de linha.
+  function renderTexto(texto) {
     if (!texto) return '';
-    const linhas = texto.split('\n');
-    let html = '';
-    let buffer = [];
-
-    const flush = () => {
-      if (!buffer.length) return;
-      html += `<p>${buffer.join('<br>')}</p>`;
-      buffer = [];
-    };
-
-    for (const linha of linhas) {
-      const trim = linha.trim();
-      if (trim === '') { flush(); continue; }
-      // Heading: curto (< 50 chars) E termina com ":" E não tem pontuação narrativa antes
-      const semDois = trim.slice(0, -1);
-      if (trim.length < 50 && /:$/.test(trim) && !/[.!?]/.test(semDois)) {
-        flush();
-        html += `<h5 class="mn-section">${escapeHtml(trim)}</h5>`;
-        continue;
-      }
-      buffer.push(escapeHtml(linha));  // preserva espaços iniciais
-    }
-    flush();
-    return html;
+    if (window.Markdown) return window.Markdown.render(texto, { secaoDoisPontos: true });
+    return '<p class="md-p">' + escapeHtml(texto).replace(/\n/g, '<br>') + '</p>';
   }
 
   // Aplica colapso visual ao card: se for muito alto, esconde excesso com fade
@@ -1049,6 +1681,9 @@
 
     document.getElementById('mn-overlay').classList.add('open');
     document.body.style.overflow = 'hidden';
+    // Abre sempre no modo de escrita e na data de hoje (a menos que já esteja
+    // editando alguma anotação, o que não acontece numa abertura nova).
+    if (!_editandoId) { verPrevia(false); setData(hojeLocal()); }
     await carregarPjs();
     // Default: abre na visão de Campanha (pediu pra ser proeminente)
     if (!_modoCampanha && !_pjSelId) _modoCampanha = true;
