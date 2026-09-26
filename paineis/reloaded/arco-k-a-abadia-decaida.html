@@ -35,7 +35,7 @@ a:hover { text-decoration:underline; }
 .search-box { position:relative; margin-bottom:16px; }
 .search-box input { width:100%; padding:8px 10px 8px 30px; border-radius:6px;
   border:1px solid var(--border); background:var(--bg-card); color:var(--text);
-  font-family:inherit; font-size:13px; }
+  font-family:inherit; font-size:13px; min-height:44px; }
 .search-box input::placeholder { color:var(--text-faint); }
 .search-box input:focus { outline:none; border-color:var(--gold-dim); }
 .search-box .ico { position:absolute; left:9px; top:50%; transform:translateY(-50%);
@@ -65,7 +65,8 @@ a:hover { text-decoration:underline; }
 
 .sidebar-back { display:flex; align-items:center; gap:6px; margin-top:18px; padding:9px 12px;
   border:1px solid var(--border); border-radius:6px; font-size:12px; color:var(--text-dim);
-  text-decoration:none; transition:background .15s, border-color .15s, color .15s; }
+  text-decoration:none; transition:background .15s, border-color .15s, color .15s;
+  min-height:44px; box-sizing:border-box; }
 .sidebar-back:hover { background:var(--bg-hover); border-color:var(--gold-dim); color:var(--text); text-decoration:none; }
 .sidebar-back:focus-visible { outline:2px solid var(--gold); outline-offset:2px; }
 
@@ -185,7 +186,14 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
   opacity:0; pointer-events:none; }
 .back-to-top.visible { opacity:1; pointer-events:auto; }
 .back-to-top:hover { border-color:var(--gold-dim); transform:translateY(-2px); }
-@media (max-width:860px) { .back-to-top { right:14px; bottom:14px; width:40px; height:40px; } }
+@media (max-width:860px) {
+  /* Encolhe pra 40px no celular (economiza tela) — mas isso derruba o alvo
+     de toque ABAIXO do minimo, o oposto do que faz sentido no toque. Halo
+     por pseudo-elemento fecha os 44px sem crescer o circulo de volta; e um
+     FAB isolado no canto, sem vizinho pra sobrepor. */
+  .back-to-top { right:14px; bottom:14px; width:40px; height:40px; }
+  .back-to-top::before { content:''; position:absolute; inset:-2px; border-radius:50%; }
+}
 @media (prefers-reduced-motion: reduce) { .reading-progress, .back-to-top { transition:none; } }
 
 /* ---------- pagina indice ---------- */
@@ -213,9 +221,10 @@ div.statblock table.ability-table th { color:var(--gold); font-size:11px; font-w
   .layout { flex-direction:column; }
   .mobile-topbar { display:flex; align-items:center; gap:12px; position:sticky; top:0; z-index:40;
     background:var(--bg-sidebar); border-bottom:1px solid var(--border); padding:12px 16px; }
-  .mobile-topbar .brand { margin:0; font-size:15px; flex:1; }
+  .mobile-topbar .brand { margin:0; font-size:15px; flex:1; display:flex; align-items:center; min-height:44px; }
   .mobile-topbar button { background:none; border:1px solid var(--border); color:var(--text);
-    border-radius:6px; padding:6px 10px; font-family:inherit; font-size:13px; }
+    border-radius:6px; padding:6px 10px; font-family:inherit; font-size:13px;
+    min-height:44px; min-width:44px; }
   .sidebar-left { position:fixed; left:0; top:49px; bottom:0; z-index:39; transform:translateX(-100%);
     transition:transform .2s; width:82vw; max-width:320px; box-shadow:8px 0 30px rgba(0,0,0,.5); }
   .sidebar-left.open { transform:translateX(0); }

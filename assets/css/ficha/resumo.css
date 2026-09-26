@@ -166,7 +166,9 @@
      de toque (.insp-btn, personagem.css) e é o campo que cede largura;
      flex-wrap é a rede de segurança pra telas de 320px. */
   .resumo-status .resumo-insp-linha { gap: var(--space-1, 4px); flex-wrap: wrap; }
-  .resumo-status .resumo-insp-input { width: 1.4em; min-width: 0; }
+  /* O campo em si (não os botões, já a 44px) tinha 34px de altura — o menor
+     alvo desta tela. min-height sem mudar a largura estreita de propósito. */
+  .resumo-status .resumo-insp-input { width: 1.4em; min-width: 0; min-height: var(--touch-target, 44px); }
   .resumo-status .insp-btn { flex-shrink: 0; }
 
   /* PV: número e barra maiores — é o destaque da tela em sessão. */
@@ -184,7 +186,12 @@
   /* Chips e atalhos das outras seções: nada apertado a 360px. */
   .resumo-salv-chip { padding: 8px 12px; font-size: 13px; }
   .condicao-chip { min-height: var(--touch-target, 44px); padding: 4px 6px 4px 14px; font-size: 13px; }
-  .condicao-x { width: 30px; height: 30px; font-size: 13px; }
+  /* O chip em volta (.condicao-chip, acima) já tem 44px de altura, mas o
+     próprio ✕ — o alvo de toque de verdade pra remover — é um <span> de
+     30×30 plantado no fim do chip; halo por pseudo-elemento fecha os 44px
+     sem esticar o desenho circular. */
+  .condicao-x { width: 30px; height: 30px; font-size: 13px; position: relative; }
+  .condicao-x::before { content: ''; position: absolute; inset: -7px; }
   .resumo-atalhos .btn { flex: 1 1 100%; }
   .ataque-card { padding: var(--space-3, 12px); gap: var(--space-2, 8px); }
   .ataque-card .btn { margin-left: auto; }

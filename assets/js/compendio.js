@@ -172,7 +172,10 @@
     .cp-x { min-width: 44px; min-height: 44px; padding: 0; }
     .cp-busca input { font-size: 16px; padding: 12px 14px; }  /* >=16px evita zoom no iOS */
     .cp-chips { gap: 5px; }
-    .cp-chip { padding: 7px 12px; font-size: 11px; }          /* alvo de toque maior */
+    /* padding maior já existia ("alvo de toque maior") mas só chegava a
+       31px — min-height fecha nos 44px (--touch-target) sem inchar a
+       largura, que é o que empilha vários chips numa fileira. */
+    .cp-chip { padding: 7px 12px; font-size: 11px; min-height: 44px; display: inline-flex; align-items: center; }
     .cp-item { padding: 12px 10px; gap: 10px; }
     .cp-thumb { width: 54px; height: 54px; }                  /* miniatura maior no toque */
     .cp-item-nome { font-size: 16px; }

@@ -335,9 +335,13 @@
   .combate-topo .stat-card-valor input { min-height: var(--touch-target, 44px); font-size: 19px; }
   /* Inspiração: [−][n][+] numa coluna de ~140px. Os dois botões mantêm os
      44px de toque (.insp-btn, personagem.css) e é o campo que cede largura;
-     flex-wrap é a rede de segurança pra telas de 320px. */
+     flex-wrap é a rede de segurança pra telas de 320px.
+     O input de CA/Iniciativa/Deslocamento fica DENTRO de um <div
+     class="stat-card-valor"> (a regra acima pega pelo descendente), mas o de
+     Inspiração tem a classe stat-card-valor NO PRÓPRIO <input> — a regra
+     acima nunca bateu nele, então min-height precisa vir explícito aqui. */
   .combate-topo .resumo-insp-linha { gap: var(--space-1, 4px); flex-wrap: wrap; }
-  .combate-topo .resumo-insp-input { width: 1.4em; min-width: 0; }
+  .combate-topo .resumo-insp-input { width: 1.4em; min-width: 0; min-height: var(--touch-target, 44px); }
   .combate-topo .insp-btn { flex-shrink: 0; }
 
   /* PV: número e barra com mais presença */

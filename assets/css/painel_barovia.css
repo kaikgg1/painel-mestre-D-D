@@ -276,7 +276,10 @@
   .hp-current-input.critico { color: var(--erro); }
   .hp-sep { color: var(--text-dim); font-size: 13px; }
   .hp-max-input { max-width: 34px; color: var(--text-dim); }
-  .hp-temp-wrap { display: flex; align-items: baseline; gap: 2px; color: var(--magic); font-size: 12px; margin-left: 4px; }
+  /* É um <label> (painel_barovia_inline.js) em volta do input — tocar no "+"
+     já foca o campo, mas a CAIXA continua do tamanho do texto (12px) até
+     aqui: min-height fecha o alvo de toque vertical sem alargar a pílula. */
+  .hp-temp-wrap { display: flex; align-items: center; gap: 2px; color: var(--magic); font-size: 12px; margin-left: 4px; min-height: var(--touch-target, 44px); }
   .hp-temp-wrap .hp-temp-plus { opacity: .7; }
   .hp-temp-input { max-width: 26px; color: var(--magic); font-weight: 700; }
   .stat-input {
@@ -578,7 +581,11 @@
     }
     .equip-add input, .equip-add button { min-height: 44px; }
     .card-actions button, .card-actions .remove-card { min-height: 38px; }
-  }
+    /* + Condição / Ver mais (magias) / Ver mais (equipamento): 22px de altura
+       de desenho, tocados o tempo todo em combate — halo pra não crescer o
+       texto pequeno que já combina com o resto do card. */
+    .add-condition-btn, .summary-btn { position: relative; }
+    .add-condition-btn::before, .summary-btn::before { content: ''; position: absolute; inset: -11px; }
 
   button:focus-visible, input:focus-visible, [contenteditable]:focus-visible {
     outline: 2px solid var(--gold); outline-offset: 2px;

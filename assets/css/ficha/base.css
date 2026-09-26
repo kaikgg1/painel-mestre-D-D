@@ -139,6 +139,24 @@ html, body {
    bloco "HEADER MOBILE" no fim desta seção). */
 @media (max-width: 767px) { .back-btn-lbl { display: none; } }
 
+/* auth.js injeta .auth-nome/.auth-btn dentro de #auth-slot (renderHeader) —
+   sem isto os dois ficam com a aparência crua do navegador (o botão "Sair"
+   virava um <button> nativo de ~31px de alvo de toque). Mesmo padrão de
+   assets/css/painel_barovia.css/painel_mestre.css, adaptado aos tokens da
+   ficha (--f-ui/--fs-meta/--sf-*) — a ficha nunca tinha essa regra. */
+.auth-slot .auth-nome { color: var(--text-dim); letter-spacing: .3px; }
+.auth-slot .auth-btn {
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: var(--sp-2) var(--sp-3); min-height: var(--touch-target, 44px);
+  background: var(--sf-2); border: 1px solid var(--borda);
+  color: var(--parchment-dim); border-radius: var(--r-sm);
+  font-family: var(--f-ui); font-size: var(--fs-meta); font-weight: 600;
+  letter-spacing: .3px; text-decoration: none; cursor: pointer; transition: all .15s;
+}
+.auth-slot .auth-btn:hover { background: var(--sf-3); border-color: var(--borda-forte); color: var(--parchment); }
+.auth-slot .auth-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+@media (max-width: 767px) { .auth-slot .auth-nome { display: none; } }
+
 .auth-slot { display: flex; align-items: center; gap: var(--sp-2); font-family: var(--f-ui); font-size: var(--fs-meta); flex-shrink: 0; margin-left: auto; }
 .auth-nome { color: var(--parchment-dim); }
 .auth-btn {
