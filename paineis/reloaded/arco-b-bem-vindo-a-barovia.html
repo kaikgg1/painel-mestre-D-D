@@ -76,7 +76,12 @@ a:hover { text-decoration:underline; }
 
 /* ---------- coluna central ---------- */
 main.article { flex:1 1 auto; min-width:0; max-width:800px;
-  padding:48px 40px 100px; line-height:1.7; font-size:16.5px; }
+  padding:48px 40px 100px; line-height:1.7; font-size:16.5px;
+  /* As notas de rodape citam a fonte com a URL crua; uma URL nao tem
+     onde quebrar e esticava a linha alem da largura da tela, jogando a
+     PAGINA INTEIRA 31px pra fora no celular (o texto do corpo saia
+     cortado na direita em ato1-resumo e cap2-lore-de-barovia). */
+  overflow-wrap: break-word; }
 .page-title { font-size:clamp(28px,4vw,38px); font-weight:800; color:var(--title);
   margin:0 0 28px; letter-spacing:-.3px; }
 main.article h1 { color:var(--gold); font-size:26px; font-weight:700;
