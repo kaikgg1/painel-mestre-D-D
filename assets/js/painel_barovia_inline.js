@@ -522,7 +522,9 @@ function criarCard(p) {
       const alvo = hpCur.closest('.card') || hpCur;
       if (delta < 0) FX.dano(alvo, delta); else FX.cura(alvo, delta);
     }
-    if (delta !== 0) window.LogCombate?.registrar(`${escapeHtml(p.nome)}: <strong>${delta > 0 ? '+' : ''}${delta} PV</strong> (${antes}→${v})`);
+    // O log agora vem de log_alteracoes.js (assina character_changes, que o
+    // trigger no banco já grava sozinho pra QUALQUER save de hp_atual —
+    // registrar aqui de novo duplicaria a mesma mudança no widget).
     rerenderCard(p);
   }, 'hp-current-input' + (hpCritico || inconsciente ? ' critico' : ''), null);
   const hpSep = document.createElement('span');
@@ -657,7 +659,8 @@ function criarCard(p) {
         if (p.condicoes.includes(cond)) p.condicoes = p.condicoes.filter(c => c !== cond);
         else p.condicoes.push(cond);
         salvar(p);
-        window.LogCombate?.registrar(`${escapeHtml(p.nome)}: <strong>${escapeHtml(cond)}</strong> ${p.condicoes.includes(cond) ? 'ativada' : 'removida'}`);
+        // log_alteracoes.js já cobre isto via character_changes (trigger no
+        // banco) — ver comentário equivalente no handler de PV, acima.
         repintarCondicoes();
         repintarPicker();
       };
@@ -1374,4 +1377,14 @@ async function descansoLongo() {
   render();
   // Só agora ehMestre está preenchido (o 'load' do init roda antes disso).
   renderInativos();
+
+  // Log de alterações (assets/js/log_alteracoes.js): quem mudou o quê em
+  // qualquer ficha, Mestre ou o próprio jogador pelo login dele.
+  if (ehMestre) {
+    window.LogAlteracoes?.iniciarMestre(
+      id => estado.personagens.find(x => x.id === id) || null);
+  } else {
+    const u = await window.Auth.getUser();
+    if (u) window.LogAlteracoes?.iniciarJogador(u.id);
+  }
 })();

@@ -40,6 +40,7 @@ const SCRIPTS = [
   '026_ultimo_login.sql',
   '027_status_contas.sql',
   '028_ultimo_visto.sql',
+  '029_log_alteracoes_ficha.sql',
 ];
 
 (async () => {

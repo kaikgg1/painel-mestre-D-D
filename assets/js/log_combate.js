@@ -1,14 +1,25 @@
 // assets/js/log_combate.js
-// Log leve de eventos de combate (mst-9) — derivado das ações de HP/
-// condição que já existem (dano/cura, condição ativada/removida), sem
-// exigir que o Mestre digite nada. Um FAB com badge de "não lidos" abre um
-// painel com as últimas 30 entradas, mais recente primeiro.
+// Widget de log (FAB + painel) — nasceu só pra combate (mst-9: dano/cura e
+// condições, empurrados pelos painéis do Mestre), e junto com
+// assets/js/log_alteracoes.js passou a mostrar TODA alteração de ficha de
+// jogador, dizendo quem mudou (Mestre ou o próprio jogador, pelo login
+// dele) — ver sql/029_log_alteracoes_ficha.sql. Este arquivo continua sendo
+// só o WIDGET (renderizar a lista, FAB com badge, abrir/fechar); ele não
+// sabe de onde vêm as entradas.
 //
-// Self-contained como confirmar.js/rolador.js/iniciativa.js. Não persiste
-// (reseta ao recarregar a página) — é uma ferramenta de sessão, não um
-// histórico permanente.
+// Duas origens diferentes empurram texto aqui pelo mesmo registrar():
+//   - vilao_combate.js chama direto (client-side, ao vivo, sem persistir —
+//     vilão não é uma linha de characters, não tem o que logar no banco).
+//   - log_alteracoes.js assina character_changes (Realtime + carga inicial
+//     das últimas linhas) e traduz cada uma pra texto antes de chamar aqui.
 //
-// API: LogCombate.registrar(texto)
+// Self-contained como confirmar.js/rolador.js/iniciativa.js quanto ao FAB
+// em si — mas o CONTEÚDO de character_changes é persistente (ver
+// log_alteracoes.js); só a LISTA na tela (até 30 itens) é que reseta ao
+// recarregar, porque log_alteracoes.js recarrega a partir do banco no boot.
+//
+// API: LogCombate.registrar(texto, quandoISO?)  — quandoISO é opcional,
+// pra carregar uma linha histórica com a hora real dela em vez de "agora".
 window.LogCombate = (function () {
   const MAX = 30;
   let _eventos = [];
@@ -84,7 +95,7 @@ window.LogCombate = (function () {
     painel.className = 'lc-painel';
     painel.id = 'lc-painel';
     painel.innerHTML = `
-      <div class="lc-titulo">Log de Combate
+      <div class="lc-titulo">Log
         <span>
           <button type="button" class="lc-limpar" id="lc-limpar">limpar</button>
           <button type="button" class="lc-fechar" id="lc-fechar" aria-label="Fechar">✕</button>
@@ -107,7 +118,7 @@ window.LogCombate = (function () {
     if (!lista) return;
     lista.innerHTML = _eventos.length
       ? _eventos.map(e => `<div class="lc-item"><span class="lc-hora">${e.hora}</span>${e.texto}</div>`).join('')
-      : `<div class="lc-vazio">Nenhum evento ainda — dano/cura e condições aparecem aqui.</div>`;
+      : `<div class="lc-vazio">Nenhum evento ainda — alterações na ficha (Mestre ou jogador) aparecem aqui.</div>`;
   }
   function atualizarBadge() {
     const badge = document.getElementById('lc-badge');
@@ -116,12 +127,23 @@ window.LogCombate = (function () {
     badge.classList.toggle('show', _naoLidos > 0);
   }
 
-  function registrar(texto) {
+  // quandoISO: timestamp real de uma linha histórica (log_alteracoes.js
+  // carregando o que já estava no banco antes desta página abrir). Sem
+  // isso, toda entrada carregada de uma vez apareceria com a hora atual —
+  // enganoso pra algo que aconteceu há uma hora ou ontem.
+  //
+  // isNovo=false: não soma no badge de "não lidos". A carga inicial do
+  // histórico (log_alteracoes.js, ao montar a página) não é uma notificação
+  // — sem isso o badge nasceria em "9+" toda vez que a página abrisse, só
+  // por reconstruir o que já era conhecido.
+  function registrar(texto, quandoISO, isNovo = true) {
     montar();
-    const hora = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-    _eventos.unshift({ texto, hora });
+    const quando = quandoISO ? new Date(quandoISO) : new Date();
+    const hora = quando.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+    _eventos.unshift({ texto, hora, quando: quando.getTime() });
+    _eventos.sort((a, b) => b.quando - a.quando);
     _eventos = _eventos.slice(0, MAX);
-    if (!document.getElementById('lc-painel')?.classList.contains('open')) _naoLidos++;
+    if (isNovo && !document.getElementById('lc-painel')?.classList.contains('open')) _naoLidos++;
     atualizarLista();
     atualizarBadge();
   }

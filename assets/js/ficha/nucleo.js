@@ -231,6 +231,9 @@ async function init() {
   await carregarPersonagens();
   escutarMudancasExternas();
   configurarToastExterno();
+  // Filtra por user_id (não por personagem) — uma assinatura só, estável
+  // mesmo trocando de PJ no seletor do header. Ver assets/js/log_alteracoes.js.
+  window.LogAlteracoes?.iniciarJogador(usuario.id);
 }
 
 // ─── Realtime: detecta quando o Mestre (ou outra aba) edita meu PJ ─
