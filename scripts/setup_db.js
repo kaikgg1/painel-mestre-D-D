@@ -42,6 +42,7 @@ const SCRIPTS = [
   '028_ultimo_visto.sql',
   '029_log_alteracoes_ficha.sql',
   '030_log_detalhado_slots_e_recursos.sql',
+  '031_merge_recursos_usados_rpc.sql',
 ];
 
 (async () => {

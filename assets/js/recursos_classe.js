@@ -8,11 +8,14 @@
 //   RecursosClasse.recursosPara(personagem, atributos) -> [{id,nome,icone,max,periodo,dica,step?}, ...]
 //   RecursosClasse.lerUsado(recursos_usados, id)        -> number (usados até agora)
 //   RecursosClasse.gravarUsado(recursos_usados, id, n)  -> muta o objeto in-place, preservando formato
-//   RecursosClasse.mesclarComBanco(characterId, meuObjetoLocal) -> Promise<objeto mesclado>
-//     Lê o recursos_usados ATUAL do banco e devolve {...doBanco, ...meuObjetoLocal} —
-//     minhas chaves vencem (é a mudança que estou gravando agora), mas chaves
-//     que só existem no banco (outro cliente adicionou) são preservadas em vez
-//     de apagadas. Ver comentário completo na implementação, mais abaixo.
+//   RecursosClasse.gravarRecursosUsados(characterId, patchLocal) -> Promise<void>
+//     Grava patchLocal em characters.recursos_usados COM MERGE, direto no
+//     banco (RPC mesclar_recurso_usado — sql/031), num único round-trip:
+//     minhas chaves vencem, chaves que só existem no banco (outro cliente
+//     adicionou) são preservadas. Ver comentário completo na implementação,
+//     mais abaixo — e por que isto substituiu um "lê, mescla local, grava"
+//     de 2 round-trips (ficava lento: "delay muito grande" ao marcar/
+//     desmarcar um recurso).
 (function () {
   const ico = (chave) => (window.Icones ? window.Icones.html(chave) : '');
   // Fórmula central em assets/js/regras_base.js (carregar antes deste arquivo).
@@ -150,26 +153,26 @@
   // recursos_usados é gravado como o objeto INTEIRO, de 3 lugares diferentes
   // que não conversam entre si (a ficha do jogador, o painel do Mestre —
   // painel_mestre_inline.js e painel_barovia_inline.js — cada um com sua
-  // própria cópia em memória). Sem isto, quem gravasse por último apagava
+  // própria cópia em memória). Sem merge, quem gravasse por último apagava
   // qualquer chave que só existisse na cópia do OUTRO: era assim que os
   // "Recursos de Classe" da Lilith sumiam — bastava o Mestre marcar UM
   // recurso no painel dele (com uma cópia mais antiga, carregada antes da
   // jogadora ter usado várias habilidades) pra sobrescrever o campo inteiro
   // e apagar as outras 7 que só existiam no banco.
   //
-  // Não elimina 100% da corrida (ainda há uma janela entre ler e escrever),
-  // mas fecha o caso comum: cliente com sessão aberta há um tempo, sem ter
-  // recebido a mudança mais recente de outro cliente via Realtime.
-  async function mesclarComBanco(characterId, meuObjetoLocal) {
-    if (!window.sb || !characterId) return meuObjetoLocal || {};
-    const { data, error } = await window.sb.from('characters')
-      .select('recursos_usados').eq('id', characterId).maybeSingle();
-    if (error) {
-      console.warn('[RecursosClasse] não consegui reler antes de mesclar (gravando só o local):', error.message);
-      return meuObjetoLocal || {};
-    }
-    return { ...(data?.recursos_usados || {}), ...(meuObjetoLocal || {}) };
+  // A primeira versão disto fazia SELECT (lê o banco) + merge local +
+  // UPDATE — 2 round-trips em série, por CLIQUE. Handling isso na hora que
+  // dispara o UPDATE seria mais rápido, mas ainda deixaria uma janela entre
+  // ler e escrever; a RPC abaixo faz o merge DENTRO do próprio UPDATE
+  // (jsonb || jsonb, atômico no Postgres) — 1 round-trip, sem janela de
+  // corrida nenhuma, mais rápido que a versão anterior E mais correto.
+  async function gravarRecursosUsados(characterId, patchLocal) {
+    if (!window.sb || !characterId) return;
+    const { error } = await window.sb.rpc('mesclar_recurso_usado', {
+      p_character_id: characterId, p_patch: patchLocal || {},
+    });
+    if (error) throw error;
   }
 
-  window.RecursosClasse = { recursosPara, lerUsado, gravarUsado, mesclarComBanco, RECURSOS_POR_CLASSE };
+  window.RecursosClasse = { recursosPara, lerUsado, gravarUsado, gravarRecursosUsados, RECURSOS_POR_CLASSE };
 })();

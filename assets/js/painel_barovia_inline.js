@@ -30,16 +30,21 @@ function salvar(p) {
 }
 
 // Toggle de "Recursos de Classe" no card: mescla com o banco ANTES de
-// salvar (RecursosClasse.mesclarComBanco) — esta tela fica aberta a mesa
+// salvar (RecursosClasse.gravarRecursosUsados) — esta tela fica aberta a mesa
 // inteira, então p.recursosUsados pode estar bem mais velho que o que a
 // própria ficha do jogador já gravou (cada habilidade usada por ela some
 // da mesma lista até essa mesclagem). Sem isto, marcar UM recurso aqui
 // apagava os outros que só existiam no banco — era o bug dos "Recursos de
 // Classe" da Lilith sumindo. Ver comentário completo em recursos_classe.js.
 async function salvarRecursosMesclado(p) {
-  if (!window.RecursosClasse || !p?.id) { salvar(p); return; }
-  p.recursosUsados = await window.RecursosClasse.mesclarComBanco(p.id, p.recursosUsados);
-  salvar(p);
+  if (!window.RecursosClasse || !p?.id) return;
+  marcarEcoLocal(p.id);
+  try {
+    await window.RecursosClasse.gravarRecursosUsados(p.id, p.recursosUsados);
+  } catch (e) {
+    console.warn('[recursos] erro ao salvar:', e);
+    window.dispatchEvent(new CustomEvent('dbsync:erro', { detail: { id: p.id, error: e.message } }));
+  }
 }
 
 function carregar() { return estado; }

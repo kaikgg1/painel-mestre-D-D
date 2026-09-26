@@ -405,12 +405,7 @@ async function aplicarDescanso(tipo) {
     if (longo || tipoSlot === 'pact') sm[lvl] = Object.assign({}, sm[lvl], { atual: 0 });
   }
 
-  // Merge com o banco antes de gravar: mesma razão de RecursosClasse.
-  // mesclarComBanco (usado por salvarRecursos, em aba_habilidades.js) — sem
-  // isto, um descanso aplicado com uma cópia local desatualizada de
-  // recursos_usados apagaria chaves que só existissem no banco.
-  const recMesclado = await window.RecursosClasse.mesclarComBanco(charAtivo.id, rec);
-  const payload = { recursos_usados: recMesclado, slots_magia: sm };
+  const payload = { slots_magia: sm };
   let msg = longo ? 'Descanso longo aplicado' : 'Descanso curto aplicado';
 
   if (longo) {
@@ -423,10 +418,18 @@ async function aplicarDescanso(tipo) {
   }
 
   Object.assign(charAtivo, payload);
+  charAtivo.recursos_usados = rec;
   _ultimoSaveLocal = Date.now();
-  const { error } = await window.sb.from('characters').update(payload).eq('id', charAtivo.id);
-  if (error) {
-    console.warn('[descanso] erro ao salvar:', error);
+  // recursos_usados vai pela RPC de merge (sql/031) — atômica, sem apagar
+  // chaves que só existam no banco; os outros campos (slots, PV, dado de
+  // vida) vão juntos no update comum, já que descanso É pra zerá-los de
+  // vez, não tem outro cliente concorrendo por ESSES campos aqui.
+  const [rMesclar, rUpdate] = await Promise.all([
+    window.RecursosClasse.gravarRecursosUsados(charAtivo.id, rec).then(() => null).catch(e => e),
+    window.sb.from('characters').update(payload).eq('id', charAtivo.id).then(({ error }) => error || null),
+  ]);
+  if (rMesclar || rUpdate) {
+    console.warn('[descanso] erro ao salvar:', rMesclar || rUpdate);
     toast('⚠ Erro ao aplicar descanso — tente de novo');
     return;
   }
