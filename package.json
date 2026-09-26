@@ -17,6 +17,8 @@
     "auditoria": "node scripts/auditoria.js",
     "indice-reloaded": "node scripts/gerar_indice_reloaded.js",
     "smoke": "node scripts/smoke_ficha.js",
+    "auditoria-mobile": "node scripts/auditoria_mobile.js",
+    "auditoria-mobile-logado": "node scripts/auditoria_mobile.js --logado",
     "reprocessar-monstros": "node scripts/reprocessar_monstros.js --aplicar"
   },
   "dependencies": {

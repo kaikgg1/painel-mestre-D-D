@@ -549,6 +549,14 @@
     .exh-pip { width: 44px; height: 44px; font-size: 15px; }
     .death-pip { width: 44px; height: 44px; }
     .hp-current-input, .hp-max-input { min-height: 44px; }
+    /* Os −/+ de inspiração são 18×18 e ficaram de fora do lay-5. Área de toque
+       por pseudo-elemento, e assimétrica de propósito: a pílula é
+       `position:absolute` no canto do card, então um halo de 44px pra cada
+       lado passaria da borda do card (e o + e o − se sobreporiam por cima do
+       número no meio). 24×38 não é os 44 ideais, mas é o que cabe aqui sem
+       mexer no desenho — mais que o dobro da área de antes. */
+    .inspiration .insp-btn { position: relative; }
+    .inspiration .insp-btn::after { content: ''; position: absolute; inset: -10px -3px; }
     /* Bolinha de slot visual de 26px + área de toque de 44px pelo ::after (sem
        inchar o desenho, que numa fileira de 9 slots ficaria gigante). O gap
        maior evita que as áreas vizinhas se sobreponham demais. Mesmo padrão de

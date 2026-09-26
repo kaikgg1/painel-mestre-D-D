@@ -461,6 +461,14 @@
      o toque real é maior graças ao ::after abaixo, sem virar uma bolinha
      gigante. Mais gap entre pips pra essa área invisível não se sobrepor
      demais entre pips vizinhos. */
+  /* O <label> em volta do PV temporário (aba_combate.js) já fez o rótulo
+     "PV Temp.:" focar o campo, mas a linha continuava com 21px de altura —
+     alvo largo e baixo. Aqui ela vira uma faixa de 44px; o texto fica
+     centrado, então visualmente só ganha respiro. */
+  .hp-temp-label {
+    min-height: var(--touch-target, 44px);
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+  }
   .slot-pips { gap: 10px; }
   .slot-pip { position: relative; width: 26px; height: 26px; }
   .slot-pip::after {

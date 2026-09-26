@@ -532,7 +532,12 @@ function criarCard(p) {
   hpNums.appendChild(hpCur);
   hpNums.appendChild(hpSep);
   hpNums.appendChild(hpMax);
-  const hpTempWrap = document.createElement('div');
+  // <label> e não <div>: o input de PV temporário tem 14px de altura, o menor
+  // alvo de toque do sistema. Input é elemento substituído e não renderiza
+  // ::before/::after, então o truque de área ampliada dos pips não serve aqui
+  // — mas um <label> em volta faz o "+" e todo o espaço da caixa focarem o
+  // input nativamente, sem mudar um pixel do desenho.
+  const hpTempWrap = document.createElement('label');
   hpTempWrap.className = 'hp-temp-wrap';
   const hpTempPlus = document.createElement('span');
   hpTempPlus.className = 'hp-temp-plus';
@@ -577,7 +582,11 @@ function criarCard(p) {
   const chips = document.createElement('div');
   chips.className = 'stat-chips';
   const fazChip = (label, valor, callback, min) => {
-    const box = document.createElement('div');
+    // <label>: o chip tem ~40px de altura mas o input dentro dele só ocupa
+    // 18px — o resto (rótulo + padding) era espaço morto. Como <label>, tocar
+    // em qualquer ponto do chip foca o input, sem crescer nada na tela. Vale
+    // pra CA, Iniciativa, Movimento e Percepção Passiva.
+    const box = document.createElement('label');
     box.className = 'stat-chip';
     const lb = document.createElement('div');
     lb.className = 'stat-chip-label';

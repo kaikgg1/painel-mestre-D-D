@@ -56,6 +56,19 @@
     text-shadow: 0 0 24px rgba(184,138,44,0.35);
     flex: 1; text-align: center;
   }
+  /* A 320px este cabeçalho estourava 68px pra fora da tela. O .back-btn tem
+     white-space:nowrap com um rótulo longo ("← Maldição de Strahd") e, como
+     item de flex, o min-width:auto padrão impede que ele encolha; o
+     .header-title (flex:1) também não encolhe abaixo do próprio texto. Os
+     dois lado a lado + padding + gap dão 388px numa tela de 320.
+     No celular o título sobe pra uma linha só dele e o botão fica embaixo,
+     inteiro e legível — mesmo remédio do .rc-pool na ficha. O min-height do
+     botão sobe de 40 pra 44px (--touch-target) já que ele ganhou a linha. */
+  @media (max-width: 520px) {
+    .site-header { flex-wrap: wrap; padding: 10px 14px; gap: 10px; }
+    .header-title { flex: 1 1 100%; order: -1; }
+    .back-btn { font-size: 10px; padding: 10px 14px; letter-spacing: 1px; min-height: 44px; }
+  }
   .auth-slot { display: flex; align-items: center; gap: 8px; font-family: 'Cinzel', serif; font-size: 11px; }
   .auth-slot .auth-nome { color: var(--parchment-dim); letter-spacing: 1px; }
   .auth-slot .auth-btn {

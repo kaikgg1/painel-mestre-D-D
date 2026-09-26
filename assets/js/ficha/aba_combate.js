@@ -45,9 +45,14 @@ function renderCombate(c) {
           <div class="hp-fill ${classeBar}" id="hp-fill" style="width:${pct}%"></div>
           <div class="hp-percent" id="hp-percent">${pct}%</div>
         </div>
-        <div class="hp-temp-label">
+        <!-- <label> e não <div>: o input sozinho tem 21px de altura, abaixo do
+             --touch-target do projeto, e <input> não renderiza ::before/::after
+             pra ganhar área ampliada como os pips. Com o <label>, tocar em
+             "PV Temp.:" também foca o campo — o alvo passa a ser a linha
+             inteira, sem mudar o desenho. -->
+        <label class="hp-temp-label">
           PV Temp.: <input name="hp_temp" type="text" inputmode="numeric" value="${c.hp_temp ?? 0}" data-validar="int" data-min="0">
-        </div>
+        </label>
         <div id="exaustao-hp-aviso"></div>
 
         <!-- .no-lock: aplicar dano/cura é ação de mesa em tempo real, não

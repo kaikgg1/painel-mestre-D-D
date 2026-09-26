@@ -207,6 +207,29 @@
     .phase-content { display: block !important; page-break-after: always; }
     .ability-body { display: block !important; }
   }
+
+  /* Alvo de toque no celular (--touch-target: 44px, assets/css/tokens.css).
+     Os botoes do statblock tinham 24px de altura e os circulos de reacao 22px,
+     e os dois sao tocados em plena luta.
+     Nos .btn cresce a altura de verdade: eles ficam numa linha com flex-wrap e
+     gap de 4px, entao um halo invisivel por pseudo-elemento se sobreporia a
+     linha de cima. inline-flex porque .btn tambem e usado em <a> e <label>,
+     que ignorariam min-height sendo inline.
+     Nos .react-dot e halo mesmo, com ::before (o ::after ja desenha o ✗ do
+     usado): 34px de toque para 22px de desenho, a mesma sobreposicao de 2px
+     que o projeto ja aceita nos .slot-pip da ficha. */
+  @media (max-width: 720px) {
+    .btn {
+      min-height: 44px; padding: 4px 12px; gap: 5px;
+      display: inline-flex; align-items: center; justify-content: center;
+    }
+    .react-dot { position: relative; }
+    .react-dot::before { content: ''; position: absolute; inset: -6px; }
+    /* Input e elemento substituido: nao renderiza ::before/::after, entao aqui
+       nao da pra usar halo — e altura real mesmo. O CA do vilao tinha 21px, a
+       busca de magia 30px e os PV 32px, todos editados durante a luta. */
+    .editable, .hp-input, .spell-search { min-height: 44px; }
+  }
 </style>
 <script src="../../assets/vendor/iconify-icon-2.1.0.min.js"></script>
 <script src="../../assets/js/icones.js"></script>

@@ -336,8 +336,18 @@
    o polegar — alvo de 44px (--touch-target) em vez dos 38px de antes. */
 @media (max-width: 767px) {
   .rc-grid { grid-template-columns: 1fr; }
+  /* O pip é clicado em combate (recursos.js), mas ficou de fora da passagem
+     de alvos de toque: os irmãos .slot-pip (combate.css) e .hab-pip
+     (habilidades.css) ganharam área ampliada por pseudo-elemento e este não.
+     Mesmo padrão aqui — ::before porque o ::after já desenha o ✕ do pip
+     gasto. Alvo de 38px, igual ao .slot-pip; com gap de 10px as áreas
+     vizinhas não se sobrepõem.
+     O inset é -7 e não -5 porque ele conta a partir do PADDING box: o pip tem
+     28px no total mas 2px de borda de cada lado, então a caixa de referência
+     é 24px (24 + 7 + 7 = 38). Medido, não estimado — com -5 dava 34px. */
   .rc-pip { width: 28px; height: 28px; }
-  .rc-pips { gap: 8px; }
+  .rc-pip::before { content: ''; position: absolute; inset: -7px; }
+  .rc-pips { gap: 10px; }
   /* Com 4 botões de 44px+ não sobra largura pro "40/40" na mesma linha em
      360px (ele vazava ou empurrava o "+" pra uma 2ª linha sozinho): o número
      sobe pra uma linha própria e os botões ficam espalhados embaixo. */

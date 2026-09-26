@@ -77,6 +77,17 @@
   @media (max-width: 480px) {
     .rd-painel { right: 10px; left: 10px; width: auto; }
     .rd-fab { right: 12px; bottom: 12px; }
+    /* Os d4…d100 tinham 29px de altura e o ✕ 19px — são os botões mais
+       apertados do painel do Mestre no celular, e os mais clicados. Os dados
+       crescem pra 44px (o painel estica uns 30px, de boa num flutuante);
+       o ✕ ganha área por pseudo-elemento pra não empurrar o título. Sobra
+       dentro do padding de 14px do painel, então não vaza. */
+    .rd-dado-btn { min-height: 44px; }
+    .rd-fechar { position: relative; }
+    .rd-fechar::after { content: ''; position: absolute; inset: -12px -10px; }
+    /* Modificador (23px), fórmula (27px) e o botão de rolar a fórmula (27px):
+       inputs não aceitam halo por pseudo-elemento, então é altura real. */
+    .rd-mod-row input, #rd-formula, #rd-formula-btn { min-height: 44px; }
   }
   `;
 
