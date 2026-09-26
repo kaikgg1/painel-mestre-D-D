@@ -398,13 +398,18 @@ async function popularHabilidades(classe, nivel, subclasse) {
   aplicarFiltroHabilidades();
 }
 
-// Salva recursos_usados via UPDATE direto.
+// Salva recursos_usados via UPDATE direto — com merge (RecursosClasse.
+// mesclarComBanco) pra não apagar chaves que o Mestre (ou outro aparelho
+// seu) tenha adicionado desde a última vez que esta ficha carregou os
+// dados. Ver comentário completo em assets/js/recursos_classe.js.
 // Lança em caso de erro — use salvarRecursosSeguro() pra fire-and-forget.
 async function salvarRecursos() {
   if (!charAtivo?.id) return;
+  const mesclado = await window.RecursosClasse.mesclarComBanco(charAtivo.id, charAtivo.recursos_usados);
+  charAtivo.recursos_usados = mesclado;
   _ultimoSaveLocal = Date.now();
   const { error } = await window.sb.from('characters')
-    .update({ recursos_usados: charAtivo.recursos_usados || {} })
+    .update({ recursos_usados: mesclado })
     .eq('id', charAtivo.id);
   if (error) {
     console.warn('[recursos] erro ao salvar:', error);

@@ -405,7 +405,12 @@ async function aplicarDescanso(tipo) {
     if (longo || tipoSlot === 'pact') sm[lvl] = Object.assign({}, sm[lvl], { atual: 0 });
   }
 
-  const payload = { recursos_usados: rec, slots_magia: sm };
+  // Merge com o banco antes de gravar: mesma razão de RecursosClasse.
+  // mesclarComBanco (usado por salvarRecursos, em aba_habilidades.js) — sem
+  // isto, um descanso aplicado com uma cópia local desatualizada de
+  // recursos_usados apagaria chaves que só existissem no banco.
+  const recMesclado = await window.RecursosClasse.mesclarComBanco(charAtivo.id, rec);
+  const payload = { recursos_usados: recMesclado, slots_magia: sm };
   let msg = longo ? 'Descanso longo aplicado' : 'Descanso curto aplicado';
 
   if (longo) {

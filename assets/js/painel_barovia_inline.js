@@ -29,6 +29,19 @@ function salvar(p) {
   renderPartyBar();
 }
 
+// Toggle de "Recursos de Classe" no card: mescla com o banco ANTES de
+// salvar (RecursosClasse.mesclarComBanco) — esta tela fica aberta a mesa
+// inteira, então p.recursosUsados pode estar bem mais velho que o que a
+// própria ficha do jogador já gravou (cada habilidade usada por ela some
+// da mesma lista até essa mesclagem). Sem isto, marcar UM recurso aqui
+// apagava os outros que só existiam no banco — era o bug dos "Recursos de
+// Classe" da Lilith sumindo. Ver comentário completo em recursos_classe.js.
+async function salvarRecursosMesclado(p) {
+  if (!window.RecursosClasse || !p?.id) { salvar(p); return; }
+  p.recursosUsados = await window.RecursosClasse.mesclarComBanco(p.id, p.recursosUsados);
+  salvar(p);
+}
+
 function carregar() { return estado; }
 
 // ===== FORA DA MESA: PJs da campanha com is_active=false =====
@@ -915,7 +928,7 @@ function criarCard(p) {
     row.appendChild(nomeSpan);
     row.appendChild(fazTracker(def.id, def.max, atual, (val) => {
       window.RecursosClasse.gravarUsado(recursos, def.id, val);
-      salvar(p);
+      salvarRecursosMesclado(p);
     }));
     recBody.appendChild(row);
   });
@@ -936,7 +949,7 @@ function criarCard(p) {
     row.appendChild(nomeSpan);
     row.appendChild(fazTracker(k, r.max, r.atual || 0, (val) => {
       r.atual = val;
-      salvar(p);
+      salvarRecursosMesclado(p);
     }));
     recBody.appendChild(row);
   });

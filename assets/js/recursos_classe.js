@@ -8,6 +8,11 @@
 //   RecursosClasse.recursosPara(personagem, atributos) -> [{id,nome,icone,max,periodo,dica,step?}, ...]
 //   RecursosClasse.lerUsado(recursos_usados, id)        -> number (usados até agora)
 //   RecursosClasse.gravarUsado(recursos_usados, id, n)  -> muta o objeto in-place, preservando formato
+//   RecursosClasse.mesclarComBanco(characterId, meuObjetoLocal) -> Promise<objeto mesclado>
+//     Lê o recursos_usados ATUAL do banco e devolve {...doBanco, ...meuObjetoLocal} —
+//     minhas chaves vencem (é a mudança que estou gravando agora), mas chaves
+//     que só existem no banco (outro cliente adicionou) são preservadas em vez
+//     de apagadas. Ver comentário completo na implementação, mais abaixo.
 (function () {
   const ico = (chave) => (window.Icones ? window.Icones.html(chave) : '');
   // Fórmula central em assets/js/regras_base.js (carregar antes deste arquivo).
@@ -142,5 +147,29 @@
     }
   }
 
-  window.RecursosClasse = { recursosPara, lerUsado, gravarUsado, RECURSOS_POR_CLASSE };
+  // recursos_usados é gravado como o objeto INTEIRO, de 3 lugares diferentes
+  // que não conversam entre si (a ficha do jogador, o painel do Mestre —
+  // painel_mestre_inline.js e painel_barovia_inline.js — cada um com sua
+  // própria cópia em memória). Sem isto, quem gravasse por último apagava
+  // qualquer chave que só existisse na cópia do OUTRO: era assim que os
+  // "Recursos de Classe" da Lilith sumiam — bastava o Mestre marcar UM
+  // recurso no painel dele (com uma cópia mais antiga, carregada antes da
+  // jogadora ter usado várias habilidades) pra sobrescrever o campo inteiro
+  // e apagar as outras 7 que só existiam no banco.
+  //
+  // Não elimina 100% da corrida (ainda há uma janela entre ler e escrever),
+  // mas fecha o caso comum: cliente com sessão aberta há um tempo, sem ter
+  // recebido a mudança mais recente de outro cliente via Realtime.
+  async function mesclarComBanco(characterId, meuObjetoLocal) {
+    if (!window.sb || !characterId) return meuObjetoLocal || {};
+    const { data, error } = await window.sb.from('characters')
+      .select('recursos_usados').eq('id', characterId).maybeSingle();
+    if (error) {
+      console.warn('[RecursosClasse] não consegui reler antes de mesclar (gravando só o local):', error.message);
+      return meuObjetoLocal || {};
+    }
+    return { ...(data?.recursos_usados || {}), ...(meuObjetoLocal || {}) };
+  }
+
+  window.RecursosClasse = { recursosPara, lerUsado, gravarUsado, mesclarComBanco, RECURSOS_POR_CLASSE };
 })();

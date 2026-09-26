@@ -368,23 +368,46 @@
     }
 
     if (p.timer) clearTimeout(p.timer);
-    p.timer = setTimeout(async () => {
-      const campos = p.campos; pendingUpdates.delete(id);
-      const { data, error } = await window.sb
-        .from('characters').update(campos).eq('id', id).select('*').maybeSingle();
-      if (error) {
-        console.warn('[dbsync] salvarCampo:', error);
-        // Falha silenciosa aqui significa o Mestre achar que salvou e não ter salvo —
-        // avisa quem estiver escutando (ver toast em painel_mestre/painel_barovia).
-        window.dispatchEvent(new CustomEvent('dbsync:erro', { detail: { id, error: error.message } }));
-      }
-      else if (data) {
-        const antigo = cache.get(id);
-        data._jogador_nome = antigo?._jogador_nome || '';
-        cache.set(id, data);
-      }
-    }, DEBOUNCE_MS);
+    p.timer = setTimeout(() => executarGravacao(id), DEBOUNCE_MS);
   }
+
+  // Grava AGORA os campos pendentes de um personagem (chamado pelo timer do
+  // debounce OU por flushPendentes(), abaixo). Extraído do timer pra poder
+  // ser disparado antes da hora quando a página está saindo.
+  async function executarGravacao(id) {
+    const p = pendingUpdates.get(id);
+    if (!p) return;
+    const campos = p.campos; pendingUpdates.delete(id);
+    if (p.timer) clearTimeout(p.timer);
+    const { data, error } = await window.sb
+      .from('characters').update(campos).eq('id', id).select('*').maybeSingle();
+    if (error) {
+      console.warn('[dbsync] salvarCampo:', error);
+      // Falha silenciosa aqui significa o Mestre achar que salvou e não ter salvo —
+      // avisa quem estiver escutando (ver toast em painel_mestre/painel_barovia).
+      window.dispatchEvent(new CustomEvent('dbsync:erro', { detail: { id, error: error.message } }));
+    }
+    else if (data) {
+      const antigo = cache.get(id);
+      data._jogador_nome = antigo?._jogador_nome || '';
+      cache.set(id, data);
+    }
+  }
+
+  // Marca uma caixa (recurso, condição, PV…) e aperta F5 na hora — o clique
+  // ainda estava esperando o debounce de 400ms e nunca chegou a ser gravado.
+  // Ao esconder a aba ou sair da página, dispara AGORA toda gravação
+  // pendente em vez de esperar o timer. Não é 100% garantido (o navegador
+  // pode encerrar a conexão no meio), mas é bem melhor que não tentar —
+  // 'visibilitychange' cobre trocar de aba/minimizar; 'pagehide' cobre F5,
+  // fechar a aba e navegar pra outra página.
+  function flushPendentes() {
+    for (const id of [...pendingUpdates.keys()]) executarGravacao(id);
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'hidden') flushPendentes();
+  });
+  window.addEventListener('pagehide', flushPendentes);
 
   async function deletar(id) {
     const { error } = await window.sb.from('characters').delete().eq('id', id);

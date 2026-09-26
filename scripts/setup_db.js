@@ -41,6 +41,7 @@ const SCRIPTS = [
   '027_status_contas.sql',
   '028_ultimo_visto.sql',
   '029_log_alteracoes_ficha.sql',
+  '030_log_detalhado_slots_e_recursos.sql',
 ];
 
 (async () => {
