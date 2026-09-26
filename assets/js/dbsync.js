@@ -86,7 +86,18 @@
     slots: 'slots_magia',
     magias: 'magias_preparadas',
     condicoes: 'condicoes',
-    isActive: 'is_active',
+    // isActive NÃO tem par aqui de propósito. dbToUi() continua expondo
+    // isActive pra LEITURA (estrela, filtro), mas a coluna is_active só
+    // pode ser escrita por setAtivo() / alternarAtivo() da ficha — um
+    // toggle explícito, nunca de carona num autosave.
+    //
+    // Enquanto o mapa existia, todo salvar(p) dos painéis levava is_active
+    // no pacote e a única proteção era a comparação com o cache: bastava o
+    // objeto em memória ter um isActive velho (aba aberta ao lado com o
+    // realtime caído, ou id fora do cache — aí salvarCampo manda TODAS as
+    // colunas) pra o painel desligar o PJ da campanha sem ninguém clicar em
+    // nada. É o mesmo bug que a ficha já tinha resolvido com
+    // `delete payload.is_active` (assets/js/ficha/salvar.js).
     recursosUsados: 'recursos_usados',
     dadoVidaAtual: 'dado_vida_atual',
     inventario: 'inventario',

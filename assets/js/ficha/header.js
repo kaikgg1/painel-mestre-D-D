@@ -67,11 +67,17 @@ function renderHeader(c) {
       <span class="dot" aria-hidden="true"></span><span class="lbl"><span class="lbl-prefixo">Vinculado a </span>${nomeCampanha}</span>
     </span>`;
   } else {
+    // Cada problema aponta pro SEU lugar. O aviso mandava tudo pra "aba
+    // Identidade", mas lá só existe o campo Campanha — controle de Ativo
+    // nunca houve nessa aba (a estrela mora no menu ⋯). Quem seguia a dica
+    // marcava a campanha, salvava, e a ficha continuava fora do painel do
+    // Mestre sem entender por quê.
     const problemas = [];
-    if (!temCampanha) problemas.push('vincule uma Campanha');
-    if (!ehAtivo) problemas.push('marque como Ativo');
+    if (!temCampanha) problemas.push('vincule uma Campanha (aba Personagem)');
+    if (!ehAtivo) problemas.push('marque como Ativo (menu ⋯ → ☆ Tornar ativo)');
     campanhaHtml = `<span class="hdr-campanha aviso" id="hdr-campanha-aviso" role="button" tabindex="0"
-        title="Esta ficha não aparece pro Mestre: ${escape(problemas.join(' e '))} (aba Identidade)">
+        data-falta="${temCampanha ? 'ativo' : 'campanha'}"
+        title="Esta ficha não aparece pro Mestre: ${escape(problemas.join(' e '))}">
       ${ico('aviso')}<span class="lbl">Não visível ao Mestre</span>
     </span>`;
   }
@@ -122,16 +128,32 @@ function conectarListenersHeader() {
     render();
   });
 
-  // Pill de campanha (estado de aviso): atalho pra aba Personagem, onde dá
-  // pra corrigir (campo Campanha) — a estrela de Ativo mora no menu ⋯.
+  // Pill de campanha (estado de aviso): atalho pra ONDE está o problema —
+  // aba Personagem quando falta vincular a campanha, menu ⋯ (é lá que mora
+  // a estrela) quando falta marcar como Ativo. Antes levava sempre pra aba,
+  // onde não tem nada pra resolver o caso do Ativo.
   const pill = document.getElementById('hdr-campanha-aviso');
   if (pill) {
-    const irPraIdentidade = () => {
+    const corrigir = () => {
+      if (pill.dataset.falta === 'ativo') {
+        // Abre o menu no tick seguinte: o "clique fora fecha o menu" que vive
+        // no document ainda vai receber ESTE clique (o pill está fora do
+        // popover) e fecharia o menu na hora se abrisse já.
+        setTimeout(() => {
+          const pop = document.getElementById('menu-popover');
+          const btn = document.getElementById('btn-menu-toggle');
+          if (!pop || !btn) return;
+          pop.hidden = false;
+          btn.setAttribute('aria-expanded', 'true');
+          document.getElementById('btn-ativo')?.focus();
+        }, 0);
+        return;
+      }
       const alvo = document.querySelector('.tab[data-tab="personagem"]');
       if (alvo) alvo.click();
     };
-    pill.addEventListener('click', irPraIdentidade);
-    pill.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); irPraIdentidade(); } });
+    pill.addEventListener('click', corrigir);
+    pill.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); corrigir(); } });
   }
 
   // Editar / Travar (modo edição global). Fase 9: a aba Personagem decide

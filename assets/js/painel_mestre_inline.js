@@ -67,6 +67,57 @@ function renderPartyBar() {
 // Compatibilidade — função carregar() agora é no-op (init real é via DBSync)
 function carregar() { return estado; }
 
+// ===== FORA DA MESA: PJs da campanha com is_active=false =====
+// O painel carrega só quem está ativo (DBSync apenasAtivos), então um PJ
+// desativado simplesmente desaparecia da tela e o Mestre não tinha NENHUM
+// caminho pra trazer de volta — só o dono da ficha, pelo menu ⋯ dela. Esta
+// barra lista os inativos da campanha e devolve esse controle pro Mestre.
+// Query própria (não passa pelo cache do DBSync) justamente porque o cache
+// existe pra guardar os visíveis.
+async function renderInativos() {
+  const bar = document.getElementById('inativos-bar');
+  if (!bar || !window.sb || !ehMestre) return;
+  const { data, error } = await window.sb
+    .from('characters')
+    .select('id, nome, classe, nivel')
+    .eq('campanha', CAMPANHA)
+    .eq('is_active', false)
+    .order('nome');
+  if (error) { console.warn('[inativos]', error.message); bar.hidden = true; return; }
+  // "Personagem Padrão" é o placeholder que o grimório cria só pra ancorar
+  // as magias favoritas — nunca foi um PJ de verdade (mesmo filtro das
+  // Anotações, assets/js/master_notes.js).
+  const lista = (data || [])
+    .filter(c => (c.nome || '').trim().toLowerCase() !== 'personagem padrão')
+    // Os NPCs do próprio Mestre entram no painel mesmo inativos (o filtro do
+    // DBSync é "is_active OR é meu"), então já estão na tela como card — não
+    // podem aparecer de novo aqui como se estivessem fora da mesa.
+    .filter(c => !estado.personagens.some(x => x.id === c.id));
+  if (!lista.length) { bar.hidden = true; bar.innerHTML = ''; return; }
+  bar.hidden = false;
+  bar.innerHTML = `<span class="ib-rotulo">Fora da mesa</span>` + lista.map(c => {
+    const sub = [c.classe, c.nivel ? 'N' + c.nivel : ''].filter(Boolean).join(' ');
+    return `<button type="button" class="ib-chip" data-ativar="${escapeHtml(c.id)}"
+        title="Trazer ${escapeHtml(c.nome)} de volta pro painel (marca a ficha como Ativa)">
+      <span aria-hidden="true">☆</span>
+      <span class="ib-nome">${escapeHtml(c.nome || 'Sem nome')}</span>
+      ${sub ? `<span class="ib-sub">${escapeHtml(sub)}</span>` : ''}
+    </button>`;
+  }).join('');
+  bar.querySelectorAll('[data-ativar]').forEach(btn => {
+    btn.onclick = async () => {
+      btn.disabled = true;
+      try {
+        await window.DBSync.setAtivo(btn.dataset.ativar, true);
+        toast('Personagem trazido pro painel');
+      } catch (e) { btn.disabled = false; alert('Erro ao ativar: ' + e.message); return; }
+      // O card aparece pelo realtime (vira "visível" pro DBSync); aqui só
+      // atualiza a própria barra.
+      renderInativos();
+    };
+  });
+}
+
 function criarPersonagem(base = {}) {
   return {
     id: Date.now() + Math.random(),
@@ -910,6 +961,26 @@ function criarCard(p) {
     if (window.AjustePericias) window.AjustePericias.abrir(p.id, p.nome);
   };
 
+  // ★ Na mesa — tira o PJ do painel sem apagar nada (characters.is_active).
+  // Até aqui essa coluna só tinha um controle na ficha DO JOGADOR (menu ⋯):
+  // o Mestre via o card desaparecer e não tinha como trazer de volta.
+  // DBSync.setAtivo() já existia sem nenhum botão chamando.
+  const ativoBtn = document.createElement('button');
+  ativoBtn.className = 'save-card';
+  ativoBtn.textContent = '★ Na mesa';
+  ativoBtn.title = 'Tirar do painel (a ficha continua salva; volta em "Fora da mesa")';
+  ativoBtn.onclick = async () => {
+    ativoBtn.disabled = true;
+    try {
+      await window.DBSync.setAtivo(p.id, false);
+      p.isActive = false;
+      estado.personagens = estado.personagens.filter(x => x.id !== p.id);
+      render();
+      renderInativos();
+      toast(`${p.nome} saiu do painel — está em "Fora da mesa"`);
+    } catch (e) { ativoBtn.disabled = false; alert('Erro: ' + e.message); }
+  };
+
   const remover = document.createElement('button');
   remover.className = 'remove-card';
   remover.textContent = '✕ remover';
@@ -932,6 +1003,7 @@ function criarCard(p) {
   actions.appendChild(salvarBtn);
   actions.appendChild(descBtn);
   actions.appendChild(periciasBtn);
+  actions.appendChild(ativoBtn);
   actions.appendChild(remover);
   card.appendChild(actions);
 
@@ -1023,11 +1095,13 @@ function podeEditar() {
         if (ev.tipo === 'load') {
           estado.personagens = window.DBSync.listar();
           render();
+          renderInativos();
         } else if (ev.tipo === 'insert') {
           if (!estado.personagens.find(x => x.id === ev.char.id)) {
             estado.personagens.push(ev.char);
             render();
           }
+          renderInativos();   // quem entrou no painel saiu de "Fora da mesa"
         } else if (ev.tipo === 'update') {
           const idx = estado.personagens.findIndex(x => x.id === ev.char.id);
           // Atualiza o objeto NO LUGAR em vez de trocar a referência: os
@@ -1045,6 +1119,7 @@ function podeEditar() {
         } else if (ev.tipo === 'delete') {
           estado.personagens = estado.personagens.filter(x => x.id !== ev.id);
           render();
+          renderInativos();   // pode ter sido desativado, não apagado
         }
       }
     });
@@ -1057,4 +1132,6 @@ function podeEditar() {
 
 
   render();
+  // Só agora ehMestre está preenchido (o 'load' do init roda antes disso).
+  renderInativos();
 })();

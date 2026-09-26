@@ -168,6 +168,30 @@
   .party-chip.inconsciente .pc-nome { color: var(--erro); }
   .party-chip .pc-flag { font-size: 12px; }
 
+  /* ===== FORA DA MESA — PJs com is_active=false (um clique pra voltar) ===== */
+  .inativos-bar {
+    max-width: 1280px; margin: -8px auto 22px;
+    display: flex; gap: 8px; flex-wrap: wrap; align-items: center; justify-content: center;
+  }
+  .inativos-bar .ib-rotulo {
+    font-family: 'Cinzel', serif; font-size: 10px; font-weight: 700;
+    letter-spacing: 1.4px; text-transform: uppercase; color: var(--text-muted);
+  }
+  .inativos-bar .ib-chip {
+    display: flex; align-items: center; gap: 7px;
+    background: transparent; border: 1px dashed var(--bronze); border-radius: 20px;
+    padding: 5px 12px; cursor: pointer; color: var(--text-muted);
+    font-family: 'Cinzel', serif; font-size: 11px; font-weight: 600;
+    transition: color .15s, border-color .15s, transform .15s;
+  }
+  .inativos-bar .ib-chip:hover:not(:disabled) { color: var(--text); border-color: var(--gold); transform: translateY(-1px); }
+  .inativos-bar .ib-chip:disabled { opacity: .5; cursor: progress; }
+  .inativos-bar .ib-sub { font-size: 10px; opacity: .75; }
+  /* `hidden` sozinho não basta: o display:flex acima é regra de AUTOR e vence
+     o `[hidden] { display: none }` do navegador (mesmo motivo de .btn[hidden]
+     em components.css). Sem isto a barra vazia continuava ocupando espaço. */
+  .inativos-bar[hidden], .vilao-widget-bar[hidden] { display: none !important; }
+
   /* ===== VILÕES EM JOGO (mst-7) ===== */
   .vilao-widget-bar {
     max-width: 1280px; margin: 0 auto 22px;
@@ -865,7 +889,7 @@
     body { background: white !important; padding: 0 !important; color: #222 !important;
       background-image: none !important; print-color-adjust: exact; -webkit-print-color-adjust: exact; }
     body::before { display: none !important; }
-    .toolbar, .hint, .remove-card, .toast, .auth-slot, .back-link, .party-bar, .vilao-widget-bar { display: none !important; }
+    .toolbar, .hint, .remove-card, .toast, .auth-slot, .back-link, .party-bar, .inativos-bar, .vilao-widget-bar { display: none !important; }
     .header { margin: 0 0 12px; padding: 0 0 8px; border-bottom: 2px solid #6b1010; }
     .header h1 { color: #6b1010 !important; text-shadow: none !important; font-size: 24pt; letter-spacing: 2px; }
     .header .subtitle { color: #6a4f0e !important; font-size: 11pt; }
