@@ -261,7 +261,7 @@ function conectarListenersCombate() {
     if (dvRestantes < 1) { toast('Sem Dados de Vida disponíveis'); return; }
     const faces = dadoVidaDaClasse(charAtivo.classe) || charAtivo.dado_vida_tipo || 8;
     const rolagem = 1 + Math.floor(Math.random() * faces);
-    const conMod = mod(charAtivo.atributos?.con ?? 10);
+    const conMod = mod(atributoTotal(charAtivo, 'con'));
     const recuperado = Math.max(0, rolagem + conMod);
     const hpMax = parseNum(inpHpMax?.value, { inteiro: true }) ?? charAtivo.hp_max ?? 0;
     const hpAtual = parseNum(inpHpAtual.value, { inteiro: true }) ?? 0;

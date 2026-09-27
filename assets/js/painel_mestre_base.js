@@ -40,6 +40,32 @@ function toast(msg) {
   t._timer = setTimeout(() => t.classList.remove('show'), 2000);
 }
 
+// Fonte de Magia (conversor pontos ⇄ espaços) + Metamágica do Feiticeiro
+// (assets/js/feiticeiro_ui.js). salvar/salvarRecursosMesclado/rerenderCard
+// são de cada painel (painel_*_inline.js), chamados só no clique.
+function montarBlocoFeiticeiro(p) {
+  const chave = (p.classe || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+  if (chave !== 'feiticeiro' || !window.FeiticeiroUI) return null;
+  if (!p.recursosUsados || typeof p.recursosUsados !== 'object') p.recursosUsados = {};
+  if (!p.slots) p.slots = {};
+  return window.FeiticeiroUI.bloco({
+    nivel: p.nivel,
+    getRec: () => p.recursosUsados,
+    getSlots: () => p.slots,
+    getMetamagias: () => p.metamagias || [],
+    salvarRecursos: patch => salvarRecursosMesclado(p, patch),
+    salvarSlots: () => salvar(p),
+    salvarMetamagias: async arr => {
+      p.metamagias = arr;
+      marcarEcoLocal(p.id);
+      const { error } = await window.sb.from('characters').update({ metamagias: arr }).eq('id', p.id);
+      if (error) toast('Erro ao salvar Metamágica: ' + error.message);
+    },
+    atualizar: () => rerenderCard(p),
+    avisar: msg => toast(msg),
+  });
+}
+
 // Falha de autosave (DBSync.salvarCampo) hoje só ia pro console — o Mestre
 // achava que tinha salvo e não tinha. Avisa na tela.
 window.addEventListener('dbsync:erro', () => toast('⚠ Falha ao salvar — verifique sua conexão'));

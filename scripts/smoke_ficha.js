@@ -140,7 +140,7 @@ window.URL.createObjectURL = (blob) => { window.__ultimoBlobPDF = blob; return '
 window.URL.revokeObjectURL = () => {};
 
 // Modulos compartilhados que a ficha consome (PHB, slots, exaustao, recursos, icones)
-for (const m of ['icones.js','ui.js','regras_base.js','phb_catalogo.js','phb_slots.js','exaustao_regras.js','recursos_classe.js','ataques.js','condicoes_regras.js']) {
+for (const m of ['icones.js','ui.js','regras_base.js','phb_catalogo.js','phb_slots.js','exaustao_regras.js','recursos_classe.js','feiticeiro_ui.js','ataques.js','condicoes_regras.js']) {
   const el = window.document.createElement('script');
   el.textContent = fs.readFileSync(path.join(raiz, 'assets/js', m), 'utf8');
   window.document.head.appendChild(el);
@@ -195,7 +195,8 @@ const esperadas = [
   'popularHabilidades','popularFeaturesPersonalizadas','tentarRecuperarImagemCriatura',
   'conectarListeners','conectarListenersEquipamento','conectarListenersTags',
   'conectarListenersAliados','salvar','salvarRecursos','salvarCompanions',
-  'abrirModalConjurar','abrirModalConversorFeit','abrirBuscadorMonstros',
+  'abrirModalConjurar','blocoFeiticeiroFicha','abrirBuscadorMonstros',
+  'habilidadesDoNivel','atributoTotal','atributosEfetivos',
   'aplicarEstadoLock','aplicarTabIndexLock','atualizarExaustaoUI',
   'recalcularValoresPericiasSalv','validarCampo','detectarUsosLimitados',
   'slugFeature','dadoVidaDaClasse','chaveDeClasse','classeUsaMagia','init','toast',
@@ -212,7 +213,31 @@ const apiObjetos = [
   ['Ataques', ['calcular', 'rolar', 'ehDistancia', 'temAcuidade']],
   ['CondicoesRegras', ['descricao']],
   ['UI', ['abrirSeletor']],
+  ['FeiticeiroUI', ['bloco']],
+  ['RecursosClasse', ['criarSlotComPontos', 'quebrarSlotEmPontos', 'limparSlotsExtras', 'metamagiasPermitidas', 'atributosEfetivos']],
 ];
+
+// Fonte de Magia: recupera espaço gasto; sem gasto cria extra que some no descanso longo.
+{
+  const RC = window.RecursosClasse;
+  const slots = { 1: { max: 4, atual: 1 }, 3: { max: 3, atual: 0 } };
+  const rec = { pontos_feiticaria: 0 };
+  const e1 = RC.criarSlotComPontos(slots, rec, 1, 9);
+  const e2 = RC.criarSlotComPontos(slots, rec, 3, 9);
+  const e3 = RC.criarSlotComPontos(slots, rec, 3, 9);
+  if (e1 || e2 || slots[1].atual !== 0 || slots[3].max !== 4 || rec.pontos_feiticaria !== 7 || !e3) {
+    erros.push('criarSlotComPontos: resultado inesperado ' + JSON.stringify({ e1, e2, e3, slots, rec }));
+  }
+  RC.limparSlotsExtras(slots, rec);
+  if (slots[3].max !== 3 || JSON.stringify(rec.slots_extras) !== '{}') erros.push('limparSlotsExtras não removeu o espaço extra');
+  const e4 = RC.quebrarSlotEmPontos(slots, rec, 3);
+  if (e4 || slots[3].atual !== 1 || rec.pontos_feiticaria !== 4) erros.push('quebrarSlotEmPontos: resultado inesperado');
+  if (RC.metamagiasPermitidas(9) !== 2 || RC.metamagiasPermitidas(10) !== 3 || RC.metamagiasPermitidas(17) !== 4) {
+    erros.push('metamagiasPermitidas fora da tabela do PHB');
+  }
+  const bonus = window.eval('atributoTotal({ atributos: { for: 14 }, atributos_bonus: { for: 2 } }, "for")');
+  if (bonus !== 16) erros.push('atributoTotal não soma atributos_bonus: ' + bonus);
+}
 for (const [nomeObj, metodos] of apiObjetos) {
   const obj = window[nomeObj];
   if (!obj) { erros.push('objeto global ausente: ' + nomeObj); continue; }
@@ -236,8 +261,7 @@ if (faltando.length) erros.push('funções globais ausentes: ' + faltando.join('
 
 // Constantes de regras (let/const de topo não viram window.*, então testamos via eval)
 const consts = ['ATRIBUTOS','PERICIAS','CLASSES','RACAS','ALINHAMENTOS','CAMPANHAS',
-  'SUBCLASSES_POR_CLASSE','DADO_VIDA_POR_CLASSE','TEMPLATES_CRIATURA','ATR_CRIATURA',
-  'CUSTO_SLOT_DE_PONTOS'];
+  'SUBCLASSES_POR_CLASSE','DADO_VIDA_POR_CLASSE','TEMPLATES_CRIATURA','ATR_CRIATURA'];
 for (const c of consts) {
   try { if (window.eval('typeof ' + c) === 'undefined') erros.push('constante ausente: ' + c); }
   catch (e) { erros.push('constante ' + c + ' → ' + e.message); }

@@ -313,8 +313,7 @@ function setCheck(idx, nomes, marcado) {
 
 function habilidadesDoPersonagem(HAB, chave, c) {
   const lista = (HAB && HAB[chave]) || [];
-  const nivel = +c.nivel || 1;
-  return lista.filter(h => h.nivel <= nivel && (!h.subclasse || h.subclasse === c.subclasse));
+  return habilidadesDoNivel(lista, +c.nivel || 1, c.subclasse);
 }
 
 // ── Blocos de preenchimento ──────────────────────────────────────────
@@ -355,8 +354,8 @@ function preencherIdentidade(idx, c, opcoes) {
 
 function preencherAtributosSalvPericias(idx, c) {
   for (const [k, ] of ATRIBUTOS) {
-    const score = c.atributos?.[k];
-    if (score == null) continue;
+    if (c.atributos?.[k] == null) continue;
+    const score = atributoTotal(c, k);
     const en = ABREV_ATRIBUTO[k];
     setTexto(idx, [`Front_${en} Score`, en.toUpperCase()], score);
     setTexto(idx, [`Front_${en} Mod`, `${en.toUpperCase()}mod`], fmtMod(mod(score)));
@@ -396,7 +395,7 @@ function preencherCombate(idx, c, opcoes) {
   const armas = c.inventario?.armas || [];
   armas.forEach((arma, i) => {
     const n = i + 1;
-    const calc = window.Ataques ? Ataques.calcular(arma, c.atributos, nivelTotalPersonagem(c)) : null;
+    const calc = window.Ataques ? Ataques.calcular(arma, atributosEfetivos(c), nivelTotalPersonagem(c)) : null;
     setTexto(idx, `Front_Weapon Name ${n}`, arma.nome);
     if (calc) {
       setTexto(idx, `Front_Weapon Atk Bonus ${n}`, fmtMod(calc.bonusAtaque));
@@ -449,7 +448,7 @@ function preencherHabilidadesFixas(idx, c, HAB, opcoes) {
     }
   }
 
-  const recursos = window.RecursosClasse ? RecursosClasse.recursosPara(c, c.atributos) : [];
+  const recursos = window.RecursosClasse ? RecursosClasse.recursosPara(c, atributosEfetivos(c)) : [];
   for (const def of CAMPOS_RECURSO) {
     const r = recursos.find(x => x.id === def.recurso);
     if (!r) continue;

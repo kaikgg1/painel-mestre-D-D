@@ -139,7 +139,7 @@ async function todasHabilidadesPJ(c) {
     const db = await carregarHabilidadesClasses();
     if (db) {
       const todas = db[chaveDeClasse(c.classe)] || [];
-      const habs = todas.filter(h => h.nivel <= (c.nivel || 1) && (!h.subclasse || h.subclasse === c.subclasse));
+      const habs = habilidadesDoNivel(todas, c.nivel, c.subclasse);
       for (const h of habs) {
         lista.push({ slug: slugFeature(h.nome), nome: h.nome, desc: h.desc, tipoAcao: detectarTipoAcao(h), custom: false });
       }
@@ -279,8 +279,7 @@ async function popularHabilidades(classe, nivel, subclasse) {
     return;
   }
   const todas = db[chaveDeClasse(classe)] || [];
-  // Filtra: nivel <= atual AND (sem subclasse OR subclasse === subclasse do PJ)
-  const habs = todas.filter(h => h.nivel <= (nivel || 1) && (!h.subclasse || h.subclasse === subclasse));
+  const habs = habilidadesDoNivel(todas, nivel, subclasse);
   if (!habs.length) {
     wrap.innerHTML = `<div class="item-vazio">Nenhuma habilidade encontrada para ${escape(classe)}.</div>`;
     return;

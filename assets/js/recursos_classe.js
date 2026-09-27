@@ -112,6 +112,8 @@
           max: 1 + Math.max(0, mod(a.car)), periodo: 'descanso longo',
           dica: 'Detecta celestiais/mortos-vivos/corruptos em 18m' },
       ];
+      if (nv >= 3) r.push({ id: 'canalizar_divindade', nome: 'Canalizar Divindade', icone: ico('brilho'),
+        max: 1, periodo: 'descanso curto', dica: 'Opções do juramento · CD = CD das magias de paladino' });
       if (nv >= 14) r.push({ id: 'toque_purificador', nome: 'Toque Purificador', icone: ico('brilho'),
         max: _max1(mod(a.car)), periodo: 'descanso longo', dica: 'Termina 1 efeito mágico' });
       return r;
@@ -122,13 +124,92 @@
     },
   };
 
+  // Metamágica do Feiticeiro (PHB Galápagos, cap. 3). custo = pontos de
+  // feitiçaria; 'nivel' = custo igual ao nível da magia (Duplicada, mín. 1).
+  const METAMAGIAS = [
+    { id: 'acelerada', nome: 'Magia Acelerada', custo: 2,
+      desc: 'Magia com tempo de conjuração de 1 ação passa a ser 1 ação bônus.' },
+    { id: 'aumentada', nome: 'Magia Aumentada', custo: 3,
+      desc: 'Um alvo tem desvantagem no primeiro teste de resistência contra a magia.' },
+    { id: 'cuidadosa', nome: 'Magia Cuidadosa', custo: 1,
+      desc: 'Até mod. de Carisma criaturas (mín. 1) passam automaticamente no teste de resistência da magia.' },
+    { id: 'distante', nome: 'Magia Distante', custo: 1,
+      desc: 'Dobra o alcance (1,5 m ou mais); magia de toque passa a ter 9 m.' },
+    { id: 'duplicada', nome: 'Magia Duplicada', custo: 'nivel',
+      desc: 'Magia de alvo único (não pessoal) ganha um segundo alvo. Custo = nível da magia (truque = 1).' },
+    { id: 'estendida', nome: 'Magia Estendida', custo: 1,
+      desc: 'Dobra a duração de magia de 1 minuto ou mais (máx. 24 horas).' },
+    { id: 'potencializada', nome: 'Magia Potencializada', custo: 1,
+      desc: 'Rola de novo até mod. de Carisma dados de dano (mín. 1). Combina com outra Metamágica.' },
+    { id: 'sutil', nome: 'Magia Sutil', custo: 1,
+      desc: 'Conjura sem componentes verbais nem somáticos.' },
+  ];
+  function metamagiasPermitidas(nv) { return nv >= 17 ? 4 : nv >= 10 ? 3 : nv >= 3 ? 2 : 0; }
+
+  // Fonte de Magia (PHB): pontos → espaço (até o 5°) e espaço → pontos.
+  // slots = {nivel:{max,atual}} com atual = GASTOS. Mutam slots/rec e
+  // devolvem null no sucesso ou a mensagem do porquê não deu.
+  // Espaço criado sem nenhum gasto pra recuperar vira max+1 e fica anotado
+  // em rec.slots_extras — o livro diz que ele some no descanso longo
+  // (limparSlotsExtras).
+  const CUSTO_SLOT_DE_PONTOS = { 1: 2, 2: 3, 3: 5, 4: 6, 5: 7 };
+  function criarSlotComPontos(slots, rec, lvl, maxPontos) {
+    const custo = CUSTO_SLOT_DE_PONTOS[lvl];
+    if (!custo) return 'Só dá pra criar espaços até o 5° nível';
+    const usados = lerUsado(rec, 'pontos_feiticaria');
+    if (maxPontos - usados < custo) return `Precisa de ${custo} pontos de feitiçaria`;
+    const s = slots[lvl] || (slots[lvl] = { max: 0, atual: 0 });
+    if ((+s.atual || 0) > 0) {
+      s.atual = +s.atual - 1;
+    } else {
+      s.max = (+s.max || 0) + 1;
+      const ex = rec.slots_extras && typeof rec.slots_extras === 'object' ? rec.slots_extras : {};
+      ex[lvl] = (+ex[lvl] || 0) + 1;
+      rec.slots_extras = ex;
+    }
+    gravarUsado(rec, 'pontos_feiticaria', usados + custo);
+    return null;
+  }
+  function quebrarSlotEmPontos(slots, rec, lvl) {
+    const s = slots[lvl];
+    if (!s || (+s.max || 0) - (+s.atual || 0) <= 0) return 'Sem espaço livre desse nível';
+    const usados = lerUsado(rec, 'pontos_feiticaria');
+    if (usados <= 0) return 'Pontos de feitiçaria já estão no máximo';
+    s.atual = (+s.atual || 0) + 1;
+    gravarUsado(rec, 'pontos_feiticaria', Math.max(0, usados - lvl));
+    return null;
+  }
+  function limparSlotsExtras(slots, rec) {
+    const ex = rec && rec.slots_extras;
+    if (!ex || typeof ex !== 'object') return;
+    for (const [lvl, n] of Object.entries(ex)) {
+      const s = slots && slots[lvl];
+      if (s) s.max = Math.max(0, (+s.max || 0) - (+n || 0));
+    }
+    rec.slots_extras = {};
+  }
+
+  // Soma characters.atributos_bonus (ajuste do Mestre, migration 032) por
+  // cima do valor base — mesmo padrão do bônus de perícia/salvaguarda.
+  // Compartilhado pela ficha do jogador E pelos painéis do Mestre (nenhum
+  // dos dois deve calcular Pontos de Feitiçaria/CD/etc a partir só do valor
+  // base se houver um ajuste do Mestre no atributo).
+  function atributosEfetivos(c) {
+    const base = c?.atributos || {};
+    const bonus = c?.atributos_bonus || {};
+    const chaves = new Set([...Object.keys(base), ...Object.keys(bonus)]);
+    const out = {};
+    chaves.forEach(k => { out[k] = (+base[k] || 10) + (+bonus[k] || 0); });
+    return out;
+  }
+
   function recursosPara(c, atrs) {
     if (!c) return [];
     const chave = chaveDeClasse(c.classe);
     const fn = RECURSOS_POR_CLASSE[chave];
     if (!fn) return [];
     const nv = +c.nivel || 1;
-    try { return fn(nv, atrs || c.atributos || {}); }
+    try { return fn(nv, atrs || atributosEfetivos(c)); }
     catch { return []; }
   }
 
@@ -174,5 +255,9 @@
     if (error) throw error;
   }
 
-  window.RecursosClasse = { recursosPara, lerUsado, gravarUsado, gravarRecursosUsados, RECURSOS_POR_CLASSE };
+  window.RecursosClasse = {
+    recursosPara, lerUsado, gravarUsado, gravarRecursosUsados, RECURSOS_POR_CLASSE, atributosEfetivos,
+    METAMAGIAS, metamagiasPermitidas, CUSTO_SLOT_DE_PONTOS,
+    criarSlotComPontos, quebrarSlotEmPontos, limparSlotsExtras,
+  };
 })();

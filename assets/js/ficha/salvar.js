@@ -202,6 +202,9 @@ async function salvar(e) {
   delete payload.habilidades_favoritas;
   delete payload.concentracao;
   delete payload.classes_secundarias;
+  // Gravados só pelo Mestre (pericias_mestre.js) ou por save próprio (feiticeiro_ui.js).
+  delete payload.atributos_bonus;
+  delete payload.metamagias;
 
   // Remove campos que não vão pro UPDATE
   delete payload.id;
@@ -220,6 +223,7 @@ async function salvar(e) {
   // — não tem "aba dona" pra isso ficar desatualizado feito slots_magia.
   payload.percepcao_passiva = percepcaoPassiva({
     atributos: payload.atributos ?? alvo.atributos,
+    atributos_bonus: alvo.atributos_bonus,
     pericias: payload.pericias ?? alvo.pericias,
     nivel: payload.nivel ?? alvo.nivel,
     classes_secundarias: alvo.classes_secundarias,

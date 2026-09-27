@@ -142,6 +142,16 @@ async function carregarHabilidadesClasses() {
     clearTimeout(t);
   }
 }
+// Habilidades do catálogo que o PJ tem no nível atual. Quando a subclasse
+// dele já tem as habilidades reais cadastradas, some a linha genérica
+// ("Característica do Arquétipo" etc.) que só marcava o nível.
+function habilidadesDoNivel(todas, nivel, subclasse) {
+  const temSub = !!subclasse && todas.some(h => h.subclasse === subclasse);
+  return todas.filter(h => h.nivel <= (nivel || 1)
+    && (!h.subclasse || h.subclasse === subclasse)
+    && !(temSub && !h.subclasse && /^Característica d/i.test(h.nome)));
+}
+
 function chaveDeClasse(classe) {
   return (classe || '').normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 }
@@ -163,6 +173,24 @@ const bonusProf = window.Regras.bonusProf;
 function salvProf(salv, k) { const v = salv?.[k]; return v === true || !!(v && v.prof); }
 function salvBonus(salv, k) { const v = salv?.[k]; return (v && typeof v === 'object' && +v.bonus) || 0; }
 
+// Bônus de atributo dado pelo Mestre (characters.atributos_bonus, migration
+// 032) — mesmo padrão de pericias[k].bonus/salvaguardas[k].bonus: soma por
+// cima do valor BASE sem sobrescrevê-lo. atributoBase() nunca inclui o bônus
+// (é o que a aba Personagem mostra/edita); atributoTotal() é o valor
+// efetivo pra qualquer cálculo de modificador (perícia, salvaguarda,
+// percepção passiva, ataques, dado de vida...).
+function atributoBase(c, k) { return (c?.atributos || {})[k] ?? 10; }
+function atributoBonus(c, k) { return +((c?.atributos_bonus || {})[k]) || 0; }
+function atributoTotal(c, k) { return atributoBase(c, k) + atributoBonus(c, k); }
+// Objeto {for,dex,con,int,sab,car} já com o bônus do Mestre somado — pra
+// passar em bloco pros helpers que esperam um "atributos" (Ataques.calcular,
+// RecursosClasse.recursosPara) sem precisar tocar em cada um deles.
+function atributosEfetivos(c) {
+  const out = {};
+  ATRIBUTOS.forEach(([k]) => { out[k] = atributoTotal(c, k); });
+  return out;
+}
+
 // Valor final de salvaguarda/perícia a partir do PERSONAGEM SALVO (charAtivo).
 // Usado no primeiro render de Combate e no Resumo — mesma fórmula, um só
 // lugar, os dois nunca divergem. (Diferente de recalcularValoresPericiasSalv()
@@ -170,12 +198,12 @@ function salvBonus(salv, k) { const v = salv?.[k]; return (v && typeof v === 'ob
 // salvas — proposta diferente, não dá pra unificar sem misturar as duas.)
 function valorSalvaguarda(c, atrKey) {
   const salv = c.salvaguardas || {};
-  const m = mod((c.atributos || {})[atrKey] ?? 10);
+  const m = mod(atributoTotal(c, atrKey));
   return m + (salvProf(salv, atrKey) ? bonusProf(nivelTotalPersonagem(c)) : 0) + salvBonus(salv, atrKey);
 }
 function valorPericia(c, periciaKey, atrKey) {
   const p = (c.pericias || {})[periciaKey] || {};
-  const m = mod((c.atributos || {})[atrKey] ?? 10);
+  const m = mod(atributoTotal(c, atrKey));
   const bp = bonusProf(nivelTotalPersonagem(c));
   return m + (p.prof ? bp : 0) + (p.exp ? bp : 0) + (+p.bonus || 0);
 }
@@ -254,7 +282,7 @@ function _assinaturaRelevante(c) {
     'nome','raca','classe','subclasse','nivel','origem','alinhamento',
     'hp_max','hp_atual','hp_temp','ca','iniciativa_bonus','deslocamento',
     'dado_vida_tipo','dado_vida_atual','exaustao','inspiracao',
-    'atributos','salvaguardas','pericias','slots_magia','condicoes',
+    'atributos','atributos_bonus','metamagias','salvaguardas','pericias','slots_magia','condicoes',
     'recursos_usados','features_personalizadas','companions','inventario',
     'truques_conhecidos','magias_conhecidas','cd_resistencia','bonus_atq_magia',
     'tracos_pessoais','ideais','vinculos','defeitos','historia','notas',

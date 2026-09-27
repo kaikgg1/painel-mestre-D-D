@@ -115,14 +115,25 @@
     { "nivel": 1, "nome": "Conjuração", "desc": "Conjura magias arcanas usando Carisma. Foco arcano como componente." },
     { "nivel": 1, "nome": "Origem Feiticeira", "desc": "Escolha origem (Linhagem Dracônica ou Magia Selvagem). Habilidades nos níveis 1, 6, 14 e 18." },
     { "nivel": 2, "nome": "Fonte de Magia (Pontos de Feitiçaria)", "desc": "Ganha pontos de feitiçaria (= nível). Converte em slots e vice-versa. Recupera em descanso longo." },
-    { "nivel": 3, "nome": "Metamagia (2 opções)", "desc": "Escolha 2 metamagias (Magia Acelerada, Sutil, Distante, Gêmea, Empoderada, etc.) usando pontos de feitiçaria." },
+    { "nivel": 3, "nome": "Metamágica (2 opções)", "desc": "Escolha 2 opções de Metamágica (Acelerada, Aumentada, Cuidadosa, Distante, Duplicada, Estendida, Potencializada, Sutil), pagas com pontos de feitiçaria. Só uma opção por magia, salvo indicação contrária." },
     { "nivel": 4, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20). Repete nos níveis 8, 12, 16 e 19." },
     { "nivel": 6, "nome": "Característica da Origem Feiticeira", "desc": "Característica adicional da sua origem feiticeira (ex.: Resistência Elemental da Linhagem Dracônica)." },
-    { "nivel": 10, "nome": "Metamagia (3 opções)", "desc": "Escolha mais 1 metamagia (total 3)." },
+    { "nivel": 10, "nome": "Metamágica (3 opções)", "desc": "Escolha mais 1 opção de Metamágica (total 3)." },
     { "nivel": 14, "nome": "Característica da Origem Feiticeira", "desc": "Outra característica da sua origem feiticeira." },
-    { "nivel": 17, "nome": "Metamagia (4 opções)", "desc": "Escolha mais 1 metamagia (total 4)." },
+    { "nivel": 17, "nome": "Metamágica (4 opções)", "desc": "Escolha mais 1 opção de Metamágica (total 4)." },
     { "nivel": 18, "nome": "Característica da Origem Feiticeira", "desc": "Característica final da sua origem feiticeira (ex.: Presença Dracônica)." },
-    { "nivel": 20, "nome": "Restauração Feiticeira", "desc": "Recupera 4 pontos de feitiçaria em descanso curto. 1x/descanso longo." }
+    { "nivel": 20, "nome": "Restauração Mística", "desc": "Recupera 4 pontos de feitiçaria gastos sempre que terminar um descanso curto." },
+
+    { "nivel": 1, "subclasse": "Linhagem Dracônica", "nome": "Ancestral Dracônico",
+      "desc": "Escolha um tipo de dragão como ancestral; o tipo de dano associado é usado por características posteriores: Azul (elétrico), Branco (frio), Bronze (elétrico), Cobre (ácido), Latão (fogo), Negro (ácido), Ouro (fogo), Prata (frio), Verde (veneno), Vermelho (fogo). Você fala, lê e escreve Dracônico, e seu bônus de proficiência é dobrado em testes de Carisma ao interagir com dragões, se ele se aplicar." },
+    { "nivel": 1, "subclasse": "Linhagem Dracônica", "nome": "Resiliência Dracônica",
+      "desc": "Seu máximo de pontos de vida aumenta em 1 e aumenta em mais 1 sempre que você ganhar um nível na classe. Sem armadura, sua CA é igual a 13 + seu modificador de Destreza (escamas de dragão)." },
+    { "nivel": 6, "subclasse": "Linhagem Dracônica", "nome": "Afinidade Elemental",
+      "desc": "Quando conjurar uma magia que cause dano do tipo do seu ancestral dracônico, some seu modificador de Carisma a uma rolagem de dano dessa magia. Ao mesmo tempo, pode gastar 1 ponto de feitiçaria para ganhar resistência a esse tipo de dano por 1 hora." },
+    { "nivel": 14, "subclasse": "Linhagem Dracônica", "nome": "Asas de Dragão",
+      "desc": "Com uma ação bônus, brota um par de asas de dragão das costas e ganha deslocamento de voo igual ao seu deslocamento atual. Elas duram até você dissipá-las com outra ação bônus. Não funciona com armadura que não acomode as asas." },
+    { "nivel": 18, "subclasse": "Linhagem Dracônica", "nome": "Presença Dracônica",
+      "desc": "Com uma ação, gaste 5 pontos de feitiçaria para exalar uma aura de admiração ou medo (à escolha) de 18 metros, por 1 minuto ou até perder a concentração. Cada criatura hostil que começar o turno na aura faz um teste de resistência de Sabedoria ou fica enfeitiçada (admiração) ou amedrontada (medo) até a aura acabar. Quem passar fica imune à aura por 24 horas." }
   ],
   "guerreiro": [
     { "nivel": 1, "nome": "Estilo de Luta", "desc": "Escolha um estilo (Arquearia, Combate com Duas Armas, Defesa, Duelismo, etc.)." },
@@ -143,7 +154,18 @@
     { "nivel": 17, "nome": "Surto de Ação (2 usos)", "desc": "Pode usar Surto de Ação 2x/descanso curto." },
     { "nivel": 17, "nome": "Indomável (3 usos)", "desc": "Pode re-rolar testes de resistência 3x/descanso longo." },
     { "nivel": 18, "nome": "Característica do Arquétipo", "desc": "Característica final do seu arquétipo marcial." },
-    { "nivel": 20, "nome": "Ataque Extra (3)", "desc": "Pode atacar 4x na ação de Ataque." }
+    { "nivel": 20, "nome": "Ataque Extra (3)", "desc": "Pode atacar 4x na ação de Ataque." },
+
+    { "nivel": 3, "subclasse": "Campeão", "nome": "Crítico Aprimorado",
+      "desc": "Seus ataques com armas conseguem acerto crítico com 19 ou 20 na jogada de ataque." },
+    { "nivel": 7, "subclasse": "Campeão", "nome": "Atletismo Extraordinário",
+      "desc": "Some metade do seu bônus de proficiência (arredondado para cima) a qualquer teste de Força, Destreza ou Constituição em que ainda não aplique o bônus de proficiência. No salto longo com corrida, o alcance aumenta em 0,3 m × seu modificador de Força." },
+    { "nivel": 10, "subclasse": "Campeão", "nome": "Estilo de Luta Adicional",
+      "desc": "Escolha um segundo Estilo de Luta da característica de classe." },
+    { "nivel": 15, "subclasse": "Campeão", "nome": "Crítico Superior",
+      "desc": "Seus ataques com armas conseguem acerto crítico com 18 a 20 na jogada de ataque." },
+    { "nivel": 18, "subclasse": "Campeão", "nome": "Sobrevivente",
+      "desc": "No começo de cada turno, se não estiver com mais da metade dos pontos de vida, recupere 5 + seu modificador de Constituição em PV. Não funciona com 0 pontos de vida." }
   ],
   "ladino": [
     { "nivel": 1, "nome": "Expertise (2 perícias)", "desc": "Dobra bônus de proficiência em 2 perícias ou 1 perícia + Ferramentas de Ladrão." },
@@ -218,6 +240,7 @@
     { "nivel": 2, "nome": "Castigo Divino", "desc": "Gasta slot ao acertar ataque cc: +2d8 de dano radiante (+1d8 por nível de slot acima do 1°). +1d8 contra mortos-vivos/celestiais." },
     { "nivel": 3, "nome": "Saúde Divina", "desc": "Imune a doenças." },
     { "nivel": 3, "nome": "Juramento Sagrado", "desc": "Escolha juramento (Devoção, Anciões, Vingança, Quebrador de Juramento). Habilidades nos níveis 3, 7, 15 e 20." },
+    { "nivel": 3, "nome": "Canalizar Divindade", "desc": "Seu juramento concede opções de Canalizar Divindade. 1 uso, recuperado em descanso curto ou longo. CD = 8 + proficiência + mod. de Carisma quando pede teste de resistência." },
     { "nivel": 4, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20). Repete nos níveis 8, 12, 16 e 19." },
     { "nivel": 5, "nome": "Ataque Extra", "desc": "Pode atacar 2x na ação de Ataque." },
     { "nivel": 6, "nome": "Aura de Proteção", "desc": "Você e aliados em 3m somam mod CAR em testes de resistência." },
@@ -240,7 +263,20 @@
     { "nivel": 15, "subclasse": "Quebrador de Juramento", "nome": "Resistência Sobrenatural",
       "desc": "No 15° nível, o paladino ganha resistência a dano de concussão, cortante e perfurante de ataques não-mágicos." },
     { "nivel": 20, "subclasse": "Quebrador de Juramento", "nome": "Senhor do Pavor",
-      "desc": "No 20° nível, o paladino pode, com uma ação, envolver a si mesmo com uma aura de trevas que dura por 1 minuto. A aura reduz qualquer luz plena num raio de 9 metros em volta do paladino a penumbra. Sempre que um inimigo que esteja amedrontado em relação ao paladino começar seu turno na aura, ele sofre 4d10 de dano psíquico. Além disso, o paladino e criaturas que ele escolher na aura são encobertos por sombras profundas. As criaturas que dependem de visão têm desvantagem nas jogadas de ataque contra as criaturas encobertas pelas sombras. Enquanto a aura durar, o paladino pode usar uma ação bônus, no seu turno, para fazer com que as sombras na aura ataquem uma criatura. O paladino realiza um ataque corpo-a-corpo com magia contra o alvo. Se o ataque atingir, o alvo sofre dano necrótico igual a 3d10 + o modificador de Carisma do paladino. Após ativar a aura, o paladino não poderá fazê-la novamente até terminar um descanso longo." }
+      "desc": "No 20° nível, o paladino pode, com uma ação, envolver a si mesmo com uma aura de trevas que dura por 1 minuto. A aura reduz qualquer luz plena num raio de 9 metros em volta do paladino a penumbra. Sempre que um inimigo que esteja amedrontado em relação ao paladino começar seu turno na aura, ele sofre 4d10 de dano psíquico. Além disso, o paladino e criaturas que ele escolher na aura são encobertos por sombras profundas. As criaturas que dependem de visão têm desvantagem nas jogadas de ataque contra as criaturas encobertas pelas sombras. Enquanto a aura durar, o paladino pode usar uma ação bônus, no seu turno, para fazer com que as sombras na aura ataquem uma criatura. O paladino realiza um ataque corpo-a-corpo com magia contra o alvo. Se o ataque atingir, o alvo sofre dano necrótico igual a 3d10 + o modificador de Carisma do paladino. Após ativar a aura, o paladino não poderá fazê-la novamente até terminar um descanso longo." },
+
+    { "nivel": 3, "subclasse": "Juramento de Vingança", "nome": "Magias de Juramento",
+      "desc": "Sempre preparadas: 3° perdição, marca do caçador · 5° imobilizar pessoa, passo nebuloso · 9° velocidade, proteção contra energia · 13° banimento, porta dimensional · 17° imobilizar monstro, vidência." },
+    { "nivel": 3, "subclasse": "Juramento de Vingança", "nome": "Canalizar Divindade: Abjurar Inimigo",
+      "desc": "Com uma ação, escolha uma criatura que possa ver a até 18 metros. Ela faz um teste de resistência de Sabedoria (corruptores e mortos-vivos com desvantagem), a não ser que seja imune a ficar amedrontada. Na falha, fica amedrontada por 1 minuto ou até sofrer dano, com deslocamento 0 e sem bônus de deslocamento. No sucesso, o deslocamento cai à metade por 1 minuto ou até sofrer dano." },
+    { "nivel": 3, "subclasse": "Juramento de Vingança", "nome": "Canalizar Divindade: Voto de Inimizade",
+      "desc": "Com uma ação bônus, pronuncie um voto contra uma criatura que possa ver a até 3 metros. Você tem vantagem nas jogadas de ataque contra ela por 1 minuto ou até ela cair a 0 pontos de vida ou ficar inconsciente." },
+    { "nivel": 7, "subclasse": "Juramento de Vingança", "nome": "Vingador Implacável",
+      "desc": "Quando atingir uma criatura com um ataque de oportunidade, pode se mover até metade do seu deslocamento logo depois, como parte da mesma reação, sem provocar ataques de oportunidade." },
+    { "nivel": 15, "subclasse": "Juramento de Vingança", "nome": "Alma de Vingança",
+      "desc": "Quando uma criatura sob seu Voto de Inimizade realizar um ataque, você pode usar sua reação para fazer um ataque corpo a corpo com arma contra ela, se estiver ao seu alcance." },
+    { "nivel": 20, "subclasse": "Juramento de Vingança", "nome": "Anjo Vingador",
+      "desc": "Com uma ação, transforme-se por 1 hora: asas dão deslocamento de voo de 18 metros e você emana uma aura de ameaça de 9 metros — a primeira vez que um inimigo entra nela ou começa o turno nela durante uma batalha, faz um teste de resistência de Sabedoria ou fica amedrontado por você por 1 minuto ou até sofrer dano. Ataques contra a criatura amedrontada têm vantagem. 1 uso por descanso longo." }
   ],
   "patrulheiro": [
     { "nivel": 1, "nome": "Inimigo Predileto", "desc": "Escolha tipo de criatura. Vantagem em testes de Sabedoria pra rastreá-lo e Inteligência pra recordar info." },

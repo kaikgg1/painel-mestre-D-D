@@ -31,6 +31,7 @@
 //   bonusAtqMagia   → bonus_atq_magia (mesma coluna que a ficha usa)
 //   concentracao    → concentracao (jsonb: {ativa, magia})
 //   atributos       → atributos (jsonb: {for,dex,con,int,sab,car} — usado p/ calcular recursos de classe)
+//   atributos_bonus → atributos_bonus (jsonb, só LEITURA aqui — quem grava é pericias_mestre.js)
 //   inspiracao      → inspiracao
 //   exaustao        → exaustao
 //   sucessos        → morte_sucessos
@@ -149,6 +150,13 @@
       bonusAtqMagia: row.bonus_atq_magia ?? null,
       concentracao: row.concentracao || { ativa: false, magia: '' },
       atributos: row.atributos || { for:10, dex:10, con:10, int:10, sab:10, car:10 },
+      // Ajuste do Mestre por atributo (migration 032) — só leitura aqui;
+      // quem grava é pericias_mestre.js direto no banco (mesmo padrão do
+      // bônus de perícia, que também não passa por salvarCampo/UI_TO_DB).
+      atributos_bonus: row.atributos_bonus || {},
+      // Metamágica do Feiticeiro (migration 033) — gravada direto por
+      // montarBlocoFeiticeiro (painel_mestre_base.js), não por salvarCampo.
+      metamagias: Array.isArray(row.metamagias) ? row.metamagias : [],
       inspiracao: typeof row.inspiracao === 'number' ? row.inspiracao : (row.inspiracao ? 1 : 0),
       exaustao: row.exaustao ?? 0,
       sucessos: row.morte_sucessos ?? 0,

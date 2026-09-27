@@ -1,7 +1,12 @@
 // assets/js/pericias_mestre.js
-// Modal pro Mestre dar/tirar bônus em perícias de um jogador.
-// O bônus é somado ao cálculo normal (mod + proficiência + expertise) na ficha.
-// Persiste em characters.pericias[chave].bonus.
+// Modal pro Mestre dar/tirar bônus em perícias E ATRIBUTOS de um jogador.
+// O bônus de perícia é somado ao cálculo normal (mod + proficiência +
+// expertise) na ficha; persiste em characters.pericias[chave].bonus.
+// O bônus de atributo é somado ao valor BASE (não o sobrescreve) em todo
+// cálculo de modificador da ficha (perícia, salvaguarda, percepção
+// passiva, ataques...) — ver atributoTotal()/atributosEfetivos() em
+// assets/js/ficha/nucleo.js e assets/js/recursos_classe.js. Persiste em
+// characters.atributos_bonus[chave] (migration 032).
 //
 // API: AjustePericias.abrir(characterId, nomePersonagem)
 // Dependências: window.sb, window.Auth (mestre).
@@ -32,9 +37,36 @@
     ['sobrevivencia','Sobrevivência','SAB'],
   ];
 
+  // MESMAS chaves usadas na ficha (ficha/nucleo.js → const ATRIBUTOS)
+  const ATRIBUTOS = [
+    ['for','Força'],
+    ['dex','Destreza'],
+    ['con','Constituição'],
+    ['int','Inteligência'],
+    ['sab','Sabedoria'],
+    ['car','Carisma'],
+  ];
+
   let _injetado = false;
   let _charId = null;
-  let _pericias = {};   // cópia local editável
+  let _pericias = {};        // cópia local editável
+  let _atributosBonus = {};  // cópia local editável (characters.atributos_bonus)
+  let _colunaAtrBonusExiste = true;  // false se a migration 032 ainda não rodou
+
+  // select('pericias, atributos_bonus') falha por INTEIRO (nem pericias volta)
+  // se a coluna atributos_bonus ainda não existir (migration 032 pendente) —
+  // PostgREST rejeita a query toda por uma coluna desconhecida. Tenta com as
+  // duas colunas; se der erro claramente ligado à coluna nova, refaz só com
+  // pericias, pra ninguém perder o ajuste de perícia por causa disso.
+  async function buscarPericiasEAtributosBonus(characterId) {
+    const r1 = await window.sb.from('characters')
+      .select('pericias, atributos_bonus').eq('id', characterId).maybeSingle();
+    if (!r1.error) { _colunaAtrBonusExiste = true; return r1; }
+    const r2 = await window.sb.from('characters')
+      .select('pericias').eq('id', characterId).maybeSingle();
+    if (!r2.error) _colunaAtrBonusExiste = false;
+    return r2;
+  }
 
   const CSS = `
   .ap-overlay {
@@ -116,6 +148,12 @@
   .ap-status { font-size: 11px; color: #8c7d5e; font-style: italic; }
   .ap-title iconify-icon { vertical-align: -2px; color: #d4a843; }
   .ap-status iconify-icon { vertical-align: -2px; color: #c4302b; }
+  .ap-secao-titulo {
+    font-family: 'Cinzel', serif; font-size: 12px; font-weight: 700;
+    color: #b88a2c; letter-spacing: 1px; text-transform: uppercase;
+    margin: 4px 0 6px; padding-top: 10px; border-top: 1px solid rgba(139,105,20,0.2);
+  }
+  .ap-secao-titulo:first-child { margin-top: 0; padding-top: 0; border-top: none; }
   .ap-salvar {
     background: linear-gradient(180deg, #b88a2c, #6a4f0e);
     border: 1px solid #d4a843; color: #1a1014;
@@ -146,11 +184,14 @@
     ov.innerHTML = `
       <div class="ap-modal" role="dialog" aria-modal="true" aria-labelledby="ap-title">
         <div class="ap-header">
-          <div class="ap-title" id="ap-title">${ico('alvo')} Ajustar Perícias<small id="ap-sub"></small></div>
+          <div class="ap-title" id="ap-title">${ico('alvo')} Ajustar Perícias e Atributos<small id="ap-sub"></small></div>
           <button type="button" class="ap-close" id="ap-close">Fechar ✕</button>
         </div>
         <div class="ap-body">
-          <div class="ap-hint">Bônus extra do Mestre (situacional, item, dádiva…). Soma ao cálculo normal da perícia na ficha do jogador. Use −/+ para ajustar.</div>
+          <div class="ap-hint">Bônus extra do Mestre (situacional, item, dádiva…). Some ao valor base sem apagá-lo — a ficha do jogador continua mostrando/editando o valor base normalmente. Use −/+ para ajustar.</div>
+          <div class="ap-secao-titulo">Atributos</div>
+          <div id="ap-lista-atr"></div>
+          <div class="ap-secao-titulo">Perícias</div>
           <div id="ap-lista"></div>
         </div>
         <div class="ap-footer">
@@ -167,7 +208,7 @@
       if (e.key === 'Escape' && ov.classList.contains('open')) fechar();
     });
 
-    // Delegação dos botões +/-
+    // Delegação dos botões +/- (perícias)
     document.getElementById('ap-lista').addEventListener('click', e => {
       const btn = e.target.closest('.ap-btn');
       if (!btn) return;
@@ -179,6 +220,18 @@
       _pericias[k].bonus = novo;
       if (!novo) delete _pericias[k].bonus;
       atualizarLinha(k);
+    });
+
+    // Delegação dos botões +/- (atributos)
+    document.getElementById('ap-lista-atr').addEventListener('click', e => {
+      const btn = e.target.closest('.ap-btn');
+      if (!btn) return;
+      const k = btn.dataset.k;
+      const delta = btn.dataset.act === 'mais' ? 1 : -1;
+      const atual = +_atributosBonus[k] || 0;
+      const novo = Math.max(-10, Math.min(10, atual + delta));
+      if (novo) _atributosBonus[k] = novo; else delete _atributosBonus[k];
+      atualizarLinhaAtr(k);
     });
   }
 
@@ -201,6 +254,14 @@
     el.className = 'ap-val ' + classeVal(v);
   }
 
+  function atualizarLinhaAtr(k) {
+    const el = document.querySelector(`.ap-val[data-val-atr="${k}"]`);
+    if (!el) return;
+    const v = +_atributosBonus[k] || 0;
+    el.textContent = fmt(v);
+    el.className = 'ap-val ' + classeVal(v);
+  }
+
   function renderLista() {
     const wrap = document.getElementById('ap-lista');
     wrap.innerHTML = PERICIAS.map(([k, nome, atr]) => {
@@ -217,6 +278,22 @@
     }).join('');
   }
 
+  function renderListaAtr() {
+    const wrap = document.getElementById('ap-lista-atr');
+    wrap.innerHTML = ATRIBUTOS.map(([k, nome]) => {
+      const v = +_atributosBonus[k] || 0;
+      return `
+        <div class="ap-row">
+          <span class="ap-nome">${nome}</span>
+          <span class="ap-ctrl">
+            <button type="button" class="ap-btn ap-btn-menos" data-k="${k}" data-act="menos" aria-label="Diminuir bônus de ${nome}">−</button>
+            <span class="ap-val ${classeVal(v)}" data-val-atr="${k}">${fmt(v)}</span>
+            <button type="button" class="ap-btn ap-btn-mais" data-k="${k}" data-act="mais" aria-label="Aumentar bônus de ${nome}">+</button>
+          </span>
+        </div>`;
+    }).join('');
+  }
+
   async function abrir(characterId, nomePersonagem) {
     if (!window.sb || !window.Auth) { alert('Supabase não carregado.'); return; }
     if (!(await window.Auth.ehMestre())) { alert('Apenas o Mestre pode ajustar perícias.'); return; }
@@ -225,18 +302,26 @@
     document.getElementById('ap-sub').textContent = nomePersonagem || '';
     document.getElementById('ap-status').textContent = 'Carregando…';
     document.getElementById('ap-lista').innerHTML = '';
+    document.getElementById('ap-lista-atr').innerHTML = '';
 
     const ov = document.getElementById('ap-overlay');
     ov.classList.add('open');
     document.body.style.overflow = 'hidden';
 
-    // Busca perícias atuais
-    const { data, error } = await window.sb.from('characters')
-      .select('pericias').eq('id', characterId).maybeSingle();
+    // Busca perícias e bônus de atributo atuais.
+    const { data, error } = await buscarPericiasEAtributosBonus(characterId);
     if (error) { setStatus('Erro ao carregar', 'aviso'); return; }
     // Cópia profunda pra editar sem afetar o original até salvar
     _pericias = JSON.parse(JSON.stringify(data?.pericias || {}));
+    _atributosBonus = JSON.parse(JSON.stringify(data?.atributos_bonus || {}));
     document.getElementById('ap-status').textContent = '';
+    const secaoAtr = document.querySelector('.ap-secao-titulo');
+    if (secaoAtr) secaoAtr.style.display = _colunaAtrBonusExiste ? '' : 'none';
+    document.getElementById('ap-lista-atr').style.display = _colunaAtrBonusExiste ? '' : 'none';
+    if (!_colunaAtrBonusExiste) {
+      setStatus('Rode a migration 032_atributos_bonus.sql pra ajustar atributos', 'aviso');
+    }
+    renderListaAtr();
     renderLista();
   }
 
@@ -254,8 +339,7 @@
 
     // Re-busca o estado atual pra fazer MERGE (não sobrescrever prof/exp que o
     // jogador possa ter mudado enquanto o modal estava aberto).
-    const { data, error: errLoad } = await window.sb.from('characters')
-      .select('pericias').eq('id', _charId).maybeSingle();
+    const { data, error: errLoad } = await buscarPericiasEAtributosBonus(_charId);
     if (errLoad) { btn.disabled = false; setStatus(errLoad.message, 'aviso'); return; }
     const atual = JSON.parse(JSON.stringify(data?.pericias || {}));
 
@@ -271,8 +355,20 @@
       }
     });
 
+    const payload = { pericias: atual };
+    if (_colunaAtrBonusExiste) {
+      // Aplica só os bônus de atributo que defini, preservando o que outra
+      // sessão do Mestre possa ter gravado nos atributos que eu não toquei.
+      const atualAtr = JSON.parse(JSON.stringify(data?.atributos_bonus || {}));
+      ATRIBUTOS.forEach(([k]) => {
+        const novoBonus = +_atributosBonus[k] || 0;
+        if (novoBonus) atualAtr[k] = novoBonus; else delete atualAtr[k];
+      });
+      payload.atributos_bonus = atualAtr;
+    }
+
     const { error } = await window.sb.from('characters')
-      .update({ pericias: atual }).eq('id', _charId);
+      .update(payload).eq('id', _charId);
     btn.disabled = false;
     if (error) { setStatus(error.message, 'aviso'); return; }
     status.textContent = '✓ Salvo!';

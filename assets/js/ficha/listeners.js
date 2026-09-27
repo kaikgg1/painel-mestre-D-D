@@ -436,11 +436,11 @@ function validarEAtualizarMod(inp) {
     const k = inp.dataset.attr;
     const v = parseNum(inp.value, { inteiro: true, min: 1, max: 30 });
     if (v !== null) {
-      const el = document.querySelector(`[data-mod="${k}"]`);
-      if (el) el.textContent = fmtMod(mod(v));
       // Atualiza no charAtivo pra recálculo das perícias funcionar
       if (!charAtivo.atributos) charAtivo.atributos = {};
       charAtivo.atributos[k] = v;
+      const el = document.querySelector(`[data-mod="${k}"]`);
+      if (el) el.textContent = fmtMod(mod(atributoTotal(charAtivo, k)));
     }
   }
 }
@@ -448,6 +448,7 @@ function validarEAtualizarMod(inp) {
 // Recalcula valores das salvaguardas e perícias on the fly (sem re-render)
 function recalcularValoresPericiasSalv() {
   const atrs = charAtivo.atributos || {};
+  const bonusMestre = charAtivo.atributos_bonus || {};
   const bp = bonusProf(nivelTotalPersonagem(charAtivo));
   // Coleta inputs atuais (incluindo possíveis edições não-salvas)
   $$('[data-attr]').forEach(inp => {
@@ -461,7 +462,7 @@ function recalcularValoresPericiasSalv() {
     if (!cb || !out) return;
     const bonusEl = document.querySelector(`[data-salv-bonus="${k}"]`);
     const bonus = bonusEl ? (parseInt(bonusEl.value, 10) || 0) : 0;
-    const m = mod(atrs[k] ?? 10);
+    const m = mod((atrs[k] ?? 10) + (+bonusMestre[k] || 0));
     out.textContent = fmtMod(m + (cb.checked ? bp : 0) + bonus);
     // Símbolo ○/● da linha compacta (Fase 4, §9) — opcional: só existe em Combate
     const simb = document.querySelector(`[data-salv-simbolo="${k}"]`);
@@ -475,7 +476,7 @@ function recalcularValoresPericiasSalv() {
     if (!prof || !out) return;
     const bonusEl = document.querySelector(`[data-per-bonus="${k}"]`);
     const bonus = bonusEl ? (parseInt(bonusEl.value, 10) || 0) : 0;
-    const m = mod(atrs[atr] ?? 10);
+    const m = mod((atrs[atr] ?? 10) + (+bonusMestre[atr] || 0));
     out.textContent = fmtMod(m + (prof.checked ? bp : 0) + (exp?.checked ? bp : 0) + bonus);
     // Símbolo ○/●/◆ da linha compacta (Fase 4, §9) — opcional: só existe em Combate
     const simb = document.querySelector(`[data-per-simbolo="${k}"]`);
@@ -562,7 +563,7 @@ function conectarListenersEquipamento() {
       const idx = +btn.dataset.equipRolar;
       const arma = (charAtivo.inventario?.armas || [])[idx];
       if (!arma || !window.Ataques) return;
-      const r = Ataques.rolar(arma, charAtivo.atributos, nivelTotalPersonagem(charAtivo), _modoRolagem);
+      const r = Ataques.rolar(arma, atributosEfetivos(charAtivo), nivelTotalPersonagem(charAtivo), _modoRolagem);
       const critico = r.critico ? ' · CRÍTICO!' : r.falhaCritica ? ' · falha crítica' : '';
       toast(`${arma.nome}: ataque ${r.ataqueTexto}${critico} · dano ${r.danoTexto}`);
     });

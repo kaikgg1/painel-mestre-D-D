@@ -232,105 +232,6 @@
   border-top: 1px dashed var(--borda);
 }
 
-/* ===== MODAL FEITIÇARIA — Converter pontos ⇄ slots ===== */
-.fei-overlay {
-  position: fixed; inset: 0; z-index: 300;
-  background: rgba(0,0,0,0.8);
-  backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
-  display: flex; align-items: center; justify-content: center;
-  padding: 20px;
-  animation: fadeIn 0.18s ease-out;
-}
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-/* UI.abrirModal (assets/js/ui.js) sempre embrulha o corpo num .modal-card
-   genérico — aqui o próprio .fei-modal já traz fundo/borda/padding, então o
-   card genérico vira só um wrapper transparente por baixo dele. */
-.fei-overlay .modal-card {
-  background: none; border: none; padding: 0; box-shadow: none;
-  max-width: none; width: auto;
-}
-.fei-modal {
-  background: linear-gradient(160deg, #1c1a14 0%, #151510 100%);
-  border: 2px solid var(--borda);
-  border-radius: 8px;
-  max-width: 520px; width: 100%;
-  max-height: 90vh; max-height: 90dvh;
-  overflow-y: auto;
-  padding: 22px 24px;
-  box-shadow: 0 0 0 1px var(--blood-bright) inset, 0 24px 60px rgba(0,0,0,0.8);
-  position: relative;
-  animation: feiIn 0.2s ease-out;
-}
-@keyframes feiIn { from { transform: scale(0.96); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-.fei-close {
-  position: absolute; top: 12px; right: 12px;
-  background: transparent; border: 1px solid var(--text-dim);
-  color: var(--text-dim); cursor: pointer;
-  width: 32px; height: 32px; border-radius: 4px;
-  font-size: 14px; line-height: 1;
-  transition: all 0.15s;
-}
-.fei-close:hover { border-color: var(--blood-bright); color: var(--parchment); background: var(--blood); }
-.fei-titulo {
-  font-family: var(--f-display);
-  font-size: 20px; color: var(--gold-bright);
-  letter-spacing: 1.5px; margin-bottom: 8px;
-  padding-right: 36px;
-}
-.fei-status {
-  font-family: var(--f-ui); font-size: 13px;
-  color: var(--parchment); letter-spacing: 0.5px;
-  padding: 8px 12px; border-radius: 4px;
-  background: rgba(196,154,58,0.1);
-  border: 1px solid var(--borda);
-  margin-bottom: 16px;
-}
-.fei-status strong { color: var(--gold-bright); font-size: 16px; }
-.fei-sec { margin-bottom: 16px; }
-.fei-sec-titulo {
-  font-family: var(--f-titulo); font-size: 11px;
-  color: var(--gold); letter-spacing: 1.5px;
-  text-transform: uppercase; margin-bottom: 8px;
-}
-.fei-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
-  gap: 6px;
-}
-.fei-opt {
-  background: linear-gradient(180deg, rgba(196,154,58,0.2), rgba(0,0,0,0.3));
-  border: 1px solid var(--borda);
-  color: var(--parchment);
-  padding: 10px 12px; border-radius: 5px;
-  cursor: pointer;
-  font-family: var(--f-ui); font-size: 12px;
-  display: flex; flex-direction: column; gap: 2px;
-  transition: all 0.15s; min-height: 56px;
-  align-items: center; justify-content: center;
-}
-.fei-opt:hover:not(.desabilitada) {
-  border-color: var(--gold-bright);
-  background: linear-gradient(180deg, rgba(196,154,58,0.3), rgba(196,154,58,0.2));
-  transform: translateY(-2px);
-}
-.fei-opt.desabilitada {
-  opacity: 0.4; cursor: not-allowed;
-}
-.fei-opt-lvl { font-weight: 700; letter-spacing: 0.5px; }
-.fei-opt-custo {
-  font-size: 10px; color: var(--gold-bright);
-  letter-spacing: 0.5px; font-style: italic;
-}
-.fei-vazio {
-  grid-column: 1/-1; padding: 14px; text-align: center;
-  color: var(--text-dim); font-style: italic; font-size: 12px;
-}
-.fei-rodape {
-  font-size: 10px; color: var(--text-dim);
-  font-style: italic; padding-top: 10px;
-  border-top: 1px solid var(--borda);
-  margin-top: 10px; line-height: 1.4;
-}
-
 /* Breakpoint do projeto: mobile < 768px (era 640px aqui). Os botões do pool
    (−, −5, +5, +) e o ⟲ de recuperar tudo são clicados em pleno combate, com
    o polegar — alvo de 44px (--touch-target) em vez dos 38px de antes. */
@@ -356,9 +257,6 @@
   .rc-pool-btn { width: var(--touch-target); height: var(--touch-target); font-size: 18px; }
   .rc-pool-btn.rc-pool-btn-big { width: var(--touch-target-lg); font-size: 13px; }
   .rc-reset { min-width: var(--touch-target); min-height: var(--touch-target); }
-  .fei-modal { padding: 18px; }
-  .fei-titulo { font-size: 17px; }
-  .fei-opt { min-height: 52px; }
 }
 
 /* ===== LOCK GLOBAL — modo "ler" por padrão ===== */
@@ -517,7 +415,6 @@ iconify-icon {
 .criatura-img-edit iconify-icon,
 .cc-rolar iconify-icon           { vertical-align: -0.14em; }
 .bm-titulo iconify-icon,
-.fei-titulo iconify-icon,
 #modal-titulo iconify-icon       { color: var(--gold-light); }
 
 /* ============================================================

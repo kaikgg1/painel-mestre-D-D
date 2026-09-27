@@ -546,6 +546,15 @@ h3:first-of-type { margin-top: 0; }
   font-family: var(--f-titulo); font-size: var(--fs-label);
   color: var(--text-dim); letter-spacing: 1.4px; text-transform: uppercase;
 }
+/* Selo do bônus/penalidade que o Mestre deu neste atributo (pericias_mestre.js).
+   Só some da UI se o bônus for 0 — ver atributoBonus() em nucleo.js. */
+.atributo .attr-bonus-mestre {
+  display: inline-block; margin-left: 4px;
+  font-family: var(--f-ui); font-size: 10px; font-weight: 700;
+  color: var(--gold-light); background: var(--sf-ouro);
+  border: 1px solid var(--borda-ouro); border-radius: var(--r-pill);
+  padding: 0 5px; letter-spacing: 0;
+}
 .atributo .valor-base {
   background: transparent; border: none;
   color: var(--parchment); font-family: var(--f-num);

@@ -29,7 +29,7 @@ function calcularCarga(c) {
   const totalMoedas = ['po','pp','pe','pc','pl'].reduce((s, cod) => s + (+m[cod] || 0), 0);
   const pesoMoedas = totalMoedas / 100;
   const total = pesoArmas + pesoArmaduras + pesoItens + pesoMoedas;
-  const forca = Math.max(0, +c.atributos?.for || 10);
+  const forca = Math.max(0, atributoTotal(c, 'for') || 10);
   const capacidade = forca * 7.5;
   let nivel = 'normal';
   if (total > capacidade) nivel = 'excede';
@@ -79,7 +79,7 @@ function renderEquipamento(c) {
         <h3 class="bloco-titulo">Armas</h3>
         <span class="contador-bloco">${inv.armas?.length || 0}</span>
       </div>
-      ${renderCardsArmas(inv.armas || [], c.atributos, nivelTotalPersonagem(c))}
+      ${renderCardsArmas(inv.armas || [], atributosEfetivos(c), nivelTotalPersonagem(c))}
       <div class="adicionar-bloco equip-acoes">
         <button class="btn no-lock" type="button" id="btn-abrir-seletor-arma">${ico('buscar')} Adicionar arma do catálogo (${window.PHB.ARMAS.length})</button>
         ${botaoAbrirSheet('sheet-arma', '+ Arma fora do catálogo')}

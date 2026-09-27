@@ -17,7 +17,7 @@ function recursosPara(c, atrs) {
 function renderRecursosClasse(c) {
   const wrap = document.getElementById('recursos-classe-wrap');
   if (!wrap) return;
-  const recursos = recursosPara(c, c.atributos);
+  const recursos = recursosPara(c, atributosEfetivos(c));
   if (!recursos.length) { wrap.innerHTML = ''; return; }
 
   const usados = c.recursos_usados || {};
@@ -62,7 +62,6 @@ function renderRecursosClasse(c) {
   const cabec = `
     <div class="rc-cabecalho">
       <h3 style="margin:0">Recursos de ${escape(c.classe || 'Classe')} <span class="rc-nv">N${+c.nivel || 1}</span></h3>
-      ${ehFeit ? `<button type="button" class="btn no-lock" id="btn-fei-converter" title="Converter pontos ⇄ slots">⇄ Converter</button>` : ''}
     </div>`;
 
   wrap.innerHTML = `
@@ -72,7 +71,42 @@ function renderRecursosClasse(c) {
     </div>`;
 
   ligarListenersRecursos();
-  if (ehFeit) ligarConversorFeiticaria();
+  if (ehFeit && window.FeiticeiroUI) wrap.querySelector('.rc-painel').appendChild(blocoFeiticeiroFicha(c));
+}
+
+// Fonte de Magia + Metamágica (assets/js/feiticeiro_ui.js — o mesmo bloco dos
+// painéis do Mestre). Cada campo tem save próprio, fora do autosave do form.
+function blocoFeiticeiroFicha(c) {
+  if (!c.recursos_usados || typeof c.recursos_usados !== 'object') c.recursos_usados = {};
+  if (!c.slots_magia) c.slots_magia = {};
+  return window.FeiticeiroUI.bloco({
+    nivel: c.nivel,
+    getRec: () => charAtivo.recursos_usados,
+    getSlots: () => charAtivo.slots_magia,
+    getMetamagias: () => charAtivo.metamagias || [],
+    salvarRecursos: patch => {
+      _ultimoSaveLocal = Date.now();
+      window.RecursosClasse.gravarRecursosUsados(charAtivo.id, patch)
+        .catch(e => { console.warn('[feiticeiro] recursos:', e); toast('Falha ao salvar — tente novamente', 'aviso'); });
+    },
+    salvarSlots: async () => {
+      _ultimoSaveLocal = Date.now();
+      const { error } = await window.sb.from('characters').update({ slots_magia: charAtivo.slots_magia }).eq('id', charAtivo.id);
+      if (error) { console.warn('[feiticeiro] slots:', error); toast('Falha ao salvar espaços — tente novamente', 'aviso'); }
+    },
+    salvarMetamagias: async arr => {
+      charAtivo.metamagias = arr;
+      _ultimoSaveLocal = Date.now();
+      const { error } = await window.sb.from('characters').update({ metamagias: arr }).eq('id', charAtivo.id);
+      if (error) { console.warn('[feiticeiro] metamágica:', error); toast('Falha ao salvar Metamágica', 'aviso'); }
+    },
+    atualizar: () => {
+      const aba = document.querySelector('.tab.ativa')?.dataset.tab;
+      if (aba === 'combate' || aba === 'magias') render();
+      else renderRecursosClasse(charAtivo);
+    },
+    avisar: msg => toast(msg),
+  });
 }
 
 // Event delegation: 1 listener no painel inteiro, em vez de N listeners individuais.
@@ -175,7 +209,7 @@ async function alternarPipRecurso(pip) {
 async function ajustarRecurso(id, delta) {
   if (!charAtivo) return;
   if (_lockRecurso.has(id)) return;
-  const recs = recursosPara(charAtivo, charAtivo.atributos);
+  const recs = recursosPara(charAtivo, atributosEfetivos(charAtivo));
   const def = recs.find(r => r.id === id);
   if (!def) return;
 
@@ -225,132 +259,6 @@ async function ajustarRecurso(id, delta) {
   }
 }
 
-/* ===== FEITICEIRO: Conversor Pontos ⇄ Slots ===== */
-function ligarConversorFeiticaria() {
-  const btn = document.getElementById('btn-fei-converter');
-  if (!btn) return;
-  btn.addEventListener('click', abrirModalConversorFeit);
-}
-
-// Custos PHB para criar slot via pontos de feitiçaria
-const CUSTO_SLOT_DE_PONTOS = { 1: 2, 2: 3, 3: 5, 4: 6, 5: 7 };
-
-function abrirModalConversorFeit() {
-  if (!charAtivo) return;
-  const nv = +charAtivo.nivel || 1;
-  const recs = recursosPara(charAtivo, charAtivo.atributos);
-  const ptDef = recs.find(r => r.id === 'pontos_feiticaria');
-  if (!ptDef) return;
-  const ptUsados = (charAtivo.recursos_usados || {}).pontos_feiticaria || 0;
-  const ptLivres = ptDef.max - ptUsados;
-
-  // Quais slots o feiticeiro pode criar? (PHB: até 5° nível)
-  const slotsMagia = charAtivo.slots_magia || {};
-  let opcoes = '';
-  for (let lvl = 1; lvl <= 5; lvl++) {
-    const custo = CUSTO_SLOT_DE_PONTOS[lvl];
-    const podePagar = ptLivres >= custo;
-    opcoes += `
-      <button type="button" class="fei-opt ${podePagar ? '' : 'desabilitada'}"
-              data-fei-criar="${lvl}" ${podePagar ? '' : 'disabled'}>
-        <span class="fei-opt-lvl">Slot ${lvl}°</span>
-        <span class="fei-opt-custo">${custo} pt</span>
-      </button>`;
-  }
-
-  // Quais slots pode converter EM pontos? (PHB: 1 slot de nível X = X pontos)
-  let conversaoVolta = '';
-  for (let lvl = 1; lvl <= 9; lvl++) {
-    const s = slotsMagia[lvl];
-    if (!s) continue;
-    const livres = (s.max || 0) - (s.atual || 0);
-    if (livres <= 0) continue;
-    conversaoVolta += `
-      <button type="button" class="fei-opt" data-fei-quebrar="${lvl}">
-        <span class="fei-opt-lvl">Slot ${lvl}°</span>
-        <span class="fei-opt-custo">→ ${lvl} pt</span>
-      </button>`;
-  }
-  if (!conversaoVolta) conversaoVolta = '<div class="fei-vazio">Nenhum slot disponível para converter.</div>';
-
-  // Overlay/card genéricos (UI.abrirModal, assets/js/ui.js) — antes este
-  // modal criava seu próprio overlay sem tratar Esc; ganha isso de graça
-  // migrando pro helper compartilhado (mesmo usado pelo Conjurar de magias).
-  const { overlay, fechar } = UI.abrirModal({
-    className: 'fei-overlay',
-    corpoHtml: `
-      <div class="fei-modal">
-        <button class="fei-close" type="button" aria-label="Fechar">✕</button>
-        <div class="fei-titulo" id="fei-titulo">⇄ Fonte de Magia</div>
-        <div class="fei-status">Pontos de Feitiçaria: <strong>${ptLivres}</strong> / ${ptDef.max}</div>
-        <div class="fei-sec">
-          <div class="fei-sec-titulo">Criar slot (gasta pontos)</div>
-          <div class="fei-grid">${opcoes}</div>
-        </div>
-        <div class="fei-sec">
-          <div class="fei-sec-titulo">Quebrar slot em pontos</div>
-          <div class="fei-grid">${conversaoVolta}</div>
-        </div>
-        <div class="fei-rodape">PHB: 1 slot 1°=2 · 2°=3 · 3°=5 · 4°=6 · 5°=7. Sem conversão acima do 5° nível.</div>
-      </div>`,
-  });
-  overlay.querySelector('.modal-card')?.setAttribute('aria-labelledby', 'fei-titulo');
-  overlay.querySelector('.fei-close').onclick = fechar;
-
-  // Criar slot
-  overlay.querySelectorAll('[data-fei-criar]').forEach(b => {
-    b.onclick = () => {
-      const lvl = +b.dataset.feiCriar;
-      const custo = CUSTO_SLOT_DE_PONTOS[lvl];
-      const rec = charAtivo.recursos_usados || {};
-      const usados = rec.pontos_feiticaria || 0;
-      if (ptDef.max - usados < custo) return;
-      // Garante que existe entry de slot desse nível
-      const sm = charAtivo.slots_magia || {};
-      if (!sm[lvl]) sm[lvl] = { max: 0, atual: 0 };
-      sm[lvl].max = Math.max(sm[lvl].max, 1);
-      sm[lvl].atual = Math.max(0, (sm[lvl].atual || 0) - 1);
-      // "atual" é o nº de slots GASTOS (mesmo campo lido em aba_combate.js/aba_magias.js).
-      // Criar um slot novo disponível: se atual > 0, decrementa (havia slot gasto pra "reaproveitar");
-      // senão aumenta max (slot extra de verdade).
-      charAtivo.slots_magia = sm;
-      rec.pontos_feiticaria = usados + custo;
-      charAtivo.recursos_usados = rec;
-      toast(`✓ Slot de nível ${lvl} criado (-${custo} pt)`);
-      salvarRecursosSeguro();
-      // Salva slots_magia direto
-      window.sb.from('characters').update({ slots_magia: charAtivo.slots_magia }).eq('id', charAtivo.id);
-      fechar();
-      renderRecursosClasse(charAtivo);
-      // Re-render aba Combate se aberta (slots aparecem lá)
-      const tabAtual = document.querySelector('.tab.ativa')?.dataset.tab;
-      if (tabAtual === 'combate') render();
-    };
-  });
-
-  // Quebrar slot
-  overlay.querySelectorAll('[data-fei-quebrar]').forEach(b => {
-    b.onclick = () => {
-      const lvl = +b.dataset.feiQuebrar;
-      const sm = charAtivo.slots_magia || {};
-      if (!sm[lvl] || (sm[lvl].max - (sm[lvl].atual || 0)) <= 0) return;
-      sm[lvl].atual = (sm[lvl].atual || 0) + 1;
-      const rec = charAtivo.recursos_usados || {};
-      const usados = rec.pontos_feiticaria || 0;
-      rec.pontos_feiticaria = Math.max(0, usados - lvl);
-      charAtivo.slots_magia = sm;
-      charAtivo.recursos_usados = rec;
-      toast(`✓ Slot ${lvl}° → +${lvl} pt`);
-      salvarRecursosSeguro();
-      window.sb.from('characters').update({ slots_magia: charAtivo.slots_magia }).eq('id', charAtivo.id);
-      fechar();
-      renderRecursosClasse(charAtivo);
-      const tabAtual = document.querySelector('.tab.ativa')?.dataset.tab;
-      if (tabAtual === 'combate') render();
-    };
-  });
-}
-
 /* ============================================================
    DESCANSO CURTO / LONGO — aplica a regra do PHB em lote, em vez de
    o jogador ter que clicar em cada pip de cada slot/recurso um por um.
@@ -372,7 +280,7 @@ async function aplicarDescanso(tipo) {
   const rec = Object.assign({}, charAtivo.recursos_usados || {});
 
   // 1) Recursos de classe (RecursosClasse) — período já estruturado.
-  for (const r of recursosPara(charAtivo, charAtivo.atributos)) {
+  for (const r of recursosPara(charAtivo, atributosEfetivos(charAtivo))) {
     const curto = /curto/i.test(r.periodo || '');
     if (longo || curto) gravarUsadoRecurso(rec, r.id, 0);
   }
@@ -404,6 +312,8 @@ async function aplicarDescanso(tipo) {
   for (const lvl of Object.keys(sm)) {
     if (longo || tipoSlot === 'pact') sm[lvl] = Object.assign({}, sm[lvl], { atual: 0 });
   }
+  // Espaços criados com pontos de feitiçaria somem no descanso longo (PHB).
+  if (longo) window.RecursosClasse?.limparSlotsExtras(sm, rec);
 
   const payload = { slots_magia: sm };
   let msg = longo ? 'Descanso longo aplicado' : 'Descanso curto aplicado';

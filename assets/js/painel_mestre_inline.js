@@ -38,11 +38,24 @@ function salvar(p) {
 // da mesma lista até essa mesclagem). Sem isto, marcar UM recurso aqui
 // apagava os outros que só existiam no banco — era o bug dos "Recursos de
 // Classe" da Lilith sumindo. Ver comentário completo em recursos_classe.js.
-async function salvarRecursosMesclado(p) {
+// Grava só a chave que mudou: p.recursosUsados inteiro pode estar velho e
+// reverteria no banco o que o jogador mudou nas outras chaves.
+function marcarRecurso(p, id, val, maxLivre) {
+  if (!p.recursosUsados || typeof p.recursosUsados !== 'object') p.recursosUsados = {};
+  if (maxLivre != null) {
+    const antigo = p.recursosUsados[id];
+    p.recursosUsados[id] = { ...(antigo && typeof antigo === 'object' ? antigo : {}), max: maxLivre, atual: val };
+  } else {
+    window.RecursosClasse.gravarUsado(p.recursosUsados, id, val);
+  }
+  salvarRecursosMesclado(p, { [id]: p.recursosUsados[id] });
+}
+
+async function salvarRecursosMesclado(p, patch) {
   if (!window.RecursosClasse || !p?.id) return;
   marcarEcoLocal(p.id);
   try {
-    await window.RecursosClasse.gravarRecursosUsados(p.id, p.recursosUsados);
+    await window.RecursosClasse.gravarRecursosUsados(p.id, patch || p.recursosUsados);
   } catch (e) {
     console.warn('[recursos] erro ao salvar:', e);
     window.dispatchEvent(new CustomEvent('dbsync:erro', { detail: { id: p.id, error: e.message } }));
@@ -666,7 +679,7 @@ function criarCard(p) {
     };
     const fazTracker = (max, atual, onMudar) => max > 12 ? fazPool(max, atual, onMudar) : fazPips(max, atual, onMudar);
 
-    const catalogo = window.RecursosClasse.recursosPara({ classe: p.classe, nivel: p.nivel }, p.atributos);
+    const catalogo = window.RecursosClasse.recursosPara({ classe: p.classe, nivel: p.nivel }, window.RecursosClasse.atributosEfetivos(p));
     const idsCatalogo = new Set(catalogo.map(r => r.id));
 
     catalogo.forEach(def => {
@@ -683,10 +696,9 @@ function criarCard(p) {
       window.DetalhesCatalogo?.ligarNomeHabilidade(nomeSpan, window.DetalhesCatalogo.slugFeature(def.nome), p.classe, def.nome, true);
       const atual = window.RecursosClasse.lerUsado(recursos, def.id);
       row.appendChild(nomeSpan);
-      row.appendChild(fazTracker(def.max, atual, (val) => {
-        window.RecursosClasse.gravarUsado(recursos, def.id, val);
-        salvarRecursosMesclado(p);
-      }));
+      // Sempre via p.recursosUsados: o realtime troca esse objeto com
+      // Object.assign e mexer na const `recursos` velha perdia o clique.
+      row.appendChild(fazTracker(def.max, atual, (val) => marcarRecurso(p, def.id, val)));
       recBody.appendChild(row);
     });
 
@@ -706,16 +718,15 @@ function criarCard(p) {
       nomeSpan.textContent = k.replace(/_/g, ' ');
       window.DetalhesCatalogo?.ligarNomeHabilidade(nomeSpan, k, p.classe);
       row.appendChild(nomeSpan);
-      row.appendChild(fazTracker(r.max, r.atual || 0, (val) => {
-        r.atual = val;
-        salvarRecursosMesclado(p);
-      }));
+      row.appendChild(fazTracker(r.max, r.atual || 0, (val) => marcarRecurso(p, k, val, r.max)));
       recBody.appendChild(row);
     });
 
     if (!catalogo.length && !chavesLivres.length) {
       recBody.innerHTML = `<span class="recurso-vazio">Sem recursos rastreáveis pra essa classe (ou ainda não sincronizado com a ficha do jogador).</span>`;
     }
+    const blocoFeit = montarBlocoFeiticeiro(p);
+    if (blocoFeit) recBody.appendChild(blocoFeit);
     recSection.appendChild(recBody);
     card.appendChild(recSection);
   }
@@ -976,7 +987,7 @@ function criarCard(p) {
   const periciasBtn = document.createElement('button');
   periciasBtn.className = 'save-card';
   periciasBtn.innerHTML = ico('alvo') + 'Perícias';
-  periciasBtn.title = 'Dar/tirar bônus de perícia';
+  periciasBtn.title = 'Dar/tirar bônus de perícia ou de atributo';
   periciasBtn.onclick = () => {
     if (window.AjustePericias) window.AjustePericias.abrir(p.id, p.nome);
   };
@@ -1054,6 +1065,7 @@ function aplicarDescansoLongo(p) {
   p.exaustao = Math.max(0, (p.exaustao || 0) - 1);
   p.sucessos = 0;
   p.falhas = 0;
+  if (p.slots) window.RecursosClasse?.limparSlotsExtras(p.slots, p.recursosUsados);
   if (p.slots) Object.keys(p.slots).forEach(nv => { p.slots[nv].atual = 0; });
   if (p.recursosUsados && typeof p.recursosUsados === 'object') {
     // Dois formatos coexistem em recursos_usados: {atual,max} (trackers da

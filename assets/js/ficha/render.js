@@ -138,13 +138,16 @@ function renderPersonagem(c, atrs) {
     <div id="pj-sec-atributos">
       <h3>Atributos</h3>
       <div class="grid-6">
-        ${ATRIBUTOS.map(([k, nome]) => `
+        ${ATRIBUTOS.map(([k, nome]) => {
+          const bonusMestre = atributoBonus(c, k);
+          return `
           <div class="atributo">
-            <span class="nome-atr">${nome.slice(0,3).toUpperCase()}</span>
+            <span class="nome-atr">${nome.slice(0,3).toUpperCase()}${bonusMestre ? `<span class="attr-bonus-mestre" title="Bônus do Mestre: ${fmtMod(bonusMestre)}">${fmtMod(bonusMestre)}</span>` : ''}</span>
             <input type="text" inputmode="numeric" class="valor-base" name="attr_${k}" value="${atrs[k] ?? 10}" data-attr="${k}" data-validar="int" data-min="1" data-max="30" aria-label="${nome} (valor base 1-30)">
-            <span class="modificador" data-mod="${k}">${fmtMod(mod(atrs[k]))}</span>
+            <span class="modificador" data-mod="${k}">${fmtMod(mod(atributoTotal(c, k)))}</span>
           </div>
-        `).join('')}
+        `;
+        }).join('')}
       </div>
     </div>
 
