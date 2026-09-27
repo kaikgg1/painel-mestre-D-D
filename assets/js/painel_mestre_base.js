@@ -137,6 +137,25 @@ function montarSecaoHabilidades(p) {
     }
     const porNivel = new Map();
     habs.forEach(h => { if (!porNivel.has(h.nivel)) porNivel.set(h.nivel, []); porNivel.get(h.nivel).push(h); });
+    // Conjuradores ganham magias de nível mais alto em níveis sem habilidade
+    // nova no livro (Feiticeiro 5/7/9…) — sem isto a lista parecia parar antes
+    // do nível do personagem.
+    if (window.SlotsPHB) {
+      const maxCirculo = n => {
+        const s = window.SlotsPHB.porClasse(p.classe, n, p._subclasse) || {};
+        let m = 0;
+        for (let i = 1; i <= 9; i++) if ((s[i] || 0) > 0) m = i;
+        return m;
+      };
+      for (let n = 1, antes = 0; n <= Math.min(20, +p.nivel || 1); n++) {
+        const m = maxCirculo(n);
+        if (m > antes) {
+          if (!porNivel.has(n)) porNivel.set(n, []);
+          porNivel.get(n).push({ nivel: n, nome: `Magias de ${m}° nível`, desc: `A partir deste nível você tem espaços de magia de ${m}° nível e pode conjurar magias desse nível.` });
+        }
+        antes = Math.max(antes, m);
+      }
+    }
     [...porNivel.keys()].sort((a, b) => a - b).forEach(nv => {
       corpo.appendChild(titulo(`Nível ${nv}`));
       porNivel.get(nv).forEach(h => corpo.appendChild(item(h.nome, h.desc, h.subclasse)));

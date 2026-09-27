@@ -22,7 +22,7 @@ window.fetch = async (url) => {
   return { ok: true, status: 200, json: async () => JSON.parse(txt) };
 };
 
-for (const m of ['icones.js', 'regras_base.js', 'recursos_classe.js', 'feiticeiro_ui.js', 'habilidades_regras.js', 'progressao_classes.js', 'painel_mestre_base.js']) {
+for (const m of ['icones.js', 'regras_base.js', 'phb_slots.js', 'recursos_classe.js', 'feiticeiro_ui.js', 'habilidades_regras.js', 'progressao_classes.js', 'painel_mestre_base.js']) {
   const sc = window.document.createElement('script');
   sc.textContent = fs.readFileSync(path.join(raiz, 'assets/js', m), 'utf8');
   window.document.head.appendChild(sc);
@@ -52,6 +52,20 @@ const esperar = async (cond) => { for (let i = 0; i < 100 && !cond(); i++) await
   if (niveis.some(t => /Nível (1[0-9]|20)/.test(t))) erros.push('habilidades do Mestre: grupo de nível acima do 9');
   if (nomes.filter(n => n === '').length) erros.push('habilidades do Mestre: característica sem nome listada');
   if (!sec.querySelector('.hab-mestre-sub')) erros.push('habilidades do Mestre: sem tag de subclasse');
+
+  // A lista vai até o nível do personagem: Feiticeiro 9 tem 5 (3° círculo),
+  // 7 (4°), 8 (aumento de atributo) e 9 (5°); Paladino 8 tem o 8.
+  const lando = window.montarSecaoHabilidades({ classe: 'Feiticeiro', nivel: 9, _subclasse: 'Linhagem Dracônica' });
+  window.document.body.appendChild(lando);
+  await esperar(() => !/Carregando/.test(lando.textContent));
+  const nivLando = [...lando.querySelectorAll('.hab-mestre-nivel')].map(h => h.textContent);
+  for (const n of ['Nível 5', 'Nível 7', 'Nível 8', 'Nível 9']) if (!nivLando.includes(n)) erros.push('habilidades do Mestre: Feiticeiro 9 sem o grupo ' + n);
+  if (!/Magias de 5° nível/.test(lando.textContent)) erros.push('habilidades do Mestre: Feiticeiro 9 sem "Magias de 5° nível"');
+  const vaclav = window.montarSecaoHabilidades({ classe: 'Paladino', nivel: 8, _subclasse: 'Juramento de Vingança' });
+  window.document.body.appendChild(vaclav);
+  await esperar(() => !/Carregando/.test(vaclav.textContent));
+  if (![...vaclav.querySelectorAll('.hab-mestre-nivel')].some(h => h.textContent === 'Nível 8')) erros.push('habilidades do Mestre: Paladino 8 sem o grupo Nível 8');
+  if ([...vaclav.querySelectorAll('.hab-mestre-nivel')].some(h => /Nível (9|1\d|20)/.test(h.textContent))) erros.push('habilidades do Mestre: Paladino 8 mostrou nível acima do 8');
 
   // Histórico das escolhas de nível + aviso de nível pendente.
   const comHist = window.montarSecaoHabilidades({

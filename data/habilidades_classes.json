@@ -38,7 +38,12 @@
     { "nivel": 10, "subclasse": "Caminho do Guerreiro Totêmico", "nome": "Andarilho Espiritual",
       "desc": "Você pode conjurar comunhão com a natureza, apenas como ritual. Uma versão espiritual de um dos animais escolhidos em Totem Espiritual ou Aspecto da Besta aparece para transmitir a informação." },
     { "nivel": 14, "subclasse": "Caminho do Guerreiro Totêmico", "nome": "Sintonia Totêmica",
-      "desc": "Benefício baseado num totem à escolha (mesmo ou diferente). Águia: em fúria, deslocamento de voo igual ao de caminhada; você cai se terminar o turno no ar sem ter onde se agarrar. Lobo: em fúria, quando atingir uma criatura Grande ou menor com ataque corpo-a-corpo com arma, pode usar ação bônus para derrubá-la. Urso: em fúria, criaturas hostis a até 1,5 metro têm desvantagem em ataques contra alvos que não sejam você ou outro personagem com essa característica; imune se não puder ver ou ouvir você ou não puder ser amedrontada." }
+      "desc": "Benefício baseado num totem à escolha (mesmo ou diferente). Águia: em fúria, deslocamento de voo igual ao de caminhada; você cai se terminar o turno no ar sem ter onde se agarrar. Lobo: em fúria, quando atingir uma criatura Grande ou menor com ataque corpo-a-corpo com arma, pode usar ação bônus para derrubá-la. Urso: em fúria, criaturas hostis a até 1,5 metro têm desvantagem em ataques contra alvos que não sejam você ou outro personagem com essa característica; imune se não puder ver ou ouvir você ou não puder ser amedrontada." },
+
+    { "nivel": 8, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." },
+    { "nivel": 12, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." },
+    { "nivel": 16, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." },
+    { "nivel": 19, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." }
   ],
   "bardo": [
     { "nivel": 1, "nome": "Conjuração", "desc": "Conjura magias de bardo usando Carisma. Pode usar instrumento musical como foco arcano." },
@@ -79,7 +84,12 @@
     { "nivel": 6, "subclasse": "Colégio do Valor", "nome": "Ataque Extra",
       "desc": "Você pode atacar duas vezes, ao invés de uma, sempre que realizar a ação de Ataque no seu turno." },
     { "nivel": 14, "subclasse": "Colégio do Valor", "nome": "Magia de Batalha",
-      "desc": "Quando você usar sua ação para conjurar uma magia de bardo, pode realizar um ataque com arma como ação bônus." }
+      "desc": "Quando você usar sua ação para conjurar uma magia de bardo, pode realizar um ataque com arma como ação bônus." },
+
+    { "nivel": 8, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." },
+    { "nivel": 12, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." },
+    { "nivel": 16, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." },
+    { "nivel": 19, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." }
   ],
   "bruxo": [
     { "nivel": 1, "nome": "Patrono Sobrenatural", "desc": "Escolha um patrono (Arquifada, Senhor das Trevas ou Grande Antigo). Características nos níveis 1, 6, 10 e 14." },
@@ -131,7 +141,12 @@
     { "nivel": 10, "subclasse": "Patrono Grande Antigo", "nome": "Escudo de Pensamentos",
       "desc": "Seus pensamentos não podem ser lidos por telepatia ou outros meios, a menos que você permita. Você tem resistência a dano psíquico e, sempre que uma criatura causar dano psíquico a você, ela sofre a mesma quantidade de dano." },
     { "nivel": 14, "subclasse": "Patrono Grande Antigo", "nome": "Criar Lacaio",
-      "desc": "Ação: toque um humanoide incapacitado. Ele fica enfeitiçado por você até que remover maldição seja conjurada nele, a condição enfeitiçado seja removida ou você use essa característica novamente. Você pode se comunicar telepaticamente com ele enquanto estiverem no mesmo plano de existência." }
+      "desc": "Ação: toque um humanoide incapacitado. Ele fica enfeitiçado por você até que remover maldição seja conjurada nele, a condição enfeitiçado seja removida ou você use essa característica novamente. Você pode se comunicar telepaticamente com ele enquanto estiverem no mesmo plano de existência." },
+
+    { "nivel": 8, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." },
+    { "nivel": 12, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." },
+    { "nivel": 16, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." },
+    { "nivel": 19, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." }
   ],
   "clerigo": [
     { "nivel": 1, "nome": "Conjuração", "desc": "Conjura magias divinas usando Sabedoria. Símbolo sagrado como foco." },
@@ -255,7 +270,12 @@
     { "nivel": 8, "subclasse": "Domínio da Guerra", "nome": "Golpe Divino",
       "desc": "No 8º nível, uma vez em cada um de seus turnos, quando acertar uma criatura com um ataque com arma, o clérigo pode fazer o ataque causar 1d8 de dano extra do mesmo tipo do dano da arma. No 14º nível, o dano extra aumenta para 2d8." },
     { "nivel": 17, "subclasse": "Domínio da Guerra", "nome": "Avatar da Batalha",
-      "desc": "A partir do 17° nível, o clérigo ganha resistência a dano de concussão, cortante e perfurante de ataques não-mágicos." }
+      "desc": "A partir do 17° nível, o clérigo ganha resistência a dano de concussão, cortante e perfurante de ataques não-mágicos." },
+
+    { "nivel": 8, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." },
+    { "nivel": 12, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." },
+    { "nivel": 16, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." },
+    { "nivel": 19, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." }
   ],
   "druida": [
     { "nivel": 1, "nome": "Druídico (linguagem)", "desc": "Conhece a linguagem secreta dos druidas." },
@@ -294,7 +314,12 @@
     { "nivel": 10, "subclasse": "Círculo da Lua", "nome": "Forma Selvagem de Elemental",
       "desc": "No 10° nível, o druida pode gastar dois usos da Forma Selvagem ao mesmo tempo para se transformar em um elemental da água, do ar, do fogo ou da terra." },
     { "nivel": 14, "subclasse": "Círculo da Lua", "nome": "Mil Formas",
-      "desc": "No 14° nível, o druida pode conjurar a magia alterar-se à vontade." }
+      "desc": "No 14° nível, o druida pode conjurar a magia alterar-se à vontade." },
+
+    { "nivel": 8, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." },
+    { "nivel": 12, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." },
+    { "nivel": 16, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." },
+    { "nivel": 19, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." }
   ],
   "feiticeiro": [
     { "nivel": 1, "nome": "Conjuração", "desc": "Conjura magias arcanas usando Carisma. Foco arcano como componente." },
@@ -329,7 +354,12 @@
     { "nivel": 14, "subclasse": "Magia Selvagem", "nome": "Caos Controlado",
       "desc": "Sempre que você rolar na tabela Surto de Magia Selvagem, pode rolar duas vezes e usar qualquer um dos resultados." },
     { "nivel": 18, "subclasse": "Magia Selvagem", "nome": "Bombardeio de Magia",
-      "desc": "Quando você rolar o dano de uma magia e tirar o valor máximo em qualquer dado, escolha um desses dados, role-o novamente e adicione o resultado ao dano. Só pode ser usado uma vez por rodada." }
+      "desc": "Quando você rolar o dano de uma magia e tirar o valor máximo em qualquer dado, escolha um desses dados, role-o novamente e adicione o resultado ao dano. Só pode ser usado uma vez por rodada." },
+
+    { "nivel": 8, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." },
+    { "nivel": 12, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." },
+    { "nivel": 16, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." },
+    { "nivel": 19, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." }
   ],
   "guerreiro": [
     { "nivel": 1, "nome": "Estilo de Luta", "desc": "Escolha um estilo (Arquearia, Combate com Duas Armas, Defesa, Duelismo, etc.)." },
@@ -392,7 +422,11 @@
     { "nivel": 15, "subclasse": "Cavaleiro Místico", "nome": "Investida Arcana",
       "desc": "Quando usar seu Surto de Ação, você pode se teletransportar até 9 metros para um espaço desocupado que possa ver, antes ou depois da ação adicional." },
     { "nivel": 18, "subclasse": "Cavaleiro Místico", "nome": "Magia de Guerra Aprimorada",
-      "desc": "Quando você usar sua ação para conjurar uma magia (não só truque), pode realizar um ataque com arma com uma ação bônus." }
+      "desc": "Quando você usar sua ação para conjurar uma magia (não só truque), pode realizar um ataque com arma com uma ação bônus." },
+
+    { "nivel": 12, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." },
+    { "nivel": 16, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." },
+    { "nivel": 19, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." }
   ],
   "ladino": [
     { "nivel": 1, "nome": "Expertise (2 perícias)", "desc": "Dobra bônus de proficiência em 2 perícias ou 1 perícia + Ferramentas de Ladrão." },
@@ -452,7 +486,12 @@
     { "nivel": 13, "subclasse": "Trapaceiro Arcano", "nome": "Trapaceiro Versátil",
       "desc": "Com uma ação bônus no seu turno, designe uma criatura a até 1,5 metro da mão espectral de mãos mágicas. Você tem vantagem nas jogadas de ataque contra essa criatura até o final do turno." },
     { "nivel": 17, "subclasse": "Trapaceiro Arcano", "nome": "Ladrão de Magia",
-      "desc": "Imediatamente após uma criatura conjurar uma magia que tenha você como alvo ou inclua você na área, use sua reação para forçá-la a um teste de resistência com o modificador de conjuração dela contra a CD das suas magias. Numa falha, você ignora o efeito da magia sobre você e, se ela for de 1° nível ou mais e de um nível que você possa conjurar (não precisa ser de mago), você a conhece e pode conjurá-la com seus espaços por 8 horas; a criatura não pode conjurá-la nesse período. 1 uso por descanso longo." }
+      "desc": "Imediatamente após uma criatura conjurar uma magia que tenha você como alvo ou inclua você na área, use sua reação para forçá-la a um teste de resistência com o modificador de conjuração dela contra a CD das suas magias. Numa falha, você ignora o efeito da magia sobre você e, se ela for de 1° nível ou mais e de um nível que você possa conjurar (não precisa ser de mago), você a conhece e pode conjurá-la com seus espaços por 8 horas; a criatura não pode conjurá-la nesse período. 1 uso por descanso longo." },
+
+    { "nivel": 8, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." },
+    { "nivel": 12, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." },
+    { "nivel": 16, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." },
+    { "nivel": 19, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." }
   ],
   "mago": [
     { "nivel": 1, "nome": "Conjuração", "desc": "Conjura magias arcanas usando Inteligência. Foco arcano ou livro de magias." },
@@ -544,7 +583,12 @@
     { "nivel": 10, "subclasse": "Escola de Transmutação", "nome": "Metamorfo",
       "desc": "Você adiciona metamorfose ao grimório (se não a tiver) e pode conjurá-la sem gastar espaço de magia, tendo apenas a si mesmo como alvo e virando uma besta de ND 1 ou menor. Recupera após descanso curto ou longo (ainda pode conjurá-la normalmente com espaços)." },
     { "nivel": 14, "subclasse": "Escola de Transmutação", "nome": "Mestre Transmutador",
-      "desc": "Com uma ação, consuma sua pedra de transmutador (destruída; não pode ser refeita até um descanso longo) para um efeito: Transformação Maior (10 min: transmuta objeto não-mágico de até 1,5 m cúbico em outro de tamanho/massa similares e valor igual ou menor); Panaceia (criatura tocada perde todas as maldições, doenças e venenos e recupera todos os PV); Restaurar Vida (conjura reviver mortos por toque, sem espaço nem ter a magia); Restaurar Juventude (criatura voluntária tem idade aparente reduzida em 3d10 anos, mínimo 13)." }
+      "desc": "Com uma ação, consuma sua pedra de transmutador (destruída; não pode ser refeita até um descanso longo) para um efeito: Transformação Maior (10 min: transmuta objeto não-mágico de até 1,5 m cúbico em outro de tamanho/massa similares e valor igual ou menor); Panaceia (criatura tocada perde todas as maldições, doenças e venenos e recupera todos os PV); Restaurar Vida (conjura reviver mortos por toque, sem espaço nem ter a magia); Restaurar Juventude (criatura voluntária tem idade aparente reduzida em 3d10 anos, mínimo 13)." },
+
+    { "nivel": 8, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." },
+    { "nivel": 12, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." },
+    { "nivel": 16, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." },
+    { "nivel": 19, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." }
   ],
   "monge": [
     { "nivel": 1, "nome": "Defesa sem Armadura", "desc": "Sem armadura e sem escudo: CA = 10 + mod DES + mod SAB." },
@@ -590,7 +634,12 @@
     { "nivel": 3, "subclasse": "Caminho dos Quatro Elementos", "nome": "Discípulo dos Elementos",
       "desc": "Você aprende disciplinas elementais; cada uso custa pontos de chi. Conhece Sintonia Elemental e mais uma disciplina à escolha, e aprende uma adicional no 6°, 11° e 17° nível. Toda vez que aprende uma nova, pode substituir uma que já conhecia. Magias de disciplina usam o tempo de conjuração e regras da magia, sem componentes materiais. A partir do 5° nível, cada ponto de chi adicional eleva em 1 o nível da magia (se ela tiver aprimoramento). Máximo de chi por magia (base + adicionais): 5°–8° 3; 9°–12° 4; 13°–16° 5; 17°–20° 6." },
     { "nivel": 3, "subclasse": "Caminho dos Quatro Elementos", "nome": "Disciplinas Elementais",
-      "desc": "Sem nível mínimo: • Sintonia Elemental (ação, sem custo): cria efeito sensorial inofensivo de água/ar/fogo/terra; acende ou apaga vela, tocha ou pequena fogueira; esfria ou esquenta 0,5 kg de material inorgânico por até 1 hora; ou molda terra, fogo, ar ou névoa (até 30 cm cúbicos) em forma bruta por 1 minuto. • Chicote de Água (2 chi, ação): criatura que possa ver a até 9 m faz TR de Destreza; falha: 3d10 de concussão +1d10 por chi adicional e você a derruba ou puxa 7,5 m para perto; sucesso: metade do dano, sem puxar/derrubar. • Golpe de Varredura Cauterizante (2 chi): mãos flamejantes. • Investida dos Espíritos da Ventania (2 chi): lufada de vento. • Moldar o Rio Corrente (1 chi, ação): área de gelo ou água de até 9 m quadrados a até 36 m; transforma água em gelo e vice-versa e remodela o gelo (ergue/baixa elevação, cria ou enche vala, ergue ou achata parede, forma pilar), com extensão até metade da maior dimensão da área; não pode aprisionar ou ferir criaturas. • Presas da Serpente de Fogo (1 chi, ao usar a ação de Ataque): alcance dos ataques desarmados +3 m durante essa ação e o resto do turno; acertos causam fogo em vez de concussão, e gastando 1 chi ao acertar causam +1d10 de fogo. • Punho do Ar Contínuo (2 chi, ação): criatura a até 9 m faz TR de Força; falha: 3d10 de concussão +1d10 por chi adicional, e você pode empurrá-la até 6 m e derrubá-la; sucesso: metade do dano, sem empurrar/derrubar. • Punho dos Quatro Trovões (2 chi): onda trovejante. 6° nível: • Gongo do Pico (3 chi): despedaçar. • Serragem do Vento do Norte (3 chi): imobilizar pessoa. 11° nível: • Cavalgar o Vento (4 chi): voo em si mesmo. • Chamas da Fênix (4 chi): bola de fogo. • Postura da Neblina (4 chi): forma gasosa. 17° nível: • Defesa Eterna da Montanha (5 chi): pele de pedra em si mesmo. • Rio de Chamas Famintas (5 chi): muralha de fogo. • Onda de Pedras Rolantes (6 chi): muralha de pedra. • Sopro do Inverno (6 chi): cone de frio." }
+      "desc": "Sem nível mínimo: • Sintonia Elemental (ação, sem custo): cria efeito sensorial inofensivo de água/ar/fogo/terra; acende ou apaga vela, tocha ou pequena fogueira; esfria ou esquenta 0,5 kg de material inorgânico por até 1 hora; ou molda terra, fogo, ar ou névoa (até 30 cm cúbicos) em forma bruta por 1 minuto. • Chicote de Água (2 chi, ação): criatura que possa ver a até 9 m faz TR de Destreza; falha: 3d10 de concussão +1d10 por chi adicional e você a derruba ou puxa 7,5 m para perto; sucesso: metade do dano, sem puxar/derrubar. • Golpe de Varredura Cauterizante (2 chi): mãos flamejantes. • Investida dos Espíritos da Ventania (2 chi): lufada de vento. • Moldar o Rio Corrente (1 chi, ação): área de gelo ou água de até 9 m quadrados a até 36 m; transforma água em gelo e vice-versa e remodela o gelo (ergue/baixa elevação, cria ou enche vala, ergue ou achata parede, forma pilar), com extensão até metade da maior dimensão da área; não pode aprisionar ou ferir criaturas. • Presas da Serpente de Fogo (1 chi, ao usar a ação de Ataque): alcance dos ataques desarmados +3 m durante essa ação e o resto do turno; acertos causam fogo em vez de concussão, e gastando 1 chi ao acertar causam +1d10 de fogo. • Punho do Ar Contínuo (2 chi, ação): criatura a até 9 m faz TR de Força; falha: 3d10 de concussão +1d10 por chi adicional, e você pode empurrá-la até 6 m e derrubá-la; sucesso: metade do dano, sem empurrar/derrubar. • Punho dos Quatro Trovões (2 chi): onda trovejante. 6° nível: • Gongo do Pico (3 chi): despedaçar. • Serragem do Vento do Norte (3 chi): imobilizar pessoa. 11° nível: • Cavalgar o Vento (4 chi): voo em si mesmo. • Chamas da Fênix (4 chi): bola de fogo. • Postura da Neblina (4 chi): forma gasosa. 17° nível: • Defesa Eterna da Montanha (5 chi): pele de pedra em si mesmo. • Rio de Chamas Famintas (5 chi): muralha de fogo. • Onda de Pedras Rolantes (6 chi): muralha de pedra. • Sopro do Inverno (6 chi): cone de frio." },
+
+    { "nivel": 8, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." },
+    { "nivel": 12, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." },
+    { "nivel": 16, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." },
+    { "nivel": 19, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." }
   ],
   "paladino": [
     { "nivel": 1, "nome": "Sentido Divino", "desc": "Ação: detecta celestiais/mortos-vivos/corruptos em 18m. Usos = 1 + mod CAR/descanso longo." },
@@ -661,7 +710,12 @@
     { "nivel": 15, "subclasse": "Juramento dos Anciões", "nome": "Sentinela Imortal",
       "desc": "Quando for reduzido a 0 pontos de vida sem morrer totalmente, você pode escolher cair para 1 ponto de vida no lugar. Uma vez usada, só pode usar novamente após um descanso longo. Além disso, você não sofre efeitos colaterais por envelhecer e não pode envelhecer magicamente." },
     { "nivel": 20, "subclasse": "Juramento dos Anciões", "nome": "Campeão dos Anciões",
-      "desc": "Com uma ação, você se transforma numa antiga força da natureza por 1 minuto, ganhando: • recupera 10 pontos de vida no início de cada um dos seus turnos; • magias de paladino com tempo de conjuração de 1 ação podem ser conjuradas com uma ação bônus; • criaturas inimigas a até 3 metros têm desvantagem em testes de resistência contra suas magias de paladino e opções de Canalizar Divindade. Uma vez usada, só pode usar novamente após um descanso longo." }
+      "desc": "Com uma ação, você se transforma numa antiga força da natureza por 1 minuto, ganhando: • recupera 10 pontos de vida no início de cada um dos seus turnos; • magias de paladino com tempo de conjuração de 1 ação podem ser conjuradas com uma ação bônus; • criaturas inimigas a até 3 metros têm desvantagem em testes de resistência contra suas magias de paladino e opções de Canalizar Divindade. Uma vez usada, só pode usar novamente após um descanso longo." },
+
+    { "nivel": 8, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." },
+    { "nivel": 12, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." },
+    { "nivel": 16, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." },
+    { "nivel": 19, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." }
   ],
   "patrulheiro": [
     { "nivel": 1, "nome": "Inimigo Predileto", "desc": "Escolha tipo de criatura. Vantagem em testes de Sabedoria pra rastreá-lo e Inteligência pra recordar info." },
@@ -703,6 +757,11 @@
     { "nivel": 11, "subclasse": "Mestre das Feras", "nome": "Tempestade de Garras e Presas",
       "desc": "Seu companheiro pode usar a ação dele para realizar um ataque corpo-a-corpo contra cada criatura, à escolha dele, a até 1,5 metro dele, com uma jogada de ataque separada para cada alvo." },
     { "nivel": 15, "subclasse": "Mestre das Feras", "nome": "Defesa da Besta Superior",
-      "desc": "Sempre que um atacante que seu companheiro puder ver o atingir com um ataque, o companheiro pode usar a reação dele para reduzir o dano desse ataque à metade." }
+      "desc": "Sempre que um atacante que seu companheiro puder ver o atingir com um ataque, o companheiro pode usar a reação dele para reduzir o dano desse ataque à metade." },
+
+    { "nivel": 8, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." },
+    { "nivel": 12, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." },
+    { "nivel": 16, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." },
+    { "nivel": 19, "nome": "Aumento de Pontuação de Atributo", "desc": "+2 em 1 atributo ou +1 em 2 (máx 20) — ou um talento no lugar." }
   ]
 }
