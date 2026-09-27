@@ -63,6 +63,14 @@ const esperar = async (cond) => { for (let i = 0; i < 100 && !cond(); i++) await
   if (!/Nível 10: Metamágica: Magia Sutil · Truques: Luz/.test(comHist.textContent)) erros.push('habilidades do Mestre: histórico de escolhas do nível 10 não apareceu');
   if (!/ainda não fez as escolhas do nível 11/.test(comHist.textContent)) erros.push('habilidades do Mestre: sem aviso de escolhas pendentes');
 
+  const comAviso = window.montarSecaoHabilidades({
+    classe: 'Guerreiro', nivel: 5, _subclasse: 'Campeão',
+    _nivelEscolhas: { ultimoNivelProcessado: 4, historico: {}, aviso: { nivel: 5, motivo: 'Erro ao salvar: sem conexão' } },
+  });
+  window.document.body.appendChild(comAviso);
+  await esperar(() => !/Carregando/.test(comAviso.textContent));
+  if (!/não conseguiu concluir o nível 5: Erro ao salvar/.test(comAviso.textContent)) erros.push('habilidades do Mestre: aviso de nível travado não apareceu');
+
   // Sem subclasse: aviso de subclasse pendente.
   const semSub = window.montarSecaoHabilidades({ classe: 'Guerreiro', nivel: 5, _subclasse: '' });
   window.document.body.appendChild(semSub);

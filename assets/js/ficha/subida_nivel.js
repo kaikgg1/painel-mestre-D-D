@@ -24,6 +24,9 @@
 const ATRASO_VERIFICAR_NIVEL = 1500;
 let _timerNivel = null;
 let _assistenteNivel = null;   // { id, N, fechar } enquanto a caixa está aberta
+// Saída de emergência ("Fechar e avisar o Mestre"): a caixa não reabre pra
+// este personagem/nível até recarregar a página.
+let _nivelAdiado = null;       // { id, N }
 
 function agendarVerificacaoNivel() {
   clearTimeout(_timerNivel);
@@ -66,6 +69,7 @@ async function verificarSubidaNivel() {
     return;
   }
   if (nivel <= ult) return;           // igual, ou o Mestre baixou o nível
+  if (_nivelAdiado && _nivelAdiado.id === id && _nivelAdiado.N === ult + 1) return;
   abrirAssistenteNivel(ult + 1, data);
 }
 
@@ -329,13 +333,11 @@ const PASSOS_NIVEL = {
 
   invocacoes: {
     titulo: () => 'Invocações Místicas',
-    limite(ctx) { return window.ProgressaoPHB.qtdInvocacoes(ctx.dados, ctx.N, ctx.cat.prog); },
-    render(ctx, el) {
-      const sel = ctx.escolhas.invocacoes || (ctx.escolhas.invocacoes = new Set());
+    itens(ctx) {
       const jaTem = new Set(featuresDe(ctx).map(f => f.invocacaoId).filter(Boolean));
       const pacto = pactoAtual(ctx)?.id || '';
       const temRajada = ctx.favoritas.has('Rajada Mística') || (ctx.escolhas.truques && ctx.escolhas.truques.has('Rajada Mística'));
-      const itens = (ctx.cat.invocacoes?.invocacoes || []).filter(i => !jaTem.has(i.id)).map(i => {
+      return (ctx.cat.invocacoes?.invocacoes || []).filter(i => !jaTem.has(i.id)).map(i => {
         const pr = i.prereq || {};
         let bloqueio = '';
         if (pr.nivel && ctx.N < pr.nivel) bloqueio = `requer nível ${pr.nivel}`;
@@ -343,7 +345,18 @@ const PASSOS_NIVEL = {
         const aviso = pr.magia && !temRajada ? `requer o truque ${pr.magia}` : '';
         return { v: i.id, rotulo: i.nome, desc: i.desc, bloqueio, aviso };
       }).sort((a, b) => !!a.bloqueio - !!b.bloqueio);
+    },
+    // Nunca pede mais do que dá pra marcar (pré-requisitos e invocações já tidas).
+    limite(ctx) {
+      const livres = this.itens(ctx).filter(i => !i.bloqueio).length;
+      return Math.min(window.ProgressaoPHB.qtdInvocacoes(ctx.dados, ctx.N, ctx.cat.prog), livres);
+    },
+    render(ctx, el) {
+      const sel = ctx.escolhas.invocacoes || (ctx.escolhas.invocacoes = new Set());
+      for (const id of [...sel]) if (!this.itens(ctx).some(i => i.v === id && !i.bloqueio)) sel.delete(id);
+      const itens = this.itens(ctx);
       const lim = this.limite(ctx);
+      if (!lim) { el.innerHTML = '<p class="ajuda-mini">Nenhuma invocação disponível pra escolher agora — combine com o Mestre.</p>'; return; }
       el.innerHTML = `<p class="ajuda-mini">Escolha ${lim} invocaç${lim > 1 ? 'ões' : 'ão'}.</p>` + htmlChecklist('inv', itens, sel, lim);
       ligarChecklist(el, 'inv', sel, ctx);
     },
@@ -509,6 +522,7 @@ async function abrirAssistenteNivel(N, dados) {
       <div id="lvl-passos"></div>
       <div class="modal-acoes levelup-acoes">
         <span class="ajuda-mini" id="lvl-status"></span>
+        <button type="button" class="btn" id="lvl-adiar" hidden>Fechar e avisar o Mestre</button>
         <button type="button" class="btn" id="lvl-concluir">✓ Concluir nível ${N}</button>
       </div>`,
   });
@@ -576,7 +590,27 @@ async function abrirAssistenteNivel(N, dados) {
     const faltam = passos.filter(p => !PASSOS_NIVEL[p].valido(ctx)).length;
     btn.disabled = faltam > 0;
     card.querySelector('#lvl-status').textContent = faltam ? `Falta${faltam > 1 ? 'm' : ''} ${faltam} escolha${faltam > 1 ? 's' : ''}` : '';
+    // Escolha pendente sem nenhum controle habilitado = impossível de completar.
+    const travado = [...wrap.querySelectorAll('.levelup-bloco.pendente')]
+      .some(b => !b.querySelector('input:not([disabled]), select:not([disabled])'));
+    if (travado) mostrarSaida('Uma escolha deste nível não tem opção disponível.');
   }
+
+  // Saída de emergência: fecha sem concluir, grava o aviso pro Mestre e não
+  // reabre até recarregar a página (aí a caixa volta, no mesmo nível).
+  const btnAdiar = card.querySelector('#lvl-adiar');
+  let motivoSaida = '';
+  function mostrarSaida(motivo) { motivoSaida = motivo; btnAdiar.hidden = false; }
+  btnAdiar.addEventListener('click', async () => {
+    _nivelAdiado = { id: dados.id, N };
+    fechar();
+    _assistenteNivel = null;
+    const ne = { historico: {}, ...(dados.nivel_escolhas || {}), aviso: { nivel: N, motivo: motivoSaida, em: new Date().toISOString() } };
+    _ultimoSaveLocal = Date.now();
+    const { error } = await window.sb.from('characters').update({ nivel_escolhas: ne }).eq('id', dados.id);
+    toast(error ? 'Escolhas do nível adiadas — avise o Mestre' : 'Escolhas do nível adiadas — o Mestre foi avisado', 'aviso');
+  });
+
   desenhar();
 
   btn.addEventListener('click', async () => {
@@ -590,6 +624,7 @@ async function abrirAssistenteNivel(N, dados) {
     for (const p of passos) PASSOS_NIVEL[p].aplicar(ctx, payload, registro);
     const ne = { historico: {}, ...(dados.nivel_escolhas || {}) };
     payload.nivel_escolhas = { ...ne, ultimoNivelProcessado: N, historico: { ...(ne.historico || {}), [N]: registro } };
+    delete payload.nivel_escolhas.aviso;
 
     _ultimoSaveLocal = Date.now();
     const { data: linha, error } = await window.sb.from('characters')
@@ -601,6 +636,7 @@ async function abrirAssistenteNivel(N, dados) {
     if (error) {
       btn.disabled = false;
       card.querySelector('#lvl-status').textContent = 'Erro ao salvar — tente de novo.';
+      mostrarSaida('Erro ao salvar: ' + (error.message || 'sem conexão'));
       console.warn('[subida de nível] erro:', error);
       return;
     }

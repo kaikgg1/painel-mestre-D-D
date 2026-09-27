@@ -167,7 +167,10 @@ function montarSecaoHabilidades(p) {
     if (Number.isInteger(+pend) && +p.nivel > +pend) {
       const aviso = document.createElement('div');
       aviso.className = 'hab-mestre-vazio';
-      aviso.textContent = `O jogador ainda não fez as escolhas do nível ${+pend + 1} (a caixa abre na ficha dele).`;
+      const av = p._nivelEscolhas.aviso;
+      aviso.textContent = av && +av.nivel === +pend + 1
+        ? `⚠ O jogador não conseguiu concluir o nível ${av.nivel}: ${av.motivo || 'sem motivo'}. A caixa volta quando ele recarregar a ficha.`
+        : `O jogador ainda não fez as escolhas do nível ${+pend + 1} (a caixa abre na ficha dele).`;
       corpo.insertBefore(aviso, corpo.firstChild);
     }
     if (!corpo.children.length) corpo.innerHTML = `<div class="hab-mestre-vazio">Nenhuma habilidade encontrada.</div>`;

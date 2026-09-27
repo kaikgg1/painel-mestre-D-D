@@ -97,6 +97,7 @@ function construirQuery(tabela, payloadUpdate) {
       if (tabela === 'characters' && window.__linhaNivelTeste) {
         if (payloadUpdate) {
           if (window.__nivelSemLinha) return { data: null, error: null };
+        if (window.__nivelErro) return { data: null, error: { message: 'falha simulada' } };
           Object.assign(window.__linhaNivelTeste, payloadUpdate);
         }
         return { data: { ...window.__linhaNivelTeste }, error: null };
@@ -2108,9 +2109,46 @@ console.log(erros.some(e => e.startsWith('header:'))
       const feat = up?.features_personalizadas?.find(f => f.talentoId === 'atleta');
       if (!feat || !feat.talentoAplicado || up.atributos?.for !== 17) erros.push('subida de nível: talento Atleta não virou característica com +1 FOR aplicado');
     }
+    fecharCaixas();
+
+    // 9) Bruxo 9 que já tem todas as invocações liberadas: não pede o impossível.
+    const invs = JSON.parse(fs.readFileSync(path.join(raiz, 'data/invocacoes.json'), 'utf8')).invocacoes;
+    const tidas = invs.filter(i => !(i.prereq && i.prereq.pacto)).map(i => ({ id: 'x' + i.id, nome: 'Invocação: ' + i.nome, invocacaoId: i.id }));
+    window.__linhaNivelTeste = { id: idAtivo, nivel: 9, classe: 'Bruxo', subclasse: 'Patrono Grande Antigo', atributos: { ...atrs },
+      features_personalizadas: [...tidas, { id: 'p', nome: 'Pacto do Tomo', pactoId: 'tomo' }, { id: 'lt', nome: 'Invocação: Livro', invocacaoId: 'livro_de_segredos_antigos' }],
+      nivel_escolhas: { ultimoNivelProcessado: 8, historico: {} } };
+    await verificar();
+    const cxb = caixa();
+    const blocoInv = cxb?.querySelector('[data-passo="invocacoes"]');
+    if (!blocoInv) erros.push('subida de nível: Bruxo 9 sem o passo de invocações');
+    else if (blocoInv.classList.contains('pendente')) erros.push('subida de nível: invocação impossível deixou a caixa travada');
+    fecharCaixas();
+
+    // 10) Erro ao salvar: aparece "Fechar e avisar o Mestre"; fecha, grava o aviso e não reabre até recarregar.
+    window.__linhaNivelTeste = { id: idAtivo, nivel: 5, classe: 'Guerreiro', subclasse: 'Campeão', atributos: { ...atrs }, nivel_escolhas: { ultimoNivelProcessado: 4, historico: {} } };
+    await verificar();
+    const cxe = caixa();
+    if (cxe) {
+      if (!cxe.querySelector('#lvl-adiar').hidden) erros.push('subida de nível: saída de emergência visível sem problema nenhum');
+      window.__nivelErro = true;
+      cxe.querySelector('#lvl-concluir').click();
+      for (let i = 0; i < 50 && cxe.querySelector('#lvl-adiar').hidden; i++) await new Promise(r2 => setTimeout(r2, 10));
+      window.__nivelErro = false;
+      if (cxe.querySelector('#lvl-adiar').hidden) erros.push('subida de nível: erro ao salvar não mostrou "Fechar e avisar o Mestre"');
+      window.__todosUpdatePayloads = [];
+      cxe.querySelector('#lvl-adiar').click();
+      await new Promise(r2 => setTimeout(r2, 30));
+      if (caixa()) erros.push('subida de nível: "Fechar e avisar o Mestre" não fechou a caixa');
+      const av = window.__todosUpdatePayloads.find(p => p.nivel_escolhas?.aviso);
+      if (!av || av.nivel_escolhas.aviso.nivel !== 5) erros.push('subida de nível: aviso pro Mestre não foi gravado');
+      window.__esperarCaixa = false;
+      await verificar();
+      if (caixa()) erros.push('subida de nível: caixa adiada reabriu antes de recarregar');
+      window.eval('_nivelAdiado = null;');
+    }
   } catch (e) { erros.push('subida de nível → ' + e.message); }
   finally {
-    window.__nivelSemLinha = false; window.__esperarCaixa = false; window.__linhaNivelTeste = null;
+    window.__nivelSemLinha = false; window.__nivelErro = false; window.__esperarCaixa = false; window.__linhaNivelTeste = null;
     window.eval('clearTimeout(_timerNivel); _assistenteNivel = null;');
     fecharCaixas();
   }
