@@ -993,6 +993,7 @@ function criarCard(p) {
   if (blocoFeit) recBody.appendChild(blocoFeit);
   recSection.appendChild(recBody);
   painelCombate.appendChild(recSection);
+  painelCombate.appendChild(montarSecaoArmas(p));
 
   // Sem seção de XP de propósito: esta mesa não usa XP, o Mestre sobe o
   // nível manualmente quando decide.

@@ -22,7 +22,7 @@ window.fetch = async (url) => {
   return { ok: true, status: 200, json: async () => JSON.parse(txt) };
 };
 
-for (const m of ['icones.js', 'regras_base.js', 'phb_slots.js', 'recursos_classe.js', 'feiticeiro_ui.js', 'habilidades_regras.js', 'progressao_classes.js', 'painel_mestre_base.js']) {
+for (const m of ['icones.js', 'regras_base.js', 'phb_slots.js', 'recursos_classe.js', 'ataques.js', 'feiticeiro_ui.js', 'habilidades_regras.js', 'progressao_classes.js', 'painel_mestre_base.js']) {
   const sc = window.document.createElement('script');
   sc.textContent = fs.readFileSync(path.join(raiz, 'assets/js', m), 'utf8');
   window.document.head.appendChild(sc);
@@ -66,6 +66,15 @@ const esperar = async (cond) => { for (let i = 0; i < 100 && !cond(); i++) await
   await esperar(() => !/Carregando/.test(vaclav.textContent));
   if (![...vaclav.querySelectorAll('.hab-mestre-nivel')].some(h => h.textContent === 'Nível 8')) erros.push('habilidades do Mestre: Paladino 8 sem o grupo Nível 8');
   if ([...vaclav.querySelectorAll('.hab-mestre-nivel')].some(h => /Nível (9|1\d|20)/.test(h.textContent))) erros.push('habilidades do Mestre: Paladino 8 mostrou nível acima do 8');
+
+  // Armas: Espada Longa do Vaclav (FOR 20, nível 8) = ataque +8, dano 1d8+5 (1d10+5 com duas mãos).
+  const armas = window.montarSecaoArmas({ nome: 'Vaclav', classe: 'Paladino', nivel: 8, atributos: { for: 20, dex: 10 },
+    inventario: { armas: [{ nome: 'Espada Longa', dano: '1d8', categoria: 'Marcial corpo-a-corpo', tipo_dano: 'Cortante', propriedades: 'Versátil (1d10)' }] } });
+  if (!/Ataque \+8/.test(armas.textContent) || !/1d8\+5 \(1d10\+5 com duas mãos\)/.test(armas.textContent)) erros.push('armas do Mestre: cálculo da Espada Longa errado → ' + armas.textContent);
+  armas.querySelector('.arma-mestre-rolar').click();
+  if (!/Espada Longa: ataque d20\+8 = \d+/.test(window.document.getElementById('toast').textContent)) erros.push('armas do Mestre: rolar não mostrou o resultado');
+  const semArma = window.montarSecaoArmas({ nome: 'Aquiles', nivel: 9, atributos: {}, inventario: { armas: [] } });
+  if (!/Nenhuma arma no inventário/.test(semArma.textContent)) erros.push('armas do Mestre: sem arma não avisou');
 
   // Histórico das escolhas de nível + aviso de nível pendente.
   const comHist = window.montarSecaoHabilidades({

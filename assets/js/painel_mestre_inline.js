@@ -740,6 +740,8 @@ function criarCard(p) {
     card.appendChild(recSection);
   }
 
+  card.appendChild(montarSecaoArmas(p));
+
   // Habilidades de classe/subclasse — recolhida (este painel não tem abas e a
   // lista inteira deixaria o card enorme).
   const habDet = document.createElement('details');

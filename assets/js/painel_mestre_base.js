@@ -197,6 +197,81 @@ function montarSecaoHabilidades(p) {
   return sec;
 }
 
+// Seção "Armas" da aba Combate: armas do inventário do jogador com bônus de
+// ataque e dano calculados (assets/js/ataques.js — mesma conta da ficha,
+// com o bônus de atributo do Mestre somado) e botão de rolar.
+const CSS_ARMAS_MESTRE = `
+.arma-mestre { padding: 7px 0; border-bottom: 1px solid rgba(139,105,20,.15); display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; align-items: center; }
+.arma-mestre-nome { font-size: 14px; }
+.arma-mestre-calc { font-family: 'Cinzel', serif; font-size: 13px; color: var(--gold, #c49a3a); grid-column: 1; }
+.arma-mestre-calc strong { color: var(--parchment, #e5d8b9); }
+.arma-mestre-props { font-size: 12px; font-style: italic; color: var(--parchment-dim, #8c7d5e); grid-column: 1; }
+.arma-mestre-rolar { grid-column: 2; grid-row: 1 / span 3; min-width: 44px; min-height: 44px; cursor: pointer; background: transparent; border: 1px solid var(--gold, #8B6914); color: var(--gold, #c49a3a); border-radius: 6px; font-size: 18px; }
+.arma-mestre-rolar:hover { background: rgba(139,105,20,.2); }
+`;
+let _cssArmasMestre = false;
+
+function montarSecaoArmas(p) {
+  if (!_cssArmasMestre) {
+    _cssArmasMestre = true;
+    const s = document.createElement('style');
+    s.textContent = CSS_ARMAS_MESTRE;
+    document.head.appendChild(s);
+  }
+  const sec = document.createElement('div');
+  sec.className = 'section';
+  sec.innerHTML = `<div class="section-title">Armas</div>`;
+  const armas = Array.isArray(p.inventario?.armas) ? p.inventario.armas : [];
+  if (!armas.length || !window.Ataques) {
+    const v = document.createElement('div');
+    v.className = 'hab-mestre-vazio';
+    v.style.cssText = 'font-size:12px;font-style:italic;padding:4px 0';
+    v.textContent = 'Nenhuma arma no inventário (o jogador adiciona na aba Equipamento da ficha).';
+    sec.appendChild(v);
+    return sec;
+  }
+  const atrs = window.RecursosClasse ? window.RecursosClasse.atributosEfetivos(p) : (p.atributos || {});
+  const nivel = +p.nivel || 1;
+  const fmt = window.Regras.fmtMod;
+  armas.forEach(arma => {
+    const calc = window.Ataques.calcular(arma, atrs, nivel);
+    const linha = document.createElement('div');
+    linha.className = 'arma-mestre';
+    const nome = document.createElement('div');
+    nome.className = 'arma-mestre-nome';
+    nome.textContent = arma.nome || 'Arma';
+    const calcEl = document.createElement('div');
+    calcEl.className = 'arma-mestre-calc';
+    // Versátil (1d10): mostra também o dano usando com as duas mãos.
+    const versatil = String(arma.propriedades || '').match(/Vers[áa]til\s*\((\d+d\d+)\)/i);
+    const duasMaos = versatil ? ` (${versatil[1]}${calc.danoBonus ? fmt(calc.danoBonus) : ''} com duas mãos)` : '';
+    calcEl.innerHTML = `Ataque <strong>${fmt(calc.bonusAtaque)}</strong> · Dano <strong></strong>`;
+    calcEl.lastElementChild.textContent = calc.danoTexto + duasMaos;
+    const props = document.createElement('div');
+    props.className = 'arma-mestre-props';
+    props.textContent = [arma.tipo_dano, arma.categoria, arma.propriedades, `usa ${calc.atrKey.toUpperCase()}`].filter(Boolean).join(' · ');
+    const rolar = document.createElement('button');
+    rolar.type = 'button';
+    rolar.className = 'arma-mestre-rolar';
+    rolar.textContent = '🎲';
+    rolar.title = 'Rolar ataque e dano';
+    rolar.setAttribute('aria-label', `Rolar ataque com ${arma.nome || 'arma'}`);
+    rolar.onclick = () => {
+      const r = window.Ataques.rolar(arma, atrs, nivel);
+      const crit = r.critico ? ' · CRÍTICO!' : r.falhaCritica ? ' · falha crítica' : '';
+      toast(`${p.nome} — ${arma.nome}: ataque ${r.ataqueTexto}${crit} · dano ${r.danoTexto}`);
+    };
+    linha.append(nome, rolar, calcEl, props);
+    sec.appendChild(linha);
+  });
+  const nota = document.createElement('div');
+  nota.className = 'arma-mestre-props';
+  nota.style.paddingTop = '4px';
+  nota.textContent = 'Assume proficiência na arma. Estilo de luta e itens mágicos não entram na conta.';
+  sec.appendChild(nota);
+  return sec;
+}
+
 // Falha de autosave (DBSync.salvarCampo) hoje só ia pro console — o Mestre
 // achava que tinha salvo e não tinha. Avisa na tela.
 window.addEventListener('dbsync:erro', () => toast('⚠ Falha ao salvar — verifique sua conexão'));
