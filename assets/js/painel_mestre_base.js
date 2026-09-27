@@ -146,6 +146,30 @@ function montarSecaoHabilidades(p) {
       corpo.appendChild(titulo('Talentos e características do jogador'));
       extras.forEach(f => corpo.appendChild(item(f.nome, f.desc, f.talento ? 'Talento' : null)));
     }
+    // O que o jogador escolheu ao subir de nível (assets/js/ficha/subida_nivel.js).
+    const hist = p._nivelEscolhas?.historico || {};
+    const niveisHist = Object.keys(hist).map(Number).sort((a, b) => a - b)
+      .filter(n => window.ProgressaoPHB?.resumoRegistro(hist[n]));
+    if (niveisHist.length) {
+      corpo.appendChild(titulo('Escolhas ao subir de nível'));
+      niveisHist.forEach(n => {
+        const linha = document.createElement('div');
+        linha.className = 'hab-mestre-desc';
+        linha.style.padding = '4px 2px';
+        const forte = document.createElement('strong');
+        forte.textContent = `Nível ${n}: `;
+        linha.appendChild(forte);
+        linha.appendChild(document.createTextNode(window.ProgressaoPHB.resumoRegistro(hist[n])));
+        corpo.appendChild(linha);
+      });
+    }
+    const pend = p._nivelEscolhas?.ultimoNivelProcessado;
+    if (Number.isInteger(+pend) && +p.nivel > +pend) {
+      const aviso = document.createElement('div');
+      aviso.className = 'hab-mestre-vazio';
+      aviso.textContent = `O jogador ainda não fez as escolhas do nível ${+pend + 1} (a caixa abre na ficha dele).`;
+      corpo.insertBefore(aviso, corpo.firstChild);
+    }
     if (!corpo.children.length) corpo.innerHTML = `<div class="hab-mestre-vazio">Nenhuma habilidade encontrada.</div>`;
   });
   return sec;

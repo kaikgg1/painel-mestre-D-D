@@ -22,7 +22,7 @@ window.fetch = async (url) => {
   return { ok: true, status: 200, json: async () => JSON.parse(txt) };
 };
 
-for (const m of ['icones.js', 'regras_base.js', 'recursos_classe.js', 'feiticeiro_ui.js', 'habilidades_regras.js', 'painel_mestre_base.js']) {
+for (const m of ['icones.js', 'regras_base.js', 'recursos_classe.js', 'feiticeiro_ui.js', 'habilidades_regras.js', 'progressao_classes.js', 'painel_mestre_base.js']) {
   const sc = window.document.createElement('script');
   sc.textContent = fs.readFileSync(path.join(raiz, 'assets/js', m), 'utf8');
   window.document.head.appendChild(sc);
@@ -52,6 +52,16 @@ const esperar = async (cond) => { for (let i = 0; i < 100 && !cond(); i++) await
   if (niveis.some(t => /Nível (1[0-9]|20)/.test(t))) erros.push('habilidades do Mestre: grupo de nível acima do 9');
   if (nomes.filter(n => n === '').length) erros.push('habilidades do Mestre: característica sem nome listada');
   if (!sec.querySelector('.hab-mestre-sub')) erros.push('habilidades do Mestre: sem tag de subclasse');
+
+  // Histórico das escolhas de nível + aviso de nível pendente.
+  const comHist = window.montarSecaoHabilidades({
+    classe: 'Feiticeiro', nivel: 11, _subclasse: 'Linhagem Dracônica',
+    _nivelEscolhas: { ultimoNivelProcessado: 10, historico: { 10: { metamagias: ['Magia Sutil'], asi: null, truques: ['Luz'] } } },
+  });
+  window.document.body.appendChild(comHist);
+  await esperar(() => !/Carregando/.test(comHist.textContent));
+  if (!/Nível 10: Metamágica: Magia Sutil · Truques: Luz/.test(comHist.textContent)) erros.push('habilidades do Mestre: histórico de escolhas do nível 10 não apareceu');
+  if (!/ainda não fez as escolhas do nível 11/.test(comHist.textContent)) erros.push('habilidades do Mestre: sem aviso de escolhas pendentes');
 
   // Sem subclasse: aviso de subclasse pendente.
   const semSub = window.montarSecaoHabilidades({ classe: 'Guerreiro', nivel: 5, _subclasse: '' });

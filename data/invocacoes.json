@@ -1,0 +1,279 @@
+{
+  "pactos": [
+    {
+      "id": "corrente",
+      "nome": "Pacto da Corrente",
+      "desc": "Você aprende a magia convocar familiar e pode conjurá-la como um ritual. Essa magia não conta no número de magias que você conhece. Quando você conjura essa magia, você pode escolher uma das formas convencionais para o seu familiar ou uma das seguintes formas especiais: diabrete, pseudodragão, quasit ou sprite. Além disso, quando você realiza a ação de Ataque, você pode renunciar a um dos seus ataques para permitir que seu familiar realize um ataque, com a reação dele."
+    },
+    {
+      "id": "lamina",
+      "nome": "Pacto da Lâmina",
+      "desc": "Você pode usar sua ação para criar uma arma de pacto em sua mão vazia. Você escolhe a forma que essa arma corpo-a-corpo tem a cada vez que você a cria. Você é proficiente com ela enquanto a empunhar. Essa arma conta como sendo mágica com os propósitos de ultrapassar resistência e imunidade a ataques e danos não-mágicos. Ela desaparece se estiver a mais de 1,5 metro de você por 1 minuto ou mais, se você usar essa característica novamente, se você a dissipar (não requer ação) ou se você morrer. Você pode transformar uma arma mágica em sua arma de pacto com um ritual especial de 1 hora (pode ser feito num descanso curto)."
+    },
+    {
+      "id": "tomo",
+      "nome": "Pacto do Tomo",
+      "desc": "Seu patrono lhe deu um grimório chamado Livro das Sombras. Quando você adquire essa característica, escolha três truques da lista de magias de qualquer classe. Enquanto o livro estiver com você, você poderá conjurar esses truques à vontade. Eles não contam no número de truques que você conhece, são considerados magias de bruxo para você e não precisam ser da mesma lista de magia. Se perder o Livro das Sombras, você pode realizar uma cerimônia de 1 hora (durante um descanso curto ou longo) para receber um substituto do seu patrono, o que destrói o livro anterior. O livro se torna cinzas quando você morre."
+    }
+  ],
+  "invocacoes": [
+    {
+      "id": "armadura_de_sombras",
+      "nome": "Armadura de Sombras",
+      "prereq": null,
+      "desc": "Você pode conjurar armadura arcana em si mesmo, à vontade, sem precisar gastar um espaço de magia ou componentes materiais."
+    },
+    {
+      "id": "correntes_de_carceri",
+      "nome": "Correntes de Cárceri",
+      "prereq": {
+        "nivel": 15,
+        "pacto": "corrente",
+        "texto": "15° nível, característica Pacto da Corrente"
+      },
+      "desc": "Você pode conjurar imobilizar monstro, à vontade – tendo como alvo um celestial, corruptor ou elemental – sem precisar gastar um espaço de magia ou componentes materiais. Você deve terminar um descanso longo antes de poder usar essa invocação na mesma criatura novamente."
+    },
+    {
+      "id": "encharcar_a_mente",
+      "nome": "Encharcar a Mente",
+      "prereq": {
+        "nivel": 5,
+        "texto": "5° nível"
+      },
+      "desc": "Você pode conjurar lentidão, uma vez, usando um espaço de magia de bruxo. Você não pode fazer isso novamente até terminar um descanso longo."
+    },
+    {
+      "id": "escultor_de_carne",
+      "nome": "Escultor de Carne",
+      "prereq": {
+        "nivel": 7,
+        "texto": "7° nível"
+      },
+      "desc": "Você pode conjurar metamorfose, uma vez, usando um espaço de magia de bruxo. Você não pode fazer isso novamente até terminar um descanso longo."
+    },
+    {
+      "id": "explosao_agonizante",
+      "nome": "Explosão Agonizante",
+      "prereq": {
+        "magia": "rajada mística",
+        "texto": "truque rajada mística"
+      },
+      "desc": "Quando você conjura rajada mística, adicione seu modificador de Carisma ao dano causado quando atingir."
+    },
+    {
+      "id": "explosao_repulsiva",
+      "nome": "Explosão Repulsiva",
+      "prereq": {
+        "magia": "rajada mística",
+        "texto": "truque rajada mística"
+      },
+      "desc": "Quando você atingir uma criatura com uma rajada mística, você pode empurrar a criatura até 3 metros para longe de você em linha reta."
+    },
+    {
+      "id": "idioma_bestial",
+      "nome": "Idioma Bestial",
+      "prereq": null,
+      "desc": "Você pode conjurar falar com animais, à vontade, sem precisar gastar um espaço de magia."
+    },
+    {
+      "id": "influencia_enganadora",
+      "nome": "Influência Enganadora",
+      "prereq": null,
+      "desc": "Você ganha proficiência nas perícias Enganação e Persuasão."
+    },
+    {
+      "id": "lacaios_do_caos",
+      "nome": "Lacaios do Caos",
+      "prereq": {
+        "nivel": 9,
+        "texto": "9° nível"
+      },
+      "desc": "Você pode conjurar conjurar elemental, uma vez, usando um espaço de magia de bruxo. Você não pode fazer isso novamente até terminar um descanso longo."
+    },
+    {
+      "id": "lamina_sedenta",
+      "nome": "Lâmina Sedenta",
+      "prereq": {
+        "nivel": 5,
+        "pacto": "lamina",
+        "texto": "5° nível, característica Pacto da Lâmina"
+      },
+      "desc": "Você pode atacar com sua arma do pacto duas vezes, ao invés de apenas uma, quando você usa a ação de Ataque no seu turno."
+    },
+    {
+      "id": "lanca_mistica",
+      "nome": "Lança Mística",
+      "prereq": {
+        "magia": "rajada mística",
+        "texto": "truque rajada mística"
+      },
+      "desc": "Quando você conjura rajada mística, seu alcance será de 90 metros."
+    },
+    {
+      "id": "larapio_dos_cinco_destinos",
+      "nome": "Larápio dos Cinco Destinos",
+      "prereq": null,
+      "desc": "Você pode conjurar perdição, uma vez, usando um espaço de magia de bruxo. Você não pode fazer isso novamente até terminar um descanso longo."
+    },
+    {
+      "id": "livro_de_segredos_antigos",
+      "nome": "Livro de Segredos Antigos",
+      "prereq": {
+        "pacto": "tomo",
+        "texto": "Característica Pacto do Tomo"
+      },
+      "desc": "Você pode registrar rituais mágicos no seu Livro das Sombras. Escolha duas magias de 1° nível que possuam o descritor ritual da lista de magias de qualquer classe; elas não contam no número de magias que você conhece. Com o Livro em mãos, você pode conjurá-las como rituais. Você pode adicionar outras magias de ritual se o nível da magia for igual ou inferior à metade do seu nível de bruxo (arredondado para baixo), gastando 2 horas e 50 po por nível da magia para transcrevê-la."
+    },
+    {
+      "id": "mascara_das_muitas_faces",
+      "nome": "Máscara das Muitas Faces",
+      "prereq": null,
+      "desc": "Você pode conjurar disfarçar-se, à vontade, sem precisar gastar um espaço de magia."
+    },
+    {
+      "id": "mestre_das_infindaveis_formas",
+      "nome": "Mestre das Infindáveis Formas",
+      "prereq": {
+        "nivel": 15,
+        "texto": "15° nível"
+      },
+      "desc": "Você pode conjurar alterar-se, à vontade, sem precisar gastar um espaço de magia."
+    },
+    {
+      "id": "olhar_de_duas_mentes",
+      "nome": "Olhar de Duas Mentes",
+      "prereq": null,
+      "desc": "Você pode usar sua ação para tocar um humanoide voluntário e perceber através dos seus sentidos até o final do seu próximo turno. Contanto que a criatura esteja no mesmo plano de existência que você, você pode usar sua ação nas rodadas subsequentes para manter a conexão, estendendo a duração até o início do seu próximo turno. Enquanto estiver percebendo através dos sentidos de outra criatura, você aproveita os benefícios de todos os sentidos especiais dela e fica cego e surdo ao que está à sua volta."
+    },
+    {
+      "id": "olhos_do_guardiao_das_runas",
+      "nome": "Olhos do Guardião das Runas",
+      "prereq": null,
+      "desc": "Você pode ler todas as escritas."
+    },
+    {
+      "id": "palavra_terrivel",
+      "nome": "Palavra Terrível",
+      "prereq": {
+        "nivel": 7,
+        "texto": "7° nível"
+      },
+      "desc": "Você pode conjurar confusão, uma vez, usando um espaço de magia de bruxo. Você não pode fazer isso novamente até terminar um descanso longo."
+    },
+    {
+      "id": "passo_ascendente",
+      "nome": "Passo Ascendente",
+      "prereq": {
+        "nivel": 9,
+        "texto": "9° nível"
+      },
+      "desc": "Você pode conjurar levitação em si mesmo, à vontade, sem precisar gastar um espaço de magia ou componentes materiais."
+    },
+    {
+      "id": "salto_transcendental",
+      "nome": "Salto Transcendental",
+      "prereq": {
+        "nivel": 9,
+        "texto": "9° nível"
+      },
+      "desc": "Você pode conjurar salto em si mesmo, à vontade, sem precisar gastar um espaço de magia ou componentes materiais."
+    },
+    {
+      "id": "sinal_de_mau_agouro",
+      "nome": "Sinal de Mau Agouro",
+      "prereq": {
+        "nivel": 5,
+        "texto": "5° nível"
+      },
+      "desc": "Você pode conjurar rogar maldição, uma vez, usando um espaço de magia de bruxo. Você não pode fazer isso novamente até terminar um descanso longo."
+    },
+    {
+      "id": "sorvedor_de_vida",
+      "nome": "Sorvedor de Vida",
+      "prereq": {
+        "nivel": 12,
+        "pacto": "lamina",
+        "texto": "12° nível, característica Pacto da Lâmina"
+      },
+      "desc": "Quando você atingir uma criatura com sua arma do pacto, a criatura sofre uma quantidade de dano necrótico adicional igual ao seu modificador de Carisma (mínimo 1)."
+    },
+    {
+      "id": "sussurros_da_sepultura",
+      "nome": "Sussurros da Sepultura",
+      "prereq": {
+        "nivel": 9,
+        "texto": "9° nível"
+      },
+      "desc": "Você pode conjurar falar com os mortos, à vontade, sem precisar gastar um espaço de magia."
+    },
+    {
+      "id": "sussurros_sedutores",
+      "nome": "Sussurros Sedutores",
+      "prereq": {
+        "nivel": 7,
+        "texto": "7° nível"
+      },
+      "desc": "Você pode conjurar compulsão, uma vez, usando um espaço de magia de bruxo. Você não pode fazer isso novamente até terminar um descanso longo."
+    },
+    {
+      "id": "uno_com_as_sombras",
+      "nome": "Uno com as Sombras",
+      "prereq": {
+        "nivel": 5,
+        "texto": "5° nível"
+      },
+      "desc": "Quando você estiver em uma área de penumbra ou escuridão, você pode usar sua ação para ficar invisível até se mover ou realizar uma ação ou reação."
+    },
+    {
+      "id": "vigor_abissal",
+      "nome": "Vigor Abissal",
+      "prereq": null,
+      "desc": "Você pode conjurar vitalidade falsa em si mesmo, à vontade, como uma magia de 1° nível, sem precisar gastar um espaço de magia ou componentes materiais."
+    },
+    {
+      "id": "visao_da_bruxa",
+      "nome": "Visão da Bruxa",
+      "prereq": {
+        "nivel": 15,
+        "texto": "15° nível"
+      },
+      "desc": "Você pode ver a verdadeira forma de qualquer metamorfo ou criatura oculta através de magias de ilusão ou transmutação contanto que a criatura esteja a até 9 metros de você e você tenha linha de visão."
+    },
+    {
+      "id": "visao_diabolica",
+      "nome": "Visão Diabólica",
+      "prereq": null,
+      "desc": "Você pode ver normalmente na escuridão, tanto mágica quanto normal, com um alcance de 36 metros."
+    },
+    {
+      "id": "visao_mistica",
+      "nome": "Visão Mística",
+      "prereq": null,
+      "desc": "Você pode conjurar detectar magia, à vontade, sem precisar gastar um espaço de magia."
+    },
+    {
+      "id": "visoes_de_reinos_distantes",
+      "nome": "Visões de Reinos Distantes",
+      "prereq": {
+        "nivel": 15,
+        "texto": "15° nível"
+      },
+      "desc": "Você pode conjurar olho arcano, à vontade, sem precisar gastar um espaço de magia."
+    },
+    {
+      "id": "visoes_nas_brumas",
+      "nome": "Visões nas Brumas",
+      "prereq": null,
+      "desc": "Você pode conjurar imagem silenciosa, à vontade, sem precisar gastar um espaço de magia ou componentes materiais."
+    },
+    {
+      "id": "voz_do_mestre_das_correntes",
+      "nome": "Voz do Mestre das Correntes",
+      "prereq": {
+        "pacto": "corrente",
+        "texto": "Característica Pacto da Corrente"
+      },
+      "desc": "Você pode se comunicar telepaticamente com seu familiar e perceber através dos sentidos do seu familiar enquanto ambos estiverem no mesmo plano de existência. Além disso, enquanto estiver percebendo através dos sentidos do seu familiar, você também poderá falar através dele com a sua voz, mesmo que seu familiar, normalmente, seja incapaz de falar."
+    }
+  ]
+}

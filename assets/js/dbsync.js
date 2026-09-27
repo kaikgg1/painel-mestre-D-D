@@ -178,6 +178,7 @@
       _subclasse: row.subclasse || '',
       // Só leitura: seção "Habilidades" do card (montarSecaoHabilidades).
       _featuresPersonalizadas: Array.isArray(row.features_personalizadas) ? row.features_personalizadas : [],
+      _nivelEscolhas: row.nivel_escolhas || null,
     };
   }
 

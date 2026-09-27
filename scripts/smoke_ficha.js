@@ -2040,6 +2040,74 @@ console.log(erros.some(e => e.startsWith('header:'))
       if (caixa()) erros.push('subida de nível: conflito no update não fechou a caixa');
       if (window.__linhaNivelTeste.subclasse) erros.push('subida de nível: conflito aplicou a subclasse mesmo assim');
     }
+    fecharCaixas();
+    window.__nivelSemLinha = false;
+    const marcarN = (cx, sel, n) => { const cbs = [...cx.querySelectorAll(sel)].filter(c => !c.disabled).slice(0, n); cbs.forEach(c => { c.checked = true; ev(c, 'change'); }); return cbs.length; };
+    const passosDe = cx => [...cx.querySelectorAll('[data-passo]')].map(b => b.dataset.passo);
+
+    // 6) Feiticeiro 10: Metamágica (+1), truque (+1) e magia (+1); só conclui com tudo marcado.
+    window.__linhaNivelTeste = { id: idAtivo, nivel: 10, classe: 'Feiticeiro', subclasse: 'Linhagem Dracônica', atributos: { ...atrs }, metamagias: ['acelerada', 'sutil'], nivel_escolhas: { ultimoNivelProcessado: 9, historico: {} } };
+    await verificar();
+    let cxm = caixa();
+    const p10 = cxm ? passosDe(cxm) : [];
+    for (const p of ['metamagia', 'magias']) if (!p10.includes(p)) erros.push('subida de nível: Feiticeiro 10 sem o passo ' + p + ' (veio ' + p10 + ')');
+    if (cxm) {
+      if (cxm.querySelector('input[data-lista="mm"][value="sutil"]')) erros.push('subida de nível: Metamágica já escolhida (Sutil) aparece de novo');
+      marcarN(caixa(), 'input[data-lista="mm"]', 1);
+      marcarN(caixa(), 'input[data-lista="tr"]', 1);
+      if (!caixa().querySelector('#lvl-concluir').disabled) erros.push('subida de nível: Feiticeiro concluiu sem escolher a magia nova');
+      marcarN(caixa(), 'input[data-lista="mg"]', 1);
+      if (caixa().querySelector('#lvl-concluir').disabled) erros.push('subida de nível: Feiticeiro 10 com tudo marcado continua bloqueado');
+      window.__todosUpdatePayloads = [];
+      caixa().querySelector('#lvl-concluir').click();
+      for (let i = 0; i < 50 && caixa(); i++) await new Promise(r => setTimeout(r, 10));
+      await new Promise(r => setTimeout(r, 30));
+      const up = window.__todosUpdatePayloads.find(p => p.nivel_escolhas);
+      if (!up || up.metamagias?.length !== 3) erros.push('subida de nível: metamagias não foram de 2 pra 3');
+      const r10 = up?.nivel_escolhas.historico[10] || {};
+      if (!r10.truques?.length || !r10.magias?.length) erros.push('subida de nível: histórico sem truque/magia do nível 10');
+      const fav = window.__todosUpdatePayloads.find(p => Array.isArray(p.spell_names)) || window.__ultimoInsertPayload;
+      if (!fav || !(fav.spell_names || []).includes(r10.magias?.[0])) erros.push('subida de nível: magia escolhida não foi pra lista Favoritas');
+    }
+    fecharCaixas();
+
+    // 7) Bruxo 3: Dádiva do Pacto + invocação com pré-requisito de pacto só depois de escolher o pacto.
+    window.__linhaNivelTeste = { id: idAtivo, nivel: 3, classe: 'Bruxo', subclasse: 'Patrono Grande Antigo', atributos: { ...atrs }, features_personalizadas: [], nivel_escolhas: { ultimoNivelProcessado: 2, historico: {} } };
+    await verificar();
+    cxm = caixa();
+    const p3 = cxm ? passosDe(cxm) : [];
+    if (!p3.includes('pacto')) erros.push('subida de nível: Bruxo 3 sem Dádiva do Pacto');
+    if (cxm && !p3.includes('magias')) erros.push('subida de nível: Bruxo 3 sem magia nova (conhecidas 3→4)');
+    if (cxm && p3.includes('invocacoes')) erros.push('subida de nível: Bruxo 3 não ganha invocação nova (2→2)');
+    fecharCaixas();
+
+    // 8) Ladino 6: Especialização só em perícias proficientes; guerreiro 4 com talento que dá +1.
+    window.__linhaNivelTeste = { id: idAtivo, nivel: 6, classe: 'Ladino', subclasse: 'Ladrão', atributos: { ...atrs },
+      pericias: { furtividade: { prof: true, exp: true }, acrobacia: { prof: true }, atletismo: { prof: true }, historia: {} }, nivel_escolhas: { ultimoNivelProcessado: 5, historico: {} } };
+    await verificar();
+    cxm = caixa();
+    const expVals = cxm ? [...cxm.querySelectorAll('input[data-lista="exp"]')].map(c => c.value) : [];
+    if (expVals.includes('furtividade') || expVals.includes('historia')) erros.push('subida de nível: Especialização ofereceu perícia sem proficiência ou já especializada');
+    if (!expVals.includes('ferramentas_ladrao')) erros.push('subida de nível: Ladino sem a opção Ferramentas de Ladrão');
+    fecharCaixas();
+
+    window.__linhaNivelTeste = { id: idAtivo, nivel: 4, classe: 'Guerreiro', subclasse: 'Campeão', atributos: { ...atrs, dex: 12 }, features_personalizadas: [], nivel_escolhas: { ultimoNivelProcessado: 3, historico: {} } };
+    await verificar();
+    cxm = caixa();
+    if (cxm) {
+      const r = cxm.querySelector('[name="lvl-asi-modo"][value="talento"]'); r.checked = true; ev(r, 'change');
+      const selT = caixa().querySelector('#lvl-talento');
+      if (!selT.querySelector('option[value="duelista_defensivo"][disabled]')) erros.push('subida de nível: talento com pré-requisito DES 13 liberado com DES 12');
+      selT.value = 'atleta'; ev(selT, 'change');
+      if (!caixa().querySelector('#lvl-concluir').disabled) erros.push('subida de nível: talento com +1 concluiu sem escolher o atributo');
+      const selAtr = caixa().querySelector('#lvl-talento-atr'); selAtr.value = 'for'; ev(selAtr, 'change');
+      window.__todosUpdatePayloads = [];
+      caixa().querySelector('#lvl-concluir').click();
+      for (let i = 0; i < 50 && caixa(); i++) await new Promise(r2 => setTimeout(r2, 10));
+      const up = window.__todosUpdatePayloads.find(p => p.nivel_escolhas);
+      const feat = up?.features_personalizadas?.find(f => f.talentoId === 'atleta');
+      if (!feat || !feat.talentoAplicado || up.atributos?.for !== 17) erros.push('subida de nível: talento Atleta não virou característica com +1 FOR aplicado');
+    }
   } catch (e) { erros.push('subida de nível → ' + e.message); }
   finally {
     window.__nivelSemLinha = false; window.__esperarCaixa = false; window.__linhaNivelTeste = null;
