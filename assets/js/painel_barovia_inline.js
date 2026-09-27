@@ -612,6 +612,7 @@ function criarCard(p) {
     const badge = document.createElement('div');
     badge.className = 'unconscious-badge';
     badge.innerHTML = `${ico('atordoado')} Inconsciente`;
+    badge.title = 'Automático enquanto o PV está em 0 — some quando o personagem recebe cura';
     hpBlock.appendChild(badge);
   }
   if (exhEfeitos?.morto) {

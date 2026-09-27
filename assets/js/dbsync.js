@@ -129,6 +129,11 @@
   }
 
   function dbToUi(row) {
+    // Cópia própria: o card muda estes objetos no lugar (concentracao.ativa,
+    // condicoes.push, inventario…) e, se fossem os MESMOS do cache,
+    // salvarCampo() comparava o objeto com ele mesmo, achava que nada mudou
+    // e não gravava — "desativar concentração" voltava ao recarregar.
+    row = JSON.parse(JSON.stringify(row));
     return {
       id: row.id,
       user_id: row.user_id,
