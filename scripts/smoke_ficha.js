@@ -1965,6 +1965,7 @@ console.log(erros.some(e => e.startsWith('header:'))
   const caixa = () => doc.querySelector('.levelup-overlay');
   const fecharCaixas = () => doc.querySelectorAll('.levelup-overlay').forEach(o => o.remove());
   const ev = (el, tipo) => el.dispatchEvent(new window.Event(tipo, { bubbles: true }));
+  const marcarCartao = (lista, valor) => { const i = caixa().querySelector('input[data-lista="' + lista + '"][value="' + valor + '"]'); i.checked = true; ev(i, 'change'); };
   const verificar = async () => {
     window.eval('clearTimeout(_timerNivel); _assistenteNivel = null;');
     await window.eval('verificarSubidaNivel()');
@@ -2000,9 +2001,8 @@ console.log(erros.some(e => e.startsWith('header:'))
       if (!caixa()) erros.push('subida de nível: caixa obrigatória fechou com Esc/clique fora');
       const btn = cx.querySelector('#lvl-concluir');
       if (!btn.disabled) erros.push('subida de nível: Concluir habilitado sem escolher o aumento de atributo');
-      const selA = cx.querySelector('#lvl-asi-a');
-      if (selA.querySelector('option[value="car"]:not([disabled])')) erros.push('subida de nível: +2 em CAR 19 deveria estar bloqueado (passa de 20)');
-      selA.value = 'for'; ev(selA, 'change');
+      if (!cx.querySelector('input[data-lista="asi-atr"][value="car"]').disabled) erros.push('subida de nível: +2 em CAR 19 deveria estar bloqueado (passa de 20)');
+      marcarCartao('asi-atr', 'for');
       if (cx.querySelector('#lvl-concluir').disabled) erros.push('subida de nível: Concluir continua bloqueado depois de escolher +2 FOR');
       window.__todosUpdatePayloads = [];
       cx.querySelector('#lvl-concluir').click();
@@ -2030,10 +2030,10 @@ console.log(erros.some(e => e.startsWith('header:'))
     window.__linhaNivelTeste = { id: idAtivo, nivel: 3, classe: 'Guerreiro', subclasse: '', atributos: { ...atrs }, nivel_escolhas: { ultimoNivelProcessado: 2, historico: {} } };
     await verificar();
     const cx3 = caixa();
-    const sel = cx3?.querySelector('#lvl-subclasse');
+    const sel = cx3?.querySelector('input[data-lista="subclasse"][value="Campeão"]');
     if (!sel) erros.push('subida de nível: Guerreiro 3 sem subclasse não pediu a subclasse');
     else {
-      sel.value = 'Campeão'; ev(sel, 'change');
+      marcarCartao('subclasse', 'Campeão');
       if (!/Crítico Aprimorado/.test(caixa().textContent)) erros.push('subida de nível: escolher Campeão não mostrou "Crítico Aprimorado" nos ganhos');
       window.__nivelSemLinha = true;
       caixa().querySelector('#lvl-concluir').click();
@@ -2097,11 +2097,10 @@ console.log(erros.some(e => e.startsWith('header:'))
     cxm = caixa();
     if (cxm) {
       const r = cxm.querySelector('[name="lvl-asi-modo"][value="talento"]'); r.checked = true; ev(r, 'change');
-      const selT = caixa().querySelector('#lvl-talento');
-      if (!selT.querySelector('option[value="duelista_defensivo"][disabled]')) erros.push('subida de nível: talento com pré-requisito DES 13 liberado com DES 12');
-      selT.value = 'atleta'; ev(selT, 'change');
+      if (!caixa().querySelector('input[data-lista="talento"][value="duelista_defensivo"]').disabled) erros.push('subida de nível: talento com pré-requisito DES 13 liberado com DES 12');
+      marcarCartao('talento', 'atleta');
       if (!caixa().querySelector('#lvl-concluir').disabled) erros.push('subida de nível: talento com +1 concluiu sem escolher o atributo');
-      const selAtr = caixa().querySelector('#lvl-talento-atr'); selAtr.value = 'for'; ev(selAtr, 'change');
+      marcarCartao('talento-atr', 'for');
       window.__todosUpdatePayloads = [];
       caixa().querySelector('#lvl-concluir').click();
       for (let i = 0; i < 50 && caixa(); i++) await new Promise(r2 => setTimeout(r2, 10));
@@ -2146,6 +2145,49 @@ console.log(erros.some(e => e.startsWith('header:'))
       if (caixa()) erros.push('subida de nível: caixa adiada reabriu antes de recarregar');
       window.eval('_nivelAdiado = null;');
     }
+    fecharCaixas();
+
+    // 11) Varredura: toda classe (e as subclasses que mudam as escolhas), do
+    // nível 2 ao 20 — a caixa abre e dá pra completar tudo até liberar o
+    // Concluir. Também o nível em que cada classe escolhe a subclasse.
+    const CONFIGS = [
+      ['Bárbaro', 'Caminho do Furioso'], ['Bardo', 'Colégio do Conhecimento'], ['Bruxo', 'Patrono Arquifada'],
+      ['Clérigo', 'Domínio da Vida'], ['Druida', 'Círculo da Terra'], ['Feiticeiro', 'Magia Selvagem'],
+      ['Guerreiro', 'Campeão'], ['Guerreiro', 'Cavaleiro Místico'], ['Ladino', 'Ladrão'], ['Ladino', 'Trapaceiro Arcano'],
+      ['Mago', 'Escola de Evocação'], ['Monge', 'Caminho da Sombra'], ['Paladino', 'Juramento de Devoção'], ['Patrulheiro', 'Caçador'],
+    ];
+    const NIVEL_SUB = { 'Clérigo': 2, 'Feiticeiro': 2, 'Bruxo': 2, 'Druida': 2, 'Mago': 2 };  // 1° nível não é processado
+    const periciasTeste = { atletismo: { prof: true }, percepcao: { prof: true }, furtividade: { prof: true }, persuasao: { prof: true }, historia: { prof: true } };
+    const matriz = [];
+    const completarCaixa = async () => {
+      for (let passo = 0; passo < 40; passo++) {
+        const pend = caixa()?.querySelector('.levelup-bloco.pendente');
+        if (!pend) break;
+        const alvo = [...pend.querySelectorAll('input[data-lista]')].find(i => !i.disabled && !i.checked);
+        if (!alvo) return 'sem opção em ' + pend.dataset.passo;
+        alvo.checked = true; ev(alvo, 'change');
+      }
+      const cxv = caixa();
+      return cxv && !cxv.querySelector('#lvl-concluir').disabled ? '' : 'Concluir continua bloqueado';
+    };
+    const rodarNivel = async (classe, subclasse, N) => {
+      window.__linhaNivelTeste = { id: idAtivo, nivel: N, classe, subclasse, atributos: { for: 14, dex: 14, con: 14, int: 13, sab: 13, car: 13 },
+        pericias: periciasTeste, metamagias: [], features_personalizadas: [], nivel_escolhas: { ultimoNivelProcessado: N - 1, historico: {} } };
+      await verificar();
+      const cxv = caixa();
+      if (!cxv) { erros.push(`varredura: ${classe} ${subclasse || '(sem subclasse)'} nível ${N} — caixa não abriu`); return; }
+      const passos = [...cxv.querySelectorAll('[data-passo]')].map(b => b.dataset.passo + (b.querySelector('.levelup-contador') ? b.querySelector('.levelup-contador').textContent.replace(/^0\//, '×') : ''));
+      const problema = await completarCaixa();
+      if (problema) erros.push(`varredura: ${classe} ${subclasse || '(sem subclasse)'} nível ${N} — ${problema}`);
+      matriz.push(`${classe}/${subclasse || '—'} ${N}: ${passos.join(', ') || '(nada a escolher)'}`);
+      fecharCaixas();
+      window.eval('_assistenteNivel = null;');
+    };
+    window.__esperarCaixa = true;
+    for (const [classe, sub] of CONFIGS) for (let N = 2; N <= 20; N++) await rodarNivel(classe, sub, N);
+    for (const classe of [...new Set(CONFIGS.map(c => c[0]))]) await rodarNivel(classe, '', NIVEL_SUB[classe] || 3);
+    if (process.env.MATRIZ_NIVEIS) fs.writeFileSync(process.env.MATRIZ_NIVEIS, matriz.join('\n'));
+    console.log(`  varredura de subida de nível: ${matriz.length} caixas (12 classes, níveis 2–20) completadas até o Concluir`);
   } catch (e) { erros.push('subida de nível → ' + e.message); }
   finally {
     window.__nivelSemLinha = false; window.__nivelErro = false; window.__esperarCaixa = false; window.__linhaNivelTeste = null;

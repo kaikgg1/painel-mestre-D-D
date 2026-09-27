@@ -503,18 +503,96 @@ iconify-icon {
 }
 
 /* ===== SUBIDA DE NÍVEL (subida_nivel.js) — mesma casca do assistente de criação ===== */
-.levelup-overlay .modal-card { max-width: 640px; }
-.levelup-sub { font-size: 14px; color: var(--parchment); margin: 0 0 10px; }
-.levelup-bloco { border: 1px solid var(--borda); border-radius: 6px; padding: 10px 12px; margin-bottom: 10px; background: rgba(0,0,0,0.14); }
-.levelup-bloco h4 { margin: 0 0 8px; font-size: 14px; color: var(--gold-bright); }
-.levelup-bloco.pendente { border-color: var(--borda-ouro, #8B6914); }
-.levelup-ganho { margin: 0 0 8px; }
-.levelup-ganho summary { cursor: pointer; font-size: 14px; color: var(--parchment); min-height: 32px; display: flex; align-items: center; gap: 6px; }
-.levelup-ganho p { margin: 4px 0 0 4px; font-size: 13px; line-height: 1.45; color: var(--text-dim); }
-.levelup-mudancas { margin: 6px 0 0; padding-left: 18px; font-size: 13px; color: var(--parchment); }
-.levelup-opcao { display: flex; align-items: center; gap: 8px; font-size: 14px; min-height: 36px; }
-.levelup-opcao input { width: 18px; height: 18px; accent-color: var(--gold-bright); }
-.levelup-linha { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 6px; }
-.levelup-linha select { min-height: 38px; }
-.levelup-erro { color: var(--blood-bright, #c4302b); font-size: 12px; margin-top: 6px; }
-.levelup-acoes { justify-content: flex-end; }
+.levelup-overlay .modal-card { max-width: 680px; }
+.levelup-sub { font-size: var(--fs-ui); color: var(--text-2); margin: 0 0 var(--sp-3); }
+.levelup-bloco {
+  border: 1px solid var(--borda); border-radius: var(--r-md);
+  padding: var(--sp-3) var(--sp-3) var(--sp-3); margin-bottom: var(--sp-3); background: var(--sf-1);
+}
+.levelup-bloco.pendente { border-color: var(--borda-ouro); box-shadow: inset 3px 0 0 var(--gold-bright); }
+.levelup-bloco.completo { border-color: var(--borda-forte); }
+.levelup-bloco h4 {
+  margin: 0 0 var(--sp-2); font-family: var(--f-titulo); font-size: var(--fs-h4);
+  letter-spacing: 1.2px; text-transform: uppercase; color: var(--gold-bright);
+  display: flex; align-items: center; gap: var(--sp-2);
+}
+.levelup-bloco h4 > span:first-child { flex: 1; }
+.levelup-ok { color: var(--ok, #6f9a5a); font-size: 16px; line-height: 1; }
+.levelup-contador {
+  font-family: var(--f-ui); font-size: var(--fs-label); letter-spacing: 0; text-transform: none;
+  padding: 2px 8px; border-radius: var(--r-pill); border: 1px solid var(--borda-ouro); color: var(--gold-bright);
+}
+.levelup-contador.ok { background: var(--sf-ouro); }
+.levelup-subtitulo {
+  display: flex; align-items: center; gap: var(--sp-2); flex-wrap: wrap;
+  font-family: var(--f-titulo); font-size: var(--fs-label); letter-spacing: 1px; text-transform: uppercase;
+  color: var(--parchment); margin: var(--sp-3) 0 var(--sp-2);
+}
+.levelup-ganho { margin: 0 0 var(--sp-1); border-bottom: 1px solid var(--linha); }
+.levelup-ganho summary { cursor: pointer; font-size: var(--fs-ui); color: var(--parchment); min-height: 36px; display: flex; align-items: center; gap: var(--sp-2); }
+.levelup-ganho p { margin: 0 0 var(--sp-2) var(--sp-1); font-size: 13px; line-height: 1.45; color: var(--text-dim); }
+.levelup-mudancas { margin: var(--sp-2) 0 0; padding-left: 18px; font-size: 13px; color: var(--text-2); }
+.levelup-acoes { justify-content: flex-end; align-items: center; gap: var(--sp-2); flex-wrap: wrap; }
+
+/* Opções em cartões: o cartão inteiro é clicável; o controle nativo fica
+   pequeno à esquerda (acessível pelo teclado), o estado vem da borda/fundo. */
+.levelup-lista { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: var(--sp-2); }
+.levelup-lista.rolavel {
+  max-height: 320px; overflow-y: auto; padding: var(--sp-1); margin: 0 calc(-1 * var(--sp-1));
+  border-radius: var(--r-sm); background: var(--sf-inset); overscroll-behavior: contain;
+}
+.levelup-cartao {
+  display: flex; align-items: flex-start; gap: var(--sp-2); cursor: pointer;
+  padding: 10px var(--sp-3); min-height: 44px; border-radius: var(--r-sm);
+  background: var(--sf-2); border: 1px solid var(--borda); transition: border-color .12s, background .12s;
+}
+.levelup-cartao:hover { border-color: var(--borda-forte); background: var(--sf-3); }
+.levelup-cartao:focus-within { outline: 2px solid var(--borda-ouro); outline-offset: 1px; }
+.levelup-cartao input { width: 18px; height: 18px; margin: 1px 0 0; flex-shrink: 0; accent-color: var(--gold-bright); cursor: pointer; color-scheme: dark; }
+.levelup-cartao.marcado { border-color: var(--gold-bright); background: var(--sf-ouro); }
+.levelup-cartao.off { cursor: not-allowed; opacity: .45; }
+.levelup-cartao.off:hover { border-color: var(--borda); background: var(--sf-2); }
+.levelup-cartao-corpo { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.levelup-cartao-topo { display: flex; align-items: baseline; gap: var(--sp-2); flex-wrap: wrap; }
+.levelup-cartao-topo strong { font-size: var(--fs-ui); color: var(--parchment); font-weight: 600; }
+.levelup-tag { font-size: var(--fs-label); color: var(--gold-bright); white-space: nowrap; }
+.levelup-motivo { font-size: var(--fs-label); color: var(--erro); }
+.levelup-motivo.aviso { color: var(--text-dim); font-style: italic; }
+.levelup-cartao-desc { font-size: 12.5px; line-height: 1.4; color: var(--text-dim); }
+/* Descrição longa encurtada até marcar (o texto inteiro fica no title do cartão):
+   4 linhas nas listas curtas, 2 nas longas (talentos, invocações). */
+.levelup-cartao:not(.marcado) .levelup-cartao-desc {
+  display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden;
+}
+.levelup-lista.rolavel .levelup-cartao:not(.marcado) .levelup-cartao-desc { -webkit-line-clamp: 2; }
+.levelup-grupo {
+  grid-column: 1 / -1; font-family: var(--f-titulo); font-size: var(--fs-label); letter-spacing: 1px;
+  text-transform: uppercase; color: var(--gold-bright); padding: var(--sp-2) 2px 0;
+}
+.levelup-bloco > div > .levelup-grupo { margin-top: var(--sp-3); }
+
+/* Busca no mesmo visual dos campos da ficha (não o campo branco do navegador). */
+.levelup-busca { margin: 0 0 var(--sp-2); }
+.levelup-busca input {
+  width: 100%; min-height: 40px; padding: 8px 12px 8px 34px; border-radius: var(--r-sm);
+  background: var(--sf-inset) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23c49a3a' stroke-width='2'%3E%3Ccircle cx='11' cy='11' r='7'/%3E%3Cpath d='m20 20-3.5-3.5'/%3E%3C/svg%3E") no-repeat 11px center;
+  border: 1px solid var(--borda); color: var(--parchment); font: inherit; font-size: var(--fs-ui);
+  color-scheme: dark;
+}
+.levelup-busca input:focus { outline: none; border-color: var(--borda-ouro); }
+
+/* Aumento de atributo: +2 / +1+1 / Talento como botões segmentados. */
+.levelup-segmentos { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--sp-1); margin: 0 0 var(--sp-3); }
+.levelup-segmentos label {
+  display: flex; align-items: center; justify-content: center; text-align: center; min-height: 44px;
+  padding: 6px 8px; border-radius: var(--r-sm); cursor: pointer; font-size: 13px;
+  background: var(--sf-2); border: 1px solid var(--borda); color: var(--text-2);
+}
+.levelup-segmentos label.marcado { border-color: var(--gold-bright); background: var(--sf-ouro); color: var(--parchment); font-weight: 600; }
+.levelup-segmentos input { position: absolute; opacity: 0; pointer-events: none; }
+.levelup-segmentos label:focus-within { outline: 2px solid var(--borda-ouro); outline-offset: 1px; }
+
+@media (max-width: 600px) {
+  .levelup-lista { grid-template-columns: 1fr; }
+  .levelup-lista.rolavel { max-height: 50vh; }
+}
