@@ -205,6 +205,7 @@ async function salvar(e) {
   // Gravados só pelo Mestre (pericias_mestre.js) ou por save próprio (feiticeiro_ui.js).
   delete payload.atributos_bonus;
   delete payload.metamagias;
+  delete payload.nivel_escolhas;   // só subida_nivel.js grava
 
   // Remove campos que não vão pro UPDATE
   delete payload.id;
@@ -286,14 +287,5 @@ async function salvar(e) {
   }
   if (btn) btn.disabled = false;
 }
-
-// Confete ao subir de nível (compara com o nível antes do auto-save aplicar)
-document.addEventListener('change', e => {
-  if (e.target && e.target.name === 'nivel' && charAtivo && window.FX && FX.confete) {
-    const novo = parseInt(e.target.value, 10);
-    const antigo = parseInt(charAtivo.nivel, 10) || 0;
-    if (!isNaN(novo) && novo > antigo && novo <= 20) FX.confete('levelup');
-  }
-});
 
 init();

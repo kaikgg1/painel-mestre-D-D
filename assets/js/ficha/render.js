@@ -48,6 +48,7 @@ function render() {
   // de Atributos pelo Tab, digitar, e o autosave gravava normalmente.
   aplicarTabIndexLock();
   renderBottomNav();
+  if (typeof agendarVerificacaoNivel === 'function') agendarVerificacaoNivel();
 }
 
 function renderSubclasseSelect(classe, atual) {

@@ -277,7 +277,7 @@ function _assinaturaRelevante(c) {
     'nome','raca','classe','subclasse','nivel','origem','alinhamento',
     'hp_max','hp_atual','hp_temp','ca','iniciativa_bonus','deslocamento',
     'dado_vida_tipo','dado_vida_atual','exaustao','inspiracao',
-    'atributos','atributos_bonus','metamagias','salvaguardas','pericias','slots_magia','condicoes',
+    'atributos','atributos_bonus','metamagias','nivel_escolhas','salvaguardas','pericias','slots_magia','condicoes',
     'recursos_usados','features_personalizadas','companions','inventario',
     'truques_conhecidos','magias_conhecidas','cd_resistencia','bonus_atq_magia',
     'tracos_pessoais','ideais','vinculos','defeitos','historia','notas',

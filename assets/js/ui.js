@@ -45,7 +45,8 @@ window.UI = (function () {
   // pro primeiro (id duplicado é inválido e o leitor de tela lê o errado).
   let _seqModal = 0;
 
-  function abrirModal({ tituloHtml = '', corpoHtml = '', className = '', onFechar } = {}) {
+  // bloqueante: sem fechar por Esc nem clique fora — só pelo fechar() devolvido.
+  function abrirModal({ tituloHtml = '', corpoHtml = '', className = '', onFechar, bloqueante = false } = {}) {
     const tituloId = `ui-modal-titulo-${++_seqModal}`;
     // Guarda quem tinha o foco pra devolver no fechar (mesmo padrão de
     // lightbox.js/confirmar.js): sem isso o foco volta pro <body> e quem usa
@@ -73,8 +74,8 @@ window.UI = (function () {
       }
       if (onFechar) onFechar();
     };
-    const onKey = e => { if (e.key === 'Escape') fechar(); };
-    overlay.addEventListener('click', e => { if (e.target === overlay) fechar(); });
+    const onKey = e => { if (e.key === 'Escape' && !bloqueante) fechar(); };
+    overlay.addEventListener('click', e => { if (e.target === overlay && !bloqueante) fechar(); });
     document.addEventListener('keydown', onKey);
 
     // Foco no 1º controle do modal (ou no próprio card, que é tabindex="-1"):

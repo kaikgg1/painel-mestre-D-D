@@ -63,6 +63,7 @@ function construirQuery(tabela, payloadUpdate) {
   const builder = {
     select: () => builder,
     eq: () => builder,
+    gte: () => builder,
     order: () => builder,
     // insert(): usado por criarPersonagem()/criarPersonagemComWizard() (Assistente
     // de Criação) — devolve o payload com um id sintético, como o Supabase faria.
@@ -89,11 +90,21 @@ function construirQuery(tabela, payloadUpdate) {
       return construirQuery(tabela, payload);
     },
     single: async () => ({ data: payloadUpdate ? { ...payloadUpdate } : {}, error: null }),
-    maybeSingle: async () => (
-      tabela === 'spell_lists' && window.__magiasFavoritasTeste
+    maybeSingle: async () => {
+      // Subida de nível: __linhaNivelTeste simula a linha de characters no
+      // banco (leitura fresca e o update condicionado). __nivelSemLinha
+      // simula o update condicionado não pegar linha (outro aparelho concluiu).
+      if (tabela === 'characters' && window.__linhaNivelTeste) {
+        if (payloadUpdate) {
+          if (window.__nivelSemLinha) return { data: null, error: null };
+          Object.assign(window.__linhaNivelTeste, payloadUpdate);
+        }
+        return { data: { ...window.__linhaNivelTeste }, error: null };
+      }
+      return tabela === 'spell_lists' && window.__magiasFavoritasTeste
         ? { data: { spell_names: window.__magiasFavoritasTeste }, error: null }
-        : { data: null, error: null }
-    ),
+        : { data: null, error: null };
+    },
     // Permite `await query` sem terminal explícito (uso real em salvarCondicoes etc.)
     then: (resolve) => resolve({ data: payloadUpdate ? { ...payloadUpdate } : [], error: null }),
   };
@@ -144,7 +155,7 @@ window.URL.createObjectURL = (blob) => { window.__ultimoBlobPDF = blob; return '
 window.URL.revokeObjectURL = () => {};
 
 // Modulos compartilhados que a ficha consome (PHB, slots, exaustao, recursos, icones)
-for (const m of ['icones.js','ui.js','regras_base.js','phb_catalogo.js','phb_slots.js','exaustao_regras.js','recursos_classe.js','feiticeiro_ui.js','habilidades_regras.js','ataques.js','condicoes_regras.js']) {
+for (const m of ['icones.js','ui.js','regras_base.js','phb_catalogo.js','phb_slots.js','exaustao_regras.js','recursos_classe.js','feiticeiro_ui.js','habilidades_regras.js','progressao_classes.js','ataques.js','condicoes_regras.js']) {
   const el = window.document.createElement('script');
   el.textContent = fs.readFileSync(path.join(raiz, 'assets/js', m), 'utf8');
   window.document.head.appendChild(el);
@@ -159,7 +170,7 @@ const ordem = [
   'nucleo.js','render.js','header.js','wizard_dados.js','wizard_criacao.js','exportar_pdf.js','nav_mobile.js','seletor.js','aba_resumo.js',
   'aba_combate.js','recursos.js','aba_habilidades.js','aba_magias.js',
   'aba_equipamento.js','aba_aliados.js','aba_roleplay.js','lock.js',
-  'listeners.js','salvar.js',
+  'listeners.js','subida_nivel.js','salvar.js',
 ];
 
 const erros = [];
@@ -1945,6 +1956,99 @@ for (const [sel, rotulo] of HEADER_CHECKS) {
 console.log(erros.some(e => e.startsWith('header:'))
   ? '  FALHOU     header/nav (ver FALHAS abaixo)'
   : '  header + nav inferior populados (' + HEADER_CHECKS.length + ' elementos conferidos)');
+
+// ── Subida de nível (subida_nivel.js) ───────────────────────────────
+{
+  const antes = erros.length;
+  const doc = window.document;
+  const caixa = () => doc.querySelector('.levelup-overlay');
+  const fecharCaixas = () => doc.querySelectorAll('.levelup-overlay').forEach(o => o.remove());
+  const ev = (el, tipo) => el.dispatchEvent(new window.Event(tipo, { bubbles: true }));
+  const verificar = async () => {
+    window.eval('clearTimeout(_timerNivel); _assistenteNivel = null;');
+    await window.eval('verificarSubidaNivel()');
+    for (let i = 0; i < 50 && window.__esperarCaixa && !caixa(); i++) await new Promise(r => setTimeout(r, 10));
+  };
+  const idAtivo = window.eval('charAtivo.id');
+  const atrs = { for: 16, dex: 12, con: 14, int: 10, sab: 10, car: 19 };
+  try {
+    // 1) Personagem sem registro: marca o nível atual, sem caixa.
+    fecharCaixas();
+    window.__todosUpdatePayloads = [];
+    window.__linhaNivelTeste = { id: idAtivo, nivel: 9, classe: 'Guerreiro', subclasse: 'Campeão', atributos: { ...atrs }, nivel_escolhas: null };
+    await verificar();
+    if (caixa()) erros.push('subida de nível: abriu caixa pra personagem sem registro (deveria só marcar o nível atual)');
+    const marcou = window.__todosUpdatePayloads.find(p => p.nivel_escolhas);
+    if (!marcou || marcou.nivel_escolhas.ultimoNivelProcessado !== 9) erros.push('subida de nível: não marcou ultimoNivelProcessado = nível atual');
+
+    // 2) Nível desceu: nada.
+    window.__linhaNivelTeste = { id: idAtivo, nivel: 3, classe: 'Guerreiro', subclasse: 'Campeão', atributos: { ...atrs }, nivel_escolhas: { ultimoNivelProcessado: 5, historico: {} } };
+    await verificar();
+    if (caixa()) erros.push('subida de nível: abriu caixa quando o nível DESCEU');
+
+    // 3) Guerreiro 3→4 (ult 3): caixa do nível 4 com Aumento de Atributo, não fecha no Esc.
+    window.__esperarCaixa = true;
+    window.__linhaNivelTeste = { id: idAtivo, nivel: 5, classe: 'Guerreiro', subclasse: 'Campeão', atributos: { ...atrs }, nivel_escolhas: { ultimoNivelProcessado: 3, historico: {} } };
+    await verificar();
+    const cx = caixa();
+    if (!cx) erros.push('subida de nível: caixa não abriu (nível 5, processado até 3)');
+    else {
+      if (!/Nível 4!/.test(cx.textContent)) erros.push('subida de nível: caixa não é a do nível 4 (deveria ir um nível por vez)');
+      doc.dispatchEvent(new window.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+      cx.click();
+      if (!caixa()) erros.push('subida de nível: caixa obrigatória fechou com Esc/clique fora');
+      const btn = cx.querySelector('#lvl-concluir');
+      if (!btn.disabled) erros.push('subida de nível: Concluir habilitado sem escolher o aumento de atributo');
+      const selA = cx.querySelector('#lvl-asi-a');
+      if (selA.querySelector('option[value="car"]:not([disabled])')) erros.push('subida de nível: +2 em CAR 19 deveria estar bloqueado (passa de 20)');
+      selA.value = 'for'; ev(selA, 'change');
+      if (cx.querySelector('#lvl-concluir').disabled) erros.push('subida de nível: Concluir continua bloqueado depois de escolher +2 FOR');
+      window.__todosUpdatePayloads = [];
+      cx.querySelector('#lvl-concluir').click();
+      for (let i = 0; i < 50 && caixa(); i++) await new Promise(r => setTimeout(r, 10));
+      const up = window.__todosUpdatePayloads.find(p => p.nivel_escolhas);
+      if (!up) erros.push('subida de nível: Concluir não gravou');
+      else {
+        if (up.atributos?.for !== 18) erros.push('subida de nível: +2 FOR não virou 18 (veio ' + up.atributos?.for + ')');
+        if (up.nivel_escolhas.ultimoNivelProcessado !== 4) erros.push('subida de nível: ultimoNivelProcessado deveria ser 4');
+        if (!up.nivel_escolhas.historico?.[4]?.asi?.for) erros.push('subida de nível: histórico do nível 4 sem o aumento');
+      }
+      if (window.eval('charAtivo.atributos.for') !== 18) erros.push('subida de nível: charAtivo não recebeu o atributo novo');
+    }
+    fecharCaixas();
+
+    // 4) Nível 5 em seguida (ult agora 4): abre de novo, sem escolhas pro Guerreiro 5 → Concluir já liberado.
+    await verificar();
+    const cx5 = caixa();
+    if (!cx5 || !/Nível 5!/.test(cx5.textContent)) erros.push('subida de nível: não abriu a caixa do nível 5 depois de concluir o 4');
+    else if (cx5.querySelector('#lvl-concluir').disabled) erros.push('subida de nível: nível sem escolhas deveria poder concluir direto');
+    else if (!/Ataque Extra/.test(cx5.textContent)) erros.push('subida de nível: resumo do nível 5 do Guerreiro sem "Ataque Extra"');
+    fecharCaixas();
+
+    // 5) Subclasse pendente: Guerreiro 3 sem subclasse; conflito no update fecha sem aplicar.
+    window.__linhaNivelTeste = { id: idAtivo, nivel: 3, classe: 'Guerreiro', subclasse: '', atributos: { ...atrs }, nivel_escolhas: { ultimoNivelProcessado: 2, historico: {} } };
+    await verificar();
+    const cx3 = caixa();
+    const sel = cx3?.querySelector('#lvl-subclasse');
+    if (!sel) erros.push('subida de nível: Guerreiro 3 sem subclasse não pediu a subclasse');
+    else {
+      sel.value = 'Campeão'; ev(sel, 'change');
+      if (!/Crítico Aprimorado/.test(caixa().textContent)) erros.push('subida de nível: escolher Campeão não mostrou "Crítico Aprimorado" nos ganhos');
+      window.__nivelSemLinha = true;
+      caixa().querySelector('#lvl-concluir').click();
+      for (let i = 0; i < 50 && caixa(); i++) await new Promise(r => setTimeout(r, 10));
+      if (caixa()) erros.push('subida de nível: conflito no update não fechou a caixa');
+      if (window.__linhaNivelTeste.subclasse) erros.push('subida de nível: conflito aplicou a subclasse mesmo assim');
+    }
+  } catch (e) { erros.push('subida de nível → ' + e.message); }
+  finally {
+    window.__nivelSemLinha = false; window.__esperarCaixa = false; window.__linhaNivelTeste = null;
+    window.eval('clearTimeout(_timerNivel); _assistenteNivel = null;');
+    fecharCaixas();
+  }
+  console.log(erros.length > antes ? '  FALHOU     subida de nível (ver FALHAS abaixo)'
+    : '  subida de nível: sem caixa retroativa, descida ignorada, ASI com teto 20, caixa obrigatória, um nível por vez, subclasse pendente, conflito ok');
+}
 
 console.log('');
 if (erros.length) { console.log('FALHAS:'); erros.forEach(e => console.log('  ✗ ' + e)); process.exit(1); }

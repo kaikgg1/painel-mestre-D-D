@@ -501,3 +501,20 @@ iconify-icon {
 @media (max-width: 480px) {
   .wizard-attr-row { grid-template-columns: 1fr 80px 50px; }
 }
+
+/* ===== SUBIDA DE NÍVEL (subida_nivel.js) — mesma casca do assistente de criação ===== */
+.levelup-overlay .modal-card { max-width: 640px; }
+.levelup-sub { font-size: 14px; color: var(--parchment); margin: 0 0 10px; }
+.levelup-bloco { border: 1px solid var(--borda); border-radius: 6px; padding: 10px 12px; margin-bottom: 10px; background: rgba(0,0,0,0.14); }
+.levelup-bloco h4 { margin: 0 0 8px; font-size: 14px; color: var(--gold-bright); }
+.levelup-bloco.pendente { border-color: var(--borda-ouro, #8B6914); }
+.levelup-ganho { margin: 0 0 8px; }
+.levelup-ganho summary { cursor: pointer; font-size: 14px; color: var(--parchment); min-height: 32px; display: flex; align-items: center; gap: 6px; }
+.levelup-ganho p { margin: 4px 0 0 4px; font-size: 13px; line-height: 1.45; color: var(--text-dim); }
+.levelup-mudancas { margin: 6px 0 0; padding-left: 18px; font-size: 13px; color: var(--parchment); }
+.levelup-opcao { display: flex; align-items: center; gap: 8px; font-size: 14px; min-height: 36px; }
+.levelup-opcao input { width: 18px; height: 18px; accent-color: var(--gold-bright); }
+.levelup-linha { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 6px; }
+.levelup-linha select { min-height: 38px; }
+.levelup-erro { color: var(--blood-bright, #c4302b); font-size: 12px; margin-top: 6px; }
+.levelup-acoes { justify-content: flex-end; }
