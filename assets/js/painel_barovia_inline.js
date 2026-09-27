@@ -517,11 +517,27 @@ function criarCard(p) {
   meta.className = 'char-meta';
   meta.innerHTML = `<span class="jogador-nome" contenteditable="true" data-field="jogador">${escapeHtml(p.jogador)}</span><span class="sep">·</span><span contenteditable="true" data-field="classe">${escapeHtml(p.classe)}</span> <strong contenteditable="true" data-field="nivel">${p.nivel}</strong><span class="sep">•</span><span contenteditable="true" data-field="raca">${escapeHtml(p.raca)}</span>`;
   meta.querySelectorAll('[contenteditable]').forEach(el => {
+    // Nível só grava ao sair do campo/Enter, com limite 1–20: gravando a cada
+    // tecla, digitar "12" salvava 1 no meio do caminho (e a subida de nível
+    // da ficha do jogador reagiria a esse 1 falso).
+    if (el.dataset.field === 'nivel') {
+      const aplicarNivelCampo = () => {
+        const novo = Math.max(1, Math.min(20, parseInt(el.textContent, 10) || p.nivel || 1));
+        el.textContent = novo;
+        if (novo === +p.nivel) return;
+        p.nivel = novo;
+        salvar(p);
+        rerenderCard(p);
+      };
+      el.onblur = aplicarNivelCampo;
+      el.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); el.blur(); } };
+      return;
+    }
     const aplicarCampo = () => {
       const field = el.dataset.field;
-      p[field] = field === 'nivel' ? (parseInt(el.textContent) || 1) : (el.textContent.trim() || '?');
+      p[field] = el.textContent.trim() || '?';
       salvar(p);
-      if (field === 'classe' || field === 'nivel') rerenderCard(p);
+      if (field === 'classe') rerenderCard(p);
     };
     el.oninput = aplicarCampo;
     el.onblur = aplicarCampo;
@@ -1134,10 +1150,11 @@ function criarCard(p) {
     body.appendChild(painelMagias);
   }
 
-  // --- Painel Ficha (equipamento + bolsa) ---
+  // --- Painel Ficha (habilidades + equipamento + bolsa) ---
   const painelFicha = document.createElement('div');
   painelFicha.className = 'tab-panel';
   painelPorAba.ficha = painelFicha;
+  painelFicha.appendChild(montarSecaoHabilidades(p));
 
   const equipCount = contarEquipamento(p);
   const equipResumo = document.createElement('div');

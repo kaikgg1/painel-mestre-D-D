@@ -500,6 +500,14 @@ function criarCard(p) {
   raceClass.className = 'race-class';
   raceClass.innerHTML = `<span contenteditable="true" data-field="raca">${escapeHtml(p.raca)}</span> · <span contenteditable="true" data-field="classe">${escapeHtml(p.classe)}</span> · <strong>Nv <span contenteditable="true" data-field="nivel">${escapeHtml(String(p.nivel))}</span></strong>`;
   raceClass.querySelectorAll('[contenteditable]').forEach(el => {
+    // Nível só no blur/Enter (ver comentário igual em painel_barovia_inline.js).
+    if (el.dataset.field === 'nivel') {
+      el.onblur = () => {
+        if ((parseInt(el.textContent, 10) || 0) !== +p.nivel) el.textContent = aplicarNivel(p, el.textContent);
+      };
+      el.onkeydown = e => { if (e.key === 'Enter') { e.preventDefault(); el.blur(); } };
+      return;
+    }
     const aplicar = () => {
       const field = el.dataset.field;
       // Nível passa pelo mesmo caminho do stat-box (clamp + rerender)
@@ -731,6 +739,25 @@ function criarCard(p) {
     recSection.appendChild(recBody);
     card.appendChild(recSection);
   }
+
+  // Habilidades de classe/subclasse — recolhida (este painel não tem abas e a
+  // lista inteira deixaria o card enorme).
+  const habDet = document.createElement('details');
+  habDet.className = 'hab-mestre-bloco';
+  const habSum = document.createElement('summary');
+  habSum.className = 'section-title';
+  habSum.style.cursor = 'pointer';
+  habSum.textContent = 'Habilidades ▾';
+  habDet.appendChild(habSum);
+  let habMontada = false;
+  habDet.addEventListener('toggle', () => {
+    if (!habDet.open || habMontada) return;
+    habMontada = true;
+    const sec = montarSecaoHabilidades(p);
+    sec.querySelector('.section-title')?.remove();
+    habDet.appendChild(sec);
+  });
+  card.appendChild(habDet);
 
   // === SALVAGUARDAS DE MORTE ===
   const deathSection = document.createElement('div');

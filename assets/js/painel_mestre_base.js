@@ -66,6 +66,91 @@ function montarBlocoFeiticeiro(p) {
   });
 }
 
+// Seção "Habilidades" do card: todas as de classe + subclasse até o nível,
+// agrupadas por nível, com a descrição abrindo ali mesmo (<details>) — o
+// modal do DetalhesCatalogo busca por nome e várias subclasses repetem nomes
+// ("Magias de Juramento"), então mostraria a descrição da subclasse errada.
+// Soma as características personalizadas/talentos que o jogador criou na ficha.
+const CSS_HAB_MESTRE = `
+.hab-mestre-nivel { font-family: 'Cinzel', serif; font-size: 11px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--gold, #c49a3a); margin: 10px 0 4px; }
+.hab-mestre-item { border-bottom: 1px solid rgba(139,105,20,.15); }
+.hab-mestre-item > summary { cursor: pointer; padding: 7px 2px; min-height: 36px; display: flex; align-items: center; gap: 8px; list-style: none; font-size: 14px; }
+.hab-mestre-item > summary::-webkit-details-marker { display: none; }
+.hab-mestre-item > summary::after { content: '▾'; margin-left: auto; color: var(--gold, #c49a3a); font-size: 12px; }
+.hab-mestre-item[open] > summary::after { content: '▴'; }
+.hab-mestre-sub { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 1px; text-transform: uppercase; color: #b88a2c; border: 1px solid rgba(139,105,20,.5); border-radius: 999px; padding: 1px 6px; white-space: nowrap; }
+.hab-mestre-desc { font-size: 13px; line-height: 1.45; color: var(--parchment-dim, #b8a988); padding: 0 2px 10px; white-space: pre-line; }
+.hab-mestre-vazio { font-size: 12px; font-style: italic; color: var(--parchment-dim, #8c7d5e); padding: 6px 0; }
+`;
+let _cssHabMestre = false;
+
+function montarSecaoHabilidades(p) {
+  if (!_cssHabMestre) {
+    _cssHabMestre = true;
+    const s = document.createElement('style');
+    s.textContent = CSS_HAB_MESTRE;
+    document.head.appendChild(s);
+  }
+  const sec = document.createElement('div');
+  sec.className = 'section';
+  sec.innerHTML = `<div class="section-title">Habilidades</div>`;
+  const corpo = document.createElement('div');
+  corpo.innerHTML = `<div class="hab-mestre-vazio">Carregando…</div>`;
+  sec.appendChild(corpo);
+
+  const item = (nome, desc, tag) => {
+    const d = document.createElement('details');
+    d.className = 'hab-mestre-item';
+    const s = document.createElement('summary');
+    s.appendChild(document.createTextNode(nome));
+    if (tag) {
+      const t = document.createElement('span');
+      t.className = 'hab-mestre-sub';
+      t.textContent = tag;
+      s.appendChild(t);
+    }
+    d.appendChild(s);
+    const txt = document.createElement('div');
+    txt.className = 'hab-mestre-desc';
+    txt.textContent = desc || 'Sem descrição.';
+    d.appendChild(txt);
+    return d;
+  };
+  const titulo = texto => {
+    const h = document.createElement('div');
+    h.className = 'hab-mestre-nivel';
+    h.textContent = texto;
+    return h;
+  };
+
+  if (!window.HabilidadesRegras || !p.classe) {
+    corpo.innerHTML = `<div class="hab-mestre-vazio">${p.classe ? 'Catálogo indisponível.' : 'Sem classe definida.'}</div>`;
+    return sec;
+  }
+  window.HabilidadesRegras.doPersonagem(p.classe, p.nivel, p._subclasse).then(habs => {
+    corpo.textContent = '';
+    if (!p._subclasse && habs.some(h => /Arqu[ée]tipo|Juramento Sagrado|Dom[ií]nio Divino|Origem Feiticeira|Patrono|C[ií]rculo Dru|Tradi[çc][ãa]o|Col[ée]gio|Caminho Primitivo/.test(h.nome))) {
+      const aviso = document.createElement('div');
+      aviso.className = 'hab-mestre-vazio';
+      aviso.textContent = 'Subclasse ainda não escolhida — as habilidades dela não aparecem.';
+      corpo.appendChild(aviso);
+    }
+    const porNivel = new Map();
+    habs.forEach(h => { if (!porNivel.has(h.nivel)) porNivel.set(h.nivel, []); porNivel.get(h.nivel).push(h); });
+    [...porNivel.keys()].sort((a, b) => a - b).forEach(nv => {
+      corpo.appendChild(titulo(`Nível ${nv}`));
+      porNivel.get(nv).forEach(h => corpo.appendChild(item(h.nome, h.desc, h.subclasse)));
+    });
+    const extras = (p._featuresPersonalizadas || []).filter(f => (f.nome || '').trim());
+    if (extras.length) {
+      corpo.appendChild(titulo('Talentos e características do jogador'));
+      extras.forEach(f => corpo.appendChild(item(f.nome, f.desc, f.talento ? 'Talento' : null)));
+    }
+    if (!corpo.children.length) corpo.innerHTML = `<div class="hab-mestre-vazio">Nenhuma habilidade encontrada.</div>`;
+  });
+  return sec;
+}
+
 // Falha de autosave (DBSync.salvarCampo) hoje só ia pro console — o Mestre
 // achava que tinha salvo e não tinha. Avisa na tela.
 window.addEventListener('dbsync:erro', () => toast('⚠ Falha ao salvar — verifique sua conexão'));

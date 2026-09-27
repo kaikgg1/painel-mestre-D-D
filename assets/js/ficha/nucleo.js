@@ -142,14 +142,9 @@ async function carregarHabilidadesClasses() {
     clearTimeout(t);
   }
 }
-// Habilidades do catálogo que o PJ tem no nível atual. Quando a subclasse
-// dele já tem as habilidades reais cadastradas, some a linha genérica
-// ("Característica do Arquétipo" etc.) que só marcava o nível.
+// Filtro compartilhado com o painel do Mestre (assets/js/habilidades_regras.js).
 function habilidadesDoNivel(todas, nivel, subclasse) {
-  const temSub = !!subclasse && todas.some(h => h.subclasse === subclasse);
-  return todas.filter(h => h.nivel <= (nivel || 1)
-    && (!h.subclasse || h.subclasse === subclasse)
-    && !(temSub && !h.subclasse && /^Característica d/i.test(h.nome)));
+  return window.HabilidadesRegras.habilidadesDoNivel(todas, nivel, subclasse);
 }
 
 function chaveDeClasse(classe) {

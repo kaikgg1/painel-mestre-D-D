@@ -16,7 +16,7 @@
     "rotacionar-senha-mestre": "node scripts/rotacionar_senha_mestre.js",
     "auditoria": "node scripts/auditoria.js",
     "indice-reloaded": "node scripts/gerar_indice_reloaded.js",
-    "smoke": "node scripts/smoke_ficha.js",
+    "smoke": "node scripts/smoke_ficha.js && node scripts/smoke_painel.js",
     "auditoria-mobile": "node scripts/auditoria_mobile.js",
     "auditoria-mobile-logado": "node scripts/auditoria_mobile.js --logado",
     "reprocessar-monstros": "node scripts/reprocessar_monstros.js --aplicar"

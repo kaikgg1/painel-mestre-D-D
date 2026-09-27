@@ -176,6 +176,8 @@
       inventario: row.inventario || { moedas: {}, armas: [], armaduras: [], itens: [] },
       // Originais pra exibição (não vão pro UI_TO_DB; só pra leitura)
       _subclasse: row.subclasse || '',
+      // Só leitura: seção "Habilidades" do card (montarSecaoHabilidades).
+      _featuresPersonalizadas: Array.isArray(row.features_personalizadas) ? row.features_personalizadas : [],
     };
   }
 
