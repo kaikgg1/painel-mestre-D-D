@@ -305,7 +305,10 @@ async function popularHabilidades(classe, nivel, subclasse) {
         const usos = Math.min(+r.atual || 0, max);
         const disp = Math.max(0, max - usos);
         const favorita = favoritas.has(slug);
-        const ehTracker = !!detectado || maxSalvo > 0;
+        // Coberta por um recurso de classe: o contador é o de "Recursos de
+        // Classe" (mesmo que o painel do Mestre usa) — aqui fica só o texto.
+        const idCat = window.RecursosClasse?.idCatalogoDeHabilidade(charAtivo, slug);
+        const ehTracker = !idCat && (!!detectado || maxSalvo > 0);
 
         const botaoFav = `<button type="button" class="hab-fav-btn ${favorita ? 'ativa' : ''} no-lock" data-hab-fav="${slug}" aria-pressed="${favorita}" aria-label="${favorita ? 'Remover dos favoritos' : 'Favoritar'}" title="${favorita ? 'Remover dos favoritos' : 'Favoritar — aparece no Resumo'}">${favorita ? '★' : '☆'}</button>`;
         const badgeTipo = tipoAcao !== 'passiva' ? `<span class="hab-tipo-badge hab-tipo-${tipoAcao}">${rotuloTipoAcao(tipoAcao)}</span>` : '';
@@ -317,7 +320,7 @@ async function popularHabilidades(classe, nivel, subclasse) {
             ${h.subclasse ? `<span class="hab-sub-tag">${escape(h.subclasse)}</span>` : ''}
             <div class="hab-feature-titulo" data-hab-toggle>
               <strong>${escape(h.nome)}.</strong> ${badgeTipo}${CHEVRON_HAB}
-              <span class="hab-desc">${escape(h.desc || '—')}</span>
+              <span class="hab-desc">${escape(h.desc || '—')}${idCat ? ' <em class="hab-contador-rc">(usos marcados em Recursos de Classe)</em>' : ''}</span>
             </div>
           </div>`;
         }

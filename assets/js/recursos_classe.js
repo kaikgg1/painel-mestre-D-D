@@ -203,6 +203,33 @@
     return out;
   }
 
+  // A aba Habilidades da ficha cria contadores a partir do texto do catálogo
+  // (slug do nome: "canalizar_divindade_2_descanso", "surto_de_acao_1_uso"…).
+  // Quando a habilidade é a mesma de um recurso deste catálogo, o contador
+  // oficial é o do catálogo — os de texto duplicavam a linha no painel.
+  const MAPA_HABILIDADE_RECURSO = [
+    [/^canalizar_divindade(_\d+_descanso)?$/, 'canalizar_divindade'],
+    [/^surto_de_acao(_\d+_usos?)?$/, 'surto_acao'],
+    [/^indomavel(_\d+_usos?)?$/, 'indomavel'],
+    [/^arcanos?_misticos?_(\d)_nivel$/, m => 'arcano_' + m[1]],
+    [/^inspiracao_bardica(_d\d+)?$/, 'inspiracao_bardica'],
+    [/^retomar_o_folego$/, 'retomar_folego'],
+    [/^golpe_de_sorte$/, 'golpe_sorte'],
+  ];
+  function idCatalogoDeHabilidade(c, slug) {
+    if (!c || !slug) return null;
+    let id = slug;
+    for (const [re, alvo] of MAPA_HABILIDADE_RECURSO) {
+      const m = slug.match(re);
+      if (m) { id = typeof alvo === 'function' ? alvo(m) : alvo; break; }
+    }
+    return recursosPara(c).some(r => r.id === id && r.max > 0) ? id : null;
+  }
+  function chaveCobertaPeloCatalogo(c, chave) {
+    const id = idCatalogoDeHabilidade(c, chave);
+    return !!id && id !== chave;
+  }
+
   function recursosPara(c, atrs) {
     if (!c) return [];
     const chave = chaveDeClasse(c.classe);
@@ -259,5 +286,6 @@
     recursosPara, lerUsado, gravarUsado, gravarRecursosUsados, RECURSOS_POR_CLASSE, atributosEfetivos,
     METAMAGIAS, metamagiasPermitidas, CUSTO_SLOT_DE_PONTOS,
     criarSlotComPontos, quebrarSlotEmPontos, limparSlotsExtras,
+    idCatalogoDeHabilidade, chaveCobertaPeloCatalogo,
   };
 })();

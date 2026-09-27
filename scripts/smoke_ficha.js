@@ -99,7 +99,11 @@ function construirQuery(tabela, payloadUpdate) {
   };
   return builder;
 }
-window.sb = { from: (tabela) => construirQuery(tabela, null) };
+window.sb = {
+  from: (tabela) => construirQuery(tabela, null),
+  // RPC mesclar_recurso_usado (sql/031) — registra o patch pra conferência.
+  rpc: async (fn, args) => { (window.__rpcCalls = window.__rpcCalls || []).push({ fn, args }); return { data: null, error: null }; },
+};
 // nucleo.js faz fetch('../data/habilidades_classes.json') e
 // fetch('../data/magias_data.json') — serve os arquivos reais do disco
 // (mesmo dado que o navegador pegaria) em vez de simular "sem rede", senão
@@ -234,6 +238,26 @@ const apiObjetos = [
   if (e4 || slots[3].atual !== 1 || rec.pontos_feiticaria !== 4) erros.push('quebrarSlotEmPontos: resultado inesperado');
   if (RC.metamagiasPermitidas(9) !== 2 || RC.metamagiasPermitidas(10) !== 3 || RC.metamagiasPermitidas(17) !== 4) {
     erros.push('metamagiasPermitidas fora da tabela do PHB');
+  }
+  // Contadores de texto que duplicavam recurso de classe apontam pro id oficial.
+  const clerigo9 = { classe: 'Clérigo', nivel: 9 };
+  const guerreiro9 = { classe: 'Guerreiro', nivel: 9 };
+  const casos = [
+    [clerigo9, 'canalizar_divindade_1_descanso', 'canalizar_divindade'],
+    [clerigo9, 'canalizar_divindade_2_descanso', 'canalizar_divindade'],
+    [clerigo9, 'canalizar_divindade_toque_da_morte', null],
+    [guerreiro9, 'surto_de_acao_1_uso', 'surto_acao'],
+    [guerreiro9, 'indomavel_1_uso', 'indomavel'],
+    [guerreiro9, 'retomar_o_folego', 'retomar_folego'],
+    [{ classe: 'Guerreiro', nivel: 5 }, 'indomavel_1_uso', null],
+    [{ classe: 'Paladino', nivel: 8 }, 'canalizar_divindade', 'canalizar_divindade'],
+  ];
+  for (const [c, slug, esperado] of casos) {
+    const got = RC.idCatalogoDeHabilidade(c, slug);
+    if (got !== esperado) erros.push(`idCatalogoDeHabilidade(${c.classe} ${c.nivel}, ${slug}) = ${got}, esperado ${esperado}`);
+  }
+  if (!RC.chaveCobertaPeloCatalogo(clerigo9, 'canalizar_divindade_2_descanso') || RC.chaveCobertaPeloCatalogo(clerigo9, 'canalizar_divindade')) {
+    erros.push('chaveCobertaPeloCatalogo: filtro de chaves livres do painel errado');
   }
   const bonus = window.eval('atributoTotal({ atributos: { for: 14 }, atributos_bonus: { for: 2 } }, "for")');
   if (bonus !== 16) erros.push('atributoTotal não soma atributos_bonus: ' + bonus);
@@ -771,7 +795,10 @@ console.log('');
     ['[data-hab-filtro="todas"].ativo', 'pill "Todas" ativo por padrão'],
     ['#hab-wrap .hab-feature[data-hab-tipo="acao"]', 'feature classificada como Ação'],
     ['#hab-wrap .hab-fav-btn', 'botão de favoritar no catálogo'],
-    ['#hab-wrap .hab-pip', 'pips de uso redesenhados'],
+    // Canalizar Divindade (1/descanso) é coberta pelo recurso de catálogo:
+    // sem contador duplicado aqui, só o aviso; o contador fica em Recursos de Classe.
+    ['#hab-wrap .hab-contador-rc', 'aviso de contador em Recursos de Classe'],
+    ['#recursos-classe-wrap .rc-pip', 'pips do recurso Canalizar Divindade'],
     ['#hab-custom-wrap', 'wrap de características personalizadas'],
   ];
   for (const [sel, rotulo] of HAB_CHECKS) {

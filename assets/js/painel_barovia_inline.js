@@ -952,7 +952,8 @@ function criarCard(p) {
   });
 
   const chavesLivres = Object.keys(recursos).filter(k =>
-    !idsCatalogo.has(k) && recursos[k] && typeof recursos[k].max === 'number' && recursos[k].max > 0);
+    !idsCatalogo.has(k) && !window.RecursosClasse.chaveCobertaPeloCatalogo(p, k)
+      && recursos[k] && typeof recursos[k].max === 'number' && recursos[k].max > 0);
   chavesLivres.forEach(k => {
     const r = recursos[k];
     const row = document.createElement('div');

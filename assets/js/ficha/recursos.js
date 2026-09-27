@@ -290,7 +290,7 @@ async function aplicarDescanso(tipo) {
   if (charAtivo.classe && typeof carregarHabilidadesClasses === 'function') {
     const db = await carregarHabilidadesClasses();
     const todas = (db && db[chaveDeClasse(charAtivo.classe)]) || [];
-    const habs = todas.filter(h => h.nivel <= (charAtivo.nivel || 1) && (!h.subclasse || h.subclasse === charAtivo.subclasse));
+    const habs = habilidadesDoNivel(todas, charAtivo.nivel, charAtivo.subclasse);
     for (const h of habs) {
       const detectado = typeof detectarUsosLimitados === 'function' ? detectarUsosLimitados(h) : null;
       if (!detectado) continue;
@@ -299,8 +299,10 @@ async function aplicarDescanso(tipo) {
       const curto = /curto/i.test(periodoTxt);
       if (!longo && !curto) continue;
       const slug = slugFeature(h.nome);
-      const cur = rec[slug] || { atual: 0, max: detectado.max };
-      rec[slug] = Object.assign({}, cur, { atual: 0 });
+      // Só zera contador que já existe — criar chave pra toda habilidade
+      // detectada enchia recursos_usados de duplicatas do passo 1.
+      if (!rec[slug] || window.RecursosClasse?.idCatalogoDeHabilidade(charAtivo, slug)) continue;
+      rec[slug] = Object.assign({}, rec[slug], { atual: 0 });
     }
   }
 

@@ -45,6 +45,7 @@ const SCRIPTS = [
   '031_merge_recursos_usados_rpc.sql',
   '032_atributos_bonus.sql',
   '033_metamagias.sql',
+  '034_limpar_recursos_duplicados.sql',
 ];
 
 (async () => {
