@@ -589,22 +589,18 @@
   // recebe a senha digitada aqui) — não é mais um gate decorativo em JS.
   const NOME_MESTRE  = 'Mestre123';
 
-  // Destino pós-login. Só aceita caminho interno: `from` vem da URL, e sem
-  // essa checagem `?from=https://site-externo` mandaria o jogador pra fora
-  // logo após entrar (redirecionamento aberto). Barra dupla (`//host`) também
-  // é externa, por isso a segunda condição.
-  function destinoSeguro() {
-    const from = new URLSearchParams(location.search).get('from');
-    if (!from || !from.startsWith('/') || from.startsWith('//')) return '../index.html';
-    return from;
-  }
+  // Destino pós-login: SEMPRE o painel geral (index). O `?from=` da URL é
+  // ignorado de propósito — entrar numa conta tem que passar pela tela
+  // inicial, não cair direto numa aba interna que ficou aberta.
+  const DESTINO = '../index.html';
 
   (async () => {
     const u = await window.Auth.getUser();
-    // Já logado: vai pra onde a pessoa tentou ir, não sempre pro hub — quem
-    // clicou num link de ficha e caiu aqui era jogado pro início e tinha que
-    // navegar de novo.
-    if (u) location.replace(destinoSeguro());
+    if (u) location.replace(DESTINO);
+    else if (window.Auth.servidorFora()) {
+      erro.textContent = 'Servidor indisponível — não foi possível conectar ao banco da mesa.';
+      erro.classList.add('show');
+    }
   })();
 
   function ehMestreSelecionado() { return hidden.value === NOME_MESTRE; }
@@ -647,13 +643,15 @@
     btn.disabled = true; btn.textContent = 'Entrando…';
     const r = await window.Auth.entrarPorNome(nome, ehMestreSelecionado() ? senhaInp.value : undefined);
     if (!r.ok) {
-      erro.textContent = ehMestreSelecionado() ? 'Senha do Mestre incorreta.' : ('Falha ao entrar: ' + r.erro);
+      erro.textContent = r.rede
+        ? 'Servidor indisponível — não foi possível conectar. Tente de novo em instantes.'
+        : ehMestreSelecionado() ? 'Senha do Mestre incorreta.' : ('Falha ao entrar: ' + r.erro);
       erro.classList.add('show');
       if (ehMestreSelecionado()) { senhaInp.focus(); senhaInp.select(); }
       btn.disabled = false; btn.textContent = 'Entrar';
       return;
     }
-    location.replace(destinoSeguro());
+    location.replace(DESTINO);
   });
 </script>
 <script src="../assets/js/ambiente.js"></script>

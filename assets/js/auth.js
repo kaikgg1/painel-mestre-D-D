@@ -24,16 +24,62 @@
     return (nome || '').trim().toLowerCase() + DOMINIO;
   }
 
-  async function getUser() {
-    if (!window.sb) return null;
-    const { data } = await window.sb.auth.getUser();
-    return data?.user || null;
+  // Prazo máximo pra qualquer chamada de auth. Sem ele, servidor fora do ar
+  // (ex.: projeto Supabase pausado) deixava a página em branco pra sempre —
+  // o SDK fica tentando renovar o token em silêncio e a Promise nunca volta.
+  const PRAZO_MS = 8000;
+  let _servidorFora = false;
+
+  function comPrazo(promessa) {
+    return Promise.race([
+      promessa,
+      new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), PRAZO_MS)),
+    ]);
+  }
+
+  function ehErroDeRede(err) {
+    if (!err) return false;
+    return err.name === 'AuthRetryableFetchError' || err.status === 0
+      || /fetch|network|timeout|failed to/i.test(err.message || '');
+  }
+
+  // Cache por página: getProfile/ehMestre/renderHeader chamam getUser em
+  // sequência, e com o servidor lento cada um esperaria o prazo de novo.
+  let _userPromise = null;
+  function getUser() {
+    if (!window.sb) return Promise.resolve(null);
+    if (!_userPromise) {
+      _userPromise = comPrazo(window.sb.auth.getUser())
+        .then(({ data, error }) => {
+          if (ehErroDeRede(error)) _servidorFora = true;
+          return data?.user || null;
+        })
+        .catch(() => { _servidorFora = true; return null; });
+    }
+    return _userPromise;
+  }
+
+  function mostrarAvisoServidor() {
+    if (document.getElementById('aviso-servidor')) return;
+    const box = document.createElement('div');
+    box.id = 'aviso-servidor';
+    box.setAttribute('role', 'alert');
+    box.style.cssText = 'position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;background:rgba(0,0,0,.72)';
+    box.innerHTML = `
+      <div style="max-width:420px;text-align:center;padding:28px 24px;border:1px solid var(--gold,#b8913a);border-radius:10px;background:var(--bg-card,#16130e);color:var(--text,#e8dcc4);font-family:var(--font-body,Georgia,serif)">
+        <div style="font-family:'Cinzel',serif;color:var(--gold-bright,#d4a84b);font-size:18px;letter-spacing:1.5px;margin-bottom:10px">Servidor indisponível</div>
+        <p style="margin:0 0 18px;line-height:1.5">Não foi possível conectar ao banco de dados da mesa. Verifique a internet ou tente de novo em instantes.</p>
+        <button type="button" class="auth-btn" style="cursor:pointer">Tentar de novo</button>
+      </div>`;
+    box.querySelector('button').addEventListener('click', () => location.reload());
+    (document.body || document.documentElement).appendChild(box);
   }
 
   async function getProfile() {
     const u = await getUser();
     if (!u) return null;
-    const { data } = await window.sb.from('profiles').select('id, nome').eq('id', u.id).maybeSingle();
+    let data = null;
+    try { ({ data } = await comPrazo(window.sb.from('profiles').select('id, nome').eq('id', u.id).maybeSingle())); } catch {}
     return data || { id: u.id, nome: u.user_metadata?.nome || u.email };
   }
 
@@ -49,14 +95,22 @@
   // aqui — nunca a senha compartilhada. Ver scripts/rotacionar_senha_mestre.js.
   async function entrarPorNome(nome, senha) {
     const email = emailDoNome(nome);
-    const { data, error } = await window.sb.auth.signInWithPassword({ email, password: senha || SENHA_PADRAO });
-    if (error) return { ok: false, erro: error.message };
-    return { ok: true, user: data.user };
+    _userPromise = null;
+    try {
+      const { data, error } = await comPrazo(window.sb.auth.signInWithPassword({ email, password: senha || SENHA_PADRAO }));
+      if (error) return { ok: false, erro: error.message, rede: ehErroDeRede(error) };
+      return { ok: true, user: data.user };
+    } catch (e) {
+      return { ok: false, erro: e.message, rede: true };
+    }
   }
 
   async function sair() {
     if (!window.sb) return;
-    await window.sb.auth.signOut();
+    _userPromise = null;
+    // Mesmo com o servidor fora, a sessão local tem que ser apagada — senão o
+    // botão Sair travava e a pessoa continuava "logada" no aparelho.
+    try { await comPrazo(window.sb.auth.signOut({ scope: 'local' })); } catch {}
   }
 
   // requerLogin(): redireciona pro login se NÃO autenticado.
@@ -65,6 +119,9 @@
   async function requerLogin(loginPath) {
     const u = await getUser();
     if (u) return u;
+    // Servidor fora: mandar pro login não adianta (lá também não conecta) —
+    // avisa na própria página em vez de deixá-la em branco.
+    if (_servidorFora) { mostrarAvisoServidor(); return null; }
     const from = encodeURIComponent(location.pathname + location.search);
     const url = (loginPath || 'login.html') + '?from=' + from;
     location.replace(url);
@@ -95,5 +152,5 @@
     }
   }
 
-  window.Auth = { getUser, getProfile, ehMestre, entrarPorNome, sair, requerLogin, renderHeader, JOGADORES };
+  window.Auth = { servidorFora: () => _servidorFora, mostrarAvisoServidor, getUser, getProfile, ehMestre, entrarPorNome, sair, requerLogin, renderHeader, JOGADORES };
 })();

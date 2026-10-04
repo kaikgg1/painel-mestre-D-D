@@ -1,0 +1,37 @@
+# Mantém o projeto Supabase (plano free) acordado.
+#
+# O Supabase pausa projetos gratuitos depois de alguns dias sem uso do banco —
+# quando isso acontece o domínio some (NXDOMAIN) e o painel fica em branco.
+# Este job faz uma consulta real no Postgres via REST a cada 3 dias, o que
+# conta como atividade. Roda nos servidores do GitHub, com o PC desligado.
+#
+# A anon key é pública por design (já está em assets/js/supabase.js).
+# Pra rodar na hora: aba Actions → "Manter Supabase ativo" → Run workflow.
+
+name: Manter Supabase ativo
+
+on:
+  schedule:
+    - cron: '17 9 */3 * *'   # a cada 3 dias, 09:17 UTC
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Consulta o banco
+        env:
+          SB_URL: https://ehbngkmxwsjxuetjnztz.supabase.co
+          SB_ANON: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVoYm5na214d3NqeHVldGpuenR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1NTk2MDQsImV4cCI6MjA5NTEzNTYwNH0.nKUMwOOzlzZnaWDU7h450D-7yySVJd1kGdYXWSz36l0
+        run: |
+          # Tenta algumas vezes antes de falhar (rede instável do runner).
+          for i in 1 2 3; do
+            code=$(curl -s -o resp.txt -w '%{http_code}' -m 30 \
+              "$SB_URL/rest/v1/profiles?select=id&limit=1" \
+              -H "apikey: $SB_ANON" -H "Authorization: Bearer $SB_ANON")
+            echo "tentativa $i → HTTP $code"; cat resp.txt; echo
+            if [ "$code" = "200" ]; then exit 0; fi
+            sleep 20
+          done
+          echo "::error::Supabase não respondeu — o projeto pode estar pausado. Restaure em supabase.com/dashboard."
+          exit 1
