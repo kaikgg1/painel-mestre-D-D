@@ -238,6 +238,35 @@
     letter-spacing: 1px;
   }
 
+  /* Desktop largo — os 5 cartões numa fileira só. Em 2 colunas sobrava um
+     cartão órfão embaixo e, num notebook (1366×768, ou 1920 com escala de
+     125% do Windows), metade da tela ficava abaixo da dobra. */
+  @media (min-width: 1200px) {
+    .wrapper { max-width: 1440px; }
+    .campaigns { gap: 20px; flex-wrap: nowrap; max-width: none !important; }
+    .campaign-card { width: auto; flex: 1 1 0; max-width: 280px; padding: 34px 20px 28px; }
+    .campaign-icon { font-size: 50px; margin-bottom: 18px; }
+    .campaign-name { font-size: 19px; }
+    .campaign-desc { font-size: 14px; }
+    .campaign-cta { margin-top: auto; padding: 9px 18px; font-size: 11px; }
+    .campaign-text { margin-bottom: 22px; }
+  }
+  /* Desktop médio — 3 colunas (3 + 2 centralizados), cartões mais baixos */
+  @media (max-width: 1199px) and (min-width: 1101px) {
+    .campaigns { gap: 22px; }
+    .campaign-card { width: calc((100% - 44px) / 3); max-width: 340px; padding: 32px 24px 26px; }
+    .campaign-icon { font-size: 50px; margin-bottom: 16px; }
+    .campaign-cta { margin-top: 20px; }
+  }
+  /* Tela baixa (notebook) — encolhe o cabeçalho pra os cartões aparecerem */
+  @media (min-width: 768px) and (max-height: 860px) {
+    html, body { padding-top: 24px; padding-bottom: 24px; }
+    .crest { font-size: 36px; margin-bottom: 8px; }
+    .divider { margin: 14px auto; }
+    .prompt { margin-bottom: 22px; }
+    .footer { margin-top: 28px; }
+  }
+
   /* Tablet — 2 colunas com 3º quebrando suave */
   @media (max-width: 1100px) and (min-width: 768px) {
     .campaigns { gap: 24px; }

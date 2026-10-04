@@ -133,6 +133,12 @@
   .auth-slot .auth-btn:hover { background: var(--gold-muted); color: var(--bg-deep); }
   .auth-slot .auth-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
   @media (max-width: 767px) { .auth-slot .auth-nome { display: none; } }
+  /* Nome + Sair: fora da toolbar (lá dentro quebravam pra uma linha sozinhos
+     embaixo dos botões). Desktop: canto superior direito, como no index. */
+  .auth-slot { justify-content: flex-end; margin-bottom: 8px; }
+  @media (min-width: 1024px) {
+    .auth-slot { position: absolute; top: 16px; right: 20px; margin: 0; z-index: 5; }
+  }
   @media (max-width: 700px) { .toolbar-sep { display: none; } }
 
   /* ===== BARRA DA PARTY ===== */

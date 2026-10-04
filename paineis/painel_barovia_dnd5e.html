@@ -20,6 +20,8 @@
 </head>
 <body data-ambiente="brasas">
 
+<span class="auth-slot" id="auth-slot" aria-label="Status de login" style="display:flex;gap:8px;align-items:center;font-family:'Cinzel',serif;font-size:11px"></span>
+
 <header class="header">
   <h1>Crônicas de Barovia</h1>
   <div class="subtitle">A Maldição de Strahd · Painel do Mestre</div>
@@ -40,7 +42,6 @@
     <button type="button" onclick="abrirNotasMestre({ chave: 'barovia', titulo: 'Maldição de Strahd' })" id="btn-notas-mestre" style="display:none" aria-label="Abrir anotações do mestre"><span data-ico="notas" aria-hidden="true"></span> Anotações</button>
     <button onclick="window.print()" aria-label="Imprimir painel"><span data-ico="imprimir" aria-hidden="true"></span> Imprimir</button>
   </div>
-  <span class="auth-slot" id="auth-slot" aria-label="Status de login" style="margin-left:auto;display:flex;gap:8px;align-items:center;font-family:'Cinzel',serif;font-size:11px"></span>
 </nav>
 
 <div class="party-bar" id="party-bar"></div>
