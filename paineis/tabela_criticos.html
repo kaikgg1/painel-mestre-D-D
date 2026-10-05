@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Tabela de Críticos da mesa — sucessos críticos (20 natural) e falhas críticas (1 natural) por tipo de dano/ataque, d100.">
+<meta name="description" content="Tabela de Críticos da mesa — armas (d100, por tipo de dano/ataque) e magias (d10, por escola de magia), sucessos e falhas críticas.">
 <meta name="theme-color" content="#0d0e0c">
 <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
 <title>Tabela de Críticos — D&D 5e</title>
@@ -19,88 +19,357 @@
 
   main { position: relative; z-index: 1; max-width: 980px; margin: 0 auto; padding: 22px 16px 60px; }
 
-  .subtitulo-secao { text-align: center; color: var(--text-muted); font-style: italic; font-size: 14.5px; margin: 0 0 24px; }
+  /* ---- topo compacto de cada modo: capa pequena + resumo (no lugar da capa em tela cheia) ---- */
+  .crit-hero { display: grid; grid-template-columns: 150px 1fr; gap: 8px 24px; align-items: center;
+    margin: 0 auto 24px; }
+  .crit-hero-capa { width: 100%; display: block; border-radius: var(--radius-sm); box-shadow: 0 8px 22px var(--shadow); }
+  /* capa clicável: abre a arte em tela cheia */
+  .capa-zoom-btn { position: relative; padding: 0; border: 0; background: none; cursor: zoom-in; overflow: hidden;
+    transition: transform .2s, box-shadow .2s; }
+  .capa-zoom-btn img { display: block; width: 100%; height: auto; }
+  .capa-zoom-btn::after { content: '⤢'; position: absolute; right: 6px; bottom: 6px; width: 26px; height: 26px;
+    display: grid; place-items: center; border-radius: 50%; background: rgba(0,0,0,.6); color: #fff; font-size: 15px;
+    opacity: 0; transition: opacity .2s; }
+  .capa-zoom-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 28px var(--shadow); }
+  .capa-zoom-btn:hover::after, .capa-zoom-btn:focus-visible::after { opacity: 1; }
+  .capa-zoom-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; }
+  @media (hover: none) { .capa-zoom-btn::after { opacity: .85; } }
 
-  .explicacoes { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 22px; }
-  @media (max-width: 767px) { .explicacoes { grid-template-columns: 1fr; gap: var(--space-3, 12px); } }
-  .explicacao { padding: 16px 18px; border-left: 3px solid var(--gold); cursor: pointer;
-    opacity: .6; transition: opacity .18s, transform .15s, box-shadow .18s; }
-  .explicacao.falha { border-left-color: var(--danger); }
-  .explicacao:hover { opacity: .85; }
-  .explicacao.selecionada { opacity: 1; box-shadow: 0 0 0 1px var(--gold); }
-  .explicacao.falha.selecionada { box-shadow: 0 0 0 1px var(--danger); }
-  .explicacao:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
-  .explicacao .titulo { font-family: var(--font-heading); font-size: 13px; font-weight: 700; letter-spacing: .8px;
-    text-transform: uppercase; color: var(--gold-light); margin-bottom: 8px; }
-  .explicacao.falha .titulo { color: var(--erro); }
-  .explicacao p { margin: 0; font-size: 15px; line-height: 1.55; color: var(--text-muted); }
+  dialog.capa-zoom { width: 100vw; height: 100vh; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 0;
+    border: 0; background: transparent; overflow: hidden; }
+  dialog.capa-zoom[open] { display: grid; place-items: center; }
+  dialog.capa-zoom::backdrop { background: rgba(0,0,0,.9); backdrop-filter: blur(4px); }
+  dialog.capa-zoom img { max-width: 94vw; max-height: 94vh; max-height: 94dvh; width: auto; height: auto; object-fit: contain;
+    border-radius: var(--radius); box-shadow: 0 20px 60px rgba(0,0,0,.7); cursor: zoom-out; }
+  .capa-zoom-fechar { position: fixed; top: 14px; right: 14px; width: 44px; height: 44px; border-radius: 50%; cursor: pointer;
+    background: rgba(20,20,20,.75); border: 1px solid rgba(255,255,255,.3); color: #fff; font-size: 18px; line-height: 1; }
+  .capa-zoom-fechar:hover { background: rgba(60,60,60,.9); }
+  .capa-zoom-fechar:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+  .crit-hero h2 { margin: 0 0 6px; font-family: var(--font-heading); font-size: 23px; line-height: 1.25;
+    letter-spacing: .5px; color: var(--gold-light); }
+  .crit-hero p { margin: 0; color: var(--text-muted); font-size: 15px; line-height: 1.55; }
+  .crit-hero p strong { color: var(--text); }
+  .crit-hero.com-atalhos .crit-hero-capa { grid-row: span 2; }
+  .crit-hero.com-atalhos .crit-hero-texto { align-self: end; }
+
+  /* ---- Críticos de Armas: layout do PDF original — folhas de pergaminho e a
+     faixa vinho com o símbolo de cada coluna. Texto escuro sobre o pergaminho
+     clareado, corpo maior e números alinhados. ---- */
+  /* Cormorant é fina: peso 500 nas duas seções deixa o texto firme sobre fundo texturizado */
+  #modo-armas, #modo-magias { font-weight: 500; }
+  #modo-armas { font-variant-numeric: lining-nums tabular-nums; --perg-texto: #2a1a0c; --perg-suave: #5a4128;
+    --vinho: #2e0404; --vinho-claro: #8a1c1c; --perg-claro: #f1dfb4; --perg-linha: rgba(70,40,15,.26); }
+  .arm-folha { max-width: 980px; margin: 0 auto 28px; border-radius: var(--radius); color: var(--perg-texto);
+    background: linear-gradient(rgba(255,244,214,.4), rgba(255,244,214,.4)), url('../assets/img/criticos-armas/pergaminho.webp') center / cover;
+    box-shadow: 0 10px 30px var(--shadow); overflow: clip; scroll-margin-top: calc(var(--topo, 70px) + 12px); }
+
+  /* folha 1: as duas regras (clicáveis: escolhem a tabela) + legenda dos símbolos */
+  .arm-regras { padding: 26px 28px; }
+  .explicacoes { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-bottom: 24px; }
+  .explicacao { padding: 12px 22px 14px; text-align: center; cursor: pointer; border-radius: 10px; opacity: .6;
+    transition: opacity .18s, background .18s, box-shadow .18s; }
+  .explicacao + .explicacao { position: relative; }
+  .explicacao + .explicacao::before { content: ''; position: absolute; left: 0; top: 10%; bottom: 10%; width: 1px; background: var(--perg-linha); }
+  .explicacao:hover { opacity: .9; }
+  .explicacao.selecionada { opacity: 1; background: rgba(255,250,235,.45); box-shadow: inset 0 0 0 1px var(--perg-linha); }
+  .explicacao:focus-visible { outline: 2px solid var(--vinho-claro); outline-offset: 2px; }
+  .explicacao .titulo { font-family: var(--font-heading); font-size: 18px; font-weight: 700; line-height: 1.3;
+    color: var(--vinho-claro); margin-bottom: 10px; }
+  .explicacao p { margin: 0; font-size: 16px; line-height: 1.6; }
+  .explicacao p strong { color: var(--vinho); }
+  .explicacao .dica { display: inline-block; margin-top: 12px; padding: 5px 14px; border-radius: 999px;
+    font-family: var(--font-heading); font-size: 11.5px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    color: var(--perg-suave); border: 1px solid var(--perg-linha); }
+  .explicacao .dica::after { content: 'Ver esta tabela'; }
+  .explicacao.selecionada .dica { background: var(--vinho); border-color: var(--vinho); color: var(--perg-claro); }
+  .explicacao.selecionada .dica::after { content: 'Tabela abaixo ↓'; }
+
+  .arm-legenda { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 32px; padding-top: 22px; border-top: 1px solid var(--perg-linha); }
+  .arm-legenda-col { display: grid; gap: 12px; }
+  .arm-simbolo { display: flex; gap: 14px; align-items: center; margin: 0; font-size: 14.5px; line-height: 1.5; }
+  .arm-simbolo img { width: 46px; height: 46px; object-fit: contain; flex: none; }
+  .arm-simbolo strong { color: var(--vinho-claro); font-family: var(--font-heading); letter-spacing: .5px; }
+
+  /* folhas 2 e 3: as tabelas d100. Sem rolagem interna: o cabeçalho (faixa vinho
+     com os símbolos) gruda logo abaixo do cabeçalho do site enquanto a página rola. */
   .tabela-secao[hidden] { display: none; }
+  table.tabela-critico { width: 100%; border-collapse: separate; border-spacing: 0; table-layout: fixed;
+    font-size: 16px; line-height: 1.55; }
+  table.tabela-critico caption { caption-side: top; background: var(--vinho); color: var(--perg-claro);
+    font-family: var(--font-heading); font-size: 19px; font-weight: 700; letter-spacing: .6px; padding: 16px 16px 2px; }
+  table.tabela-critico thead th { position: sticky; top: var(--topo, 0px); z-index: 2; background: var(--vinho);
+    color: var(--perg-claro); font-family: var(--font-heading); font-size: 13px; font-weight: 700; letter-spacing: .8px;
+    text-transform: uppercase; text-align: center; vertical-align: bottom; padding: 8px 10px 12px; border-bottom: 2px solid #120101; }
+  table.tabela-critico thead th img { display: block; width: 46px; height: 46px; object-fit: contain; margin: 0 auto 6px;
+    filter: drop-shadow(0 2px 3px rgba(0,0,0,.5)); }
+  table.tabela-critico th:first-child { width: 84px; }
+  table.tabela-critico td { padding: 11px 14px; vertical-align: top; border-bottom: 1px solid var(--perg-linha);
+    border-left: 1px solid var(--perg-linha); overflow-wrap: break-word; }
+  table.tabela-critico td:first-child { border-left: 0; text-align: center; white-space: nowrap; font-family: var(--font-heading);
+    font-weight: 700; font-size: 15.5px; color: var(--vinho-claro); }
+  table.tabela-critico tbody tr:nth-child(even) td { background: rgba(255,250,235,.3); }
+  table.tabela-critico tbody tr:hover td { background: rgba(255,250,235,.55); }
+  table.tabela-critico td strong { color: var(--vinho); font-weight: 700; }
 
-  /* ---- tabelas de d100 ---- */
-  /* `overflow-x: auto` já transforma o wrap em contêiner de rolagem nos DOIS
-     eixos (o overflow-y `visible` vira `auto` por especificação). Sem altura
-     limitada ele nunca rola na vertical, então o `position: sticky` do <thead>
-     não tinha contra o que grudar. A max-height dá o scrollport vertical que
-     falta — são 20 linhas de texto denso por tabela, e o cabeçalho de tipo de
-     dano é o que diz de que coluna é cada efeito. */
-  .table-wrap { overflow-x: auto; max-height: min(72vh, 760px); margin: 0 0 40px;
-    border: 1px solid var(--border-soft); border-radius: var(--radius); }
-  table.tabela-critico { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 14.5px; }
-  table.tabela-critico caption { caption-side: top; text-align: left; font-family: var(--font-heading); font-size: 12px;
-    font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--gold); background: var(--surface-raised);
-    padding: 10px 14px; border-bottom: 1px solid var(--border-soft); }
-  table.tabela-critico th, table.tabela-critico td { border: 1px solid var(--border-soft); padding: 9px 12px; text-align: left;
-    vertical-align: top; line-height: 1.45; }
-  table.tabela-critico thead th { background: var(--surface); color: var(--gold-light); font-family: var(--font-heading);
-    font-size: 12px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase;
-    position: sticky; top: 0; z-index: 2; }
-  table.tabela-critico td:first-child, table.tabela-critico th:first-child { white-space: nowrap; font-family: var(--font-heading);
-    color: var(--gold); font-weight: 700; text-align: center; background: var(--surface); }
-  table.tabela-critico tbody tr:nth-child(even) td:not(:first-child) { background: color-mix(in srgb, var(--surface) 55%, transparent); }
-  table.tabela-critico td strong { color: var(--gold-light); font-weight: 600; }
+  /* tablet: mesma tabela, um pouco mais justa (cabe sem rolar pro lado) */
+  @media (max-width: 979px) {
+    table.tabela-critico { font-size: 15px; }
+    table.tabela-critico th:first-child { width: 68px; }
+    table.tabela-critico td { padding: 10px 10px; }
+    table.tabela-critico thead th img { width: 40px; height: 40px; }
+  }
 
   /* ---- versão mobile: lista vertical gerada a partir da mesma tabela ---- */
   .criticos-mobile { display: none; }
 
   @media (max-width: 767px) {
     main { padding: 18px var(--mobile-padding, 16px) 48px; }
-    .subtitulo-secao { margin-bottom: 18px; }
-    .explicacao { padding: var(--card-padding, 16px); }
+    .crit-hero { grid-template-columns: 88px 1fr; gap: 12px 14px; margin-bottom: 18px; }
+    .crit-hero h2 { font-size: 19px; }
+    .crit-hero p { font-size: 14px; line-height: 1.5; }
+    .crit-hero.com-atalhos .crit-hero-capa { grid-row: auto; }
+
+    .arm-folha { margin-bottom: 20px; }
+    .arm-regras { padding: 16px 14px 20px; }
+    .explicacoes { grid-template-columns: 1fr; gap: 10px; margin-bottom: 18px; }
+    .explicacao { padding: 14px; opacity: .7; }
+    .explicacao + .explicacao::before { display: none; }
+    .explicacao .titulo { font-size: 16.5px; }
+    .explicacao p { font-size: 15px; }
+    /* só a regra escolhida mostra o texto; a outra vira um botão compacto */
+    .explicacao:not(.selecionada) p { display: none; }
+    .explicacao:not(.selecionada) .titulo { margin-bottom: 6px; }
+    .explicacao:not(.selecionada) .titulo br { display: none; }
+    .explicacao .dica { margin-top: 8px; }
+    /* legenda vira grade de símbolos (o texto de cada um é sempre o mesmo) */
+    .arm-legenda { grid-template-columns: 1fr 1fr; gap: 10px; padding-top: 16px; }
+    .arm-legenda-col { gap: 10px; }
+    .arm-simbolo { flex-direction: column; gap: 4px; text-align: center; font-size: 13px; }
+    .arm-simbolo img { width: 38px; height: 38px; }
+    .arm-simbolo span { font-size: 0; }
+    .arm-simbolo strong { font-size: 12.5px; letter-spacing: .3px; }
 
     /* no mobile a tabela larga some e dá lugar aos cartões (sem scroll horizontal) */
     .table-wrap { display: none; }
-    .criticos-mobile { display: block; margin: 0 0 var(--space-5, 24px); }
+    .criticos-mobile { display: block; }
 
-    .crit-legenda { font-family: var(--font-heading); font-size: 11.5px; font-weight: 700; letter-spacing: 1px;
-      text-transform: uppercase; color: var(--gold); margin: 0 0 var(--space-3, 12px); }
+    .crit-legenda { margin: 0; padding: 14px 14px 6px; background: var(--vinho); color: var(--perg-claro); text-align: center;
+      font-family: var(--font-heading); font-size: 14px; font-weight: 700; letter-spacing: .6px; }
+    /* barra de tipos gruda no topo: dá pra trocar de coluna sem voltar lá em cima */
+    .crit-tipos { position: sticky; top: var(--topo, 0px); z-index: 3; display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 8px; padding: 8px 10px 12px; background: var(--vinho); box-shadow: 0 6px 12px rgba(0,0,0,.25); }
+    .crit-tipo { min-height: 68px; padding: 6px 4px; display: flex; flex-direction: column; gap: 4px; align-items: center;
+      justify-content: center; text-align: center; cursor: pointer; background: rgba(255,255,255,.06);
+      border: 1px solid rgba(241,223,180,.25); border-radius: var(--radius-sm); color: #e8d5a8;
+      font-family: var(--font-heading); font-size: 11px; font-weight: 700; letter-spacing: .3px;
+      text-transform: uppercase; line-height: 1.2; transition: background .18s, border-color .18s, color .18s; }
+    .crit-tipo img { width: 32px; height: 32px; object-fit: contain; }
+    .crit-tipo[aria-pressed="true"] { background: var(--perg-claro); border-color: var(--perg-claro); color: var(--vinho); }
+    .crit-tipo:focus-visible { outline: 2px solid var(--perg-claro); outline-offset: 2px; }
 
-    .crit-tipos { display: grid; grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
-      gap: var(--space-2, 8px); margin: 0 0 var(--space-4, 16px); }
-    .crit-tipo { min-height: var(--touch-target, 44px); padding: 8px 6px; display: flex; align-items: center;
-      justify-content: center; text-align: center; cursor: pointer; background: var(--surface);
-      border: 1px solid var(--border-soft); border-radius: var(--radius-sm); color: var(--text-muted);
-      font-family: var(--font-heading); font-size: 11.5px; font-weight: 700; letter-spacing: .3px;
-      text-transform: uppercase; line-height: 1.25; transition: background .18s, border-color .18s, color .18s; }
-    .crit-tipo[aria-pressed="true"] { background: color-mix(in srgb, var(--gold) 18%, transparent);
-      border-color: var(--gold); color: var(--gold-light); }
-    .crit-tipo:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
-
-    .crit-lista { border: 1px solid var(--border-soft); border-radius: var(--radius); overflow: hidden; }
-    .crit-item { padding: var(--card-padding, 16px); border-bottom: 1px solid var(--border-soft); }
-    .crit-item:nth-child(even) { background: color-mix(in srgb, var(--surface) 55%, transparent); }
+    .crit-item { padding: 14px 16px; border-bottom: 1px solid var(--perg-linha); }
+    .crit-item:nth-child(even) { background: rgba(255,250,235,.3); }
     .crit-item:last-child { border-bottom: 0; }
-    .crit-faixa { font-family: var(--font-heading); font-size: 12px; font-weight: 700; letter-spacing: 1.2px;
-      color: var(--gold); margin-bottom: var(--space-1, 4px); }
-    #tabela-falha .crit-faixa { color: var(--erro); }
-    .crit-nome { font-family: var(--font-heading); font-size: 14.5px; font-weight: 700; letter-spacing: .4px;
-      text-transform: uppercase; color: var(--gold-light); line-height: 1.3; margin-bottom: 6px;
-      overflow-wrap: anywhere; }
-    .crit-desc { font-size: 15px; line-height: 1.55; color: var(--text); overflow-wrap: break-word; }
-    .crit-desc strong { color: var(--gold-light); font-weight: 600; }
+    .crit-faixa { font-family: var(--font-heading); font-size: 13px; font-weight: 700; letter-spacing: 1.2px;
+      color: var(--vinho-claro); margin-bottom: 2px; }
+    .crit-nome { font-family: var(--font-heading); font-size: 15px; font-weight: 700; letter-spacing: .4px;
+      text-transform: uppercase; color: var(--vinho); line-height: 1.3; margin-bottom: 4px; overflow-wrap: anywhere; }
+    .crit-desc { font-size: 16px; line-height: 1.55; color: var(--perg-texto); overflow-wrap: break-word; }
+    .crit-desc strong { color: var(--vinho); font-weight: 700; }
+  }
+
+  /* ---- chave Armas / Magias ---- */
+  .modos { display: flex; justify-content: center; gap: 10px; margin: 0 0 22px; }
+  .modo-btn { min-height: var(--touch-target, 44px); padding: 10px 26px; cursor: pointer; background: var(--surface);
+    border: 1px solid var(--border-soft); border-radius: var(--radius-sm); color: var(--text-muted);
+    font-family: var(--font-heading); font-size: 13px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase;
+    transition: background .18s, border-color .18s, color .18s; }
+  .modo-btn:hover { border-color: var(--border); color: var(--text); }
+  .modo-btn[aria-pressed="true"] { background: color-mix(in srgb, var(--gold) 18%, transparent);
+    border-color: var(--gold); color: var(--gold-light); }
+  .modo-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+  #modo-armas[hidden], #modo-magias[hidden] { display: none; }
+  /* ícones vetoriais (icones.js) alinhados ao texto */
+  .ico { display: inline-flex; vertical-align: -0.15em; font-size: 1.15em; margin-right: 4px; }
+  .modo-btn .ico { font-size: 1.3em; }
+
+  /* ---- Críticos de Magia: segue o layout do PDF (uma "página" por escola, fundo
+     ilustrado, ícone da escola no canto e figuras no rodapé). O texto é HTML de
+     verdade sobre um véu escuro, com corpo maior e entrelinha folgada. ---- */
+  #modo-magias { font-variant-numeric: lining-nums tabular-nums; --mag-texto: #f4efe4; --mag-suave: #d9d2c3; --mag-sucesso: #f2cf6b; --mag-falha: #ff8f86; }
+  .mag-atalhos { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+  .mag-atalho { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 4px; min-height: 64px;
+    justify-content: center; border-radius: var(--radius-sm); background: var(--surface); border: 1px solid var(--border-soft);
+    color: var(--text-muted); text-decoration: none; font-family: var(--font-heading); font-size: 11.5px; font-weight: 700;
+    letter-spacing: .3px; text-transform: uppercase; text-align: center; transition: border-color .18s, color .18s; }
+  .mag-atalho img { width: 32px; height: 32px; object-fit: contain; }
+  .mag-atalho:hover { border-color: var(--gold); color: var(--gold-light); }
+  .mag-atalho:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+  .mag-pagina { position: relative; margin: 0 auto 32px; padding: 34px 36px 0;
+    border-radius: var(--radius); overflow: hidden; color: var(--mag-texto); isolation: isolate;
+    background: linear-gradient(180deg, rgba(8,8,12,.55), rgba(8,8,12,.38) 40%, rgba(8,8,12,.6)), var(--fundo) center / cover;
+    box-shadow: 0 10px 30px var(--shadow); scroll-margin-top: calc(var(--topo, 70px) + 12px); }
+  .mag-icone { position: absolute; top: 14px; right: 20px; width: 112px; max-height: 120px; object-fit: contain; height: auto; z-index: -1;
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,.45)); }
+  .mag-titulo { margin: 0 140px 34px 0; font-family: var(--font-heading); font-size: 24px; line-height: 1.25;
+    letter-spacing: .4px; color: #fff; text-shadow: 0 2px 6px rgba(0,0,0,.7); }
+  .mag-titulo small { display: block; margin-top: 4px; font-size: 15px; font-weight: 400; font-style: italic;
+    letter-spacing: 0; color: var(--mag-suave); }
+  .mag-num { color: var(--mag-sucesso); }
+
+  table.mag-tabela { width: 100%; border-collapse: separate; border-spacing: 0; margin: 0 0 22px;
+    background: rgba(10,10,16,.68); border: 1px solid rgba(255,255,255,.14); border-radius: 10px; overflow: hidden;
+    backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); font-size: 16px; line-height: 1.6; }
+  table.mag-tabela caption { caption-side: top; text-align: left; padding: 0 0 8px; font-family: var(--font-heading);
+    font-size: 15px; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: var(--mag-sucesso);
+    text-shadow: 0 2px 6px rgba(0,0,0,.8); }
+  table.mag-tabela.falha caption { color: var(--mag-falha); }
+  table.mag-tabela th { padding: 8px 14px; text-align: left; font-family: var(--font-heading); font-size: 12px;
+    letter-spacing: .8px; text-transform: uppercase; color: var(--mag-suave); background: rgba(255,255,255,.06);
+    border-bottom: 1px solid rgba(255,255,255,.14); }
+  table.mag-tabela td { padding: 12px 14px; vertical-align: top; border-top: 1px solid rgba(255,255,255,.08); }
+  table.mag-tabela tbody tr:first-child td { border-top: 0; }
+  table.mag-tabela td:first-child, table.mag-tabela th:first-child { width: 64px; text-align: center; white-space: nowrap; }
+  table.mag-tabela td:first-child { font-family: var(--font-heading); font-weight: 700; color: var(--mag-sucesso); }
+  table.mag-tabela.falha td:first-child { color: var(--mag-falha); }
+  table.mag-tabela td strong { color: #fff; font-weight: 700; }
+
+  /* 3 colunas iguais nas pontas: o botão do meio fica sempre no centro, seja qual for a largura das figuras */
+  .mag-rodape { display: grid; grid-template-columns: 1fr auto 1fr; align-items: end; gap: 12px; margin: 0 -14px; }
+  .mag-rodape img:first-child { justify-self: start; }
+  .mag-rodape img:last-child { justify-self: end; }
+  .mag-rodape img { height: 92px; width: auto; max-width: 100%; object-fit: contain; object-position: bottom;
+    filter: drop-shadow(0 4px 8px rgba(0,0,0,.45)); }
+  .mag-voltar { align-self: center; padding: 6px 14px; border-radius: 999px; background: rgba(10,10,16,.6);
+    border: 1px solid rgba(255,255,255,.18); color: var(--mag-suave); font-family: var(--font-heading); font-size: 11.5px;
+    letter-spacing: 1px; text-transform: uppercase; text-decoration: none; pointer-events: auto; }
+  .mag-voltar:hover { color: #fff; border-color: rgba(255,255,255,.4); }
+
+  /* página de abertura: as duas regras de uso + as oito escolas */
+  .mag-intro { padding-bottom: 30px; }
+  .mag-regras { display: grid; grid-template-columns: 1fr 1fr; margin: 0 0 26px; }
+  .mag-regra { padding: 4px 22px; text-align: center; }
+  .mag-regra + .mag-regra { border-left: 1px solid rgba(255,255,255,.35); }
+  .mag-regra h3 { margin: 0 0 10px; font-family: var(--font-heading); font-size: 17px; line-height: 1.3; color: #fff;
+    text-shadow: 0 2px 6px rgba(0,0,0,.8); }
+  .mag-regra.sucesso h3 { color: var(--mag-sucesso); }
+  .mag-regra.falha h3 { color: var(--mag-falha); }
+  .mag-regra p { margin: 0; font-size: 15.5px; line-height: 1.6; text-shadow: 0 1px 4px rgba(0,0,0,.85); }
+  .mag-escolas-intro { padding: 16px 18px; margin: 0 0 14px; border-radius: 10px; background: rgba(10,10,16,.68);
+    border: 1px solid rgba(255,255,255,.14); font-size: 15px; line-height: 1.6; }
+  .mag-escolas-intro strong { color: var(--mag-sucesso); font-family: var(--font-heading); letter-spacing: .4px; }
+  .mag-escolas { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  /* cartões da mesma linha com a mesma altura */
+  .mag-escolas li { display: flex; }
+  .mag-escolas li > .mag-escola { flex: 1; }
+  .mag-escola { display: flex; gap: 14px; align-items: flex-start; padding: 12px 16px; border-radius: 10px;
+    background: rgba(10,10,16,.68); border: 1px solid rgba(255,255,255,.12); color: var(--mag-texto);
+    text-decoration: none; font-size: 14.5px; line-height: 1.55; transition: border-color .18s, background .18s; }
+  .mag-escola:hover { border-color: var(--mag-sucesso); background: rgba(10,10,16,.8); }
+  .mag-escola:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+  .mag-escola img { width: 44px; height: 44px; object-fit: contain; flex: none; margin-top: 2px; }
+  .mag-escola strong { color: var(--mag-sucesso); font-weight: 700; }
+
+
+  /* =========================================================================
+     TELAS LARGAS: barra lateral fixa (capa + navegação) e conteúdo esticado.
+     Abaixo de 1180px tudo continua empilhado como antes.
+     ========================================================================= */
+  /* mesma largura de leitura nos dois modos (antes: 760 x 980) */
+  .crit-hero, .mag-pagina { max-width: 980px; }
+  .arm-nav { display: none; }
+  /* Acerto e Falha lado a lado já a partir do tablet largo */
+  @media (min-width: 900px) {
+    .mag-par { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; align-items: start; }
+    .mag-escolas { grid-template-columns: 1fr 1fr; }
+  }
+
+  /* fundo temático no lugar do preto chapado (fica atrás de tudo, não rola) */
+  body::before { content: ''; position: fixed; inset: -40px; z-index: 0; pointer-events: none;
+    background: linear-gradient(rgba(14,9,6,.9), rgba(14,9,6,.94)), url('../assets/img/criticos-armas/pergaminho.webp') center / cover;
+    filter: blur(6px); transition: opacity .4s; }
+  body[data-modo="magias"]::before {
+    background: linear-gradient(rgba(8,8,16,.72), rgba(8,8,16,.86)), url('../assets/img/criticos-magia/intro-fundo.webp') center / cover;
+    filter: blur(22px) saturate(.9); }
+
+  @media (min-width: 1180px) {
+    main { max-width: 1400px; padding-left: 28px; padding-right: 28px; }
+    .modo-layout { display: grid; grid-template-columns: 270px minmax(0, 1fr); gap: 32px; align-items: start; }
+    .modo-layout[hidden] { display: none; }
+    .modo-conteudo > * { max-width: none; }
+
+    /* a barra lateral acompanha a rolagem */
+    .crit-hero, .crit-hero.com-atalhos { position: sticky; top: calc(var(--topo, 70px) + 20px); margin: 0;
+      display: grid; grid-template-columns: 76px 1fr; gap: 12px; align-items: start;
+      max-height: calc(100vh - var(--topo, 70px) - 40px); overflow-y: auto; padding: 16px; scrollbar-width: none;
+      background: color-mix(in srgb, var(--surface) 82%, transparent); border: 1px solid var(--border-soft);
+      border-radius: var(--radius); box-shadow: 0 10px 30px var(--shadow); backdrop-filter: blur(6px); }
+    /* sem barra de rolagem visível: o painel foi dimensionado pra caber; em tela muito baixa ainda rola na roda do mouse */
+    .crit-hero::-webkit-scrollbar { display: none; }
+    .crit-hero .crit-hero-capa, .crit-hero.com-atalhos .crit-hero-capa { grid-row: auto; }
+    .crit-hero .crit-hero-texto { display: contents; }
+    .crit-hero h2 { grid-column: 2; align-self: center; margin: 0; font-size: 20px; }
+    .crit-hero p { grid-column: 1 / -1; font-size: 14px; line-height: 1.45; }
+    .crit-hero nav { grid-column: 1 / -1; }
+
+    /* magia: escolas em lista vertical, com a escola visível destacada */
+    .mag-atalhos { grid-template-columns: 1fr; gap: 5px; }
+    .mag-atalho { flex-direction: row; justify-content: flex-start; gap: 12px; min-height: 40px; padding: 4px 12px;
+      font-size: 12.5px; text-align: left; }
+    .mag-atalho img { width: 28px; height: 28px; }
+    .mag-atalho[aria-current="true"] { border-color: var(--gold); color: var(--gold-light);
+      background: color-mix(in srgb, var(--gold) 14%, transparent); }
+
+    /* armas: atalhos pras duas tabelas */
+    .arm-nav { display: grid; gap: 8px; }
+    .arm-nav-btn { display: flex; align-items: center; gap: 12px; padding: 10px 12px; cursor: pointer; text-align: left;
+      background: transparent; border: 1px solid var(--border-soft); border-radius: var(--radius-sm); color: var(--text-muted);
+      font-family: var(--font-heading); font-size: 13px; font-weight: 700; letter-spacing: .4px; text-transform: uppercase;
+      transition: border-color .18s, color .18s, background .18s; }
+    .arm-nav-btn small { display: block; margin-top: 2px; font-family: var(--font-body); font-size: 13px; font-weight: 500;
+      letter-spacing: 0; text-transform: none; color: var(--text-muted); }
+    .arm-nav-num { flex: none; width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%;
+      border: 1px solid currentColor; font-size: 15px; }
+    .arm-nav-btn:hover { border-color: var(--border); color: var(--text); }
+    .arm-nav-btn[aria-pressed="true"] { border-color: var(--gold); color: var(--gold-light);
+      background: color-mix(in srgb, var(--gold) 14%, transparent); }
+    .arm-nav-btn.falha[aria-pressed="true"] { border-color: var(--erro, #e06060); color: var(--erro, #e06060);
+      background: color-mix(in srgb, var(--erro, #e06060) 12%, transparent); }
+    .arm-nav-btn:focus-visible, .arm-nav-link:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+    .arm-nav-link { justify-self: center; margin-top: 4px; color: var(--text-muted); font-family: var(--font-heading);
+      font-size: 11.5px; letter-spacing: 1px; text-transform: uppercase; text-decoration: none; border-bottom: 1px solid var(--border-soft); }
+    .arm-nav-link:hover { color: var(--gold-light); }
+
+    /* páginas de magia mais largas: ícone e figuras um pouco maiores */
+    .mag-pagina { padding: 36px 40px 0; }
+    .mag-rodape img { height: 104px; }
+  }
+
+  @media (max-width: 767px) {
+    .modos { gap: 8px; }
+    .modo-btn { flex: 1; padding: 10px 12px; }
+    .mag-atalhos { grid-column: 1 / -1; gap: 6px; }
+    .mag-atalho { font-size: 10px; letter-spacing: 0; padding: 6px 2px; min-height: 58px; }
+    .mag-atalho img { width: 28px; height: 28px; }
+    .mag-pagina { padding: 22px 16px 0; margin-bottom: 22px; }
+    .mag-icone { width: 76px; top: 12px; right: 10px; }
+    .mag-titulo { margin-right: 84px; font-size: 20px; }
+    .mag-titulo small { font-size: 14px; }
+    table.mag-tabela { font-size: 15px; }
+    table.mag-tabela td { padding: 11px 10px; }
+    table.mag-tabela td:first-child, table.mag-tabela th:first-child { width: 48px; padding-left: 6px; padding-right: 6px; }
+    .mag-rodape { margin: 0 -6px; }
+    .mag-rodape img { height: 68px; }
+    .mag-regras { grid-template-columns: 1fr; gap: 18px; }
+    .mag-regra { padding: 0 4px; }
+    .mag-regra + .mag-regra { border-left: 0; border-top: 1px solid rgba(255,255,255,.35); padding-top: 18px; }
+    .mag-escola { padding: 12px; gap: 12px; }
+    .mag-escola img { width: 36px; height: 36px; }
   }
 </style>
 </head>
-<body data-ambiente="fagulhas">
+<body data-ambiente="fagulhas" data-modo="armas">
 
 <header class="site-header">
   <a href="regras_casa.html" class="back-btn">← Regras da Casa</a>
@@ -109,29 +378,64 @@
 </header>
 
 <main>
-  <p class="subtitulo-secao">D100 — clique numa opção abaixo pra ver a tabela correspondente</p>
-
-  <div class="explicacoes">
-    <div class="card explicacao selecionada" data-sel="sucesso" role="button" tabindex="0" aria-pressed="true">
-      <div class="titulo">✅ 20 Natural — Sucesso Crítico</div>
-      <p>Antes de calcular o dano, role mais <strong>1d100</strong> (ou saque uma carta do baralho de sucessos críticos) e use a coluna correspondente ao <strong>tipo de dano</strong> do ataque: perfurante, cortante ou contundente.</p>
-    </div>
-    <div class="card explicacao falha" data-sel="falha" role="button" tabindex="0" aria-pressed="false">
-      <div class="titulo">❌ 1 Natural — Falha Crítica</div>
-      <p>Além de errar o ataque, role mais <strong>1d100</strong> (ou saque uma carta do baralho de falhas críticas) e use a coluna correspondente ao <strong>tipo de ataque</strong>: corpo a corpo, à distância ou desarmado.</p>
-    </div>
+  <div class="modos" role="group" aria-label="Tipo de crítico">
+    <button type="button" class="modo-btn" data-modo="armas" aria-pressed="true"><span class="ico" data-ico="ataque" aria-hidden="true"></span> Armas</button>
+    <button type="button" class="modo-btn" data-modo="magias" aria-pressed="false"><span class="ico" data-ico="conjurar" aria-hidden="true"></span> Magias</button>
   </div>
 
-  <div class="tabela-secao" id="tabela-sucesso">
+  <div id="modo-armas" class="modo-layout">
+  <aside class="crit-hero">
+    <button type="button" class="crit-hero-capa capa-zoom-btn" data-grande="../assets/img/criticos-armas/capa-grande.webp" aria-label="Ver a capa em tela cheia"><img src="../assets/img/criticos-armas/capa.webp" alt="Capa: Tabela de Críticos — A Épica Aventura, A Maldição de Strahd" loading="lazy"></button>
+    <div class="crit-hero-texto">
+      <h2>Críticos de Armas</h2>
+      <p>Tirou <strong>20</strong> ou <strong>1 natural</strong>? Role <strong>1d100</strong> e procure o efeito na coluna do <strong>símbolo</strong> do seu ataque. Toque em Sucessos ou Falhas pra trocar a tabela.</p>
+    </div>
+    <nav class="arm-nav" aria-label="Tabelas de armas">
+      <button type="button" class="arm-nav-btn sucesso" data-ir="sucesso" aria-pressed="true"><span class="arm-nav-num">20</span><span>Sucessos Críticos<small>20 natural · por tipo de dano</small></span></button>
+      <button type="button" class="arm-nav-btn falha" data-ir="falha" aria-pressed="false"><span class="arm-nav-num">1</span><span>Falhas Críticas<small>1 natural · por tipo de ataque</small></span></button>
+      <a class="arm-nav-link" href="#arm-regras">Regras e símbolos</a>
+    </nav>
+  </aside>
+
+  <div class="modo-conteudo">
+
+  <section class="arm-folha arm-regras" id="arm-regras">
+    <div class="explicacoes">
+      <div class="explicacao selecionada" data-sel="sucesso" role="button" tabindex="0" aria-pressed="true" aria-controls="tabela-sucesso">
+        <div class="titulo">Tabela / Baralho de <br>Sucessos Críticos</div>
+        <p>Se estiver usando a tabela, quando alguém rolar um <strong>20 natural</strong> para fazer um ataque, antes de calcular o dano, ele deve rolar mais <strong>1d100</strong> e usar a tabela correspondente. Se estiver usando o baralho, saque uma carta do baralho de sucessos críticos e aplique os efeitos. A tabela e a carta possuem três efeitos diferentes. Para saber qual efeito aplicar, verifique que <strong>tipo de dano</strong> o personagem atacante está causando — perfuração, corte ou impacto — e aplique o efeito conforme o símbolo representado.</p>
+        <span class="dica"></span>
+      </div>
+      <div class="explicacao falha" data-sel="falha" role="button" tabindex="0" aria-pressed="false" aria-controls="tabela-falha">
+        <div class="titulo">Tabela / Baralho de <br>Falhas Críticas</div>
+        <p>Se estiver usando a tabela, quando alguém rolar um <strong>1 natural</strong> para fazer um ataque, além de errar o ataque, ele deve rolar mais <strong>1d100</strong> e usar a tabela correspondente. Se estiver usando o baralho, saque uma carta do baralho de falhas críticas e aplique os efeitos. A tabela e a carta possuem três efeitos diferentes. Para saber qual efeito aplicar, verifique que <strong>tipo de ataque</strong> o personagem atacante está fazendo — corpo a corpo, à distância ou desarmado — e aplique o efeito conforme o símbolo representado.</p>
+        <span class="dica"></span>
+      </div>
+    </div>
+    <div class="arm-legenda">
+      <div class="arm-legenda-col">
+        <p class="arm-simbolo"><img src="../assets/img/criticos-armas/perfurante.webp" alt=""><span><strong>Perfuração</strong>: se o atacante causa dano perfurante, aplique o efeito descrito com este símbolo.</span></p>
+        <p class="arm-simbolo"><img src="../assets/img/criticos-armas/cortante.webp" alt=""><span><strong>Corte</strong>: se o atacante causa dano cortante, aplique o efeito descrito com este símbolo.</span></p>
+        <p class="arm-simbolo"><img src="../assets/img/criticos-armas/contundente.webp" alt=""><span><strong>Impacto</strong>: se o atacante causa dano contundente, aplique o efeito descrito com este símbolo.</span></p>
+      </div>
+      <div class="arm-legenda-col">
+        <p class="arm-simbolo"><img src="../assets/img/criticos-armas/corpo.webp" alt=""><span><strong>Corpo a Corpo</strong>: se o atacante fez um ataque corpo a corpo, aplique o efeito descrito com este símbolo.</span></p>
+        <p class="arm-simbolo"><img src="../assets/img/criticos-armas/distancia.webp" alt=""><span><strong>À Distância</strong>: se o atacante fez um ataque à distância, aplique o efeito descrito com este símbolo.</span></p>
+        <p class="arm-simbolo"><img src="../assets/img/criticos-armas/desarmado.webp" alt=""><span><strong>Desarmado</strong>: se o atacante fez um ataque desarmado, aplique o efeito descrito com este símbolo.</span></p>
+      </div>
+    </div>
+  </section>
+
+  <div class="tabela-secao arm-folha" id="tabela-sucesso">
   <div class="table-wrap">
     <table class="tabela-critico">
       <caption>Tabela de Sucessos Críticos (20 Natural)</caption>
       <thead>
         <tr>
           <th>d100</th>
-          <th>⚔️ Perfurante</th>
-          <th>🪓 Cortante</th>
-          <th>🔨 Contundente</th>
+          <th><img src="../assets/img/criticos-armas/perfurante.webp" alt="">Perfurante</th>
+          <th><img src="../assets/img/criticos-armas/cortante.webp" alt="">Cortante</th>
+          <th><img src="../assets/img/criticos-armas/contundente.webp" alt="">Contundente</th>
         </tr>
       </thead>
       <tbody>
@@ -160,16 +464,16 @@
   </div>
   </div>
 
-  <div class="tabela-secao" id="tabela-falha" hidden>
+  <div class="tabela-secao arm-folha" id="tabela-falha" hidden>
   <div class="table-wrap">
     <table class="tabela-critico">
       <caption>Tabela de Falhas Críticas (1 Natural)</caption>
       <thead>
         <tr>
           <th>d100</th>
-          <th>⚔️ Corpo a Corpo</th>
-          <th>🏹 À Distância</th>
-          <th>👊 Desarmado</th>
+          <th><img src="../assets/img/criticos-armas/corpo.webp" alt="">Corpo a Corpo</th>
+          <th><img src="../assets/img/criticos-armas/distancia.webp" alt="">À Distância</th>
+          <th><img src="../assets/img/criticos-armas/desarmado.webp" alt="">Desarmado</th>
         </tr>
       </thead>
       <tbody>
@@ -197,13 +501,344 @@
     </table>
   </div>
   </div>
+  </div>
+  </div>
+
+  <div id="modo-magias" class="modo-layout" hidden>
+    <aside class="crit-hero com-atalhos">
+      <button type="button" class="crit-hero-capa capa-zoom-btn" data-grande="../assets/img/criticos-magia/capa-grande.webp" aria-label="Ver a capa em tela cheia"><img src="../assets/img/criticos-magia/capa.webp" alt="Capa: Tabela de Críticos — Magias Épicas, Efeitos Épicos (D&amp;D 5ª edição)" loading="lazy"></button>
+      <div class="crit-hero-texto">
+        <h2>Críticos de Magia</h2>
+        <p>Tirou <strong>20</strong> ou <strong>1 natural</strong> numa magia? Role <strong>1d10</strong> e use a tabela da <strong>escola</strong> da magia conjurada. Toque numa escola pra ir direto:</p>
+      </div>
+      <nav class="mag-atalhos" aria-label="Escolas de magia">
+        <a class="mag-atalho" href="#mag-abjuracao"><img src="../assets/img/criticos-magia/abjuracao-icone.webp" alt="">Abjuração</a>
+        <a class="mag-atalho" href="#mag-adivinhacao"><img src="../assets/img/criticos-magia/adivinhacao-icone.webp" alt="">Adivinhação</a>
+        <a class="mag-atalho" href="#mag-conjuracao"><img src="../assets/img/criticos-magia/conjuracao-icone.webp" alt="">Conjuração</a>
+        <a class="mag-atalho" href="#mag-encantamento"><img src="../assets/img/criticos-magia/encantamento-icone.webp" alt="">Encantamento</a>
+        <a class="mag-atalho" href="#mag-evocacao"><img src="../assets/img/criticos-magia/evocacao-icone.webp" alt="">Evocação</a>
+        <a class="mag-atalho" href="#mag-ilusao"><img src="../assets/img/criticos-magia/ilusao-icone.webp" alt="">Ilusão</a>
+        <a class="mag-atalho" href="#mag-necromancia"><img src="../assets/img/criticos-magia/necromancia-icone.webp" alt="">Necromancia</a>
+        <a class="mag-atalho" href="#mag-transmutacao"><img src="../assets/img/criticos-magia/transmutacao-icone.webp" alt="">Transmutação</a>
+      </nav>
+    </aside>
+
+    <div class="modo-conteudo">
+    <section class="mag-pagina mag-intro" id="mag-topo" style="--fundo:url('../assets/img/criticos-magia/intro-fundo.webp')">
+      <div class="mag-regras">
+        <div class="mag-regra sucesso">
+          <h3>Tabela / Baralho de <br>Sucessos Críticos</h3>
+          <p>Se estiver usando a tabela, quando alguém rolar um <strong>20 natural</strong> para fazer um ataque, antes de calcular o dano, ele deve rolar mais <strong>1d10</strong> e usar a tabela correspondente. Se estiver usando o baralho, saque uma carta do baralho de sucessos críticos e aplique os efeitos. A tabela e a carta possuem três efeitos diferentes. Para saber qual efeito aplicar, verifique a <strong>escola da magia</strong> que foi conjurada.</p>
+        </div>
+        <div class="mag-regra falha">
+          <h3>Tabela / Baralho de <br>Falhas Críticas</h3>
+          <p>Se estiver usando a tabela, quando alguém rolar um <strong>1 natural</strong> para fazer um ataque, além de errar o ataque, ele deve rolar mais <strong>1d10</strong> e usar a tabela correspondente. Se estiver usando o baralho, saque uma carta do baralho de falhas críticas e aplique os efeitos. A tabela e a carta possuem três efeitos diferentes. Para saber qual efeito aplicar, verifique a <strong>escola da magia</strong> que foi conjurada.</p>
+        </div>
+      </div>
+      <div class="mag-escolas-intro"><strong>As Escolas de Magia.</strong> Academias de grupos mágicos se dividem em oito categorias, chamadas de escolas de magia. Estudiosos, particularmente magos, aplicam essas categorias para as magias, acreditando que todas as mágicas funcionam essencialmente do mesmo modo, sejam obtidas por rigoroso estudo ou outorgado por uma divindade. As escolas de magia ajudam a descrever as magias. Elas não têm regras próprias, embora algumas regras se refiram às escolas.</div>
+      <ul class="mag-escolas">
+        <li><a class="mag-escola" href="#mag-abjuracao"><img src="../assets/img/criticos-magia/abjuracao-icone.webp" alt="" loading="lazy"><span><strong>Magias de Abjuração</strong> são protetoras em sua natureza, embora algumas tenham grande uso agressivo. Elas criam barreiras mágicas, negam efeitos nocivos, ferem invasores ou banem criaturas para outros planos de existência.</span></a></li>
+        <li><a class="mag-escola" href="#mag-adivinhacao"><img src="../assets/img/criticos-magia/adivinhacao-icone.webp" alt="" loading="lazy"><span><strong>Magias de Adivinhação</strong> revelam informações, na forma de segredos há muito esquecidos, vislumbres do futuro, a localização de coisas escondidas, a verdade por trás das ilusões ou a visão de distantes lugares ou pessoa.</span></a></li>
+        <li><a class="mag-escola" href="#mag-conjuracao"><img src="../assets/img/criticos-magia/conjuracao-icone.webp" alt="" loading="lazy"><span><strong>Magias de Conjuração</strong> envolvem a transposição de objetos ou criaturas de um local para o outro. Algumas magias invocam criaturas ou objetos ao lado do conjurador, enquanto outras permitem ao conjurador se teletransportar para outro lugar. Algumas conjurações criam objetos ou efeitos a partir do nada.</span></a></li>
+        <li><a class="mag-escola" href="#mag-encantamento"><img src="../assets/img/criticos-magia/encantamento-icone.webp" alt="" loading="lazy"><span><strong>Magias de Encantamento</strong> afetam a mente de outros, influenciando ou controlando seu comportamento. Tais magias podem fazer o inimigo ver você como amigo, forçar criaturas a tomar um rumo de ação ou mesmo controlar outra pessoa como uma marionete.</span></a></li>
+        <li><a class="mag-escola" href="#mag-evocacao"><img src="../assets/img/criticos-magia/evocacao-icone.webp" alt="" loading="lazy"><span><strong>Magias de Evocação</strong> manipulam as energias mágicas para produzir um efeito desejado. Algumas evocam explosões de raio e fogo, outras canalizam energia positiva para curar ferimentos.</span></a></li>
+        <li><a class="mag-escola" href="#mag-ilusao"><img src="../assets/img/criticos-magia/ilusao-icone.webp" alt="" loading="lazy"><span><strong>Magias de Ilusão</strong> enganam os sentidos ou a mente de outros. Elas fazem com que as pessoas vejam coisas que não estão ali, como também não notar coisas que estão ali, escutar sons fantasmagóricos ou lembrar de coisas que nunca aconteceram. Algumas ilusões criam imagens fantasmagóricas que qualquer criatura pode ver, mas as mais traiçoeiras ilusões plantam uma imagem diretamente na mente da criatura.</span></a></li>
+        <li><a class="mag-escola" href="#mag-necromancia"><img src="../assets/img/criticos-magia/necromancia-icone.webp" alt="" loading="lazy"><span><strong>Magias de Necromancia</strong> podem manipular a energia da vida e da morte. Tais magias podem garantir uma reserva extra de força de vida, drenar a energia vital de outra criatura, criar um morto-vivo ou mesmo trazer um morto de volta à vida. Criar mortos-vivos através do uso de magias necromânticas como animar mortos, não é um bom ato e apenas alguém maligno faz uso de tais magias com frequência.</span></a></li>
+        <li><a class="mag-escola" href="#mag-transmutacao"><img src="../assets/img/criticos-magia/transmutacao-icone.webp" alt="" loading="lazy"><span><strong>Magias de Transmutação</strong> mudam a propriedade de uma criatura, objeto ou ambiente. Elas podem tornar um inimigo em uma criatura inofensiva, reforçar a força de um aliado, fazer um objeto se mover ao comando do conjurador ou melhorar a capacidade inata de cura de uma criatura, para que ela se recupere rapidamente da injúria.</span></a></li>
+      </ul>
+    </section>
+
+    <section class="mag-pagina" id="mag-abjuracao" style="--fundo:url('../assets/img/criticos-magia/abjuracao-fundo.webp')">
+      <img class="mag-icone" src="../assets/img/criticos-magia/abjuracao-icone.webp" alt="" loading="lazy">
+      <h3 class="mag-titulo"><span class="mag-num">1.</span> Abjuração <small>(Proteção e Repulsão)</small></h3>
+      <div class="mag-par">
+      <table class="mag-tabela sucesso">
+        <caption><span class="ico" data-ico="alvo" aria-hidden="true"></span> Acerto Crítico (20 Natural)</caption>
+        <thead><tr><th>d10</th><th>Efeito</th></tr></thead>
+        <tbody>
+          <tr><td>1–3</td><td><strong>Retaliação Reativa:</strong> Você ganha +2 na CA até o início do seu próximo turno.</td></tr>
+          <tr><td>4–6</td><td><strong>Desarmonia Protetiva:</strong> Qualquer bônus mágico de armadura, cobertura mágica ou efeito como Escudo Arcano no alvo é dissipado imediatamente.</td></tr>
+          <tr><td>7–8</td><td><strong>Choque de Repulsão:</strong> O alvo é empurrado 4,5 metros em linha reta para longe de você e sofre a condição Caído.</td></tr>
+          <tr><td>9</td><td><strong>Escudo Refletor:</strong> Até o início do seu próximo turno, o próximo ataque à distância direcionado a você erra automaticamente e reflete de volta ao atacante.</td></tr>
+          <tr><td>10</td><td><strong>Banimento Momentâneo:</strong> O alvo desaparece em uma fissura extradimensional por 1 rodada completa (não age, não pode ser alvejado e reaparece no mesmo ponto no início do seu próximo turno).</td></tr>
+        </tbody>
+      </table>
+      <table class="mag-tabela falha">
+        <caption><span class="ico" data-ico="caveira" aria-hidden="true"></span> Falha Crítica (1 Natural)</caption>
+        <thead><tr><th>d10</th><th>Efeito</th></tr></thead>
+        <tbody>
+          <tr><td>1–3</td><td><strong>Fragilidade Defensiva:</strong> Sua CA sofre uma penalidade de -2 até o início do seu próximo turno.</td></tr>
+          <tr><td>4–6</td><td><strong>Ruptura de Barreira:</strong> Se você estiver mantendo concentração em magias defensivas, ela cai instantaneamente.</td></tr>
+          <tr><td>7–8</td><td><strong>Recuo de Força:</strong> Uma onda de choque atinge você: você é arremessado 3 metros para trás e cai no chão (Caído).</td></tr>
+          <tr><td>9</td><td><strong>Atração Hostil:</strong> Até o fim da rodada, todos os ataques de oportunidade contra você têm Vantagem.</td></tr>
+          <tr><td>10</td><td><strong>Aprisionamento Inverso:</strong> Uma cúpula de força o paralisa: você fica Impedido até o final do seu próximo turno.</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="mag-rodape">
+        <img src="../assets/img/criticos-magia/abjuracao-esq.webp" alt="" loading="lazy">
+        <a href="#mag-topo" class="mag-voltar">↑ Escolas</a>
+        <img src="../assets/img/criticos-magia/abjuracao-dir.webp" alt="" loading="lazy">
+      </div>
+    </section>
+
+    <section class="mag-pagina" id="mag-adivinhacao" style="--fundo:url('../assets/img/criticos-magia/adivinhacao-fundo.webp')">
+      <img class="mag-icone" src="../assets/img/criticos-magia/adivinhacao-icone.webp" alt="" loading="lazy">
+      <h3 class="mag-titulo"><span class="mag-num">2.</span> Adivinhação <small>(Tempo, Sentidos e Informação)</small></h3>
+      <div class="mag-par">
+      <table class="mag-tabela sucesso">
+        <caption><span class="ico" data-ico="alvo" aria-hidden="true"></span> Acerto Crítico (20 Natural)</caption>
+        <thead><tr><th>d10</th><th>Efeito</th></tr></thead>
+        <tbody>
+          <tr><td>1–3</td><td><strong>Antevisão Tática:</strong> Você descobre imediatamente a CA exata e os pontos de vida atuais do alvo.</td></tr>
+          <tr><td>4–6</td><td><strong>Ponto Fraco Revelado:</strong> O próximo ataque feito por você ou um aliado contra o alvo ganha Vantagem e ignora qualquer Resistência.</td></tr>
+          <tr><td>7–8</td><td><strong>Paralaxe Temporal:</strong> O alvo perde a Reação dele até o final da rodada atual e rola iniciativa novamente com -5 para a próxima rodada.</td></tr>
+          <tr><td>9</td><td><strong>Destino Amarrado:</strong> O alvo sofre Desvantagem em todas as salvaguardas até o fim do seu próximo turno.</td></tr>
+          <tr><td>10</td><td><strong>Presciência Absoluta:</strong> O alvo falha automaticamente na sua próxima jogada de ataque ou teste resistido contra você dentro de 1 minuto.</td></tr>
+        </tbody>
+      </table>
+      <table class="mag-tabela falha">
+        <caption><span class="ico" data-ico="caveira" aria-hidden="true"></span> Falha Crítica (1 Natural)</caption>
+        <thead><tr><th>d10</th><th>Efeito</th></tr></thead>
+        <tbody>
+          <tr><td>1–3</td><td><strong>Cegueira Temporária:</strong> Flashes visuais sobrecarregam sua retina; você fica Cego até o fim do seu turno atual.</td></tr>
+          <tr><td>4–6</td><td><strong>Desorientação Temporal:</strong> Você sofre Desvantagem em jogadas de ataque e testes de Percepção por 1 rodada.</td></tr>
+          <tr><td>7–8</td><td><strong>Eco Falso:</strong> Você gasta sua Reação imediatamente sem realizar nada, reagindo a um futuro que não existe.</td></tr>
+          <tr><td>9</td><td><strong>Leitura Aberrante:</strong> Uma visão traumatizante de planos distantes inflige a você 2d6 de dano psíquico.</td></tr>
+          <tr><td>10</td><td><strong>Catatonia Sensorial:</strong> Seus sentidos congelam no tempo; você fica Atordoado até o início do seu próximo turno.</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="mag-rodape">
+        <img src="../assets/img/criticos-magia/adivinhacao-esq.webp" alt="" loading="lazy">
+        <a href="#mag-topo" class="mag-voltar">↑ Escolas</a>
+        <img src="../assets/img/criticos-magia/adivinhacao-dir.webp" alt="" loading="lazy">
+      </div>
+    </section>
+
+    <section class="mag-pagina" id="mag-conjuracao" style="--fundo:url('../assets/img/criticos-magia/conjuracao-fundo.webp')">
+      <img class="mag-icone" src="../assets/img/criticos-magia/conjuracao-icone.webp" alt="" loading="lazy">
+      <h3 class="mag-titulo"><span class="mag-num">3.</span> Conjuração <small>(Teleporte, Criação e Planos)</small></h3>
+      <div class="mag-par">
+      <table class="mag-tabela sucesso">
+        <caption><span class="ico" data-ico="alvo" aria-hidden="true"></span> Acerto Crítico (20 Natural)</caption>
+        <thead><tr><th>d10</th><th>Efeito</th></tr></thead>
+        <tbody>
+          <tr><td>1–3</td><td><strong>Ancoragem Gravitacional:</strong> O alvo fica Impedido por cordas astrais ou matéria invocada até o final do próximo turno dele.</td></tr>
+          <tr><td>4–6</td><td><strong>Salto Espacial:</strong> Imediatamente após o impacto da magia, você se teletransporta até 9 metros para um espaço desocupado que possa ver.</td></tr>
+          <tr><td>7–8</td><td><strong>Vórtice Planar:</strong> O alvo é teletransportado 4,5 metros em uma direção à sua escolha para um local seguro no solo.</td></tr>
+          <tr><td>9</td><td><strong>Entidade Espelhada:</strong> Um clone etéreo instável surge adjacente ao alvo, realiza um ataque de oportunidade contra ele e se dissipa.</td></tr>
+          <tr><td>10</td><td><strong>Fenda do Caos:</strong> Uma fenda suga a gravidade ao redor do alvo: o alvo e todas as criaturas a até 3 metros sofrem 3d6 de dano de Força adicional e caem no chão.</td></tr>
+        </tbody>
+      </table>
+      <table class="mag-tabela falha">
+        <caption><span class="ico" data-ico="caveira" aria-hidden="true"></span> Falha Crítica (1 Natural)</caption>
+        <thead><tr><th>d10</th><th>Efeito</th></tr></thead>
+        <tbody>
+          <tr><td>1–3</td><td><strong>Gagueira Espacial:</strong> Seu deslocamento é reduzido a 0 até o final do seu próximo turno.</td></tr>
+          <tr><td>4–6</td><td><strong>Troca Indesejada:</strong> Você é teletransportado 3 metros em uma direção aleatória (role 1d8 para direção). Se houver um obstáculo, você sofre 1d6 de dano de Concussão.</td></tr>
+          <tr><td>7–8</td><td><strong>Resíduo Planar:</strong> Uma poça viscosa surge sob seus pés; o piso em um raio de 3 metros ao seu redor se torna terreno difícil por 1 minuto.</td></tr>
+          <tr><td>9</td><td><strong>Invocação Acidental:</strong> Um ser hostil menor (como um Mephit ou Diabrete) surge a até 3 metros de você e age imediatamente contra o seu grupo.</td></tr>
+          <tr><td>10</td><td><strong>Implosão Localizada:</strong> A magia colapsa no seu ponto de conjuração: você e criaturas adjacentes sofrem 2d8 de dano de Força.</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="mag-rodape">
+        <img src="../assets/img/criticos-magia/conjuracao-esq.webp" alt="" loading="lazy">
+        <a href="#mag-topo" class="mag-voltar">↑ Escolas</a>
+        <img src="../assets/img/criticos-magia/conjuracao-dir.webp" alt="" loading="lazy">
+      </div>
+    </section>
+
+    <section class="mag-pagina" id="mag-encantamento" style="--fundo:url('../assets/img/criticos-magia/encantamento-fundo.webp')">
+      <img class="mag-icone" src="../assets/img/criticos-magia/encantamento-icone.webp" alt="" loading="lazy">
+      <h3 class="mag-titulo"><span class="mag-num">4.</span> Encantamento <small>(Mente, Vontade e Emoções)</small></h3>
+      <div class="mag-par">
+      <table class="mag-tabela sucesso">
+        <caption><span class="ico" data-ico="alvo" aria-hidden="true"></span> Acerto Crítico (20 Natural)</caption>
+        <thead><tr><th>d10</th><th>Efeito</th></tr></thead>
+        <tbody>
+          <tr><td>1–3</td><td><strong>Hesitação Mental:</strong> O alvo não pode usar Reações até o final do seu próximo turno.</td></tr>
+          <tr><td>4–6</td><td><strong>Abalo Emocional:</strong> O alvo fica Amedrontado ou Enfeitiçado por você (à sua escolha) até o final do próximo turno dele.</td></tr>
+          <tr><td>7–8</td><td><strong>Comando Reflexo:</strong> O alvo larga imediatamente o que estiver segurando nas mãos.</td></tr>
+          <tr><td>9</td><td><strong>Marionete Instantânea:</strong> O alvo usa imediatamente a Reação dele para desferir um ataque corpo a corpo contra um aliado dele à sua escolha.</td></tr>
+          <tr><td>10</td><td><strong>Colapso Sináptico:</strong> A mente do alvo desliga; ele fica Incapacitado até o final do próximo turno dele.</td></tr>
+        </tbody>
+      </table>
+      <table class="mag-tabela falha">
+        <caption><span class="ico" data-ico="caveira" aria-hidden="true"></span> Falha Crítica (1 Natural)</caption>
+        <thead><tr><th>d10</th><th>Efeito</th></tr></thead>
+        <tbody>
+          <tr><td>1–3</td><td><strong>Fadiga Psíquica:</strong> Você tem Desvantagem na próxima salvaguarda mental (Inteligência, Sabedoria ou Carisma) que fizer dentro de 1 minuto.</td></tr>
+          <tr><td>4–6</td><td><strong>Fascinação Reversa:</strong> O alvo se torna imune a quaisquer magias de Encantamento conjuradas por você pelas próximas 24 horas.</td></tr>
+          <tr><td>7–8</td><td><strong>Eco de Vontade:</strong> Você é obrigado a se mover todo o seu deslocamento em linha reta para longe do alvo na sua próxima oportunidade de movimento.</td></tr>
+          <tr><td>9</td><td><strong>Retrocesso Empático:</strong> Você fica Enfeitiçado pelo alvo até o final do próximo turno dele.</td></tr>
+          <tr><td>10</td><td><strong>Sobrecarga Neural:</strong> Sua própria mente sofre o ricochete mental: você sofre 2d10 de dano psíquico e fica Atordoado até o início do seu próximo turno.</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="mag-rodape">
+        <img src="../assets/img/criticos-magia/encantamento-esq.webp" alt="" loading="lazy">
+        <a href="#mag-topo" class="mag-voltar">↑ Escolas</a>
+        <img src="../assets/img/criticos-magia/encantamento-dir.webp" alt="" loading="lazy">
+      </div>
+    </section>
+
+    <section class="mag-pagina" id="mag-evocacao" style="--fundo:url('../assets/img/criticos-magia/evocacao-fundo.webp')">
+      <img class="mag-icone" src="../assets/img/criticos-magia/evocacao-icone.webp" alt="" loading="lazy">
+      <h3 class="mag-titulo"><span class="mag-num">5.</span> Evocação <small>(Energia, Elementos e Dano Puro)</small></h3>
+      <div class="mag-par">
+      <table class="mag-tabela sucesso">
+        <caption><span class="ico" data-ico="alvo" aria-hidden="true"></span> Acerto Crítico (20 Natural)</caption>
+        <thead><tr><th>d10</th><th>Efeito</th></tr></thead>
+        <tbody>
+          <tr><td>1–3</td><td><strong>Ignição Residual:</strong> O alvo queima/congela/eletrocuta: ele sofre 1d6 de dano elemental adicional no início do próximo turno dele.</td></tr>
+          <tr><td>4–6</td><td><strong>Estouro de Concussão:</strong> O alvo é arremessado 3 metros para trás e fica Caído.</td></tr>
+          <tr><td>7–8</td><td><strong>Zona Instável:</strong> O solo em um raio de 3 metros ao redor do alvo queima/congela por 1 rodada; qualquer criatura que entrar ou começar o turno ali sofre 2d6 de dano do mesmo tipo da magia.</td></tr>
+          <tr><td>9</td><td><strong>Destruição Amplificada:</strong> Maximize o dano de todos os dados normais da magia antes de rolar os dados extras de crítico.</td></tr>
+          <tr><td>10</td><td><strong>Cataclismo Arcano:</strong> O alvo ganha Vulnerabilidade ao tipo de dano dessa magia até o final do seu próximo turno (calculada neste próprio ataque).</td></tr>
+        </tbody>
+      </table>
+      <table class="mag-tabela falha">
+        <caption><span class="ico" data-ico="caveira" aria-hidden="true"></span> Falha Crítica (1 Natural)</caption>
+        <thead><tr><th>d10</th><th>Efeito</th></tr></thead>
+        <tbody>
+          <tr><td>1–3</td><td><strong>Fumaça Ofuscante:</strong> Uma explosão de fuligem cega você até o final do seu turno atual.</td></tr>
+          <tr><td>4–6</td><td><strong>Chama Interna:</strong> Você sofre metade do dano base que a magia causaria (rolado com dados normais), do mesmo tipo de energia que tentou evocar.</td></tr>
+          <tr><td>7–8</td><td><strong>Estouro de Condução:</strong> Uma faísca atinge o aliado mais próximo a até 4,5 metros de você, causando 2d6 do dano da magia.</td></tr>
+          <tr><td>9</td><td><strong>Fissura no Conjurador:</strong> Você ganha Vulnerabilidade ao tipo de dano da magia que tentou conjurar até o início do seu próximo turno.</td></tr>
+          <tr><td>10</td><td><strong>Detonação Espontânea:</strong> A magia explode nas suas mãos; você sofre o dano total da magia (como se tivesse falhado na própria salvaguarda) e cai no chão.</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="mag-rodape">
+        <img src="../assets/img/criticos-magia/evocacao-esq.webp" alt="" loading="lazy">
+        <a href="#mag-topo" class="mag-voltar">↑ Escolas</a>
+        <img src="../assets/img/criticos-magia/evocacao-dir.webp" alt="" loading="lazy">
+      </div>
+    </section>
+
+    <section class="mag-pagina" id="mag-ilusao" style="--fundo:url('../assets/img/criticos-magia/ilusao-fundo.webp')">
+      <img class="mag-icone" src="../assets/img/criticos-magia/ilusao-icone.webp" alt="" loading="lazy">
+      <h3 class="mag-titulo"><span class="mag-num">6.</span> Ilusão <small>(Sentidos, Percepção e Realidade Aparente)</small></h3>
+      <div class="mag-par">
+      <table class="mag-tabela sucesso">
+        <caption><span class="ico" data-ico="alvo" aria-hidden="true"></span> Acerto Crítico (20 Natural)</caption>
+        <thead><tr><th>d10</th><th>Efeito</th></tr></thead>
+        <tbody>
+          <tr><td>1–3</td><td><strong>Mancha Óptica:</strong> O alvo sofre Desvantagem no próximo ataque que realizar contra qualquer criatura.</td></tr>
+          <tr><td>4–6</td><td><strong>Vulto Defensivo:</strong> Duas duplicatas ilusórias surgem ao seu redor, agindo identicamente aos efeitos da magia Reflexos por 1 rodada.</td></tr>
+          <tr><td>7–8</td><td><strong>Terror Quimérico:</strong> O alvo vê seus piores medos materializados e fica Amedrontado até o final do próximo turno dele.</td></tr>
+          <tr><td>9</td><td><strong>Invisibilidade Reversa:</strong> O alvo se torna incapaz de ver você; você é considerado Invisível para ele até o fim do combate ou até atacá-lo novamente.</td></tr>
+          <tr><td>10</td><td><strong>Delírio Total:</strong> O alvo é incapaz de distinguir amigos de inimigos: na próxima rodada, ele ataca aleatoriamente a criatura mais próxima ao alcance dele.</td></tr>
+        </tbody>
+      </table>
+      <table class="mag-tabela falha">
+        <caption><span class="ico" data-ico="caveira" aria-hidden="true"></span> Falha Crítica (1 Natural)</caption>
+        <thead><tr><th>d10</th><th>Efeito</th></tr></thead>
+        <tbody>
+          <tr><td>1–3</td><td><strong>Glitch Visual:</strong> O alvo descobre instantaneamente a posição real de quaisquer ilusões, criaturas invisíveis ou emboscadas ao redor.</td></tr>
+          <tr><td>4–6</td><td><strong>Espelho Distorcido:</strong> Seus próprios sentidos mentem para você; todos os alvos ganham Meia-Cobertura contra seus ataques até a próxima rodada.</td></tr>
+          <tr><td>7–8</td><td><strong>Assombração Psíquica:</strong> Um espectro falso surge diante de você: você fica Amedrontado até o final do seu próximo turno.</td></tr>
+          <tr><td>9</td><td><strong>Farol Luminoso:</strong> Você emite uma luz brilhante e colorida incontrolável que cancela qualquer invisibilidade e impede testes de Furtividade por 1 minuto.</td></tr>
+          <tr><td>10</td><td><strong>Perda de Ancoragem:</strong> Você é preso pela própria teia ilusória: você fica Cego e Surdo até o final do seu próximo turno.</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="mag-rodape">
+        <img src="../assets/img/criticos-magia/ilusao-esq.webp" alt="" loading="lazy">
+        <a href="#mag-topo" class="mag-voltar">↑ Escolas</a>
+        <img src="../assets/img/criticos-magia/ilusao-dir.webp" alt="" loading="lazy">
+      </div>
+    </section>
+
+    <section class="mag-pagina" id="mag-necromancia" style="--fundo:url('../assets/img/criticos-magia/necromancia-fundo.webp')">
+      <img class="mag-icone" src="../assets/img/criticos-magia/necromancia-icone.webp" alt="" loading="lazy">
+      <h3 class="mag-titulo"><span class="mag-num">7.</span> Necromancia <small>(Vida, Morte e Corrupção)</small></h3>
+      <div class="mag-par">
+      <table class="mag-tabela sucesso">
+        <caption><span class="ico" data-ico="alvo" aria-hidden="true"></span> Acerto Crítico (20 Natural)</caption>
+        <thead><tr><th>d10</th><th>Efeito</th></tr></thead>
+        <tbody>
+          <tr><td>1–3</td><td><strong>Drenagem Vital:</strong> Você recupera pontos de vida iguais ao nível da magia gasta (mínimo 1 em truques).</td></tr>
+          <tr><td>4–6</td><td><strong>Rigor Mortis:</strong> O corpo do alvo enrijece; o deslocamento dele cai pela metade e ele não pode usar reações até o fim do próximo turno dele.</td></tr>
+          <tr><td>7–8</td><td><strong>Supressão Vital:</strong> O alvo fica Envenenado e não pode recuperar PV de nenhuma forma pelas próximas 24 horas.</td></tr>
+          <tr><td>9</td><td><strong>Exaustão Cadavérica:</strong> O alvo ganha imediatamente 1 nível de Exaustão.</td></tr>
+          <tr><td>10</td><td><strong>Cisura de Alma:</strong> O alvo sofre dano necrótico maximizado. Se o alvo morrer por esse ataque, ele se levanta no início do próximo turno como um Zumbi ou Esqueleto sob seu comando por 1 hora.</td></tr>
+        </tbody>
+      </table>
+      <table class="mag-tabela falha">
+        <caption><span class="ico" data-ico="caveira" aria-hidden="true"></span> Falha Crítica (1 Natural)</caption>
+        <thead><tr><th>d10</th><th>Efeito</th></tr></thead>
+        <tbody>
+          <tr><td>1–3</td><td><strong>Gélido Abraço:</strong> Seus dedos entorpecem; você perde a capacidade de realizar ataques de oportunidade até o início do seu próximo turno.</td></tr>
+          <tr><td>4–6</td><td><strong>Dreno Inverso:</strong> O alvo cura pontos de vida temporários iguais ao dobro do seu modificador de conjuração.</td></tr>
+          <tr><td>7–8</td><td><strong>Murchar:</strong> Seus próprios tecidos sofrem necrose: você sofre 2d6 de dano necrótico que reduz sua vida máxima até um descanso longo.</td></tr>
+          <tr><td>9</td><td><strong>Infecção Mórbida:</strong> Você fica Envenenado por 1 minuto (salvaguarda de Constituição CD 12 no final de cada um dos seus turnos para encerrar).</td></tr>
+          <tr><td>10</td><td><strong>Chamado da Morte:</strong> A foice se vira contra o mestre: você sofre 3d10 de dano necrótico.</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="mag-rodape">
+        <img src="../assets/img/criticos-magia/necromancia-esq.webp" alt="" loading="lazy">
+        <a href="#mag-topo" class="mag-voltar">↑ Escolas</a>
+        <img src="../assets/img/criticos-magia/necromancia-dir.webp" alt="" loading="lazy">
+      </div>
+    </section>
+
+    <section class="mag-pagina" id="mag-transmutacao" style="--fundo:url('../assets/img/criticos-magia/transmutacao-fundo.webp')">
+      <img class="mag-icone" src="../assets/img/criticos-magia/transmutacao-icone.webp" alt="" loading="lazy">
+      <h3 class="mag-titulo"><span class="mag-num">8.</span> Transmutação <small>(Matéria, Formas e Alteração Física)</small></h3>
+      <div class="mag-par">
+      <table class="mag-tabela sucesso">
+        <caption><span class="ico" data-ico="alvo" aria-hidden="true"></span> Acerto Crítico (20 Natural)</caption>
+        <thead><tr><th>d10</th><th>Efeito</th></tr></thead>
+        <tbody>
+          <tr><td>1–3</td><td><strong>Pesantez Articular:</strong> O peso do alvo triplica momentaneamente; ele perde 6 metros de deslocamento até o fim da rodada.</td></tr>
+          <tr><td>4–6</td><td><strong>Quebra Estrutural:</strong> A armadura ou carapaça do alvo amolece: a CA dele é reduzida em 2 até o fim do combate.</td></tr>
+          <tr><td>7–8</td><td><strong>Petrificação Parcial:</strong> As pernas ou asas do alvo começam a virar pedra; ele fica Impedido até ter sucesso em uma salvaguarda de Força no fim do turno dele.</td></tr>
+          <tr><td>9</td><td><strong>Metamorfose Instantânea:</strong> O alvo é transformado em um sapo inofensivo até o início do seu próximo turno (como na magia Metamorfose).</td></tr>
+          <tr><td>10</td><td><strong>Desintegração Parcial:</strong> A matéria orgânica do alvo se dissolve; adicione 4d8 de dano de Força e o alvo tem desvantagem permanente em testes de Força e Destreza por 1 hora.</td></tr>
+        </tbody>
+      </table>
+      <table class="mag-tabela falha">
+        <caption><span class="ico" data-ico="caveira" aria-hidden="true"></span> Falha Crítica (1 Natural)</caption>
+        <thead><tr><th>d10</th><th>Efeito</th></tr></thead>
+        <tbody>
+          <tr><td>1–3</td><td><strong>Densidade Frágil:</strong> Seu foco de conjuração ou cajado se torna frágil e pesado, impondo Desvantagem em testes de Destreza até o final do turno.</td></tr>
+          <tr><td>4–6</td><td><strong>Amolecimento Óssuo:</strong> Suas pernas fraquejam: você cai no chão (Caído) e rastejar custa o triplo do deslocamento por 1 rodada.</td></tr>
+          <tr><td>7–8</td><td><strong>Fortalecimento Acidental:</strong> A matéria do alvo se densifica: o alvo ganha resistência a dano de concussão, perfurante e cortante por 1 rodada.</td></tr>
+          <tr><td>9</td><td><strong>Fusão com o Solo:</strong> Seus sapatos/pés fundem-se ao chão; você fica Impedido até gastar uma Ação para se libertar (CD 12 Atletismo).</td></tr>
+          <tr><td>10</td><td><strong>Polimorfia Reversa:</strong> Você acidentalmente se transforma em um animal miúdo e indefeso (como uma galinha ou rato, PV 1) até o final do seu próximo turno.</td></tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="mag-rodape">
+        <img src="../assets/img/criticos-magia/transmutacao-esq.webp" alt="" loading="lazy">
+        <a href="#mag-topo" class="mag-voltar">↑ Escolas</a>
+        <img src="../assets/img/criticos-magia/transmutacao-dir.webp" alt="" loading="lazy">
+      </div>
+    </section>
+    </div>
+  </div>
 
   <p style="text-align:center;margin-top:10px">
-    <a href="regras_casa.html" style="color:var(--gold-light);font-family:var(--font-heading);font-size:13px;letter-spacing:.5px;text-transform:uppercase;text-decoration:none;border-bottom:1px solid var(--border)">🎲 Voltar pra Regras da Casa →</a>
+    <a href="regras_casa.html" style="color:var(--gold-light);font-family:var(--font-heading);font-size:13px;letter-spacing:.5px;text-transform:uppercase;text-decoration:none;border-bottom:1px solid var(--border)"><span class="ico" data-ico="dado" aria-hidden="true"></span> Voltar pra Regras da Casa →</a>
   </p>
 </main>
 
+<dialog class="capa-zoom" aria-label="Capa em tela cheia">
+  <img alt="">
+  <button type="button" class="capa-zoom-fechar" aria-label="Fechar">✕</button>
+</dialog>
+
 <script>
+  /* ---- altura do cabeçalho fixo do site: o cabeçalho das tabelas gruda logo abaixo dele ---- */
+  const cabecalho = document.querySelector('.site-header');
+  const medirTopo = () => document.documentElement.style.setProperty('--topo', cabecalho.offsetHeight + 'px');
+  medirTopo();
+  if (window.ResizeObserver) new ResizeObserver(medirTopo).observe(cabecalho);
+
   /* ---- mobile: gera a lista vertical a partir da MESMA <table> (fonte única de dados) ---- */
   document.querySelectorAll('.tabela-secao').forEach(secao => {
     const tabela = secao.querySelector('table.tabela-critico');
@@ -211,7 +846,7 @@
     if (!tabela || !wrap) return;
 
     // 1ª coluna = faixa de d100; demais colunas = tipos (dano no sucesso, ataque na falha)
-    const tipos = Array.from(tabela.querySelectorAll('thead th')).slice(1).map(th => th.textContent.trim());
+    const tipos = Array.from(tabela.querySelectorAll('thead th')).slice(1).map(th => th.innerHTML.trim());
     const linhas = Array.from(tabela.querySelectorAll('tbody tr')).map(tr => {
       const celulas = Array.from(tr.children);
       return { faixa: celulas[0].textContent.trim(), colunas: celulas.slice(1) };
@@ -277,7 +912,7 @@
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'crit-tipo';
-      btn.textContent = tipo;
+      btn.innerHTML = tipo;
       btn.setAttribute('aria-pressed', 'false');
       btn.addEventListener('click', () => mostrarTipo(i));
       barra.appendChild(btn);
@@ -288,6 +923,7 @@
   });
 
   const explicacoes = document.querySelectorAll('.explicacao');
+  const navArmas = document.querySelectorAll('.arm-nav-btn');
   const paineis = { sucesso: document.getElementById('tabela-sucesso'), falha: document.getElementById('tabela-falha') };
   function selecionarCritico(nome) {
     explicacoes.forEach(el => {
@@ -297,13 +933,70 @@
     });
     paineis.sucesso.hidden = nome !== 'sucesso';
     paineis.falha.hidden = nome !== 'falha';
+    navArmas.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.ir === nome)));
+  }
+  // se a tabela escolhida ficou fora da tela (comum no celular), rola até ela
+  function levarAteTabela(nome) {
+    const alvo = paineis[nome];
+    if (alvo.getBoundingClientRect().top > window.innerHeight * 0.7) alvo.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
   explicacoes.forEach(el => {
-    el.addEventListener('click', () => selecionarCritico(el.dataset.sel));
+    el.addEventListener('click', () => { selecionarCritico(el.dataset.sel); levarAteTabela(el.dataset.sel); });
     el.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selecionarCritico(el.dataset.sel); }
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); selecionarCritico(el.dataset.sel); levarAteTabela(el.dataset.sel); }
     });
   });
+
+  // barra lateral (telas largas): troca a tabela e já leva até ela
+  navArmas.forEach(b => b.addEventListener('click', () => {
+    selecionarCritico(b.dataset.ir);
+    paineis[b.dataset.ir].scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }));
+
+  /* ---- barra lateral da magia: destaca a escola que está na tela ---- */
+  const atalhosMagia = document.querySelectorAll('.mag-atalho');
+  if (window.IntersectionObserver) {
+    const visiveis = new Map();
+    const espiao = new IntersectionObserver(entradas => {
+      entradas.forEach(e => visiveis.set(e.target.id, e.isIntersecting ? e.intersectionRatio : 0));
+      let melhor = null, maior = 0;
+      visiveis.forEach((r, id) => { if (r > maior) { maior = r; melhor = id; } });
+      atalhosMagia.forEach(a => a.setAttribute('aria-current', String(a.getAttribute('href') === '#' + melhor)));
+    }, { threshold: [0, .15, .3, .5, .75, 1] });
+    document.querySelectorAll('.mag-pagina[id^="mag-"]:not(.mag-intro)').forEach(s => espiao.observe(s));
+  }
+
+  /* ---- capa em tela cheia: mostra a miniatura na hora e troca pela versão grande quando ela chega ---- */
+  const zoom = document.querySelector('dialog.capa-zoom');
+  const zoomImg = zoom.querySelector('img');
+  document.querySelectorAll('.capa-zoom-btn').forEach(btn => btn.addEventListener('click', () => {
+    const mini = btn.querySelector('img');
+    zoomImg.src = mini.currentSrc || mini.src;
+    zoomImg.alt = mini.alt;
+    const grande = new Image();
+    grande.onload = () => { if (zoom.open) zoomImg.src = grande.src; };
+    grande.src = btn.dataset.grande;
+    zoom.showModal();
+  }));
+  // fecha clicando em qualquer lugar (Esc já fecha sozinho)
+  zoom.addEventListener('click', () => zoom.close());
+
+  /* ---- chave Armas / Magias (o hash #magias abre direto na seção de magia) ---- */
+  const modoBtns = document.querySelectorAll('.modo-btn');
+  const modos = { armas: document.getElementById('modo-armas'), magias: document.getElementById('modo-magias') };
+  function selecionarModo(nome, gravarHash) {
+    modoBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.modo === nome)));
+    modos.armas.hidden = nome !== 'armas';
+    modos.magias.hidden = nome !== 'magias';
+    document.body.dataset.modo = nome;   // troca o fundo temático
+    if (gravarHash) history.replaceState(null, '', nome === 'magias' ? '#magias' : location.pathname + location.search);
+  }
+  modoBtns.forEach(b => b.addEventListener('click', () => selecionarModo(b.dataset.modo, true)));
+  if (location.hash === '#magias' || location.hash.startsWith('#mag-')) {
+    selecionarModo('magias', false);
+    const alvo = location.hash.startsWith('#mag-') && document.querySelector(location.hash);
+    if (alvo) alvo.scrollIntoView();
+  }
 </script>
 <script src="../assets/js/ambiente.js"></script>
 <script src="../assets/js/polish.js"></script>
