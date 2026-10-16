@@ -88,7 +88,7 @@
   function pedirIndice() {
     if (IDX.pedido) return;
     IDX.pedido = true;
-    carregarScript('busca-indice.js', function (err) {
+    carregarScript('busca-indice.js?v=335a0987', function (err) {
       if (err) { IDX.erro = true; } else {
         IDX.leve = window.RELOADED_BUSCA;
         IDX.leve.paginas.forEach(function (p) {
@@ -99,7 +99,7 @@
       }
       avisar();
     });
-    carregarScript('busca-texto.js', function (err) {
+    carregarScript('busca-texto.js?v=85a1e0a0', function (err) {
       if (err) { IDX.erro = true; } else { IDX.texto = window.RELOADED_BUSCA_TEXTO; casarTexto(); }
       avisar();
     });

@@ -5,13 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#070506">
 <link rel="icon" type="image/svg+xml" href="../../assets/img/favicon.svg">
-<link rel="stylesheet" href="../../assets/css/tokens.css">
+<link rel="stylesheet" href="../../assets/css/tokens.css?v=1d38abb6">
 <title>Escher — Ficha de Combate</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
-<script src="../../assets/vendor/iconify-icon-2.1.0.min.js"></script>
-<script src="../../assets/js/icones.js"></script>
+<script src="../../assets/vendor/iconify-icon-2.1.0.min.js?v=af7e63c4"></script>
+<script src="../../assets/js/icones.js?v=146eb8bb"></script>
+<link rel="stylesheet" href="vilao-completo.css?v=e8ae2f53">
 <style>
   :root {
     --bg-deep:var(--bg); --bg-card:var(--surface); --bg-card-2:var(--surface-raised); --bg-card-3:#2a1518;
@@ -22,106 +23,106 @@
     --border-soft:rgba(168,35,43,0.14); --radius:10px;
     --accent:#c765a8; --accent-bright:#eb9fd0; --accent-glow:rgba(199,101,168,0.40); --accent-soft:rgba(199,101,168,0.12);
   }
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-  html, body { background: var(--bg-deep); color: var(--text-body); font-family: 'Cormorant Garamond', serif; font-size: 16px; line-height: 1.48; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+  
+  
   body { background: radial-gradient(ellipse at 50% -10%, var(--accent-soft), transparent 55%), radial-gradient(ellipse at 18% 4%, rgba(134,24,32,0.16), transparent 48%), radial-gradient(ellipse at 84% 96%, rgba(203,172,103,0.06), transparent 50%), var(--bg-deep); background-attachment: fixed; }
-  body::before { content: ''; position: fixed; inset: 0; pointer-events: none; opacity: 0.3; z-index: 1; background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.05 0 0 0 0 0.05 0 0 0 0.3 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>"); mix-blend-mode: overlay; }
+  
   .container { max-width: 1100px; margin: 0 auto; padding: 20px 24px 60px; position: relative; z-index: 2; }
-  .top-bar { position: sticky; top: 0; z-index: 50; background: rgba(7,5,6,0.96); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); margin: -20px -24px 16px; padding: 12px 24px; }
+  
   .top-bar-inner { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; max-width: 1100px; margin: 0 auto; }
-  .brand { font-family: 'Cinzel', serif; font-weight: 700; font-size: 1rem; letter-spacing: 0.18em; color: var(--bone); text-transform: uppercase; }
-  .brand-sub { font-family: 'IM Fell English', serif; font-style: italic; font-size: 11px; color: var(--gold-dim); letter-spacing: 0.15em; }
-  .save-controls { margin-left: auto; display: flex; gap: 8px; flex-wrap: wrap; }
-  header { text-align: center; padding: 26px 16px 26px; margin-bottom: 18px; position: relative; border-radius: var(--radius); background: radial-gradient(ellipse at 50% 0%, var(--accent-soft), transparent 70%), linear-gradient(180deg, rgba(20,10,14,0.85), rgba(7,5,6,0.4)); border: 1px solid var(--border); box-shadow: inset 0 1px 0 rgba(240,208,137,0.06), 0 10px 40px rgba(0,0,0,0.5); overflow: hidden; }
-  header::before { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(90deg, transparent, var(--accent), transparent); height: 2px; top: 0; opacity: 0.55; }
-  header::after { content: '✦'; position: absolute; bottom: -11px; left: 50%; transform: translateX(-50%); background: var(--bg-deep); padding: 0 14px; color: var(--accent); font-size: 18px; text-shadow: 0 0 12px var(--accent-glow); }
+  
+  
+  
+  
+  
+  
   .crest { font-size: clamp(2.4rem, 6vw, 3.4rem); line-height: 1; margin-bottom: 6px; color: var(--accent-bright); filter: drop-shadow(0 0 14px var(--accent-glow)); display: inline-block; }
-  .eyebrow { font-family: 'Cinzel', serif; font-size: 0.62rem; font-weight: 700; letter-spacing: 0.42em; color: var(--accent-bright); text-transform: uppercase; margin-bottom: 8px; opacity: 0.85; }
+  
   h1 { font-family: 'Cinzel', serif; font-weight: 900; font-size: clamp(2rem, 5vw, 3.1rem); letter-spacing: 0.09em; line-height: 1.02; background: linear-gradient(180deg, var(--bone) 30%, var(--accent-bright)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; text-shadow: 0 0 34px var(--accent-glow); filter: drop-shadow(0 2px 2px rgba(0,0,0,0.6)); }
   .subtitle { font-style: italic; font-size: 1rem; color: var(--gold); margin-top: 10px; letter-spacing: 0.03em; line-height: 1.5; max-width: 780px; margin-left: auto; margin-right: auto; }
-  .subtitle strong { color: var(--bone); font-style: normal; }
-  .combat-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
-  @media (max-width: 880px) { .combat-bar { grid-template-columns: 1fr; } }
+  
+  
+  
   .panel { background: linear-gradient(180deg, var(--bg-card), rgba(7,5,6,0.5)); border: 1px solid var(--border); padding: 10px 14px; border-radius: 2px; box-shadow: inset 0 1px 0 rgba(255,255,255,0.04); }
   .panel-title { font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.2em; color: var(--gold); text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; border-bottom: 1px solid var(--border-soft); padding-bottom: 6px; }
-  .hp-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  
   .hp-input { background: var(--shadow); border: 1px solid var(--blood-dark); color: var(--bone); font-family: 'Cinzel', serif; font-size: 1rem; padding: 4px 8px; width: 72px; text-align: center; border-radius: 2px; outline: none; }
-  .hp-input:focus { border-color: var(--gold); }
+  
   .hp-bar-container { flex: 1; min-width: 120px; height: 18px; background: var(--shadow); border: 1px solid var(--border); position: relative; overflow: hidden; }
-  .hp-bar { height: 100%; background: linear-gradient(90deg, var(--blood-dark), var(--blood)); transition: width 0.4s ease; box-shadow: inset 0 0 8px rgba(0,0,0,0.5); }
-  .hp-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-family: 'Cinzel', serif; font-size: 10px; color: var(--bone); letter-spacing: 0.1em; text-shadow: 0 0 4px black; }
-  .btn { background: transparent; border: 1px solid var(--gold-dim); color: var(--gold); padding: 4px 10px; font-family: 'Cinzel', serif; font-size: 10px; letter-spacing: 0.1em; cursor: pointer; transition: all 0.15s; border-radius: 2px; text-transform: uppercase; }
-  .btn:hover { background: var(--blood-dark); color: var(--bone); border-color: var(--blood); }
-  .btn.gold:hover { background: var(--gold-dim); color: var(--shadow); border-color: var(--gold); }
+  
+  
+  
+  
+  
   .react-row { display: flex; align-items: center; gap: 10px; }
   .react-dot { width: 22px; height: 22px; border: 2px solid var(--blood); border-radius: 50%; cursor: pointer; background: transparent; position: relative; }
   .react-dot.used { background: var(--blood); }
   .react-dot.used::after { content: '✗'; position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: var(--bone); font-size: 12px; }
-  .condition-row { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 14px; align-items: center; }
-  .cond-label { font-family: 'Cinzel', serif; font-size: 10px; color: var(--gold); letter-spacing: 0.18em; text-transform: uppercase; margin-right: 4px; }
-  .chip { padding: 5px 12px; background: linear-gradient(180deg, rgba(0,0,0,0.2), rgba(26,18,22,0.7)); border: 1px solid var(--border); color: var(--text-muted); font-family: 'Cinzel', serif; font-weight: 600; font-size: 10px; letter-spacing: 0.1em; cursor: pointer; border-radius: 14px; user-select: none; transition: all 0.15s; min-height: 26px; display: inline-flex; align-items: center; }
-  .chip:hover { border-color: var(--gold-dim); color: var(--bone-dim); transform: translateY(-1px); }
-  .chip.active { background: linear-gradient(180deg, var(--blood), var(--blood-dark)); border-color: var(--blood-bright); color: var(--bone); box-shadow: 0 0 8px rgba(139,26,26,0.4); }
-  .stats-bar { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; margin-bottom: 14px; background: linear-gradient(180deg, rgba(26,18,22,0.7), rgba(13,8,11,0.7)); padding: 12px 10px; border: 1px solid var(--border); border-radius: var(--radius); box-shadow: inset 0 1px 0 rgba(232,200,122,0.05); }
-  .stat { text-align: center; padding: 9px 4px 7px; background: linear-gradient(180deg, rgba(0,0,0,0.3), transparent); border: 1px solid rgba(95,23,27,0.6); border-radius: 8px; transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s; }
+  
+  
+  
+  
+  
+  
+  
   .stat:hover { border-color: var(--accent); transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,0.4), 0 0 12px var(--accent-glow); }
-  .stat-label { font-family: 'Cinzel', serif; font-size: 11px; font-weight: 700; letter-spacing: 0.22em; color: var(--gold-bright); text-shadow: 0 0 8px rgba(232,200,122,0.2); }
-  .stat-value { font-family: 'IM Fell English', serif; font-size: 1.75rem; color: var(--bone); line-height: 1.05; font-weight: 600; margin-top: 3px; }
-  .stat-mod { font-family: 'Cinzel', serif; font-weight: 700; font-size: 0.95rem; color: var(--accent-bright); background: rgba(0,0,0,0.35); border: 1px solid var(--accent); border-radius: 12px; padding: 1px 9px; display: inline-block; margin-top: 6px; box-shadow: 0 0 10px var(--accent-glow); }
-  .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 6px; margin-bottom: 12px; }
-  .info-card { background: linear-gradient(180deg, var(--bg-card), rgba(7,5,6,0.5)); border: 1px solid var(--border); border-left: 3px solid var(--accent); padding: 8px 12px; border-radius: 6px; transition: border-color 0.2s, transform 0.15s; }
+  
+  
+  
+  
+  
   .info-card:hover { transform: translateY(-1px); border-left-color: var(--accent-bright); }
-  .info-card .label { font-family: 'Cinzel', serif; font-size: 9px; letter-spacing: 0.15em; color: var(--gold); text-transform: uppercase; }
-  .info-card .value { font-family: 'IM Fell English', serif; font-size: 1.08rem; color: var(--bone); margin-top: 1px; }
+  
+  
   .info-card .editable { background: transparent; border: none; border-bottom: 1px dashed var(--gold-dim); color: var(--bone); font-family: 'IM Fell English', serif; font-size: 1rem; width: 50px; text-align: center; outline: none; }
   .info-card .editable:focus { border-bottom-color: var(--gold); color: var(--gold-bright); }
-  .meta-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
-  @media (max-width: 720px) { .meta-row { grid-template-columns: 1fr; } }
-  .meta-box { background: linear-gradient(180deg, var(--bg-card), rgba(7,5,6,0.4)); border: 1px solid var(--border); padding: 10px 14px; border-radius: 8px; }
-  .meta-title { font-family: 'Cinzel', serif; font-size: 9px; color: var(--accent-bright); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 6px; padding-bottom: 5px; border-bottom: 1px solid var(--border-soft); }
-  .meta-content { font-size: 0.95rem; color: var(--text-body); line-height: 1.55; }
-  .meta-content strong { color: var(--bone); font-weight: 600; }
-  .section { margin-bottom: 18px; }
-  .section-title { font-family: 'Cinzel', serif; font-weight: 700; font-size: 1.02rem; color: var(--blood-bright); letter-spacing: 0.14em; text-transform: uppercase; margin-bottom: 10px; padding-bottom: 7px; border-bottom: 1px solid var(--blood-dark); display: flex; align-items: center; gap: 10px; position: relative; }
+  
+  
+  
+  
+  
+  
+  
+  
   .section-title::before { content: ''; width: 7px; height: 7px; background: var(--blood); transform: rotate(45deg); box-shadow: 0 0 8px var(--blood-bright); flex-shrink: 0; }
   .section-title::after { content: ''; position: absolute; left: 0; bottom: -1px; width: 60px; height: 1px; background: linear-gradient(90deg, var(--blood-bright), transparent); }
   .section-title.lore { color: var(--accent-bright); border-bottom-color: var(--accent); }
   .section-title.lore::before { background: var(--accent); box-shadow: 0 0 8px var(--accent-glow); }
   .section-title.lore::after { background: linear-gradient(90deg, var(--accent), transparent); }
-  .ability-grid { display: grid; grid-template-columns: 1fr; gap: 7px; }
+  
   .ability { background: linear-gradient(180deg, var(--bg-card), rgba(7,5,6,0.35)); border: 1px solid var(--border); border-left: 4px solid var(--gold-dim); border-radius: 8px; transition: border-left-color 0.15s, background 0.15s, box-shadow 0.2s, transform 0.15s; overflow: hidden; }
   .ability:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.35); }
   .ability.open { box-shadow: 0 6px 22px rgba(0,0,0,0.45); }
-  .ability.attack { border-left-color: var(--blood-bright); }
+  
   .ability.weak { border-left-color: #b5643c; }
   .ability.lore { border-left-color: var(--accent); }
-  .ability-header { padding: 10px 14px; cursor: pointer; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; user-select: none; }
-  .ability-header:hover { background: rgba(255,255,255,0.03); }
+  
+  
   .ability-header::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--gold-dim); flex-shrink: 0; box-shadow: 0 0 8px currentColor; }
   .ability.attack .ability-header::before { background: var(--blood-bright); color: var(--blood-bright); }
   .ability.weak .ability-header::before { background: #b5643c; color: #b5643c; }
   .ability.lore .ability-header::before { background: var(--accent); color: var(--accent); }
-  .ability-name { font-family: 'Cinzel', serif; font-weight: 600; font-size: 1rem; color: var(--bone); letter-spacing: 0.04em; }
-  .ability-tag { font-family: 'IM Fell English', serif; font-style: italic; font-size: 0.82rem; color: var(--gold); letter-spacing: 0.03em; background: var(--accent-soft); border: 1px solid var(--border-soft); padding: 1px 8px; border-radius: 10px; }
-  .toggle-icon { margin-left: auto; color: var(--gold-dim); font-size: 0.72rem; transition: transform 0.2s; }
-  .ability.open .toggle-icon { transform: rotate(180deg); color: var(--gold); }
-  .ability-body { padding: 2px 16px 12px 34px; font-size: 0.98rem; color: var(--text-body); line-height: 1.58; display: none; }
-  .ability.open .ability-body { display: block; }
+  
+  
+  
+  
+  
+  
   .ability-body strong { color: var(--bone); font-weight: 600; }
   .ability-body em { color: var(--gold-bright); font-style: normal; font-weight: 500; }
-  .dmg { display: inline-block; padding: 1px 8px; background: linear-gradient(180deg, rgba(134,24,32,0.28), rgba(90,14,14,0.28)); border: 1px solid var(--blood); color: #ffd9d0; border-radius: 5px; font-family: 'IM Fell English', serif; font-size: 0.9rem; margin: 0 2px; font-weight: 600; box-shadow: inset 0 1px 0 rgba(255,255,255,0.05); }
-  .cd { display: inline-block; padding: 1px 8px; background: rgba(168,35,43,0.14); border: 1px solid var(--gold-dim); color: var(--gold-bright); border-radius: 5px; font-family: 'IM Fell English', serif; font-size: 0.9rem; margin: 0 2px; font-weight: 600; }
+  
+  
   .insp-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
   .insp-tag { font-family: 'Cinzel', serif; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; color: var(--accent-bright); background: var(--accent-soft); border: 1px solid var(--border-soft); padding: 4px 10px; border-radius: 12px; }
-  .notes-section { margin-top: 18px; background: var(--bg-card); border: 1px solid var(--border); padding: 10px 14px; border-radius: 2px; }
-  .notes-section h3 { font-family: 'Cinzel', serif; font-size: 0.78rem; color: var(--gold); letter-spacing: 0.2em; margin-bottom: 6px; text-transform: uppercase; }
-  .notes-area { width: 100%; min-height: 70px; background: var(--shadow); border: 1px solid var(--border); color: var(--text-body); font-family: 'Cormorant Garamond', serif; font-size: 0.92rem; padding: 8px 10px; border-radius: 2px; resize: vertical; outline: none; line-height: 1.45; }
+  
+  
+  
   .notes-area:focus { border-color: var(--gold); }
-  footer { margin-top: 24px; padding-top: 12px; border-top: 1px solid var(--border); text-align: center; color: var(--text-muted); font-family: 'IM Fell English', serif; font-style: italic; font-size: 0.85rem; }
+  
   .footer-credit { display: block; margin-top: 6px; font-size: 0.78rem; }
   .footer-credit a { color: var(--gold-dim); }
-  .toast { position: fixed; top: 16px; right: 16px; background: var(--bg-card-3); border: 1px solid var(--gold); color: var(--bone); padding: 10px 16px; font-family: 'Cinzel', serif; font-size: 0.85rem; letter-spacing: 0.1em; border-radius: 2px; box-shadow: 0 4px 20px rgba(0,0,0,0.5); z-index: 200; opacity: 0; transform: translateY(-10px); transition: all 0.3s; pointer-events: none; }
-  .toast.show { opacity: 1; transform: translateY(0); }
+  
+  
   .round-tracker { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
   .round-display { display: flex; align-items: baseline; gap: 6px; background: rgba(0,0,0,0.35); border: 1px solid var(--accent); border-radius: 8px; padding: 4px 14px; box-shadow: 0 0 14px var(--accent-glow); }
   .round-num { font-family: 'IM Fell English', serif; font-size: 1.6rem; color: var(--accent-bright); line-height: 1; font-weight: 600; min-width: 24px; text-align: center; }
@@ -152,7 +153,7 @@
     .editable, .hp-input, .spell-search { min-height: 44px; }
   }
 </style>
-<link rel="stylesheet" href="../../assets/css/ui.css">
+<link rel="stylesheet" href="../../assets/css/ui.css?v=6a7a24aa">
 </head>
 <body data-ambiente="brasas">
 
@@ -319,16 +320,16 @@
 
 </div>
 
-<script src="../../assets/vendor/supabase-js-2.45.0.min.js"></script>
-<script src="../../assets/js/supabase.js"></script>
-<script src="../../assets/js/auth.js"></script>
-<script src="../../assets/js/efeitos.js"></script>
-<script src="../../assets/js/master_state.js"></script>
-<script src="../../assets/js/rolador.js"></script>
-<script src="../../assets/js/calculadora.js"></script>
-<script src="../../assets/js/vilao_atividade.js"></script>
-<script src="../../assets/js/vilao_combate.js"></script>
-<script src="../../assets/js/log_combate.js"></script>
+<script src="../../assets/vendor/supabase-js-2.45.0.min.js?v=582880e2"></script>
+<script src="../../assets/js/supabase.js?v=ae4b9ba9"></script>
+<script src="../../assets/js/auth.js?v=b9033614"></script>
+<script src="../../assets/js/efeitos.js?v=3b490011"></script>
+<script src="../../assets/js/master_state.js?v=ef898518"></script>
+<script src="../../assets/js/rolador.js?v=64d5b6c7"></script>
+<script src="../../assets/js/calculadora.js?v=b607a0e8"></script>
+<script src="../../assets/js/vilao_atividade.js?v=55e75986"></script>
+<script src="../../assets/js/vilao_combate.js?v=1a6ee009"></script>
+<script src="../../assets/js/log_combate.js?v=acd03e2c"></script>
 <script>
 VilaoCombate.iniciarSemFases({
   storageKey: 'escher_ficha_v1',
@@ -340,7 +341,7 @@ VilaoCombate.iniciarSemFases({
 });
 </script>
 
-<script src="../../assets/js/ambiente.js"></script>
-<script src="../../assets/js/polish.js"></script>
+<script src="../../assets/js/ambiente.js?v=1bb4162e"></script>
+<script src="../../assets/js/polish.js?v=edc717cb"></script>
 </body>
 </html>

@@ -1,0 +1,4 @@
+#!/bin/sh
+# Impede commit com ?v= desatualizado nos <script>/<link> (ver scripts/versionar_assets.js).
+# Ativar uma vez por clone: git config core.hooksPath .githooks
+node scripts/versionar_assets.js --verificar

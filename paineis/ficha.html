@@ -7,11 +7,11 @@
 <meta name="theme-color" content="#0d0e0c">
 <link rel="icon" type="image/svg+xml" href="../assets/img/favicon.svg">
 <title>Minha Ficha — D&D 5e</title>
-<link rel="stylesheet" href="../assets/css/tokens.css">
-<link rel="stylesheet" href="../assets/css/components.css">
-<script src="../assets/vendor/iconify-icon-2.1.0.min.js"></script>
-<script src="../assets/js/icones.js"></script>
-<script src="../assets/js/lightbox.js"></script>
+<link rel="stylesheet" href="../assets/css/tokens.css?v=1d38abb6">
+<link rel="stylesheet" href="../assets/css/components.css?v=daebcf91">
+<script src="../assets/vendor/iconify-icon-2.1.0.min.js?v=af7e63c4"></script>
+<script src="../assets/js/icones.js?v=146eb8bb"></script>
+<script src="../assets/js/lightbox.js?v=eb7d8656"></script>
 
 <!-- Estilo da ficha — extraído do <style> inline (ver assets/css/ficha/).
      A ORDEM importa: estes arquivos vêm depois de components.css e antes de
@@ -19,18 +19,18 @@
      abaixo eles reproduzem o CSS original byte a byte (Fase 0/1). nav.css é
      novo (Fase 2, bottom nav mobile) e só define seletores inéditos, então
      não precisa respeitar essa ordem — está ao fim da lista. -->
-<link rel="stylesheet" href="../assets/css/ficha/base.css">
-<link rel="stylesheet" href="../assets/css/ficha/equipamento.css">
-<link rel="stylesheet" href="../assets/css/ficha/magias.css">
-<link rel="stylesheet" href="../assets/css/ficha/habilidades.css">
-<link rel="stylesheet" href="../assets/css/ficha/combate.css">
-<link rel="stylesheet" href="../assets/css/ficha/personagem.css">
-<link rel="stylesheet" href="../assets/css/ficha/aliados.css">
-<link rel="stylesheet" href="../assets/css/ficha/sistema.css">
-<link rel="stylesheet" href="../assets/css/ficha/nav.css">
-<link rel="stylesheet" href="../assets/css/ficha/resumo.css">
-<link rel="stylesheet" href="../assets/css/ficha/seletor.css">
-<link rel="stylesheet" href="../assets/css/ui.css">
+<link rel="stylesheet" href="../assets/css/ficha/base.css?v=c1d6269e">
+<link rel="stylesheet" href="../assets/css/ficha/equipamento.css?v=83a406ba">
+<link rel="stylesheet" href="../assets/css/ficha/magias.css?v=60796c13">
+<link rel="stylesheet" href="../assets/css/ficha/habilidades.css?v=97a9be59">
+<link rel="stylesheet" href="../assets/css/ficha/combate.css?v=51adaab6">
+<link rel="stylesheet" href="../assets/css/ficha/personagem.css?v=cd854c17">
+<link rel="stylesheet" href="../assets/css/ficha/aliados.css?v=7032e541">
+<link rel="stylesheet" href="../assets/css/ficha/sistema.css?v=2c5dc5b7">
+<link rel="stylesheet" href="../assets/css/ficha/nav.css?v=17d63ca5">
+<link rel="stylesheet" href="../assets/css/ficha/resumo.css?v=02788772">
+<link rel="stylesheet" href="../assets/css/ficha/seletor.css?v=708419fc">
+<link rel="stylesheet" href="../assets/css/ui.css?v=6a7a24aa">
 </head>
 <body data-ambiente="fagulhas">
 
@@ -61,57 +61,57 @@
 <!-- (Removido) Toast de permissão — mudanças do Mestre agora se aplicam automaticamente -->
 <div class="toast" id="toast-auto" role="status" aria-live="polite"></div>
 
-<script src="../assets/vendor/supabase-js-2.45.0.min.js"></script>
-<script src="../assets/js/supabase.js"></script>
-<script src="../assets/js/auth.js"></script>
-<script src="../assets/js/presenca.js"></script>
-<script src="../assets/js/confirmar.js"></script>
-<script src="../assets/js/ui.js"></script>
-<script src="../assets/vendor/canvas-confetti-1.9.3.min.js" defer></script>
-<script src="../assets/js/efeitos.js"></script>
-<script src="../assets/js/phb_catalogo.js"></script>
-<script src="../assets/js/phb_slots.js"></script>
-<script src="../assets/js/exaustao_regras.js"></script>
-<script src="../assets/js/regras_base.js"></script>
-<script src="../assets/js/recursos_classe.js"></script>
-<script src="../assets/js/feiticeiro_ui.js"></script>
-<script src="../assets/js/habilidades_regras.js"></script>
-<script src="../assets/js/progressao_classes.js"></script>
-<script src="../assets/js/ataques.js"></script>
-<script src="../assets/js/condicoes_regras.js"></script>
+<script src="../assets/vendor/supabase-js-2.45.0.min.js?v=582880e2"></script>
+<script src="../assets/js/supabase.js?v=ae4b9ba9"></script>
+<script src="../assets/js/auth.js?v=b9033614"></script>
+<script src="../assets/js/presenca.js?v=93a4b3b3"></script>
+<script src="../assets/js/confirmar.js?v=01e2cb20"></script>
+<script src="../assets/js/ui.js?v=7e263380"></script>
+<script src="../assets/vendor/canvas-confetti-1.9.3.min.js?v=76003302" defer></script>
+<script src="../assets/js/efeitos.js?v=3b490011"></script>
+<script src="../assets/js/phb_catalogo.js?v=0737aae9"></script>
+<script src="../assets/js/phb_slots.js?v=083886ab"></script>
+<script src="../assets/js/exaustao_regras.js?v=24d2ad42"></script>
+<script src="../assets/js/regras_base.js?v=80d60da8"></script>
+<script src="../assets/js/recursos_classe.js?v=82480f74"></script>
+<script src="../assets/js/feiticeiro_ui.js?v=0b921374"></script>
+<script src="../assets/js/habilidades_regras.js?v=48e6164a"></script>
+<script src="../assets/js/progressao_classes.js?v=17f9236f"></script>
+<script src="../assets/js/ataques.js?v=e13521c2"></script>
+<script src="../assets/js/condicoes_regras.js?v=19d33233"></script>
 <!-- Log de alterações — quem mudou o quê nesta ficha (Mestre ou você
      mesmo, em outro aparelho). log_combate.js é o widget (FAB + painel);
      log_alteracoes.js lê character_changes e traduz pra texto (ver
      sql/029_log_alteracoes_ficha.sql). -->
-<script src="../assets/js/log_combate.js"></script>
-<script src="../assets/js/log_alteracoes.js"></script>
+<script src="../assets/js/log_combate.js?v=acd03e2c"></script>
+<script src="../assets/js/log_alteracoes.js?v=b8f0398b"></script>
 
 <!-- Lógica da ficha — extraída do <script> inline (ver assets/js/ficha/).
      São scripts CLÁSSICOS (sem type="module"), como o resto do projeto: todas
      as declarações de topo compartilham o mesmo escopo global, então a ORDEM
      abaixo reproduz o script original. salvar.js é o último porque termina
      chamando init(). header.js, nav_mobile.js e aba_resumo.js são novos. -->
-<script src="../assets/js/ficha/nucleo.js"></script>
-<script src="../assets/js/ficha/render.js"></script>
-<script src="../assets/js/ficha/header.js"></script>
-<script src="../assets/js/ficha/wizard_dados.js"></script>
-<script src="../assets/js/ficha/wizard_criacao.js"></script>
-<script src="../assets/js/ficha/exportar_pdf.js"></script>
-<script src="../assets/js/ficha/nav_mobile.js"></script>
-<script src="../assets/js/ficha/seletor.js"></script>
-<script src="../assets/js/ficha/aba_resumo.js"></script>
-<script src="../assets/js/ficha/aba_combate.js"></script>
-<script src="../assets/js/ficha/recursos.js"></script>
-<script src="../assets/js/ficha/aba_habilidades.js"></script>
-<script src="../assets/js/ficha/aba_magias.js"></script>
-<script src="../assets/js/ficha/aba_equipamento.js"></script>
-<script src="../assets/js/ficha/aba_aliados.js"></script>
-<script src="../assets/js/ficha/aba_roleplay.js"></script>
-<script src="../assets/js/ficha/lock.js"></script>
-<script src="../assets/js/ficha/listeners.js"></script>
-<script src="../assets/js/ficha/subida_nivel.js"></script>
-<script src="../assets/js/ficha/salvar.js"></script>
-<script src="../assets/js/ambiente.js"></script>
-<script src="../assets/js/polish.js"></script>
+<script src="../assets/js/ficha/nucleo.js?v=0a6e81ae"></script>
+<script src="../assets/js/ficha/render.js?v=a8554246"></script>
+<script src="../assets/js/ficha/header.js?v=72ff4deb"></script>
+<script src="../assets/js/ficha/wizard_dados.js?v=1e133769"></script>
+<script src="../assets/js/ficha/wizard_criacao.js?v=fe6828d9"></script>
+<script src="../assets/js/ficha/exportar_pdf.js?v=f5e4f908"></script>
+<script src="../assets/js/ficha/nav_mobile.js?v=364b21ea"></script>
+<script src="../assets/js/ficha/seletor.js?v=784c109f"></script>
+<script src="../assets/js/ficha/aba_resumo.js?v=824eab18"></script>
+<script src="../assets/js/ficha/aba_combate.js?v=e51be36b"></script>
+<script src="../assets/js/ficha/recursos.js?v=411bdd6a"></script>
+<script src="../assets/js/ficha/aba_habilidades.js?v=09dc605b"></script>
+<script src="../assets/js/ficha/aba_magias.js?v=13289311"></script>
+<script src="../assets/js/ficha/aba_equipamento.js?v=a3a0568f"></script>
+<script src="../assets/js/ficha/aba_aliados.js?v=df981afd"></script>
+<script src="../assets/js/ficha/aba_roleplay.js?v=2aa480e0"></script>
+<script src="../assets/js/ficha/lock.js?v=37b6552d"></script>
+<script src="../assets/js/ficha/listeners.js?v=fa817588"></script>
+<script src="../assets/js/ficha/subida_nivel.js?v=0b6cd140"></script>
+<script src="../assets/js/ficha/salvar.js?v=7b440d2b"></script>
+<script src="../assets/js/ambiente.js?v=1bb4162e"></script>
+<script src="../assets/js/polish.js?v=edc717cb"></script>
 </body>
 </html>
