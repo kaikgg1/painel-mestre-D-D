@@ -2,33 +2,40 @@
 #
 # O Supabase pausa projetos gratuitos depois de alguns dias sem uso do banco —
 # quando isso acontece o domínio some (NXDOMAIN) e o painel fica em branco.
-# Este job faz uma consulta real no Postgres via REST a cada 3 dias, o que
-# conta como atividade. Roda nos servidores do GitHub, com o PC desligado.
 #
-# A anon key é pública por design (já está em assets/js/supabase.js).
+# Histórico: a versão antiga fazia só um SELECT via REST a cada 3 dias e o
+# projeto foi pausado mesmo assim (out/2026). Agora o job chama a RPC
+# public.ping() (sql/036_heartbeat.sql), que faz uma ESCRITA real no Postgres,
+# e roda todo dia — se o cron do GitHub pular algumas execuções, ainda sobra
+# margem até o limite de ~7 dias. Roda nos servidores do GitHub, com o PC
+# desligado.
+#
+# A anon key é pública por design (já está em assets/js/supabase.js) e só
+# consegue executar ping(); a tabela heartbeat tem RLS sem policies.
 # Pra rodar na hora: aba Actions → "Manter Supabase ativo" → Run workflow.
 
 name: Manter Supabase ativo
 
 on:
   schedule:
-    - cron: '17 9 */3 * *'   # a cada 3 dias, 09:17 UTC
+    - cron: '17 9 * * *'   # todo dia, 09:17 UTC
   workflow_dispatch:
 
 jobs:
   ping:
     runs-on: ubuntu-latest
     steps:
-      - name: Consulta o banco
+      - name: Grava heartbeat no banco
         env:
           SB_URL: https://ehbngkmxwsjxuetjnztz.supabase.co
           SB_ANON: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVoYm5na214d3NqeHVldGpuenR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1NTk2MDQsImV4cCI6MjA5NTEzNTYwNH0.nKUMwOOzlzZnaWDU7h450D-7yySVJd1kGdYXWSz36l0
         run: |
           # Tenta algumas vezes antes de falhar (rede instável do runner).
           for i in 1 2 3; do
-            code=$(curl -s -o resp.txt -w '%{http_code}' -m 30 \
-              "$SB_URL/rest/v1/profiles?select=id&limit=1" \
-              -H "apikey: $SB_ANON" -H "Authorization: Bearer $SB_ANON")
+            code=$(curl -s -o resp.txt -w '%{http_code}' -m 30 -X POST \
+              "$SB_URL/rest/v1/rpc/ping" \
+              -H "apikey: $SB_ANON" -H "Authorization: Bearer $SB_ANON" \
+              -H "Content-Type: application/json" -d '{}')
             echo "tentativa $i → HTTP $code"; cat resp.txt; echo
             if [ "$code" = "200" ]; then exit 0; fi
             sleep 20

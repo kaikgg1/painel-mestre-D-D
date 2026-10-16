@@ -47,6 +47,7 @@ const SCRIPTS = [
   '033_metamagias.sql',
   '034_limpar_recursos_duplicados.sql',
   '035_nivel_escolhas.sql',
+  '036_heartbeat.sql',
 ];
 
 (async () => {
