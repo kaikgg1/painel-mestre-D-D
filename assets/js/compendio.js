@@ -137,6 +137,8 @@
   .cp-thumb { position: relative; flex-shrink: 0; width: 48px; height: 48px; border-radius: 6px; overflow: hidden; background: rgba(0,0,0,.35); display: flex; align-items: center; justify-content: center; font-size: 22px; color: #b88a2c; border: 1px solid rgba(139,105,20,.3); }
   /* A imagem cobre o ícone; se falhar (onerror -> remove) o ícone reaparece. */
   .cp-thumb img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  /* recorte de item: inteiro na miniatura, sobre o pergaminho da arte */
+  .cp-thumb img.cp-thumb-item { object-fit: contain; background: #efe6d2; padding: 2px; box-sizing: border-box; }
   .cp-item-meta iconify-icon { vertical-align: -2px; margin-right: 2px; color: #b88a2c; }
   /* display:block porque agora são <span> dentro do <button> da linha */
   .cp-item-nome { display: block; font-family: 'Cinzel',serif; font-weight: 700; color: #d4a843; font-size: 15px; }
@@ -161,6 +163,18 @@
   .cp-desc { font-size: 15px; line-height: 1.65; white-space: pre-wrap; }
   /* Itens: diagramação próxima à do Guia do Mestre — título com fio dourado,
      subtítulo em itálico, parágrafos com recuo, subtítulos e tabelas. */
+  /* Ilustração do item: moldura cor de pergaminho (o fundo da arte do livro),
+     à direita no desktop, largura total no celular. */
+  .cp-fig { float: right; width: clamp(150px, 34%, 280px); margin: 4px 0 12px 18px; padding: 10px;
+    background: #efe6d2; border: 1px solid #8B6914; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,.45);
+    display: flex; align-items: center; justify-content: center; box-sizing: border-box; }
+  .cp-fig-zoom { cursor: zoom-in; transition: transform .15s ease, box-shadow .15s ease; }
+  .cp-fig-zoom:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(184,138,44,.35); }
+  .cp-img-item { display: block; max-width: 100%; max-height: 300px; width: auto; height: auto; object-fit: contain; }
+  @media (max-width: 600px) {
+    .cp-fig { float: none; width: 100%; margin: 0 0 14px; }
+    .cp-img-item { max-height: 220px; }
+  }
   .cp-ficha-item h3 { border-bottom: 1px solid rgba(184,138,44,.55); padding-bottom: 4px; margin-bottom: 4px; }
   .cp-ficha-item .cp-sub { margin-bottom: 14px; }
   .cp-ficha-item .cp-sub .cp-tag { font-style: normal; vertical-align: 2px; }
@@ -329,7 +343,7 @@
     const cor = CORES_RAR[it.raridade] || '#a89878';
     const icone = ico(chaveIconeItem(it.tipo, it.nome));
     return `<button type="button" class="cp-item" data-idx="${idx}">
-      <span class="cp-thumb">${icone}${it.imagem ? `<img src="${esc(it.imagem)}" alt="" loading="lazy" onerror="this.remove()">` : ''}</span>
+      <span class="cp-thumb">${icone}${it.imagem ? `<img class="cp-thumb-item" src="${esc(it.imagem)}" alt="" loading="lazy" onerror="this.remove()">` : ''}</span>
       <span style="flex:1;min-width:0">
         <span class="cp-item-nome">${esc(titulo(it.nome))}<span class="cp-tag" style="background:${cor}22;color:${cor};border:1px solid ${cor}66">${esc(it.raridade)}</span></span>
         <span class="cp-item-meta">${esc(it.tipo)}${it.sintonia ? ' · requer sintonização' : ''}</span>
@@ -372,8 +386,19 @@
     const sub = it.linha_tipo
       ? esc(it.linha_tipo)
       : `${esc(it.tipo)}, ${esc(it.raridade)}${it.sintonia ? ` (requer sintonização${it.sintonia_detalhe ? ' ' + esc(it.sintonia_detalhe) : ''})` : ''}`;
+    // Recorte do item (scripts/recortar_itens.js); o clique abre a prancha do
+    // livro inteira — no Lightbox se a página carregou, senão em outra aba.
+    const nomeT = titulo(it.nome);
+    let fig = '';
+    if (it.imagem) {
+      const img = `<img class="cp-img-item" src="${esc(it.imagem)}" alt="Ilustração: ${esc(nomeT)}" loading="lazy" onerror="this.closest('.cp-fig').remove()">`;
+      fig = !it.prancha ? `<figure class="cp-fig">${img}</figure>`
+        : window.Lightbox
+          ? `<figure class="cp-fig cp-fig-zoom" data-lb="${esc(it.prancha)}" data-lb-nome="${esc(nomeT)} — prancha do Guia do Mestre" title="Ver a prancha do livro">${img}</figure>`
+          : `<a class="cp-fig cp-fig-zoom" href="${esc(it.prancha)}" target="_blank" rel="noopener" title="Ver a prancha do livro">${img}</a>`;
+    }
     return `<div class="cp-ficha cp-ficha-item">
-      ${it.imagem ? `<img class="cp-img" src="${esc(it.imagem)}" alt="" onerror="this.style.display='none'">` : ''}
+      ${fig}
       <h3>${esc(titulo(it.nome))}</h3>
       <div class="cp-sub">${sub}<span class="cp-tag" style="background:${cor}22;color:${cor};border:1px solid ${cor}66">${esc(it.raridade)}</span></div>
       <div class="cp-desc cp-desc-item">${descHTML(it.descricao)}</div></div>`;

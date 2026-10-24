@@ -19,7 +19,9 @@
 
   const CSS = `
   .lbx-ov {
-    position: fixed; inset: 0; z-index: 3000; display: none;
+    /* 9100: acima dos modais (8600, components.css) e do Confirmar (9000) —
+       a imagem pode ser aberta de dentro de um modal (prancha do item mágico). */
+    position: fixed; inset: 0; z-index: 9100; display: none;
     background: rgba(3,2,3,0.94); backdrop-filter: blur(6px);
     align-items: center; justify-content: center;
     padding: 3vh 3vw; cursor: zoom-out;

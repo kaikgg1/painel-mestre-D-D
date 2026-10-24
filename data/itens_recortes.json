@@ -1,0 +1,2392 @@
+[
+ {
+  "prancha": "dmg_p150.jpeg",
+  "itens": [
+   {
+    "nome": "AMULETO DE SAÚDE",
+    "legenda": "Amuleto de Saúde",
+    "box": [
+     0,
+     0,
+     214,
+     340
+    ],
+    "obs": "inclui um pouco do Jarro de Alquimia na borda direita"
+   },
+   {
+    "nome": "JARRO DE ALQUIMIA",
+    "legenda": "Jarro de Alquimia",
+    "box": [
+     172,
+     10,
+     532,
+     484
+    ],
+    "obs": "correntes dos amuletos vizinhos aparecem nas bordas"
+   },
+   {
+    "nome": "AMULETO DE PROTEÇÃO CONTRA DETECÇÃO E LOCALIZAÇÃO",
+    "legenda": "Amuleto de Proteção Contra Detecção e Localização",
+    "box": [
+     498,
+     0,
+     662,
+     448
+    ],
+    "obs": "puxadores do Jarro aparecem na borda esquerda"
+   },
+   {
+    "nome": "AMULETO DOS PLANOS",
+    "legenda": "Amuleto dos Planos",
+    "box": [
+     645,
+     0,
+     827,
+     348
+    ],
+    "obs": "aro cortado pela borda direita da própria prancha"
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p151.jpeg",
+  "itens": [
+   {
+    "nome": "ANEL DE PROTEÇÃO",
+    "legenda": "Anel de Proteção",
+    "box": [
+     20,
+     0,
+     238,
+     254
+    ],
+    "obs": "canto inferior direito encosta no Anel de Regeneração"
+   },
+   {
+    "nome": "ANEL DE REGENERAÇÃO",
+    "legenda": "Anel de Regeneração",
+    "box": [
+     158,
+     204,
+     396,
+     362
+    ],
+    "obs": "canto superior esquerdo pega um pouco do Anel de Proteção"
+   },
+   {
+    "nome": "ANEL DE RESISTÊNCIA",
+    "legenda": "Anel de Resistência a Fogo",
+    "box": [
+     288,
+     86,
+     564,
+     242
+    ],
+    "obs": "legenda é a variante \"a Fogo\"; canônico mais próximo = ANEL DE RESISTÊNCIA"
+   },
+   {
+    "nome": "ANEL DE ARMAZENAR MAGIA",
+    "legenda": "Anel de Armazenar Magia",
+    "box": [
+     456,
+     0,
+     688,
+     190
+    ],
+    "obs": "cortado pela borda superior da prancha (original)"
+   },
+   {
+    "nome": "ANEL DE TELECINÉSIA",
+    "legenda": "Anel de Telecinésia",
+    "box": [
+     666,
+     120,
+     827,
+     370
+    ],
+    "obs": "inclui parte da legenda à esquerda; borda direita da prancha"
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p152.jpeg",
+  "itens": [
+   {
+    "nome": "ANEL DE CATIVAR ANIMAIS",
+    "legenda": "Anel de Cativar Animais",
+    "box": [
+     0,
+     0,
+     280,
+     145
+    ]
+   },
+   {
+    "nome": "ANEL DE AÇÃO LIVRE",
+    "legenda": "Anel de Ação Livre",
+    "box": [
+     340,
+     0,
+     622,
+     192
+    ]
+   },
+   {
+    "nome": "ANEL DE INVOCAÇÃO DE DJINNI",
+    "legenda": "Anel de Invocação de Djinni",
+    "box": [
+     146,
+     150,
+     418,
+     333
+    ],
+    "obs": "pequeno trecho da legenda \"Animais\" no canto superior esquerdo"
+   },
+   {
+    "nome": "ANEL DE COMANDAR ELEMENTAIS",
+    "legenda": "Anel de Comandar Elementais do Ar",
+    "box": [
+     585,
+     20,
+     827,
+     352
+    ],
+    "obs": "Legenda especifica \"do Ar\"; a corrente liga o anel a um bracelete cortado na borda direita, incluído no recorte"
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p153.jpeg",
+  "itens": [
+   {
+    "nome": "ANEL DE INVISIBILIDADE",
+    "legenda": "Anel de Invisibilidade",
+    "box": [
+     0,
+     0,
+     275,
+     188
+    ],
+    "obs": "inclui ponta da pena do Anel de Queda Suave no canto inferior"
+   },
+   {
+    "nome": "ANEL DE QUEDA SUAVE",
+    "legenda": "Anel de Queda Suave",
+    "box": [
+     108,
+     148,
+     364,
+     368
+    ],
+    "obs": "inclui borda inferior do Anel de Invisibilidade"
+   },
+   {
+    "nome": "ANEL DE ESCUDO MENTAL",
+    "legenda": "Anel de Escudo Mental",
+    "box": [
+     380,
+     18,
+     552,
+     265
+    ]
+   },
+   {
+    "nome": "ANEL DE EVASÃO",
+    "legenda": "Anel de Evasão",
+    "box": [
+     568,
+     28,
+     827,
+     412
+    ]
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p154.jpeg",
+  "itens": [
+   {
+    "nome": "ANEL DOS TRÊS DESEJOS",
+    "legenda": "Anel de Três Desejos",
+    "box": [
+     72,
+     0,
+     272,
+     192
+    ],
+    "obs": "sobrepõe o Anel de Estrelas Cadentes; topo cortado pela borda da prancha"
+   },
+   {
+    "nome": "ANEL DE ESTRELAS CADENTES",
+    "legenda": "Anel de Estrelas Cadentes",
+    "box": [
+     0,
+     125,
+     200,
+     345
+    ],
+    "obs": "parte do Anel dos Três Desejos no topo"
+   },
+   {
+    "nome": "ANEL DE REFLETIR MAGIAS",
+    "legenda": "Anel de Refletir Magias",
+    "box": [
+     245,
+     0,
+     470,
+     258
+    ]
+   },
+   {
+    "nome": "ANEL DO ARÍETE",
+    "legenda": "Anel do Aríete",
+    "box": [
+     480,
+     0,
+     725,
+     240
+    ]
+   },
+   {
+    "nome": "ANEL DE VISÃO DE RAIO-X",
+    "legenda": "Anel de Visão de Raio-X",
+    "box": [
+     665,
+     148,
+     827,
+     310
+    ],
+    "obs": "cortado pela borda direita da prancha"
+   },
+   {
+    "nome": null,
+    "legenda": "Anel de Respirar na Água",
+    "box": [
+     392,
+     208,
+     600,
+     342
+    ],
+    "obs": "sem nome canônico (a lista tem ANEL DE NATAÇÃO / ANEL DE ANDAR NA ÁGUA; nenhum é \"respirar\")"
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p155.jpeg",
+  "itens": [
+   {
+    "nome": "ARMADURA DEMONÍACA",
+    "legenda": "Armadura Demoníaca",
+    "box": [
+     70,
+     0,
+     370,
+     648
+    ],
+    "obs": "inclui a legenda (sobreposta ao desenho)"
+   },
+   {
+    "nome": "DEFENSORA",
+    "legenda": "Arma Defensora",
+    "box": [
+     333,
+     112,
+     478,
+     832
+    ],
+    "obs": "inclui o brilho da lâmina; pega uma ponta da Armadura e a legenda"
+   },
+   {
+    "nome": "ALGEMAS DIMENSIONAIS",
+    "legenda": "Algemas Dimensionais",
+    "box": [
+     84,
+     676,
+     382,
+     1106
+    ],
+    "obs": "legenda fica dentro (no meio do desenho)"
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p157.jpeg",
+  "itens": [
+   {
+    "nome": "ASAS VOADORAS",
+    "legenda": "Asas Voadoras",
+    "box": [
+     0,
+     0,
+     405,
+     425
+    ]
+   },
+   {
+    "nome": "BOTAS ALADAS",
+    "legenda": "Botas Aladas",
+    "box": [
+     20,
+     380,
+     385,
+     665
+    ]
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p159.jpeg",
+  "itens": [
+   {
+    "nome": "BARALHO DAS SURPRESAS",
+    "legenda": "(sem legenda; cartas Sun, Donjon, Jester, Balance, Euryale, Ruin, Skull, Knight, Key)",
+    "box": [
+     30,
+     48,
+     810,
+     1096
+    ],
+    "obs": "prancha inteira = 9 cartas do baralho; sem legenda própria (nomes das cartas em inglês)"
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p161.jpeg",
+  "itens": [
+   {
+    "nome": "BASTÃO DE OBEDIÊNCIA",
+    "legenda": "Bastão de Liderança",
+    "box": [
+     0,
+     0,
+     390,
+     553
+    ],
+    "obs": "sem nome canônico exato; provável BASTÃO DE OBEDIÊNCIA (Rod of Rulership)"
+   },
+   {
+    "nome": "BASTÃO DO GRANDE PODER",
+    "legenda": "Bastão do Grande Poder",
+    "box": [
+     26,
+     236,
+     362,
+     806
+    ],
+    "obs": "diagonal: inclui partes do Bastão de Liderança e do de Ressurreição"
+   },
+   {
+    "nome": "BASTÃO DE RESSURREIÇÃO",
+    "legenda": "Bastão de Ressurreição",
+    "box": [
+     50,
+     520,
+     394,
+     1034
+    ],
+    "obs": "inclui ponta do Bastão do Grande Poder"
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p164.jpeg",
+  "itens": [
+   {
+    "nome": "MOCHILA DE CARGA",
+    "legenda": "Mochila de Carga",
+    "box": [
+     248,
+     0,
+     506,
+     280
+    ],
+    "obs": "alças sobem até a borda superior"
+   },
+   {
+    "nome": "SACO DE FEIJÕES",
+    "legenda": "Saco de Feijões",
+    "box": [
+     486,
+     80,
+     671,
+     300
+    ],
+    "obs": "alça da Bolsa Devoradora passa na frente"
+   },
+   {
+    "nome": "BOLSA DEVORADORA",
+    "legenda": "Bolsa Devoradora",
+    "box": [
+     305,
+     222,
+     566,
+     454
+    ],
+    "obs": "só o corpo da bolsa; a alça longa sobe por trás do Saco de Feijões até o topo e foi deixada de fora"
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p165.jpeg",
+  "itens": [
+   {
+    "nome": "BOTAS ÉLFICAS",
+    "legenda": "Botas Élficas",
+    "box": [
+     0,
+     95,
+     437,
+     450
+    ]
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p166.jpeg",
+  "itens": [
+   {
+    "nome": "BOTAS DO INVERNO",
+    "legenda": "Botas do Inverno",
+    "box": [
+     0,
+     42,
+     345,
+     398
+    ],
+    "obs": "inclui pequena borda da bacia à direita"
+   },
+   {
+    "nome": "BACIA DE COMANDAR ELEMENTAIS DA ÁGUA",
+    "legenda": "Bacia de Convocar Elementais da Água",
+    "box": [
+     318,
+     32,
+     692,
+     432
+    ],
+    "obs": "legenda diz \"Convocar\", nome canônico usa \"Comandar\"; inclui pedaço da bota e do braseiro nas bordas"
+   },
+   {
+    "nome": "BRASEIRO DE COMANDAR ELEMENTAIS DO FOGO",
+    "legenda": "Braseiro de Convocar Elementais do Fogo",
+    "box": [
+     668,
+     0,
+     827,
+     300
+    ],
+    "obs": "legenda diz \"Convocar\", nome canônico usa \"Comandar\"; desenho cortado na borda direita/superior da prancha; não estava em associados_hoje"
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p168.jpeg",
+  "itens": [
+   {
+    "nome": "CAJADO DA PÍTON",
+    "legenda": "Cajado da Píton",
+    "box": [
+     12,
+     38,
+     210,
+     850
+    ],
+    "obs": "ponta inferior escondida atrás da Pedra da Boa Sorte; inclui parte do Cajado da Víbora"
+   },
+   {
+    "nome": "CAJADO DA VÍBORA",
+    "legenda": "Cajado da Víbora",
+    "box": [
+     158,
+     166,
+     302,
+     1062
+    ],
+    "obs": "inclui pedaços da Lâmina do Sol e da Pedra da Boa Sorte"
+   },
+   {
+    "nome": "LÂMINA DO SOL",
+    "legenda": "Lâmina do Sol",
+    "box": [
+     230,
+     325,
+     356,
+     1045
+    ],
+    "obs": "guarda cortada pela borda direita da prancha"
+   },
+   {
+    "nome": "PEDRA DA BOA SORTE",
+    "legenda": "Pedra da Boa Sorte",
+    "box": [
+     10,
+     772,
+     208,
+     984
+    ],
+    "obs": "ponta do Cajado da Píton aparece acima"
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p169.jpeg",
+  "itens": [
+   {
+    "nome": "CAJADO DAS FLORESTAS",
+    "legenda": "Cajado das Florestas",
+    "box": [
+     186,
+     10,
+     370,
+     816
+    ]
+   },
+   {
+    "nome": "CAJADO DE DEFINHAMENTO",
+    "legenda": "Cajado do Definhamento",
+    "box": [
+     108,
+     150,
+     220,
+     872
+    ],
+    "obs": "ponta inferior some atrás da Pedra"
+   },
+   {
+    "nome": "CAJADO DE TROVÃO E RELÂMPAGO",
+    "legenda": "Cajado de Trovão e Relâmpago",
+    "box": [
+     0,
+     316,
+     104,
+     1042
+    ]
+   },
+   {
+    "nome": "PEDRA DE COMANDAR ELEMENTAIS DA TERRA",
+    "legenda": "Pedra de Controlar Elementais da Terra",
+    "box": [
+     136,
+     786,
+     334,
+     1012
+    ],
+    "obs": "legenda diz \"Controlar\"; pega a base dos dois cajados acima"
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p170.jpeg",
+  "itens": [
+   {
+    "nome": "CAJADO DO PODER",
+    "legenda": "Cajado do Poder",
+    "box": [
+     130,
+     0,
+     295,
+     750
+    ]
+   },
+   {
+    "nome": "CAJADO DO FRIO",
+    "legenda": "Cajado do Frio",
+    "box": [
+     260,
+     0,
+     405,
+     545
+    ]
+   },
+   {
+    "nome": "CAJADO DE ENXAME DE INSETOS",
+    "legenda": "Cajado do Enxame de Insetos",
+    "box": [
+     0,
+     270,
+     115,
+     915
+    ]
+   },
+   {
+    "nome": "CAJADO DE CURA",
+    "legenda": "Cajado de Cura",
+    "box": [
+     55,
+     300,
+     255,
+     1128
+    ]
+   },
+   {
+    "nome": "CAJADO DO ARCANO",
+    "legenda": "Cajado do Arcano",
+    "box": [
+     288,
+     570,
+     435,
+     1128
+    ]
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p171.jpeg",
+  "itens": [
+   {
+    "nome": "CAJADO DO FOGO",
+    "legenda": "Cajado do Fogo",
+    "box": [
+     205,
+     0,
+     490,
+     565
+    ],
+    "obs": "sobrepõe cabeça do Cajado de Enfeitiçar (canto inferior esquerdo)"
+   },
+   {
+    "nome": "CAJADO DE ENFEITIÇAR",
+    "legenda": "Cajado de Enfeitiçar",
+    "box": [
+     108,
+     195,
+     490,
+     932
+    ],
+    "obs": "inclui Cola Soberana e parte do Cajado do Fogo (itens cruzados)"
+   },
+   {
+    "nome": "COLA SOBERANA",
+    "legenda": "Cola Soberana",
+    "box": [
+     58,
+     380,
+     252,
+     702
+    ]
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p172.jpeg",
+  "itens": [
+   {
+    "nome": "BOTAS DE CAMINHAR E SALTAR",
+    "legenda": "Botas de Caminhar e Saltar",
+    "box": [
+     0,
+     28,
+     248,
+     298
+    ]
+   },
+   {
+    "nome": "CAPA DO SALTIMBANCO",
+    "legenda": "Capa do Saltimbanco",
+    "box": [
+     168,
+     12,
+     478,
+     484
+    ],
+    "obs": "bota aparece à esquerda"
+   },
+   {
+    "nome": "BRACELETES DE DEFESA",
+    "legenda": "Braceletes de Defesa",
+    "box": [
+     472,
+     0,
+     827,
+     348
+    ]
+   },
+   {
+    "nome": "BROCHE DO ESCUDO",
+    "legenda": "Broche do Escudo",
+    "box": [
+     474,
+     342,
+     722,
+     438
+    ]
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p173.jpeg",
+  "itens": [
+   {
+    "nome": "MACHADO FURIOSO",
+    "legenda": "Machado Furioso",
+    "box": [
+     0,
+     0,
+     232,
+     610
+    ],
+    "obs": "cortado pelas bordas esquerda/superior da prancha (original); inclui a legenda"
+   },
+   {
+    "nome": "BOLSA DE TRUQUES",
+    "legenda": "Bolsa de Truques",
+    "box": [
+     172,
+     0,
+     412,
+     436
+    ]
+   },
+   {
+    "nome": "CINTURÃO DE FORÇA DO GIGANTE",
+    "legenda": "Cinturão de Força do Gigante de Pedra",
+    "box": [
+     376,
+     10,
+     827,
+     274
+    ],
+    "obs": "variante \"de Pedra\"; inclui a legenda"
+   },
+   {
+    "nome": "CINTO DOS ANÕES",
+    "legenda": "Cinto dos Anões",
+    "box": [
+     564,
+     236,
+     827,
+     430
+    ]
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p174.jpeg",
+  "itens": [
+   {
+    "nome": "COLAR DE ADAPTAÇÃO",
+    "legenda": "Colar de Adapotação",
+    "box": [
+     355,
+     0,
+     668,
+     358
+    ]
+   },
+   {
+    "nome": "ARCO DO JURAMENTO",
+    "legenda": "Arco do Juramento",
+    "box": [
+     30,
+     298,
+     827,
+     468
+    ]
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p176.jpeg",
+  "itens": [
+   {
+    "nome": "DIADEMA DA DESTRUIÇÃO",
+    "legenda": "Diadema da Destruição",
+    "box": [
+     5,
+     0,
+     522,
+     172
+    ],
+    "obs": "pega o topo do Carrilhão à direita"
+   },
+   {
+    "nome": "CUBO DE FORÇA",
+    "legenda": "Cubo de Força",
+    "box": [
+     138,
+     170,
+     422,
+     458
+    ]
+   },
+   {
+    "nome": "CARRILHÃO DE ABERTURA",
+    "legenda": "Carrilhão de Abertura",
+    "box": [
+     415,
+     55,
+     692,
+     428
+    ],
+    "obs": "inclui a haste/batedor ligado pela corrente e parte do Manto da Arraia à direita"
+   },
+   {
+    "nome": "MANTO DA ARRAIA",
+    "legenda": "Manto da Arraia",
+    "box": [
+     615,
+     0,
+     827,
+     612
+    ]
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p177.jpeg",
+  "itens": [
+   {
+    "nome": "ESCUDO ANIMADO",
+    "legenda": "Escudo Animado",
+    "box": [
+     48,
+     38,
+     316,
+     428
+    ],
+    "obs": "garra do Dispositivo de Kwalish na borda direita"
+   },
+   {
+    "nome": "DISPOSITIVO DE KWALISH",
+    "legenda": "Dispositivo de Kwalish",
+    "box": [
+     238,
+     0,
+     724,
+     358
+    ],
+    "obs": "borda do Escudo Animado à esquerda"
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p178.jpeg",
+  "itens": [
+   {
+    "nome": "ADAGA DE ENVENENAMENTO",
+    "legenda": "Adaga de Envenenamento",
+    "box": [
+     0,
+     6,
+     304,
+     214
+    ],
+    "obs": "cabo cortado pela borda esquerda (original); inclui a legenda"
+   },
+   {
+    "nome": "DECANTADOR DE ÁGUA INFINITA",
+    "legenda": "Decantador de Água Infinita",
+    "box": [
+     70,
+     52,
+     506,
+     428
+    ],
+    "obs": "pega a ponta da lâmina da Adaga e a legenda"
+   },
+   {
+    "nome": "CUBO DO PORTAL",
+    "legenda": "Cubo do Portal",
+    "box": [
+     488,
+     140,
+     827,
+     457
+    ],
+    "obs": "cortado pelas bordas direita/inferior (original)"
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p179.jpeg",
+  "itens": [
+   {
+    "nome": "CORDA DE ESTRANGULAMENTO",
+    "legenda": "Corda de Estrangulamento",
+    "box": [
+     0,
+     0,
+     218,
+     318
+    ]
+   },
+   {
+    "nome": "PEDRAS DE MENSAGEM",
+    "legenda": "Pedras de Mensagem",
+    "box": [
+     182,
+     80,
+     520,
+     385
+    ]
+   },
+   {
+    "nome": "ESCARAVELHO DE PROTEÇÃO",
+    "legenda": "Escaravelho de Proteção",
+    "box": [
+     520,
+     0,
+     827,
+     418
+    ]
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p180.jpeg",
+  "itens": [
+   {
+    "nome": "ELMO DE TELEPATIA",
+    "legenda": "Elmo de Telepatia",
+    "box": [
+     0,
+     0,
+     268,
+     302
+    ]
+   },
+   {
+    "nome": "ELMO DE TELETRANSPORTE",
+    "legenda": "Elmo de Teletransporte",
+    "box": [
+     236,
+     118,
+     522,
+     442
+    ],
+    "obs": "pega borda do Elmo de Telepatia à esquerda"
+   },
+   {
+    "nome": "SACOLA PRESTATIVA DE HEWARD",
+    "legenda": "Sacola Prestativa de Heward",
+    "box": [
+     528,
+     0,
+     827,
+     398
+    ]
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p181.jpeg",
+  "itens": [
+   {
+    "nome": "MARTELO DOS TROVÕES",
+    "legenda": "Martelo dos Trovões",
+    "box": [
+     114,
+     0,
+     435,
+     456
+    ],
+    "obs": "cabo passa atrás do Elmo Brilhante (inclui boa parte dele)"
+   },
+   {
+    "nome": "ELMO BRILHANTE",
+    "legenda": "Elmo Brilhante",
+    "box": [
+     50,
+     138,
+     336,
+     478
+    ],
+    "obs": "cabo do martelo atravessa o fundo"
+   },
+   {
+    "nome": "ELMO DE COMPREENÇÃO DE IDIOMAS",
+    "legenda": "Elmo de Compreensão de Idiomas",
+    "box": [
+     188,
+     390,
+     400,
+     690
+    ]
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p182.jpeg",
+  "itens": [
+   {
+    "nome": "ESTÁTUA DE PODERES INCRÍVEIS",
+    "legenda": "(as cinco estatuetas)",
+    "box": [
+     10,
+     118,
+     812,
+     570
+    ],
+    "principal": true,
+    "obs": "conjunto das variantes desenhadas"
+   },
+   {
+    "nome": "OLHOS DE ÁGUIA",
+    "legenda": "Olhos de Águia",
+    "box": [
+     183,
+     0,
+     527,
+     202
+    ],
+    "obs": "inclui a legenda"
+   },
+   {
+    "nome": "ESTÁTUA DE PODERES INCRÍVEIS",
+    "legenda": "Coruja de Serpentina",
+    "box": [
+     10,
+     146,
+     242,
+     504
+    ],
+    "obs": "estatueta (variante); inclui a legenda"
+   },
+   {
+    "nome": "ESTÁTUA DE PODERES INCRÍVEIS",
+    "legenda": "Corcel de Obsidiana",
+    "box": [
+     201,
+     178,
+     449,
+     499
+    ],
+    "obs": "estatueta (variante); pega bordas da Coruja e do Elefante"
+   },
+   {
+    "nome": "ESTÁTUA DE PODERES INCRÍVEIS",
+    "legenda": "Elefante de Mármore",
+    "box": [
+     406,
+     124,
+     684,
+     454
+    ],
+    "obs": "estatueta (variante); pega pata do Corcel e lado do Cachorro"
+   },
+   {
+    "nome": "ESTÁTUA DE PODERES INCRÍVEIS",
+    "legenda": "Cachorro de Ônix",
+    "box": [
+     610,
+     118,
+     812,
+     420
+    ],
+    "obs": "estatueta (variante); pega a tromba do Elefante"
+   },
+   {
+    "nome": "ESTÁTUA DE PODERES INCRÍVEIS",
+    "legenda": "Mosca de Ébano",
+    "box": [
+     596,
+     438,
+     780,
+     570
+    ],
+    "obs": "estatueta (variante)"
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p183.jpeg",
+  "itens": [
+   {
+    "nome": "OLHOS DO ENCANTAMENTO",
+    "legenda": "Olhos do Encantamento",
+    "box": [
+     0,
+     0,
+     312,
+     218
+    ]
+   },
+   {
+    "nome": "GARRAFA DE FUMAÇA ETERNA",
+    "legenda": "Garrafa de Fumaça Eterna",
+    "box": [
+     660,
+     0,
+     827,
+     425
+    ],
+    "obs": "garrafa cortada na borda direita da página; legenda fica dentro do recorte"
+   },
+   {
+    "nome": "ESTÁTUA DE PODERES INCRÍVEIS",
+    "legenda": "Leões Dourados",
+    "box": [
+     108,
+     222,
+     450,
+     448
+    ],
+    "obs": "Estatueta de Poder Maravilhoso (Leões Dourados) — sem nome canônico; patas traseiras sob os Bodes de Marfim"
+   },
+   {
+    "nome": "ESTÁTUA DE PODERES INCRÍVEIS",
+    "legenda": "Bodes de Marfim",
+    "box": [
+     405,
+     5,
+     648,
+     478
+    ],
+    "obs": "Estatueta de Poder Maravilhoso (Bodes de Marfim) — sem nome canônico; inclui um pouco do leão à esquerda"
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p184.jpeg",
+  "itens": [
+   {
+    "nome": "ESPADA DO FURTO DE VIDAS",
+    "legenda": "Espada do Furto de Vidas",
+    "box": [
+     143,
+     20,
+     808,
+     155
+    ]
+   },
+   {
+    "nome": "ESPADA DECEPADORA",
+    "legenda": "Espada Decepadora",
+    "box": [
+     32,
+     176,
+     813,
+     338
+    ],
+    "obs": "não estava em associados_hoje"
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p185.jpeg",
+  "itens": [
+   {
+    "nome": "FORTALEZA INSTANTÂNEA DE DAERN",
+    "legenda": "Fortaleza Intantânea de Daern",
+    "box": [
+     12,
+     10,
+     404,
+     445
+    ],
+    "obs": "legenda impressa com erro \"Intantânea\"; lâmina da espada atravessa por trás"
+   },
+   {
+    "nome": "ESPADA DANÇARINA",
+    "legenda": "Espada Dançarina",
+    "box": [
+     320,
+     60,
+     750,
+     300
+    ],
+    "obs": "lâmina passa atrás da fortaleza; recorte mostra cabo + lâmina visível"
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p186.jpeg",
+  "itens": [
+   {
+    "nome": "SANDÁLIAS DE PATAS DE ARANHA",
+    "legenda": "Sandálias de Patas de Aranha",
+    "box": [
+     160,
+     10,
+     384,
+     170
+    ]
+   },
+   {
+    "nome": "ESCUDO DE ATRAÇÃO DE PROJÉTEIS",
+    "legenda": "Escudo de Atração de Projéteis",
+    "box": [
+     0,
+     118,
+     266,
+     532
+    ],
+    "obs": "o escudo dourado se sobrepõe à direita-baixo"
+   },
+   {
+    "nome": "ESCUDO DE PROTEÇÃO CONTRA MAGIA",
+    "legenda": "Escudo de Proteção contra Magia",
+    "box": [
+     162,
+     286,
+     390,
+     724
+    ],
+    "obs": "pega a ponta do escudo de teia"
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p187.jpeg",
+  "itens": [
+   {
+    "nome": "FLAUTA ASSOMBRADA",
+    "legenda": "Flauta Assombrada",
+    "box": [
+     0,
+     0,
+     500,
+     420
+    ]
+   },
+   {
+    "nome": "FLAUTA DOS ESGOTOS",
+    "legenda": "Flauta dos Esgotos",
+    "box": [
+     305,
+     30,
+     812,
+     478
+    ]
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p188.jpeg",
+  "itens": [
+   {
+    "nome": "INSTRUMENTO DOS BARDOS",
+    "legenda": "(os seis instrumentos)",
+    "box": [
+     0,
+     0,
+     412,
+     1102
+    ],
+    "principal": true,
+    "obs": "conjunto das variantes desenhadas"
+   },
+   {
+    "nome": "INSTRUMENTO DOS BARDOS",
+    "legenda": "Lute de Doss",
+    "box": [
+     0,
+     0,
+     272,
+     238
+    ],
+    "obs": "variante do Instrumento dos Bardos; topo cortado na borda da prancha"
+   },
+   {
+    "nome": "INSTRUMENTO DOS BARDOS",
+    "legenda": "Mandolim de Canaith",
+    "box": [
+     205,
+     0,
+     412,
+     402
+    ],
+    "obs": "variante do Instrumento dos Bardos; inclui parte do alaúde"
+   },
+   {
+    "nome": "INSTRUMENTO DOS BARDOS",
+    "legenda": "Citara de Mac-Fuirmdth",
+    "box": [
+     0,
+     118,
+     278,
+     555
+    ],
+    "obs": "variante do Instrumento dos Bardos; sobreposição com alaúde, bandolim e harpa de Ollamh"
+   },
+   {
+    "nome": "INSTRUMENTO DOS BARDOS",
+    "legenda": "Harpa de Ollamh",
+    "box": [
+     138,
+     428,
+     402,
+     792
+    ],
+    "obs": "variante do Instrumento dos Bardos; inclui borda da Harpa de Anstruth"
+   },
+   {
+    "nome": "INSTRUMENTO DOS BARDOS",
+    "legenda": "Harpa de Anstruth",
+    "box": [
+     0,
+     545,
+     218,
+     988
+    ],
+    "obs": "variante do Instrumento dos Bardos; inclui pedaço da Harpa de Ollamh"
+   },
+   {
+    "nome": "INSTRUMENTO DOS BARDOS",
+    "legenda": "Lira de Cli",
+    "box": [
+     222,
+     772,
+     412,
+     1102
+    ],
+    "obs": "variante do Instrumento dos Bardos"
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p189.jpeg",
+  "itens": [
+   {
+    "nome": "COLAR DE BOLAS DE FOGO",
+    "legenda": "Colar de Bolas de Fogo",
+    "box": [
+     36,
+     0,
+     410,
+     478
+    ],
+    "obs": "cabo da Ladra das Nove Vidas no canto superior direito"
+   },
+   {
+    "nome": "LADRA DAS NOVE VIDAS",
+    "legenda": "Ladra das Nove Vidas",
+    "box": [
+     266,
+     0,
+     827,
+     505
+    ],
+    "obs": "inclui parte do colar e das contas de oração"
+   },
+   {
+    "nome": "CORRENTE DE CONTAS DE ORAÇÃO",
+    "legenda": "Corrente de Contas de Oração",
+    "box": [
+     632,
+     0,
+     827,
+     345
+    ],
+    "obs": "inclui conta esmaecida cortada na borda direita; lâmina da espada no canto inferior esquerdo"
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p190.jpeg",
+  "itens": [
+   {
+    "nome": "AZAGAIA DE RELÂMPAGO",
+    "legenda": "Azagaia de Relâmpago",
+    "box": [
+     10,
+     0,
+     80,
+     992
+    ],
+    "obs": "ponta superior na borda da prancha"
+   },
+   {
+    "nome": "MAÇA DO ROMPIMENTO",
+    "legenda": "Maça do Rompimento",
+    "box": [
+     196,
+     8,
+     370,
+     784
+    ],
+    "obs": "pega um pedaço da cabeça da Maça da Destruição e a ponta da Lâmina"
+   },
+   {
+    "nome": "MAÇA DA DESTRUIÇÃO",
+    "legenda": "Maça da Destruição",
+    "box": [
+     60,
+     386,
+     254,
+     1080
+    ],
+    "obs": "inclui a legenda"
+   },
+   {
+    "nome": "LÂMINA DA SORTE",
+    "legenda": "Lâmina da Sorte",
+    "box": [
+     268,
+     543,
+     380,
+     1137
+    ],
+    "obs": "pega a base da Maça do Rompimento"
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p191.jpeg",
+  "itens": [
+   {
+    "nome": "LEQUE DO VENTO",
+    "legenda": "Leque de Vento",
+    "box": [
+     280,
+     25,
+     827,
+     491
+    ]
+   },
+   {
+    "nome": "ARMA DE ALERTA",
+    "legenda": "Tridente de Alerta",
+    "box": [
+     0,
+     200,
+     472,
+     491
+    ],
+    "obs": "sem nome canônico exato (candidatos: ARMA DE ALERTA ou TRIDENTE DE COMANDAR PEIXES); inclui um pedaço do leque"
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p192.jpeg",
+  "itens": [
+   {
+    "nome": "LÍNGUA FLAMEJANTE",
+    "legenda": "Língua Flamejante",
+    "box": [
+     0,
+     0,
+     612,
+     470
+    ],
+    "obs": "inclui borda da manopla esquerda"
+   },
+   {
+    "nome": "MANOPLAS DE FORÇA DO OGRO",
+    "legenda": "Manoplas de Força do Ogro",
+    "box": [
+     462,
+     0,
+     836,
+     332
+    ],
+    "obs": "desenho continua além da borda direita da prancha"
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p193.jpeg",
+  "itens": [
+   {
+    "nome": "MANTO DE RESISTÊNCIA À MAGIA",
+    "legenda": "Manto de Resistência à Magia",
+    "box": [
+     16,
+     0,
+     406,
+     382
+    ]
+   },
+   {
+    "nome": "MANUAL DOS GOLENS",
+    "legenda": "Manual do Golem de Pedra",
+    "box": [
+     0,
+     332,
+     334,
+     674
+    ],
+    "obs": "variante do Manual dos Golens (golem de pedra)"
+   },
+   {
+    "nome": "MANUAL DOS GOLENS",
+    "legenda": "Manual do Golem de Barro",
+    "box": [
+     140,
+     576,
+     394,
+     842
+    ],
+    "obs": "variante do Manual dos Golens (golem de barro)"
+   },
+   {
+    "nome": "MAÇA DO TERROR",
+    "legenda": "Maça do Terror",
+    "box": [
+     18,
+     710,
+     294,
+     1090
+    ],
+    "obs": "cabo cortado pela borda inferior da prancha"
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p194.jpeg",
+  "itens": [
+   {
+    "nome": "MANTO DE DESLOCAMENTO",
+    "legenda": "Manto de Deslocamento",
+    "box": [
+     20,
+     0,
+     310,
+     456
+    ],
+    "obs": "inclui parte da legenda"
+   },
+   {
+    "nome": "MANTO ÉLFICO",
+    "legenda": "Manto Élfico",
+    "box": [
+     346,
+     0,
+     524,
+     414
+    ]
+   },
+   {
+    "nome": "MANTO DE PROTEÇÃO",
+    "legenda": "Manto de Proteção",
+    "box": [
+     606,
+     0,
+     824,
+     430
+    ],
+    "obs": "inclui parte da legenda"
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p195.jpeg",
+  "itens": [
+   {
+    "nome": "ESPELHO DO APRISIONAMENTO",
+    "legenda": "Espelho do Aprisionamento",
+    "box": [
+     82,
+     0,
+     282,
+     472
+    ]
+   },
+   {
+    "nome": "MEDALHÃO DE PENSAMENTOS",
+    "legenda": "Medalhão de Pensamentos",
+    "box": [
+     305,
+     0,
+     482,
+     478
+    ],
+    "obs": "legenda fica dentro do recorte (ao lado do crânio)"
+   },
+   {
+    "nome": "MANUAL DOS GOLENS",
+    "legenda": "Manual do Golem de Carne",
+    "box": [
+     42,
+     472,
+     475,
+     705
+    ],
+    "obs": "legenda específica do Golem de Carne -> MANUAL DOS GOLENS; borda inferior inclui topo do Manual de Rapidez"
+   },
+   {
+    "nome": "MANUAL DE RAPIDEZ DE MOVIMENTOS",
+    "legenda": "Manual de Rapidez de Movimentos",
+    "box": [
+     278,
+     650,
+     482,
+     948
+    ]
+   },
+   {
+    "nome": "MANUAL DE SAÚDE CORPORAL",
+    "legenda": "Manual de Saúde Corporal",
+    "box": [
+     70,
+     760,
+     308,
+     1062
+    ],
+    "obs": "a legenda solta \"Lanterna de Revelação\" está impressa sobre este livro (não há lanterna desenhada)"
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p196.jpeg",
+  "itens": [
+   {
+    "nome": "GEMA DA LUMINOSIDADE",
+    "legenda": "Gema de Luminosidade",
+    "box": [
+     0,
+     0,
+     222,
+     455
+    ],
+    "obs": "legenda diz \"de\", canônico \"DA\""
+   },
+   {
+    "nome": "BARCO DOBRÁVEL",
+    "legenda": "Barco Dobrável",
+    "box": [
+     232,
+     0,
+     836,
+     272
+    ],
+    "obs": "barco maior cortado na borda direita/superior da prancha"
+   },
+   {
+    "nome": "MARCA CONGELANTE",
+    "legenda": "Marca Congelante",
+    "box": [
+     362,
+     265,
+     836,
+     438
+    ],
+    "obs": "lâmina continua além da borda direita da prancha"
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p197.jpeg",
+  "itens": [
+   {
+    "nome": "PEDRA IÔNICA",
+    "legenda": "Pedras Iônicas",
+    "box": [
+     36,
+     0,
+     438,
+     438
+    ],
+    "obs": "grupo de 6 pedras; inclui parte das Faixas de Ferro"
+   },
+   {
+    "nome": "FAIXAS DE FERRO DE BILARRO",
+    "legenda": "Faixas de Ferro de Bilarro",
+    "box": [
+     206,
+     150,
+     473,
+     548
+    ],
+    "obs": "cortada pela borda direita da prancha"
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p199.jpeg",
+  "itens": [
+   {
+    "nome": "PENAS DE QUAAL",
+    "legenda": "Barco de Cisne",
+    "box": [
+     112,
+     0,
+     450,
+     294
+    ],
+    "obs": "pena de Quaal; inclui a grande pena branca que sobe do barco (sobrepõe o Leque). Recorte só do barco: [112,150,268,294]"
+   },
+   {
+    "nome": "PENAS DE QUAAL",
+    "legenda": "Leque",
+    "box": [
+     246,
+     92,
+     494,
+     400
+    ],
+    "obs": "pena de Quaal; cortado pela borda direita",
+    "principal": true
+   },
+   {
+    "nome": "PENAS DE QUAAL",
+    "legenda": "Âncora",
+    "box": [
+     102,
+     326,
+     280,
+     504
+    ],
+    "obs": "pena de Quaal"
+   },
+   {
+    "nome": "PENAS DE QUAAL",
+    "legenda": "Pássaro",
+    "box": [
+     124,
+     420,
+     320,
+     670
+    ],
+    "obs": "pena de Quaal"
+   },
+   {
+    "nome": "PENAS DE QUAAL",
+    "legenda": "Árvore",
+    "box": [
+     326,
+     356,
+     494,
+     730
+    ],
+    "obs": "pena de Quaal; cortada pela borda direita"
+   },
+   {
+    "nome": "PENAS DE QUAAL",
+    "legenda": "Chicote",
+    "box": [
+     326,
+     724,
+     494,
+     1030
+    ],
+    "obs": "pena de Quaal; inclui a legenda"
+   },
+   {
+    "nome": "ALJAVA DE EHLONNA",
+    "legenda": "Aljava de Ehlonna",
+    "box": [
+     36,
+     670,
+     350,
+     1084
+    ],
+    "obs": "cortada pela borda inferior (original); inclui a legenda"
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p200.jpeg",
+  "itens": [
+   {
+    "nome": "PERIAPTO DE CICATRIZAÇÃO",
+    "legenda": "Periapto de Cicatrização",
+    "box": [
+     175,
+     0,
+     495,
+     428
+    ],
+    "obs": "inclui a corrente inteira; pedaço da legenda à esquerda"
+   },
+   {
+    "nome": "PERIAPTO DE SAÚDE",
+    "legenda": "Periaptode Saúde",
+    "box": [
+     480,
+     0,
+     645,
+     458
+    ]
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p201.jpeg",
+  "itens": [
+   {
+    "nome": "GEMA DE VISÃO",
+    "legenda": "Gema da Visão",
+    "box": [
+     16,
+     3,
+     200,
+     386
+    ],
+    "obs": "legenda diz \"da\", canônico \"DE\"; pega parte da lâmina do Matador de Gigantes"
+   },
+   {
+    "nome": "MATADOR DE GIGANTES",
+    "legenda": "Matador de Gigantes",
+    "box": [
+     138,
+     92,
+     388,
+     532
+    ],
+    "obs": "pega topo das luvas embaixo"
+   },
+   {
+    "nome": "LUVAS DE APANHAR PROJÉTEIS",
+    "legenda": "Luvas de Apanhar Projéteis",
+    "box": [
+     0,
+     428,
+     362,
+     808
+    ],
+    "obs": "cabo do Matador de Gigantes passa por trás"
+   },
+   {
+    "nome": "ÓCULOS NOTURNOS",
+    "legenda": "Óculos Noturnos",
+    "box": [
+     48,
+     788,
+     408,
+     1055
+    ]
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p202.jpeg",
+  "itens": [
+   {
+    "nome": "GLOBO DE FLUXO",
+    "legenda": "Globo de Fluxo",
+    "box": [
+     0,
+     0,
+     190,
+     190
+    ],
+    "obs": "esfera azul cortada pelas bordas superior/esquerda da prancha"
+   },
+   {
+    "nome": "PÓ DO DESAPARECIMENTO",
+    "legenda": "Pó do Desaparecimento",
+    "box": [
+     150,
+     16,
+     374,
+     374
+    ],
+    "obs": "frasco em forma de fada"
+   },
+   {
+    "nome": "GEMA ELEMENTAL",
+    "legenda": "Gemas Elementais",
+    "box": [
+     320,
+     50,
+     590,
+     508
+    ],
+    "obs": "grupo de 4 gemas"
+   },
+   {
+    "nome": "MALHA DO EFREETI",
+    "legenda": "Malha do Efreeti",
+    "box": [
+     560,
+     0,
+     827,
+     528
+    ]
+   },
+   {
+    "nome": "PÓ DE ESPIRRAR E TOSSIR",
+    "legenda": "Pó de Espirrar e Tossir",
+    "box": [
+     0,
+     178,
+     194,
+     518
+    ],
+    "obs": "recipiente em forma de rosto + nariz com pó vermelho"
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p204.jpeg",
+  "itens": [
+   {
+    "nome": "ROBE DOS OLHOS",
+    "legenda": "Robe dos Olhos",
+    "box": [
+     176,
+     0,
+     394,
+     564
+    ]
+   },
+   {
+    "nome": "ROBE DAS ESTRELAS",
+    "legenda": "Robe das Estrelas",
+    "box": [
+     50,
+     436,
+     310,
+     1020
+    ],
+    "obs": "canto superior direito pega a barra do Robe dos Olhos"
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p205.jpeg",
+  "itens": [
+   {
+    "nome": "BASTÃO DE ABSORÇÃO",
+    "legenda": "Bastão de Absorção",
+    "box": [
+     180,
+     0,
+     428,
+     508
+    ]
+   },
+   {
+    "nome": "ROBE DO ARQUIMAGO",
+    "legenda": "Robe do Arquimago",
+    "box": [
+     22,
+     82,
+     255,
+     612
+    ]
+   },
+   {
+    "nome": "ROBE DOS ITENS ÚTEIS",
+    "legenda": "Robe dos Itens Úteis",
+    "box": [
+     148,
+     555,
+     448,
+     1085
+    ]
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p206.jpeg",
+  "itens": [
+   {
+    "nome": "ARREMESSADOR ANÃO",
+    "legenda": "Arremessador Anão",
+    "box": [
+     198,
+     28,
+     592,
+     302
+    ],
+    "obs": "pega braço da Armadura Anã e ponta da Matadora de Dragões"
+   },
+   {
+    "nome": "ARMADURA ANÃ",
+    "legenda": "Armadura Anã",
+    "box": [
+     482,
+     0,
+     827,
+     488
+    ],
+    "obs": "pega fim do cabo do martelo"
+   },
+   {
+    "nome": "MATADORA DE DRAGÕES",
+    "legenda": "Matadora de Dragões",
+    "box": [
+     0,
+     62,
+     522,
+     452
+    ],
+    "obs": "espada atravessa a Garrafa do Efreeti e o martelo; difícil isolar"
+   },
+   {
+    "nome": "GARRAFA DO EFREETI",
+    "legenda": "Garrafa do Efreeti",
+    "box": [
+     28,
+     0,
+     226,
+     462
+    ],
+    "obs": "lâmina da Matadora de Dragões passa na frente"
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p208.jpeg",
+  "itens": [
+   {
+    "nome": "TALISMÃ DA ESFERA",
+    "legenda": "Talismã da Esfera",
+    "box": [
+     0,
+     10,
+     470,
+     364
+    ]
+   },
+   {
+    "nome": "TALISMÃ DO MAL ABSOLUTO",
+    "legenda": "Talismã do Mal Absoluto",
+    "box": [
+     512,
+     0,
+     827,
+     425
+    ]
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p209.jpeg",
+  "itens": [
+   {
+    "nome": "ARMA VICIOSA",
+    "legenda": "Arma Viciosa",
+    "box": [
+     190,
+     0,
+     394,
+     274
+    ],
+    "obs": "lâmina sai pela borda superior (original)"
+   },
+   {
+    "nome": "BASTÃO DO TENTÁCULO",
+    "legenda": "Bastão do Tentáculo",
+    "box": [
+     34,
+     0,
+     420,
+     644
+    ],
+    "obs": "diagonal: pega a Arma Viciosa, o Tomo de Liderança e o topo do Tomo da Compreensão"
+   },
+   {
+    "nome": "TOMO DE LIDERANÇA E INFLUÊNCIA",
+    "legenda": "Tomo de Liderança e Influência",
+    "box": [
+     6,
+     391,
+     240,
+     654
+    ]
+   },
+   {
+    "nome": "TOMO DA COMPREENSÃO",
+    "legenda": "Tomo da Compreensão",
+    "box": [
+     81,
+     556,
+     430,
+     884
+    ],
+    "obs": "pega cantos dos outros dois tomos"
+   },
+   {
+    "nome": "TOMO DOS GRANDES PENSAMENTOS",
+    "legenda": "Tomo dos Grandes Pensamentos",
+    "box": [
+     11,
+     741,
+     264,
+     1064
+    ]
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p210.jpeg",
+  "itens": [
+   {
+    "nome": "VINGADORA SAGRADA",
+    "legenda": "Vingadora Sagrada",
+    "box": [
+     0,
+     0,
+     312,
+     268
+    ]
+   },
+   {
+    "nome": "TROMBETA DA DESTRUIÇÃO",
+    "legenda": "Trombeta da Destruição",
+    "box": [
+     40,
+     0,
+     495,
+     445
+    ],
+    "obs": "é a trombeta em forma de cabeça de leão; sobrepõe Vingadora Sagrada e Bastão Imóvel"
+   },
+   {
+    "nome": "BASTÃO IMÓVEL",
+    "legenda": "Bastão Imóvel",
+    "box": [
+     298,
+     0,
+     762,
+     438
+    ],
+    "obs": "sobrepõe a Trombeta da Destruição e a boca da Trombeta do Valhalla"
+   },
+   {
+    "nome": "TROMBETA DO VALHALLA",
+    "legenda": "Trombeta do Valhalla",
+    "box": [
+     500,
+     190,
+     800,
+     455
+    ]
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p211.jpeg",
+  "itens": [
+   {
+    "nome": "FRASCO DE FERRO",
+    "legenda": "Frasco de Ferro",
+    "box": [
+     108,
+     0,
+     388,
+     318
+    ]
+   },
+   {
+    "nome": "UNGUENTO DE KEOGHTOM",
+    "legenda": "Unguento de Keoghtom",
+    "box": [
+     3,
+     328,
+     348,
+     642
+    ]
+   },
+   {
+    "nome": "LANTERNA DE REVELAÇÃO",
+    "legenda": "Lanterna de Revelação",
+    "box": [
+     112,
+     618,
+     388,
+     1102
+    ],
+    "obs": "não estava em associados_hoje; desenho encosta na borda direita"
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p212.jpeg",
+  "itens": [
+   {
+    "nome": "ESPADA VORPAL",
+    "legenda": "Espada Vorpal",
+    "box": [
+     102,
+     0,
+     390,
+     426
+    ],
+    "obs": "não estava em associados_hoje; ponta da lâmina cortada pela borda superior"
+   },
+   {
+    "nome": "TRIDENTE DE COMANDAR PEIXES",
+    "legenda": "Tridente de Comandar Peixes",
+    "box": [
+     68,
+     80,
+     498,
+     800
+    ],
+    "obs": "haste diagonal: inclui a Espada Vorpal quase inteira"
+   },
+   {
+    "nome": "SOLVENTE UNIVERSAL",
+    "legenda": "Solvente Universal",
+    "box": [
+     318,
+     660,
+     422,
+     1034
+    ]
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p213.jpeg",
+  "itens": [
+   {
+    "nome": "VARINHA DE RELÂMPAGOS",
+    "legenda": "Varinha de Relâmpagos",
+    "box": [
+     16,
+     10,
+     432,
+     264
+    ],
+    "obs": "diagonal, sai pela borda direita; pega a ponta da Varinha de Detectar Magia"
+   },
+   {
+    "nome": "VARINHA DE DETECTAR MAGIA",
+    "legenda": "Varinha de Detectar Magia",
+    "box": [
+     48,
+     194,
+     432,
+     430
+    ],
+    "obs": "diagonal; pega pontas das varinhas vizinhas"
+   },
+   {
+    "nome": "VARINHA DE MÍSSEIS MÁGICOS",
+    "legenda": "Varinha de Mísseis Mágicos",
+    "box": [
+     26,
+     381,
+     432,
+     624
+    ],
+    "obs": "diagonal; pega pontas das varinhas vizinhas"
+   },
+   {
+    "nome": "VARINHA DE PARALISIA",
+    "legenda": "Varinha de Paralisia",
+    "box": [
+     21,
+     556,
+     432,
+     834
+    ],
+    "obs": "diagonal; pega pontas das varinhas vizinhas"
+   },
+   {
+    "nome": "VARINHA DE SEGREDOS",
+    "legenda": "Varinha dos Segredos",
+    "box": [
+     21,
+     741,
+     432,
+     1050
+    ],
+    "obs": "legenda \"dos Segredos\"; inclui as duas esferas; pega a ponta da Varinha de Paralisia"
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p214.jpeg",
+  "itens": [
+   {
+    "nome": "VARINHA DE TEIA",
+    "legenda": "Varinha de Teia",
+    "box": [
+     0,
+     28,
+     604,
+     366
+    ]
+   },
+   {
+    "nome": "VARINHA DAS MARAVILHAS",
+    "legenda": "Varinha das Maravilhas",
+    "box": [
+     100,
+     90,
+     820,
+     538
+    ]
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p223.jpeg",
+  "itens": [
+   {
+    "nome": "ESPADA DE KAS",
+    "legenda": "Espada de Kas",
+    "box": [
+     92,
+     36,
+     827,
+     278
+    ],
+    "obs": "lâmina continua além da borda direita da prancha"
+   },
+   {
+    "nome": "CETRO DE ORCUS",
+    "legenda": "Cetro de Orcus",
+    "box": [
+     0,
+     312,
+     762,
+     558
+    ]
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p224.jpeg",
+  "itens": [
+   {
+    "nome": "LIVRO DA ESCURIDÃO PERVERSA",
+    "legenda": "Livro da Escuridão Perversa",
+    "box": [
+     38,
+     0,
+     482,
+     416
+    ]
+   },
+   {
+    "nome": "LIVRO DOS GRANDES FEITOS",
+    "legenda": "Livro dos Grandes Feitos",
+    "box": [
+     22,
+     380,
+     482,
+     928
+    ]
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p226.jpeg",
+  "itens": [
+   {
+    "nome": "MACHADO DOS LORDES ANÕES",
+    "legenda": "Machado dos Lordes Anões",
+    "box": [
+     28,
+     62,
+     474,
+     690
+    ],
+    "obs": "ocupa a prancha toda; inclui a legenda; sai pelas bordas direita/inferior"
+   }
+  ]
+ },
+ {
+  "prancha": "dmg_p227.jpeg",
+  "itens": [
+   {
+    "nome": "ORBE DOS DRAGÕES",
+    "legenda": "Orbe dos Dragões",
+    "box": [
+     0,
+     0,
+     442,
+     446
+    ]
+   },
+   {
+    "nome": "OLHO E MÃO DE VECNA",
+    "legenda": "Mão e Olho de Vecna",
+    "box": [
+     432,
+     0,
+     820,
+     460
+    ],
+    "obs": "olho + mão juntos; legenda entre eles fica dentro do recorte"
+   }
+  ]
+ }
+]

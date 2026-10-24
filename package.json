@@ -20,7 +20,8 @@
     "auditoria-mobile": "node scripts/auditoria_mobile.js",
     "auditoria-mobile-logado": "node scripts/auditoria_mobile.js --logado",
     "reprocessar-monstros": "node scripts/reprocessar_monstros.js --aplicar",
-    "versionar": "node scripts/versionar_assets.js"
+    "versionar": "node scripts/versionar_assets.js",
+    "recortar-itens": "node scripts/recortar_itens.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.45.0",

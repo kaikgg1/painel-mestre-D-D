@@ -224,10 +224,14 @@ function montar(item) {
   return texto.replace(/[ \t]+/g, ' ').trim();
 }
 
-// Imagens: associação manual feita sobre as pranchas do livro (commit cb06d0e).
-// Preservada por nome — itens novos ficam sem imagem até alguém conferir a prancha.
+// Imagens: geradas por scripts/recortar_itens.js (recorte + prancha inteira).
+// Preservadas por nome; depois de mudar o mapa de recortes, rode npm run recortar-itens.
 const imagens = {};
-try { for (const it of JSON.parse(fs.readFileSync(OUT, 'utf8'))) if (it.imagem) imagens[NOME_FIX[it.nome] || it.nome] = it.imagem; } catch {}
+try {
+  for (const it of JSON.parse(fs.readFileSync(OUT, 'utf8'))) {
+    if (it.imagem) imagens[NOME_FIX[it.nome] || it.nome] = { imagem: it.imagem, prancha: it.prancha };
+  }
+} catch {}
 
 const vistos = new Set();
 const saida = [];
@@ -246,7 +250,8 @@ for (const it of itens) {
     linha_tipo: tipoLinha.replace(/muito ara\b/, 'muito rara'),   // como está no livro (subtítulo da ficha)
     descricao,
   };
-  if (imagens[it.nome]) obj.imagem = imagens[it.nome];
+  const img = imagens[it.nome];
+  if (img) { obj.imagem = img.imagem; if (img.prancha) obj.prancha = img.prancha; }
   saida.push(obj);
 }
 

@@ -65,6 +65,12 @@ window.DetalhesCatalogo = (function () {
   .dc-desc p { margin: 0 0 10px; }
   .dc-desc p:last-child { margin-bottom: 0; }
   .dc-desc em { font-style: italic; }
+  .dc-fig { float: right; width: clamp(110px, 32%, 190px); margin: 2px 0 10px 14px; padding: 8px; box-sizing: border-box;
+    background: #efe6d2; border: 1px solid var(--border, #6f5a2a); border-radius: 6px;
+    display: flex; align-items: center; justify-content: center; }
+  .dc-fig img { display: block; max-width: 100%; max-height: 200px; object-fit: contain; }
+  .dc-fig-zoom { cursor: zoom-in; }
+  @media (max-width: 480px) { .dc-fig { float: none; width: 100%; margin: 0 0 12px; } .dc-fig img { max-height: 180px; } }
   .dc-dsub { font-family: 'Cinzel', serif; font-size: 13px; color: var(--gold, #c49a3a); font-variant: small-caps; margin: 14px 0 6px; }
   .dc-dtab { margin: 0 0 10px; font-size: 14px; line-height: 1.45; border: 1px solid var(--border-soft, #3d3420); border-radius: 4px; }
   .dc-dtab > div { padding: 3px 8px; }
@@ -141,6 +147,16 @@ window.DetalhesCatalogo = (function () {
     const t = String(texto || '').trim();
     if (!t) return '<p class="dc-vazio">Sem descrição no catálogo.</p>';
     return t.split(/\n\n+/).map(p => `<p>${destacar(esc(p.trim()))}</p>`).join('');
+  }
+
+  // Ilustração do item mágico (recorte da prancha do livro — scripts/recortar_itens.js).
+  // O clique abre a prancha inteira no Lightbox, quando a página o carrega.
+  function figuraItem(it, nome) {
+    if (!it || !it.imagem) return '';
+    const zoom = it.prancha && window.Lightbox
+      ? ` data-lb="${esc(it.prancha)}" data-lb-nome="${esc(nome)} — prancha do Guia do Mestre" title="Ver a prancha do livro"` : '';
+    return `<figure class="dc-fig${zoom ? ' dc-fig-zoom' : ''}"${zoom}>`
+      + `<img src="${esc(it.imagem)}" alt="Ilustração: ${esc(nome)}" loading="lazy" onerror="this.closest('.dc-fig').remove()"></figure>`;
   }
 
   // Itens mágicos (data/itens_data.json): além dos parágrafos, o parser marca
@@ -373,7 +389,7 @@ window.DetalhesCatalogo = (function () {
       <h3 class="dc-titulo">${esc(nome)}</h3>
       <div class="dc-badges">${badges}</div>
       ${props}
-      <div class="dc-desc">${desc}</div>
+      <div class="dc-desc">${figuraItem(magico, nome)}${desc}</div>
       ${magico?.sintonia_detalhe ? `<div class="dc-extra"><strong>Sintonia.</strong> ${esc(magico.sintonia_detalhe)}</div>` : ''}
     `);
   }
