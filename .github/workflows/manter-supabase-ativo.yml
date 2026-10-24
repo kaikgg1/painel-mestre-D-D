@@ -1,14 +1,22 @@
-# Mantém o projeto Supabase (plano free) acordado.
+# Mantém o projeto Supabase (plano free) no ar — e religa sozinho se ele pausar.
 #
-# O Supabase pausa projetos gratuitos depois de alguns dias sem uso do banco —
-# quando isso acontece o domínio some (NXDOMAIN) e o painel fica em branco.
+# O plano free pausa o projeto depois de ~7 dias sem "atividade", e quando isso
+# acontece o domínio some (NXDOMAIN) e o painel fica em branco.
 #
-# Histórico: a versão antiga fazia só um SELECT via REST a cada 3 dias e o
-# projeto foi pausado mesmo assim (out/2026). Agora o job chama a RPC
-# public.ping() (sql/036_heartbeat.sql), que faz uma ESCRITA real no Postgres,
-# e roda todo dia — se o cron do GitHub pular algumas execuções, ainda sobra
-# margem até o limite de ~7 dias. Roda nos servidores do GitHub, com o PC
-# desligado.
+# Histórico (out/2026): o ping não evita a pausa. Nem SELECT via REST (a cada
+# 3 dias) nem escrita real via RPC public.ping() (diária, sql/036_heartbeat.sql)
+# impediram: o projeto pausou menos de 1 dia depois de uma escrita bem-sucedida.
+# O Supabase não conta chamadas de API como atividade nesse critério.
+#
+# Por isso o job tem duas etapas:
+#   1. Ping (RPC ping()). Se responder 200, acabou.
+#   2. Se não responder: consulta a Management API; se o projeto estiver
+#      pausado (INACTIVE), manda restaurar e espera ele voltar. Fica fora do ar
+#      no máximo até a próxima execução (roda 2x por dia) + o tempo da restauração.
+#
+# Precisa do secret SUPABASE_ACCESS_TOKEN (Personal Access Token da conta, em
+# supabase.com/dashboard/account/tokens → GitHub: Settings → Secrets and
+# variables → Actions). Sem ele, só o ping roda e o job falha quando pausar.
 #
 # A anon key é pública por design (já está em assets/js/supabase.js) e só
 # consegue executar ping(); a tabela heartbeat tem RLS sem policies.
@@ -18,7 +26,7 @@ name: Manter Supabase ativo
 
 on:
   schedule:
-    - cron: '17 9 * * *'   # todo dia, 09:17 UTC
+    - cron: '17 9,21 * * *'   # 09:17 e 21:17 UTC (06:17 e 18:17 em Brasília)
   workflow_dispatch:
 
 jobs:
@@ -26,19 +34,75 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Grava heartbeat no banco
+        id: ping
         env:
           SB_URL: https://ehbngkmxwsjxuetjnztz.supabase.co
           SB_ANON: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVoYm5na214d3NqeHVldGpuenR6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk1NTk2MDQsImV4cCI6MjA5NTEzNTYwNH0.nKUMwOOzlzZnaWDU7h450D-7yySVJd1kGdYXWSz36l0
         run: |
-          # Tenta algumas vezes antes de falhar (rede instável do runner).
+          # Tenta algumas vezes antes de desistir (rede instável do runner).
           for i in 1 2 3; do
             code=$(curl -s -o resp.txt -w '%{http_code}' -m 30 -X POST \
               "$SB_URL/rest/v1/rpc/ping" \
               -H "apikey: $SB_ANON" -H "Authorization: Bearer $SB_ANON" \
               -H "Content-Type: application/json" -d '{}')
             echo "tentativa $i → HTTP $code"; cat resp.txt; echo
-            if [ "$code" = "200" ]; then exit 0; fi
+            if [ "$code" = "200" ]; then echo "ok=true" >> "$GITHUB_OUTPUT"; exit 0; fi
             sleep 20
           done
-          echo "::error::Supabase não respondeu — o projeto pode estar pausado. Restaure em supabase.com/dashboard."
+          echo "ok=false" >> "$GITHUB_OUTPUT"
+          echo "::warning::Supabase não respondeu ao ping — verificando se o projeto está pausado."
+
+      - name: Religa o projeto se estiver pausado
+        if: steps.ping.outputs.ok != 'true'
+        env:
+          REF: ehbngkmxwsjxuetjnztz
+          TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo "::error::Supabase fora do ar e o secret SUPABASE_ACCESS_TOKEN não existe, então não dá pra religar sozinho. Restaure em supabase.com/dashboard."
+            exit 1
+          fi
+          API="https://api.supabase.com/v1/projects/$REF"
+          status() {
+            curl -s -m 30 "$API" -H "Authorization: Bearer $TOKEN" | jq -r '.status // "ERRO"'
+          }
+
+          st=$(status)
+          echo "status atual do projeto: $st"
+
+          case "$st" in
+            INACTIVE)
+              echo "Projeto pausado — pedindo restauração."
+              code=$(curl -s -o resp.txt -w '%{http_code}' -m 60 -X POST "$API/restore" \
+                -H "Authorization: Bearer $TOKEN")
+              echo "POST /restore → HTTP $code"; cat resp.txt; echo
+              case "$code" in 200|201|202) ;; *)
+                echo "::error::A API recusou a restauração (HTTP $code). Restaure em supabase.com/dashboard."
+                exit 1;;
+              esac;;
+            COMING_UP|RESTORING|RESTARTING|UPGRADING)
+              echo "Projeto já está subindo — só aguardando.";;
+            ACTIVE_HEALTHY)
+              echo "::error::A API diz ACTIVE_HEALTHY mas o ping falhou. Pode ser incidente do Supabase."
+              exit 1;;
+            *)
+              echo "::error::Status inesperado: $st. Veja supabase.com/dashboard."
+              exit 1;;
+          esac
+
+          # Espera até ~25 min o projeto voltar a ficar saudável.
+          for i in $(seq 1 50); do
+            sleep 30
+            st=$(status)
+            echo "[$i/50] status: $st"
+            if [ "$st" = "ACTIVE_HEALTHY" ]; then
+              echo "::warning::O projeto estava pausado e foi religado automaticamente."
+              exit 0
+            fi
+            case "$st" in RESTORE_FAILED|INIT_FAILED|PAUSE_FAILED)
+              echo "::error::A restauração falhou ($st). Abra um ticket no suporte do Supabase."
+              exit 1;;
+            esac
+          done
+          echo "::error::O projeto não voltou em 25 minutos (último status: $st). Veja supabase.com/dashboard."
           exit 1
