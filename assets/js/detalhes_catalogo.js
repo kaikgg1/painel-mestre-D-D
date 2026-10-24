@@ -64,6 +64,12 @@ window.DetalhesCatalogo = (function () {
   }
   .dc-desc p { margin: 0 0 10px; }
   .dc-desc p:last-child { margin-bottom: 0; }
+  .dc-desc em { font-style: italic; }
+  .dc-dsub { font-family: 'Cinzel', serif; font-size: 13px; color: var(--gold, #c49a3a); font-variant: small-caps; margin: 14px 0 6px; }
+  .dc-dtab { margin: 0 0 10px; font-size: 14px; line-height: 1.45; border: 1px solid var(--border-soft, #3d3420); border-radius: 4px; }
+  .dc-dtab > div { padding: 3px 8px; }
+  .dc-dtab > div:first-child { font-weight: 700; color: var(--gold-light, #dfc57a); }
+  .dc-dtab > div:nth-child(2n+3) { background: rgba(255,255,255,.035); }
   /* Números que decidem a jogada: dados, CD, alcance */
   .dc-hl { color: var(--gold-light, #dfc57a); font-weight: 700; }
   .dc-extra {
@@ -135,6 +141,22 @@ window.DetalhesCatalogo = (function () {
     const t = String(texto || '').trim();
     if (!t) return '<p class="dc-vazio">Sem descrição no catálogo.</p>';
     return t.split(/\n\n+/).map(p => `<p>${destacar(esc(p.trim()))}</p>`).join('');
+  }
+
+  // Itens mágicos (data/itens_data.json): além dos parágrafos, o parser marca
+  // subtítulos/aberturas com **negrito**, magias com *itálico* e linhas de
+  // tabela com "\n" (ver scripts/parse_itens.js).
+  function paragrafosItem(texto) {
+    const t = String(texto || '').trim();
+    if (!t) return '<p class="dc-vazio">Sem descrição no catálogo.</p>';
+    const inline = s => destacar(esc(s))
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.+?)\*/g, '<em>$1</em>');
+    return t.split(/\n\n+/).map(p => {
+      if (/^\*\*[^*]+\*\*$/.test(p)) return `<h4 class="dc-dsub">${esc(p.slice(2, -2))}</h4>`;
+      if (p.includes('\n')) return `<div class="dc-dtab">${p.split('\n').map(l => `<div>${inline(l)}</div>`).join('')}</div>`;
+      return `<p>${inline(p)}</p>`;
+    }).join('');
   }
 
   function badge(txt, classe) {
@@ -342,7 +364,7 @@ window.DetalhesCatalogo = (function () {
     ]);
 
     const desc = magico?.descricao
-      ? paragrafos(magico.descricao)
+      ? paragrafosItem(magico.descricao)
       : `<p class="dc-vazio">${phb
           ? 'Equipamento comum do Livro do Jogador — sem descrição de regra além das propriedades acima.'
           : 'Item fora do catálogo (adicionado à mão), sem descrição cadastrada.'}</p>`;

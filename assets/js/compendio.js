@@ -159,6 +159,21 @@
   .cp-bloco { margin: 6px 0; font-size: 14px; line-height: 1.55; }
   .cp-bloco b { color: #d4a843; }
   .cp-desc { font-size: 15px; line-height: 1.65; white-space: pre-wrap; }
+  /* Itens: diagramação próxima à do Guia do Mestre — título com fio dourado,
+     subtítulo em itálico, parágrafos com recuo, subtítulos e tabelas. */
+  .cp-ficha-item h3 { border-bottom: 1px solid rgba(184,138,44,.55); padding-bottom: 4px; margin-bottom: 4px; }
+  .cp-ficha-item .cp-sub { margin-bottom: 14px; }
+  .cp-ficha-item .cp-sub .cp-tag { font-style: normal; vertical-align: 2px; }
+  .cp-desc-item { white-space: normal; }
+  .cp-desc-item p { margin: 0; }
+  .cp-desc-item p + p { text-indent: 1.4em; }
+  .cp-desc-item strong { color: #e0c27a; font-style: italic; }
+  .cp-desc-item em { font-style: italic; }
+  .cp-dsub { font-family: 'Cinzel',serif; color: #b88a2c; font-size: 14px; font-variant: small-caps; letter-spacing: .5px; margin: 16px 0 6px; border-bottom: 1px solid rgba(139,105,20,.35); padding-bottom: 2px; }
+  .cp-dtab { margin: 6px 0 12px; font-size: 14px; line-height: 1.45; border: 1px solid rgba(139,105,20,.3); border-radius: 6px; overflow: hidden; }
+  .cp-dtab > div { padding: 4px 10px; }
+  .cp-dtab > div:first-child { font-weight: 700; color: #d4a843; background: rgba(139,105,20,.18); }
+  .cp-dtab > div:nth-child(2n+3) { background: rgba(255,255,255,.035); }
   @media (max-width: 600px) { .cp-modal { max-height: 96vh; } .cp-ficha .cp-img { float: none; width: 100%; max-width: 100%; margin: 0 0 12px; } }
 
   /* --- Responsivo (mobile) --------------------------------------------
@@ -338,13 +353,30 @@
     corpo.scrollTop = 0;
   }
 
+  // Descrição dos itens (scripts/parse_itens.js): parágrafos separados por
+  // linha em branco, linhas de tabela por "\n", **negrito** e *itálico*.
+  function inlineDesc(s) {
+    return esc(s).replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*(.+?)\*/g, '<em>$1</em>');
+  }
+  function descHTML(texto) {
+    return String(texto || '').split(/\n{2,}/).map(p => {
+      if (/^\*\*[^*]+\*\*$/.test(p)) return `<h4 class="cp-dsub">${esc(p.slice(2, -2))}</h4>`;
+      if (p.includes('\n')) return `<div class="cp-dtab">${p.split('\n').map(l => `<div>${inlineDesc(l)}</div>`).join('')}</div>`;
+      return `<p>${inlineDesc(p)}</p>`;
+    }).join('');
+  }
+
   function fichaItem(it) {
     const cor = CORES_RAR[it.raridade] || '#a89878';
-    return `<div class="cp-ficha">
+    // Subtítulo como no livro; JSON antigo sem linha_tipo cai no formato montado.
+    const sub = it.linha_tipo
+      ? esc(it.linha_tipo)
+      : `${esc(it.tipo)}, ${esc(it.raridade)}${it.sintonia ? ` (requer sintonização${it.sintonia_detalhe ? ' ' + esc(it.sintonia_detalhe) : ''})` : ''}`;
+    return `<div class="cp-ficha cp-ficha-item">
       ${it.imagem ? `<img class="cp-img" src="${esc(it.imagem)}" alt="" onerror="this.style.display='none'">` : ''}
       <h3>${esc(titulo(it.nome))}</h3>
-      <div class="cp-sub">${esc(it.tipo)}, <b style="color:${cor}">${esc(it.raridade)}</b>${it.sintonia ? ` · requer sintonização${it.sintonia_detalhe ? ' ' + esc(it.sintonia_detalhe) : ''}` : ''}</div>
-      <div class="cp-desc">${esc(it.descricao)}</div></div>`;
+      <div class="cp-sub">${sub}<span class="cp-tag" style="background:${cor}22;color:${cor};border:1px solid ${cor}66">${esc(it.raridade)}</span></div>
+      <div class="cp-desc cp-desc-item">${descHTML(it.descricao)}</div></div>`;
   }
   function fichaMonstro(m) {
     const a = m.atributos || {};
